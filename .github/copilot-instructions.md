@@ -1,0 +1,43 @@
+# Project Overview
+
+Conduit is a social blogging site (i.e. a Medium.com clone). It uses a custom API for all requests, including authentication.
+
+General functionality:
+
+| Endpoint | Description | Returns | Auth                    |
+|:---------|:------------|:-------|:------------------------|
+| POST /api/users/login | Authenticates a user | User and JWT token | Allow Anonymous         |
+| POST /api/users | Registers a new user | User and JWT token | Allow Anonymous         |
+| GET /api/user | Returns the currently logged in user | User | Authentication Required |
+| PUT /api/user | Update user | User | Authentication Required |
+| GET /api/profiles/:username | Returns a profile | Profile | Authentication Optional |
+| POST /api/profiles/:username/follow | Follow a user | Profile | Authentication Required |
+| DELETE /api/profiles/:username/follow | Unfollow a user | Profile | Authentication Required |
+| GET /api/articles | Returns most recent articles globally | Multiple Articles, Articles Count | Authentication Optional |
+| GET /api/articles/feed | Returns most recent articles from followed users | Multiple Articles, Articles Count | Authentication Required |
+| GET /api/articles/:slug | Returns an article | Article | Authentication Optional |
+| POST /api/articles | Create an article | Article | Authentication Required |
+| PUT /api/articles/:slug | Update an article | Article | Authentication Required |
+| DELETE /api/articles/:slug | Delete an article | None | Authentication Required |
+| POST /api/articles/:slug/comments | Add a comment to an article | Comment | Authentication Required |
+| GET /api/articles/:slug/comments | Get comments for an article | Multiple Comments | Authentication Optional |
+| DELETE /api/articles/:slug/comments/:id | Delete a comment | None | Authentication Required |
+| POST /api/articles/:slug/favorite | Favorite an article | Article | Authentication Required |
+| DELETE /api/articles/:slug/favorite | Unfavorite an article | Article | Authentication Required |
+| GET /api/tags | Get all tags | Multiple Tags | Allow Anonymous         |
+
+## Folder Structure
+
+- `/App`: Contains the source code for the application.
+- `/App/Client`: Contains the source code for the React-Vite-Typescript frontend.
+- `/App/Server`: Contains the source code for the .NET backend using the Ardalis Clean Architecture Template (without Aspire).
+
+## Frontend Libraries and Frameworks
+- React-Vite-Typescript
+- Carbon Design System
+
+## Backend Libraries and Frameworks
+- .NET 9
+- Ardalis Clean Architecture Template (without Aspire)
+- Entity Framework Core with Sqlite Database
+- Serilog for logging
