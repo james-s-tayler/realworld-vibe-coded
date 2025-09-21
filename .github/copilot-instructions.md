@@ -40,9 +40,14 @@ General functionality:
 ## Backend Libraries and Frameworks
 - .NET 9
 - Ardalis Clean Architecture Template (without Aspire)
+- FastEndpoints for minimal APIs
+- MediatR for CQRS pattern
+- Domain-Driven Design principles
+- FluentValidation for request validation
 - Entity Framework Core with Sqlite Database
 - SpaProxy for development
 - Serilog for logging
+- xUnit for testing
 
 ## Infrastructure as Code
 - Bicep for Azure infrastructure as code
