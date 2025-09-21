@@ -1,6 +1,6 @@
----
-applyTo: "Makefile"
----
+~~---
+applyTo: "**/[Mm]akefile"
+---~~
 
 # Config and Helpers section contents
 The Makefile should start with the following code:
