@@ -31,6 +31,7 @@ General functionality:
 - `/App`: Contains the source code for the application.
 - `/App/Client`: Contains the source code for the React-Vite-Typescript frontend.
 - `/App/Server`: Contains the source code for the .NET backend using the Ardalis Clean Architecture Template (without Aspire).
+- `/Infra`: Contains Bicep files for Azure infrastructure as code.
 
 ## Frontend Libraries and Frameworks
 - React-Vite-Typescript
@@ -40,4 +41,15 @@ General functionality:
 - .NET 9
 - Ardalis Clean Architecture Template (without Aspire)
 - Entity Framework Core with Sqlite Database
+- SpaProxy for development
 - Serilog for logging
+
+## Infrastructure as Code
+- Bicep for Azure infrastructure as code
+
+## CI/CD
+- GitHub Actions for CI/CD
+- Docker for containerization
+- Deployment to Azure App Service
+- Makefile for lint, build, test and deployment tasks
+  - The same Makefile is used for both local development and GitHub Actions CI/CD.
