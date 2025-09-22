@@ -30,6 +30,7 @@ jobs:
         with:
           global-json-file: App/Server/global.json
           cache: true
+          cache-dependency-path: "**/packages.lock.json"
 
       - name: Verify .NET version
         run: dotnet --info
@@ -53,6 +54,7 @@ jobs:
         with:
           global-json-file: App/Server/global.json
           cache: true
+          cache-dependency-path: "**/packages.lock.json"
 
       - name: Verify .NET version
         run: dotnet --info
