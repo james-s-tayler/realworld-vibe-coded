@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Cancel in-progress runs for the same ref/PR to save minutes
+concurrency:
+  group: server-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-server:
+    name: Build (Server)
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Build (server)
+        run: make build/server
+
+  test-server:
+    name: Test (Server)
+    runs-on: ubuntu-latest
+    # Run tests as an independent job so it shows up as its own status check
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Test (server)
+        run: make test/server
