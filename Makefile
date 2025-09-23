@@ -38,6 +38,10 @@ lint/server:
 	@echo "Running dotnet format (verify only) on $(SERVER_SOLUTION) ..."
 	dotnet format --verify-no-changes "${SERVER_SOLUTION}"
 
+#HELP lint makefile
+lint/make: lint/make/help/hash lint/make/help/count
+	@echo "Makefile linting passed."
+
 #HELP verify that help comment itself does not contain hash character
 lint/make/help/hash:
 	@# 1. Get all the lines that start with #HELP
