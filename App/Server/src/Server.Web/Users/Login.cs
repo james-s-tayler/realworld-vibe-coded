@@ -29,6 +29,24 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
     });
   }
 
+  public override void OnValidationFailed()
+  {
+    var errorBody = new List<string>();
+    
+    foreach (var failure in ValidationFailures)
+    {
+      errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
+    }
+
+    HttpContext.Response.StatusCode = 422;
+    HttpContext.Response.ContentType = "application/json";
+    var json = System.Text.Json.JsonSerializer.Serialize(new
+    {
+      errors = new { body = errorBody }
+    });
+    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
+  }
+
   public override async Task HandleAsync(
     LoginRequest request,
     CancellationToken cancellationToken)
@@ -56,10 +74,22 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
 
     if (result.Status == ResultStatus.Unauthorized)
     {
-      await SendResultAsync(Results.UnprocessableEntity(new { errors = new { message = new[] { "Invalid email or password" } } }));
+      HttpContext.Response.StatusCode = 401;
+      HttpContext.Response.ContentType = "application/json";
+      var json = System.Text.Json.JsonSerializer.Serialize(new 
+      { 
+        errors = new { body = new[] { "email or password is invalid" } } 
+      });
+      await HttpContext.Response.WriteAsync(json, cancellationToken);
       return;
     }
 
-    await SendResultAsync(Results.BadRequest(new { errors = new { message = new[] { result.Errors.FirstOrDefault() ?? "Login failed" } } }));
+    HttpContext.Response.StatusCode = 400;
+    HttpContext.Response.ContentType = "application/json";
+    var errorJson = System.Text.Json.JsonSerializer.Serialize(new 
+    { 
+      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Login failed" } } 
+    });
+    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
   }
 }

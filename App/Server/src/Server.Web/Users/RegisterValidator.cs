@@ -9,22 +9,25 @@ public class RegisterValidator : Validator<RegisterRequest>
   {
     RuleFor(x => x.User.Email)
       .NotEmpty()
-      .WithMessage("Email is required.")
+      .WithMessage("is required.")
       .EmailAddress()
-      .WithMessage("Email format is invalid.");
+      .WithMessage("is invalid.")
+      .OverridePropertyName("email");
 
     RuleFor(x => x.User.Username)
       .NotEmpty()
-      .WithMessage("Username is required.")
+      .WithMessage("is required.")
       .MinimumLength(2)
-      .WithMessage("Username must be at least 2 characters.")
+      .WithMessage("must be at least 2 characters.")
       .MaximumLength(100)
-      .WithMessage("Username cannot exceed 100 characters.");
+      .WithMessage("cannot exceed 100 characters.")
+      .OverridePropertyName("username");
 
     RuleFor(x => x.User.Password)
       .NotEmpty()
-      .WithMessage("Password is required.")
+      .WithMessage("is required.")
       .MinimumLength(6)
-      .WithMessage("Password must be at least 6 characters.");
+      .WithMessage("must be at least 6 characters.")
+      .OverridePropertyName("password");
   }
 }

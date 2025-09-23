@@ -30,6 +30,24 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
     });
   }
 
+  public override void OnValidationFailed()
+  {
+    var errorBody = new List<string>();
+    
+    foreach (var failure in ValidationFailures)
+    {
+      errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
+    }
+
+    HttpContext.Response.StatusCode = 422;
+    HttpContext.Response.ContentType = "application/json";
+    var json = System.Text.Json.JsonSerializer.Serialize(new
+    {
+      errors = new { body = errorBody }
+    });
+    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
+  }
+
   public override async Task HandleAsync(
     RegisterRequest request,
     CancellationToken cancellationToken)
@@ -53,21 +71,34 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
           Token = userDto.Token
         }
       };
-      await SendCreatedAtAsync<Register>(new { }, Response, cancellation: cancellationToken);
+      HttpContext.Response.StatusCode = 201;
       return;
     }
 
     if (result.IsInvalid())
     {
-      var errors = new Dictionary<string, string[]>();
+      var errorBody = new List<string>();
       foreach (var error in result.ValidationErrors)
       {
-        errors[error.Identifier] = new[] { error.ErrorMessage };
+        errorBody.Add($"{error.Identifier} {error.ErrorMessage}");
       }
-      await SendResultAsync(Results.UnprocessableEntity(new { errors }));
+      
+      HttpContext.Response.StatusCode = 422;
+      HttpContext.Response.ContentType = "application/json";
+      var json = System.Text.Json.JsonSerializer.Serialize(new
+      {
+        errors = new { body = errorBody }
+      });
+      await HttpContext.Response.WriteAsync(json, cancellationToken);
       return;
     }
 
-    await SendResultAsync(Results.BadRequest(new { errors = new { message = new[] { result.Errors.FirstOrDefault() ?? "Registration failed" } } }));
+    HttpContext.Response.StatusCode = 400;
+    HttpContext.Response.ContentType = "application/json";
+    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+    {
+      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Registration failed" } }
+    });
+    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
   }
 }

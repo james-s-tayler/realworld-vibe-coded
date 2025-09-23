@@ -9,12 +9,14 @@ public class LoginValidator : Validator<LoginRequest>
   {
     RuleFor(x => x.User.Email)
       .NotEmpty()
-      .WithMessage("Email is required.")
+      .WithMessage("is required.")
       .EmailAddress()
-      .WithMessage("Email format is invalid.");
+      .WithMessage("is invalid.")
+      .OverridePropertyName("email");
 
     RuleFor(x => x.User.Password)
       .NotEmpty()
-      .WithMessage("Password is required.");
+      .WithMessage("is required.")
+      .OverridePropertyName("password");
   }
 }
