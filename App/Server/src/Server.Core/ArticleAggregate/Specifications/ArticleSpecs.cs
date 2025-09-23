@@ -56,3 +56,22 @@ public class TagByNameSpec : Specification<Tag>
     Query.Where(t => t.Name == name);
   }
 }
+
+public class ArticleBySlugSpec : Specification<Article>
+{
+  public ArticleBySlugSpec(string slug)
+  {
+    Query.Where(a => a.Slug == slug);
+  }
+}
+
+public class ArticleBySlugWithDetailsSpec : Specification<Article>
+{
+  public ArticleBySlugWithDetailsSpec(string slug)
+  {
+    Query.Where(a => a.Slug == slug)
+         .Include(a => a.Author)
+         .Include(a => a.Tags)
+         .Include(a => a.FavoritedBy);
+  }
+}

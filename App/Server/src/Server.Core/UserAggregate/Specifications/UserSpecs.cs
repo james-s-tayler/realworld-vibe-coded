@@ -25,3 +25,12 @@ public class UserByEmailAndPasswordSpec : Specification<User>
     Query.Where(user => user.Email == email);
   }
 }
+
+public class UserWithFollowingSpec : Specification<User>
+{
+  public UserWithFollowingSpec(int userId)
+  {
+    Query.Where(user => user.Id == userId)
+         .Include(user => user.Following);
+  }
+}

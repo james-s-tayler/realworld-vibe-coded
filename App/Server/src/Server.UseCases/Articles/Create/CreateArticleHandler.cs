@@ -44,6 +44,19 @@ public class CreateArticleHandler : ICommandHandler<CreateArticleCommand, Result
       // Create the article
       var article = new Article(request.Title, request.Description, request.Body, author);
 
+      // Check for duplicate slug
+      var existingArticle = await _articleRepository
+        .FirstOrDefaultAsync(new ArticleBySlugSpec(article.Slug), cancellationToken);
+      
+      if (existingArticle != null)
+      {
+        return Result.Invalid(new ValidationError
+        {
+          Identifier = "slug",
+          ErrorMessage = "has already been taken",
+        });
+      }
+
       // Add tags if provided
       if (request.TagList != null && request.TagList.Any())
       {
@@ -78,8 +91,8 @@ public class CreateArticleHandler : ICommandHandler<CreateArticleCommand, Result
         createdArticle.Description,
         createdArticle.Body,
         createdArticle.Tags.Select(t => t.Name).ToList(),
-        createdArticle.CreatedAt,
-        createdArticle.UpdatedAt,
+        DateTime.SpecifyKind(createdArticle.CreatedAt, DateTimeKind.Utc),
+        DateTime.SpecifyKind(createdArticle.UpdatedAt, DateTimeKind.Utc),
         false, // favorited - TODO: implement when we have current user context
         createdArticle.FavoritesCount,
         new AuthorDto(
