@@ -1,6 +1,6 @@
 ﻿namespace Server.Core.ArticleAggregate;
 
-public class Tag : EntityBase
+public class Tag : EntityBase, IAggregateRoot
 {
   public Tag(string name)
   {

@@ -35,5 +35,19 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     builder.HasIndex(p => p.Username)
         .IsUnique()
         .HasDatabaseName("IX_Users_Username");
+
+    // Configure many-to-many self-referencing relationship for following
+    builder.HasMany(u => u.Following)
+        .WithMany(u => u.Followers)
+        .UsingEntity<Dictionary<string, object>>(
+            "UserFollows",
+            j => j.HasOne<User>().WithMany().HasForeignKey("FollowingId"),
+            j => j.HasOne<User>().WithMany().HasForeignKey("FollowerId"),
+            j =>
+            {
+              j.HasKey("FollowerId", "FollowingId");
+              j.HasIndex("FollowerId");
+              j.HasIndex("FollowingId");
+            });
   }
 }

@@ -48,3 +48,11 @@ public class ArticlesFavoritedByUserSpec : Specification<Article>
          .OrderByDescending(x => x.CreatedAt);
   }
 }
+
+public class TagByNameSpec : Specification<Tag>
+{
+  public TagByNameSpec(string name)
+  {
+    Query.Where(t => t.Name == name);
+  }
+}
