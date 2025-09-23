@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Server.UseCases.Users.Update;
 
 namespace Server.Web.Users;
@@ -19,15 +19,15 @@ public class UpdateUser(IMediator _mediator) : Endpoint<UpdateUserRequest, Updat
     {
       s.Summary = "Update current user";
       s.Description = "Update the currently authenticated user's details.";
-      s.ExampleRequest = new UpdateUserRequest 
-      { 
-        User = new UpdateUserData 
-        { 
-          Email = "updated@example.com", 
+      s.ExampleRequest = new UpdateUserRequest
+      {
+        User = new UpdateUserData
+        {
+          Email = "updated@example.com",
           Username = "newusername",
           Bio = "Updated bio",
           Image = "https://example.com/avatar.jpg"
-        } 
+        }
       };
     });
   }
@@ -35,7 +35,7 @@ public class UpdateUser(IMediator _mediator) : Endpoint<UpdateUserRequest, Updat
   public override void OnValidationFailed()
   {
     var errorBody = new List<string>();
-    
+
     foreach (var failure in ValidationFailures)
     {
       errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
@@ -55,7 +55,7 @@ public class UpdateUser(IMediator _mediator) : Endpoint<UpdateUserRequest, Updat
     CancellationToken cancellationToken)
   {
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-    
+
     if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
     {
       HttpContext.Response.StatusCode = 401;
@@ -100,7 +100,7 @@ public class UpdateUser(IMediator _mediator) : Endpoint<UpdateUserRequest, Updat
       {
         errorBody.Add($"{error.Identifier} {error.ErrorMessage}");
       }
-      
+
       HttpContext.Response.StatusCode = 422;
       HttpContext.Response.ContentType = "application/json";
       var validationJson = System.Text.Json.JsonSerializer.Serialize(new

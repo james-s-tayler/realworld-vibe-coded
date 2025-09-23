@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Server.Web.Users;
 
@@ -13,7 +13,7 @@ public class LoginUserData
 {
   [Required]
   public string Email { get; set; } = default!;
-  
+
   [Required]
   public string Password { get; set; } = default!;
 }

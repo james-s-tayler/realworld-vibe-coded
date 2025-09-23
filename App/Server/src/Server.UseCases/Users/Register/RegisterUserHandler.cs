@@ -1,4 +1,4 @@
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Microsoft.Extensions.Logging;
 using Server.Core.Interfaces;
@@ -32,7 +32,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Result<U
     // Check if user already exists by email or username
     var existingUserByEmail = await _repository
       .FirstOrDefaultAsync(new UserByEmailSpec(request.Email), cancellationToken);
-    
+
     if (existingUserByEmail != null)
     {
       _logger.LogWarning("Registration failed: Email {Email} already exists", request.Email);
@@ -45,13 +45,13 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Result<U
 
     var existingUserByUsername = await _repository
       .FirstOrDefaultAsync(new UserByUsernameSpec(request.Username), cancellationToken);
-    
+
     if (existingUserByUsername != null)
     {
       _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
       return Result.Invalid(new ValidationError
       {
-        Identifier = "username", 
+        Identifier = "username",
         ErrorMessage = "Username already exists",
       });
     }
@@ -65,7 +65,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Result<U
       var createdUser = await _repository.AddAsync(newUser, cancellationToken);
       var token = _jwtTokenGenerator.GenerateToken(createdUser);
 
-      _logger.LogInformation("User {Username} registered successfully with ID {UserId}", 
+      _logger.LogInformation("User {Username} registered successfully with ID {UserId}",
         createdUser.Username, createdUser.Id);
 
       return Result.Success(new UserDto(

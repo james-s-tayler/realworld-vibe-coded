@@ -1,4 +1,4 @@
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Microsoft.Extensions.Logging;
 using Server.Core.Interfaces;

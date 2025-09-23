@@ -1,4 +1,4 @@
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
 
 namespace Server.Core.UserAggregate;

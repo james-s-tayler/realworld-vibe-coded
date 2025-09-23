@@ -18,7 +18,7 @@ public static class ServiceConfigs
     // Configure JWT Authentication
     var jwtSettings = new JwtSettings();
     builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
-    
+
     services.AddAuthentication("Token")
       .AddJwtBearer("Token", options =>
       {
@@ -33,7 +33,7 @@ public static class ServiceConfigs
           ValidateLifetime = true,
           ClockSkew = TimeSpan.Zero
         };
-        
+
         // Configure events to return JSON error responses for authentication failures
         options.Events = new JwtBearerEvents
         {
@@ -52,27 +52,27 @@ public static class ServiceConfigs
           {
             // Skip the default logic that adds WWW-Authenticate header
             context.HandleResponse();
-            
+
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
-            
+
             var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
             {
               errors = new { body = new[] { "Unauthorized" } }
             });
-            
+
             return context.Response.WriteAsync(errorResponse);
           },
           OnForbidden = context =>
           {
             context.Response.StatusCode = 401;
             context.Response.ContentType = "application/json";
-            
+
             var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
             {
               errors = new { body = new[] { "Unauthorized" } }
             });
-            
+
             return context.Response.WriteAsync(errorResponse);
           }
         };

@@ -1,4 +1,4 @@
-using Server.UseCases.Users.Login;
+﻿using Server.UseCases.Users.Login;
 
 namespace Server.Web.Users;
 
@@ -18,13 +18,13 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
     {
       s.Summary = "Login user";
       s.Description = "Authenticate user with email and password. Returns user details with JWT token.";
-      s.ExampleRequest = new LoginRequest 
-      { 
-        User = new LoginUserData 
-        { 
-          Email = "user@example.com", 
-          Password = "password123" 
-        } 
+      s.ExampleRequest = new LoginRequest
+      {
+        User = new LoginUserData
+        {
+          Email = "user@example.com",
+          Password = "password123"
+        }
       };
     });
   }
@@ -32,7 +32,7 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
   public override void OnValidationFailed()
   {
     var errorBody = new List<string>();
-    
+
     foreach (var failure in ValidationFailures)
     {
       errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
@@ -76,9 +76,9 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
     {
       HttpContext.Response.StatusCode = 401;
       HttpContext.Response.ContentType = "application/json";
-      var json = System.Text.Json.JsonSerializer.Serialize(new 
-      { 
-        errors = new { body = new[] { "email or password is invalid" } } 
+      var json = System.Text.Json.JsonSerializer.Serialize(new
+      {
+        errors = new { body = new[] { "email or password is invalid" } }
       });
       await HttpContext.Response.WriteAsync(json, cancellationToken);
       return;
@@ -86,9 +86,9 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
 
     HttpContext.Response.StatusCode = 400;
     HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new 
-    { 
-      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Login failed" } } 
+    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+    {
+      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Login failed" } }
     });
     await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
   }

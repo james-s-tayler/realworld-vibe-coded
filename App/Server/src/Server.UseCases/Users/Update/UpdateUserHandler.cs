@@ -1,4 +1,4 @@
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Microsoft.Extensions.Logging;
 using Server.Core.Interfaces;
@@ -42,7 +42,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, Result<UserD
     {
       var existingUserByEmail = await _repository
         .FirstOrDefaultAsync(new UserByEmailSpec(request.Email), cancellationToken);
-      
+
       if (existingUserByEmail != null && existingUserByEmail.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Email {Email} already exists", request.Email);
@@ -60,7 +60,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, Result<UserD
     {
       var existingUserByUsername = await _repository
         .FirstOrDefaultAsync(new UserByUsernameSpec(request.Username), cancellationToken);
-      
+
       if (existingUserByUsername != null && existingUserByUsername.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Username {Username} already exists", request.Username);

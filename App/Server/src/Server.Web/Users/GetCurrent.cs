@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Server.UseCases.Users.GetCurrent;
 
 namespace Server.Web.Users;
@@ -25,7 +25,7 @@ public class GetCurrent(IMediator _mediator) : EndpointWithoutRequest<UserCurren
   public override async Task HandleAsync(CancellationToken cancellationToken)
   {
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-    
+
     if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
     {
       HttpContext.Response.StatusCode = 401;

@@ -1,4 +1,4 @@
-using Server.UseCases.Users.Register;
+﻿using Server.UseCases.Users.Register;
 
 namespace Server.Web.Users;
 
@@ -18,14 +18,14 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
     {
       s.Summary = "Register a new user";
       s.Description = "Create a new user account. Returns user details with JWT token.";
-      s.ExampleRequest = new RegisterRequest 
-      { 
-        User = new UserData 
-        { 
-          Email = "user@example.com", 
-          Username = "username", 
-          Password = "password123" 
-        } 
+      s.ExampleRequest = new RegisterRequest
+      {
+        User = new UserData
+        {
+          Email = "user@example.com",
+          Username = "username",
+          Password = "password123"
+        }
       };
     });
   }
@@ -33,7 +33,7 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
   public override void OnValidationFailed()
   {
     var errorBody = new List<string>();
-    
+
     foreach (var failure in ValidationFailures)
     {
       errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
@@ -82,7 +82,7 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
       {
         errorBody.Add($"{error.Identifier} {error.ErrorMessage}");
       }
-      
+
       HttpContext.Response.StatusCode = 422;
       HttpContext.Response.ContentType = "application/json";
       var json = System.Text.Json.JsonSerializer.Serialize(new
