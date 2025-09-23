@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using Server.Core.ContributorAggregate;
 using FastEndpoints;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Server.Core.ContributorAggregate;
 
 namespace Server.UseCases.Contributors.Create;
 
@@ -17,19 +17,19 @@ public record CreateContributorCommand2(string Name) : FastEndpoints.ICommand<Re
 
 public class CreateContributorCommandHandler2 : CommandHandler<CreateContributorCommand2, Result<int>>
 {
-    private readonly IRepository<Contributor> _repository;
-    public CreateContributorCommandHandler2(IRepository<Contributor> repository)
-    {
-        _repository = repository;
-    }
-    public override async Task<Result<int>> ExecuteAsync(CreateContributorCommand2 request, CancellationToken cancellationToken)
-    {
-        var newContributor = new Contributor(request.Name);
-        var createdItem = await _repository.AddAsync(newContributor, cancellationToken);
+  private readonly IRepository<Contributor> _repository;
+  public CreateContributorCommandHandler2(IRepository<Contributor> repository)
+  {
+    _repository = repository;
+  }
+  public override async Task<Result<int>> ExecuteAsync(CreateContributorCommand2 request, CancellationToken cancellationToken)
+  {
+    var newContributor = new Contributor(request.Name);
+    var createdItem = await _repository.AddAsync(newContributor, cancellationToken);
 
     Console.WriteLine($"<<<<<<<Created contributor with ID: {createdItem.Id}");
     return createdItem.Id;
-    }
+  }
 }
 
 public sealed class CommandLogger<TCommand, TResult>(ILogger<TCommand> logger)
