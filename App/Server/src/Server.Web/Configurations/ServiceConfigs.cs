@@ -1,5 +1,9 @@
-﻿using Server.Core.Interfaces;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Server.Core.Interfaces;
 using Server.Infrastructure;
+using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Email;
 
 namespace Server.Web.Configurations;
@@ -11,6 +15,27 @@ public static class ServiceConfigs
     services.AddInfrastructureServices(builder.Configuration, logger)
             .AddMediatrConfigs();
 
+    // Configure JWT Authentication
+    var jwtSettings = new JwtSettings();
+    builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
+    
+    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+      .AddJwtBearer(options =>
+      {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+          ValidateIssuerSigningKey = true,
+          IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
+          ValidateIssuer = true,
+          ValidIssuer = jwtSettings.Issuer,
+          ValidateAudience = true,
+          ValidAudience = jwtSettings.Audience,
+          ValidateLifetime = true,
+          ClockSkew = TimeSpan.Zero
+        };
+      });
+
+    services.AddAuthorization();
 
     if (builder.Environment.IsDevelopment())
     {

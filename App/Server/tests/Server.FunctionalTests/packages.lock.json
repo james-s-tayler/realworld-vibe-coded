@@ -1078,9 +1078,11 @@
           "FastEndpoints": "[6.2.0, )",
           "FastEndpoints.Swagger": "[6.2.0, )",
           "MediatR": "[12.5.0, )",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "[9.0.6, )",
           "Serilog.AspNetCore": "[9.0.0, )",
           "Server.Infrastructure": "[1.0.0, )",
-          "Server.UseCases": "[1.0.0, )"
+          "Server.UseCases": "[1.0.0, )",
+          "System.IdentityModel.Tokens.Jwt": "[8.2.1, )"
         }
       },
       "Ardalis.GuardClauses": {
