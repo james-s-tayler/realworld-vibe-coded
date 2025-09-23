@@ -84,3 +84,12 @@ jobs:
 
       - name: Lint (server)
         run: make lint/server
+
+  lint-make:
+    name: Lint Makefile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Makefile lint
+        run: make lint/make

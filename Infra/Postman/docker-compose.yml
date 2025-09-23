@@ -1,0 +1,19 @@
+services:
+  newman:
+    image: postman/newman:alpine
+    network_mode: host
+    volumes:
+      - ./:/etc/newman
+    environment:
+      APIURL: https://localhost:57679/api
+      USERNAME: soloyolo
+      EMAIL: soloyolo@mail.com
+      PASSWORD: password123
+      FOLDER: ${FOLDER}
+    entrypoint: >
+      sh -lc 'newman run /etc/newman/Conduit.postman_collection.json
+      $${FOLDER:+--folder "$$FOLDER"} 
+      --delay-request 25
+      --insecure
+      --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME"
+      --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"'
