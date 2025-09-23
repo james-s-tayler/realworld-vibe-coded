@@ -12,6 +12,7 @@ An attempt at implementing gothinkster/realworld purely through vibe-coding
 
 ## Notes on MCP
 - [MCP Servers](https://github.com/modelcontextprotocol/servers/tree/main)
+- [GitHub MCP Server](https://github.com/github/github-mcp-server)
 - [Hyperbrowser](https://github.com/hyperbrowserai/mcp)
 - [Kintone](https://github.com/kintone/mcp-server?tab=readme-ov-file)
 - [Microsoft Learn MCP Server](https://github.com/microsoftdocs/mcp)
