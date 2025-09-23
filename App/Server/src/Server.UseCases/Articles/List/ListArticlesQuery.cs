@@ -1,4 +1,4 @@
-namespace Server.UseCases.Articles.List;
+﻿namespace Server.UseCases.Articles.List;
 
 public record ListArticlesQuery(
   string? Tag = null,

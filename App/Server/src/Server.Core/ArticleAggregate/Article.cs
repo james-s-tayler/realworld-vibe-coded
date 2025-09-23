@@ -1,4 +1,4 @@
-using Server.Core.UserAggregate;
+﻿using Server.Core.UserAggregate;
 
 namespace Server.Core.ArticleAggregate;
 
@@ -26,10 +26,10 @@ public class Article : EntityBase, IAggregateRoot
   public string Slug { get; private set; } = string.Empty;
   public DateTime CreatedAt { get; private set; }
   public DateTime UpdatedAt { get; private set; }
-  
+
   public int AuthorId { get; private set; }
   public User Author { get; private set; } = default!;
-  
+
   public List<Tag> Tags { get; private set; } = new();
   public List<User> FavoritedBy { get; private set; } = new();
 

@@ -1,4 +1,4 @@
-namespace Server.Core.ArticleAggregate.Dtos;
+﻿namespace Server.Core.ArticleAggregate.Dtos;
 
 public record ArticleDto(
   string Slug,

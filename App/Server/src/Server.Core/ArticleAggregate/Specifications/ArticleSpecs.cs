@@ -1,4 +1,4 @@
-using Server.Core.ArticleAggregate;
+﻿using Server.Core.ArticleAggregate;
 
 namespace Server.Core.ArticleAggregate.Specifications;
 

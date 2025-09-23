@@ -1,4 +1,4 @@
-namespace Server.Core.ArticleAggregate;
+﻿namespace Server.Core.ArticleAggregate;
 
 public class Tag : EntityBase
 {
