@@ -1,5 +1,6 @@
 ﻿using Server.Core.Interfaces;
 using Server.Core.Services;
+using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Queries;
 using Server.UseCases.Contributors.List;
@@ -21,7 +22,14 @@ public static class InfrastructureServiceExtensions
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
            .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
            .AddScoped<IListContributorsQueryService, ListContributorsQueryService>()
-           .AddScoped<IDeleteContributorService, DeleteContributorService>();
+           .AddScoped<IDeleteContributorService, DeleteContributorService>()
+           .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
+           .AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+    // Configure JWT settings
+    var jwtSettings = new JwtSettings();
+    config.GetSection("JwtSettings").Bind(jwtSettings);
+    services.AddSingleton(jwtSettings);
 
 
     logger.LogInformation("{Project} services registered", "Infrastructure");

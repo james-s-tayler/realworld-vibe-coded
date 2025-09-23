@@ -55,3 +55,8 @@ nunit-*.xml
 
 .idea/
 **/*.txt
+
+# SQLite database files
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
