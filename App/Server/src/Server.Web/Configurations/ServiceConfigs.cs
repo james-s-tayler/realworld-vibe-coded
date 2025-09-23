@@ -19,8 +19,8 @@ public static class ServiceConfigs
     var jwtSettings = new JwtSettings();
     builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
     
-    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-      .AddJwtBearer(options =>
+    services.AddAuthentication("Token")
+      .AddJwtBearer("Token", options =>
       {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -32,6 +32,49 @@ public static class ServiceConfigs
           ValidAudience = jwtSettings.Audience,
           ValidateLifetime = true,
           ClockSkew = TimeSpan.Zero
+        };
+        
+        // Configure events to return JSON error responses for authentication failures
+        options.Events = new JwtBearerEvents
+        {
+          OnMessageReceived = context =>
+          {
+            string? authorization = context.Request.Headers["Authorization"];
+
+            if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Token ", StringComparison.OrdinalIgnoreCase))
+            {
+              context.Token = authorization.Substring("Token ".Length).Trim();
+            }
+
+            return Task.CompletedTask;
+          },
+          OnChallenge = context =>
+          {
+            // Skip the default logic that adds WWW-Authenticate header
+            context.HandleResponse();
+            
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+            
+            var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+            {
+              errors = new { body = new[] { "Unauthorized" } }
+            });
+            
+            return context.Response.WriteAsync(errorResponse);
+          },
+          OnForbidden = context =>
+          {
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+            
+            var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+            {
+              errors = new { body = new[] { "Unauthorized" } }
+            });
+            
+            return context.Response.WriteAsync(errorResponse);
+          }
         };
       });
 

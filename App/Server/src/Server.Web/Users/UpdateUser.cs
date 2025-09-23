@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Server.UseCases.Users.Update;
 
 namespace Server.Web.Users;
@@ -15,7 +14,7 @@ public class UpdateUser(IMediator _mediator) : Endpoint<UpdateUserRequest, Updat
   public override void Configure()
   {
     Put(UpdateUserRequest.Route);
-    AuthSchemes(JwtBearerDefaults.AuthenticationScheme);
+    AuthSchemes("Token");
     Summary(s =>
     {
       s.Summary = "Update current user";

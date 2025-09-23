@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Server.UseCases.Users.GetCurrent;
 
 namespace Server.Web.Users;
@@ -15,7 +14,7 @@ public class GetCurrent(IMediator _mediator) : EndpointWithoutRequest<UserCurren
   public override void Configure()
   {
     Get("/api/user");
-    AuthSchemes(JwtBearerDefaults.AuthenticationScheme);
+    AuthSchemes("Token");
     Summary(s =>
     {
       s.Summary = "Get current user";
