@@ -50,7 +50,7 @@ General functionality:
 - xUnit for testing
 
 ## Testing
-- There is a comprehensive Postman collection that can be run through `make test/server/postman`. The postman collection is also split into folders which have their own make targets and can independently test areas of the system. The quality of the postman suite is excellent. If the postman suite is green, then the backend api has been implemented correctly. 
+- There is a comprehensive Postman collection that can be run through `make test/server/postman`. The Postman collection is also split into folders which have their own make targets and can independently test areas of the system. The quality of the Postman suite is excellent. If the Postman suite is green, then the backend api has been implemented correctly. 
 
 ## Infrastructure as Code
 - Bicep for Azure infrastructure as code
