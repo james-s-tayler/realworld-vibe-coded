@@ -12,28 +12,31 @@ public class CreateArticleValidator : Validator<CreateArticleRequest>
 
     RuleFor(x => x.Article.Title)
       .NotEmpty()
-      .WithMessage("Title is required")
+      .WithMessage("can't be blank")
       .MaximumLength(200)
-      .WithMessage("Title must not exceed 200 characters");
+      .WithMessage("is too long (maximum is 200 characters)")
+      .OverridePropertyName("title");
 
     RuleFor(x => x.Article.Description)
       .NotEmpty()
-      .WithMessage("Description is required")
+      .WithMessage("can't be blank")
       .MaximumLength(500)
-      .WithMessage("Description must not exceed 500 characters");
+      .WithMessage("is too long (maximum is 500 characters)")
+      .OverridePropertyName("description");
 
     RuleFor(x => x.Article.Body)
       .NotEmpty()
-      .WithMessage("Body is required")
+      .WithMessage("can't be blank")
       .MaximumLength(10000)
-      .WithMessage("Body must not exceed 10000 characters");
+      .WithMessage("is too long (maximum is 10000 characters)")
+      .OverridePropertyName("body");
 
     RuleForEach(x => x.Article.TagList)
       .NotEmpty()
-      .WithMessage("Tag cannot be empty")
+      .WithMessage("can't be blank")
       .MaximumLength(50)
-      .WithMessage("Tag must not exceed 50 characters")
+      .WithMessage("is too long (maximum is 50 characters)")
       .Must(tag => !tag.Contains(","))
-      .WithMessage("Tag cannot contain commas");
+      .WithMessage("cannot contain commas");
   }
 }

@@ -39,7 +39,7 @@ public class CreateArticle(IMediator _mediator) : Endpoint<CreateArticleRequest,
 
     foreach (var failure in ValidationFailures)
     {
-      errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
+      errorBody.Add($"{failure.PropertyName} {failure.ErrorMessage}");
     }
 
     HttpContext.Response.StatusCode = 422;

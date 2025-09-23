@@ -85,7 +85,7 @@ public class CreateArticleHandler : ICommandHandler<CreateArticleCommand, Result
         new AuthorDto(
           author.Username,
           author.Bio ?? string.Empty,
-          author.Image ?? string.Empty,
+          author.Image, // Keep null if null, don't convert to empty string
           false // following - TODO: implement when we have current user context
         )
       ));
