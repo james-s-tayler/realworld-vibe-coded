@@ -93,3 +93,26 @@ jobs:
         uses: actions/checkout@v4
       - name: Run Makefile lint
         run: make lint/make
+
+  test-auth-postman:
+    name: Test Auth (Postman)
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Test Auth (Postman)
+        run: make test/server/postman/auth
