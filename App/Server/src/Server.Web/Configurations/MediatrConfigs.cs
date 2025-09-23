@@ -1,8 +1,8 @@
-﻿using Ardalis.SharedKernel;
+﻿using System.Reflection;
+using Ardalis.SharedKernel;
+using MediatR;
 using Server.Core.ContributorAggregate;
 using Server.UseCases.Contributors.Create;
-using MediatR;
-using System.Reflection;
 
 namespace Server.Web.Configurations;
 

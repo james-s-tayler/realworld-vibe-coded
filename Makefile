@@ -16,14 +16,15 @@ help:
 
 #HELP confirm before running a destructive action
 confirm:
-	@echo -n 'Are you sure? [y/N] ' && read ans && [ $${ans:-N} = y
+	@echo -n 'Are you sure? [y/N] ' && read ans && [ $${ans:-N} = y ]
 
 # ==================================================================================== #
 # LINTING
 # ==================================================================================== #
-#HELP lint backend code
+#HELP verify backend formatting & analyzers (no changes). Fails if issues found
 lint/server:
-	@echo "No backend linting configured yet."
+	@echo "Running dotnet format (verify only) on $(SERVER_SOLUTION) ..."
+	dotnet format --verify-no-changes "${SERVER_SOLUTION}"
 
 #HELP lint client code
 lint/client:
