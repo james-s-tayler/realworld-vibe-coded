@@ -1,4 +1,6 @@
-﻿using Server.Core.ContributorAggregate;
+﻿using Server.Core.ArticleAggregate;
+using Server.Core.ContributorAggregate;
+using Server.Core.TagAggregate;
 using Server.Core.UserAggregate;
 
 namespace Server.Infrastructure.Data;
@@ -9,6 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
 
   public DbSet<Contributor> Contributors => Set<Contributor>();
   public DbSet<User> Users => Set<User>();
+  public DbSet<Article> Articles => Set<Article>();
+  public DbSet<Tag> Tags => Set<Tag>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
