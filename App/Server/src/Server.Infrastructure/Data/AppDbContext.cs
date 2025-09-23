@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
   public DbSet<User> Users => Set<User>();
   public DbSet<Article> Articles => Set<Article>();
   public DbSet<Tag> Tags => Set<Tag>();
+  public DbSet<Comment> Comments => Set<Comment>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

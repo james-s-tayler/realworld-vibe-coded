@@ -48,3 +48,24 @@ public class ArticlesFavoritedByUserSpec : Specification<Article>
          .OrderByDescending(x => x.CreatedAt);
   }
 }
+
+public class ArticleBySlugSpec : Specification<Article>
+{
+  public ArticleBySlugSpec(string slug)
+  {
+    Query.Where(x => x.Slug == slug)
+         .Include(x => x.Author)
+         .Include(x => x.Tags)
+         .Include(x => x.FavoritedBy)
+         .Include(x => x.Comments)
+         .ThenInclude(c => c.Author);
+  }
+}
+
+public class TagByNameSpec : Specification<Tag>
+{
+  public TagByNameSpec(string name)
+  {
+    Query.Where(x => x.Name == name);
+  }
+}
