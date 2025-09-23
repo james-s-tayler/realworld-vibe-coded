@@ -62,3 +62,13 @@ run-local/server:
 #HELP run client locally
 run-local/client:
 	@echo "No client run-local configured yet."
+
+# ==================================================================================== #
+# DB
+# ==================================================================================== #
+#HELP delete local sqlite database (idempotent)
+db/reset:
+	@[ "$(FORCE)" = "1" ] || $(MAKE) confirm
+	@echo "Deleting App/Server/src/Server.Web/database.sqlite ..."
+	rm -f -- App/Server/src/Server.Web/database.sqlite
+	@echo "Done."
