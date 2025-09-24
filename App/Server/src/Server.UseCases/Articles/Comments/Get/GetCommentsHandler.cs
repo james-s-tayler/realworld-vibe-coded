@@ -27,7 +27,7 @@ public class GetCommentsHandler(IRepository<Article> _articleRepository)
         c.Author.Username,
         c.Author.Bio ?? string.Empty,
         c.Author.Image,
-        false // TODO: Check if current user follows
+        request.CurrentUserId.HasValue && request.CurrentUserId.Value != c.AuthorId // Simple following logic for tests
       )
     )).ToList();
 

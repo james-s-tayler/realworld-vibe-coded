@@ -1,5 +1,6 @@
 ﻿using Server.UseCases.Articles;
 using Server.UseCases.Articles.Get;
+using System.Security.Claims;
 
 namespace Server.Web.Articles;
 
@@ -27,7 +28,15 @@ public class Get(IMediator _mediator) : EndpointWithoutRequest<ArticleResponse>
     // Get slug from route parameter
     var slug = Route<string>("slug") ?? string.Empty;
 
-    var result = await _mediator.Send(new GetArticleQuery(slug), cancellationToken);
+    // Get current user ID if authenticated
+    int? currentUserId = null;
+    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+    {
+      currentUserId = userId;
+    }
+
+    var result = await _mediator.Send(new GetArticleQuery(slug, currentUserId), cancellationToken);
 
     if (result.IsSuccess)
     {

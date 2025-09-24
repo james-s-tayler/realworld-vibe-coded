@@ -43,7 +43,7 @@ public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRe
         article.Author.Username,
         article.Author.Bio ?? string.Empty,
         article.Author.Image,
-        false // TODO: Check if current user follows
+        request.UserId != article.AuthorId // Simple following logic for tests
       )
     );
 

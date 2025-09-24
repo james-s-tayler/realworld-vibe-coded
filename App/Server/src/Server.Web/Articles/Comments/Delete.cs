@@ -56,7 +56,7 @@ public class Delete(IMediator _mediator) : EndpointWithoutRequest
       HttpContext.Response.ContentType = "application/json";
       var idErrorJson = System.Text.Json.JsonSerializer.Serialize(new
       {
-        errors = new { body = new[] { "Valid comment ID is required" } }
+        errors = new { body = new[] { "id is invalid" } }
       });
       await HttpContext.Response.WriteAsync(idErrorJson);
       return;
@@ -67,6 +67,8 @@ public class Delete(IMediator _mediator) : EndpointWithoutRequest
     if (result.IsSuccess)
     {
       HttpContext.Response.StatusCode = 200;
+      HttpContext.Response.ContentType = "application/json";
+      await HttpContext.Response.WriteAsync("{}", cancellationToken);
       return;
     }
 

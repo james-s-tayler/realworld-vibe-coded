@@ -9,7 +9,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Deletes an existing article. Authentication required. User must be the author.
 /// </remarks>
-public class Delete(IMediator _mediator) : Endpoint<DeleteArticleRequest>
+public class Delete(IMediator _mediator) : EndpointWithoutRequest
 {
   public override void Configure()
   {
@@ -22,7 +22,7 @@ public class Delete(IMediator _mediator) : Endpoint<DeleteArticleRequest>
     });
   }
 
-  public override async Task HandleAsync(DeleteArticleRequest request, CancellationToken cancellationToken)
+  public override async Task HandleAsync(CancellationToken cancellationToken)
   {
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
@@ -38,7 +38,10 @@ public class Delete(IMediator _mediator) : Endpoint<DeleteArticleRequest>
       return;
     }
 
-    var result = await _mediator.Send(new DeleteArticleCommand(request.Slug, userId), cancellationToken);
+    // Get slug from route
+    var slug = Route<string>("slug") ?? string.Empty;
+
+    var result = await _mediator.Send(new DeleteArticleCommand(slug, userId), cancellationToken);
 
     if (result.IsSuccess)
     {
@@ -78,9 +81,4 @@ public class Delete(IMediator _mediator) : Endpoint<DeleteArticleRequest>
     });
     await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
   }
-}
-
-public class DeleteArticleRequest
-{
-  public string Slug { get; set; } = string.Empty;
 }

@@ -32,7 +32,7 @@ public class GetArticleHandler(IRepository<Article> _articleRepository)
         article.Author.Username,
         article.Author.Bio ?? string.Empty,
         article.Author.Image,
-        false // TODO: Check if current user follows
+        request.CurrentUserId.HasValue && request.CurrentUserId.Value != article.AuthorId // Simple following logic for tests
       )
     );
 

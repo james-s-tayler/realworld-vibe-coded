@@ -1,5 +1,6 @@
 ﻿namespace Server.UseCases.Articles.Get;
 
 public record GetArticleQuery(
-  string Slug
+  string Slug,
+  int? CurrentUserId = null
 ) : IQuery<Result<ArticleResponse>>;

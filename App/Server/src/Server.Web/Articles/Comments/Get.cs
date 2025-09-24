@@ -1,5 +1,6 @@
 ﻿using Server.Core.ArticleAggregate.Dtos;
 using Server.UseCases.Articles.Comments.Get;
+using System.Security.Claims;
 
 namespace Server.Web.Articles.Comments;
 
@@ -24,7 +25,15 @@ public class Get(IMediator _mediator) : Endpoint<GetCommentsRequest, CommentsRes
 
   public override async Task HandleAsync(GetCommentsRequest request, CancellationToken cancellationToken)
   {
-    var result = await _mediator.Send(new GetCommentsQuery(request.Slug), cancellationToken);
+    // Get current user ID if authenticated
+    int? currentUserId = null;
+    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+    {
+      currentUserId = userId;
+    }
+
+    var result = await _mediator.Send(new GetCommentsQuery(request.Slug, currentUserId), cancellationToken);
 
     if (result.IsSuccess)
     {
