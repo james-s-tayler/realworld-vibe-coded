@@ -12,7 +12,8 @@ public class ListArticlesHandler(IListArticlesQueryService _query)
       request.Author,
       request.Favorited,
       request.Limit,
-      request.Offset);
+      request.Offset,
+      request.CurrentUserId);
 
     var totalCount = await _query.CountAsync(
       request.Tag,

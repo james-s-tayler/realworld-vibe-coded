@@ -5,5 +5,6 @@ public record ListArticlesQuery(
   string? Author = null,
   string? Favorited = null,
   int Limit = 20,
-  int Offset = 0
+  int Offset = 0,
+  int? CurrentUserId = null
 ) : IQuery<Result<ArticlesResponse>>;

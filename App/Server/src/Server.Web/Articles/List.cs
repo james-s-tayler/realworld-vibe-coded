@@ -1,4 +1,5 @@
-﻿using Server.UseCases.Articles;
+﻿using System.Security.Claims;
+using Server.UseCases.Articles;
 using Server.UseCases.Articles.List;
 
 namespace Server.Web.Articles;
@@ -31,12 +32,21 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse
     var limit = Query<int?>("limit", false) ?? 20;
     var offset = Query<int?>("offset", false) ?? 0;
 
+    // Get current user ID if authenticated
+    int? currentUserId = null;
+    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+    {
+      currentUserId = userId;
+    }
+
     var result = await _mediator.Send(new ListArticlesQuery(
       tag,
       author,
       favorited,
       limit,
-      offset), cancellationToken);
+      offset,
+      currentUserId), cancellationToken);
 
     if (result.IsSuccess)
     {

@@ -2,10 +2,12 @@
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.Interfaces;
+using Server.Core.UserAggregate;
+using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Comments.Get;
 
-public class GetCommentsHandler(IRepository<Article> _articleRepository)
+public class GetCommentsHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
   : IQueryHandler<GetCommentsQuery, Result<CommentsResponse>>
 {
   public async Task<Result<CommentsResponse>> Handle(GetCommentsQuery request, CancellationToken cancellationToken)
@@ -18,6 +20,14 @@ public class GetCommentsHandler(IRepository<Article> _articleRepository)
       return Result.NotFound("Article not found");
     }
 
+    // Get current user with following relationships if authenticated
+    User? currentUser = null;
+    if (request.CurrentUserId.HasValue)
+    {
+      currentUser = await _userRepository.FirstOrDefaultAsync(
+        new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken);
+    }
+
     var commentDtos = article.Comments.Select(c => new CommentDto(
       c.Id,
       c.CreatedAt,
@@ -27,7 +37,7 @@ public class GetCommentsHandler(IRepository<Article> _articleRepository)
         c.Author.Username,
         c.Author.Bio ?? string.Empty,
         c.Author.Image,
-        request.CurrentUserId.HasValue && request.CurrentUserId.Value != c.AuthorId // Simple following logic for tests
+        currentUser?.IsFollowing(c.AuthorId) ?? false
       )
     )).ToList();
 
