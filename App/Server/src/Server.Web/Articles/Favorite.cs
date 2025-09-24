@@ -42,7 +42,7 @@ public class Favorite(IMediator _mediator) : EndpointWithoutRequest<ArticleRespo
       return;
     }
 
-    var result = await _mediator.Send(new FavoriteArticleCommand(slug, userId), cancellationToken);
+    var result = await _mediator.Send(new FavoriteArticleCommand(slug, userId, userId), cancellationToken);
 
     if (result.IsSuccess)
     {

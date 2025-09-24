@@ -3,6 +3,7 @@ using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
+using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Favorite;
 
@@ -29,6 +30,12 @@ public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRe
     await _articleRepository.UpdateAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
+    // Load current user with following relationships to check following status
+    var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
+      new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
+
+    var isFollowing = currentUserWithFollowing?.IsFollowing(article.AuthorId) ?? false;
+
     var articleDto = new ArticleDto(
       article.Slug,
       article.Title,
@@ -43,7 +50,7 @@ public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRe
         article.Author.Username,
         article.Author.Bio ?? string.Empty,
         article.Author.Image,
-        request.UserId != article.AuthorId // Simple following logic for tests
+        isFollowing
       )
     );
 

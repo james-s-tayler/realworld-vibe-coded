@@ -42,7 +42,7 @@ public class Unfavorite(IMediator _mediator) : EndpointWithoutRequest<ArticleRes
       return;
     }
 
-    var result = await _mediator.Send(new UnfavoriteArticleCommand(slug, userId), cancellationToken);
+    var result = await _mediator.Send(new UnfavoriteArticleCommand(slug, userId, userId), cancellationToken);
 
     if (result.IsSuccess)
     {

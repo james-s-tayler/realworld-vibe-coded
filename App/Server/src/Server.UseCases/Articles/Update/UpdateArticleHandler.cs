@@ -2,10 +2,12 @@
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.Interfaces;
+using Server.Core.UserAggregate;
+using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Update;
 
-public class UpdateArticleHandler(IRepository<Article> _articleRepository)
+public class UpdateArticleHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
   : ICommandHandler<UpdateArticleCommand, Result<ArticleResponse>>
 {
   public async Task<Result<ArticleResponse>> Handle(UpdateArticleCommand request, CancellationToken cancellationToken)
@@ -48,6 +50,15 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
     await _articleRepository.UpdateAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
+    // Load current user with following relationships to check following status
+    var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
+      new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
+
+    var isFollowing = currentUserWithFollowing?.IsFollowing(article.AuthorId) ?? false;
+
+    // Check if current user has favorited this article
+    var isFavorited = article.FavoritedBy.Any(u => u.Id == request.CurrentUserId);
+
     var articleDto = new ArticleDto(
       article.Slug,
       article.Title,
@@ -56,13 +67,13 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
       article.Tags.Select(t => t.Name).ToList(),
       article.CreatedAt,
       article.UpdatedAt,
-      false, // TODO: Check if current user favorited
+      isFavorited,
       article.FavoritesCount,
       new AuthorDto(
         article.Author.Username,
         article.Author.Bio ?? string.Empty,
         article.Author.Image,
-        false // TODO: Check if current user follows
+        isFollowing
       )
     );
 

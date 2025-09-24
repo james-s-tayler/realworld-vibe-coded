@@ -2,5 +2,6 @@
 
 public record UnfavoriteArticleCommand(
   string Slug,
-  int UserId
+  int UserId,
+  int CurrentUserId
 ) : ICommand<Result<ArticleResponse>>;

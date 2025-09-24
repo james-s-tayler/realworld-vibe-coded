@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Create;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -10,7 +11,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Creates a new article. Authentication required.
 /// </remarks>
-public class Create(IMediator _mediator) : Endpoint<CreateArticleRequest, ArticleResponse>
+public class Create(IMediator _mediator) : BaseValidatedEndpoint<CreateArticleRequest, ArticleResponse>
 {
   public override void Configure()
   {
@@ -24,51 +25,13 @@ public class Create(IMediator _mediator) : Endpoint<CreateArticleRequest, Articl
     });
   }
 
-  public override void OnValidationFailed()
-  {
-    var errorBody = new List<string>();
-
-    foreach (var failure in ValidationFailures)
-    {
-      // Handle nested properties like Article.Title -> title
-      var propertyName = failure.PropertyName.ToLower();
-      if (propertyName.Contains('.'))
-      {
-        propertyName = propertyName.Split('.').Last();
-      }
-
-      // Handle array indexing for tags like Article.TagList[0] -> taglist[0]
-      if (propertyName.Contains("taglist["))
-      {
-        // Already in the right format, just ensure lowercase
-        propertyName = propertyName.Replace("taglist", "taglist");
-      }
-
-      errorBody.Add($"{propertyName} {failure.ErrorMessage}");
-    }
-
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var json = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = errorBody }
-    });
-    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
-  }
-
   public override async Task HandleAsync(CreateArticleRequest request, CancellationToken cancellationToken)
   {
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
     if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
     {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      await WriteUnauthorizedResponseAsync(cancellationToken);
       return;
     }
 

@@ -5,5 +5,6 @@ public record UpdateArticleCommand(
   string? Title,
   string? Description,
   string? Body,
-  int UserId
+  int UserId,
+  int CurrentUserId
 ) : ICommand<Result<ArticleResponse>>;

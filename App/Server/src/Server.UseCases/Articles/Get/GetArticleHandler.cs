@@ -28,7 +28,8 @@ public class GetArticleHandler(
     var isFollowing = currentUser != null && currentUser.Id != article.Author.Id && currentUser.IsFollowing(article.Author.Id);
 
     // Check if current user has favorited the article
-    var isFavorited = false; // For now, set to false - would need UserFavorites relationship table
+    var isFavorited = request.CurrentUserId.HasValue &&
+      article.FavoritedBy.Any(u => u.Id == request.CurrentUserId.Value);
 
     var articleDto = new ArticleDto(
       article.Slug,
