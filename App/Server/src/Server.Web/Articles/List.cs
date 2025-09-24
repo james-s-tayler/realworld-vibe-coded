@@ -25,12 +25,20 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse
 
   public override async Task HandleAsync(CancellationToken cancellationToken)
   {
-    // Get query parameters from the request
-    var tag = Query<string?>("tag", false);
-    var author = Query<string?>("author", false);
-    var favorited = Query<string?>("favorited", false);
-    var limit = Query<int?>("limit", false) ?? 20;
-    var offset = Query<int?>("offset", false) ?? 0;
+    var validation = QueryParameterValidator.ValidateListArticlesParameters(HttpContext.Request);
+
+    if (!validation.IsValid)
+    {
+      HttpContext.Response.StatusCode = 422;
+      HttpContext.Response.ContentType = "application/json";
+
+      var validationErrorJson = System.Text.Json.JsonSerializer.Serialize(new
+      {
+        errors = new { body = validation.Errors.ToArray() }
+      });
+      await HttpContext.Response.WriteAsync(validationErrorJson, cancellationToken);
+      return;
+    }
 
     // Get current user ID if authenticated
     int? currentUserId = null;
@@ -41,11 +49,11 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse
     }
 
     var result = await _mediator.Send(new ListArticlesQuery(
-      tag,
-      author,
-      favorited,
-      limit,
-      offset,
+      validation.Tag,
+      validation.Author,
+      validation.Favorited,
+      validation.Limit,
+      validation.Offset,
       currentUserId), cancellationToken);
 
     if (result.IsSuccess)

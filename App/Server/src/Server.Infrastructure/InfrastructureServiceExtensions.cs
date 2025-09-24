@@ -23,6 +23,7 @@ public static class InfrastructureServiceExtensions
            .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
            .AddScoped<IListContributorsQueryService, ListContributorsQueryService>()
            .AddScoped<IListArticlesQueryService, ListArticlesQueryService>()
+           .AddScoped<IFeedQueryService, FeedQueryService>()
            .AddScoped<IListTagsQueryService, ListTagsQueryService>()
            .AddScoped<IDeleteContributorService, DeleteContributorService>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
