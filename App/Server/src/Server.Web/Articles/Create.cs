@@ -17,7 +17,6 @@ public class Create(IMediator _mediator) : Endpoint<CreateArticleRequest, Articl
     Post("/api/articles");
     AuthSchemes("Token");
     DontAutoTag();
-    DontThrowIfValidationFails();
     Summary(s =>
     {
       s.Summary = "Create article";
@@ -25,52 +24,40 @@ public class Create(IMediator _mediator) : Endpoint<CreateArticleRequest, Articl
     });
   }
 
-  public override async Task HandleAsync(CreateArticleRequest request, CancellationToken cancellationToken)
+  public override void OnValidationFailed()
   {
-    // Check for validation errors manually
-    if (ValidationFailed)
+    var errorBody = new List<string>();
+
+    foreach (var failure in ValidationFailures)
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-
-      var errors = new Dictionary<string, List<string>>();
-
-      foreach (var failure in ValidationFailures)
+      // Handle nested properties like Article.Title -> title
+      var propertyName = failure.PropertyName.ToLower();
+      if (propertyName.Contains('.'))
       {
-        var originalPropertyName = failure.PropertyName;
-        var propertyName = failure.PropertyName.ToLowerInvariant();
-
-        // Handle nested properties like Article.Title -> title
-        if (propertyName.Contains('.'))
-        {
-          propertyName = propertyName.Split('.').Last();
-        }
-
-        // Handle array indexing for tags like Article.TagList[0] -> tagList[0]
-        if (originalPropertyName.Contains("TagList["))
-        {
-          // Extract the index and format as tagList[index]
-          var indexMatch = System.Text.RegularExpressions.Regex.Match(originalPropertyName, @"TagList\[(\d+)\]");
-          if (indexMatch.Success)
-          {
-            propertyName = $"taglist[{indexMatch.Groups[1].Value}]";
-          }
-        }
-
-        if (!errors.ContainsKey(propertyName))
-        {
-          errors[propertyName] = new List<string>();
-        }
-
-        // Use the error message as-is since we've already formatted it in the validator
-        errors[propertyName].Add(failure.ErrorMessage);
+        propertyName = propertyName.Split('.').Last();
       }
 
-      var validationErrorResponse = System.Text.Json.JsonSerializer.Serialize(new { errors });
-      await HttpContext.Response.WriteAsync(validationErrorResponse, cancellationToken);
-      return;
+      // Handle array indexing for tags like Article.TagList[0] -> taglist[0]
+      if (propertyName.Contains("taglist["))
+      {
+        // Already in the right format, just ensure lowercase
+        propertyName = propertyName.Replace("taglist", "taglist");
+      }
+
+      errorBody.Add($"{propertyName} {failure.ErrorMessage}");
     }
 
+    HttpContext.Response.StatusCode = 422;
+    HttpContext.Response.ContentType = "application/json";
+    var json = System.Text.Json.JsonSerializer.Serialize(new
+    {
+      errors = new { body = errorBody }
+    });
+    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
+  }
+
+  public override async Task HandleAsync(CreateArticleRequest request, CancellationToken cancellationToken)
+  {
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
     if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
