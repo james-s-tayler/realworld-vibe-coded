@@ -26,5 +26,12 @@ public class CreateArticleValidator : Validator<CreateArticleRequest>
       .Must(tags => tags == null || tags.All(tag => !string.IsNullOrWhiteSpace(tag) && !tag.Contains(",")))
       .WithMessage("must not be empty or contain commas")
       .OverridePropertyName("tagList");
+
+    // Add individual tag validation for better error messages
+    RuleForEach(x => x.Article.TagList)
+      .Must(tag => !string.IsNullOrWhiteSpace(tag))
+      .WithMessage("can't be blank")
+      .Must(tag => !tag.Contains(","))
+      .WithMessage("can't contain commas");
   }
 }

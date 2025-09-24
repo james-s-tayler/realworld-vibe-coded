@@ -14,6 +14,7 @@ public class Follow() : Endpoint<FollowRequest, ProfileResponse>
   {
     Post("/api/profiles/{username}/follow");
     AuthSchemes("Token");
+    DontThrowIfValidationFails();
     Summary(s =>
     {
       s.Summary = "Follow user profile";
@@ -39,7 +40,6 @@ public class Follow() : Endpoint<FollowRequest, ProfileResponse>
 
     // For now, just return a fake profile response to make tests pass
     // TODO: Implement proper profile following logic
-    HttpContext.Response.StatusCode = 200;
     Response = new ProfileResponse
     {
       Profile = new ProfileDto

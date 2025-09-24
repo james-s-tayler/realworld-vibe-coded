@@ -16,6 +16,8 @@ public class Create(IMediator _mediator) : Endpoint<CreateArticleRequest, Articl
   {
     Post("/api/articles");
     AuthSchemes("Token");
+    DontAutoTag();
+    DontThrowIfValidationFails();
     Summary(s =>
     {
       s.Summary = "Create article";
@@ -25,6 +27,35 @@ public class Create(IMediator _mediator) : Endpoint<CreateArticleRequest, Articl
 
   public override async Task HandleAsync(CreateArticleRequest request, CancellationToken cancellationToken)
   {
+    // Check for validation errors manually
+    if (ValidationFailed)
+    {
+      HttpContext.Response.StatusCode = 422;
+      HttpContext.Response.ContentType = "application/json";
+
+      var errors = new Dictionary<string, List<string>>();
+
+      foreach (var failure in ValidationFailures)
+      {
+        var propertyName = failure.PropertyName.ToLowerInvariant();
+        // Handle nested properties like Article.Title -> title
+        if (propertyName.Contains('.'))
+        {
+          propertyName = propertyName.Split('.').Last();
+        }
+
+        if (!errors.ContainsKey(propertyName))
+        {
+          errors[propertyName] = new List<string>();
+        }
+        errors[propertyName].Add(failure.ErrorMessage);
+      }
+
+      var validationErrorResponse = System.Text.Json.JsonSerializer.Serialize(new { errors });
+      await HttpContext.Response.WriteAsync(validationErrorResponse, cancellationToken);
+      return;
+    }
+
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
     if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
