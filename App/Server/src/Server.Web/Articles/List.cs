@@ -32,6 +32,24 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse
     var limit = Query<int?>("limit", false) ?? 20;
     var offset = Query<int?>("offset", false) ?? 0;
 
+    // Validate input parameters
+    if (limit <= 0 || offset < 0)
+    {
+      HttpContext.Response.StatusCode = 422;
+      HttpContext.Response.ContentType = "application/json";
+      
+      var errors = new List<string>();
+      if (limit <= 0) errors.Add("limit must be greater than 0");
+      if (offset < 0) errors.Add("offset must be greater than or equal to 0");
+      
+      var validationErrorJson = System.Text.Json.JsonSerializer.Serialize(new
+      {
+        errors = new { body = errors.ToArray() }
+      });
+      await HttpContext.Response.WriteAsync(validationErrorJson, cancellationToken);
+      return;
+    }
+
     // Get current user ID if authenticated
     int? currentUserId = null;
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);

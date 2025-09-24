@@ -15,11 +15,8 @@ public class ListArticlesHandler(IListArticlesQueryService _query)
       request.Offset,
       request.CurrentUserId);
 
-    var totalCount = await _query.CountAsync(
-      request.Tag,
-      request.Author,
-      request.Favorited);
+    var articlesCount = articles.Count();
 
-    return Result.Success(new ArticlesResponse(articles.ToList(), totalCount));
+    return Result.Success(new ArticlesResponse(articles.ToList(), articlesCount));
   }
 }
