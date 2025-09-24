@@ -2,6 +2,7 @@
 using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.Interfaces;
+using Server.Core.UserAggregate;
 using Server.Infrastructure.Data;
 
 namespace Server.Infrastructure.Data.Queries;
@@ -13,7 +14,8 @@ public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQuer
     string? author = null,
     string? favorited = null,
     int limit = 20,
-    int offset = 0)
+    int offset = 0,
+    int? currentUserId = null)
   {
     var query = BuildQuery(tag, author, favorited);
 
@@ -23,7 +25,17 @@ public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQuer
       .AsNoTracking()
       .ToListAsync();
 
-    return articles.Select(MapToDto);
+    // Get current user with following relationships if authenticated
+    User? currentUser = null;
+    if (currentUserId.HasValue)
+    {
+      currentUser = await _context.Users
+        .Include(u => u.Following)
+        .AsNoTracking()
+        .FirstOrDefaultAsync(u => u.Id == currentUserId.Value);
+    }
+
+    return articles.Select(a => MapToDto(a, currentUser));
   }
 
   public async Task<int> CountAsync(
@@ -61,8 +73,11 @@ public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQuer
     return query.OrderByDescending(a => a.CreatedAt);
   }
 
-  private static ArticleDto MapToDto(Article article)
+  private static ArticleDto MapToDto(Article article, User? currentUser = null)
   {
+    var isFavorited = currentUser != null && article.FavoritedBy.Any(u => u.Id == currentUser.Id);
+    var isFollowing = currentUser?.IsFollowing(article.AuthorId) ?? false;
+
     return new ArticleDto(
       article.Slug,
       article.Title,
@@ -71,13 +86,13 @@ public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQuer
       article.Tags.Select(t => t.Name).ToList(),
       article.CreatedAt,
       article.UpdatedAt,
-      false, // TODO: Check if current user favorited
+      isFavorited,
       article.FavoritesCount,
       new AuthorDto(
         article.Author.Username,
         article.Author.Bio ?? string.Empty,
         article.Author.Image,
-        false // TODO: Check if current user follows
+        isFollowing
       )
     );
   }

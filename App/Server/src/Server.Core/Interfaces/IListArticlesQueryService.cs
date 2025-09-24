@@ -9,7 +9,8 @@ public interface IListArticlesQueryService
     string? author = null,
     string? favorited = null,
     int limit = 20,
-    int offset = 0);
+    int offset = 0,
+    int? currentUserId = null);
 
   Task<int> CountAsync(
     string? tag = null,
