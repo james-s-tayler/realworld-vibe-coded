@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
   public DbSet<Article> Articles => Set<Article>();
   public DbSet<Tag> Tags => Set<Tag>();
   public DbSet<Comment> Comments => Set<Comment>();
+  public DbSet<UserFollowing> UserFollowings => Set<UserFollowing>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

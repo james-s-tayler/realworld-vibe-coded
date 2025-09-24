@@ -3,10 +3,15 @@ using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
+using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Create;
 
-public class CreateArticleHandler(IRepository<User> _userRepository, IRepository<Article> _articleRepository, IRepository<Tag> _tagRepository)
+public class CreateArticleHandler(
+  IRepository<User> _userRepository, 
+  IRepository<Article> _articleRepository, 
+  IRepository<Tag> _tagRepository,
+  IRepository<UserFollowing> _userFollowingRepository)
   : ICommandHandler<CreateArticleCommand, Result<ArticleResponse>>
 {
   public async Task<Result<ArticleResponse>> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
@@ -31,14 +36,9 @@ public class CreateArticleHandler(IRepository<User> _userRepository, IRepository
     // Create the article
     var article = new Article(request.Title, request.Description, request.Body, author);
 
-    // Handle tags
+    // Handle tags - validation is now done at the endpoint level
     foreach (var tagName in request.TagList ?? new List<string>())
     {
-      if (string.IsNullOrWhiteSpace(tagName) || tagName.Contains(","))
-      {
-        return Result.Error("Invalid tag format");
-      }
-
       var existingTag = await _tagRepository.FirstOrDefaultAsync(
         new TagByNameSpec(tagName), cancellationToken);
 
@@ -54,6 +54,16 @@ public class CreateArticleHandler(IRepository<User> _userRepository, IRepository
     await _articleRepository.AddAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
+    // Check if current user is following the article author
+    var currentUser = await _userRepository.GetByIdAsync(request.CurrentUserId ?? 0, cancellationToken);
+    var isFollowing = currentUser != null && currentUser.Id != author.Id &&
+                     await _userFollowingRepository.AnyAsync(
+                       new IsFollowingSpec(currentUser.Id, author.Id), 
+                       cancellationToken);
+
+    // Check if current user has favorited the article (always false for newly created articles)
+    var isFavorited = false;
+
     var articleDto = new ArticleDto(
       article.Slug,
       article.Title,
@@ -62,13 +72,13 @@ public class CreateArticleHandler(IRepository<User> _userRepository, IRepository
       article.Tags.Select(t => t.Name).ToList(),
       article.CreatedAt,
       article.UpdatedAt,
-      false, // TODO: Check if current user favorited
+      isFavorited,
       article.FavoritesCount,
       new AuthorDto(
         article.Author.Username,
         article.Author.Bio ?? string.Empty,
         article.Author.Image,
-        false // TODO: Check if current user follows
+        isFollowing
       )
     );
 

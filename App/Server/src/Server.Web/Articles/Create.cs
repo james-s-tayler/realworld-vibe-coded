@@ -77,6 +77,7 @@ public class Create(IMediator _mediator) : Endpoint<CreateArticleRequest, Articl
       request.Article.Description,
       request.Article.Body,
       request.Article.TagList ?? new List<string>(),
+      userId,
       userId), cancellationToken);
 
     if (result.IsSuccess)

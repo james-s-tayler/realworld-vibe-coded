@@ -69,7 +69,7 @@ public class Create(IMediator _mediator) : Endpoint<CreateCommentRequest, Commen
     // Get slug from route parameter
     var slug = Route<string>("slug") ?? string.Empty;
 
-    var result = await _mediator.Send(new CreateCommentCommand(slug, request.Comment.Body, userId), cancellationToken);
+    var result = await _mediator.Send(new CreateCommentCommand(slug, request.Comment.Body, userId, userId), cancellationToken);
 
     if (result.IsSuccess)
     {
