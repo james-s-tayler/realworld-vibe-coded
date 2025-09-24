@@ -16,6 +16,7 @@ public class Article : EntityBase, IAggregateRoot
     UpdatedAt = DateTime.UtcNow;
     Tags = new List<Tag>();
     FavoritedBy = new List<User>();
+    Comments = new List<Comment>();
   }
 
   private Article() { } // For EF Core
@@ -32,6 +33,7 @@ public class Article : EntityBase, IAggregateRoot
 
   public List<Tag> Tags { get; private set; } = new();
   public List<User> FavoritedBy { get; private set; } = new();
+  public List<Comment> Comments { get; private set; } = new();
 
   public int FavoritesCount => FavoritedBy.Count;
 
