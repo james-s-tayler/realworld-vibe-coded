@@ -2,13 +2,14 @@
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.Interfaces;
+using Server.Core.UserAggregate;
 
-namespace Server.UseCases.Articles.Get;
+namespace Server.UseCases.Articles.Favorite;
 
-public class GetArticleHandler(IRepository<Article> _articleRepository) 
-  : IQueryHandler<GetArticleQuery, Result<ArticleResponse>>
+public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
+  : ICommandHandler<FavoriteArticleCommand, Result<ArticleResponse>>
 {
-  public async Task<Result<ArticleResponse>> Handle(GetArticleQuery request, CancellationToken cancellationToken)
+  public async Task<Result<ArticleResponse>> Handle(FavoriteArticleCommand request, CancellationToken cancellationToken)
   {
     var article = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(request.Slug), cancellationToken);
@@ -18,6 +19,16 @@ public class GetArticleHandler(IRepository<Article> _articleRepository)
       return Result.NotFound("Article not found");
     }
 
+    var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
+    if (user == null)
+    {
+      return Result.Error("User not found");
+    }
+
+    article.AddToFavorites(user);
+    await _articleRepository.UpdateAsync(article, cancellationToken);
+    await _articleRepository.SaveChangesAsync(cancellationToken);
+
     var articleDto = new ArticleDto(
       article.Slug,
       article.Title,
@@ -26,7 +37,7 @@ public class GetArticleHandler(IRepository<Article> _articleRepository)
       article.Tags.Select(t => t.Name).ToList(),
       article.CreatedAt,
       article.UpdatedAt,
-      false, // TODO: Check if current user favorited
+      true, // User just favorited this article
       article.FavoritesCount,
       new AuthorDto(
         article.Author.Username,

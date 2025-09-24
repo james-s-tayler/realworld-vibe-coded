@@ -16,6 +16,6 @@ public record ArticleDto(
 public record AuthorDto(
   string Username,
   string Bio,
-  string Image,
+  string? Image,
   bool Following
 );

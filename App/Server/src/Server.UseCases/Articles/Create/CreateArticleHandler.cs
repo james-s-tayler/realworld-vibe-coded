@@ -67,7 +67,7 @@ public class CreateArticleHandler(IRepository<User> _userRepository, IRepository
       new AuthorDto(
         article.Author.Username,
         article.Author.Bio ?? string.Empty,
-        article.Author.Image ?? string.Empty,
+        article.Author.Image,
         false // TODO: Check if current user follows
       )
     );
