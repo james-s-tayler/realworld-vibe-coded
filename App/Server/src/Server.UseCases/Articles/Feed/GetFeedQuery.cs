@@ -1,4 +1,4 @@
-using Server.UseCases.Articles;
+﻿using Server.UseCases.Articles;
 
 namespace Server.UseCases.Articles.Feed;
 

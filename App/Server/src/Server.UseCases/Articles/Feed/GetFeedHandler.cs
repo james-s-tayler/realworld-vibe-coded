@@ -1,4 +1,4 @@
-using Server.Core.Interfaces;
+﻿using Server.Core.Interfaces;
 
 namespace Server.UseCases.Articles.Feed;
 
