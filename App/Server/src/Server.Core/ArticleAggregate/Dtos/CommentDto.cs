@@ -11,3 +11,7 @@ public record CommentDto(
 public record CommentsResponse(
   List<CommentDto> Comments
 );
+
+public record CommentResponse(
+  CommentDto Comment
+);
