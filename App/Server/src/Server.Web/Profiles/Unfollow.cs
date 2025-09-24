@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Ardalis.SharedKernel;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;

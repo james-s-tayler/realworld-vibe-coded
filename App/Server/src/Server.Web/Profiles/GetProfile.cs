@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Ardalis.SharedKernel;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
@@ -71,7 +71,7 @@ public class GetProfile(IRepository<User> _userRepository) : EndpointWithoutRequ
     {
       var currentUser = await _userRepository.FirstOrDefaultAsync(
         new UserWithFollowingSpec(currentUserId.Value), cancellationToken);
-      
+
       if (currentUser != null)
       {
         isFollowing = currentUser.IsFollowing(userToGet);
