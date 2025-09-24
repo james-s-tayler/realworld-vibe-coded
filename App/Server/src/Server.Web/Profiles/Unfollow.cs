@@ -75,6 +75,19 @@ public class Unfollow(IRepository<User> _userRepository) : EndpointWithoutReques
       return;
     }
 
+    // Check if the user is already following the target user
+    if (!currentUser.IsFollowing(userToUnfollow))
+    {
+      HttpContext.Response.StatusCode = 422;
+      HttpContext.Response.ContentType = "application/json";
+      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      {
+        errors = new { body = new[] { "username is not being followed" } }
+      });
+      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      return;
+    }
+
     // Unfollow the user
     currentUser.Unfollow(userToUnfollow);
     await _userRepository.SaveChangesAsync(cancellationToken);
