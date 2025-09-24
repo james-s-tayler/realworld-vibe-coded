@@ -62,19 +62,8 @@ public class Create(IMediator _mediator) : Endpoint<CreateArticleRequest, Articl
           errors[propertyName] = new List<string>();
         }
 
-        // Format error message with field name prefix
-        var errorMessage;
-        if (failure.ErrorMessage.StartsWith(propertyName))
-        {
-          // Already has field name prefix
-          errorMessage = failure.ErrorMessage;
-        }
-        else
-        {
-          // Prepend field name to error message
-          errorMessage = $"{propertyName} {failure.ErrorMessage}";
-        }
-        errors[propertyName].Add(errorMessage);
+        // Use the error message as-is since we've already formatted it in the validator
+        errors[propertyName].Add(failure.ErrorMessage);
       }
 
       var validationErrorResponse = System.Text.Json.JsonSerializer.Serialize(new { errors });

@@ -9,17 +9,17 @@ public class CreateArticleValidator : Validator<CreateArticleRequest>
   {
     RuleFor(x => x.Article.Title)
       .NotEmpty()
-      .WithMessage("can't be blank")
+      .WithMessage("title can't be blank")
       .OverridePropertyName("title");
 
     RuleFor(x => x.Article.Description)
       .NotEmpty()
-      .WithMessage("can't be blank")
+      .WithMessage("description can't be blank")
       .OverridePropertyName("description");
 
     RuleFor(x => x.Article.Body)
       .NotEmpty()
-      .WithMessage("can't be blank")
+      .WithMessage("body can't be blank")
       .OverridePropertyName("body");
 
     RuleFor(x => x.Article.TagList)
@@ -30,8 +30,8 @@ public class CreateArticleValidator : Validator<CreateArticleRequest>
     // Add individual tag validation for better error messages
     RuleForEach(x => x.Article.TagList)
       .Must(tag => !string.IsNullOrWhiteSpace(tag))
-      .WithMessage("can't be blank")
+      .WithMessage("tagList[{CollectionIndex}] can't be blank")
       .Must(tag => !tag.Contains(","))
-      .WithMessage("can't contain commas");
+      .WithMessage("tagList[{CollectionIndex}] can't contain commas");
   }
 }
