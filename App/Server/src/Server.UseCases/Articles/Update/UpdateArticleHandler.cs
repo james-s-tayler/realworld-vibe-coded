@@ -34,7 +34,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
 
         if (existingArticle != null)
         {
-          return Result.Error("slug must be unique");
+          return Result.Error("slug already taken");
         }
       }
     }

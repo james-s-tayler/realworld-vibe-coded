@@ -18,10 +18,10 @@ public class UpdateArticleValidator : Validator<UpdateArticleRequest>
     RuleFor(x => x.Article.Body)
       .NotEmpty()
       .WithMessage("can't be blank");
-      
+
     RuleFor(x => x.Article)
-      .Must(article => !string.IsNullOrEmpty(article.Title) || 
-                      !string.IsNullOrEmpty(article.Description) || 
+      .Must(article => !string.IsNullOrEmpty(article.Title) ||
+                      !string.IsNullOrEmpty(article.Description) ||
                       !string.IsNullOrEmpty(article.Body))
       .WithMessage("must have at least one field")
       .WithName("article");

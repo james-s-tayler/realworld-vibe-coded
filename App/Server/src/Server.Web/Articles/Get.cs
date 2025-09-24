@@ -1,6 +1,6 @@
-﻿using Server.UseCases.Articles;
+﻿using System.Security.Claims;
+using Server.UseCases.Articles;
 using Server.UseCases.Articles.Get;
-using System.Security.Claims;
 
 namespace Server.Web.Articles;
 
