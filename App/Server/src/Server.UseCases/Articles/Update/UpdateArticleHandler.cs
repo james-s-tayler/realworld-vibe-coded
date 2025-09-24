@@ -24,7 +24,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
     }
 
     // Check for duplicate slug if title changed
-    if (article.Title != request.Title)
+    if (request.Title != null && article.Title != request.Title)
     {
       var newSlug = GenerateSlug(request.Title);
       if (newSlug != article.Slug)
@@ -34,12 +34,17 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
 
         if (existingArticle != null)
         {
-          return Result.Error("slug already taken");
+          return Result.Error("slug has already been taken");
         }
       }
     }
 
-    article.Update(request.Title, request.Description, request.Body);
+    // Update only the fields that are provided (not null)
+    var newTitle = request.Title ?? article.Title;
+    var newDescription = request.Description ?? article.Description;
+    var newBody = request.Body ?? article.Body;
+
+    article.Update(newTitle, newDescription, newBody);
     await _articleRepository.UpdateAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 

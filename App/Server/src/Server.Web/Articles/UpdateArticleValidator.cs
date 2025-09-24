@@ -7,23 +7,26 @@ public class UpdateArticleValidator : Validator<UpdateArticleRequest>
 {
   public UpdateArticleValidator()
   {
+    // Only validate non-empty fields - if a field is provided, it can't be empty
     RuleFor(x => x.Article.Title)
       .NotEmpty()
-      .WithMessage("can't be blank");
+      .WithMessage("title can't be blank")
+      .When(x => x.Article.Title != null);
 
     RuleFor(x => x.Article.Description)
       .NotEmpty()
-      .WithMessage("can't be blank");
+      .WithMessage("description can't be blank")
+      .When(x => x.Article.Description != null);
 
     RuleFor(x => x.Article.Body)
       .NotEmpty()
-      .WithMessage("can't be blank");
+      .WithMessage("body can't be blank")
+      .When(x => x.Article.Body != null);
 
+    // Ensure at least one field is provided for update
     RuleFor(x => x.Article)
-      .Must(article => !string.IsNullOrEmpty(article.Title) ||
-                      !string.IsNullOrEmpty(article.Description) ||
-                      !string.IsNullOrEmpty(article.Body))
-      .WithMessage("must have at least one field")
+      .Must(article => article.Title != null || article.Description != null || article.Body != null)
+      .WithMessage("article must have at least one field")
       .WithName("article");
   }
 }
