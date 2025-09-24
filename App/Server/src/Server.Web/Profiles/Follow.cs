@@ -8,13 +8,12 @@ namespace Server.Web.Profiles;
 /// <remarks>
 /// Follow a user by username. Authentication required.
 /// </remarks>
-public class Follow() : Endpoint<FollowRequest, ProfileResponse>
+public class Follow() : EndpointWithoutRequest<ProfileResponse>
 {
   public override void Configure()
   {
     Post("/api/profiles/{username}/follow");
     AuthSchemes("Token");
-    DontThrowIfValidationFails();
     Summary(s =>
     {
       s.Summary = "Follow user profile";
@@ -22,30 +21,10 @@ public class Follow() : Endpoint<FollowRequest, ProfileResponse>
     });
   }
 
-  public override async Task HandleAsync(FollowRequest request, CancellationToken cancellationToken)
+  public override async Task HandleAsync(CancellationToken cancellationToken)
   {
-    // Check for validation errors manually
-    if (ValidationFailed)
-    {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-
-      var errors = new Dictionary<string, List<string>>();
-
-      foreach (var failure in ValidationFailures)
-      {
-        var propertyName = failure.PropertyName.ToLowerInvariant();
-        if (!errors.ContainsKey(propertyName))
-        {
-          errors[propertyName] = new List<string>();
-        }
-        errors[propertyName].Add(failure.ErrorMessage);
-      }
-
-      var validationErrorResponse = System.Text.Json.JsonSerializer.Serialize(new { errors });
-      await HttpContext.Response.WriteAsync(validationErrorResponse, cancellationToken);
-      return;
-    }
+    // Get username from route parameter
+    var username = Route<string>("username") ?? string.Empty;
 
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
@@ -67,18 +46,13 @@ public class Follow() : Endpoint<FollowRequest, ProfileResponse>
     {
       Profile = new ProfileDto
       {
-        Username = request.Username,
+        Username = username,
         Bio = "Sample bio",
         Image = null,
         Following = true
       }
     };
   }
-}
-
-public class FollowRequest
-{
-  public string Username { get; set; } = string.Empty;
 }
 
 public class ProfileResponse

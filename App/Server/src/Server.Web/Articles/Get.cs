@@ -9,13 +9,12 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Gets a single article by its slug. Authentication optional.
 /// </remarks>
-public class Get(IMediator _mediator) : Endpoint<GetArticleRequest, ArticleResponse>
+public class Get(IMediator _mediator) : EndpointWithoutRequest<ArticleResponse>
 {
   public override void Configure()
   {
     Get("/api/articles/{slug}");
     AllowAnonymous();
-    DontThrowIfValidationFails();
     Summary(s =>
     {
       s.Summary = "Get article by slug";
@@ -23,32 +22,12 @@ public class Get(IMediator _mediator) : Endpoint<GetArticleRequest, ArticleRespo
     });
   }
 
-  public override async Task HandleAsync(GetArticleRequest request, CancellationToken cancellationToken)
+  public override async Task HandleAsync(CancellationToken cancellationToken)
   {
-    // Check for validation errors manually
-    if (ValidationFailed)
-    {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
+    // Get slug from route parameter
+    var slug = Route<string>("slug") ?? string.Empty;
 
-      var errors = new Dictionary<string, List<string>>();
-
-      foreach (var failure in ValidationFailures)
-      {
-        var propertyName = failure.PropertyName.ToLowerInvariant();
-        if (!errors.ContainsKey(propertyName))
-        {
-          errors[propertyName] = new List<string>();
-        }
-        errors[propertyName].Add(failure.ErrorMessage);
-      }
-
-      var validationErrorResponse = System.Text.Json.JsonSerializer.Serialize(new { errors });
-      await HttpContext.Response.WriteAsync(validationErrorResponse, cancellationToken);
-      return;
-    }
-
-    var result = await _mediator.Send(new GetArticleQuery(request.Slug), cancellationToken);
+    var result = await _mediator.Send(new GetArticleQuery(slug), cancellationToken);
 
     if (result.IsSuccess)
     {
@@ -66,7 +45,4 @@ public class Get(IMediator _mediator) : Endpoint<GetArticleRequest, ArticleRespo
   }
 }
 
-public class GetArticleRequest
-{
-  public string Slug { get; set; } = string.Empty;
-}
+
