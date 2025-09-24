@@ -31,7 +31,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
       {
         var existingArticle = await _articleRepository.FirstOrDefaultAsync(
           new ArticleBySlugSpec(newSlug), cancellationToken);
-        
+
         if (existingArticle != null)
         {
           return Result.Error("An article with this title already exists");

@@ -5,7 +5,7 @@ using Server.Core.Interfaces;
 
 namespace Server.UseCases.Articles.Get;
 
-public class GetArticleHandler(IRepository<Article> _articleRepository) 
+public class GetArticleHandler(IRepository<Article> _articleRepository)
   : IQueryHandler<GetArticleQuery, Result<ArticleResponse>>
 {
   public async Task<Result<ArticleResponse>> Handle(GetArticleQuery request, CancellationToken cancellationToken)

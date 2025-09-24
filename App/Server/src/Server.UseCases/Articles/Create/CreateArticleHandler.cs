@@ -1,8 +1,8 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
+using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
-using Server.Core.ArticleAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Create;
 
@@ -22,7 +22,7 @@ public class CreateArticleHandler(IRepository<User> _userRepository, IRepository
     var slug = GenerateSlug(request.Title);
     var existingArticle = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(slug), cancellationToken);
-    
+
     if (existingArticle != null)
     {
       return Result.Error("An article with this title already exists");
@@ -41,7 +41,7 @@ public class CreateArticleHandler(IRepository<User> _userRepository, IRepository
 
       var existingTag = await _tagRepository.FirstOrDefaultAsync(
         new TagByNameSpec(tagName), cancellationToken);
-      
+
       if (existingTag == null)
       {
         existingTag = new Tag(tagName);

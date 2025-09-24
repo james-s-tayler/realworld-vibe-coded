@@ -1,5 +1,5 @@
-﻿using Server.UseCases.Articles.Get;
-using Server.UseCases.Articles;
+﻿using Server.UseCases.Articles;
+using Server.UseCases.Articles.Get;
 
 namespace Server.Web.Articles;
 

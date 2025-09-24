@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
-using Server.UseCases.Articles.Favorite;
 using Server.UseCases.Articles;
+using Server.UseCases.Articles.Favorite;
 
 namespace Server.Web.Articles;
 
