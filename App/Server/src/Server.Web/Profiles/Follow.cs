@@ -1,4 +1,7 @@
 ﻿using System.Security.Claims;
+using Ardalis.SharedKernel;
+using Server.Core.UserAggregate;
+using Server.Core.UserAggregate.Specifications;
 
 namespace Server.Web.Profiles;
 
@@ -8,7 +11,7 @@ namespace Server.Web.Profiles;
 /// <remarks>
 /// Follow a user by username. Authentication required.
 /// </remarks>
-public class Follow() : EndpointWithoutRequest<ProfileResponse>
+public class Follow(IRepository<User> _userRepository) : EndpointWithoutRequest<ProfileResponse>
 {
   public override void Configure()
   {
@@ -40,15 +43,49 @@ public class Follow() : EndpointWithoutRequest<ProfileResponse>
       return;
     }
 
-    // For now, just return a fake profile response to make tests pass
-    // TODO: Implement proper profile following logic
+    // Find the user to follow
+    var userToFollow = await _userRepository.FirstOrDefaultAsync(
+      new Server.Core.UserAggregate.UserByUsernameSpec(username), cancellationToken);
+
+    if (userToFollow == null)
+    {
+      HttpContext.Response.StatusCode = 404;
+      HttpContext.Response.ContentType = "application/json";
+      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      {
+        errors = new { body = new[] { "User not found" } }
+      });
+      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      return;
+    }
+
+    // Get current user with following relationships
+    var currentUser = await _userRepository.FirstOrDefaultAsync(
+      new UserWithFollowingSpec(userId), cancellationToken);
+
+    if (currentUser == null)
+    {
+      HttpContext.Response.StatusCode = 404;
+      HttpContext.Response.ContentType = "application/json";
+      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      {
+        errors = new { body = new[] { "Current user not found" } }
+      });
+      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      return;
+    }
+
+    // Follow the user
+    currentUser.Follow(userToFollow);
+    await _userRepository.SaveChangesAsync(cancellationToken);
+
     Response = new ProfileResponse
     {
       Profile = new ProfileDto
       {
-        Username = username,
-        Bio = "Sample bio",
-        Image = null,
+        Username = userToFollow.Username,
+        Bio = userToFollow.Bio,
+        Image = userToFollow.Image,
         Following = true
       }
     };

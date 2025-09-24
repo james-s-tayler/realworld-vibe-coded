@@ -1,4 +1,4 @@
-using Ardalis.SharedKernel;
+﻿using Ardalis.SharedKernel;
 
 namespace Server.Core.UserAggregate;
 

@@ -8,10 +8,9 @@ using Server.Core.UserAggregate.Specifications;
 namespace Server.UseCases.Articles.Create;
 
 public class CreateArticleHandler(
-  IRepository<User> _userRepository, 
-  IRepository<Article> _articleRepository, 
-  IRepository<Tag> _tagRepository,
-  IRepository<UserFollowing> _userFollowingRepository)
+  IRepository<User> _userRepository,
+  IRepository<Article> _articleRepository,
+  IRepository<Tag> _tagRepository)
   : ICommandHandler<CreateArticleCommand, Result<ArticleResponse>>
 {
   public async Task<Result<ArticleResponse>> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
@@ -55,11 +54,9 @@ public class CreateArticleHandler(
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
     // Check if current user is following the article author
-    var currentUser = await _userRepository.GetByIdAsync(request.CurrentUserId ?? 0, cancellationToken);
-    var isFollowing = currentUser != null && currentUser.Id != author.Id &&
-                     await _userFollowingRepository.AnyAsync(
-                       new IsFollowingSpec(currentUser.Id, author.Id), 
-                       cancellationToken);
+    var currentUser = request.CurrentUserId.HasValue ?
+        await _userRepository.FirstOrDefaultAsync(new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken) : null;
+    var isFollowing = currentUser != null && currentUser.Id != author.Id && currentUser.IsFollowing(author.Id);
 
     // Check if current user has favorited the article (always false for newly created articles)
     var isFavorited = false;

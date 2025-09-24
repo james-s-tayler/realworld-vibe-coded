@@ -14,18 +14,15 @@ public class CreateCommentHandler : IRequestHandler<CreateCommentCommand, Result
 {
   private readonly IRepository<Article> _articleRepository;
   private readonly IRepository<User> _userRepository;
-  private readonly IRepository<UserFollowing> _userFollowingRepository;
   private readonly ILogger<CreateCommentHandler> _logger;
 
   public CreateCommentHandler(
     IRepository<Article> articleRepository,
     IRepository<User> userRepository,
-    IRepository<UserFollowing> userFollowingRepository,
     ILogger<CreateCommentHandler> logger)
   {
     _articleRepository = articleRepository;
     _userRepository = userRepository;
-    _userFollowingRepository = userFollowingRepository;
     _logger = logger;
   }
 
@@ -60,11 +57,9 @@ public class CreateCommentHandler : IRequestHandler<CreateCommentCommand, Result
     _logger.LogInformation("Comment created successfully with ID {CommentId}", comment.Id);
 
     // Check if current user is following the comment author
-    var currentUser = await _userRepository.GetByIdAsync(request.CurrentUserId ?? 0, cancellationToken);
-    var isFollowing = currentUser != null && 
-                     await _userFollowingRepository.AnyAsync(
-                       new IsFollowingSpec(currentUser.Id, user.Id), 
-                       cancellationToken);
+    var currentUser = request.CurrentUserId.HasValue ?
+        await _userRepository.FirstOrDefaultAsync(new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken) : null;
+    var isFollowing = currentUser != null && currentUser.IsFollowing(user.Id);
 
     // Return the comment response
     var response = new CommentResponse(

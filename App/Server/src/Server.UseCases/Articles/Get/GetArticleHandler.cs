@@ -9,8 +9,7 @@ namespace Server.UseCases.Articles.Get;
 
 public class GetArticleHandler(
   IRepository<Article> _articleRepository,
-  IRepository<User> _userRepository,
-  IRepository<UserFollowing> _userFollowingRepository)
+  IRepository<User> _userRepository)
   : IQueryHandler<GetArticleQuery, Result<ArticleResponse>>
 {
   public async Task<Result<ArticleResponse>> Handle(GetArticleQuery request, CancellationToken cancellationToken)
@@ -24,14 +23,12 @@ public class GetArticleHandler(
     }
 
     // Check if current user is following the article author
-    var currentUser = await _userRepository.GetByIdAsync(request.CurrentUserId ?? 0, cancellationToken);
-    var isFollowing = currentUser != null && currentUser.Id != article.Author.Id &&
-                     await _userFollowingRepository.AnyAsync(
-                       new IsFollowingSpec(currentUser.Id, article.Author.Id), 
-                       cancellationToken);
+    var currentUser = request.CurrentUserId.HasValue ?
+        await _userRepository.FirstOrDefaultAsync(new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken) : null;
+    var isFollowing = currentUser != null && currentUser.Id != article.Author.Id && currentUser.IsFollowing(article.Author.Id);
 
     // Check if current user has favorited the article
-    var isFavorited = false; // TODO: Implement favorites relationship
+    var isFavorited = false; // For now, set to false - would need UserFavorites relationship table
 
     var articleDto = new ArticleDto(
       article.Slug,

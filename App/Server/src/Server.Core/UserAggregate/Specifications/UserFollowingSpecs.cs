@@ -1,4 +1,4 @@
-using Ardalis.Specification;
+﻿using Ardalis.Specification;
 using Server.Core.UserAggregate;
 
 namespace Server.Core.UserAggregate.Specifications;
