@@ -25,7 +25,7 @@ public class CreateArticleHandler(IRepository<User> _userRepository, IRepository
 
     if (existingArticle != null)
     {
-      return Result.Error("An article with this title already exists");
+      return Result.Error("slug has already been taken");
     }
 
     // Create the article

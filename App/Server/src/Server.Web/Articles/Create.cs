@@ -37,18 +37,44 @@ public class Create(IMediator _mediator) : Endpoint<CreateArticleRequest, Articl
 
       foreach (var failure in ValidationFailures)
       {
+        var originalPropertyName = failure.PropertyName;
         var propertyName = failure.PropertyName.ToLowerInvariant();
+
         // Handle nested properties like Article.Title -> title
         if (propertyName.Contains('.'))
         {
           propertyName = propertyName.Split('.').Last();
         }
 
+        // Handle array indexing for tags like Article.TagList[0] -> tagList[0]
+        if (originalPropertyName.Contains("TagList["))
+        {
+          // Extract the index and format as tagList[index]
+          var indexMatch = System.Text.RegularExpressions.Regex.Match(originalPropertyName, @"TagList\[(\d+)\]");
+          if (indexMatch.Success)
+          {
+            propertyName = $"taglist[{indexMatch.Groups[1].Value}]";
+          }
+        }
+
         if (!errors.ContainsKey(propertyName))
         {
           errors[propertyName] = new List<string>();
         }
-        errors[propertyName].Add(failure.ErrorMessage);
+
+        // Format error message with field name prefix
+        var errorMessage;
+        if (failure.ErrorMessage.StartsWith(propertyName))
+        {
+          // Already has field name prefix
+          errorMessage = failure.ErrorMessage;
+        }
+        else
+        {
+          // Prepend field name to error message
+          errorMessage = $"{propertyName} {failure.ErrorMessage}";
+        }
+        errors[propertyName].Add(errorMessage);
       }
 
       var validationErrorResponse = System.Text.Json.JsonSerializer.Serialize(new { errors });

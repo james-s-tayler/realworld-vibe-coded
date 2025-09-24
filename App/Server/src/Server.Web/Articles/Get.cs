@@ -15,6 +15,7 @@ public class Get(IMediator _mediator) : Endpoint<GetArticleRequest, ArticleRespo
   {
     Get("/api/articles/{slug}");
     AllowAnonymous();
+    DontThrowIfValidationFails();
     Summary(s =>
     {
       s.Summary = "Get article by slug";
@@ -24,6 +25,29 @@ public class Get(IMediator _mediator) : Endpoint<GetArticleRequest, ArticleRespo
 
   public override async Task HandleAsync(GetArticleRequest request, CancellationToken cancellationToken)
   {
+    // Check for validation errors manually
+    if (ValidationFailed)
+    {
+      HttpContext.Response.StatusCode = 422;
+      HttpContext.Response.ContentType = "application/json";
+
+      var errors = new Dictionary<string, List<string>>();
+
+      foreach (var failure in ValidationFailures)
+      {
+        var propertyName = failure.PropertyName.ToLowerInvariant();
+        if (!errors.ContainsKey(propertyName))
+        {
+          errors[propertyName] = new List<string>();
+        }
+        errors[propertyName].Add(failure.ErrorMessage);
+      }
+
+      var validationErrorResponse = System.Text.Json.JsonSerializer.Serialize(new { errors });
+      await HttpContext.Response.WriteAsync(validationErrorResponse, cancellationToken);
+      return;
+    }
+
     var result = await _mediator.Send(new GetArticleQuery(request.Slug), cancellationToken);
 
     if (result.IsSuccess)
