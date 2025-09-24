@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Remove article from favorites. Authentication required.
 /// </remarks>
-public class Unfavorite(IMediator _mediator) : Endpoint<UnfavoriteArticleRequest, ArticleResponse>
+public class Unfavorite(IMediator _mediator) : EndpointWithoutRequest<ArticleResponse>
 {
   public override void Configure()
   {
@@ -23,8 +23,11 @@ public class Unfavorite(IMediator _mediator) : Endpoint<UnfavoriteArticleRequest
     });
   }
 
-  public override async Task HandleAsync(UnfavoriteArticleRequest request, CancellationToken cancellationToken)
+  public override async Task HandleAsync(CancellationToken cancellationToken)
   {
+    // Get slug from route parameter
+    var slug = Route<string>("slug") ?? string.Empty;
+
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
     if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
@@ -39,7 +42,7 @@ public class Unfavorite(IMediator _mediator) : Endpoint<UnfavoriteArticleRequest
       return;
     }
 
-    var result = await _mediator.Send(new UnfavoriteArticleCommand(request.Slug, userId), cancellationToken);
+    var result = await _mediator.Send(new UnfavoriteArticleCommand(slug, userId), cancellationToken);
 
     if (result.IsSuccess)
     {
@@ -67,9 +70,4 @@ public class Unfavorite(IMediator _mediator) : Endpoint<UnfavoriteArticleRequest
     });
     await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
   }
-}
-
-public class UnfavoriteArticleRequest
-{
-  public string Slug { get; set; } = string.Empty;
 }

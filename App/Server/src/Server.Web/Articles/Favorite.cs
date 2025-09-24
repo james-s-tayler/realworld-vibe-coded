@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Add article to favorites. Authentication required.
 /// </remarks>
-public class Favorite(IMediator _mediator) : Endpoint<FavoriteArticleRequest, ArticleResponse>
+public class Favorite(IMediator _mediator) : EndpointWithoutRequest<ArticleResponse>
 {
   public override void Configure()
   {
@@ -23,8 +23,11 @@ public class Favorite(IMediator _mediator) : Endpoint<FavoriteArticleRequest, Ar
     });
   }
 
-  public override async Task HandleAsync(FavoriteArticleRequest request, CancellationToken cancellationToken)
+  public override async Task HandleAsync(CancellationToken cancellationToken)
   {
+    // Get slug from route parameter
+    var slug = Route<string>("slug") ?? string.Empty;
+
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
     if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
@@ -39,7 +42,7 @@ public class Favorite(IMediator _mediator) : Endpoint<FavoriteArticleRequest, Ar
       return;
     }
 
-    var result = await _mediator.Send(new FavoriteArticleCommand(request.Slug, userId), cancellationToken);
+    var result = await _mediator.Send(new FavoriteArticleCommand(slug, userId), cancellationToken);
 
     if (result.IsSuccess)
     {
@@ -67,9 +70,4 @@ public class Favorite(IMediator _mediator) : Endpoint<FavoriteArticleRequest, Ar
     });
     await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
   }
-}
-
-public class FavoriteArticleRequest
-{
-  public string Slug { get; set; } = string.Empty;
 }
