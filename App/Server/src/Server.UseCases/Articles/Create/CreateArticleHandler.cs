@@ -1,4 +1,4 @@
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Microsoft.Extensions.Logging;
 using Server.Core.ArticleAggregate;
@@ -47,7 +47,7 @@ public class CreateArticleHandler : ICommandHandler<CreateArticleCommand, Result
       // Check for duplicate slug
       var existingArticle = await _articleRepository
         .FirstOrDefaultAsync(new ArticleBySlugSpec(article.Slug), cancellationToken);
-      
+
       if (existingArticle != null)
       {
         return Result.Invalid(new ValidationError
@@ -65,7 +65,7 @@ public class CreateArticleHandler : ICommandHandler<CreateArticleCommand, Result
           // Find or create tag
           var existingTag = await _tagRepository
             .FirstOrDefaultAsync(new TagByNameSpec(tagName), cancellationToken);
-          
+
           if (existingTag != null)
           {
             article.AddTag(existingTag);
@@ -81,7 +81,7 @@ public class CreateArticleHandler : ICommandHandler<CreateArticleCommand, Result
 
       var createdArticle = await _articleRepository.AddAsync(article, cancellationToken);
 
-      _logger.LogInformation("Article '{Title}' created successfully with ID {ArticleId}", 
+      _logger.LogInformation("Article '{Title}' created successfully with ID {ArticleId}",
         createdArticle.Title, createdArticle.Id);
 
       // Return the article DTO

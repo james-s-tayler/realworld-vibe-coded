@@ -1,45 +1,50 @@
 ﻿using System.Security.Claims;
 using Server.Core.ArticleAggregate.Dtos;
-using Server.UseCases.Articles.GetBySlug;
+using Server.UseCases.Articles.Favorite;
 
 namespace Server.Web.Articles;
 
 /// <summary>
-/// Get article by slug
+/// Favorite an article
 /// </summary>
 /// <remarks>
-/// Get a single article by its slug. Authentication optional.
+/// Favorite an article. Authentication required.
 /// </remarks>
-public class GetArticle(IMediator _mediator) : EndpointWithoutRequest<GetArticleResponse>
+public class FavoriteArticle(IMediator _mediator) : EndpointWithoutRequest<FavoriteArticleResponse>
 {
   public override void Configure()
   {
-    Get("/api/articles/{slug}");
-    AllowAnonymous();
+    Post("/api/articles/{slug}/favorite");
+    AuthSchemes("Token");
     Summary(s =>
     {
-      s.Summary = "Get article by slug";
-      s.Description = "Get a single article by its slug. Authentication optional.";
+      s.Summary = "Favorite an article";
+      s.Description = "Favorite an article. Authentication required.";
     });
   }
 
   public override async Task HandleAsync(CancellationToken cancellationToken)
   {
     var slug = Route<string>("slug") ?? string.Empty;
-
-    // Get current user ID if authenticated
-    int? currentUserId = null;
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+
+    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
     {
-      currentUserId = userId;
+      HttpContext.Response.StatusCode = 401;
+      HttpContext.Response.ContentType = "application/json";
+      var unauthorizedJson = System.Text.Json.JsonSerializer.Serialize(new
+      {
+        errors = new { body = new[] { "Unauthorized" } }
+      });
+      await HttpContext.Response.WriteAsync(unauthorizedJson, cancellationToken);
+      return;
     }
 
-    var result = await _mediator.Send(new GetArticleBySlugQuery(slug, currentUserId), cancellationToken);
+    var result = await _mediator.Send(new FavoriteArticleCommand(userId, slug), cancellationToken);
 
     if (result.IsSuccess)
     {
-      Response = new GetArticleResponse { Article = result.Value };
+      Response = new FavoriteArticleResponse { Article = result.Value };
       return;
     }
 
@@ -59,13 +64,13 @@ public class GetArticle(IMediator _mediator) : EndpointWithoutRequest<GetArticle
     HttpContext.Response.ContentType = "application/json";
     var errorJson = System.Text.Json.JsonSerializer.Serialize(new
     {
-      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Failed to get article" } }
+      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Failed to favorite article" } }
     });
     await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
   }
 }
 
-public class GetArticleResponse
+public class FavoriteArticleResponse
 {
   public ArticleDto Article { get; set; } = default!;
 }

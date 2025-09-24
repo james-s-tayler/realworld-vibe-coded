@@ -1,4 +1,4 @@
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Microsoft.Extensions.Logging;
 using Server.Core.Interfaces;
@@ -33,7 +33,7 @@ public class FollowProfileHandler : ICommandHandler<FollowProfileCommand, Result
     // Get the user to follow
     var userToFollow = await _repository
       .FirstOrDefaultAsync(new UserByUsernameSpec(request.UsernameToFollow), cancellationToken);
-    
+
     if (userToFollow == null)
     {
       return Result.NotFound("User to follow not found");
