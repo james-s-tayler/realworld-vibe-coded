@@ -25,6 +25,31 @@ public class Create(IMediator _mediator) : Endpoint<CreateCommentRequest, Commen
     });
   }
 
+  public override void OnValidationFailed()
+  {
+    var errorBody = new List<string>();
+
+    foreach (var failure in ValidationFailures)
+    {
+      // Handle nested properties like Comment.Body -> body
+      var propertyName = failure.PropertyName.ToLower();
+      if (propertyName.Contains('.'))
+      {
+        propertyName = propertyName.Split('.').Last();
+      }
+
+      errorBody.Add($"{propertyName} {failure.ErrorMessage}");
+    }
+
+    HttpContext.Response.StatusCode = 422;
+    HttpContext.Response.ContentType = "application/json";
+    var json = System.Text.Json.JsonSerializer.Serialize(new
+    {
+      errors = new { body = errorBody }
+    });
+    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
+  }
+
   public override async Task HandleAsync(CreateCommentRequest request, CancellationToken cancellationToken)
   {
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
@@ -55,7 +80,7 @@ public class Create(IMediator _mediator) : Endpoint<CreateCommentRequest, Commen
 
     if (result.Status == Ardalis.Result.ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 404;
+      HttpContext.Response.StatusCode = 422;
       HttpContext.Response.ContentType = "application/json";
       var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
       {
@@ -65,7 +90,7 @@ public class Create(IMediator _mediator) : Endpoint<CreateCommentRequest, Commen
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
+    HttpContext.Response.StatusCode = 422;
     HttpContext.Response.ContentType = "application/json";
     var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
     {

@@ -23,6 +23,31 @@ public class Update(IMediator _mediator) : Endpoint<UpdateArticleRequest, Articl
     });
   }
 
+  public override void OnValidationFailed()
+  {
+    var errorBody = new List<string>();
+
+    foreach (var failure in ValidationFailures)
+    {
+      // Handle nested properties like Article.Title -> title
+      var propertyName = failure.PropertyName.ToLower();
+      if (propertyName.Contains('.'))
+      {
+        propertyName = propertyName.Split('.').Last();
+      }
+
+      errorBody.Add($"{propertyName} {failure.ErrorMessage}");
+    }
+
+    HttpContext.Response.StatusCode = 422;
+    HttpContext.Response.ContentType = "application/json";
+    var json = System.Text.Json.JsonSerializer.Serialize(new
+    {
+      errors = new { body = errorBody }
+    });
+    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
+  }
+
   public override async Task HandleAsync(UpdateArticleRequest request, CancellationToken cancellationToken)
   {
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
