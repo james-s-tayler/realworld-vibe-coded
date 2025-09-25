@@ -34,9 +34,9 @@ function parseNewmanReport(reportPath, context) {
   const executionTimeMs = Math.round(executionTime);
   const executionTimeSec = Math.round(executionTime / 1000 * 10) / 10;
 
-  // Get top failures
+  // Get all failures
   const failures = run.failures || [];
-  const topFailures = failures.slice(0, 5).map(failure => {
+  const allFailures = failures.map(failure => {
     const source = failure.source || {};
     const error = failure.error || {};
     return `• **${source.name || 'Unknown'}**: ${error.message || error.test || 'Unknown error'}`;
@@ -56,7 +56,7 @@ function parseNewmanReport(reportPath, context) {
 - **Requests**: ${passedRequests}/${totalRequests} passed
 - **Execution Time**: ${executionTimeSec}s
 
-${failures.length > 0 ? `**🔍 Top Failures**\n${topFailures}` : '**🎉 All tests passed!**'}
+${failures.length > 0 ? `**🔍 All Failures**\n${allFailures}` : '**🎉 All tests passed!**'}
 
 ---
 📁 **Full reports available in build artifacts**
