@@ -138,65 +138,15 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
-            const path = require('path');
+            const { parseNewmanReport } = require('./.github/scripts/newman-report-parser.js');
             
             try {
-              // Read the Newman JSON report
-              const reportPath = 'reports/newman-report.json';
-              if (!fs.existsSync(reportPath)) {
-                console.log('No Newman report found, skipping comment');
+              const commentBody = parseNewmanReport('reports/newman-report.json', context);
+              
+              if (!commentBody) {
+                console.log('No comment body generated, skipping PR comment');
                 return;
               }
-              
-              const reportContent = fs.readFileSync(reportPath, 'utf8');
-              const report = JSON.parse(reportContent);
-              
-              const run = report.run;
-              const stats = run.stats;
-              
-              // Calculate summary statistics
-              const totalTests = stats.assertions.total || 0;
-              const passedTests = (stats.assertions.total - stats.assertions.failed) || 0;
-              const failedTests = stats.assertions.failed || 0;
-              const totalRequests = stats.requests.total || 0;
-              const passedRequests = (stats.requests.total - stats.requests.failed) || 0;
-              const failedRequests = stats.requests.failed || 0;
-              
-              // Get execution details
-              const executionTime = run.timings.completed - run.timings.started;
-              const executionTimeMs = Math.round(executionTime);
-              const executionTimeSec = Math.round(executionTime / 1000 * 10) / 10;
-              
-              // Get top failures
-              const failures = run.failures || [];
-              const topFailures = failures.slice(0, 5).map(failure => {
-                const source = failure.source || {};
-                const error = failure.error || {};
-                return `• **${source.name || 'Unknown'}**: ${error.message || error.test || 'Unknown error'}`;
-              }).join('\n');
-              
-              // Determine overall status
-              const testsPassed = failedTests === 0;
-              const statusIcon = testsPassed ? '✅' : '❌';
-              const statusText = testsPassed ? 'PASSED' : 'FAILED';
-              
-              // Create the comment body
-              const testPassPercentage = totalTests > 0 ? Math.round(passedTests/totalTests*100) : 0;
-              const commentBody = `## ${statusIcon} Postman API Tests ${statusText}
-              
-              **📊 Test Summary**
-              - **Tests**: ${passedTests}/${totalTests} passed (${testPassPercentage}%)
-              - **Requests**: ${passedRequests}/${totalRequests} passed
-              - **Execution Time**: ${executionTimeSec}s
-              
-              ${failures.length > 0 ? `**🔍 Top Failures**\n${topFailures}` : '**🎉 All tests passed!**'}
-              
-              ---
-              📁 **Full reports available in build artifacts**
-              - [JSON Report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
-              
-              <sub>🤖 This comment will be automatically updated on subsequent runs</sub>`;
               
               // Find existing comment to update
               const comments = await github.rest.issues.listComments({
@@ -218,6 +168,7 @@ jobs:
                   comment_id: botComment.id,
                   body: commentBody
                 });
+                console.log('Updated existing PR comment');
               } else {
                 // Create new comment
                 await github.rest.issues.createComment({
@@ -226,6 +177,7 @@ jobs:
                   issue_number: context.issue.number,
                   body: commentBody
                 });
+                console.log('Created new PR comment');
               }
               
             } catch (error) {
