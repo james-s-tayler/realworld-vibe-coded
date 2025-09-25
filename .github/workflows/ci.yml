@@ -131,7 +131,6 @@ jobs:
           name: postman-test-reports
           path: |
             reports/newman-report.json
-            reports/newman-report.html
           retention-days: 30
 
       - name: Parse test results and create PR comment
@@ -195,7 +194,6 @@ jobs:
               ---
               📁 **Full reports available in build artifacts**
               - [JSON Report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
-              - [HTML Report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
               
               <sub>🤖 This comment will be automatically updated on subsequent runs</sub>`;
               

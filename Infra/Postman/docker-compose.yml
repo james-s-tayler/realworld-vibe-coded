@@ -16,9 +16,7 @@ services:
       $${FOLDER:+--folder "$$FOLDER"} 
       --delay-request 25
       --insecure
-      --reporters json,htmlextra
+      --reporters json
       --reporter-json-export /reports/newman-report.json
-      --reporter-htmlextra-export /reports/newman-report.html
-      --reporter-htmlextra-title "Conduit API Tests$${FOLDER:+ - $$FOLDER}"
       --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME"
       --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"'
