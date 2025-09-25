@@ -84,7 +84,8 @@ build/client:
 # ==================================================================================== #
 #HELP run backend tests
 test/server:
-	dotnet test "${SERVER_SOLUTION}"
+	@mkdir -p TestResults
+	dotnet test "${SERVER_SOLUTION}" --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
 
 #HELP helper utility to prep for postman tests (reset db, stop any background backend, start backend, wait for it to be up)
 test/server/postman/prep: db/reset/force run-local/server/background/stop run-local/server/background test/server/ping 
