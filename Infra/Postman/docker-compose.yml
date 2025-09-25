@@ -4,6 +4,7 @@ services:
     network_mode: host
     volumes:
       - ./:/etc/newman
+      - ../../reports:/reports
     environment:
       APIURL: https://localhost:57679/api
       USERNAME: soloyolo
@@ -15,5 +16,7 @@ services:
       $${FOLDER:+--folder "$$FOLDER"} 
       --delay-request 25
       --insecure
+      --reporters json
+      --reporter-json-export /reports/newman-report.json
       --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME"
       --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"'

@@ -91,6 +91,8 @@ test/server/postman/prep: db/reset/force run-local/server/background/stop run-lo
 
 #HELP run postman tests
 test/server/postman: test/server/postman/prep
+	@mkdir -p reports
+	@rm -f reports/newman-report.json
 	@docker_exit_code=0; \
 	FOLDER=$(FOLDER) docker compose -f $(POSTMAN_COMPOSE_FILE) up --abort-on-container-exit || docker_exit_code=$$?; \
 	$(MAKE) run-local/server/background/stop; \
