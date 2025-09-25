@@ -60,3 +60,6 @@ nunit-*.xml
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+
+# Newman/Postman test reports
+reports/
