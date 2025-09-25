@@ -10,7 +10,7 @@ public class User : EntityBase, IAggregateRoot
     UpdateEmail(email);
     UpdateUsername(username);
     HashedPassword = Guard.Against.NullOrEmpty(hashedPassword, nameof(hashedPassword));
-    Bio = "I work at statefarm"; // Default bio as per Postman tests
+    Bio = "This will break the test - wrong default bio"; // Default bio as per Postman tests
     Image = null; // Default image as per Postman tests
     Following = new List<UserFollowing>();
     Followers = new List<UserFollowing>();
