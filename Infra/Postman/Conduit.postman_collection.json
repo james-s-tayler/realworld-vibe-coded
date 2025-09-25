@@ -9153,7 +9153,7 @@
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.email).to.eql(email)",
                   "});",
-                  "pm.test('user.usermame matches USERNAME variable', function() {",
+                  "pm.test('user.username matches USERNAME variable', function() {",
                   "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
                   "    pm.expect(user.username).to.eql(username)",
                   "});",
