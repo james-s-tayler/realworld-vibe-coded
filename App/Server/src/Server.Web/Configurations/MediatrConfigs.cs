@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using Ardalis.SharedKernel;
 using MediatR;
-using Server.Core.ContributorAggregate;
-using Server.UseCases.Contributors.Create;
+using Server.Core.UserAggregate;
+using Server.UseCases.Users.Register;
 
 namespace Server.Web.Configurations;
 
@@ -12,8 +12,8 @@ public static class MediatrConfigs
   {
     var mediatRAssemblies = new[]
       {
-        Assembly.GetAssembly(typeof(Contributor)), // Core
-        Assembly.GetAssembly(typeof(CreateContributorCommand)) // UseCases
+        Assembly.GetAssembly(typeof(User)), // Core
+        Assembly.GetAssembly(typeof(RegisterUserCommand)) // UseCases
       };
 
     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!))
