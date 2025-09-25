@@ -45,7 +45,7 @@ public class Follow(IRepository<User> _userRepository) : EndpointWithoutRequest<
 
     // Find the user to follow
     var userToFollow = await _userRepository.FirstOrDefaultAsync(
-      new Server.Core.UserAggregate.UserByUsernameSpec(username), cancellationToken);
+      new UserByUsernameSpec(username), cancellationToken);
 
     if (userToFollow == null)
     {
@@ -90,17 +90,4 @@ public class Follow(IRepository<User> _userRepository) : EndpointWithoutRequest<
       }
     };
   }
-}
-
-public class ProfileResponse
-{
-  public ProfileDto Profile { get; set; } = default!;
-}
-
-public class ProfileDto
-{
-  public string Username { get; set; } = string.Empty;
-  public string Bio { get; set; } = string.Empty;
-  public string? Image { get; set; }
-  public bool Following { get; set; }
 }
