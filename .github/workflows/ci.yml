@@ -156,11 +156,11 @@ jobs:
               const stats = run.stats;
               
               // Calculate summary statistics
-              const totalTests = stats.tests.total || 0;
-              const passedTests = stats.tests.passed || 0;
-              const failedTests = stats.tests.failed || 0;
+              const totalTests = stats.assertions.total || 0;
+              const passedTests = (stats.assertions.total - stats.assertions.failed) || 0;
+              const failedTests = stats.assertions.failed || 0;
               const totalRequests = stats.requests.total || 0;
-              const passedRequests = stats.requests.passed || 0;
+              const passedRequests = (stats.requests.total - stats.requests.failed) || 0;
               const failedRequests = stats.requests.failed || 0;
               
               // Get execution details
@@ -182,10 +182,11 @@ jobs:
               const statusText = testsPassed ? 'PASSED' : 'FAILED';
               
               // Create the comment body
+              const testPassPercentage = totalTests > 0 ? Math.round(passedTests/totalTests*100) : 0;
               const commentBody = `## ${statusIcon} Postman API Tests ${statusText}
               
               **📊 Test Summary**
-              - **Tests**: ${passedTests}/${totalTests} passed (${Math.round(passedTests/totalTests*100)}%)
+              - **Tests**: ${passedTests}/${totalTests} passed (${testPassPercentage}%)
               - **Requests**: ${passedRequests}/${totalRequests} passed
               - **Execution Time**: ${executionTimeSec}s
               
