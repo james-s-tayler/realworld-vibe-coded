@@ -112,6 +112,10 @@ test/server/postman/article: test/server/postman
 test/server/postman/feed: FOLDER=FeedAndArticles
 test/server/postman/feed: test/server/postman
 
+#HELP run postman tests in the Profiles folder
+test/server/postman/profiles: FOLDER=Profiles
+test/server/postman/profiles: test/server/postman
+
 #HELP ping backend to see if it's up (requires backend running in background)
 test/server/ping:
 	@T=60; URL=https://localhost:57679/swagger/index.html; \

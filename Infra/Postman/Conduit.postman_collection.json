@@ -9058,6 +9058,240 @@
       "name": "Profiles",
       "item": [
         {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"user\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('user');",
+                  "    });",
+                  "",
+                  "    var user = responseJSON.user || {};",
+                  "",
+                  "    pm.test('\"email\" property matches EMAIL variable', function() {",
+                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
+                  "        pm.expect(user.email).to.eql(email);",
+                  "    });",
+                  "    pm.test('\"usermame\" property matches USERNAME variable', function() {",
+                  "        const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME');",
+                  "        pm.expect(user.username).to.eql(username);",
+                  "    });",
+                  "    pm.test('User has default \"bio\" property', function() {",
+                  "        pm.expect(user.bio).to.eql('I work at statefarm');",
+                  "    });",
+                  "    pm.test('User has \"image\" property', function() {",
+                  "        pm.expect(user).to.have.property('image');",
+                  "        pm.expect(user.image).to.be.null;",
+                  "    });",
+                  "    pm.test('User has \"token\" property', function() {",
+                  "        pm.expect(user).to.have.property('token');",
+                  "    });",
+                  "    pm.test('\"token\" property is not empty', function() {",
+                  "        pm.expect(user.token).to.not.be.empty",
+                  "    });",
+                  "    pm.test('\"token\" property is not same as password', function() {",
+                  "    const password = pm.globals.get('PASSWORD') || pm.environment.get('PASSWORD');",
+                  "    pm.expect(user.token).to.not.eql(password, 'The password must be hashed, and not stored in plain text');",
+                  "    });",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login and Remember Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"user\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('user')",
+                  "});",
+                  "",
+                  "var user = responseJSON.user || {};",
+                  "",
+                  "pm.test('user.email matches the EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.email).to.eql(email)",
+                  "});",
+                  "pm.test('user.usermame matches USERNAME variable', function() {",
+                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
+                  "    pm.expect(user.username).to.eql(username)",
+                  "});",
+                  "pm.test('User has \"bio\" property', function() {",
+                  "    pm.expect(user).to.have.property('bio')",
+                  "});",
+                  "pm.test('User has \"image\" property', function() {",
+                  "    pm.expect(user).to.have.property('image')",
+                  "});",
+                  "pm.test('User has \"token\" property', function() {",
+                  "    pm.expect(user).to.have.property('token')",
+                  "});",
+                  "",
+                  "if(pm.test('User has \"token\" property')){",
+                  "    pm.globals.set('token', user.token);",
+                  "}",
+                  "",
+                  "pm.test('Global variable \"token\" has been set', function() {",
+                  "    pm.globals.get('token') === user.token",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users/login",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register (second user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"user\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('user');",
+                  "    });",
+                  "",
+                  "    var user = responseJSON.user || {};",
+                  "",
+                  "    pm.test('\"email\" property matches SECOND_EMAIL variable', function() {",
+                  "        const email = pm.globals.get('SECOND_EMAIL');",
+                  "        pm.expect(user.email).to.eql(email);",
+                  "    });",
+                  "    pm.test('\"usermame\" property matches SECOND_USERNAME variable', function() {",
+                  "        const username = pm.globals.get('SECOND_USERNAME');",
+                  "        pm.expect(user.username).to.eql(username);",
+                  "    });",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set(\"SECOND_EMAIL\", (Math.random() * 1000) + \"@example.com\")",
+                  "pm.globals.set(\"SECOND_USERNAME\", (Math.random() * 1000) + \"\")"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{SECOND_USERNAME}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Register Celeb",
           "event": [
             {
