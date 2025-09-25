@@ -9240,7 +9240,7 @@
                   "        const email = pm.globals.get('SECOND_EMAIL');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"usermame\" property matches SECOND_USERNAME variable', function() {",
+                  "    pm.test('\"username\" property matches SECOND_USERNAME variable', function() {",
                   "        const username = pm.globals.get('SECOND_USERNAME');",
                   "        pm.expect(user.username).to.eql(username);",
                   "    });",
