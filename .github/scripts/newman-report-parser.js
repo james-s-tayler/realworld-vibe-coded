@@ -62,49 +62,26 @@ ${failures.length > 0 ? `**🔍 Top Failures**\n${topFailures}` : '**🎉 All te
 📁 **Full reports available in build artifacts**
 - [JSON Report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
 
-<sub>🤖 This comment will be automatically updated on subsequent runs</sub>`;
+<sub>🤖 Generated on each test run</sub>`;
 
   return commentBody;
 }
 
 /**
- * Creates or updates PR comment with Newman test results
+ * Creates a new PR comment with Newman test results
  * @param {object} github - GitHub API client
  * @param {object} context - GitHub Actions context
  * @param {string} commentBody - Comment content to post
  */
-async function createOrUpdateComment(github, context, commentBody) {
-  // Find existing comment to update
-  const comments = await github.rest.issues.listComments({
+async function createComment(github, context, commentBody) {
+  // Always create a new comment for each test run
+  await github.rest.issues.createComment({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    issue_number: context.issue.number
+    issue_number: context.issue.number,
+    body: commentBody
   });
-
-  const botComment = comments.data.find(comment => 
-    comment.user.login === 'github-actions[bot]' && 
-    comment.body.includes('Postman API Tests')
-  );
-
-  if (botComment) {
-    // Update existing comment
-    await github.rest.issues.updateComment({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      comment_id: botComment.id,
-      body: commentBody
-    });
-    console.log('Updated existing PR comment');
-  } else {
-    // Create new comment
-    await github.rest.issues.createComment({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      issue_number: context.issue.number,
-      body: commentBody
-    });
-    console.log('Created new PR comment');
-  }
+  console.log('Created new PR comment');
 }
 
 // Main execution when run as script
@@ -136,7 +113,7 @@ async function main() {
 // Export functions for potential reuse
 module.exports = {
   parseNewmanReport,
-  createOrUpdateComment
+  createComment
 };
 
 // Run main function if executed directly

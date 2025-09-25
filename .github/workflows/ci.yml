@@ -148,37 +148,14 @@ jobs:
                 return;
               }
               
-              // Find existing comment to update
-              const comments = await github.rest.issues.listComments({
+              // Always create a new comment for each test run
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number
+                issue_number: context.issue.number,
+                body: commentBody
               });
-              
-              const botComment = comments.data.find(comment => 
-                comment.user.login === 'github-actions[bot]' && 
-                comment.body.includes('Postman API Tests')
-              );
-              
-              if (botComment) {
-                // Update existing comment
-                await github.rest.issues.updateComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  comment_id: botComment.id,
-                  body: commentBody
-                });
-                console.log('Updated existing PR comment');
-              } else {
-                // Create new comment
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.issue.number,
-                  body: commentBody
-                });
-                console.log('Created new PR comment');
-              }
+              console.log('Created new PR comment');
               
             } catch (error) {
               console.error('Error creating/updating PR comment:', error);
