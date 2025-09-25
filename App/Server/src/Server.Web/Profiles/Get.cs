@@ -60,7 +60,7 @@ public class Get(IRepository<User> _userRepository) : EndpointWithoutRequest<Pro
       // Get the current user to check if they are following
       var currentUser = await _userRepository.FirstOrDefaultAsync(
         new UserWithFollowingSpec(currentUserId.Value), cancellationToken);
-      
+
       if (currentUser != null)
       {
         isFollowing = currentUser.IsFollowing(user);
