@@ -1,22 +1,39 @@
 services:
+  api:
+    build:
+      context: ../../App/Server
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__SqliteConnection: "Data Source=database.sqlite"
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/swagger/index.html"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
+    
   newman:
     image: postman/newman:alpine
-    network_mode: host
+    depends_on:
+      api:
+        condition: service_healthy
     volumes:
       - ./:/etc/newman
       - ../../reports:/reports
     environment:
-      APIURL: https://localhost:57679/api
-      USERNAME: soloyolo
-      EMAIL: soloyolo@mail.com
-      PASSWORD: password123
-      FOLDER: ${FOLDER}
+      - APIURL=http://api:5000/api
+      - USERNAME=soloyolo
+      - EMAIL=soloyolo@mail.com
+      - PASSWORD=password123
+      - FOLDER=${FOLDER}
     entrypoint: >
-      sh -lc 'newman run /etc/newman/Conduit.postman_collection.json
-      $${FOLDER:+--folder "$$FOLDER"} 
-      --delay-request 25
-      --insecure
-      --reporters json
-      --reporter-json-export /reports/newman-report.json
-      --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME"
-      --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"'
+      sh -c '
+      if [ -n "$$FOLDER" ]; then
+        newman run /etc/newman/Conduit.postman_collection.json --folder "$$FOLDER" --delay-request 25 --reporters cli,json --reporter-json-export /reports/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+      else
+        newman run /etc/newman/Conduit.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /reports/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+      fi'
