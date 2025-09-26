@@ -87,16 +87,13 @@ test/server:
 	@mkdir -p TestResults
 	dotnet test "${SERVER_SOLUTION}" --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
 
-#HELP helper utility to prep for postman tests (reset db, stop any background backend, start backend, wait for it to be up)
-test/server/postman/prep: db/reset/force run-local/server/background/stop run-local/server/background test/server/ping 
-
-#HELP run postman tests
-test/server/postman: test/server/postman/prep
+#HELP run postman tests using Docker Compose
+test/server/postman:
 	@mkdir -p reports
 	@rm -f reports/newman-report.json
 	@docker_exit_code=0; \
-	FOLDER=$(FOLDER) docker compose -f $(POSTMAN_COMPOSE_FILE) up --abort-on-container-exit || docker_exit_code=$$?; \
-	$(MAKE) run-local/server/background/stop; \
+	FOLDER=$(FOLDER) docker compose -f $(POSTMAN_COMPOSE_FILE) up --build --abort-on-container-exit || docker_exit_code=$$?; \
+	docker compose -f $(POSTMAN_COMPOSE_FILE) down; \
 	exit $$docker_exit_code
 	
 #HELP run postman tests in the Auth folder
