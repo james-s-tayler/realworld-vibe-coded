@@ -367,7 +367,11 @@ Task("Db-Reset")
     }
     
     Information("Deleting App/Server/src/Server.Web/database.sqlite ...");
-    DeleteFile("App/Server/src/Server.Web/database.sqlite");
+    var dbFile = File("App/Server/src/Server.Web/database.sqlite");
+    if (FileExists(dbFile))
+    {
+        DeleteFile(dbFile);
+    }
     Information("Done.");
 });
 
@@ -376,7 +380,11 @@ Task("Db-Reset-Force")
     .Does(() =>
 {
     Information("Deleting App/Server/src/Server.Web/database.sqlite ...");
-    DeleteFile("App/Server/src/Server.Web/database.sqlite");
+    var dbFile = File("App/Server/src/Server.Web/database.sqlite");
+    if (FileExists(dbFile))
+    {
+        DeleteFile(dbFile);
+    }
     Information("Done.");
 });
 

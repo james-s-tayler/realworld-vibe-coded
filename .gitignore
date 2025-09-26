@@ -63,3 +63,6 @@ nunit-*.xml
 
 # Newman/Postman test reports
 reports/
+
+# Cake build tool cache
+tools/
