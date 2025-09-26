@@ -88,7 +88,7 @@ test/server:
 	dotnet test "${SERVER_SOLUTION}" --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
 
 #HELP run postman tests using Docker Compose
-test/server/postman:
+test/server/postman: db/reset/force
 	@mkdir -p reports
 	@rm -f reports/newman-report.json
 	@docker_exit_code=0; \
