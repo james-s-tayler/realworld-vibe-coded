@@ -176,9 +176,87 @@ class Build : NukeBuild
 
     Target TestServerPostman => _ => _
         .Description("Run postman tests")
-        .DependsOn(TestServerPostmanPrep)
         .Executes(() =>
         {
+            // Inline the prep steps to avoid dependency chain issues
+            Console.WriteLine("Preparing for Postman tests...");
+            
+            // 1. Reset database
+            Console.WriteLine($"Deleting {DatabasePath} ...");
+            if (File.Exists(DatabasePath))
+            {
+                File.Delete(DatabasePath);
+            }
+            Console.WriteLine("Database reset completed.");
+            
+            // 2. Stop any existing background servers
+            try
+            {
+                ProcessTasks.StartProcess("pkill", "dotnet").AssertWaitForExit();
+                Console.WriteLine("Stopped any existing background servers.");
+            }
+            catch
+            {
+                // Ignore if no processes to kill
+            }
+            
+            // 3. Start server in background
+            var startInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "bash",
+                Arguments = $"-c \"dotnet run --project '{ServerProject}' > /dev/null 2>&1 &\"",
+                WorkingDirectory = RootDirectory,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            
+            using (var process = System.Diagnostics.Process.Start(startInfo))
+            {
+                process?.WaitForExit();
+            }
+            
+            Console.WriteLine("Started server in background, waiting for startup...");
+            System.Threading.Thread.Sleep(5000);
+            
+            // 4. Test if server is responding
+            var serverReady = false;
+            var maxPingAttempts = 30;
+            var url = "https://localhost:57679/swagger/index.html";
+            
+            for (int i = 1; i <= maxPingAttempts; i++)
+            {
+                try
+                {
+                    var result = ProcessTasks.StartProcess("curl", 
+                        $"-k -s -o /dev/null -w \"%{{http_code}}\" {url}")
+                        .AssertWaitForExit();
+                    
+                    if (result.ExitCode == 0)
+                    {
+                        Console.WriteLine($"Server is ready (ping attempt {i})");
+                        serverReady = true;
+                        break;
+                    }
+                }
+                catch
+                {
+                    // Continue trying
+                }
+                
+                if (i % 5 == 0)
+                {
+                    Console.WriteLine($"Waiting for server to start... (attempt {i}/{maxPingAttempts})");
+                }
+                
+                System.Threading.Thread.Sleep(1000);
+            }
+            
+            if (!serverReady)
+            {
+                throw new Exception("Server failed to start within timeout period");
+            }
+            
+            // 5. Prepare reports directory
             if (Directory.Exists(ReportsDirectory))
                 Directory.Delete(ReportsDirectory, true);
             Directory.CreateDirectory(ReportsDirectory);
@@ -188,14 +266,12 @@ class Build : NukeBuild
                 File.Delete(ReportsDirectory / "newman-report.json");
             }
             
+            // 6. Run Docker Compose tests
             try
             {
                 var folder = Environment.GetEnvironmentVariable("FOLDER") ?? "";
-                
-                // Set up docker compose command with environment variable
                 var processArgs = $"compose -f {PostmanComposeFile} up --abort-on-container-exit";
                 
-                // Set environment variable if provided and run docker compose
                 var originalFolder = Environment.GetEnvironmentVariable("FOLDER");
                 if (!string.IsNullOrEmpty(folder))
                 {
@@ -204,6 +280,7 @@ class Build : NukeBuild
                 
                 try
                 {
+                    Console.WriteLine($"Running Docker Compose tests{(string.IsNullOrEmpty(folder) ? "" : $" (FOLDER={folder})")}...");
                     ProcessTasks.StartProcess("docker", processArgs, workingDirectory: RootDirectory)
                         .AssertWaitForExit()
                         .AssertZeroExitCode();
@@ -228,6 +305,7 @@ class Build : NukeBuild
                 {
                     ProcessTasks.StartProcess("pkill", "dotnet")
                         .AssertWaitForExit();
+                    Console.WriteLine("Stopped background server.");
                 }
                 catch
                 {
@@ -290,8 +368,10 @@ class Build : NukeBuild
         .Description("Ping backend to see if it's up (requires backend running in background)")
         .Executes(() =>
         {
-            var timeout = 60;
+            var timeout = 90; // Increased timeout for CI environments
             var url = "https://localhost:57679/swagger/index.html";
+            
+            Console.WriteLine($"Starting ping attempts to {url} (max {timeout} attempts)...");
             
             for (int i = 1; i <= timeout; i++)
             {
@@ -305,17 +385,21 @@ class Build : NukeBuild
                     
                     if (result.ExitCode == 0)
                     {
+                        Console.WriteLine($"Backend is responding (attempt {i})");
                         return;
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Continue trying
+                    if (i % 10 == 0) // Log every 10th attempt
+                    {
+                        Console.WriteLine($"Ping attempt {i} failed: {ex.Message}");
+                    }
                 }
                 
                 if (i == timeout)
                 {
-                    Console.WriteLine("Backend ping timeout");
+                    Console.WriteLine("Backend ping timeout - server may not have started properly");
                     Environment.Exit(1);
                 }
                 
@@ -346,23 +430,22 @@ class Build : NukeBuild
         .Description("Run backend in the background (for local development)")
         .Executes(() =>
         {
-            // Start the server in the background exactly like Makefile does: dotnet run &
+            // Use the same approach as Makefile: direct shell execution with & operator
             var startInfo = new System.Diagnostics.ProcessStartInfo
             {
-                FileName = "dotnet",
-                Arguments = $"run --project {ServerProject}",
+                FileName = "bash",
+                Arguments = $"-c \"dotnet run --project '{ServerProject}' > /dev/null 2>&1 &\"",
                 WorkingDirectory = RootDirectory,
                 UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
                 CreateNoWindow = true
             };
             
-            var process = System.Diagnostics.Process.Start(startInfo);
+            using var process = System.Diagnostics.Process.Start(startInfo);
+            process?.WaitForExit();
             
-            Console.WriteLine($"Started server in background with PID: {process.Id}");
-            // Give the process time to start up properly  
-            System.Threading.Thread.Sleep(5000);
+            Console.WriteLine("Started server in background");
+            // Give the process a brief moment to start - ping has its own retry logic
+            System.Threading.Thread.Sleep(2000);
         });
 
     Target RunLocalServerBackgroundStop => _ => _
