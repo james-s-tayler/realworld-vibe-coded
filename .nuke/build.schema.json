@@ -31,10 +31,21 @@
         "LintMake",
         "LintServer",
         "ResetDatabase",
+        "ResetDatabaseForce",
         "RunLocalClient",
         "RunLocalServer",
+        "RunLocalServerBackground",
+        "RunLocalServerBackgroundStop",
         "TestClient",
-        "TestServer"
+        "TestServer",
+        "TestServerPing",
+        "TestServerPostman",
+        "TestServerPostmanArticle",
+        "TestServerPostmanArticlesEmpty",
+        "TestServerPostmanAuth",
+        "TestServerPostmanFeed",
+        "TestServerPostmanPrep",
+        "TestServerPostmanProfiles"
       ]
     },
     "Verbosity": {

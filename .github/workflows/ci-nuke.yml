@@ -143,3 +143,75 @@ jobs:
         uses: actions/checkout@v4
       - name: Run Makefile lint via Nuke
         run: ./build.sh LintMake
+
+  test-server-postman-nuke:
+    name: Test Server (Postman) - Nuke
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Test Server (Postman) - Nuke
+        id: postman_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh TestServerPostman
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts and comment
+        
+      - name: Upload Postman Reports
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: postman-test-reports-nuke
+          path: |
+            reports/newman-report.json
+          retention-days: 30
+
+      - name: Parse test results and create PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { parseNewmanReport } = require('./.github/scripts/newman-report-parser.js');
+            
+            try {
+              const commentBody = parseNewmanReport('reports/newman-report.json', context, ' - Nuke');
+              
+              if (!commentBody) {
+                console.log('No comment body generated, skipping PR comment');
+                return;
+              }
+              
+              // Always create a new comment for each test run
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+              console.log('Created new PR comment');
+              
+            } catch (error) {
+              console.error('Error creating/updating PR comment:', error);
+            }
+
+      - name: Fail job if tests failed
+        if: steps.postman_tests.outputs.exit_code != '0'
+        run: |
+          echo "Postman tests failed with exit code ${{ steps.postman_tests.outputs.exit_code }}"
+          exit ${{ steps.postman_tests.outputs.exit_code }}

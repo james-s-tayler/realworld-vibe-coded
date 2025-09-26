@@ -17,6 +17,8 @@ class Build : NukeBuild
     AbsolutePath ServerProject => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "Server.Web.csproj";
     AbsolutePath ClientSolution => RootDirectory / "App" / "Client";
     AbsolutePath TestResultsDirectory => RootDirectory / "TestResults";
+    AbsolutePath ReportsDirectory => RootDirectory / "reports";
+    AbsolutePath PostmanComposeFile => RootDirectory / "Infra" / "Postman" / "docker-compose.yml";
     AbsolutePath DatabasePath => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "database.sqlite";
 
     Target HelpTarget => _ => _
@@ -24,17 +26,28 @@ class Build : NukeBuild
         .Executes(() =>
         {
             Console.WriteLine("Available targets:");
-            Console.WriteLine("help                    List all the available tasks");
-            Console.WriteLine("lint-server             Verify backend formatting & analyzers");
-            Console.WriteLine("lint-make              Lint makefile");
-            Console.WriteLine("lint-client            Lint client code");
-            Console.WriteLine("build-server           Dotnet build (backend)");
-            Console.WriteLine("build-client           Build client (frontend)");
-            Console.WriteLine("test-server            Run backend tests");
-            Console.WriteLine("test-client            Run client tests");
-            Console.WriteLine("run-local-server       Run backend locally");
-            Console.WriteLine("run-local-client       Run client locally");
-            Console.WriteLine("reset-database         Delete local sqlite database");
+            Console.WriteLine("help                         List all the available tasks");
+            Console.WriteLine("lint-server                  Verify backend formatting & analyzers");
+            Console.WriteLine("lint-make                   Lint makefile");
+            Console.WriteLine("lint-client                 Lint client code");
+            Console.WriteLine("build-server                Dotnet build (backend)");
+            Console.WriteLine("build-client                Build client (frontend)");
+            Console.WriteLine("test-server                 Run backend tests");
+            Console.WriteLine("test-server-postman-prep     Helper utility to prep for postman tests");
+            Console.WriteLine("test-server-postman         Run postman tests");
+            Console.WriteLine("test-server-postman-auth    Run postman tests in the Auth folder");
+            Console.WriteLine("test-server-postman-articles-empty  Run postman tests in the ArticlesEmpty folder");  
+            Console.WriteLine("test-server-postman-article Run postman tests in the Article folder");
+            Console.WriteLine("test-server-postman-feed    Run postman tests in the FeedAndArticles folder");
+            Console.WriteLine("test-server-postman-profiles Run postman tests in the Profiles folder");
+            Console.WriteLine("test-server-ping            Ping backend to see if it's up");
+            Console.WriteLine("test-client                 Run client tests");
+            Console.WriteLine("run-local-server            Run backend locally");
+            Console.WriteLine("run-local-server-background Run backend in the background");
+            Console.WriteLine("run-local-server-background-stop Stop background backend");
+            Console.WriteLine("run-local-client            Run client locally");
+            Console.WriteLine("reset-database              Delete local sqlite database");
+            Console.WriteLine("reset-database-force        Delete local sqlite database (no confirmation)");
         });
 
     // ==================================================================================== //
@@ -155,6 +168,159 @@ class Build : NukeBuild
             Console.WriteLine("No client tests configured yet.");
         });
 
+    // Postman Testing Targets
+
+    Target TestServerPostmanPrep => _ => _
+        .Description("Helper utility to prep for postman tests (reset db, stop any background backend, start backend, wait for it to be up)")
+        .DependsOn(ResetDatabaseForce, RunLocalServerBackgroundStop, RunLocalServerBackground, TestServerPing);
+
+    Target TestServerPostman => _ => _
+        .Description("Run postman tests")
+        .DependsOn(TestServerPostmanPrep)
+        .Executes(() =>
+        {
+            if (Directory.Exists(ReportsDirectory))
+                Directory.Delete(ReportsDirectory, true);
+            Directory.CreateDirectory(ReportsDirectory);
+            
+            if (File.Exists(ReportsDirectory / "newman-report.json"))
+            {
+                File.Delete(ReportsDirectory / "newman-report.json");
+            }
+            
+            try
+            {
+                var folder = Environment.GetEnvironmentVariable("FOLDER") ?? "";
+                
+                // Set up docker compose command with environment variable
+                var processArgs = $"compose -f {PostmanComposeFile} up --abort-on-container-exit";
+                
+                if (!string.IsNullOrEmpty(folder))
+                {
+                    // Set environment variable and run
+                    var originalFolder = Environment.GetEnvironmentVariable("FOLDER");
+                    Environment.SetEnvironmentVariable("FOLDER", folder);
+                    
+                    try
+                    {
+                        ProcessTasks.StartProcess("docker", processArgs, workingDirectory: RootDirectory)
+                            .AssertWaitForExit()
+                            .AssertZeroExitCode();
+                    }
+                    finally
+                    {
+                        Environment.SetEnvironmentVariable("FOLDER", originalFolder);
+                    }
+                }
+                else
+                {
+                    ProcessTasks.StartProcess("docker", processArgs, workingDirectory: RootDirectory)
+                        .AssertWaitForExit()
+                        .AssertZeroExitCode();
+                }
+            }
+            finally
+            {
+                // Always try to stop the background server
+                try
+                {
+                    ProcessTasks.StartProcess("pkill", "dotnet")
+                        .AssertWaitForExit();
+                }
+                catch
+                {
+                    // Ignore errors, similar to Makefile
+                }
+            }
+        });
+
+    Target TestServerPostmanAuth => _ => _
+        .Description("Run postman tests in the Auth folder")
+        .Executes(() =>
+        {
+            Environment.SetEnvironmentVariable("FOLDER", "Auth");
+            ProcessTasks.StartProcess("dotnet", "run --project build/_build.csproj -- TestServerPostman", workingDirectory: RootDirectory)
+                .AssertWaitForExit()
+                .AssertZeroExitCode();
+        });
+
+    Target TestServerPostmanArticlesEmpty => _ => _
+        .Description("Run postman tests in the ArticlesEmpty folder")
+        .Executes(() =>
+        {
+            Environment.SetEnvironmentVariable("FOLDER", "ArticlesEmpty");
+            ProcessTasks.StartProcess("dotnet", "run --project build/_build.csproj -- TestServerPostman", workingDirectory: RootDirectory)
+                .AssertWaitForExit()
+                .AssertZeroExitCode();
+        });
+
+    Target TestServerPostmanArticle => _ => _
+        .Description("Run postman tests in the Article folder")
+        .Executes(() =>
+        {
+            Environment.SetEnvironmentVariable("FOLDER", "Article");
+            ProcessTasks.StartProcess("dotnet", "run --project build/_build.csproj -- TestServerPostman", workingDirectory: RootDirectory)
+                .AssertWaitForExit()
+                .AssertZeroExitCode();
+        });
+
+    Target TestServerPostmanFeed => _ => _
+        .Description("Run postman tests in the FeedAndArticles folder")
+        .Executes(() =>
+        {
+            Environment.SetEnvironmentVariable("FOLDER", "FeedAndArticles");
+            ProcessTasks.StartProcess("dotnet", "run --project build/_build.csproj -- TestServerPostman", workingDirectory: RootDirectory)
+                .AssertWaitForExit()
+                .AssertZeroExitCode();
+        });
+
+    Target TestServerPostmanProfiles => _ => _
+        .Description("Run postman tests in the Profiles folder")
+        .Executes(() =>
+        {
+            Environment.SetEnvironmentVariable("FOLDER", "Profiles");
+            ProcessTasks.StartProcess("dotnet", "run --project build/_build.csproj -- TestServerPostman", workingDirectory: RootDirectory)
+                .AssertWaitForExit()
+                .AssertZeroExitCode();
+        });
+
+    Target TestServerPing => _ => _
+        .Description("Ping backend to see if it's up (requires backend running in background)")
+        .Executes(() =>
+        {
+            var timeout = 60;
+            var url = "https://localhost:57679/swagger/index.html";
+            
+            for (int i = 1; i <= timeout; i++)
+            {
+                Console.WriteLine($"Pinging {url} (attempt {i} of {timeout}) ...");
+                try
+                {
+                    // Use curl command similar to Makefile
+                    var result = ProcessTasks.StartProcess("curl", 
+                        $"-k -s -o /dev/null -w \"%{{http_code}}\" {url}")
+                        .AssertWaitForExit();
+                    
+                    if (result.ExitCode == 0)
+                    {
+                        return;
+                    }
+                }
+                catch
+                {
+                    // Continue trying
+                }
+                
+                if (i == timeout)
+                {
+                    Console.WriteLine("Backend ping timeout");
+                    Environment.Exit(1);
+                }
+                
+                System.Threading.Thread.Sleep(1000);
+            }
+        });
+
     // ==================================================================================== //
     // RUN-LOCAL
     // ==================================================================================== //
@@ -174,12 +340,63 @@ class Build : NukeBuild
             Console.WriteLine("No client run-local configured yet.");
         });
 
+    Target RunLocalServerBackground => _ => _
+        .Description("Run backend in the background (for local development)")
+        .Executes(() =>
+        {
+            // Start the server in the background
+            ProcessTasks.StartProcess("dotnet", 
+                $"run --project \"{ServerProject}\"", 
+                workingDirectory: RootDirectory,
+                logOutput: false);
+        });
+
+    Target RunLocalServerBackgroundStop => _ => _
+        .Description("Stop background backend (for local development)")
+        .Executes(() =>
+        {
+            Console.WriteLine("Killing Server.Web ...");
+            try
+            {
+                ProcessTasks.StartProcess("pkill", "dotnet")
+                    .AssertWaitForExit();
+            }
+            catch
+            {
+                // Ignore errors, similar to Makefile -pkill dotnet || true
+            }
+            Console.WriteLine("Done.");
+        });
+
     // ==================================================================================== //
     // DB
     // ==================================================================================== //
 
     Target ResetDatabase => _ => _
-        .Description("Delete local sqlite database")
+        .Description("Delete local sqlite database (confirm or FORCE=1 to skip)")
+        .Executes(() =>
+        {
+            if (Environment.GetEnvironmentVariable("FORCE") != "1")
+            {
+                Console.WriteLine("Are you sure? [y/N]");
+                var input = Console.ReadLine()?.Trim().ToLower();
+                if (input != "y" && input != "yes")
+                {
+                    Console.WriteLine("Operation cancelled.");
+                    Environment.Exit(1);
+                }
+            }
+            
+            Console.WriteLine($"Deleting {DatabasePath} ...");
+            if (File.Exists(DatabasePath))
+            {
+                File.Delete(DatabasePath);
+            }
+            Console.WriteLine("Done.");
+        });
+
+    Target ResetDatabaseForce => _ => _
+        .Description("Delete local sqlite database (no confirmation)")
         .Executes(() =>
         {
             Console.WriteLine($"Deleting {DatabasePath} ...");
