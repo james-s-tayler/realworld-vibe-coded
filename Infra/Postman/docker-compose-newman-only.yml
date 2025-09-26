@@ -1,0 +1,20 @@
+services:
+  newman:
+    image: postman/newman:alpine
+    volumes:
+      - ./:/etc/newman
+      - ../../reports:/reports
+    environment:
+      APIURL: http://api:5000/api
+      USERNAME: soloyolo
+      EMAIL: soloyolo@mail.com
+      PASSWORD: password123
+      FOLDER: ${FOLDER}
+    entrypoint: >
+      sh -lc 'newman run /etc/newman/Conduit.postman_collection.json
+      $${FOLDER:+--folder "$$FOLDER"} 
+      --delay-request 25
+      --reporters json
+      --reporter-json-export /reports/newman-report.json
+      --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME"
+      --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"'
