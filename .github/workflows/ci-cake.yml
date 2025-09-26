@@ -1,0 +1,233 @@
+name: CI (Cake)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Cancel in-progress runs for the same ref/PR to save minutes
+concurrency:
+  group: server-ci-cake-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build-server-cake:
+    name: Build (Server - Cake)
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Install Cake tool
+        run: dotnet tool install --global Cake.Tool --version 4.0.0
+
+      - name: Build (server - cake)
+        run: dotnet-cake build.cake --target=Build-Server
+
+  test-server-cake:
+    name: Test (Server - Cake)
+    runs-on: ubuntu-latest
+    # Run tests as an independent job so it shows up as its own status check
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Install Cake tool
+        run: dotnet tool install --global Cake.Tool --version 4.0.0
+
+      - name: Test (server - cake)
+        id: xunit_tests
+        run: |
+          set +e  # Don't exit on error
+          dotnet-cake build.cake --target=Test-Server
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts and comment
+        
+      - name: Upload xUnit Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: xunit-test-reports-cake
+          path: |
+            TestResults/test-results.trx
+          retention-days: 30
+
+      - name: Parse test results and create PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { parseXUnitReport } = require('./.github/scripts/xunit-report-parser.js');
+            
+            try {
+              const commentBody = parseXUnitReport('TestResults/test-results.trx', context, 'Cake');
+              
+              if (!commentBody) {
+                console.log('No comment body generated, skipping PR comment');
+                return;
+              }
+              
+              // Always create a new comment for each test run
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+              console.log('Created new PR comment');
+              
+            } catch (error) {
+              console.error('Error creating/updating PR comment:', error);
+            }
+
+      - name: Fail job if tests failed
+        if: steps.xunit_tests.outputs.exit_code != '0'
+        run: |
+          echo "xUnit tests failed with exit code ${{ steps.xunit_tests.outputs.exit_code }}"
+          exit ${{ steps.xunit_tests.outputs.exit_code }}
+
+  lint-server-cake:
+    name: Lint (Server - Cake)
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Install Cake tool
+        run: dotnet tool install --global Cake.Tool --version 4.0.0
+
+      - name: Lint (server - cake)
+        run: dotnet-cake build.cake --target=Lint-Server
+
+  lint-make-cake:
+    name: Lint Makefile (Cake)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Cake tool
+        run: dotnet tool install --global Cake.Tool --version 4.0.0
+        
+      - name: Run Makefile lint via Cake
+        run: dotnet-cake build.cake --target=Lint-Make
+
+  test-server-postman-cake:
+    name: Test Server (Postman - Cake)
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Install Cake tool
+        run: dotnet tool install --global Cake.Tool --version 4.0.0
+
+      - name: Test Server (Postman - Cake)
+        id: postman_tests
+        run: |
+          set +e  # Don't exit on error
+          dotnet-cake build.cake --target=Test-Server-Postman
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts and comment
+        
+      - name: Upload Postman Reports
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: postman-test-reports-cake
+          path: |
+            reports/newman-report.json
+          retention-days: 30
+
+      - name: Parse test results and create PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { parseNewmanReport } = require('./.github/scripts/newman-report-parser.js');
+            
+            try {
+              const commentBody = parseNewmanReport('reports/newman-report.json', context, 'Cake');
+              
+              if (!commentBody) {
+                console.log('No comment body generated, skipping PR comment');
+                return;
+              }
+              
+              // Always create a new comment for each test run
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+              console.log('Created new PR comment');
+              
+            } catch (error) {
+              console.error('Error creating/updating PR comment:', error);
+            }
+
+      - name: Fail job if tests failed
+        if: steps.postman_tests.outputs.exit_code != '0'
+        run: |
+          echo "Postman tests failed with exit code ${{ steps.postman_tests.outputs.exit_code }}"
+          exit ${{ steps.postman_tests.outputs.exit_code }}
