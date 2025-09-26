@@ -195,29 +195,31 @@ class Build : NukeBuild
                 // Set up docker compose command with environment variable
                 var processArgs = $"compose -f {PostmanComposeFile} up --abort-on-container-exit";
                 
+                // Set environment variable if provided and run docker compose
+                var originalFolder = Environment.GetEnvironmentVariable("FOLDER");
                 if (!string.IsNullOrEmpty(folder))
                 {
-                    // Set environment variable and run
-                    var originalFolder = Environment.GetEnvironmentVariable("FOLDER");
                     Environment.SetEnvironmentVariable("FOLDER", folder);
-                    
-                    try
-                    {
-                        ProcessTasks.StartProcess("docker", processArgs, workingDirectory: RootDirectory)
-                            .AssertWaitForExit()
-                            .AssertZeroExitCode();
-                    }
-                    finally
-                    {
-                        Environment.SetEnvironmentVariable("FOLDER", originalFolder);
-                    }
                 }
-                else
+                
+                try
                 {
                     ProcessTasks.StartProcess("docker", processArgs, workingDirectory: RootDirectory)
                         .AssertWaitForExit()
                         .AssertZeroExitCode();
                 }
+                finally
+                {
+                    if (!string.IsNullOrEmpty(folder))
+                    {
+                        Environment.SetEnvironmentVariable("FOLDER", originalFolder);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Postman tests failed: {ex.Message}");
+                throw;
             }
             finally
             {
@@ -344,11 +346,23 @@ class Build : NukeBuild
         .Description("Run backend in the background (for local development)")
         .Executes(() =>
         {
-            // Start the server in the background
-            ProcessTasks.StartProcess("dotnet", 
-                $"run --project \"{ServerProject}\"", 
-                workingDirectory: RootDirectory,
-                logOutput: false);
+            // Start the server in the background exactly like Makefile does: dotnet run &
+            var startInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = $"run --project {ServerProject}",
+                WorkingDirectory = RootDirectory,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+            
+            var process = System.Diagnostics.Process.Start(startInfo);
+            
+            Console.WriteLine($"Started server in background with PID: {process.Id}");
+            // Give the process time to start up properly  
+            System.Threading.Thread.Sleep(5000);
         });
 
     Target RunLocalServerBackgroundStop => _ => _
