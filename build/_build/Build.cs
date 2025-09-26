@@ -116,13 +116,15 @@ class Build : NukeBuild
                 Console.WriteLine($"Setting FOLDER environment variable to: {Folder}");
             }
 
+            int exitCode = 0;
             try
             {
                 var args = "compose -f Infra/Postman/docker-compose.yml up --build --abort-on-container-exit";
                 var process = ProcessTasks.StartProcess("docker", args, 
                     workingDirectory: RootDirectory, 
                     environmentVariables: envVars);
-                process.AssertWaitForExit();
+                process.WaitForExit();
+                exitCode = process.ExitCode;
             }
             finally
             {
@@ -131,6 +133,13 @@ class Build : NukeBuild
                     workingDirectory: RootDirectory,
                     environmentVariables: envVars);
                 downProcess.WaitForExit();
+            }
+            
+            // Explicitly fail the target if Docker Compose failed
+            if (exitCode != 0)
+            {
+                Console.WriteLine($"Docker Compose exited with code: {exitCode}");
+                throw new Exception($"Postman tests failed with exit code: {exitCode}");
             }
         });
 
