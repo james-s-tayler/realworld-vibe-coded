@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -170,147 +171,47 @@ class Build : NukeBuild
 
     // Postman Testing Targets
 
-    Target TestServerPostmanPrep => _ => _
-        .Description("Helper utility to prep for postman tests (reset db, stop any background backend, start backend, wait for it to be up)")
-        .DependsOn(ResetDatabaseForce, RunLocalServerBackgroundStop, RunLocalServerBackground, TestServerPing);
-
     Target TestServerPostman => _ => _
         .Description("Run postman tests")
         .Executes(() =>
         {
-            // Inline the prep steps to avoid dependency chain issues
-            Console.WriteLine("Preparing for Postman tests...");
+            // Use a dedicated shell script that handles all the complex background process management
+            // This ensures the same reliable behavior as the Makefile for both local development and CI
+            Console.WriteLine("Running Postman tests via reliable shell script...");
             
-            // 1. Reset database
-            Console.WriteLine($"Deleting {DatabasePath} ...");
-            if (File.Exists(DatabasePath))
-            {
-                File.Delete(DatabasePath);
-            }
-            Console.WriteLine("Database reset completed.");
-            
-            // 2. Stop any existing background servers
-            try
-            {
-                ProcessTasks.StartProcess("pkill", "dotnet").AssertWaitForExit();
-                Console.WriteLine("Stopped any existing background servers.");
-            }
-            catch
-            {
-                // Ignore if no processes to kill
-            }
-            
-            // 3. Start server in background
-            var startInfo = new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = "bash",
-                Arguments = $"-c \"dotnet run --project '{ServerProject}' > /dev/null 2>&1 &\"",
-                WorkingDirectory = RootDirectory,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-            
-            using (var process = System.Diagnostics.Process.Start(startInfo))
-            {
-                process?.WaitForExit();
-            }
-            
-            Console.WriteLine("Started server in background, waiting for startup...");
-            System.Threading.Thread.Sleep(5000);
-            
-            // 4. Test if server is responding
-            var serverReady = false;
-            var maxPingAttempts = 30;
-            var url = "https://localhost:57679/swagger/index.html";
-            
-            for (int i = 1; i <= maxPingAttempts; i++)
-            {
-                try
-                {
-                    var result = ProcessTasks.StartProcess("curl", 
-                        $"-k -s -o /dev/null -w \"%{{http_code}}\" {url}")
-                        .AssertWaitForExit();
-                    
-                    if (result.ExitCode == 0)
-                    {
-                        Console.WriteLine($"Server is ready (ping attempt {i})");
-                        serverReady = true;
-                        break;
-                    }
-                }
-                catch
-                {
-                    // Continue trying
-                }
-                
-                if (i % 5 == 0)
-                {
-                    Console.WriteLine($"Waiting for server to start... (attempt {i}/{maxPingAttempts})");
-                }
-                
-                System.Threading.Thread.Sleep(1000);
-            }
-            
-            if (!serverReady)
-            {
-                throw new Exception("Server failed to start within timeout period");
-            }
-            
-            // 5. Prepare reports directory
-            if (Directory.Exists(ReportsDirectory))
-                Directory.Delete(ReportsDirectory, true);
-            Directory.CreateDirectory(ReportsDirectory);
-            
-            if (File.Exists(ReportsDirectory / "newman-report.json"))
-            {
-                File.Delete(ReportsDirectory / "newman-report.json");
-            }
-            
-            // 6. Run Docker Compose tests
             try
             {
                 var folder = Environment.GetEnvironmentVariable("FOLDER") ?? "";
-                var processArgs = $"compose -f {PostmanComposeFile} up --abort-on-container-exit";
                 
-                var originalFolder = Environment.GetEnvironmentVariable("FOLDER");
+                // Set up the environment for the script
+                var envVars = new Dictionary<string, string>();
                 if (!string.IsNullOrEmpty(folder))
                 {
-                    Environment.SetEnvironmentVariable("FOLDER", folder);
+                    envVars["FOLDER"] = folder;
+                    Console.WriteLine($"Running tests for folder: {folder}");
                 }
                 
-                try
+                // Execute the reliable shell script that mimics Makefile exactly
+                var result = ProcessTasks.StartProcess(
+                    RootDirectory / "scripts" / "run-postman-tests.sh", 
+                    workingDirectory: RootDirectory,
+                    environmentVariables: envVars)
+                    .AssertWaitForExit();
+                
+                if (result.ExitCode == 0)
                 {
-                    Console.WriteLine($"Running Docker Compose tests{(string.IsNullOrEmpty(folder) ? "" : $" (FOLDER={folder})")}...");
-                    ProcessTasks.StartProcess("docker", processArgs, workingDirectory: RootDirectory)
-                        .AssertWaitForExit()
-                        .AssertZeroExitCode();
+                    Console.WriteLine("✅ Postman tests completed successfully!");
                 }
-                finally
+                else
                 {
-                    if (!string.IsNullOrEmpty(folder))
-                    {
-                        Environment.SetEnvironmentVariable("FOLDER", originalFolder);
-                    }
+                    Console.WriteLine($"❌ Postman tests failed with exit code: {result.ExitCode}");
+                    Environment.Exit(result.ExitCode);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Postman tests failed: {ex.Message}");
+                Console.WriteLine($"💥 Postman test execution failed: {ex.Message}");
                 throw;
-            }
-            finally
-            {
-                // Always try to stop the background server
-                try
-                {
-                    ProcessTasks.StartProcess("pkill", "dotnet")
-                        .AssertWaitForExit();
-                    Console.WriteLine("Stopped background server.");
-                }
-                catch
-                {
-                    // Ignore errors, similar to Makefile
-                }
             }
         });
 
