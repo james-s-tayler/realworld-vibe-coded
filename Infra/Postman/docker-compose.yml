@@ -6,7 +6,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:5000
-      ConnectionStrings__SqliteConnection: "Data Source=/app/src/Server.Web/database.sqlite"
+      ConnectionStrings__SqliteConnection: "Data Source=database.sqlite"
     ports:
       - "5000:5000"
     healthcheck:
@@ -29,14 +29,11 @@ services:
       - USERNAME=soloyolo
       - EMAIL=soloyolo@mail.com
       - PASSWORD=password123
-    command: [
-      "run", "/etc/newman/Conduit.postman_collection.json",
-      "--folder", "${FOLDER}",
-      "--delay-request", "25",
-      "--reporters", "cli,json",
-      "--reporter-json-export", "/reports/newman-report.json",
-      "--global-var", "APIURL=http://api:5000/api",
-      "--global-var", "USERNAME=soloyolo", 
-      "--global-var", "EMAIL=soloyolo@mail.com",
-      "--global-var", "PASSWORD=password123"
-    ]
+      - FOLDER=${FOLDER}
+    entrypoint: >
+      sh -c '
+      if [ -n "$$FOLDER" ]; then
+        newman run /etc/newman/Conduit.postman_collection.json --folder "$$FOLDER" --delay-request 25 --reporters cli,json --reporter-json-export /reports/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+      else
+        newman run /etc/newman/Conduit.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /reports/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+      fi'
