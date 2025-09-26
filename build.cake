@@ -116,7 +116,9 @@ Task("Lint-Make")
     // Delegate to original Makefile for consistency
     var result = StartProcess("make", new ProcessSettings
     {
-        Arguments = "lint/make"
+        Arguments = "lint/make",
+        Timeout = 120000, // 2 minutes in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)
@@ -178,7 +180,9 @@ Task("Test-Server-Postman-Prep")
     // Delegate to make for complex prep work
     var result = StartProcess("make", new ProcessSettings
     {
-        Arguments = "test/server/postman/prep"
+        Arguments = "test/server/postman/prep",
+        Timeout = 300000, // 5 minutes in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)
@@ -192,10 +196,18 @@ Task("Test-Server-Postman")
     .Does(() =>
 {
     // Delegate to make for complex postman testing
+    var environmentVariables = new Dictionary<string, string>();
+    if (!string.IsNullOrEmpty(folder))
+    {
+        environmentVariables.Add("FOLDER", folder);
+    }
+    
     var result = StartProcess("make", new ProcessSettings
     {
         Arguments = "test/server/postman",
-        EnvironmentVariables = string.IsNullOrEmpty(folder) ? new Dictionary<string, string>() : new Dictionary<string, string> { { "FOLDER", folder } }
+        EnvironmentVariables = environmentVariables,
+        Timeout = 600000, // 10 minutes in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)
@@ -211,7 +223,9 @@ Task("Test-Server-Postman-Auth")
 {
     var result = StartProcess("make", new ProcessSettings
     {
-        Arguments = "test/server/postman/auth"
+        Arguments = "test/server/postman/auth",
+        Timeout = 600000, // 10 minutes in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)
@@ -226,7 +240,9 @@ Task("Test-Server-Postman-Articles-Empty")
 {
     var result = StartProcess("make", new ProcessSettings
     {
-        Arguments = "test/server/postman/articles-empty"
+        Arguments = "test/server/postman/articles-empty",
+        Timeout = 600000, // 10 minutes in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)
@@ -241,7 +257,9 @@ Task("Test-Server-Postman-Article")
 {
     var result = StartProcess("make", new ProcessSettings
     {
-        Arguments = "test/server/postman/article"
+        Arguments = "test/server/postman/article",
+        Timeout = 600000, // 10 minutes in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)
@@ -256,7 +274,9 @@ Task("Test-Server-Postman-Feed")
 {
     var result = StartProcess("make", new ProcessSettings
     {
-        Arguments = "test/server/postman/feed"
+        Arguments = "test/server/postman/feed",
+        Timeout = 600000, // 10 minutes in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)
@@ -271,7 +291,9 @@ Task("Test-Server-Postman-Profiles")
 {
     var result = StartProcess("make", new ProcessSettings
     {
-        Arguments = "test/server/postman/profiles"
+        Arguments = "test/server/postman/profiles",
+        Timeout = 600000, // 10 minutes in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)
@@ -287,7 +309,9 @@ Task("Test-Server-Ping")
     // Delegate to make for complex ping logic
     var result = StartProcess("make", new ProcessSettings
     {
-        Arguments = "test/server/ping"
+        Arguments = "test/server/ping",
+        Timeout = 120000, // 2 minutes in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)
@@ -321,7 +345,9 @@ Task("Run-Local-Server-Background")
     // Delegate to make for complex background process management
     var result = StartProcess("make", new ProcessSettings
     {
-        Arguments = "run-local/server/background"
+        Arguments = "run-local/server/background",
+        Timeout = 120000, // 2 minutes in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)
@@ -337,7 +363,9 @@ Task("Run-Local-Server-Background-Stop")
     // Delegate to make for complex process stopping
     var result = StartProcess("make", new ProcessSettings
     {
-        Arguments = "run-local/server/background/stop"
+        Arguments = "run-local/server/background/stop",
+        Timeout = 60000, // 1 minute in milliseconds
+        WorkingDirectory = Context.Environment.WorkingDirectory
     });
     
     if (result != 0)

@@ -160,6 +160,7 @@ jobs:
   test-server-postman-cake:
     name: Test Server (Postman - Cake)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
