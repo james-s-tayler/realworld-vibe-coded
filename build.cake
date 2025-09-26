@@ -206,8 +206,8 @@ Task("Test-Server-Postman")
     {
         Arguments = "test/server/postman",
         EnvironmentVariables = environmentVariables,
-        Timeout = 600000, // 10 minutes in milliseconds
         WorkingDirectory = Context.Environment.WorkingDirectory
+        // Removed timeout to let it run as long as needed
     });
     
     if (result != 0)

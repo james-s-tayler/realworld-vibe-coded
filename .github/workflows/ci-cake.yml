@@ -158,7 +158,7 @@ jobs:
         run: dotnet-cake build.cake --target=Lint-Make
 
   test-server-postman-cake:
-    name: Test Server (Postman - Cake)
+    name: Test Server (Postman - Cake Hybrid)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -185,7 +185,11 @@ jobs:
         id: postman_tests
         run: |
           set +e  # Don't exit on error
-          dotnet-cake build.cake --target=Test-Server-Postman
+          # Handle database reset and cleanup with Cake
+          dotnet-cake build.cake --target=Db-Reset-Force
+          dotnet-cake build.cake --target=Run-Local-Server-Background-Stop
+          # Use Make for the complex postman workflow that includes background process management
+          make test/server/postman
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
