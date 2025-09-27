@@ -34,8 +34,7 @@
         "RunLocalClient",
         "RunLocalServer",
         "TestServer",
-        "TestServerPostman",
-        "TestTarget"
+        "TestServerPostman"
       ]
     },
     "Verbosity": {
