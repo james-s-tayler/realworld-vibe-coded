@@ -7,7 +7,7 @@ using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
-class Build : NukeBuild
+public class Build : NukeBuild
 {
     public static int Main() => Execute<Build>();
 
@@ -54,12 +54,6 @@ class Build : NukeBuild
                 .SetSeverity("error")
                 .SetVerifyNoChanges(true));
 
-            // Build the analyzer first to ensure it's available
-            DotNetBuild(s => s.SetProjectFile(RootDirectory / "build" / "_build.Analyzers" / "_build.Analyzers.csproj"));
-
-            // Then build the main project (this will run the Roslyn analyzer)
-            DotNetBuild(s => s.SetProjectFile(RootDirectory / "build" / "_build" / "_build.csproj"));
-
             // Run the ArchUnit tests
             var testProject = RootDirectory / "build" / "_build.Tests" / "_build.Tests.csproj";
             DotNetTest(s => s
@@ -105,7 +99,7 @@ class Build : NukeBuild
 
             Console.WriteLine("Running Postman tests with Docker Compose...");
 
-            var envVars = new System.Collections.Generic.Dictionary<string, string>();
+            var envVars = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(Folder))
             {
                 envVars["FOLDER"] = Folder;
