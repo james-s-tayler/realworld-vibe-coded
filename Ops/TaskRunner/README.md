@@ -13,9 +13,9 @@ Nuke is a modern build automation system for .NET projects that provides:
 ## Structure
 
 ```
-build/
-└── _build/
-    ├── _build.csproj    # Nuke build project
+Ops/TaskRunner/
+└── Nuke/
+    ├── Nuke.csproj    # Nuke build project
     └── Build.cs         # Build targets implementation
 
 .nuke/                   # Nuke configuration directory
@@ -23,8 +23,8 @@ build/
 ├── build.schema.json   # Build schema for IDE support
 └── parameters.json     # Build parameters
 
-build.sh                 # Cross-platform build script (Unix)
-build.cmd                # Cross-platform build script (Windows)
+build.sh                  # Cross-platform build script (Unix)
+build.cmd                 # Cross-platform build script (Windows)
 ```
 
 ## Available Targets
@@ -114,7 +114,7 @@ The CI workflow uses Nuke for all build, test, and deployment tasks. The GitHub 
 
 ## Adding New Targets
 
-To add new build targets, modify the `_build/Build.cs` file:
+To add new build targets, modify the `Nuke/Build.cs` file:
 
 ```csharp
 Target MyNewTarget => _ => _

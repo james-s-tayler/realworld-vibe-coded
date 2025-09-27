@@ -3,16 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_build", "_build\_build.csproj", "{5EE6DCED-7BD3-44E8-B6CF-5D7F900697B6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuke", "Nuke\Nuke.csproj", "{5EE6DCED-7BD3-44E8-B6CF-5D7F900697B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_build.Tests", "_build.Tests\_build.Tests.csproj", "{D44635CF-FF5A-4EA0-A61E-6E83CC635D9D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuke.Tests", "Nuke.Tests\Nuke.Tests.csproj", "{D44635CF-FF5A-4EA0-A61E-6E83CC635D9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_build.Analyzers", "_build.Analyzers\_build.Analyzers.csproj", "{65C862A1-F3D5-4567-9FB8-D8277DD31F38}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuke.Analyzers", "Nuke.Analyzers\Nuke.Analyzers.csproj", "{65C862A1-F3D5-4567-9FB8-D8277DD31F38}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WrapperScripts", "WrapperScripts", "{7E1C84E1-53B8-456F-8069-59A356B9E5C9}"
 	ProjectSection(SolutionItems) = preProject
-		..\build.sh = ..\build.sh
-		..\build.cmd = ..\build.cmd
+		..\..\build.sh = ..\..\build.sh
+		..\..\build.cmd = ..\..\build.cmd
 	EndProjectSection
 EndProject
 Global

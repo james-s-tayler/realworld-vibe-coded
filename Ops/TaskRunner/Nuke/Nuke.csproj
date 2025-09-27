@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../_build.Analyzers/_build.Analyzers.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="../Nuke.Analyzers/Nuke.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
