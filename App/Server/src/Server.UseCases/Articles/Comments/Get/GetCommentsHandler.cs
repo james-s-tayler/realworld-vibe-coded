@@ -28,18 +28,7 @@ public class GetCommentsHandler(IRepository<Article> _articleRepository, IReposi
         new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken);
     }
 
-    var commentDtos = article.Comments.Select(c => new CommentDto(
-      c.Id,
-      c.CreatedAt,
-      c.UpdatedAt,
-      c.Body,
-      new AuthorDto(
-        c.Author.Username,
-        c.Author.Bio ?? string.Empty,
-        c.Author.Image,
-        currentUser?.IsFollowing(c.AuthorId) ?? false
-      )
-    )).ToList();
+    var commentDtos = article.Comments.Select(c => CommentMappers.MapToDto(c, currentUser)).ToList();
 
     return Result.Success(new CommentsResponse(commentDtos));
   }

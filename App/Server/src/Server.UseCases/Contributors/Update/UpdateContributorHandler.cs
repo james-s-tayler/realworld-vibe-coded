@@ -17,7 +17,6 @@ public class UpdateContributorHandler(IRepository<Contributor> _repository)
 
     await _repository.UpdateAsync(existingContributor, cancellationToken);
 
-    return new ContributorDTO(existingContributor.Id,
-      existingContributor.Name, existingContributor.PhoneNumber?.Number ?? "");
+    return ContributorMappers.MapToDto(existingContributor);
   }
 }

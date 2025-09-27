@@ -4,6 +4,7 @@ using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
 using Server.Infrastructure.Data;
+using Server.UseCases.Articles;
 
 namespace Server.Infrastructure.Data.Queries;
 
@@ -45,7 +46,7 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
       .AsNoTracking()
       .FirstOrDefaultAsync(u => u.Id == userId);
 
-    return articles.Select(a => MapToDto(a, currentUser));
+    return articles.Select(a => ArticleMappers.MapToDto(a, currentUser));
   }
 
   public async Task<int> GetFeedCountAsync(int userId)
@@ -69,27 +70,5 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
       .CountAsync();
   }
 
-  private static ArticleDto MapToDto(Article article, User? currentUser = null)
-  {
-    var isFavorited = currentUser != null && article.FavoritedBy.Any(u => u.Id == currentUser.Id);
-    var isFollowing = currentUser?.IsFollowing(article.AuthorId) ?? false;
 
-    return new ArticleDto(
-      article.Slug,
-      article.Title,
-      article.Description,
-      article.Body,
-      article.Tags.Select(t => t.Name).ToList(),
-      article.CreatedAt,
-      article.UpdatedAt,
-      isFavorited,
-      article.FavoritesCount,
-      new AuthorDto(
-        article.Author.Username,
-        article.Author.Bio ?? string.Empty,
-        article.Author.Image,
-        isFollowing
-      )
-    );
-  }
 }

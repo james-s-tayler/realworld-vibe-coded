@@ -59,23 +59,9 @@ public class CreateCommentHandler : IRequestHandler<CreateCommentCommand, Result
     // Check if current user is following the comment author
     var currentUser = request.CurrentUserId.HasValue ?
         await _userRepository.FirstOrDefaultAsync(new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken) : null;
-    var isFollowing = currentUser != null && currentUser.IsFollowing(user.Id);
 
     // Return the comment response
-    var response = new CommentResponse(
-      new CommentDto(
-        comment.Id,
-        comment.CreatedAt,
-        comment.UpdatedAt,
-        comment.Body,
-        new AuthorDto(
-          user.Username,
-          user.Bio ?? string.Empty,
-          user.Image,
-          isFollowing
-        )
-      )
-    );
+    var response = new CommentResponse(CommentMappers.MapToDto(comment, currentUser));
 
     return Result.Success(response);
   }

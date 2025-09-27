@@ -22,32 +22,11 @@ public class GetArticleHandler(
       return Result.NotFound("Article not found");
     }
 
-    // Check if current user is following the article author
+    // Get current user with following relationships if authenticated
     var currentUser = request.CurrentUserId.HasValue ?
         await _userRepository.FirstOrDefaultAsync(new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken) : null;
-    var isFollowing = currentUser != null && currentUser.Id != article.Author.Id && currentUser.IsFollowing(article.Author.Id);
 
-    // Check if current user has favorited the article
-    var isFavorited = request.CurrentUserId.HasValue &&
-      article.FavoritedBy.Any(u => u.Id == request.CurrentUserId.Value);
-
-    var articleDto = new ArticleDto(
-      article.Slug,
-      article.Title,
-      article.Description,
-      article.Body,
-      article.Tags.Select(t => t.Name).ToList(),
-      article.CreatedAt,
-      article.UpdatedAt,
-      isFavorited,
-      article.FavoritesCount,
-      new AuthorDto(
-        article.Author.Username,
-        article.Author.Bio ?? string.Empty,
-        article.Author.Image,
-        isFollowing
-      )
-    );
+    var articleDto = ArticleMappers.MapToDto(article, currentUser);
 
     return Result.Success(new ArticleResponse { Article = articleDto });
   }
