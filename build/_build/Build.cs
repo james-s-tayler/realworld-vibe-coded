@@ -45,9 +45,22 @@ class Build : NukeBuild
         .Description("Lint Nuke build targets for documentation and naming conventions")
         .Executes(() =>
         {
-            // First ensure the build project is compiled so we can analyze it
+            var nukeSolution = RootDirectory / "build" / "Build.sln";
+
+            // Run dotnet format on the Nuke solution (only check whitespace and style, not warnings)
+            Console.WriteLine($"Running dotnet format (verify only) on {nukeSolution}");
+            DotNetFormat(s => s
+                .SetProject(nukeSolution)
+                .SetSeverity("error")
+                .SetVerifyNoChanges(true));
+
+            // Build the analyzer first to ensure it's available
+            DotNetBuild(s => s.SetProjectFile(RootDirectory / "build" / "_build.Analyzers" / "_build.Analyzers.csproj"));
+
+            // Then build the main project (this will run the Roslyn analyzer)
             DotNetBuild(s => s.SetProjectFile(RootDirectory / "build" / "_build" / "_build.csproj"));
-            
+
+            // Run the ArchUnit tests
             var testProject = RootDirectory / "build" / "_build.Tests" / "_build.Tests.csproj";
             DotNetTest(s => s
                 .SetProjectFile(testProject));
@@ -74,7 +87,7 @@ class Build : NukeBuild
             if (Directory.Exists(TestResultsDirectory))
                 Directory.Delete(TestResultsDirectory, true);
             Directory.CreateDirectory(TestResultsDirectory);
-            
+
             DotNetTest(s => s
                 .SetProjectFile(ServerSolution)
                 .SetLoggers("trx;LogFileName=test-results.trx")
@@ -89,9 +102,9 @@ class Build : NukeBuild
             if (Directory.Exists(ReportsDirectory))
                 Directory.Delete(ReportsDirectory, true);
             Directory.CreateDirectory(ReportsDirectory);
-            
+
             Console.WriteLine("Running Postman tests with Docker Compose...");
-            
+
             var envVars = new System.Collections.Generic.Dictionary<string, string>();
             if (!string.IsNullOrEmpty(Folder))
             {
@@ -103,8 +116,8 @@ class Build : NukeBuild
             try
             {
                 var args = "compose -f Infra/Postman/docker-compose.yml up --build --abort-on-container-exit";
-                var process = ProcessTasks.StartProcess("docker", args, 
-                    workingDirectory: RootDirectory, 
+                var process = ProcessTasks.StartProcess("docker", args,
+                    workingDirectory: RootDirectory,
                     environmentVariables: envVars);
                 process.WaitForExit();
                 exitCode = process.ExitCode;
@@ -112,12 +125,12 @@ class Build : NukeBuild
             finally
             {
                 var downArgs = "compose -f Infra/Postman/docker-compose.yml down";
-                var downProcess = ProcessTasks.StartProcess("docker", downArgs, 
+                var downProcess = ProcessTasks.StartProcess("docker", downArgs,
                     workingDirectory: RootDirectory,
                     environmentVariables: envVars);
                 downProcess.WaitForExit();
             }
-            
+
             // Explicitly fail the target if Docker Compose failed
             if (exitCode != 0)
             {
@@ -154,7 +167,7 @@ class Build : NukeBuild
                     return;
                 }
             }
-            
+
             Console.WriteLine($"Deleting {DatabaseFile}...");
             if (File.Exists(DatabaseFile))
             {

@@ -18,7 +18,7 @@ public class NukeTargetDescriptionAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: "All Nuke build targets should have a .Description() call to document their purpose for users.");
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(MissingDescriptionRule);
 
     public override void Initialize(AnalysisContext context)
@@ -31,14 +31,14 @@ public class NukeTargetDescriptionAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeProperty(SyntaxNodeAnalysisContext context)
     {
         var propertyDeclaration = (PropertyDeclarationSyntax)context.Node;
-        
+
         // Check if this is a Target property (has type "Target")
         if (!IsTargetProperty(propertyDeclaration))
             return;
 
         // Get the property name
         var propertyName = propertyDeclaration.Identifier.ValueText;
-        
+
         // Skip if this is an overridden property or has certain attributes that indicate it's not a user target
         if (ShouldSkipTarget(propertyName))
             return;
@@ -47,10 +47,10 @@ public class NukeTargetDescriptionAnalyzer : DiagnosticAnalyzer
         if (!HasDescriptionCall(propertyDeclaration))
         {
             var diagnostic = Diagnostic.Create(
-                MissingDescriptionRule, 
-                propertyDeclaration.Identifier.GetLocation(), 
+                MissingDescriptionRule,
+                propertyDeclaration.Identifier.GetLocation(),
                 propertyName);
-            
+
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -58,7 +58,7 @@ public class NukeTargetDescriptionAnalyzer : DiagnosticAnalyzer
     private static bool IsTargetProperty(PropertyDeclarationSyntax property)
     {
         // Check if the property type is "Target"
-        return property.Type is IdentifierNameSyntax identifierName && 
+        return property.Type is IdentifierNameSyntax identifierName &&
                identifierName.Identifier.ValueText == "Target";
     }
 
@@ -81,7 +81,7 @@ public class NukeTargetDescriptionAnalyzer : DiagnosticAnalyzer
         // Check accessor with lambda expression body
         var getter = property.AccessorList?.Accessors
             .FirstOrDefault(a => a.Keyword.IsKind(SyntaxKind.GetKeyword));
-        
+
         if (getter?.ExpressionBody?.Expression != null)
         {
             return ContainsDescriptionCall(getter.ExpressionBody.Expression);

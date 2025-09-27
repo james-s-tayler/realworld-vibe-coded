@@ -24,9 +24,9 @@ namespace BuildTests
             {
                 throw new DirectoryNotFoundException($"Could not find repository root from current directory: {currentDirectory}");
             }
-            
+
             var buildAssemblyPath = Path.Combine(repositoryRoot, "build", "_build", "bin", "Debug", "_build.dll");
-            
+
             if (!File.Exists(buildAssemblyPath))
             {
                 throw new FileNotFoundException($"Could not find build assembly at: {buildAssemblyPath}. Current directory: {currentDirectory}. Repository root: {repositoryRoot}");
@@ -75,7 +75,7 @@ namespace BuildTests
 
             var evaluationResults = rule.Evaluate(Architecture);
             var violations = evaluationResults.Where(r => !r.Passed).ToList();
-            
+
             Assert.Empty(violations); // Build class should exist
         }
     }
