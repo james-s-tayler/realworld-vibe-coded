@@ -28,7 +28,7 @@ public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, Result<U
   {
     using var activity = TelemetrySource.ActivitySource.StartActivity("GetCurrentUserHandler.Handle");
     activity?.SetTag("user.id", request.UserId);
-    
+
     _logger.LogInformation("Getting current user for ID {UserId}", request.UserId);
 
     var user = await _repository.GetByIdAsync(request.UserId, cancellationToken);

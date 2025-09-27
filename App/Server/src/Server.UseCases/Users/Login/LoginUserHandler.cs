@@ -31,7 +31,7 @@ public class LoginUserHandler : IQueryHandler<LoginUserQuery, Result<UserDto>>
   {
     using var activity = TelemetrySource.ActivitySource.StartActivity("LoginUserHandler.Handle");
     activity?.SetTag("user.email", request.Email);
-    
+
     _logger.LogInformation("Handling user login for {Email}", request.Email);
 
     // Find user by email
