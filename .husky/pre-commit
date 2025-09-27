@@ -1,0 +1,38 @@
+#!/bin/sh
+# Cross-platform pre-commit hook that runs appropriate lint targets based on changed files
+
+# Get list of staged files
+staged_files=$(git diff --cached --name-only)
+
+# Check if there are any changes in App/Server
+server_changes=$(echo "$staged_files" | grep "^App/Server/" | wc -l)
+
+# Check if there are any changes in Task/Runner  
+task_runner_changes=$(echo "$staged_files" | grep "^Task/Runner/" | wc -l)
+
+# Run lint-server-fix if there are server changes
+if [ "$server_changes" -gt 0 ]; then
+  echo "🔧 Server changes detected, running lint-server-fix..."
+  if ! ./build.sh lint-server-fix; then
+    echo "❌ Server linting failed. Please fix the issues and try again."
+    exit 1
+  fi
+  echo "✅ Server linting completed successfully."
+fi
+
+# Run lint-nuke-fix if there are Task/Runner changes
+if [ "$task_runner_changes" -gt 0 ]; then
+  echo "🔧 Task/Runner changes detected, running lint-nuke-fix..."
+  if ! ./build.sh lint-nuke-fix; then
+    echo "❌ Nuke linting failed. Please fix the issues and try again."
+    exit 1
+  fi
+  echo "✅ Nuke linting completed successfully."
+fi
+
+# If no relevant changes, skip linting
+if [ "$server_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ]; then
+  echo "ℹ️  No changes detected in App/Server or Task/Runner directories. Skipping linting."
+fi
+
+echo "🎉 Pre-commit hook completed successfully."
