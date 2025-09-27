@@ -69,3 +69,6 @@ reports/
 
 # Rider/Resharper DotSettings user files
 *.DotSettings.user
+
+# Node.js dependencies
+node_modules/

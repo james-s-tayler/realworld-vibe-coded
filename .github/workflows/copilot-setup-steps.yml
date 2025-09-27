@@ -37,3 +37,13 @@ jobs:
         run: |
           dotnet --version
           dotnet --info
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Husky and setup pre-commit hooks
+        run: |
+          npm ci
