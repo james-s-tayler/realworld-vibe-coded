@@ -1,7 +1,7 @@
-﻿using System.Security.Claims;
-using FastEndpoints;
+﻿using FastEndpoints;
 using MediatR;
 using Server.Core.ArticleAggregate.Dtos;
+using Server.Core.Interfaces;
 using Server.UseCases.Articles.Comments.Create;
 using Server.Web.Infrastructure;
 
@@ -13,7 +13,7 @@ namespace Server.Web.Articles.Comments;
 /// <remarks>
 /// Create a new comment for an article. Authentication required.
 /// </remarks>
-public class Create(IMediator _mediator) : BaseValidatedEndpoint<CreateCommentRequest, CommentResponse>
+public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<CreateCommentRequest, CommentResponse>
 {
   public override void Configure()
   {
@@ -28,9 +28,12 @@ public class Create(IMediator _mediator) : BaseValidatedEndpoint<CreateCommentRe
 
   public override async Task HandleAsync(CreateCommentRequest request, CancellationToken cancellationToken)
   {
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+    int userId;
+    try
+    {
+      userId = _currentUserService.GetRequiredCurrentUserId();
+    }
+    catch (UnauthorizedAccessException)
     {
       await WriteUnauthorizedResponseAsync(cancellationToken);
       return;
