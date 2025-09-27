@@ -88,26 +88,51 @@ script: |
   });
 ```
 
-## Benefits
+## CI Status Check Naming
 
-These principles provide:
+### Principle: Match Kebab-Case NUKE Target Names
 
-- **Better Maintainability**: External scripts are easier to modify, test, and review
-- **Cleaner Workflows**: YAML files focus on orchestration rather than business logic  
-- **Visibility**: New comments preserve history and show progression over time
-- **Debugging**: Separate files make it easier to troubleshoot complex logic
-- **Reusability**: External scripts can be used across multiple workflows
-- **Testing**: External scripts can be unit tested independently
+All GitHub Actions CI status check names must exactly match the kebab-case name of the corresponding NUKE target they execute. This ensures clarity and consistency between CI check names and build targets.
 
-## File Organization
+**✅ Do:**
+- Use the exact kebab-case name of the NUKE target for both job ID and job name
+- Example: `lint-server-verify` (not `lint-server` or `Lint (Server)`)
+- Keep job names simple and automation-friendly
 
+**❌ Don't:**
+- Use descriptive names with parentheses like `Build (Server)` or `Lint (Nuke Build)`
+- Use abbreviated names that don't match the full NUKE target name
+- Mix naming conventions within the same workflow
+
+### Path-Based Job Gating
+
+CI jobs should only run when changes to their respective areas are detected. Use path-based gating to optimize CI resource usage while maintaining predictable status checks.
+
+**✅ Do:**
+- Always include a `changes` job that detects path changes using `dorny/paths-filter@v3`
+- Gate jobs with `if: ${{ needs.changes.outputs.AREA == 'true' }}`
+- Include an "Explain skip" step for user-friendly logging when skipped
+
+**Example:**
+```yaml
+lint-server-verify:
+  name: lint-server-verify
+  runs-on: ubuntu-latest
+  needs: changes
+  if: ${{ needs.changes.outputs.server == 'true' }}
+  steps:
+    - name: Explain skip
+      if: ${{ needs.changes.outputs.server != 'true' }}
+      run: echo "No Server changes detected; skipping server linting."
+    - name: Run lint
+      run: ./build.sh lint-server-verify
 ```
-.github/
-├── scripts/           # External JavaScript modules
-│   ├── data-processor.js
-│   ├── comment-generator.js
-│   └── utils.js
-└── workflows/         # Workflow orchestration only
-    ├── ci.yml
-    └── deploy.yml
-```
+
+### Benefits
+
+This approach provides:
+
+- **Automation-Friendly**: Status check names can be programmatically mapped to build targets
+- **Clarity**: Developers immediately understand which NUKE target corresponds to which CI check
+- **Consistency**: Uniform naming pattern across all CI jobs and build targets
+- **Simplicity**: No ambiguity about which command maps to which status check

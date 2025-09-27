@@ -63,7 +63,7 @@ Each downstream job includes:
 Example:
 ```yaml
 build-server:
-  name: Build (Server)
+  name: build-server
   runs-on: ubuntu-latest
   needs: changes
   if: ${{ needs.changes.outputs.server == 'true' }}
@@ -87,8 +87,8 @@ Mark these job names as required in your branch protection settings:
 - `build-nuke` - Nuke build system validation  
 - `build-server` - Server application build
 - `test-server` - Server unit tests
-- `lint-server` - Server code linting
-- `lint-nuke` - Nuke build script linting  
+- `lint-server-verify` - Server code linting
+- `lint-nuke-verify` - Nuke build script linting  
 - `test-server-postman` - Server integration tests
 
 All jobs will appear in every PR's status checks, but will skip execution when their associated folders haven't changed.
