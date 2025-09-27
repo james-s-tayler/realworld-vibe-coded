@@ -41,7 +41,7 @@ jobs:
             infra:
               - 'Infra/**'
             task_runner:
-              - 'Ops/TaskRunner/**'
+              - 'Task/Runner/**'
   build-nuke:
     name: Build (Nuke)
     runs-on: ubuntu-latest
@@ -69,7 +69,7 @@ jobs:
         run: dotnet --info
 
       - name: Build (Nuke build system)
-        run: dotnet build Ops/TaskRunner/Nuke.sln
+        run: dotnet build Task/Runner/Nuke.sln
 
   build-server:
     name: Build (Server)

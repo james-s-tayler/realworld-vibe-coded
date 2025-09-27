@@ -18,6 +18,7 @@ public class Build : NukeBuild
     readonly bool Force = false;
 
     // Paths  
+    AbsolutePath TaskRunnerDirectory => RootDirectory / "Task" / "Runner";
     AbsolutePath ServerSolution => RootDirectory / "App" / "Server" / "Server.sln";
     AbsolutePath ServerProject => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "Server.Web.csproj";
     AbsolutePath TestResultsDirectory => RootDirectory / "TestResults";
@@ -61,7 +62,7 @@ public class Build : NukeBuild
         .Description("Verify Nuke build targets for documentation and naming conventions")
         .Executes(() =>
         {
-            var nukeSolution = RootDirectory / "Ops" / "TaskRunner" / "Nuke.sln";
+            var nukeSolution = TaskRunnerDirectory / "Nuke.sln";
 
             // Run dotnet format on the Nuke solution (only check whitespace and style, not warnings)
             Console.WriteLine($"Running dotnet format (verify only) on {nukeSolution}");
@@ -71,7 +72,7 @@ public class Build : NukeBuild
                 .SetVerifyNoChanges(true));
 
             // Run the ArchUnit tests
-            var testProject = RootDirectory / "Ops" / "TaskRunner" / "Nuke.Tests" / "Nuke.Tests.csproj";
+            var testProject = TaskRunnerDirectory / "Nuke.Tests" / "Nuke.Tests.csproj";
             DotNetTest(s => s
                 .SetProjectFile(testProject));
         });
@@ -80,7 +81,7 @@ public class Build : NukeBuild
         .Description("Fix Nuke build formatting and style issues automatically")
         .Executes(() =>
         {
-            var nukeSolution = RootDirectory / "Ops" / "TaskRunner" / "Nuke.sln";
+            var nukeSolution = TaskRunnerDirectory / "Nuke.sln";
 
             // Run dotnet format on the Nuke solution to fix formatting issues
             Console.WriteLine($"Running dotnet format (fix mode) on {nukeSolution}");
