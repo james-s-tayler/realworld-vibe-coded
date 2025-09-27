@@ -9,6 +9,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_build.Tests", "_build.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_build.Analyzers", "_build.Analyzers\_build.Analyzers.csproj", "{65C862A1-F3D5-4567-9FB8-D8277DD31F38}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WrapperScripts", "WrapperScripts", "{7E1C84E1-53B8-456F-8069-59A356B9E5C9}"
+	ProjectSection(SolutionItems) = preProject
+		..\build.sh = ..\build.sh
+		..\build.cmd = ..\build.cmd
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
