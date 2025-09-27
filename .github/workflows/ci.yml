@@ -38,6 +38,7 @@ jobs:
               - 'App/Client/**'
             server:
               - 'App/Server/**'
+              - 'Test/**'
             infra:
               - 'Infra/**'
             task_runner:
