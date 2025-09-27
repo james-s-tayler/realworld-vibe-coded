@@ -104,18 +104,6 @@ All GitHub Actions CI status check names must exactly match the kebab-case name 
 - Use abbreviated names that don't match the full NUKE target name
 - Mix naming conventions within the same workflow
 
-### NUKE Target to CI Job Mapping
-
-| NUKE Target | CI Job Name | Description |
-|-------------|-------------|-------------|
-| `build-server` | `build-server` | Build the .NET backend |
-| `build-client` | `build-client` | Build the frontend |
-| `test-server` | `test-server` | Run backend unit/integration tests |
-| `test-server-postman` | `test-server-postman` | Run Postman API tests |
-| `lint-server-verify` | `lint-server-verify` | Verify backend formatting & analyzers |
-| `lint-client-verify` | `lint-client-verify` | Verify client code formatting and style |
-| `lint-nuke-verify` | `lint-nuke-verify` | Verify Nuke build targets |
-
 ### Path-Based Job Gating
 
 CI jobs should only run when changes to their respective areas are detected. Use path-based gating to optimize CI resource usage while maintaining predictable status checks.
