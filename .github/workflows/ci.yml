@@ -18,7 +18,7 @@ permissions:
 jobs:
   # Detect changes to specific paths to gate downstream jobs
   changes:
-    name: Detect Changes
+    name: changes
     runs-on: ubuntu-latest
     outputs:
       client: ${{ steps.filter.outputs.client }}
@@ -46,7 +46,7 @@ jobs:
             test_postman:
               - 'Test/Postman/**'
   build-nuke:
-    name: Build (Nuke)
+    name: build-nuke
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.task_runner == 'true' }}
@@ -75,7 +75,7 @@ jobs:
         run: dotnet build Task/Runner/Nuke.sln
 
   build-server:
-    name: Build (Server)
+    name: build-server
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.server == 'true' }}
@@ -104,7 +104,7 @@ jobs:
         run: ./build.sh build-server
 
   test-server:
-    name: Test (Server)
+    name: test-server
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.server == 'true' }}
@@ -182,8 +182,8 @@ jobs:
           echo "xUnit tests failed with exit code ${{ steps.xunit_tests.outputs.exit_code }}"
           exit ${{ steps.xunit_tests.outputs.exit_code }}
 
-  lint-server:
-    name: Lint (Server)
+  lint-server-verify:
+    name: lint-server-verify
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.server == 'true' }}
@@ -211,8 +211,8 @@ jobs:
       - name: Lint (server)
         run: ./build.sh lint-server-verify
 
-  lint-nuke:
-    name: Lint (Nuke Build)
+  lint-nuke-verify:
+    name: lint-nuke-verify
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.task_runner == 'true' }}
@@ -241,7 +241,7 @@ jobs:
         run: ./build.sh lint-nuke-verify
 
   test-server-postman:
-    name: Test Server (Postman)
+    name: test-server-postman
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.test_postman == 'true' }}
