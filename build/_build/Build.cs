@@ -53,7 +53,6 @@ class Build : NukeBuild
                 .SetProjectFile(testProject));
         });
 
-
     Target BuildServer => _ => _
         .Description("dotnet build (backend)")
         .Executes(() =>
