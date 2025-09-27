@@ -1,4 +1,4 @@
-using Server.Core.UserAggregate;
+﻿using Server.Core.UserAggregate;
 using Server.UseCases.Users;
 
 namespace Server.UnitTests.UseCases.Users;

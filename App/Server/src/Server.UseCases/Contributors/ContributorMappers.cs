@@ -1,4 +1,4 @@
-using Server.Core.ContributorAggregate;
+﻿using Server.Core.ContributorAggregate;
 
 namespace Server.UseCases.Contributors;
 
