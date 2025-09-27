@@ -1,4 +1,4 @@
-namespace Server.Web.Articles;
+﻿namespace Server.Web.Articles;
 
 public class FeedRequest
 {
