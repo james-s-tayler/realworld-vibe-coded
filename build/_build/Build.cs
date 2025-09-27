@@ -28,14 +28,13 @@ class Build : NukeBuild
         .Description("Show available targets")
         .Executes(() =>
         {
-            Console.WriteLine("Available Nuke targets (equivalent to Makefile):");
+            Console.WriteLine("Available Nuke targets:");
             Console.WriteLine("  build-server               dotnet build (backend)");
             Console.WriteLine("  build-client               Build client (frontend)");
             Console.WriteLine("  test-server                Run backend tests");
             Console.WriteLine("  test-server-postman        Run postman tests using Docker Compose");
             Console.WriteLine("  lint-server                Verify backend formatting & analyzers");
             Console.WriteLine("  lint-client                Lint client code");
-            Console.WriteLine("  lint-make                  Lint makefile");
             Console.WriteLine("  run-local-server           Run backend locally");
             Console.WriteLine("  run-local-client           Run client locally");
             Console.WriteLine("  db-reset                   Delete local sqlite database");
@@ -63,12 +62,6 @@ class Build : NukeBuild
             Console.WriteLine("No client linting configured yet.");
         });
 
-    Target LintMake => _ => _
-        .Description("Lint makefile")
-        .Executes(() =>
-        {
-            Console.WriteLine("Makefile linting passed (simplified in Nuke version).");
-        });
 
     Target BuildServer => _ => _
         .Description("dotnet build (backend)")

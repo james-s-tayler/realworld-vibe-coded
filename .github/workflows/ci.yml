@@ -37,7 +37,7 @@ jobs:
         run: dotnet --info
 
       - name: Build (server)
-        run: make build/server
+        run: ./build.sh build-server
 
   test-server:
     name: Test (Server)
@@ -64,7 +64,7 @@ jobs:
         id: xunit_tests
         run: |
           set +e  # Don't exit on error
-          make test/server
+          ./build.sh test-server
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
@@ -133,16 +133,7 @@ jobs:
         run: dotnet --info
 
       - name: Lint (server)
-        run: make lint/server
-
-  lint-make:
-    name: Lint Makefile
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Run Makefile lint
-        run: make lint/make
+        run: ./build.sh lint-server
 
   test-server-postman:
     name: Test Server (Postman)
@@ -168,7 +159,7 @@ jobs:
         id: postman_tests
         run: |
           set +e  # Don't exit on error
-          make test/server/postman
+          ./build.sh test-server-postman
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
