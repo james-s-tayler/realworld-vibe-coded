@@ -17,7 +17,7 @@ namespace BuildTests
         private static readonly Architecture Architecture = new ArchLoader()
             .LoadAssembly(Assembly.GetAssembly(typeof(Build)))
             .Build();
-        
+
         private static readonly IObjectProvider<Class> BuildClasses =
             Classes().That().AreAssignableTo(typeof(NukeBuild)).As("Build Classes");
 
@@ -25,14 +25,14 @@ namespace BuildTests
             PropertyMembers()
                 .That().AreDeclaredIn(BuildClasses)
                 .And().DependOnAny(typeof(Target));
-        
+
         [Fact]
         public void BuildClassExists()
         {
             IArchRule buildClassesShouldNotBeEmpty = Classes().That().Are(BuildClasses).Should().Exist();
             buildClassesShouldNotBeEmpty.Check(Architecture);
         }
-        
+
         [Fact]
         public void NukeTargetsExist()
         {
@@ -42,7 +42,7 @@ namespace BuildTests
         [Fact]
         public void NukeTargetsShouldFollowNamingConventions()
         {
-            IArchRule nukeTargetsShouldFollowNamingConventions = 
+            IArchRule nukeTargetsShouldFollowNamingConventions =
                 PropertyMembers().That().Are(NukeTargets)
                 .Should().HaveNameStartingWith("Lint")
                 .OrShould().HaveNameStartingWith("Build")
@@ -50,8 +50,23 @@ namespace BuildTests
                 .OrShould().HaveNameStartingWith("RunLocal")
                 .OrShould().HaveNameStartingWith("Db")
                 .Because("this is the established naming convention for Nuke build targets");
-            
+
             nukeTargetsShouldFollowNamingConventions.Check(Architecture);
+        }
+
+        [Fact]
+        public void LintTargetsShouldFollowLintNamingConvention()
+        {
+            var lintTargets = PropertyMembers()
+                .That().Are(NukeTargets)
+                .And().HaveNameStartingWith("Lint");
+
+            IArchRule lintTargetsShouldEndWithVerifyOrFix = lintTargets
+                .Should().HaveNameEndingWith("Verify")
+                .OrShould().HaveNameEndingWith("Fix")
+                .Because("Lint targets must end with either 'Verify' (for checking) or 'Fix' (for auto-fixing) to clarify their behavior");
+
+            lintTargetsShouldEndWithVerifyOrFix.Check(Architecture);
         }
     }
 }

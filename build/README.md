@@ -31,18 +31,32 @@ build.cmd                # Cross-platform build script (Windows)
 
 | Nuke Target | Description |
 |-------------|-------------|
-| `show-help` | Display available targets |
 | `build-server` | Build the .NET backend |
 | `build-client` | Build the frontend (placeholder) |
 | `test-server` | Run backend unit/integration tests |
 | `test-server-postman` | Run Postman API tests |
-| `lint-server` | Lint backend code with dotnet format |
-| `lint-client` | Lint frontend code (placeholder) |
-| `lint-nuke` | Lint Nuke build targets for documentation and naming conventions |
+| `lint-server-verify` | Verify backend formatting & analyzers (no changes). Fails if issues found |
+| `lint-server-fix` | Fix backend formatting & analyzer issues automatically |
+| `lint-client-verify` | Verify client code formatting and style |
+| `lint-client-fix` | Fix client code formatting and style issues automatically |
+| `lint-nuke-verify` | Verify Nuke build targets for documentation and naming conventions |
+| `lint-nuke-fix` | Fix Nuke build formatting and style issues automatically |
 | `run-local-server` | Run backend locally |
 | `run-local-client` | Run frontend locally (placeholder) |
 | `db-reset` | Reset SQLite database with confirmation |
 | `db-reset-force` | Reset SQLite database without confirmation |
+
+### Target Naming Conventions
+
+All Nuke targets follow specific naming conventions:
+
+- **Lint targets**: Must end with either `Verify` (check for issues) or `Fix` (auto-fix issues)
+  - `LintServerVerify`, `LintServerFix`, `LintNukeVerify`, `LintNukeFix`
+- **Build targets**: Start with `Build` - `BuildServer`, `BuildClient`
+- **Test targets**: Start with `Test` - `TestServer`, `TestServerPostman`
+- **Utility targets**: Use descriptive names - `RunLocalServer`, `DbReset`, etc.
+
+These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` target.
 
 ## Usage
 
@@ -50,7 +64,7 @@ build.cmd                # Cross-platform build script (Windows)
 
 ```bash
 # Show all available targets
-./build.sh show-help
+./build.sh --help
 
 # Build the server
 ./build.sh build-server
@@ -58,11 +72,17 @@ build.cmd                # Cross-platform build script (Windows)
 # Run tests
 ./build.sh test-server
 
-# Lint code
-./build.sh lint-server
+# Verify code formatting (fails if issues found)
+./build.sh lint-server-verify
 
-# Lint Nuke build targets
-./build.sh lint-nuke
+# Fix code formatting issues automatically
+./build.sh lint-server-fix
+
+# Verify Nuke build targets compliance
+./build.sh lint-nuke-verify
+
+# Fix Nuke build formatting issues
+./build.sh lint-nuke-fix
 
 # Run Postman tests with specific folder
 ./build.sh test-server-postman --folder Auth
@@ -111,13 +131,18 @@ All Nuke build targets must follow these requirements:
 
 1. **Documentation**: Every target must include a `.Description()` call explaining what the target does
 2. **Naming**: Target names must follow PascalCase convention (e.g., `BuildServer`, `TestServer`)
-3. **Validation**: Use `./build.sh lint-nuke` to verify targets comply with requirements
+3. **Lint naming**: Targets starting with "Lint" must end with either "Verify" or "Fix"
+4. **Validation**: Use `./build.sh lint-nuke-verify` to verify targets comply with requirements
 
-The `lint-nuke` target will validate:
-- All targets have proper `.Description()` calls
-- Target names follow PascalCase naming conventions
-- Build fails if any targets don't meet requirements
+The linting system includes:
+- **ArchUnit.NET**: Validates target architecture and naming conventions at test time
+- **Custom Roslyn Analyzer**: Enforces `.Description()` calls at compile time
+- **dotnet format**: Ensures consistent code formatting
 
-This linting is enforced in CI to ensure consistent build target documentation.
+Use the "Fix" targets to automatically resolve formatting issues:
+- `./build.sh lint-nuke-fix` - Fix Nuke build formatting
+- `./build.sh lint-server-fix` - Fix server code formatting
+
+This linting is enforced in CI to ensure consistent build target documentation and formatting.
 
 For more information about Nuke, visit the [official documentation](https://nuke.build/).

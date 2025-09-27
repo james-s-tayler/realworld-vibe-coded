@@ -24,7 +24,7 @@ public class Build : NukeBuild
     AbsolutePath ReportsDirectory => RootDirectory / "reports";
     AbsolutePath DatabaseFile => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "database.sqlite";
 
-    Target LintServer => _ => _
+    Target LintServerVerify => _ => _
         .Description("Verify backend formatting & analyzers (no changes). Fails if issues found")
         .Executes(() =>
         {
@@ -34,15 +34,31 @@ public class Build : NukeBuild
                 .SetVerifyNoChanges(true));
         });
 
-    Target LintClient => _ => _
-        .Description("Lint client code")
+    Target LintServerFix => _ => _
+        .Description("Fix backend formatting & analyzer issues automatically")
+        .Executes(() =>
+        {
+            Console.WriteLine($"Running dotnet format (fix mode) on {ServerSolution}");
+            DotNetFormat(s => s
+                .SetProject(ServerSolution));
+        });
+
+    Target LintClientVerify => _ => _
+        .Description("Verify client code formatting and style")
         .Executes(() =>
         {
             Console.WriteLine("No client linting configured yet.");
         });
 
-    Target LintNuke => _ => _
-        .Description("Lint Nuke build targets for documentation and naming conventions")
+    Target LintClientFix => _ => _
+        .Description("Fix client code formatting and style issues automatically")
+        .Executes(() =>
+        {
+            Console.WriteLine("No client linting configured yet.");
+        });
+
+    Target LintNukeVerify => _ => _
+        .Description("Verify Nuke build targets for documentation and naming conventions")
         .Executes(() =>
         {
             var nukeSolution = RootDirectory / "build" / "Build.sln";
@@ -58,6 +74,19 @@ public class Build : NukeBuild
             var testProject = RootDirectory / "build" / "_build.Tests" / "_build.Tests.csproj";
             DotNetTest(s => s
                 .SetProjectFile(testProject));
+        });
+
+    Target LintNukeFix => _ => _
+        .Description("Fix Nuke build formatting and style issues automatically")
+        .Executes(() =>
+        {
+            var nukeSolution = RootDirectory / "build" / "Build.sln";
+
+            // Run dotnet format on the Nuke solution to fix formatting issues
+            Console.WriteLine($"Running dotnet format (fix mode) on {nukeSolution}");
+            DotNetFormat(s => s
+                .SetProject(nukeSolution)
+                .SetSeverity("error"));
         });
 
     Target BuildServer => _ => _

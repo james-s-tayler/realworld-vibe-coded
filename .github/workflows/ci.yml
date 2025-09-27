@@ -156,7 +156,7 @@ jobs:
         run: dotnet --info
 
       - name: Lint (server)
-        run: ./build.sh lint-server
+        run: ./build.sh lint-server-verify
 
   lint-nuke:
     name: Lint (Nuke Build)
@@ -179,7 +179,7 @@ jobs:
         run: dotnet --info
 
       - name: Lint (Nuke build targets)
-        run: ./build.sh lint-nuke
+        run: ./build.sh lint-nuke-verify
 
   test-server-postman:
     name: Test Server (Postman)
