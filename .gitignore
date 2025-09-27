@@ -63,3 +63,6 @@ nunit-*.xml
 
 # Newman/Postman test reports
 reports/
+
+# Nuke build temp files
+.nuke/temp/
