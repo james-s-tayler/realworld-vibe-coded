@@ -16,13 +16,45 @@ permissions:
   pull-requests: write
 
 jobs:
+  # Detect changes to specific paths to gate downstream jobs
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      client: ${{ steps.filter.outputs.client }}
+      server: ${{ steps.filter.outputs.server }}
+      infra: ${{ steps.filter.outputs.infra }}
+      task_runner: ${{ steps.filter.outputs.task_runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for path changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            client:
+              - 'App/Client/**'
+            server:
+              - 'App/Server/**'
+            infra:
+              - 'Infra/**'
+            task_runner:
+              - 'Ops/TaskRunner/**'
   build-nuke:
     name: Build (Nuke)
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.task_runner == 'true' }}
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
+      - name: Explain skip
+        if: ${{ needs.changes.outputs.task_runner != 'true' }}
+        run: echo "No TaskRunner changes detected; skipping Nuke build checks."
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -42,10 +74,16 @@ jobs:
   build-server:
     name: Build (Server)
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' }}
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
+      - name: Explain skip
+        if: ${{ needs.changes.outputs.server != 'true' }}
+        run: echo "No Server changes detected; skipping server build checks."
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -65,11 +103,17 @@ jobs:
   test-server:
     name: Test (Server)
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' }}
     # Run tests as an independent job so it shows up as its own status check
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
+      - name: Explain skip
+        if: ${{ needs.changes.outputs.server != 'true' }}
+        run: echo "No Server changes detected; skipping server tests."
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -91,7 +135,7 @@ jobs:
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
-        
+
       - name: Upload xUnit Test Reports
         uses: actions/upload-artifact@v4
         if: always()  # Upload even if tests failed
@@ -107,15 +151,15 @@ jobs:
         with:
           script: |
             const { parseXUnitReport } = require('./.github/scripts/xunit-report-parser.js');
-            
+
             try {
               const commentBody = parseXUnitReport('TestResults/test-results.trx', context);
-              
+
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');
                 return;
               }
-              
+
               // Always create a new comment for each test run
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -124,7 +168,7 @@ jobs:
                 body: commentBody
               });
               console.log('Created new PR comment');
-              
+
             } catch (error) {
               console.error('Error creating/updating PR comment:', error);
             }
@@ -138,10 +182,16 @@ jobs:
   lint-server:
     name: Lint (Server)
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' }}
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
+      - name: Explain skip
+        if: ${{ needs.changes.outputs.server != 'true' }}
+        run: echo "No Server changes detected; skipping server linting."
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -161,10 +211,16 @@ jobs:
   lint-nuke:
     name: Lint (Nuke Build)
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.task_runner == 'true' }}
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
+      - name: Explain skip
+        if: ${{ needs.changes.outputs.task_runner != 'true' }}
+        run: echo "No TaskRunner changes detected; skipping Nuke linting."
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -184,10 +240,16 @@ jobs:
   test-server-postman:
     name: Test Server (Postman)
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' }}
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
+      - name: Explain skip
+        if: ${{ needs.changes.outputs.server != 'true' }}
+        run: echo "No Server changes detected; skipping Postman integration tests."
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -209,7 +271,7 @@ jobs:
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
-        
+
       - name: Upload Postman Reports
         uses: actions/upload-artifact@v4
         if: always()  # Upload even if tests failed
@@ -225,15 +287,15 @@ jobs:
         with:
           script: |
             const { parseNewmanReport } = require('./.github/scripts/newman-report-parser.js');
-            
+
             try {
               const commentBody = parseNewmanReport('reports/newman-report.json', context);
-              
+
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');
                 return;
               }
-              
+
               // Always create a new comment for each test run
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -242,7 +304,7 @@ jobs:
                 body: commentBody
               });
               console.log('Created new PR comment');
-              
+
             } catch (error) {
               console.error('Error creating/updating PR comment:', error);
             }
