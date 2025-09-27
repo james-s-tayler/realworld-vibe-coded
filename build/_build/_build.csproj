@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Analyzer Include="../_build.Analyzers/bin/Debug/netstandard2.0/_build.Analyzers.dll" Condition="Exists('../_build.Analyzers/bin/Debug/netstandard2.0/_build.Analyzers.dll')" />
+    <ProjectReference Include="../_build.Analyzers/_build.Analyzers.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

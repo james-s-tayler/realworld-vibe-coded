@@ -2,7 +2,7 @@
 set -e
 
 # Define paths
-BUILD_PROJECT="build/_build/_build.csproj"
+BUILD_SOLUTION="build/Build.sln"
 BUILD_OUTPUT="build/_build/bin/Debug/_build.dll"
 BUILD_EXECUTABLE="build/_build/bin/Debug/_build"
 
@@ -19,8 +19,13 @@ is_build_current() {
         output_file="$BUILD_EXECUTABLE"
     fi
     
-    # Check project file
-    if [[ "$BUILD_PROJECT" -nt "$output_file" ]]; then
+    # Check solution file and project files
+    if [[ "$BUILD_SOLUTION" -nt "$output_file" ]]; then
+        return 1
+    fi
+    
+    # Check individual project files
+    if find build -name "*.csproj" -newer "$output_file" | grep -q .; then
         return 1
     fi
     
@@ -34,8 +39,8 @@ is_build_current() {
 
 # Build if necessary
 if ! is_build_current; then
-    echo "Building Nuke project..."
-    dotnet build "$BUILD_PROJECT" --verbosity quiet
+    echo "Building Nuke solution..."
+    dotnet build "$BUILD_SOLUTION" --verbosity quiet
 fi
 
 # Run the built executable

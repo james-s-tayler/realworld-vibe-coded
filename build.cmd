@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set BUILD_PROJECT=build\_build\_build.csproj
+set BUILD_SOLUTION=build\Build.sln
 set BUILD_OUTPUT=build\_build\bin\Debug\_build.dll
 set BUILD_EXECUTABLE=build\_build\bin\Debug\_build.exe
 
@@ -11,13 +11,13 @@ set BUILD_NEEDED=0
 rem Check if output exists
 if not exist "%BUILD_OUTPUT%" if not exist "%BUILD_EXECUTABLE%" set BUILD_NEEDED=1
 
-rem Check if project file is newer (basic check)
-if exist "%BUILD_PROJECT%" if not exist "%BUILD_OUTPUT%" set BUILD_NEEDED=1
+rem Check if solution file is newer (basic check)
+if exist "%BUILD_SOLUTION%" if not exist "%BUILD_OUTPUT%" set BUILD_NEEDED=1
 
 rem Build if necessary
 if %BUILD_NEEDED%==1 (
-    echo Building Nuke project...
-    dotnet build "%BUILD_PROJECT%" --verbosity quiet
+    echo Building Nuke solution...
+    dotnet build "%BUILD_SOLUTION%" --verbosity quiet
 )
 
 rem Run the built executable
