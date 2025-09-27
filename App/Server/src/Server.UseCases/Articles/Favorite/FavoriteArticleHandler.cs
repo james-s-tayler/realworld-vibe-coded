@@ -34,25 +34,7 @@ public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRe
     var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
       new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
 
-    var isFollowing = currentUserWithFollowing?.IsFollowing(article.AuthorId) ?? false;
-
-    var articleDto = new ArticleDto(
-      article.Slug,
-      article.Title,
-      article.Description,
-      article.Body,
-      article.Tags.Select(t => t.Name).ToList(),
-      article.CreatedAt,
-      article.UpdatedAt,
-      true, // User just favorited this article
-      article.FavoritesCount,
-      new AuthorDto(
-        article.Author.Username,
-        article.Author.Bio ?? string.Empty,
-        article.Author.Image,
-        isFollowing
-      )
-    );
+    var articleDto = ArticleMappers.MapToDto(article, currentUserWithFollowing, true); // User just favorited this article
 
     return Result.Success(new ArticleResponse { Article = articleDto });
   }

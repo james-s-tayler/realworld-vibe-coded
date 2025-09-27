@@ -34,25 +34,7 @@ public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, I
     var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
       new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
 
-    var isFollowing = currentUserWithFollowing?.IsFollowing(article.AuthorId) ?? false;
-
-    var articleDto = new ArticleDto(
-      article.Slug,
-      article.Title,
-      article.Description,
-      article.Body,
-      article.Tags.Select(t => t.Name).ToList(),
-      article.CreatedAt,
-      article.UpdatedAt,
-      false, // User just unfavorited this article
-      article.FavoritesCount,
-      new AuthorDto(
-        article.Author.Username,
-        article.Author.Bio ?? string.Empty,
-        article.Author.Image,
-        isFollowing
-      )
-    );
+    var articleDto = ArticleMappers.MapToDto(article, currentUserWithFollowing, false); // User just unfavorited this article
 
     return Result.Success(new ArticleResponse { Article = articleDto });
   }
