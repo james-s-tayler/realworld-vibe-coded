@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Server.Core.Interfaces;
+using Server.Core.Observability;
 using Server.Infrastructure;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Email;
+using Server.Web.Configurations;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Configurations;
 
@@ -14,6 +17,10 @@ public static class ServiceConfigs
   {
     services.AddInfrastructureServices(builder.Configuration, logger)
             .AddMediatrConfigs();
+
+    // Register OpenTelemetry dependencies
+    services.AddSingleton(TelemetrySource.ActivitySource);
+    services.AddSingleton(TelemetrySource.Meter);
 
     // Configure JWT Authentication
     var jwtSettings = new JwtSettings();
