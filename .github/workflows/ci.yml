@@ -25,6 +25,7 @@ jobs:
       server: ${{ steps.filter.outputs.server }}
       infra: ${{ steps.filter.outputs.infra }}
       task_runner: ${{ steps.filter.outputs.task_runner }}
+      test: ${{ steps.filter.outputs.test }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,6 +43,8 @@ jobs:
               - 'Infra/**'
             task_runner:
               - 'Task/Runner/**'
+            test_postman:
+              - 'Test/Postman/**'
   build-nuke:
     name: Build (Nuke)
     runs-on: ubuntu-latest
@@ -241,14 +244,14 @@ jobs:
     name: Test Server (Postman)
     runs-on: ubuntu-latest
     needs: changes
-    if: ${{ needs.changes.outputs.server == 'true' }}
+    if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.test_postman == 'true' }}
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
       - name: Explain skip
-        if: ${{ needs.changes.outputs.server != 'true' }}
-        run: echo "No Server changes detected; skipping Postman integration tests."
+        if: ${{ needs.changes.outputs.server != 'true' && needs.changes.outputs.test_postman != 'true' }}
+        run: echo "No Server or Test changes detected; skipping Postman integration tests."
 
       - name: Checkout
         uses: actions/checkout@v4

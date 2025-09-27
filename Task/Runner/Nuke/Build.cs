@@ -139,7 +139,7 @@ public class Build : NukeBuild
             int exitCode = 0;
             try
             {
-                var args = "compose -f Infra/Postman/docker-compose.yml up --build --abort-on-container-exit";
+                var args = "compose -f Test/Postman/docker-compose.yml up --build --abort-on-container-exit";
                 var process = ProcessTasks.StartProcess("docker", args,
                     workingDirectory: RootDirectory,
                     environmentVariables: envVars);
@@ -148,7 +148,7 @@ public class Build : NukeBuild
             }
             finally
             {
-                var downArgs = "compose -f Infra/Postman/docker-compose.yml down";
+                var downArgs = "compose -f Test/Postman/docker-compose.yml down";
                 var downProcess = ProcessTasks.StartProcess("docker", downArgs,
                     workingDirectory: RootDirectory,
                     environmentVariables: envVars);
