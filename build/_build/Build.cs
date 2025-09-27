@@ -89,7 +89,7 @@ public class Build : NukeBuild
         });
 
     Target TestServerPostman => _ => _
-        .Description("Run postman tests using Docker Compose")
+        .Description("Run postman tests using Docker Compose. Optionally specify a FOLDER parameter to run a specific Postman collection folder. E.g. FOLDER=Auth nuke TestServerPostman")
         .DependsOn(DbResetForce)
         .Executes(() =>
         {

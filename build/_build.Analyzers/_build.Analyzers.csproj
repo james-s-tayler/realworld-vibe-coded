@@ -8,6 +8,8 @@
     <PackageVersion>1.0.0</PackageVersion>
     <Authors>Build Team</Authors>
     <Description>Roslyn analyzers for Nuke build targets</Description>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
 
   <ItemGroup>
