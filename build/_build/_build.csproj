@@ -11,4 +11,8 @@
     <PackageReference Include="Nuke.Common" Version="9.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Analyzer Include="../_build.Analyzers/bin/Debug/netstandard2.0/_build.Analyzers.dll" Condition="Exists('../_build.Analyzers/bin/Debug/netstandard2.0/_build.Analyzers.dll')" />
+  </ItemGroup>
+
 </Project>
