@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\_build\_build.csproj" />
+    <ProjectReference Include="..\Nuke\Nuke.csproj" />
   </ItemGroup>
 
 </Project>

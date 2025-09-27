@@ -2,8 +2,8 @@
 setlocal
 
 set BUILD_SOLUTION=Ops\TaskRunner\Nuke.sln
-set BUILD_OUTPUT=Ops\TaskRunner\_build\bin\Debug\_build.dll
-set BUILD_EXECUTABLE=Ops\TaskRunner\_build\bin\Debug\_build.exe
+set BUILD_OUTPUT=Ops\TaskRunner\Nuke\bin\Debug\Nuke.dll
+set BUILD_EXECUTABLE=Ops\TaskRunner\Nuke\bin\Debug\Nuke.exe
 
 rem Check if build is up to date
 set BUILD_NEEDED=0

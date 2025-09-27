@@ -71,7 +71,7 @@ public class Build : NukeBuild
                 .SetVerifyNoChanges(true));
 
             // Run the ArchUnit tests
-            var testProject = RootDirectory / "Ops" / "TaskRunner" / "_build.Tests" / "_build.Tests.csproj";
+            var testProject = RootDirectory / "Ops" / "TaskRunner" / "Nuke.Tests" / "Nuke.Tests.csproj";
             DotNetTest(s => s
                 .SetProjectFile(testProject));
         });

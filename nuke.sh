@@ -3,8 +3,8 @@ set -e
 
 # Define paths
 BUILD_SOLUTION="Ops/TaskRunner/Nuke.sln"
-BUILD_OUTPUT="Ops/TaskRunner/_build/bin/Debug/_build.dll"
-BUILD_EXECUTABLE="Ops/TaskRunner/_build/bin/Debug/_build"
+BUILD_OUTPUT="Ops/TaskRunner/Nuke/bin/Debug/Nuke.dll"
+BUILD_EXECUTABLE="Ops/TaskRunner/Nuke/bin/Debug/Nuke"
 
 # Function to check if build is up to date
 is_build_current() {
@@ -30,7 +30,7 @@ is_build_current() {
     fi
     
     # Check Build.cs and other source files
-    if find Ops/TaskRunner/_build -name "*.cs" -newer "$output_file" | grep -q .; then
+    if find Ops/TaskRunner/Nuke -name "*.cs" -newer "$output_file" | grep -q .; then
         return 1
     fi
     
