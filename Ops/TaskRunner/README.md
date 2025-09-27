@@ -23,7 +23,7 @@ Ops/TaskRunner/
 ├── build.schema.json   # Build schema for IDE support
 └── parameters.json     # Build parameters
 
-nuke.sh                  # Cross-platform build script (Unix)
+build.sh                  # Cross-platform build script (Unix)
 nuke.cmd                 # Cross-platform build script (Windows)
 ```
 
@@ -64,37 +64,37 @@ These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` t
 
 ```bash
 # Show all available targets
-./nuke.sh --help
+./build.sh --help
 
 # Build the server
-./nuke.sh build-server
+./build.sh build-server
 
 # Run tests
-./nuke.sh test-server
+./build.sh test-server
 
 # Verify code formatting (fails if issues found)
-./nuke.sh lint-server-verify
+./build.sh lint-server-verify
 
 # Fix code formatting issues automatically
-./nuke.sh lint-server-fix
+./build.sh lint-server-fix
 
 # Verify Nuke build targets compliance
-./nuke.sh lint-nuke-verify
+./build.sh lint-nuke-verify
 
 # Fix Nuke build formatting issues
-./nuke.sh lint-nuke-fix
+./build.sh lint-nuke-fix
 
 # Run Postman tests with specific folder
-./nuke.sh test-server-postman --folder Auth
+./build.sh test-server-postman --folder Auth
 
 # Reset database
-./nuke.sh db-reset-force
+./build.sh db-reset-force
 ```
 
 ### Windows
 
 ```cmd
-rem Use nuke.cmd instead of nuke.sh
+rem Use nuke.cmd instead of build.sh
 nuke.cmd show-help
 nuke.cmd build-server
 ```
@@ -132,7 +132,7 @@ All Nuke build targets must follow these requirements:
 1. **Documentation**: Every target must include a `.Description()` call explaining what the target does
 2. **Naming**: Target names must follow PascalCase convention (e.g., `BuildServer`, `TestServer`)
 3. **Lint naming**: Targets starting with "Lint" must end with either "Verify" or "Fix"
-4. **Validation**: Use `./nuke.sh lint-nuke-verify` to verify targets comply with requirements
+4. **Validation**: Use `./build.sh lint-nuke-verify` to verify targets comply with requirements
 
 The linting system includes:
 - **ArchUnit.NET**: Validates target architecture and naming conventions at test time
@@ -140,8 +140,8 @@ The linting system includes:
 - **dotnet format**: Ensures consistent code formatting
 
 Use the "Fix" targets to automatically resolve formatting issues:
-- `./nuke.sh lint-nuke-fix` - Fix Nuke build formatting
-- `./nuke.sh lint-server-fix` - Fix server code formatting
+- `./build.sh lint-nuke-fix` - Fix Nuke build formatting
+- `./build.sh lint-server-fix` - Fix server code formatting
 
 This linting is enforced in CI to ensure consistent build target documentation and formatting.
 
