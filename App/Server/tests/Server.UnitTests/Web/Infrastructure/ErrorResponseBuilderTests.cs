@@ -1,5 +1,5 @@
+﻿using Server.Web.Infrastructure;
 using Shouldly;
-using Server.Web.Infrastructure;
 using Xunit;
 
 namespace Server.UnitTests.Web.Infrastructure;
