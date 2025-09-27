@@ -67,7 +67,12 @@ class Build : NukeBuild
         .Description("Lint Nuke build targets for documentation and naming conventions")
         .Executes(() =>
         {
-            NukeLinter.RunLintChecks();
+            // First ensure the build project is compiled so we can analyze it
+            DotNetBuild(s => s.SetProjectFile(RootDirectory / "build" / "_build" / "_build.csproj"));
+            
+            var testProject = RootDirectory / "build" / "_build.Tests" / "_build.Tests.csproj";
+            DotNetTest(s => s
+                .SetProjectFile(testProject));
         });
 
 
