@@ -5,10 +5,15 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <NukeTelemetryVersion>1</NukeTelemetryVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Nuke.Common" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../_build.Analyzers/_build.Analyzers.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

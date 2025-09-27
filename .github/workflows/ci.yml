@@ -16,6 +16,29 @@ permissions:
   pull-requests: write
 
 jobs:
+  build-nuke:
+    name: Build (Nuke)
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Build (Nuke build system)
+        run: dotnet build build/Build.sln
+
   build-server:
     name: Build (Server)
     runs-on: ubuntu-latest
@@ -133,7 +156,30 @@ jobs:
         run: dotnet --info
 
       - name: Lint (server)
-        run: ./build.sh lint-server
+        run: ./build.sh lint-server-verify
+
+  lint-nuke:
+    name: Lint (Nuke Build)
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Lint (Nuke build targets)
+        run: ./build.sh lint-nuke-verify
 
   test-server-postman:
     name: Test Server (Postman)
