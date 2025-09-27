@@ -2,8 +2,6 @@
 using Server.Web.Configurations;
 using Server.Web.Infrastructure;
 
-// Test comment: This change should trigger server CI jobs (build-server, test-server, lint-server, test-server-postman)
-
 var builder = WebApplication.CreateBuilder(args);
 
 var logger = Log.Logger = new LoggerConfiguration()

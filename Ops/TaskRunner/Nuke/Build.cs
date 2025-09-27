@@ -7,8 +7,6 @@ using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
-// Test comment: This change should trigger task_runner CI jobs (build-nuke, lint-nuke)
-
 public class Build : NukeBuild
 {
     public static int Main() => Execute<Build>();
