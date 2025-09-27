@@ -10,6 +10,8 @@
     <Description>Roslyn analyzers for Nuke build targets</Description>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <AnalysisLevel>latest</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>RS2008</NoWarn> <!-- Suppress analyzer release tracking requirement for internal build tool -->
   </PropertyGroup>
 
   <ItemGroup>
