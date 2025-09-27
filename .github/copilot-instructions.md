@@ -65,3 +65,5 @@ General functionality:
 ## Contributing
 - Do a code review before finishing your work.
 - You are not permitted to suppress warnings or errors in code unless explicitly instructed to do so.
+- You are not permitted to modify any Archunit rules unless explicitly instructed to do so.
+- Don't hardcode things or use magic strings.
