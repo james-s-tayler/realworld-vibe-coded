@@ -47,6 +47,3 @@ jobs:
       - name: Install Husky and setup pre-commit hooks
         run: |
           npm ci
-          npx husky install
-          # Configure git hooks directory to ensure Husky works
-          git config core.hooksPath .husky
