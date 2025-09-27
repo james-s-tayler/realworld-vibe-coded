@@ -61,3 +61,7 @@ General functionality:
 - Deployment to Azure App Service
 - Nuke build system for lint, build, test and deployment tasks
   - The same Nuke build system is used for both local development and GitHub Actions CI/CD.
+
+## Contributing
+- Do a code review before finishing your work.
+- You are not permitted to suppress warnings or errors in code unless explicitly instructed to do so.
