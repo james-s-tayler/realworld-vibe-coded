@@ -6,9 +6,10 @@ const fs = require('fs');
  * Parses xUnit TRX report and generates PR comment content
  * @param {string} reportPath - Path to the TRX XML report
  * @param {object} context - GitHub Actions context object
+ * @param {string} suffix - Optional suffix to add to the title (e.g., "(Nuke Build)")
  * @returns {string} - Generated comment body
  */
-function parseXUnitReport(reportPath, context) {
+function parseXUnitReport(reportPath, context, suffix = '') {
   if (!fs.existsSync(reportPath)) {
     console.log('No xUnit TRX report found, skipping comment');
     return null;
@@ -93,7 +94,8 @@ function parseXUnitReport(reportPath, context) {
   const testPassPercentage = total > 0 ? Math.round(passed / total * 100) : 0;
   
   // Create the comment body
-  const commentBody = `## ${statusIcon} xUnit Tests ${statusText}
+  const title = suffix ? `xUnit Tests ${statusText} ${suffix}` : `xUnit Tests ${statusText}`;
+  const commentBody = `## ${statusIcon} ${title}
 
 **📊 Test Summary**
 - **Tests**: ${passed}/${total} passed (${testPassPercentage}%)${skipped > 0 ? `\n- **Skipped**: ${skipped}` : ''}

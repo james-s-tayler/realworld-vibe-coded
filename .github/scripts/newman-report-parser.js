@@ -7,9 +7,10 @@ const path = require('path');
  * Parses Newman JSON report and generates PR comment content
  * @param {string} reportPath - Path to the Newman JSON report
  * @param {object} context - GitHub Actions context object
+ * @param {string} suffix - Optional suffix to add to the title (e.g., "(Nuke Build)")
  * @returns {string} - Generated comment body
  */
-function parseNewmanReport(reportPath, context) {
+function parseNewmanReport(reportPath, context, suffix = '') {
   if (!fs.existsSync(reportPath)) {
     console.log('No Newman report found, skipping comment');
     return null;
@@ -49,7 +50,8 @@ function parseNewmanReport(reportPath, context) {
 
   // Create the comment body
   const testPassPercentage = totalTests > 0 ? Math.round(passedTests/totalTests*100) : 0;
-  const commentBody = `## ${statusIcon} Postman API Tests ${statusText}
+  const title = suffix ? `Postman API Tests ${statusText} ${suffix}` : `Postman API Tests ${statusText}`;
+  const commentBody = `## ${statusIcon} ${title}
 
 **📊 Test Summary**
 - **Tests**: ${passedTests}/${totalTests} passed (${testPassPercentage}%)
