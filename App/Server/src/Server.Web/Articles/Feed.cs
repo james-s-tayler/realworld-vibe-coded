@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Feed;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -10,7 +11,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Get articles from followed users. Authentication required.
 /// </remarks>
-public class Feed(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse>
+public class Feed(IMediator _mediator) : BaseValidatedEndpoint<FeedRequest, ArticlesResponse>
 {
   public override void Configure()
   {
@@ -23,39 +24,18 @@ public class Feed(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse
     });
   }
 
-  public override async Task HandleAsync(CancellationToken cancellationToken)
+  public override async Task HandleAsync(FeedRequest request, CancellationToken cancellationToken)
   {
     // Get current user ID from claims
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
     if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
     {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      await WriteUnauthorizedResponseAsync(cancellationToken);
       return;
     }
 
-    var validation = QueryParameterValidator.ValidateFeedParameters(HttpContext.Request);
-
-    if (!validation.IsValid)
-    {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-
-      var validationErrorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = validation.Errors.ToArray() }
-      });
-      await HttpContext.Response.WriteAsync(validationErrorJson, cancellationToken);
-      return;
-    }
-
-    var result = await _mediator.Send(new GetFeedQuery(userId, validation.Limit, validation.Offset), cancellationToken);
+    var result = await _mediator.Send(new GetFeedQuery(userId, request.Limit, request.Offset), cancellationToken);
 
     if (result.IsSuccess)
     {
