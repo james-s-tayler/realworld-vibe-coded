@@ -8,6 +8,6 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
   <PropertyGroup>
-    <NoWarn>1591;NETSDK1206</NoWarn> <!-- Remove this to turn on warnings for missing XML Comments; NETSDK1206: Suppress SQLite runtime identifier warnings -->
+    <NoWarn>1591</NoWarn> <!-- Remove this to turn on warnings for missing XML Comments -->
   </PropertyGroup>
 </Project>
