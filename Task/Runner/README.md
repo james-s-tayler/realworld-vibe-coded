@@ -13,7 +13,7 @@ Nuke is a modern build automation system for .NET projects that provides:
 ## Structure
 
 ```
-Ops/TaskRunner/
+Task/Runner/
 └── Nuke/
     ├── Nuke.csproj    # Nuke build project
     └── Build.cs         # Build targets implementation

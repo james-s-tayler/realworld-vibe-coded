@@ -44,7 +44,7 @@ changes:
           infra:
             - 'Infra/**'
           task_runner:
-            - 'Ops/TaskRunner/**'
+            - 'Task/Runner/**'
 ```
 
 This job:

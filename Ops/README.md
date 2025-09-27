@@ -4,9 +4,9 @@ This directory contains tooling that facilitates the day-to-day operations of th
 
 ## Contents
 
-### TaskRunner (Nuke Build System)
+### TaskRunner (Nuke Build System) - MOVED
 
-The `TaskRunner/` directory contains the Nuke build system that manages all build, test, and deployment tasks for the project.
+The TaskRunner directory has been moved to `Task/Runner/`. Please refer to the new location for all build system documentation and functionality.
 
 **Key Features:**
 - Cross-platform build automation
@@ -16,7 +16,7 @@ The `TaskRunner/` directory contains the Nuke build system that manages all buil
 
 **Usage:**
 - From repository root: `./build.sh [target]` or `./build.cmd [target]`
-- From TaskRunner directory: `dotnet run --project Nuke -- [target]`
+- From Task/Runner directory: `dotnet run --project Nuke -- [target]`
 
 ### Future Operations Tools
 
