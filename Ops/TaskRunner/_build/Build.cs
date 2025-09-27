@@ -61,7 +61,7 @@ public class Build : NukeBuild
         .Description("Verify Nuke build targets for documentation and naming conventions")
         .Executes(() =>
         {
-            var nukeSolution = RootDirectory / "build" / "Build.sln";
+            var nukeSolution = RootDirectory / "Ops" / "TaskRunner" / "Nuke.sln";
 
             // Run dotnet format on the Nuke solution (only check whitespace and style, not warnings)
             Console.WriteLine($"Running dotnet format (verify only) on {nukeSolution}");
@@ -71,7 +71,7 @@ public class Build : NukeBuild
                 .SetVerifyNoChanges(true));
 
             // Run the ArchUnit tests
-            var testProject = RootDirectory / "build" / "_build.Tests" / "_build.Tests.csproj";
+            var testProject = RootDirectory / "Ops" / "TaskRunner" / "_build.Tests" / "_build.Tests.csproj";
             DotNetTest(s => s
                 .SetProjectFile(testProject));
         });
@@ -80,7 +80,7 @@ public class Build : NukeBuild
         .Description("Fix Nuke build formatting and style issues automatically")
         .Executes(() =>
         {
-            var nukeSolution = RootDirectory / "build" / "Build.sln";
+            var nukeSolution = RootDirectory / "Ops" / "TaskRunner" / "Nuke.sln";
 
             // Run dotnet format on the Nuke solution to fix formatting issues
             Console.WriteLine($"Running dotnet format (fix mode) on {nukeSolution}");

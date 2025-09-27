@@ -37,7 +37,7 @@ jobs:
         run: dotnet --info
 
       - name: Build (Nuke build system)
-        run: dotnet build build/Build.sln
+        run: dotnet build Ops/TaskRunner/Nuke.sln
 
   build-server:
     name: Build (Server)
@@ -60,7 +60,7 @@ jobs:
         run: dotnet --info
 
       - name: Build (server)
-        run: ./build.sh build-server
+        run: ./nuke.sh build-server
 
   test-server:
     name: Test (Server)
@@ -87,7 +87,7 @@ jobs:
         id: xunit_tests
         run: |
           set +e  # Don't exit on error
-          ./build.sh test-server
+          ./nuke.sh test-server
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
@@ -156,7 +156,7 @@ jobs:
         run: dotnet --info
 
       - name: Lint (server)
-        run: ./build.sh lint-server-verify
+        run: ./nuke.sh lint-server-verify
 
   lint-nuke:
     name: Lint (Nuke Build)
@@ -179,7 +179,7 @@ jobs:
         run: dotnet --info
 
       - name: Lint (Nuke build targets)
-        run: ./build.sh lint-nuke-verify
+        run: ./nuke.sh lint-nuke-verify
 
   test-server-postman:
     name: Test Server (Postman)
@@ -205,7 +205,7 @@ jobs:
         id: postman_tests
         run: |
           set +e  # Don't exit on error
-          ./build.sh test-server-postman
+          ./nuke.sh test-server-postman
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment

@@ -13,7 +13,7 @@ Nuke is a modern build automation system for .NET projects that provides:
 ## Structure
 
 ```
-build/
+Ops/TaskRunner/
 └── _build/
     ├── _build.csproj    # Nuke build project
     └── Build.cs         # Build targets implementation
@@ -23,8 +23,8 @@ build/
 ├── build.schema.json   # Build schema for IDE support
 └── parameters.json     # Build parameters
 
-build.sh                 # Cross-platform build script (Unix)
-build.cmd                # Cross-platform build script (Windows)
+nuke.sh                  # Cross-platform build script (Unix)
+nuke.cmd                 # Cross-platform build script (Windows)
 ```
 
 ## Available Targets
@@ -64,37 +64,37 @@ These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` t
 
 ```bash
 # Show all available targets
-./build.sh --help
+./nuke.sh --help
 
 # Build the server
-./build.sh build-server
+./nuke.sh build-server
 
 # Run tests
-./build.sh test-server
+./nuke.sh test-server
 
 # Verify code formatting (fails if issues found)
-./build.sh lint-server-verify
+./nuke.sh lint-server-verify
 
 # Fix code formatting issues automatically
-./build.sh lint-server-fix
+./nuke.sh lint-server-fix
 
 # Verify Nuke build targets compliance
-./build.sh lint-nuke-verify
+./nuke.sh lint-nuke-verify
 
 # Fix Nuke build formatting issues
-./build.sh lint-nuke-fix
+./nuke.sh lint-nuke-fix
 
 # Run Postman tests with specific folder
-./build.sh test-server-postman --folder Auth
+./nuke.sh test-server-postman --folder Auth
 
 # Reset database
-./build.sh db-reset-force
+./nuke.sh db-reset-force
 ```
 
 ### Windows
 
 ```cmd
-rem Use build.cmd instead of build.sh
+rem Use build.cmd instead of nuke.sh
 build.cmd show-help
 build.cmd build-server
 ```
@@ -132,7 +132,7 @@ All Nuke build targets must follow these requirements:
 1. **Documentation**: Every target must include a `.Description()` call explaining what the target does
 2. **Naming**: Target names must follow PascalCase convention (e.g., `BuildServer`, `TestServer`)
 3. **Lint naming**: Targets starting with "Lint" must end with either "Verify" or "Fix"
-4. **Validation**: Use `./build.sh lint-nuke-verify` to verify targets comply with requirements
+4. **Validation**: Use `./nuke.sh lint-nuke-verify` to verify targets comply with requirements
 
 The linting system includes:
 - **ArchUnit.NET**: Validates target architecture and naming conventions at test time
@@ -140,8 +140,8 @@ The linting system includes:
 - **dotnet format**: Ensures consistent code formatting
 
 Use the "Fix" targets to automatically resolve formatting issues:
-- `./build.sh lint-nuke-fix` - Fix Nuke build formatting
-- `./build.sh lint-server-fix` - Fix server code formatting
+- `./nuke.sh lint-nuke-fix` - Fix Nuke build formatting
+- `./nuke.sh lint-server-fix` - Fix server code formatting
 
 This linting is enforced in CI to ensure consistent build target documentation and formatting.
 
