@@ -1,6 +1,6 @@
-~~---
+---
 applyTo: "**/.github/workflows/*.yml"
----~~
+---
 
 # GitHub Actions Guidelines
 
