@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.List;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -10,7 +11,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// List articles globally. Optional filters for tag, author, favorited user. Authentication optional.
 /// </remarks>
-public class List(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse>
+public class List(IMediator _mediator) : BaseValidatedEndpoint<ListArticlesRequest, ArticlesResponse>
 {
   public override void Configure()
   {
@@ -23,23 +24,8 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse
     });
   }
 
-  public override async Task HandleAsync(CancellationToken cancellationToken)
+  public override async Task HandleAsync(ListArticlesRequest request, CancellationToken cancellationToken)
   {
-    var validation = QueryParameterValidator.ValidateListArticlesParameters(HttpContext.Request);
-
-    if (!validation.IsValid)
-    {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-
-      var validationErrorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = validation.Errors.ToArray() }
-      });
-      await HttpContext.Response.WriteAsync(validationErrorJson, cancellationToken);
-      return;
-    }
-
     // Get current user ID if authenticated
     int? currentUserId = null;
     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
@@ -49,11 +35,11 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse
     }
 
     var result = await _mediator.Send(new ListArticlesQuery(
-      validation.Tag,
-      validation.Author,
-      validation.Favorited,
-      validation.Limit,
-      validation.Offset,
+      request.Tag,
+      request.Author,
+      request.Favorited,
+      request.Limit,
+      request.Offset,
       currentUserId), cancellationToken);
 
     if (result.IsSuccess)
