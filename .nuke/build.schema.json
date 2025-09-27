@@ -29,6 +29,7 @@
         "DbReset",
         "DbResetForce",
         "LintClient",
+        "LintNuke",
         "LintServer",
         "RunLocalClient",
         "RunLocalServer",

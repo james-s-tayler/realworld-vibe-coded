@@ -38,6 +38,7 @@ build.cmd                # Cross-platform build script (Windows)
 | `test-server-postman` | Run Postman API tests |
 | `lint-server` | Lint backend code with dotnet format |
 | `lint-client` | Lint frontend code (placeholder) |
+| `lint-nuke` | Lint Nuke build targets for documentation and naming conventions |
 | `run-local-server` | Run backend locally |
 | `run-local-client` | Run frontend locally (placeholder) |
 | `db-reset` | Reset SQLite database with confirmation |
@@ -59,6 +60,9 @@ build.cmd                # Cross-platform build script (Windows)
 
 # Lint code
 ./build.sh lint-server
+
+# Lint Nuke build targets
+./build.sh lint-nuke
 
 # Run Postman tests with specific folder
 ./build.sh test-server-postman --folder Auth
@@ -100,5 +104,20 @@ Target MyNewTarget => _ => _
         // Implementation here
     });
 ```
+
+### Target Linting Requirements
+
+All Nuke build targets must follow these requirements:
+
+1. **Documentation**: Every target must include a `.Description()` call explaining what the target does
+2. **Naming**: Target names must follow PascalCase convention (e.g., `BuildServer`, `TestServer`)
+3. **Validation**: Use `./build.sh lint-nuke` to verify targets comply with requirements
+
+The `lint-nuke` target will validate:
+- All targets have proper `.Description()` calls
+- Target names follow PascalCase naming conventions
+- Build fails if any targets don't meet requirements
+
+This linting is enforced in CI to ensure consistent build target documentation.
 
 For more information about Nuke, visit the [official documentation](https://nuke.build/).

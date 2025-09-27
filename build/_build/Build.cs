@@ -35,6 +35,7 @@ class Build : NukeBuild
             Console.WriteLine("  test-server-postman        Run postman tests using Docker Compose");
             Console.WriteLine("  lint-server                Verify backend formatting & analyzers");
             Console.WriteLine("  lint-client                Lint client code");
+            Console.WriteLine("  lint-nuke                  Lint Nuke build targets for documentation and naming conventions");
             Console.WriteLine("  run-local-server           Run backend locally");
             Console.WriteLine("  run-local-client           Run client locally");
             Console.WriteLine("  db-reset                   Delete local sqlite database");
@@ -60,6 +61,13 @@ class Build : NukeBuild
         .Executes(() =>
         {
             Console.WriteLine("No client linting configured yet.");
+        });
+
+    Target LintNuke => _ => _
+        .Description("Lint Nuke build targets for documentation and naming conventions")
+        .Executes(() =>
+        {
+            NukeLinter.RunLintChecks();
         });
 
 
