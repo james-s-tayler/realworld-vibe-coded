@@ -1,4 +1,6 @@
-﻿using Server.UseCases.Contributors.Create;
+﻿using Serilog;
+using Server.Core.Observability;
+using Server.UseCases.Contributors.Create;
 using Server.Web.Configurations;
 using Server.Web.Infrastructure;
 
@@ -11,7 +13,8 @@ var logger = Log.Logger = new LoggerConfiguration()
 
 logger.Information("Starting web host");
 
-builder.AddLoggerConfigs();
+builder.AddLoggerConfigs()
+       .AddOpenTelemetryConfigs();
 
 var appLogger = new SerilogLoggerFactory(logger)
     .CreateLogger<Program>();
@@ -27,7 +30,7 @@ builder.Services.AddFastEndpoints()
                 })
                 .AddCommandMiddleware(c =>
                 {
-                  c.Register(typeof(CommandLogger<,>));
+                  c.Register(typeof(OpenTelemetryCommandLogger<,>));
                 });
 
 // Configure JSON serialization options
@@ -47,6 +50,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 var app = builder.Build();
 
 await app.UseAppMiddlewareAndSeedDatabase();
+
+app.UseOpenTelemetryConfigs();
 
 app.Run();
 

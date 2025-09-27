@@ -1,9 +1,11 @@
-﻿using Server.Core.ArticleAggregate;
+﻿using System.Diagnostics;
+using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
+using Server.Core.Observability;
 
 namespace Server.UseCases.Articles.Create;
 
@@ -15,20 +17,29 @@ public class CreateArticleHandler(
 {
   public async Task<Result<ArticleResponse>> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
   {
+    using var activity = TelemetrySource.ActivitySource.StartActivity("CreateArticleHandler.Handle");
+    activity?.SetTag("article.title", request.Title);
+    activity?.SetTag("article.author_id", request.AuthorId);
+    activity?.SetTag("article.tags_count", request.TagList?.Count ?? 0);
+
     // Get the author
     var author = await _userRepository.GetByIdAsync(request.AuthorId, cancellationToken);
     if (author == null)
     {
+      activity?.SetStatus(ActivityStatusCode.Error, "Author not found");
       return Result.Error("Author not found");
     }
 
     // Check for duplicate slug
     var slug = GenerateSlug(request.Title);
+    activity?.SetTag("article.slug", slug);
+    
     var existingArticle = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(slug), cancellationToken);
 
     if (existingArticle != null)
     {
+      activity?.SetStatus(ActivityStatusCode.Error, "Slug already taken");
       return Result.Error("slug has already been taken");
     }
 
@@ -79,6 +90,9 @@ public class CreateArticleHandler(
       )
     );
 
+    activity?.SetTag("article.created_at", article.CreatedAt.ToString("O"));
+    activity?.SetStatus(ActivityStatusCode.Ok);
+    
     return Result.Success(new ArticleResponse { Article = articleDto });
   }
 
