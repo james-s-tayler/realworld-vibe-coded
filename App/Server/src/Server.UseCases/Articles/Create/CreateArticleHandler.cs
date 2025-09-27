@@ -3,9 +3,9 @@ using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.Interfaces;
+using Server.Core.Observability;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
-using Server.Core.Observability;
 
 namespace Server.UseCases.Articles.Create;
 
@@ -33,7 +33,7 @@ public class CreateArticleHandler(
     // Check for duplicate slug
     var slug = GenerateSlug(request.Title);
     activity?.SetTag("article.slug", slug);
-    
+
     var existingArticle = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(slug), cancellationToken);
 
@@ -92,7 +92,7 @@ public class CreateArticleHandler(
 
     activity?.SetTag("article.created_at", article.CreatedAt.ToString("O"));
     activity?.SetStatus(ActivityStatusCode.Ok);
-    
+
     return Result.Success(new ArticleResponse { Article = articleDto });
   }
 

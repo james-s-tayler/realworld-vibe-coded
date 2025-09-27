@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
 namespace Server.Core.Observability;
@@ -12,7 +12,7 @@ public static class TelemetrySource
   /// The ActivitySource for OpenTelemetry tracing
   /// </summary>
   public static readonly ActivitySource ActivitySource = new("Conduit.Server");
-  
+
   /// <summary>
   /// The Meter for OpenTelemetry metrics
   /// </summary>

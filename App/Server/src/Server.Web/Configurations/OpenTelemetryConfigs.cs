@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -31,7 +31,7 @@ public static class OpenTelemetryConfigs
           {
             // Skip health checks and metrics endpoints from tracing
             var path = httpContext.Request.Path.Value;
-            return !string.IsNullOrEmpty(path) && 
+            return !string.IsNullOrEmpty(path) &&
                    !path.StartsWith("/health", StringComparison.OrdinalIgnoreCase) &&
                    !path.StartsWith("/metrics", StringComparison.OrdinalIgnoreCase);
           };
@@ -64,7 +64,7 @@ public static class OpenTelemetryConfigs
     // Add Prometheus metrics endpoint
     app.UseRouting();
     app.MapPrometheusScrapingEndpoint("/metrics");
-    
+
     return app;
   }
 }
