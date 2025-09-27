@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles.Delete;
 
 namespace Server.Web.Articles;
@@ -9,7 +9,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Deletes an existing article. Authentication required. User must be the author.
 /// </remarks>
-public class Delete(IMediator _mediator) : EndpointWithoutRequest
+public class Delete(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest
 {
   public override void Configure()
   {
@@ -24,9 +24,12 @@ public class Delete(IMediator _mediator) : EndpointWithoutRequest
 
   public override async Task HandleAsync(CancellationToken cancellationToken)
   {
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+    int userId;
+    try
+    {
+      userId = _currentUserService.GetRequiredCurrentUserId();
+    }
+    catch (UnauthorizedAccessException)
     {
       HttpContext.Response.StatusCode = 401;
       HttpContext.Response.ContentType = "application/json";

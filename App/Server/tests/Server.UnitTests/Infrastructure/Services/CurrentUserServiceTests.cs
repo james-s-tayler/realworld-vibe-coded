@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using Server.Core.Interfaces;
@@ -59,7 +59,7 @@ public class CurrentUserServiceTests
       new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString())
     }, "test");
     var user = new ClaimsPrincipal(identity);
-    
+
     _httpContext.User.Returns(user);
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
@@ -79,7 +79,7 @@ public class CurrentUserServiceTests
       new Claim(ClaimTypes.NameIdentifier, "invalid")
     }, "test");
     var user = new ClaimsPrincipal(identity);
-    
+
     _httpContext.User.Returns(user);
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
@@ -99,7 +99,7 @@ public class CurrentUserServiceTests
       new Claim(ClaimTypes.Name, "testuser")
     }, "test");
     var user = new ClaimsPrincipal(identity);
-    
+
     _httpContext.User.Returns(user);
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
@@ -120,7 +120,7 @@ public class CurrentUserServiceTests
       new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString())
     }, "test");
     var user = new ClaimsPrincipal(identity);
-    
+
     _httpContext.User.Returns(user);
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
@@ -153,7 +153,7 @@ public class CurrentUserServiceTests
       new Claim(ClaimTypes.NameIdentifier, "123")
     }, "test");
     var user = new ClaimsPrincipal(identity);
-    
+
     _httpContext.User.Returns(user);
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 

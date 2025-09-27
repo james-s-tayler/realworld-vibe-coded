@@ -79,7 +79,7 @@ public static class ServiceConfigs
       });
 
     services.AddAuthorization();
-    
+
     // Register IHttpContextAccessor for CurrentUserService
     services.AddHttpContextAccessor();
 

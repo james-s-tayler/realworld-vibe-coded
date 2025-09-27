@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using Server.Core.Interfaces;
 using Server.UseCases.Users.GetCurrent;
 
 namespace Server.Web.Users;
@@ -9,7 +9,7 @@ namespace Server.Web.Users;
 /// <remarks>
 /// Get the currently authenticated user details.
 /// </remarks>
-public class GetCurrent(IMediator _mediator) : EndpointWithoutRequest<UserCurrentResponse>
+public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<UserCurrentResponse>
 {
   public override void Configure()
   {
@@ -24,9 +24,12 @@ public class GetCurrent(IMediator _mediator) : EndpointWithoutRequest<UserCurren
 
   public override async Task HandleAsync(CancellationToken cancellationToken)
   {
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+    int userId;
+    try
+    {
+      userId = _currentUserService.GetRequiredCurrentUserId();
+    }
+    catch (UnauthorizedAccessException)
     {
       HttpContext.Response.StatusCode = 401;
       HttpContext.Response.ContentType = "application/json";

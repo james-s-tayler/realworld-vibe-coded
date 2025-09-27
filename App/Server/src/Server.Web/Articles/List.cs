@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.List;
 
@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// List articles globally. Optional filters for tag, author, favorited user. Authentication optional.
 /// </remarks>
-public class List(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse>
+public class List(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticlesResponse>
 {
   public override void Configure()
   {
@@ -41,12 +41,7 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse
     }
 
     // Get current user ID if authenticated
-    int? currentUserId = null;
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
-    {
-      currentUserId = userId;
-    }
+    var currentUserId = _currentUserService.GetCurrentUserId();
 
     var result = await _mediator.Send(new ListArticlesQuery(
       validation.Tag,
