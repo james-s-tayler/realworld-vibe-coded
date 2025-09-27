@@ -9,7 +9,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 class Build : NukeBuild
 {
-    public static int Main() => Execute<Build>(x => x.ShowHelp);
+    public static int Main() => Execute<Build>();
 
     [Parameter("Postman folder to test")]
     readonly string? Folder;
@@ -23,28 +23,6 @@ class Build : NukeBuild
     AbsolutePath TestResultsDirectory => RootDirectory / "TestResults";
     AbsolutePath ReportsDirectory => RootDirectory / "reports";
     AbsolutePath DatabaseFile => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "database.sqlite";
-
-    Target ShowHelp => _ => _
-        .Description("Show available targets")
-        .Executes(() =>
-        {
-            Console.WriteLine("Available Nuke targets:");
-            Console.WriteLine("  build-server               dotnet build (backend)");
-            Console.WriteLine("  build-client               Build client (frontend)");
-            Console.WriteLine("  test-server                Run backend tests");
-            Console.WriteLine("  test-server-postman        Run postman tests using Docker Compose");
-            Console.WriteLine("  lint-server                Verify backend formatting & analyzers");
-            Console.WriteLine("  lint-client                Lint client code");
-            Console.WriteLine("  lint-nuke                  Lint Nuke build targets for documentation and naming conventions");
-            Console.WriteLine("  run-local-server           Run backend locally");
-            Console.WriteLine("  run-local-client           Run client locally");
-            Console.WriteLine("  db-reset                   Delete local sqlite database");
-            Console.WriteLine("  db-reset-force             Delete local sqlite database (no confirmation)");
-            Console.WriteLine("");
-            Console.WriteLine("Use: ./build.sh <target> [options]");
-            Console.WriteLine("Example: ./build.sh build-server");
-            Console.WriteLine("Example: ./build.sh test-server-postman --folder Auth");
-        });
 
     Target LintServer => _ => _
         .Description("Verify backend formatting & analyzers (no changes). Fails if issues found")
