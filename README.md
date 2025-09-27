@@ -25,4 +25,4 @@ An attempt at implementing gothinkster/realworld purely through vibe-coding
 - [Figma MCP Server](https://github.com/paulvandermeijs/figma-mcp)
 - [n8n MCP Server](https://github.com/leonardsellem/n8n-mcp-server)
 - [Unleash Feature Toggle MCP](https://github.com/cuongtl1992/unleash-mcp)
-- [Workflowy](https://github.com/danield137/mcp-workflowy)
+- [Workflowy](https://github.com/danield137/mcp-workflowy)Test change
