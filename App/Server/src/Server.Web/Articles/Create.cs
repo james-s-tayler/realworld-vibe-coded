@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Server.UseCases.Articles;
+﻿using Server.UseCases.Articles;
 using Server.UseCases.Articles.Create;
 using Server.Web.Infrastructure;
 
@@ -11,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Creates a new article. Authentication required.
 /// </remarks>
-public class Create(IMediator _mediator) : BaseValidatedEndpoint<CreateArticleRequest, ArticleResponse>
+public class Create(IMediator _mediator) : BaseResultEndpoint<CreateArticleRequest, ArticleResponse>
 {
   public override void Configure()
   {
@@ -27,12 +26,10 @@ public class Create(IMediator _mediator) : BaseValidatedEndpoint<CreateArticleRe
 
   public override async Task HandleAsync(CreateArticleRequest request, CancellationToken cancellationToken)
   {
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+    var userId = GetCurrentUserId();
+    if (userId == null)
     {
-      await WriteUnauthorizedResponseAsync(cancellationToken);
-      return;
+      throw new UnauthorizedAccessException();
     }
 
     var result = await _mediator.Send(new CreateArticleCommand(
@@ -40,22 +37,9 @@ public class Create(IMediator _mediator) : BaseValidatedEndpoint<CreateArticleRe
       request.Article.Description,
       request.Article.Body,
       request.Article.TagList ?? new List<string>(),
-      userId,
-      userId), cancellationToken);
+      userId.Value,
+      userId.Value), cancellationToken);
 
-    if (result.IsSuccess)
-    {
-      HttpContext.Response.StatusCode = 201;
-      Response = result.Value;
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    await HandleResultAsync(result, 201, cancellationToken);
   }
 }
