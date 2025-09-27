@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Ardalis.Result;
 using FastEndpoints;
 
@@ -16,7 +16,7 @@ public abstract class BaseResultEndpoint<TRequest, TResponse> : Endpoint<TReques
   {
     HttpContext.Response.StatusCode = 422;
     HttpContext.Response.ContentType = "application/json";
-    
+
     var json = ErrorResponseBuilder.CreateValidationErrorResponse(ValidationFailures);
     HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
   }
@@ -54,7 +54,7 @@ public abstract class BaseResultEndpoint<TRequest, TResponse> : Endpoint<TReques
   private async Task HandleErrorResultAsync(Ardalis.Result.IResult result, CancellationToken cancellationToken)
   {
     HttpContext.Response.ContentType = "application/json";
-    
+
     switch (result.Status)
     {
       case ResultStatus.Invalid:
@@ -62,34 +62,34 @@ public abstract class BaseResultEndpoint<TRequest, TResponse> : Endpoint<TReques
         var validationResponse = ErrorResponseBuilder.CreateValidationErrorResponse(result.ValidationErrors);
         await HttpContext.Response.WriteAsync(validationResponse, cancellationToken);
         break;
-        
+
       case ResultStatus.Unauthorized:
         HttpContext.Response.StatusCode = 401;
         var unauthorizedResponse = ErrorResponseBuilder.CreateUnauthorizedResponse();
         await HttpContext.Response.WriteAsync(unauthorizedResponse, cancellationToken);
         break;
-        
+
       case ResultStatus.Forbidden:
         HttpContext.Response.StatusCode = 403;
         var forbiddenResponse = ErrorResponseBuilder.CreateErrorResponse("Forbidden");
         await HttpContext.Response.WriteAsync(forbiddenResponse, cancellationToken);
         break;
-        
+
       case ResultStatus.NotFound:
         HttpContext.Response.StatusCode = 404;
         var notFoundResponse = ErrorResponseBuilder.CreateErrorResponse("Not found");
         await HttpContext.Response.WriteAsync(notFoundResponse, cancellationToken);
         break;
-        
+
       case ResultStatus.Conflict:
         HttpContext.Response.StatusCode = 409;
         var conflictResponse = ErrorResponseBuilder.CreateErrorResponse(result.Errors);
         await HttpContext.Response.WriteAsync(conflictResponse, cancellationToken);
         break;
-        
+
       case ResultStatus.Error:
       default:
-        HttpContext.Response.StatusCode = 400;
+        HttpContext.Response.StatusCode = 422; // Use 422 for general errors to match RealWorld API expectations
         var errorResponse = ErrorResponseBuilder.CreateErrorResponse(result.Errors);
         await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
         break;

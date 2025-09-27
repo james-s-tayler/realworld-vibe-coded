@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using Ardalis.Result;
 using FluentValidation;
 using MediatR;
@@ -33,7 +33,7 @@ public class ErrorHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<TReq
         var resultType = typeof(TResponse);
         var createMethod = typeof(Result<>).MakeGenericType(resultType.GetGenericArguments())
           .GetMethod("Invalid", new[] { typeof(List<ValidationError>) });
-        
+
         return (TResponse)createMethod?.Invoke(null, new object[] { validationErrors })!;
       }
 
@@ -48,7 +48,7 @@ public class ErrorHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<TReq
         var resultType = typeof(TResponse);
         var createMethod = typeof(Result<>).MakeGenericType(resultType.GetGenericArguments())
           .GetMethod("Unauthorized");
-        
+
         return (TResponse)createMethod?.Invoke(null, null)!;
       }
 
@@ -63,7 +63,7 @@ public class ErrorHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<TReq
         var resultType = typeof(TResponse);
         var createMethod = typeof(Result<>).MakeGenericType(resultType.GetGenericArguments())
           .GetMethod("Error", new[] { typeof(string[]) });
-        
+
         return (TResponse)createMethod?.Invoke(null, new object[] { errors })!;
       }
 
@@ -78,7 +78,7 @@ public class ErrorHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<TReq
         var resultType = typeof(TResponse);
         var createMethod = typeof(Result<>).MakeGenericType(resultType.GetGenericArguments())
           .GetMethod("Error", new[] { typeof(string[]) });
-        
+
         return (TResponse)createMethod?.Invoke(null, new object[] { errors })!;
       }
 

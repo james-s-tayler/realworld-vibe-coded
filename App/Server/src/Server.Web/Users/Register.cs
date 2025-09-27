@@ -1,4 +1,5 @@
 ﻿using Server.UseCases.Users.Register;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Users;
 
@@ -8,7 +9,7 @@ namespace Server.Web.Users;
 /// <remarks>
 /// Creates a new user account given email, username, and password.
 /// </remarks>
-public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterResponse>
+public class Register(IMediator _mediator) : BaseResultEndpoint<RegisterRequest, RegisterResponse>
 {
   public override void Configure()
   {
@@ -28,24 +29,6 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
         }
       };
     });
-  }
-
-  public override void OnValidationFailed()
-  {
-    var errorBody = new List<string>();
-
-    foreach (var failure in ValidationFailures)
-    {
-      errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
-    }
-
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var json = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = errorBody }
-    });
-    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
   }
 
   public override async Task HandleAsync(
@@ -75,30 +58,6 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
       return;
     }
 
-    if (result.IsInvalid())
-    {
-      var errorBody = new List<string>();
-      foreach (var error in result.ValidationErrors)
-      {
-        errorBody.Add($"{error.Identifier} {error.ErrorMessage}");
-      }
-
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var json = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = errorBody }
-      });
-      await HttpContext.Response.WriteAsync(json, cancellationToken);
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Registration failed" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+    await HandleResultAsync(result, 201, cancellationToken);
   }
 }

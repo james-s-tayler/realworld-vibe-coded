@@ -30,9 +30,6 @@ builder.Services.AddFastEndpoints()
                   c.Register(typeof(CommandLogger<,>));
                 });
 
-// Register global error handler
-builder.Services.AddSingleton<GlobalErrorHandler>();
-
 // Configure JSON serialization options
 builder.Services.ConfigureHttpJsonOptions(options =>
 {

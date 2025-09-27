@@ -1,4 +1,4 @@
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using FluentValidation;
 using MediatR;
 
@@ -28,7 +28,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
     var context = new FluentValidation.ValidationContext<TRequest>(request);
     var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
-    
+
     var failures = validationResults
       .SelectMany(r => r.Errors)
       .Where(f => f != null)
@@ -49,7 +49,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         var resultType = typeof(TResponse);
         var createMethod = typeof(Result<>).MakeGenericType(resultType.GetGenericArguments())
           .GetMethod("Invalid", new[] { typeof(List<ValidationError>) });
-        
+
         return (TResponse)createMethod?.Invoke(null, new object[] { validationErrors })!;
       }
 
