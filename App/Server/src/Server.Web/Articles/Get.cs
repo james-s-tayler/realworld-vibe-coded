@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Get;
 
@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Gets a single article by its slug. Authentication optional.
 /// </remarks>
-public class Get(IMediator _mediator) : EndpointWithoutRequest<ArticleResponse>
+public class Get(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse>
 {
   public override void Configure()
   {
@@ -29,12 +29,7 @@ public class Get(IMediator _mediator) : EndpointWithoutRequest<ArticleResponse>
     var slug = Route<string>("slug") ?? string.Empty;
 
     // Get current user ID if authenticated
-    int? currentUserId = null;
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
-    {
-      currentUserId = userId;
-    }
+    var currentUserId = _currentUserService.GetCurrentUserId();
 
     var result = await _mediator.Send(new GetArticleQuery(slug, currentUserId), cancellationToken);
 

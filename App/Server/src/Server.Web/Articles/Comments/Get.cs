@@ -1,5 +1,5 @@
-﻿using System.Security.Claims;
-using Server.Core.ArticleAggregate.Dtos;
+﻿using Server.Core.ArticleAggregate.Dtos;
+using Server.Core.Interfaces;
 using Server.UseCases.Articles.Comments.Get;
 
 namespace Server.Web.Articles.Comments;
@@ -10,7 +10,7 @@ namespace Server.Web.Articles.Comments;
 /// <remarks>
 /// Get all comments for an article. Authentication optional.
 /// </remarks>
-public class Get(IMediator _mediator) : Endpoint<GetCommentsRequest, CommentsResponse>
+public class Get(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<GetCommentsRequest, CommentsResponse>
 {
   public override void Configure()
   {
@@ -26,12 +26,7 @@ public class Get(IMediator _mediator) : Endpoint<GetCommentsRequest, CommentsRes
   public override async Task HandleAsync(GetCommentsRequest request, CancellationToken cancellationToken)
   {
     // Get current user ID if authenticated
-    int? currentUserId = null;
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
-    {
-      currentUserId = userId;
-    }
+    var currentUserId = _currentUserService.GetCurrentUserId();
 
     var result = await _mediator.Send(new GetCommentsQuery(request.Slug, currentUserId), cancellationToken);
 

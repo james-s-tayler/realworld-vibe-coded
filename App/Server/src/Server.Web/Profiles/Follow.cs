@@ -1,5 +1,5 @@
-﻿using System.Security.Claims;
-using Ardalis.SharedKernel;
+﻿using Ardalis.SharedKernel;
+using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
 
@@ -11,7 +11,7 @@ namespace Server.Web.Profiles;
 /// <remarks>
 /// Follow a user by username. Authentication required.
 /// </remarks>
-public class Follow(IRepository<User> _userRepository) : EndpointWithoutRequest<ProfileResponse>
+public class Follow(IRepository<User> _userRepository, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ProfileResponse>
 {
   public override void Configure()
   {
@@ -29,9 +29,12 @@ public class Follow(IRepository<User> _userRepository) : EndpointWithoutRequest<
     // Get username from route parameter
     var username = Route<string>("username") ?? string.Empty;
 
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+    int userId;
+    try
+    {
+      userId = _currentUserService.GetRequiredCurrentUserId();
+    }
+    catch (UnauthorizedAccessException)
     {
       HttpContext.Response.StatusCode = 401;
       HttpContext.Response.ContentType = "application/json";

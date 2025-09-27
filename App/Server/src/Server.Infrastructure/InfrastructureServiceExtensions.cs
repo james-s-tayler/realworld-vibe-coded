@@ -3,6 +3,7 @@ using Server.Core.Services;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Queries;
+using Server.Infrastructure.Services;
 using Server.UseCases.Contributors.List;
 
 
@@ -27,7 +28,8 @@ public static class InfrastructureServiceExtensions
            .AddScoped<IListTagsQueryService, ListTagsQueryService>()
            .AddScoped<IDeleteContributorService, DeleteContributorService>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
-           .AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+           .AddScoped<IJwtTokenGenerator, JwtTokenGenerator>()
+           .AddScoped<ICurrentUserService, CurrentUserService>();
 
     // Configure JWT settings
     var jwtSettings = new JwtSettings();

@@ -857,6 +857,7 @@
           "NSubstitute": "[5.3.0, )",
           "ReportGenerator": "[5.4.8, )",
           "Server.Core": "[1.0.0, )",
+          "Server.Infrastructure": "[1.0.0, )",
           "Server.UseCases": "[1.0.0, )",
           "Shouldly": "[4.3.0, )",
           "xunit": "[2.9.3, )"
