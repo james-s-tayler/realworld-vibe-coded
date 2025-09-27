@@ -39,12 +39,6 @@ public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, Result<U
 
     _logger.LogInformation("Retrieved current user {Username}", user.Username);
 
-    return Result.Success(new UserDto(
-      user.Id,
-      user.Email,
-      user.Username,
-      user.Bio,
-      user.Image,
-      token));
+    return Result.Success(UserMappers.MapToDto(user, token));
   }
 }

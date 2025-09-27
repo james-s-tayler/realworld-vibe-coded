@@ -23,7 +23,7 @@ public class CreateArticleHandler(
     }
 
     // Check for duplicate slug
-    var slug = GenerateSlug(request.Title);
+    var slug = ArticleMappers.GenerateSlug(request.Title);
     var existingArticle = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(slug), cancellationToken);
 
@@ -53,44 +53,17 @@ public class CreateArticleHandler(
     await _articleRepository.AddAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
-    // Check if current user is following the article author
+    // Get current user with following relationships if authenticated
     var currentUser = request.CurrentUserId.HasValue ?
         await _userRepository.FirstOrDefaultAsync(new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken) : null;
-    var isFollowing = currentUser != null && currentUser.Id != author.Id && currentUser.IsFollowing(author.Id);
 
-    // Check if current user has favorited the article (always false for newly created articles)
-    var isFavorited = false;
-
-    var articleDto = new ArticleDto(
-      article.Slug,
-      article.Title,
-      article.Description,
-      article.Body,
-      article.Tags.Select(t => t.Name).ToList(),
-      article.CreatedAt,
-      article.UpdatedAt,
-      isFavorited,
-      article.FavoritesCount,
-      new AuthorDto(
-        article.Author.Username,
-        article.Author.Bio ?? string.Empty,
-        article.Author.Image,
-        isFollowing
-      )
-    );
+    var articleDto = ArticleMappers.MapToDto(article, currentUser, false); // Always false for newly created articles
 
     return Result.Success(new ArticleResponse { Article = articleDto });
   }
 
   private static string GenerateSlug(string title)
   {
-    return title.ToLowerInvariant()
-      .Replace(" ", "-")
-      .Replace(".", "")
-      .Replace(",", "")
-      .Replace("!", "")
-      .Replace("?", "")
-      .Replace("'", "")
-      .Replace("\"", "");
+    return ArticleMappers.GenerateSlug(title);
   }
 }

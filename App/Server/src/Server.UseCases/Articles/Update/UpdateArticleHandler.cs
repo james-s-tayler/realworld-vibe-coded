@@ -28,7 +28,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository, IRepo
     // Check for duplicate slug if title changed
     if (request.Title != null && article.Title != request.Title)
     {
-      var newSlug = GenerateSlug(request.Title);
+      var newSlug = ArticleMappers.GenerateSlug(request.Title);
       if (newSlug != article.Slug)
       {
         var existingArticle = await _articleRepository.FirstOrDefaultAsync(
@@ -54,41 +54,16 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository, IRepo
     var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
       new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
 
-    var isFollowing = currentUserWithFollowing?.IsFollowing(article.AuthorId) ?? false;
-
     // Check if current user has favorited this article
     var isFavorited = article.FavoritedBy.Any(u => u.Id == request.CurrentUserId);
 
-    var articleDto = new ArticleDto(
-      article.Slug,
-      article.Title,
-      article.Description,
-      article.Body,
-      article.Tags.Select(t => t.Name).ToList(),
-      article.CreatedAt,
-      article.UpdatedAt,
-      isFavorited,
-      article.FavoritesCount,
-      new AuthorDto(
-        article.Author.Username,
-        article.Author.Bio ?? string.Empty,
-        article.Author.Image,
-        isFollowing
-      )
-    );
+    var articleDto = ArticleMappers.MapToDto(article, currentUserWithFollowing, isFavorited);
 
     return Result.Success(new ArticleResponse { Article = articleDto });
   }
 
   private static string GenerateSlug(string title)
   {
-    return title.ToLowerInvariant()
-      .Replace(" ", "-")
-      .Replace(".", "")
-      .Replace(",", "")
-      .Replace("!", "")
-      .Replace("?", "")
-      .Replace("'", "")
-      .Replace("\"", "");
+    return ArticleMappers.GenerateSlug(title);
   }
 }
