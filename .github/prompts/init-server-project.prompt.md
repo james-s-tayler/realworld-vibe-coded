@@ -10,4 +10,4 @@ description: 'Create a new server project following the established conventions 
 4. cd back to the root directory
 5. check the backend project builds and tests pass with `dotnet build`
 6. check the backend tests pass with `dotnet test`
-7. Add commands to the Makefile to build and test the new project
+7. Add targets to the Nuke build system to build and test the new project
