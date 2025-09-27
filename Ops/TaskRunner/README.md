@@ -94,9 +94,9 @@ These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` t
 ### Windows
 
 ```cmd
-rem Use build.cmd instead of nuke.sh
-build.cmd show-help
-build.cmd build-server
+rem Use nuke.cmd instead of nuke.sh
+nuke.cmd show-help
+nuke.cmd build-server
 ```
 
 ## CI Integration
