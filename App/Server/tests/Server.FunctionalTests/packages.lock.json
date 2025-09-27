@@ -1054,7 +1054,6 @@
           "Microsoft.Extensions.Configuration": "[9.0.6, )",
           "Microsoft.Extensions.Logging": "[9.0.6, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[9.0.6, )",
-          "SQLite": "[3.13.0, )",
           "Server.Core": "[1.0.0, )",
           "Server.UseCases": "[1.0.0, )",
           "System.IdentityModel.Tokens.Jwt": "[8.2.1, )"
@@ -1322,12 +1321,6 @@
           "Serilog.Sinks.Debug": "3.0.0",
           "Serilog.Sinks.File": "6.0.0"
         }
-      },
-      "SQLite": {
-        "type": "CentralTransitive",
-        "requested": "[3.13.0, )",
-        "resolved": "3.13.0",
-        "contentHash": "MJfRiz2p6aMVOxrxGMdVzhpzI0oxTgZSwC8eVuOpV8L7yYaFUu8q/OFYwv9P0/aZ/pdEu24O6gma6wZJMTun9A=="
       },
       "System.IdentityModel.Tokens.Jwt": {
         "type": "CentralTransitive",

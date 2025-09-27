@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>CS0649</NoWarn> <!-- Suppress warning for Folder parameter which is set via environment variable -->
   </PropertyGroup>
 
   <ItemGroup>
