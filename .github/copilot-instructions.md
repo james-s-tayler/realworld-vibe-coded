@@ -50,7 +50,7 @@ General functionality:
 - xUnit for testing
 
 ## Testing
-- There is a comprehensive Postman collection that can be run through `make test/server/postman`. The Postman collection is also split into folders which have their own make targets and can independently test areas of the system. The quality of the Postman suite is excellent. If the Postman suite is green, then the backend api has been implemented correctly. 
+- There is a comprehensive Postman collection that can be run through `./build.sh test-server-postman`. The Postman collection is also split into folders which have their own Nuke targets and can independently test areas of the system. The quality of the Postman suite is excellent. If the Postman suite is green, then the backend api has been implemented correctly. 
 
 ## Infrastructure as Code
 - Bicep for Azure infrastructure as code
@@ -59,5 +59,5 @@ General functionality:
 - GitHub Actions for CI/CD
 - Docker for containerization
 - Deployment to Azure App Service
-- Makefile for lint, build, test and deployment tasks
-  - The same Makefile is used for both local development and GitHub Actions CI/CD.
+- Nuke build system for lint, build, test and deployment tasks
+  - The same Nuke build system is used for both local development and GitHub Actions CI/CD.
