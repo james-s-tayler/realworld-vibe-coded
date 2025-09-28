@@ -362,8 +362,8 @@ jobs:
         with:
           name: e2e-test-reports
           path: |
-            reports/e2e/*.trx
-            reports/e2e/traces/*.zip
+            Reports/e2e/*.trx
+            Reports/e2e/traces/*.zip
           retention-days: 30
 
       - name: Parse test results and create PR comment
@@ -374,7 +374,7 @@ jobs:
             const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
 
             try {
-              const commentBody = parseMultipleXUnitReports('reports/e2e', context, '(E2E)');
+              const commentBody = parseMultipleXUnitReports('Reports/e2e', context, '(E2E)');
 
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');
