@@ -3,6 +3,7 @@ using Microsoft.Playwright.Xunit;
 
 namespace E2eTests;
 
+// test ci workflow
 [Collection("E2E Tests")]
 public class SwaggerE2eTests : PageTest
 {
