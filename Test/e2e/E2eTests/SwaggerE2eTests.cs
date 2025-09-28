@@ -35,7 +35,7 @@ public class SwaggerE2eTests : PageTest
         try
         {
             // Use environment variable for URL if available (for Docker), otherwise use localhost
-            var baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "https://localhost:57679";
+            var baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
             var swaggerUrl = $"{baseUrl}/swagger/index.html";
             
             // Navigate to Swagger docs
@@ -68,7 +68,7 @@ public class SwaggerE2eTests : PageTest
         finally
         {
             // Create traces directory if it doesn't exist
-            var tracesDir = Path.Combine("TestResults", "traces");
+            var tracesDir = Path.Combine("reports", "e2e", "traces");
             Directory.CreateDirectory(tracesDir);
             
             // Stop tracing and save to file

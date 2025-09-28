@@ -178,14 +178,14 @@ public class Build : NukeBuild
             }
         });
 
-    Target TestServerE2e => _ => _
+    Target TestE2e => _ => _
         .Description("Run E2E Playwright tests using Docker Compose")
         .DependsOn(DbResetForce)
         .Executes(() =>
         {
-            if (Directory.Exists(TestResultsDirectory))
-                Directory.Delete(TestResultsDirectory, true);
-            Directory.CreateDirectory(TestResultsDirectory);
+            if (Directory.Exists(ReportsDirectory))
+                Directory.Delete(ReportsDirectory, true);
+            Directory.CreateDirectory(ReportsDirectory);
 
             Console.WriteLine("Running E2E tests with Docker Compose...");
 
