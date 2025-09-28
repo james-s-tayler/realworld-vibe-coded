@@ -112,10 +112,29 @@ public class Build : NukeBuild
                 Directory.Delete(TestResultsDirectory, true);
             Directory.CreateDirectory(TestResultsDirectory);
 
-            DotNetTest(s => s
-                .SetProjectFile(ServerSolution)
-                .SetLoggers("trx;LogFileName=test-results.trx")
-                .SetResultsDirectory(TestResultsDirectory));
+            // Get all test projects in the solution
+            var testProjects = new[]
+            {
+                RootDirectory / "App" / "Server" / "tests" / "Server.UnitTests" / "Server.UnitTests.csproj",
+                RootDirectory / "App" / "Server" / "tests" / "Server.IntegrationTests" / "Server.IntegrationTests.csproj",
+                RootDirectory / "App" / "Server" / "tests" / "Server.FunctionalTests" / "Server.FunctionalTests.csproj"
+            };
+
+            // Run tests for each project with unique result files
+            foreach (var testProject in testProjects)
+            {
+                if (File.Exists(testProject))
+                {
+                    var projectName = Path.GetFileNameWithoutExtension(testProject);
+                    var logFileName = $"{projectName}-results.trx";
+
+                    Console.WriteLine($"Running tests for {projectName}...");
+                    DotNetTest(s => s
+                        .SetProjectFile(testProject)
+                        .SetLoggers($"trx;LogFileName={logFileName}")
+                        .SetResultsDirectory(TestResultsDirectory));
+                }
+            }
         });
 
     Target TestServerPostman => _ => _
