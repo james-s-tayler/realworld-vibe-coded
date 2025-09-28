@@ -37,8 +37,8 @@
         "LintServerVerify",
         "RunLocalClient",
         "RunLocalServer",
-        "TestE2e",
         "TestClient",
+        "TestE2e",
         "TestServer",
         "TestServerPostman"
       ]
