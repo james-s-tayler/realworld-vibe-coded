@@ -1,5 +1,5 @@
+﻿using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
-using System.Text.Json;
 
 namespace Server.Web.Infrastructure;
 
@@ -16,8 +16,8 @@ public class UnauthorizedExceptionHandler : IExceptionHandler
   }
 
   public async ValueTask<bool> TryHandleAsync(
-    HttpContext httpContext, 
-    Exception exception, 
+    HttpContext httpContext,
+    Exception exception,
     CancellationToken cancellationToken)
   {
     if (exception is not UnauthorizedAccessException unauthorizedException)
@@ -29,12 +29,12 @@ public class UnauthorizedExceptionHandler : IExceptionHandler
 
     httpContext.Response.StatusCode = 401;
     httpContext.Response.ContentType = "application/json";
-    
+
     var errorResponse = JsonSerializer.Serialize(new
     {
       errors = new { body = new[] { "Unauthorized" } }
     });
-    
+
     await httpContext.Response.WriteAsync(errorResponse, cancellationToken);
     return true;
   }

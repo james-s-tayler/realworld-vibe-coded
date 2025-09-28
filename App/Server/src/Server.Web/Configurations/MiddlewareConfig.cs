@@ -9,7 +9,7 @@ public static class MiddlewareConfig
   {
     // Always add the exception handler first
     app.UseExceptionHandler();
-    
+
     if (app.Environment.IsDevelopment())
     {
       app.UseShowAllServicesMiddleware(); // see https://github.com/ardalis/AspNetCoreStartupServices

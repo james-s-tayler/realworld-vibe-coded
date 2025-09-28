@@ -80,7 +80,7 @@ public static class ServiceConfigs
       });
 
     services.AddAuthorization();
-    
+
     // Register global exception handler for unauthorized access
     services.AddExceptionHandler<UnauthorizedExceptionHandler>();
     services.AddProblemDetails();

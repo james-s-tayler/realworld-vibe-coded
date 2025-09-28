@@ -25,7 +25,7 @@ public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserSer
   public override async Task HandleAsync(CancellationToken cancellationToken)
   {
     var userId = _currentUserService.GetRequiredCurrentUserId();
-    
+
     var result = await _mediator.Send(new GetCurrentUserQuery(userId), cancellationToken);
 
     if (result.IsSuccess)
