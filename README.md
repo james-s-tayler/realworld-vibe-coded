@@ -16,6 +16,19 @@ An attempt at implementing gothinkster/realworld purely through vibe-coding
   - run via `npx @arabold/docs-mcp-server@latest`
   - Add MCP server settings
   - browse to [http://localhost:6280](http://localhost:6280) and slurp up the docs
+
+Inside Github Copilot in the repo settings for copilot
+
+    { 
+      "mcpServers": {
+        "docs-mcp-server": {
+          "type": "sse",
+          "url": "http://localhost:6280/sse",
+          "tools": ["SearchTool"]
+        }
+      }
+    }
+
 - [MCP Servers](https://github.com/modelcontextprotocol/servers/tree/main)
 - [GitHub MCP Server](https://github.com/github/github-mcp-server)
 - [Hyperbrowser](https://github.com/hyperbrowserai/mcp)
