@@ -81,7 +81,6 @@ function parseMultipleXUnitReports(reportDirectory, context, suffix = '') {
 
   // Create the comment body
   const title = suffix ? `xUnit Tests ${statusText} ${suffix}` : `xUnit Tests ${statusText}`;
-  
   const commentBody = `## ${statusIcon} ${title}
 
 **📊 Test Summary**
@@ -285,7 +284,6 @@ function parseXUnitReport(reportPath, context, suffix = '') {
   
   // Create the comment body
   const title = suffix ? `xUnit Tests ${statusText} ${suffix}` : `xUnit Tests ${statusText}`;
-  
   const commentBody = `## ${statusIcon} ${title}
 
 **📊 Test Summary**
@@ -332,7 +330,7 @@ async function main() {
     }
 
     const context = JSON.parse(contextJson);
-    const commentBody = parseXUnitReport(reportPath, context, 'xUnit Tests');
+    const commentBody = parseXUnitReport(reportPath, context);
 
     if (commentBody) {
       // When used as a standalone script, just output the comment body
