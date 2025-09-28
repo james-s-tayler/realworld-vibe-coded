@@ -16,11 +16,23 @@ const OUTPUT_DIR = path.join(REPORTS_DIR, 'html-report');
 const TRACES_DIR = path.join(REPORTS_DIR, 'traces');
 
 /**
- * Ensure directory exists
+ * Ensure directory exists with proper error handling for CI environments
  */
 function ensureDir(dir) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  } catch (error) {
+    console.error(`Failed to create directory ${dir}:`, error.message);
+    // Try alternative approach for CI environments
+    try {
+      const { execSync } = require('child_process');
+      execSync(`mkdir -p "${dir}"`, { stdio: 'inherit' });
+    } catch (fallbackError) {
+      console.error(`Fallback directory creation also failed:`, fallbackError.message);
+      throw new Error(`Cannot create directory ${dir}: ${error.message}`);
+    }
   }
 }
 
@@ -76,6 +88,8 @@ function getTraceFiles() {
 function generateHtmlReport() {
   console.log('Generating HTML report...');
   
+  // Ensure base directories exist first
+  ensureDir(REPORTS_DIR);
   ensureDir(OUTPUT_DIR);
   
   // Parse test results
