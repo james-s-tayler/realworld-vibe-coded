@@ -441,6 +441,14 @@ jobs:
           name: e2e-test-reports
           path: |
             Reports/e2e/*.trx
+          retention-days: 30
+
+      - name: Upload E2E Test Traces
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: e2e-test-traces
+          path: |
             Reports/e2e/traces/*.zip
           retention-days: 30
 

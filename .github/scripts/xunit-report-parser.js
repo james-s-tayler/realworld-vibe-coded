@@ -80,7 +80,8 @@ function parseMultipleXUnitReports(reportDirectory, context, suffix = '') {
   ).join('\n');
 
   // Create the comment body
-  const title = suffix ? `xUnit Tests ${statusText} ${suffix}` : `xUnit Tests ${statusText}`;
+  const baseTestType = suffix && suffix.includes('(E2E)') ? 'E2E Tests' : 'xUnit Tests';
+  const title = suffix ? `${baseTestType} ${statusText}` : `xUnit Tests ${statusText}`;
   const commentBody = `## ${statusIcon} ${title}
 
 **📊 Test Summary**
@@ -283,7 +284,8 @@ function parseXUnitReport(reportPath, context, suffix = '') {
   const testPassPercentage = total > 0 ? Math.round(passed / total * 100) : 0;
   
   // Create the comment body
-  const title = suffix ? `xUnit Tests ${statusText} ${suffix}` : `xUnit Tests ${statusText}`;
+  const baseTestType = suffix && suffix.includes('(E2E)') ? 'E2E Tests' : 'xUnit Tests';
+  const title = suffix ? `${baseTestType} ${statusText}` : `xUnit Tests ${statusText}`;
   const commentBody = `## ${statusIcon} ${title}
 
 **📊 Test Summary**
