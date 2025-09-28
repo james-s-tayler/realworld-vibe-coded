@@ -7,11 +7,10 @@ const path = require('path');
  * Parses multiple xUnit TRX reports and generates merged PR comment content
  * @param {string} reportDirectory - Path to the directory containing TRX files
  * @param {object} context - GitHub Actions context object
- * @param {string} testTypeName - Name of the test type (e.g., "xUnit Tests", "E2E Tests")
- * @param {string} tracesArtifactName - Optional name of traces artifact for linking
+ * @param {string} suffix - Optional suffix to add to the title (e.g., "(Nuke Build)")
  * @returns {string} - Generated comment body
  */
-function parseMultipleXUnitReports(reportDirectory, context, testTypeName = 'xUnit Tests', tracesArtifactName = null) {
+function parseMultipleXUnitReports(reportDirectory, context, suffix = '') {
   if (!fs.existsSync(reportDirectory)) {
     console.log('Test results directory not found, skipping comment');
     return null;
@@ -81,12 +80,7 @@ function parseMultipleXUnitReports(reportDirectory, context, testTypeName = 'xUn
   ).join('\n');
 
   // Create the comment body
-  const title = `${testTypeName} ${statusText}`;
-  
-  let artifactLinks = `- [TRX Reports](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
-  if (tracesArtifactName) {
-    artifactLinks += `\n- [Test Traces](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
-  }
+  const title = suffix ? `xUnit Tests ${statusText} ${suffix}` : `xUnit Tests ${statusText}`;
   
   const commentBody = `## ${statusIcon} ${title}
 
@@ -102,7 +96,7 @@ ${allFailures.length > 0 ? `**🔍 Failed Tests**\n${failureDetails}` : '**🎉 
 
 ---
 📁 **Full reports available in build artifacts**
-${artifactLinks}
+- [Test Artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
 
 <sub>🤖 Generated on each test run</sub>`;
 
@@ -202,11 +196,10 @@ function parseSingleTrxFile(filePath, suiteName) {
  * Parses xUnit TRX report and generates PR comment content
  * @param {string} reportPath - Path to the TRX XML report
  * @param {object} context - GitHub Actions context object
- * @param {string} testTypeName - Name of the test type (e.g., "xUnit Tests", "E2E Tests")
- * @param {string} tracesArtifactName - Optional name of traces artifact for linking
+ * @param {string} suffix - Optional suffix to add to the title (e.g., "(Nuke Build)")
  * @returns {string} - Generated comment body
  */
-function parseXUnitReport(reportPath, context, testTypeName = 'xUnit Tests', tracesArtifactName = null) {
+function parseXUnitReport(reportPath, context, suffix = '') {
   if (!fs.existsSync(reportPath)) {
     console.log('No xUnit TRX report found, skipping comment');
     return null;
@@ -291,12 +284,7 @@ function parseXUnitReport(reportPath, context, testTypeName = 'xUnit Tests', tra
   const testPassPercentage = total > 0 ? Math.round(passed / total * 100) : 0;
   
   // Create the comment body
-  const title = `${testTypeName} ${statusText}`;
-  
-  let artifactLinks = `- [TRX Report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
-  if (tracesArtifactName) {
-    artifactLinks += `\n- [Test Traces](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
-  }
+  const title = suffix ? `xUnit Tests ${statusText} ${suffix}` : `xUnit Tests ${statusText}`;
   
   const commentBody = `## ${statusIcon} ${title}
 
@@ -308,7 +296,7 @@ ${failures.length > 0 ? `**🔍 Failed Tests**\n${failureDetails}` : '**🎉 All
 
 ---
 📁 **Full reports available in build artifacts**
-${artifactLinks}
+- [Test Artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
 
 <sub>🤖 Generated on each test run</sub>`;
 
