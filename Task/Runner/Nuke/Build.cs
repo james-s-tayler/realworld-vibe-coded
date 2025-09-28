@@ -158,7 +158,7 @@ public class Build : NukeBuild
             var e2eTestsDir = E2eTestsProject.Parent;  // This should be Test/e2e/E2eTests
             var playwrightScript = e2eTestsDir / "bin" / "Debug" / "net9.0" / "playwright.ps1";
             Console.WriteLine($"Looking for Playwright script at: {playwrightScript}");
-            
+
             if (File.Exists(playwrightScript))
             {
                 Console.WriteLine("Installing Playwright browsers...");
