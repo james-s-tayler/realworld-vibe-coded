@@ -94,6 +94,58 @@ Mark these job names as required in your branch protection settings:
 
 All jobs will appear in every PR's status checks, but will skip execution when their associated folders haven't changed.
 
+## E2E Test Reports and GitHub Pages Deployment
+
+The `test-e2e` job automatically generates and deploys interactive HTML reports to GitHub Pages:
+
+### Report Generation Process
+
+1. **Test Execution**: Playwright E2E tests run in Docker containers
+2. **Trace Collection**: Test traces are saved as ZIP files during execution
+3. **HTML Report Generation**: A Node.js script processes test results and traces
+4. **GitHub Pages Deployment**: Reports are deployed to `https://username.github.io/repo-name/`
+
+### Report Features
+
+- **Test Results Summary**: Pass/fail counts and execution details
+- **Interactive Traces**: Click-to-view traces using Playwright's online trace viewer
+- **Responsive Design**: Works on desktop and mobile devices
+- **Automatic Updates**: Deployed on every main branch push
+
+### Accessing Reports
+
+**For Main Branch:**
+- Live reports are available at the GitHub Pages URL after CI completes
+- PR comments include links to the deployed reports
+
+**For Pull Requests:**
+- HTML reports are uploaded as artifacts and can be downloaded from the CI run
+- Trace files are also available as separate artifacts
+
+### Report Contents
+
+Each report includes:
+- Test execution summary (total, passed, failed)
+- Links to individual trace files
+- Instructions for viewing traces
+- Timestamp and execution metadata
+
+The trace files can be viewed using Playwright's trace viewer, which provides:
+- Step-by-step test execution timeline
+- Screenshots at each action
+- Network requests and responses  
+- Console logs and page events
+- Source code for each test step
+
+### Configuration
+
+Report generation is handled by:
+- **Build Target**: `TestE2e` in `Task/Runner/Nuke/Build.cs`
+- **Report Script**: `.github/scripts/generate-e2e-report.js`
+- **CI Workflow**: `.github/workflows/ci.yml` (test-e2e job)
+
+All jobs will appear in every PR's status checks, but will skip execution when their associated folders haven't changed.
+
 ## Extending Filters for New Folders
 
 To add support for new folders:

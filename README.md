@@ -1,6 +1,16 @@
 # realworld-vibe-coded
 An attempt at implementing gothinkster/realworld purely through vibe-coding
 
+## Testing & Reports
+
+This project includes comprehensive testing with live reporting:
+
+- **E2E Tests**: Playwright tests with interactive trace viewing
+- **Live Reports**: [GitHub Pages deployment](https://james-s-tayler.github.io/realworld-vibe-coded/) with test traces
+- **CI/CD**: Automated testing and deployment on every commit
+
+See [E2E Testing Documentation](Docs/e2e-testing.md) for detailed information.
+
 ## Specifications
 - [Endpoints](https://docs.realworld.show/specifications/backend/endpoints/)
 

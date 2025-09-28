@@ -241,7 +241,7 @@ public class Build : NukeBuild
                 var reportProcess = ProcessTasks.StartProcess("node", reportScript,
                     workingDirectory: RootDirectory);
                 reportProcess.WaitForExit();
-                
+
                 if (reportProcess.ExitCode == 0)
                 {
                     Console.WriteLine("HTML report generated successfully");
