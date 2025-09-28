@@ -2,7 +2,6 @@
 using Server.Web.Configurations;
 using Server.Web.Infrastructure;
 
-// test ci pipeline change
 var builder = WebApplication.CreateBuilder(args);
 
 var logger = Log.Logger = new LoggerConfiguration()
