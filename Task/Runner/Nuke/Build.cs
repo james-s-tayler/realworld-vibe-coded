@@ -178,6 +178,42 @@ public class Build : NukeBuild
             }
         });
 
+    Target TestServerE2e => _ => _
+        .Description("Run E2E Playwright tests using Docker Compose")
+        .DependsOn(DbResetForce)
+        .Executes(() =>
+        {
+            if (Directory.Exists(TestResultsDirectory))
+                Directory.Delete(TestResultsDirectory, true);
+            Directory.CreateDirectory(TestResultsDirectory);
+
+            Console.WriteLine("Running E2E tests with Docker Compose...");
+
+            int exitCode = 0;
+            try
+            {
+                var args = "compose -f Test/e2e/docker-compose.yml up --build --abort-on-container-exit";
+                var process = ProcessTasks.StartProcess("docker", args,
+                    workingDirectory: RootDirectory);
+                process.WaitForExit();
+                exitCode = process.ExitCode;
+            }
+            finally
+            {
+                var downArgs = "compose -f Test/e2e/docker-compose.yml down";
+                var downProcess = ProcessTasks.StartProcess("docker", downArgs,
+                    workingDirectory: RootDirectory);
+                downProcess.WaitForExit();
+            }
+
+            // Explicitly fail the target if Docker Compose failed
+            if (exitCode != 0)
+            {
+                Console.WriteLine($"Docker Compose exited with code: {exitCode}");
+                throw new Exception($"E2E tests failed with exit code: {exitCode}");
+            }
+        });
+
     Target RunLocalServer => _ => _
         .Description("Run backend locally")
         .Executes(() =>

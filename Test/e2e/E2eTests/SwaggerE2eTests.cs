@@ -1,0 +1,81 @@
+using Microsoft.Playwright;
+using Microsoft.Playwright.Xunit;
+
+namespace E2eTests;
+
+[Collection("E2E Tests")]
+public class SwaggerE2eTests : PageTest
+{
+    public override BrowserNewContextOptions ContextOptions()
+    {
+        return new BrowserNewContextOptions()
+        {
+            IgnoreHTTPSErrors = true
+        };
+    }
+
+    [Fact]
+    public async Task SwaggerApiDocs_AreDisplayed()
+    {
+        // Configure additional browser options to ignore HTTPS errors
+        await Context.SetExtraHTTPHeadersAsync(new Dictionary<string, string>
+        {
+            ["User-Agent"] = "E2E-Test-Suite"
+        });
+
+        // Start tracing
+        await Context.Tracing.StartAsync(new()
+        {
+            Title = "Swagger API Docs Test",
+            Screenshots = true,
+            Snapshots = true,
+            Sources = true
+        });
+
+        try
+        {
+            // Use environment variable for URL if available (for Docker), otherwise use localhost
+            var baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "https://localhost:57679";
+            var swaggerUrl = $"{baseUrl}/swagger/index.html";
+            
+            // Navigate to Swagger docs
+            await Page.GotoAsync(swaggerUrl, new()
+            {
+                WaitUntil = WaitUntilState.NetworkIdle,
+                Timeout = 30000
+            });
+
+            // Wait for Swagger UI to load and verify it's visible
+            var swaggerContainer = Page.Locator(".swagger-ui");
+            await swaggerContainer.WaitForAsync(new() { Timeout = 10000 });
+            
+            var isVisible = await swaggerContainer.IsVisibleAsync();
+            Assert.True(isVisible, "Swagger UI container should be visible");
+
+            // Verify that the API title is displayed (Conduit API)
+            var apiInfo = Page.Locator(".info .title");
+            await apiInfo.WaitForAsync(new() { Timeout = 5000 });
+            var title = await apiInfo.TextContentAsync();
+            Assert.NotNull(title);
+            Assert.NotEmpty(title.Trim());
+
+            // Verify that operations are visible
+            var operations = Page.Locator(".opblock");
+            await operations.First.WaitForAsync(new() { Timeout = 5000 });
+            var operationCount = await operations.CountAsync();
+            Assert.True(operationCount > 0, "Should have API operations visible");
+        }
+        finally
+        {
+            // Create traces directory if it doesn't exist
+            var tracesDir = Path.Combine("TestResults", "traces");
+            Directory.CreateDirectory(tracesDir);
+            
+            // Stop tracing and save to file
+            await Context.Tracing.StopAsync(new()
+            {
+                Path = Path.Combine(tracesDir, $"swagger_test_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip")
+            });
+        }
+    }
+}
