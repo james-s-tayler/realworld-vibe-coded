@@ -14,6 +14,8 @@ concurrency:
 permissions:
   contents: read
   pull-requests: write
+  pages: write
+  id-token: write
 
 jobs:
   # Detect changes to specific paths to gate downstream jobs
@@ -422,6 +424,16 @@ jobs:
           cache: true
           cache-dependency-path: "**/packages.lock.json"
 
+      - name: Setup Node.js for E2E report generation
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
       - name: Verify .NET version
         run: dotnet --info
 
@@ -452,6 +464,26 @@ jobs:
             Reports/e2e/traces/*.zip
           retention-days: 30
 
+      - name: Upload pages artifact for GitHub Pages
+        if: always() && github.ref == 'refs/heads/main'  # Only deploy on main branch
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: Reports/e2e/html-report/
+
+      - name: Deploy to GitHub Pages
+        if: always() && github.ref == 'refs/heads/main'  # Only deploy on main branch
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Upload E2E HTML Report to Artifacts (for PR viewing)
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: e2e-html-report
+          path: |
+            Reports/e2e/html-report/
+          retention-days: 30
+
       - name: Parse test results and create PR comment
         if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -460,7 +492,14 @@ jobs:
             const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
 
             try {
-              const commentBody = parseMultipleXUnitReports('Reports/e2e', context, '(E2E)');
+              const baseCommentBody = parseMultipleXUnitReports('Reports/e2e', context, '(E2E)');
+              
+              // Add link to GitHub Pages if this is a main branch push
+              let commentBody = baseCommentBody;
+              if (commentBody && context.ref === 'refs/heads/main') {
+                const pagesUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/`;
+                commentBody += `\n\n📊 **Live E2E Report**: [View detailed test traces and reports](${pagesUrl})`;
+              }
 
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');

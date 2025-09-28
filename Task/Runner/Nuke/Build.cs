@@ -233,6 +233,29 @@ public class Build : NukeBuild
                 downProcess.WaitForExit();
             }
 
+            // Generate HTML report from test results and traces (regardless of test outcome)
+            Console.WriteLine("Generating E2E HTML report...");
+            try
+            {
+                var reportScript = RootDirectory / ".github" / "scripts" / "generate-e2e-report.js";
+                var reportProcess = ProcessTasks.StartProcess("node", reportScript,
+                    workingDirectory: RootDirectory);
+                reportProcess.WaitForExit();
+                
+                if (reportProcess.ExitCode == 0)
+                {
+                    Console.WriteLine("HTML report generated successfully");
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: HTML report generation failed with exit code: {reportProcess.ExitCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Failed to generate HTML report: {ex.Message}");
+            }
+
             // Explicitly fail the target if Docker Compose failed
             if (exitCode != 0)
             {
