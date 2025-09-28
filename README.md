@@ -11,6 +11,11 @@ An attempt at implementing gothinkster/realworld purely through vibe-coding
 - [Adding repository custom instructions for GitHub Copilot](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions?tool=jetbrains)
 
 ## Notes on MCP
+- [Docs MCP Server](https://github.com/arabold/docs-mcp-server)
+  - install via `sudo npm install -g @arabold/docs-mcp-server@latest`
+  - run via `npx @arabold/docs-mcp-server@latest`
+  - Add MCP server settings
+  - browse to [http://localhost:6280](http://localhost:6280) and slurp up the docs
 - [MCP Servers](https://github.com/modelcontextprotocol/servers/tree/main)
 - [GitHub MCP Server](https://github.com/github/github-mcp-server)
 - [Hyperbrowser](https://github.com/hyperbrowserai/mcp)
