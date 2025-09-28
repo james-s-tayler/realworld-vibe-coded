@@ -159,7 +159,7 @@ jobs:
             const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
 
             try {
-              const commentBody = parseMultipleXUnitReports('TestResults', context, 'xUnit Tests');
+              const commentBody = parseMultipleXUnitReports('TestResults', context);
 
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');
