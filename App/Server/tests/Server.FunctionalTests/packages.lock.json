@@ -1078,7 +1078,6 @@
           "FastEndpoints.Swagger": "[6.2.0, )",
           "MediatR": "[12.5.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[9.0.6, )",
-          "Microsoft.AspNetCore.SpaProxy": "[9.0.9, )",
           "Serilog.AspNetCore": "[9.0.0, )",
           "Server.Infrastructure": "[1.0.0, )",
           "Server.UseCases": "[1.0.0, )",
@@ -1221,12 +1220,6 @@
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.0.1"
         }
-      },
-      "Microsoft.AspNetCore.SpaProxy": {
-        "type": "CentralTransitive",
-        "requested": "[9.0.9, )",
-        "resolved": "9.0.9",
-        "contentHash": "4OcpPFPPs+DEf0EH7Qs9DS+Btan6F2GGD5wnv7fOXNCUBpIWi+zj2mWmNpkwhOXDOBSMObeHI/+MB6p4BsnhAQ=="
       },
       "Microsoft.EntityFrameworkCore.Relational": {
         "type": "CentralTransitive",

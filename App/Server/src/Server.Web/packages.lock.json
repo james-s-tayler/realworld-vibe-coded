@@ -68,12 +68,6 @@
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.0.1"
         }
       },
-      "Microsoft.AspNetCore.SpaProxy": {
-        "type": "Direct",
-        "requested": "[9.0.9, )",
-        "resolved": "9.0.9",
-        "contentHash": "4OcpPFPPs+DEf0EH7Qs9DS+Btan6F2GGD5wnv7fOXNCUBpIWi+zj2mWmNpkwhOXDOBSMObeHI/+MB6p4BsnhAQ=="
-      },
       "Microsoft.EntityFrameworkCore.Design": {
         "type": "Direct",
         "requested": "[9.0.6, )",
