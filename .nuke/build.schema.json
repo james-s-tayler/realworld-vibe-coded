@@ -28,7 +28,7 @@
         "BuildServer",
         "DbReset",
         "DbResetForce",
-        "InstallClientDependencies",
+        "InstallClient",
         "LintClientFix",
         "LintClientVerify",
         "LintNukeFix",

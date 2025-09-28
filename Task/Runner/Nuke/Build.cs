@@ -50,7 +50,7 @@ public class Build : NukeBuild
 
     Target LintClientVerify => _ => _
         .Description("Verify client code formatting and style")
-        .DependsOn(InstallClientDependencies)
+        .DependsOn(InstallClient)
         .Executes(() =>
         {
             Console.WriteLine($"Running ESLint on {ClientDirectory}");
@@ -61,7 +61,7 @@ public class Build : NukeBuild
 
     Target LintClientFix => _ => _
         .Description("Fix client code formatting and style issues automatically")
-        .DependsOn(InstallClientDependencies)
+        .DependsOn(InstallClient)
         .Executes(() =>
         {
             Console.WriteLine($"Running ESLint fix on {ClientDirectory}");
@@ -111,7 +111,7 @@ public class Build : NukeBuild
 
     Target BuildClient => _ => _
         .Description("Build client (frontend)")
-        .DependsOn(InstallClientDependencies)
+        .DependsOn(InstallClient)
         .Executes(() =>
         {
             Console.WriteLine($"Building client in {ClientDirectory}");
@@ -151,7 +151,7 @@ public class Build : NukeBuild
 
     Target TestClient => _ => _
         .Description("Run client tests")
-        .DependsOn(InstallClientDependencies)
+        .DependsOn(InstallClient)
         .Executes(() =>
         {
             Console.WriteLine($"Running client tests in {ClientDirectory}");
@@ -212,7 +212,7 @@ public class Build : NukeBuild
             DotNetRun(s => s.SetProjectFile(ServerProject));
         });
 
-    Target InstallClientDependencies => _ => _
+    Target InstallClient => _ => _
         .Description("Install client dependencies if needed")
         .Executes(() =>
         {
@@ -234,7 +234,7 @@ public class Build : NukeBuild
 
     Target RunLocalClient => _ => _
         .Description("Run client locally")
-        .DependsOn(InstallClientDependencies)
+        .DependsOn(InstallClient)
         .Executes(() =>
         {
             Console.WriteLine($"Starting Vite dev server in {ClientDirectory}");
