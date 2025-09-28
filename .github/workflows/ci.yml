@@ -452,7 +452,7 @@ jobs:
         with:
           name: e2e-test-reports
           path: |
-            Reports/e2e/*.trx
+            reports/e2e/*.trx
           retention-days: 30
 
       - name: Upload E2E Test Traces
@@ -461,14 +461,14 @@ jobs:
         with:
           name: e2e-test-traces
           path: |
-            Reports/e2e/traces/*.zip
+            reports/e2e/traces/*.zip
           retention-days: 30
 
       - name: Upload pages artifact for GitHub Pages
         if: always()  # Deploy for all CI runs including PRs
         uses: actions/upload-pages-artifact@v3
         with:
-          path: Reports/e2e/html-report/
+          path: reports/e2e/html-report/
 
       - name: Deploy to GitHub Pages
         if: always()  # Deploy for all CI runs including PRs
@@ -481,7 +481,7 @@ jobs:
         with:
           name: e2e-html-report
           path: |
-            Reports/e2e/html-report/
+            reports/e2e/html-report/
           retention-days: 30
 
       - name: Parse test results and create PR comment
@@ -492,7 +492,7 @@ jobs:
             const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
 
             try {
-              const baseCommentBody = parseMultipleXUnitReports('Reports/e2e', context, '(E2E)');
+              const baseCommentBody = parseMultipleXUnitReports('reports/e2e', context, '(E2E)');
               
               // Add link to GitHub Pages since reports are now deployed for all CI runs
               let commentBody = baseCommentBody;
