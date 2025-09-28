@@ -151,8 +151,9 @@ public class Build : NukeBuild
         .Executes(() =>
         {
             Console.WriteLine($"Running client tests in {ClientDirectory}");
-            // Note: Vite starter doesn't include tests by default, this is a placeholder
-            Console.WriteLine("No client tests configured yet. Add Vitest or Jest to enable client testing.");
+            NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("test:run"));
         });
 
     Target TestServerPostman => _ => _
