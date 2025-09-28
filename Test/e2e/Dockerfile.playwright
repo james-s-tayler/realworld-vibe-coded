@@ -10,14 +10,14 @@ ENV DOTNET_ROOT="/usr/share/dotnet"
 
 WORKDIR /tests
 
-# Copy the test project files
-COPY E2eTests/ ./
+# Copy the entire test project directory structure
+COPY E2eTests/ ./E2eTests/
 
 # Restore packages
-RUN dotnet restore E2eTests.csproj
+RUN dotnet restore ./E2eTests/E2eTests.csproj
 
-# Build the test project
-RUN dotnet build E2eTests.csproj -c Release
+# Build the test project  
+RUN dotnet build ./E2eTests/E2eTests.csproj -c Release
 
 # Create directories for results
 RUN mkdir -p /Reports/e2e/traces
@@ -27,4 +27,4 @@ ENV CI=true
 ENV PLAYWRIGHT_HEADLESS=true
 
 # Set the entry point to run the tests
-ENTRYPOINT ["dotnet", "test", "E2eTests.csproj", "-c", "Release", "--logger", "trx;LogFileName=/Reports/e2e/e2e-results.trx", "--no-build", "--verbosity", "normal"]
+ENTRYPOINT ["dotnet", "test", "./E2eTests/E2eTests.csproj", "-c", "Release", "--logger", "trx;LogFileName=/Reports/e2e/e2e-results.trx", "--no-build", "--verbosity", "normal"]
