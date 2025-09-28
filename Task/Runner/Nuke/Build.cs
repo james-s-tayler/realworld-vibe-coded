@@ -25,6 +25,7 @@ public class Build : NukeBuild
     AbsolutePath ServerSolution => RootDirectory / "App" / "Server" / "Server.sln";
     AbsolutePath ServerProject => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "Server.Web.csproj";
     AbsolutePath ClientDirectory => RootDirectory / "App" / "Client";
+    AbsolutePath E2eTestsProject => RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
     AbsolutePath TestResultsDirectory => RootDirectory / "TestResults";
     AbsolutePath ReportsDirectory => RootDirectory / "reports";
     AbsolutePath DatabaseFile => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "database.sqlite";
@@ -138,6 +139,30 @@ public class Build : NukeBuild
             Console.WriteLine($"Running client tests in {ClientDirectory}");
             // Note: Vite starter doesn't include tests by default, this is a placeholder
             Console.WriteLine("No client tests configured yet. Add Vitest or Jest to enable client testing.");
+        });
+
+    Target TestE2e => _ => _
+        .Description("Run end-to-end tests using Playwright")
+        .Executes(() =>
+        {
+            if (Directory.Exists(TestResultsDirectory))
+                Directory.Delete(TestResultsDirectory, true);
+            Directory.CreateDirectory(TestResultsDirectory);
+
+            Console.WriteLine($"Running Playwright e2e tests from {E2eTestsProject}");
+            
+            // Install Playwright browsers first
+            var playwrightScript = E2eTestsProject.Parent / "E2eTests" / "bin" / "Debug" / "net9.0" / "playwright.ps1";
+            if (File.Exists(playwrightScript))
+            {
+                Console.WriteLine("Installing Playwright browsers...");
+                ProcessTasks.StartProcess("pwsh", $"{playwrightScript} install chromium").WaitForExit();
+            }
+
+            DotNetTest(s => s
+                .SetProjectFile(E2eTestsProject)
+                .SetLoggers("trx;LogFileName=e2e-test-results.trx")
+                .SetResultsDirectory(TestResultsDirectory));
         });
 
     Target TestServerPostman => _ => _
