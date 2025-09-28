@@ -150,7 +150,7 @@ public class Build : NukeBuild
             Directory.CreateDirectory(TestResultsDirectory);
 
             Console.WriteLine($"Running Playwright e2e tests from {E2eTestsProject}");
-            
+
             // Install Playwright browsers first
             var playwrightScript = E2eTestsProject.Parent / "E2eTests" / "bin" / "Debug" / "net9.0" / "playwright.ps1";
             if (File.Exists(playwrightScript))

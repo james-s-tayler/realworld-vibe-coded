@@ -28,10 +28,11 @@ public static class MiddlewareConfig
 
     await SeedDatabase(app);
 
-    // Configure SPA serving
+    // Configure SPA serving - middleware order is important
     if (app.Environment.IsDevelopment())
     {
-      // In development, proxy to Vite dev server
+      // In development, try to proxy to Vite dev server if it's running
+      // This middleware will only proxy non-API requests
       app.UseSpaDevServer("http://localhost:5173");
     }
     else

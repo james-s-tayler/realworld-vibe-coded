@@ -67,7 +67,9 @@ public class SpaDevServerMiddleware
           requestMessage.Content.Headers.TryAddWithoutValidation("Content-Type", context.Request.ContentType);
       }
 
-      var response = await _httpClient.SendAsync(requestMessage);
+      // Set a short timeout to fail fast if dev server isn't available
+      using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+      var response = await _httpClient.SendAsync(requestMessage, cts.Token);
 
       // Copy response status
       context.Response.StatusCode = (int)response.StatusCode;
@@ -86,11 +88,11 @@ public class SpaDevServerMiddleware
       // Copy response body
       await response.Content.CopyToAsync(context.Response.Body);
     }
-    catch (Exception ex)
+    catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException || ex is OperationCanceledException)
     {
-      _logger.LogError(ex, "Failed to proxy request to Vite dev server: {DevServerUrl}", _devServerUrl);
-      context.Response.StatusCode = 503;
-      await context.Response.WriteAsync("Vite dev server not available. Make sure it's running on " + _devServerUrl);
+      _logger.LogWarning("Vite dev server not available at {DevServerUrl}. Request will fall through to next middleware.", _devServerUrl);
+      // If dev server is not available, let the request fall through to the next middleware
+      await _next(context);
     }
   }
 }
