@@ -218,8 +218,8 @@ public class Build : NukeBuild
         {
             var packageLock = ClientDirectory / "package-lock.json";
             var nodeModules = ClientDirectory / "node_modules";
-            
-            if (!Directory.Exists(nodeModules) || 
+
+            if (!Directory.Exists(nodeModules) ||
                 (File.Exists(packageLock) && File.GetLastWriteTime(packageLock) > Directory.GetLastWriteTime(nodeModules)))
             {
                 Console.WriteLine("Installing/updating client dependencies...");
