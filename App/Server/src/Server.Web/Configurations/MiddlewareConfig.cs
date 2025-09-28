@@ -1,5 +1,6 @@
 ﻿using Ardalis.ListStartupServices;
 using Server.Infrastructure.Data;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Configurations;
 
@@ -26,6 +27,25 @@ public static class MiddlewareConfig
     app.UseAuthorization();
 
     await SeedDatabase(app);
+
+    // Configure SPA serving
+    if (app.Environment.IsDevelopment())
+    {
+      // In development, proxy to Vite dev server
+      app.UseSpaDevServer("http://localhost:5173");
+    }
+    else
+    {
+      // In production, serve static files and fallback to SPA
+      app.UseDefaultFiles(); // Serve index.html by default
+      app.UseStaticFiles(new StaticFileOptions
+      {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+          Path.Combine(Directory.GetCurrentDirectory(), "../Client/dist")),
+        RequestPath = ""
+      });
+      app.MapFallbackToFile("index.html"); // SPA fallback routing
+    }
 
     return app;
   }
