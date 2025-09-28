@@ -25,7 +25,7 @@ jobs:
       server: ${{ steps.filter.outputs.server }}
       infra: ${{ steps.filter.outputs.infra }}
       task_runner: ${{ steps.filter.outputs.task_runner }}
-      test: ${{ steps.filter.outputs.test }}
+      test_postman: ${{ steps.filter.outputs.test_postman }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -239,6 +239,84 @@ jobs:
 
       - name: Lint (Nuke build targets)
         run: ./build.sh lint-nuke-verify
+
+  build-client:
+    name: build-client
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.client == 'true' }}
+    steps:
+      - name: Explain skip
+        if: ${{ needs.changes.outputs.client != 'true' }}
+        run: echo "No Client changes detected; skipping client build checks."
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: App/Client/package-lock.json
+
+      - name: Install dependencies
+        run: cd App/Client && npm ci
+
+      - name: Build (client)
+        run: ./build.sh build-client
+
+  test-client:
+    name: test-client
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.client == 'true' }}
+    steps:
+      - name: Explain skip
+        if: ${{ needs.changes.outputs.client != 'true' }}
+        run: echo "No Client changes detected; skipping client tests."
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: App/Client/package-lock.json
+
+      - name: Install dependencies
+        run: cd App/Client && npm ci
+
+      - name: Test (client)
+        run: ./build.sh test-client
+
+  lint-client-verify:
+    name: lint-client-verify
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.client == 'true' }}
+    steps:
+      - name: Explain skip
+        if: ${{ needs.changes.outputs.client != 'true' }}
+        run: echo "No Client changes detected; skipping client linting."
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: App/Client/package-lock.json
+
+      - name: Install dependencies
+        run: cd App/Client && npm ci
+
+      - name: Lint (client)
+        run: ./build.sh lint-client-verify
 
   test-server-postman:
     name: test-server-postman

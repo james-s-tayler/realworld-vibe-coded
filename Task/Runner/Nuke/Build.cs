@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.Npm;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using static Nuke.Common.Tools.Npm.NpmTasks;
 
 public class Build : NukeBuild
 {
@@ -21,6 +24,7 @@ public class Build : NukeBuild
     AbsolutePath TaskRunnerDirectory => RootDirectory / "Task" / "Runner";
     AbsolutePath ServerSolution => RootDirectory / "App" / "Server" / "Server.sln";
     AbsolutePath ServerProject => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "Server.Web.csproj";
+    AbsolutePath ClientDirectory => RootDirectory / "App" / "Client";
     AbsolutePath TestResultsDirectory => RootDirectory / "TestResults";
     AbsolutePath ReportsDirectory => RootDirectory / "reports";
     AbsolutePath DatabaseFile => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "database.sqlite";
@@ -46,16 +50,24 @@ public class Build : NukeBuild
 
     Target LintClientVerify => _ => _
         .Description("Verify client code formatting and style")
+        .DependsOn(InstallClient)
         .Executes(() =>
         {
-            Console.WriteLine("No client linting configured yet.");
+            Console.WriteLine($"Running ESLint on {ClientDirectory}");
+            NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("lint"));
         });
 
     Target LintClientFix => _ => _
         .Description("Fix client code formatting and style issues automatically")
+        .DependsOn(InstallClient)
         .Executes(() =>
         {
-            Console.WriteLine("No client linting configured yet.");
+            Console.WriteLine($"Running ESLint fix on {ClientDirectory}");
+            NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("lint:fix"));
         });
 
     Target LintNukeVerify => _ => _
@@ -99,9 +111,13 @@ public class Build : NukeBuild
 
     Target BuildClient => _ => _
         .Description("Build client (frontend)")
+        .DependsOn(InstallClient)
         .Executes(() =>
         {
-            Console.WriteLine("No client build configured yet.");
+            Console.WriteLine($"Building client in {ClientDirectory}");
+            NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("build"));
         });
 
     Target TestServer => _ => _
@@ -131,6 +147,17 @@ public class Build : NukeBuild
                     .SetLoggers($"trx;LogFileName={logFileName}")
                     .SetResultsDirectory(TestResultsDirectory));
             }
+        });
+
+    Target TestClient => _ => _
+        .Description("Run client tests")
+        .DependsOn(InstallClient)
+        .Executes(() =>
+        {
+            Console.WriteLine($"Running client tests in {ClientDirectory}");
+            NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("test:run"));
         });
 
     Target TestServerPostman => _ => _
@@ -185,11 +212,35 @@ public class Build : NukeBuild
             DotNetRun(s => s.SetProjectFile(ServerProject));
         });
 
-    Target RunLocalClient => _ => _
-        .Description("Run client locally")
+    Target InstallClient => _ => _
+        .Description("Install client dependencies if needed")
         .Executes(() =>
         {
-            Console.WriteLine("No client run-local configured yet.");
+            var packageLock = ClientDirectory / "package-lock.json";
+            var nodeModules = ClientDirectory / "node_modules";
+
+            if (!Directory.Exists(nodeModules) ||
+                (File.Exists(packageLock) && File.GetLastWriteTime(packageLock) > Directory.GetLastWriteTime(nodeModules)))
+            {
+                Console.WriteLine("Installing/updating client dependencies...");
+                NpmInstall(s => s
+                    .SetProcessWorkingDirectory(ClientDirectory));
+            }
+            else
+            {
+                Console.WriteLine("Client dependencies are up to date.");
+            }
+        });
+
+    Target RunLocalClient => _ => _
+        .Description("Run client locally")
+        .DependsOn(InstallClient)
+        .Executes(() =>
+        {
+            Console.WriteLine($"Starting Vite dev server in {ClientDirectory}");
+            NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("dev"));
         });
 
     Target DbReset => _ => _

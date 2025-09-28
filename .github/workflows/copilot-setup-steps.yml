@@ -48,6 +48,10 @@ jobs:
         run: |
           npm ci
 
+      - name: Install client dependencies
+        run: |
+          cd App/Client && npm ci
+
       - name: Install Playwright Chromium browser
         run: |
           npx playwright install chromium

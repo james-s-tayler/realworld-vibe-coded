@@ -28,6 +28,7 @@
         "BuildServer",
         "DbReset",
         "DbResetForce",
+        "InstallClient",
         "LintClientFix",
         "LintClientVerify",
         "LintNukeFix",
@@ -36,6 +37,7 @@
         "LintServerVerify",
         "RunLocalClient",
         "RunLocalServer",
+        "TestClient",
         "TestServer",
         "TestServerPostman"
       ]
