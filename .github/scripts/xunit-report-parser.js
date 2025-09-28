@@ -7,10 +7,11 @@ const path = require('path');
  * Parses multiple xUnit TRX reports and generates merged PR comment content
  * @param {string} reportDirectory - Path to the directory containing TRX files
  * @param {object} context - GitHub Actions context object
- * @param {string} suffix - Optional suffix to add to the title (e.g., "(Nuke Build)")
+ * @param {string} testTypeName - Name of the test type (e.g., "xUnit Tests", "E2E Tests")
+ * @param {string} tracesArtifactName - Optional name of traces artifact for linking
  * @returns {string} - Generated comment body
  */
-function parseMultipleXUnitReports(reportDirectory, context, suffix = '') {
+function parseMultipleXUnitReports(reportDirectory, context, testTypeName = 'xUnit Tests', tracesArtifactName = null) {
   if (!fs.existsSync(reportDirectory)) {
     console.log('Test results directory not found, skipping comment');
     return null;
@@ -80,8 +81,13 @@ function parseMultipleXUnitReports(reportDirectory, context, suffix = '') {
   ).join('\n');
 
   // Create the comment body
-  const baseTestType = suffix && suffix.includes('(E2E)') ? 'E2E Tests' : 'xUnit Tests';
-  const title = suffix ? `${baseTestType} ${statusText}` : `xUnit Tests ${statusText}`;
+  const title = `${testTypeName} ${statusText}`;
+  
+  let artifactLinks = `- [TRX Reports](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+  if (tracesArtifactName) {
+    artifactLinks += `\n- [Test Traces](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+  }
+  
   const commentBody = `## ${statusIcon} ${title}
 
 **📊 Test Summary**
@@ -96,7 +102,7 @@ ${allFailures.length > 0 ? `**🔍 Failed Tests**\n${failureDetails}` : '**🎉 
 
 ---
 📁 **Full reports available in build artifacts**
-- [TRX Reports](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+${artifactLinks}
 
 <sub>🤖 Generated on each test run</sub>`;
 
@@ -196,10 +202,11 @@ function parseSingleTrxFile(filePath, suiteName) {
  * Parses xUnit TRX report and generates PR comment content
  * @param {string} reportPath - Path to the TRX XML report
  * @param {object} context - GitHub Actions context object
- * @param {string} suffix - Optional suffix to add to the title (e.g., "(Nuke Build)")
+ * @param {string} testTypeName - Name of the test type (e.g., "xUnit Tests", "E2E Tests")
+ * @param {string} tracesArtifactName - Optional name of traces artifact for linking
  * @returns {string} - Generated comment body
  */
-function parseXUnitReport(reportPath, context, suffix = '') {
+function parseXUnitReport(reportPath, context, testTypeName = 'xUnit Tests', tracesArtifactName = null) {
   if (!fs.existsSync(reportPath)) {
     console.log('No xUnit TRX report found, skipping comment');
     return null;
@@ -284,8 +291,13 @@ function parseXUnitReport(reportPath, context, suffix = '') {
   const testPassPercentage = total > 0 ? Math.round(passed / total * 100) : 0;
   
   // Create the comment body
-  const baseTestType = suffix && suffix.includes('(E2E)') ? 'E2E Tests' : 'xUnit Tests';
-  const title = suffix ? `${baseTestType} ${statusText}` : `xUnit Tests ${statusText}`;
+  const title = `${testTypeName} ${statusText}`;
+  
+  let artifactLinks = `- [TRX Report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+  if (tracesArtifactName) {
+    artifactLinks += `\n- [Test Traces](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+  }
+  
   const commentBody = `## ${statusIcon} ${title}
 
 **📊 Test Summary**
@@ -296,7 +308,7 @@ ${failures.length > 0 ? `**🔍 Failed Tests**\n${failureDetails}` : '**🎉 All
 
 ---
 📁 **Full reports available in build artifacts**
-- [TRX Report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+${artifactLinks}
 
 <sub>🤖 Generated on each test run</sub>`;
 
@@ -332,7 +344,7 @@ async function main() {
     }
 
     const context = JSON.parse(contextJson);
-    const commentBody = parseXUnitReport(reportPath, context);
+    const commentBody = parseXUnitReport(reportPath, context, 'xUnit Tests');
 
     if (commentBody) {
       // When used as a standalone script, just output the comment body

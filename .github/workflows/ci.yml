@@ -159,7 +159,7 @@ jobs:
             const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
 
             try {
-              const commentBody = parseMultipleXUnitReports('TestResults', context);
+              const commentBody = parseMultipleXUnitReports('TestResults', context, 'xUnit Tests');
 
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');
@@ -460,7 +460,7 @@ jobs:
             const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
 
             try {
-              const commentBody = parseMultipleXUnitReports('Reports/e2e', context, '(E2E)');
+              const commentBody = parseMultipleXUnitReports('Reports/e2e', context, 'E2E Tests', 'e2e-test-traces');
 
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');
