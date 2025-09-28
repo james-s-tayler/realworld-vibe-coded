@@ -62,8 +62,8 @@ nunit-*.xml
 *.sqlite-wal
 
 # Newman/Postman test reports and E2E test results
-reports/
-Reports/
+*.zip
+*.trx
 
 # Nuke build temp files
 .nuke/temp/

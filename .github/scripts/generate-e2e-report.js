@@ -11,7 +11,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 // Configuration
-const REPORTS_DIR = path.join(__dirname, '../../reports/e2e');
+const REPORTS_DIR = path.join(__dirname, '../../Reports/e2e');
 const OUTPUT_DIR = path.join(REPORTS_DIR, 'html-report');
 const TRACES_DIR = path.join(REPORTS_DIR, 'traces');
 
@@ -25,22 +25,7 @@ function ensureDir(dir) {
     }
   } catch (error) {
     console.error(`Failed to create directory ${dir}:`, error.message);
-    // Try to fix permissions first, then retry
-    try {
-      const { execSync } = require('child_process');
-      console.log('Attempting to fix permissions and retry directory creation...');
-      const reportsRoot = path.join(__dirname, '../../reports');
-      execSync(`sudo chown -R $(whoami):$(whoami) "${reportsRoot}" 2>/dev/null || true`, { stdio: 'inherit' });
-      execSync(`chmod -R 755 "${reportsRoot}" 2>/dev/null || true`, { stdio: 'inherit' });
-      
-      // Now retry the directory creation
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-    } catch (fallbackError) {
-      console.error(`Fallback directory creation also failed:`, fallbackError.message);
-      throw new Error(`Cannot create directory ${dir}: ${error.message}`);
-    }
+    throw new Error(`Cannot create directory ${dir}: ${error.message}`);
   }
 }
 

@@ -26,7 +26,7 @@ public class Build : NukeBuild
     AbsolutePath ServerProject => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "Server.Web.csproj";
     AbsolutePath ClientDirectory => RootDirectory / "App" / "Client";
     AbsolutePath TestResultsDirectory => RootDirectory / "TestResults";
-    AbsolutePath ReportsDirectory => RootDirectory / "reports";
+    AbsolutePath ReportsDirectory => RootDirectory / "Reports";
     AbsolutePath DatabaseFile => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "database.sqlite";
 
     Target LintServerVerify => _ => _
