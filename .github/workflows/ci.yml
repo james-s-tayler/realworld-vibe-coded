@@ -464,11 +464,32 @@ jobs:
             Reports/e2e/traces/*.zip
           retention-days: 30
 
+      - name: Check for available HTML reports
+        if: always()
+        id: check_reports
+        run: |
+          if [ -d "reports/e2e/playwright-report" ] && [ "$(ls -A reports/e2e/playwright-report)" ]; then
+            echo "report_type=native" >> $GITHUB_OUTPUT
+            echo "report_path=reports/e2e/playwright-report" >> $GITHUB_OUTPUT
+            echo "📊 Found native Playwright HTML report"
+          elif [ -d "reports/e2e/simple-report" ] && [ "$(ls -A reports/e2e/simple-report)" ]; then
+            echo "report_type=simple" >> $GITHUB_OUTPUT
+            echo "report_path=reports/e2e/simple-report" >> $GITHUB_OUTPUT
+            echo "🔧 Found simple HTML report"
+          elif [ -d "reports/e2e/html-report" ] && [ "$(ls -A reports/e2e/html-report)" ]; then
+            echo "report_type=custom" >> $GITHUB_OUTPUT
+            echo "report_path=reports/e2e/html-report" >> $GITHUB_OUTPUT
+            echo "⚙️  Found custom HTML report"
+          else
+            echo "report_type=none" >> $GITHUB_OUTPUT
+            echo "❌ No HTML reports found"
+          fi
+
       - name: Upload pages artifact for GitHub Pages
-        if: always()  # Deploy for all CI runs including PRs
+        if: always() && steps.check_reports.outputs.report_type != 'none'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: Reports/e2e/html-report/
+          path: ${{ steps.check_reports.outputs.report_path }}
 
       - name: Deploy to GitHub Pages
         if: always()  # Deploy for all CI runs including PRs

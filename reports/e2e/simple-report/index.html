@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Test Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        .header { background: #f5f5f5; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; }
+        .trace-list { list-style: none; padding: 0; }
+        .trace-item { 
+            background: white; 
+            border: 1px solid #ddd; 
+            margin: 0.5rem 0; 
+            padding: 1rem; 
+            border-radius: 4px; 
+        }
+        .trace-link { 
+            color: #0066cc; 
+            text-decoration: none; 
+            font-weight: bold; 
+        }
+        .trace-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 E2E Test Report</h1>
+        <p>Generated on <span id="timestamp"></span></p>
+    </div>
+    
+    <h2>📊 Playwright Traces</h2>
+    <div id="trace-list">
+        <p>Loading traces...</p>
+    </div>
+    
+    <script>
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        
+        // This will be populated by the shell script
+        const traces = [];
+        
+        const traceList = document.getElementById('trace-list');
+        if (traces.length === 0) {
+            traceList.innerHTML = '<p>No trace files found.</p>';
+        } else {
+            const list = document.createElement('ul');
+            list.className = 'trace-list';
+            
+            traces.forEach(trace => {
+                const item = document.createElement('li');
+                item.className = 'trace-item';
+                
+                const link = document.createElement('a');
+                link.href = `https://trace.playwright.dev/?trace=../traces/${trace.name}`;
+                link.className = 'trace-link';
+                link.target = '_blank';
+                link.textContent = `📊 ${trace.name}`;
+                
+                const info = document.createElement('div');
+                info.textContent = `${trace.size} • ${trace.modified}`;
+                info.style.fontSize = '0.9em';
+                info.style.color = '#666';
+                info.style.marginTop = '0.5rem';
+                
+                item.appendChild(link);
+                item.appendChild(info);
+                list.appendChild(item);
+            });
+            
+            traceList.appendChild(list);
+        }
+    </script>
+</body>
+</html>
