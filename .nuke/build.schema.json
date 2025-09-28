@@ -37,7 +37,6 @@
         "RunLocalClient",
         "RunLocalServer",
         "TestClient",
-        "TestE2e",
         "TestServer",
         "TestServerPostman"
       ]
