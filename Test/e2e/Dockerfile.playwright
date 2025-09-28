@@ -1,13 +1,14 @@
-# Use the official .NET 9 SDK image
+# Use Ubuntu with .NET SDK
 FROM mcr.microsoft.com/dotnet/sdk:9.0
 
-# Install Node.js and Playwright dependencies
+# Install system dependencies for Playwright
 RUN apt-get update && apt-get install -y \
-    curl \
-    wget \
-    gnupg \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libdrm2 \
+    libgtk-3-0 \
+    libgbm1 \
+    libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tests
@@ -18,16 +19,18 @@ COPY E2eTests/ ./
 # Restore packages
 RUN dotnet restore E2eTests.csproj
 
-# Install Playwright and its dependencies
-RUN dotnet tool install --global Microsoft.Playwright.CLI
-ENV PATH="${PATH}:/root/.dotnet/tools"
-RUN playwright install --with-deps chromium
+# Install Playwright browsers
+RUN pwsh bin/Debug/net9.0/playwright.ps1 install --with-deps
 
 # Build the test project
 RUN dotnet build E2eTests.csproj -c Release
 
 # Create directories for results
 RUN mkdir -p /TestResults/traces
+
+# Set environment variables for headless operation
+ENV CI=true
+ENV PLAYWRIGHT_HEADLESS=true
 
 # Set the entry point to run the tests
 ENTRYPOINT ["dotnet", "test", "E2eTests.csproj", "-c", "Release", "--logger", "trx;LogFileName=/TestResults/e2e-results.trx", "--no-build", "--verbosity", "normal"]
