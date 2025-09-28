@@ -26,16 +26,7 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
   public override async Task HandleAsync(CancellationToken cancellationToken)
   {
-    int userId;
-    try
-    {
-      userId = _currentUserService.GetRequiredCurrentUserId();
-    }
-    catch (UnauthorizedAccessException)
-    {
-      HttpContext.Response.StatusCode = 401;
-      return;
-    }
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     // Get parameters from route
     var slug = Route<string>("slug") ?? string.Empty;

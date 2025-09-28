@@ -24,23 +24,8 @@ public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserSer
 
   public override async Task HandleAsync(CancellationToken cancellationToken)
   {
-    int userId;
-    try
-    {
-      userId = _currentUserService.GetRequiredCurrentUserId();
-    }
-    catch (UnauthorizedAccessException)
-    {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
-      return;
-    }
-
+    var userId = _currentUserService.GetRequiredCurrentUserId();
+    
     var result = await _mediator.Send(new GetCurrentUserQuery(userId), cancellationToken);
 
     if (result.IsSuccess)

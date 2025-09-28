@@ -26,16 +26,7 @@ public class Update(IMediator _mediator, ICurrentUserService _currentUserService
 
   public override async Task HandleAsync(UpdateArticleRequest request, CancellationToken cancellationToken)
   {
-    int userId;
-    try
-    {
-      userId = _currentUserService.GetRequiredCurrentUserId();
-    }
-    catch (UnauthorizedAccessException)
-    {
-      await WriteUnauthorizedResponseAsync(cancellationToken);
-      return;
-    }
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new UpdateArticleCommand(
       request.Slug,

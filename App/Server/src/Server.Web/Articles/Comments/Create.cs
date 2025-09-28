@@ -28,16 +28,7 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
 
   public override async Task HandleAsync(CreateCommentRequest request, CancellationToken cancellationToken)
   {
-    int userId;
-    try
-    {
-      userId = _currentUserService.GetRequiredCurrentUserId();
-    }
-    catch (UnauthorizedAccessException)
-    {
-      await WriteUnauthorizedResponseAsync(cancellationToken);
-      return;
-    }
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     // Get slug from route parameter
     var slug = Route<string>("slug") ?? string.Empty;

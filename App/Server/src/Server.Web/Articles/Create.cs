@@ -27,16 +27,7 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
 
   public override async Task HandleAsync(CreateArticleRequest request, CancellationToken cancellationToken)
   {
-    int userId;
-    try
-    {
-      userId = _currentUserService.GetRequiredCurrentUserId();
-    }
-    catch (UnauthorizedAccessException)
-    {
-      await WriteUnauthorizedResponseAsync(cancellationToken);
-      return;
-    }
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new CreateArticleCommand(
       request.Article.Title,

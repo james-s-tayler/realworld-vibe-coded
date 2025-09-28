@@ -29,22 +29,7 @@ public class Unfollow(IRepository<User> _userRepository, ICurrentUserService _cu
     // Get username from route parameter
     var username = Route<string>("username") ?? string.Empty;
 
-    int userId;
-    try
-    {
-      userId = _currentUserService.GetRequiredCurrentUserId();
-    }
-    catch (UnauthorizedAccessException)
-    {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
-      return;
-    }
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     // Find the user to unfollow
     var userToUnfollow = await _userRepository.FirstOrDefaultAsync(

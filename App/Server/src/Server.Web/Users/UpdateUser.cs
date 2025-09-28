@@ -54,22 +54,7 @@ public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserSer
     UpdateUserRequest request,
     CancellationToken cancellationToken)
   {
-    int userId;
-    try
-    {
-      userId = _currentUserService.GetRequiredCurrentUserId();
-    }
-    catch (UnauthorizedAccessException)
-    {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var unauthorizedJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(unauthorizedJson, cancellationToken);
-      return;
-    }
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new UpdateUserCommand(
       userId,

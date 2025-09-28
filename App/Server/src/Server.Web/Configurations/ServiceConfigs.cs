@@ -5,6 +5,7 @@ using Server.Core.Interfaces;
 using Server.Infrastructure;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Email;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Configurations;
 
@@ -79,6 +80,10 @@ public static class ServiceConfigs
       });
 
     services.AddAuthorization();
+    
+    // Register global exception handler for unauthorized access
+    services.AddExceptionHandler<UnauthorizedExceptionHandler>();
+    services.AddProblemDetails();
 
     // Register IHttpContextAccessor for CurrentUserService
     services.AddHttpContextAccessor();
