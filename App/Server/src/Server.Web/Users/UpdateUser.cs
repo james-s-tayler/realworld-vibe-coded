@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using Server.Core.Interfaces;
 using Server.UseCases.Users.Update;
 
 namespace Server.Web.Users;
@@ -9,7 +9,7 @@ namespace Server.Web.Users;
 /// <remarks>
 /// Update the currently authenticated user's details.
 /// </remarks>
-public class UpdateUser(IMediator _mediator) : Endpoint<UpdateUserRequest, UpdateUserResponse>
+public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<UpdateUserRequest, UpdateUserResponse>
 {
   public override void Configure()
   {
@@ -54,19 +54,7 @@ public class UpdateUser(IMediator _mediator) : Endpoint<UpdateUserRequest, Updat
     UpdateUserRequest request,
     CancellationToken cancellationToken)
   {
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-    {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var unauthorizedJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(unauthorizedJson, cancellationToken);
-      return;
-    }
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new UpdateUserCommand(
       userId,

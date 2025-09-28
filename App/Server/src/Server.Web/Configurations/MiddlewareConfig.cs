@@ -7,14 +7,15 @@ public static class MiddlewareConfig
 {
   public static async Task<IApplicationBuilder> UseAppMiddlewareAndSeedDatabase(this WebApplication app)
   {
+    // Always add the exception handler first
+    app.UseExceptionHandler();
+
     if (app.Environment.IsDevelopment())
     {
-      app.UseDeveloperExceptionPage();
       app.UseShowAllServicesMiddleware(); // see https://github.com/ardalis/AspNetCoreStartupServices
     }
     else
     {
-      app.UseDefaultExceptionHandler(); // from FastEndpoints
       app.UseHsts();
     }
 
