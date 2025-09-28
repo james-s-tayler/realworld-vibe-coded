@@ -5,18 +5,12 @@ services:
       dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: https://+:57679;http://+:57678
-      ASPNETCORE_HTTPS_PORT: 57679
-      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
-      ASPNETCORE_Kestrel__Certificates__Default__Password: ""
+      ASPNETCORE_URLS: http://+:5000
       ConnectionStrings__SqliteConnection: "Data Source=database.sqlite"
     ports:
-      - "57679:57679"
-      - "57678:57678"
-    volumes:
-      - ./https:/https:ro
+      - "5000:5000"
     healthcheck:
-      test: ["CMD", "curl", "-k", "-f", "https://localhost:57679/swagger/index.html"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/swagger/index.html"]
       interval: 5s
       timeout: 10s
       retries: 20
@@ -33,7 +27,7 @@ services:
       - ./:/tests
       - ../../Reports:/Reports
     environment:
-      - PLAYWRIGHT_BASE_URL=https://api:57679
+      - PLAYWRIGHT_BASE_URL=http://api:5000
       - CI=true
     networks:
       - default
