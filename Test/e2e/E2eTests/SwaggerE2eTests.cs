@@ -65,8 +65,8 @@ public class SwaggerE2eTests : PageTest
         }
         finally
         {
-            // Create traces directory if it doesn't exist
-            var tracesDir = Path.Combine("Reports", "e2e", "traces");
+            // Use absolute path that matches Docker volume mount
+            var tracesDir = "/Reports/e2e/traces";
             Directory.CreateDirectory(tracesDir);
             
             // Stop tracing and save to file
