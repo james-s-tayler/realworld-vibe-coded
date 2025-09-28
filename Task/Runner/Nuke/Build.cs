@@ -126,10 +126,25 @@ public class Build : NukeBuild
                 Directory.Delete(TestResultsDirectory, true);
             Directory.CreateDirectory(TestResultsDirectory);
 
-            DotNetTest(s => s
-                .SetProjectFile(ServerSolution)
-                .SetLoggers("trx;LogFileName=test-results.trx")
-                .SetResultsDirectory(TestResultsDirectory));
+            // Get all test projects in the solution
+            var testsDirectory = RootDirectory / "App" / "Server" / "tests";
+            var testProjects = Directory.GetDirectories(testsDirectory)
+                .Select(dir => (AbsolutePath)dir / $"{Path.GetFileName(dir)}.csproj")
+                .Where(project => File.Exists(project))
+                .ToArray();
+
+            // Run tests for each project with unique result files
+            foreach (var testProject in testProjects)
+            {
+                var projectName = Path.GetFileNameWithoutExtension(testProject);
+                var logFileName = $"{projectName}-results.trx";
+
+                Console.WriteLine($"Running tests for {projectName}...");
+                DotNetTest(s => s
+                    .SetProjectFile(testProject)
+                    .SetLoggers($"trx;LogFileName={logFileName}")
+                    .SetResultsDirectory(TestResultsDirectory));
+            }
         });
 
     Target TestClient => _ => _

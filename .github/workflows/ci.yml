@@ -148,7 +148,7 @@ jobs:
         with:
           name: xunit-test-reports
           path: |
-            TestResults/test-results.trx
+            TestResults/*.trx
           retention-days: 30
 
       - name: Parse test results and create PR comment
@@ -156,10 +156,10 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { parseXUnitReport } = require('./.github/scripts/xunit-report-parser.js');
+            const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
 
             try {
-              const commentBody = parseXUnitReport('TestResults/test-results.trx', context);
+              const commentBody = parseMultipleXUnitReports('TestResults', context);
 
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');
