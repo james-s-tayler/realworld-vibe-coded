@@ -38,6 +38,9 @@ jobs:
           dotnet --version
           dotnet --info
 
+      - name: Trust dotnet dev certs
+        run: dotnet dev-certs https --trust
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
