@@ -90,6 +90,7 @@ Mark these job names as required in your branch protection settings:
 - `lint-server-verify` - Server code linting
 - `lint-nuke-verify` - Nuke build script linting  
 - `test-server-postman` - Server integration tests
+- `test-e2e` - End-to-end Playwright tests
 
 All jobs will appear in every PR's status checks, but will skip execution when their associated folders haven't changed.
 

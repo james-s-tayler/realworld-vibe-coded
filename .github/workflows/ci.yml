@@ -26,6 +26,7 @@ jobs:
       infra: ${{ steps.filter.outputs.infra }}
       task_runner: ${{ steps.filter.outputs.task_runner }}
       test_postman: ${{ steps.filter.outputs.test_postman }}
+      test_e2e: ${{ steps.filter.outputs.test_e2e }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,6 +46,8 @@ jobs:
               - 'Task/Runner/**'
             test_postman:
               - 'Test/Postman/**'
+            test_e2e:
+              - 'Test/e2e/**'
   build-nuke:
     name: build-nuke
     runs-on: ubuntu-latest
@@ -395,3 +398,90 @@ jobs:
         run: |
           echo "Postman tests failed with exit code ${{ steps.postman_tests.outputs.exit_code }}"
           exit ${{ steps.postman_tests.outputs.exit_code }}
+
+  test-e2e:
+    name: test-e2e
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.client == 'true' || needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Explain skip
+        if: ${{ needs.changes.outputs.server != 'true' && needs.changes.outputs.client != 'true' && needs.changes.outputs.test_e2e != 'true' }}
+        run: echo "No App/Client, App/Server, or Test/e2e changes detected; skipping E2E tests."
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts and comment
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: e2e-test-reports
+          path: |
+            Reports/e2e/*.trx
+          retention-days: 30
+
+      - name: Upload E2E Test Traces
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: e2e-test-traces
+          path: |
+            Reports/e2e/traces/*.zip
+          retention-days: 30
+
+      - name: Parse test results and create PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
+
+            try {
+              const commentBody = parseMultipleXUnitReports('Reports/e2e', context, '(E2E)');
+
+              if (!commentBody) {
+                console.log('No comment body generated, skipping PR comment');
+                return;
+              }
+
+              // Always create a new comment for each test run
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+              console.log('Created new PR comment');
+
+            } catch (error) {
+              console.error('Error creating/updating PR comment:', error);
+            }
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}

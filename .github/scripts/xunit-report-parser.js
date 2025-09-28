@@ -95,7 +95,7 @@ ${allFailures.length > 0 ? `**🔍 Failed Tests**\n${failureDetails}` : '**🎉 
 
 ---
 📁 **Full reports available in build artifacts**
-- [TRX Reports](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+- [Test Artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
 
 <sub>🤖 Generated on each test run</sub>`;
 
@@ -294,7 +294,7 @@ ${failures.length > 0 ? `**🔍 Failed Tests**\n${failureDetails}` : '**🎉 All
 
 ---
 📁 **Full reports available in build artifacts**
-- [TRX Report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+- [Test Artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
 
 <sub>🤖 Generated on each test run</sub>`;
 

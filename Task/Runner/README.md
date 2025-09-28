@@ -35,6 +35,7 @@ build.cmd                 # Cross-platform build script (Windows)
 | `build-client` | Build the frontend (placeholder) |
 | `test-server` | Run backend unit/integration tests |
 | `test-server-postman` | Run Postman API tests |
+| `test-e2e` | Run E2E Playwright tests |
 | `lint-server-verify` | Verify backend formatting & analyzers (no changes). Fails if issues found |
 | `lint-server-fix` | Fix backend formatting & analyzer issues automatically |
 | `lint-client-verify` | Verify client code formatting and style |
