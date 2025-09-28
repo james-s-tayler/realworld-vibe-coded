@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Feed;
 
@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Get articles from followed users. Authentication required.
 /// </remarks>
-public class Feed(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse>
+public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticlesResponse>
 {
   public override void Configure()
   {
@@ -25,20 +25,8 @@ public class Feed(IMediator _mediator) : EndpointWithoutRequest<ArticlesResponse
 
   public override async Task HandleAsync(CancellationToken cancellationToken)
   {
-    // Get current user ID from claims
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-    {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
-      return;
-    }
+    // Get current user ID from service
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     var validation = QueryParameterValidator.ValidateFeedParameters(HttpContext.Request);
 

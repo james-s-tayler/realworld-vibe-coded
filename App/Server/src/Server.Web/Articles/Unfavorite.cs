@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Unfavorite;
 
@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Remove article from favorites. Authentication required.
 /// </remarks>
-public class Unfavorite(IMediator _mediator) : EndpointWithoutRequest<ArticleResponse>
+public class Unfavorite(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse>
 {
   public override void Configure()
   {
@@ -28,19 +28,7 @@ public class Unfavorite(IMediator _mediator) : EndpointWithoutRequest<ArticleRes
     // Get slug from route parameter
     var slug = Route<string>("slug") ?? string.Empty;
 
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-    {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
-      return;
-    }
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new UnfavoriteArticleCommand(slug, userId, userId), cancellationToken);
 

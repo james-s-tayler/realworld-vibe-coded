@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Update;
 using Server.Web.Infrastructure;
@@ -11,7 +11,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Updates an existing article. Authentication required. User must be the author.
 /// </remarks>
-public class Update(IMediator _mediator) : BaseValidatedEndpoint<UpdateArticleRequest, ArticleResponse>
+public class Update(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<UpdateArticleRequest, ArticleResponse>
 {
   public override void Configure()
   {
@@ -26,13 +26,7 @@ public class Update(IMediator _mediator) : BaseValidatedEndpoint<UpdateArticleRe
 
   public override async Task HandleAsync(UpdateArticleRequest request, CancellationToken cancellationToken)
   {
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-    {
-      await WriteUnauthorizedResponseAsync(cancellationToken);
-      return;
-    }
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new UpdateArticleCommand(
       request.Slug,

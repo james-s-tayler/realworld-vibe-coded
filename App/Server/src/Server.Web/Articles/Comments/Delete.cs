@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
-using FastEndpoints;
+﻿using FastEndpoints;
 using MediatR;
+using Server.Core.Interfaces;
 using Server.UseCases.Articles.Comments.Delete;
 
 namespace Server.Web.Articles.Comments;
@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Comments;
 /// <remarks>
 /// Delete a comment. Authentication required. Only comment author can delete.
 /// </remarks>
-public class Delete(IMediator _mediator) : EndpointWithoutRequest
+public class Delete(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest
 {
   public override void Configure()
   {
@@ -26,13 +26,7 @@ public class Delete(IMediator _mediator) : EndpointWithoutRequest
 
   public override async Task HandleAsync(CancellationToken cancellationToken)
   {
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
-    {
-      HttpContext.Response.StatusCode = 401;
-      return;
-    }
+    var userId = _currentUserService.GetRequiredCurrentUserId();
 
     // Get parameters from route
     var slug = Route<string>("slug") ?? string.Empty;

@@ -1,5 +1,5 @@
-﻿using System.Security.Claims;
-using Ardalis.SharedKernel;
+﻿using Ardalis.SharedKernel;
+using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
 
@@ -11,7 +11,7 @@ namespace Server.Web.Profiles;
 /// <remarks>
 /// Get a user profile by username. Authentication optional.
 /// </remarks>
-public class Get(IRepository<User> _userRepository) : EndpointWithoutRequest<ProfileResponse>
+public class Get(IRepository<User> _userRepository, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ProfileResponse>
 {
   public override void Configure()
   {
@@ -30,12 +30,7 @@ public class Get(IRepository<User> _userRepository) : EndpointWithoutRequest<Pro
     var username = Route<string>("username") ?? string.Empty;
 
     // Get current user ID if authenticated
-    int? currentUserId = null;
-    var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
-    {
-      currentUserId = userId;
-    }
+    var currentUserId = _currentUserService.GetCurrentUserId();
 
     // Find the user profile
     var user = await _userRepository.FirstOrDefaultAsync(
