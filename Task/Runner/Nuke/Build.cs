@@ -151,12 +151,22 @@ public class Build : NukeBuild
 
             Console.WriteLine($"Running Playwright e2e tests from {E2eTestsProject}");
 
-            // Install Playwright browsers first
-            var playwrightScript = E2eTestsProject.Parent / "E2eTests" / "bin" / "Debug" / "net9.0" / "playwright.ps1";
+            // Build the project first to ensure playwright.ps1 exists
+            DotNetBuild(s => s.SetProjectFile(E2eTestsProject));
+
+            // Install Playwright browsers
+            var e2eTestsDir = E2eTestsProject.Parent;  // This should be Test/e2e/E2eTests
+            var playwrightScript = e2eTestsDir / "bin" / "Debug" / "net9.0" / "playwright.ps1";
+            Console.WriteLine($"Looking for Playwright script at: {playwrightScript}");
+            
             if (File.Exists(playwrightScript))
             {
                 Console.WriteLine("Installing Playwright browsers...");
                 ProcessTasks.StartProcess("pwsh", $"{playwrightScript} install chromium").WaitForExit();
+            }
+            else
+            {
+                Console.WriteLine($"Playwright script not found at {playwrightScript}. Tests may fail without browsers installed.");
             }
 
             DotNetTest(s => s
