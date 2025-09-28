@@ -73,3 +73,8 @@ nunit-*.xml
 
 # Node.js dependencies
 node_modules/
+
+# Generated reports and test artifacts
+reports/
+playwright-report/
+test-results/
