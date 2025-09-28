@@ -50,6 +50,7 @@ public class Build : NukeBuild
 
     Target LintClientVerify => _ => _
         .Description("Verify client code formatting and style")
+        .DependsOn(InstallClientDependencies)
         .Executes(() =>
         {
             Console.WriteLine($"Running ESLint on {ClientDirectory}");
@@ -60,6 +61,7 @@ public class Build : NukeBuild
 
     Target LintClientFix => _ => _
         .Description("Fix client code formatting and style issues automatically")
+        .DependsOn(InstallClientDependencies)
         .Executes(() =>
         {
             Console.WriteLine($"Running ESLint fix on {ClientDirectory}");
@@ -109,6 +111,7 @@ public class Build : NukeBuild
 
     Target BuildClient => _ => _
         .Description("Build client (frontend)")
+        .DependsOn(InstallClientDependencies)
         .Executes(() =>
         {
             Console.WriteLine($"Building client in {ClientDirectory}");
@@ -148,6 +151,7 @@ public class Build : NukeBuild
 
     Target TestClient => _ => _
         .Description("Run client tests")
+        .DependsOn(InstallClientDependencies)
         .Executes(() =>
         {
             Console.WriteLine($"Running client tests in {ClientDirectory}");
@@ -208,8 +212,29 @@ public class Build : NukeBuild
             DotNetRun(s => s.SetProjectFile(ServerProject));
         });
 
+    Target InstallClientDependencies => _ => _
+        .Description("Install client dependencies if needed")
+        .Executes(() =>
+        {
+            var packageLock = ClientDirectory / "package-lock.json";
+            var nodeModules = ClientDirectory / "node_modules";
+            
+            if (!Directory.Exists(nodeModules) || 
+                (File.Exists(packageLock) && File.GetLastWriteTime(packageLock) > Directory.GetLastWriteTime(nodeModules)))
+            {
+                Console.WriteLine("Installing/updating client dependencies...");
+                NpmInstall(s => s
+                    .SetProcessWorkingDirectory(ClientDirectory));
+            }
+            else
+            {
+                Console.WriteLine("Client dependencies are up to date.");
+            }
+        });
+
     Target RunLocalClient => _ => _
         .Description("Run client locally")
+        .DependsOn(InstallClientDependencies)
         .Executes(() =>
         {
             Console.WriteLine($"Starting Vite dev server in {ClientDirectory}");
