@@ -44,6 +44,14 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install Husky and setup pre-commit hooks
+      - name: Install dependencies including Playwright
         run: |
           npm ci
+
+      - name: Install Playwright Chromium browser
+        run: |
+          npx playwright install chromium
+
+      - name: Verify Playwright installation
+        run: |
+          npx playwright --version
