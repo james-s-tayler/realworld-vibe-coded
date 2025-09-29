@@ -141,62 +141,29 @@ public class Build : NukeBuild
                 .Where(project => File.Exists(project))
                 .ToArray();
 
-            // Run tests for each project with unique result files
+            // Run tests for each project with TRX output only
             foreach (var testProject in testProjects)
             {
                 var projectName = Path.GetFileNameWithoutExtension(testProject);
                 var logFileName = $"{projectName}-results.trx";
-                var markdownFileName = $"{projectName}-testResults.md";
-                var absoluteMarkdownPath = markdownReportsDirectory / markdownFileName;
 
                 Console.WriteLine($"Running tests for {projectName}...");
                 DotNetTest(s => s
                     .SetProjectFile(testProject)
-                    .SetLoggers($"trx;LogFileName={logFileName}", $"liquid.md;logfilename={absoluteMarkdownPath}")
+                    .SetLoggers($"trx;LogFileName={logFileName}")
                     .SetResultsDirectory(TestResultsDirectory));
             }
 
-            // Combine all markdown reports into testResults.md
+            // Convert TRX files to markdown using our custom converter
             var combinedReportPath = markdownReportsDirectory / "testResults.md";
-            var individualReports = Directory.GetFiles(markdownReportsDirectory, "*-testResults.md");
+            var trxToMarkdownProject = RootDirectory / "Task" / "Runner" / "TrxToMarkdown" / "TrxToMarkdown.csproj";
+            
+            Console.WriteLine("Converting TRX files to markdown...");
+            DotNetRun(s => s
+                .SetProjectFile(trxToMarkdownProject)
+                .SetApplicationArguments($"\"{TestResultsDirectory}\" \"{combinedReportPath}\""));
 
-            if (individualReports.Length > 0)
-            {
-                using (var combinedWriter = File.CreateText(combinedReportPath))
-                {
-                    combinedWriter.WriteLine("# Combined Test Results");
-                    combinedWriter.WriteLine();
-
-                    foreach (var reportFile in individualReports)
-                    {
-                        var content = File.ReadAllText(reportFile);
-                        // Remove the BOM if present and adjust the header level
-                        content = content.TrimStart('\uFEFF');
-                        content = content.Replace("# Test Run", "## " + Path.GetFileNameWithoutExtension(reportFile).Replace("-testResults", ""));
-                        combinedWriter.WriteLine(content);
-                        combinedWriter.WriteLine();
-                        combinedWriter.WriteLine("---");
-                        combinedWriter.WriteLine();
-                    }
-                }
-                Console.WriteLine($"Combined test report created at: {combinedReportPath}");
-            }
-            else
-            {
-                // Create a fallback report if no individual reports were generated
-                using (var fallbackWriter = File.CreateText(combinedReportPath))
-                {
-                    fallbackWriter.WriteLine("# Test Results");
-                    fallbackWriter.WriteLine();
-                    fallbackWriter.WriteLine("⚠️ **Warning:** No markdown test reports were generated.");
-                    fallbackWriter.WriteLine();
-                    fallbackWriter.WriteLine("This might indicate an issue with the LiquidTestReports.Markdown logger.");
-                    fallbackWriter.WriteLine("Please check the test execution logs for more details.");
-                    fallbackWriter.WriteLine();
-                    fallbackWriter.WriteLine("Traditional TRX reports should still be available in the TestResults directory.");
-                }
-                Console.WriteLine($"Fallback test report created at: {combinedReportPath}");
-            }
+            Console.WriteLine($"Test report created at: {combinedReportPath}");
         });
 
     Target TestClient => _ => _

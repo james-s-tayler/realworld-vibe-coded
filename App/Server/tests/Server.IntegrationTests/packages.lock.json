@@ -8,16 +8,6 @@
         "resolved": "6.0.4",
         "contentHash": "lkhqpF8Pu2Y7IiN7OntbsTtdbpR1syMsm2F3IgX6ootA4ffRqWL5jF7XipHuZQTdVuWG/gVAAcf8mjk8Tz0xPg=="
       },
-      "LiquidTestReports.Markdown": {
-        "type": "Direct",
-        "requested": "[1.0.9, )",
-        "resolved": "1.0.9",
-        "contentHash": "8fHnajFIoc5UjG7zlcy2bZnDLRIkpOvzyKYWI6NPSELHqhO07IqNAVWdlRUVNa+fwFx64lM0X8ABjXaMIuKVoA==",
-        "dependencies": {
-          "LiquidTestReports.Core": "1.0.9",
-          "Microsoft.TestPlatform.ObjectModel": "16.6.1"
-        }
-      },
       "Microsoft.AspNetCore.Mvc.Testing": {
         "type": "Direct",
         "requested": "[9.0.6, )",
@@ -104,11 +94,6 @@
           "System.Management": "6.0.1"
         }
       },
-      "DotLiquid": {
-        "type": "Transitive",
-        "resolved": "2.0.333",
-        "contentHash": "JDbE5dvErMveKVZDw6TvEVbzPnX00DDaK9TJ3Zv/gxQ63IB59z5lkWYhH9XrXw2EPmzF6Sfqf4Lojnfs98TmSQ=="
-      },
       "EmptyFiles": {
         "type": "Transitive",
         "resolved": "4.4.0",
@@ -131,16 +116,6 @@
         "type": "Transitive",
         "resolved": "12.0.0",
         "contentHash": "8NVLxtMUXynRHJIX3Hn1ACovaqZIJASufXIIFkD0EUbcd5PmMsL1xUD5h548gCezJ5BzlITaR9CAMrGe29aWpA=="
-      },
-      "LiquidTestReports.Core": {
-        "type": "Transitive",
-        "resolved": "1.0.9",
-        "contentHash": "Y/ALQ4sMBLZLSSw+Fz0FIB3C+fSFrZffSXgHZhWsc2uVk92I4gWpk/u4397zcclcwzdf44uniOAVm3RtnxxnZA==",
-        "dependencies": {
-          "DotLiquid": "2.0.333",
-          "Microsoft.TestPlatform.ObjectModel": "16.6.1",
-          "System.ValueTuple": "4.5.0"
-        }
       },
       "MediatR.Contracts": {
         "type": "Transitive",
@@ -794,11 +769,6 @@
         "resolved": "4.5.4",
         "contentHash": "zteT+G8xuGu6mS+mzDzYXbzS7rd3K6Fjb9RiZlYlJPam2/hU7JCBZBVEcywNuR+oZ1ncTvc/cq0faRr3P01OVg=="
       },
-      "System.ValueTuple": {
-        "type": "Transitive",
-        "resolved": "4.5.0",
-        "contentHash": "okurQJO6NRE/apDIP23ajJ0hpiNmJ+f0BwOlB/cSqTLQlw5upkf+5+96+iG2Jw40G1fCVCyPz/FhIABUjMR+RQ=="
-      },
       "System.Windows.Extensions": {
         "type": "Transitive",
         "resolved": "6.0.0",
@@ -883,7 +853,6 @@
       "server.unittests": {
         "type": "Project",
         "dependencies": {
-          "LiquidTestReports.Markdown": "[1.0.9, )",
           "Microsoft.NET.Test.Sdk": "[17.14.1, )",
           "NSubstitute": "[5.3.0, )",
           "ReportGenerator": "[5.4.8, )",
