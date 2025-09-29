@@ -141,12 +141,12 @@ public static class TrxToMarkdownConverter
     public static string CombineMarkdownReports(IEnumerable<string> markdownContents, string title = "Combined Test Results")
     {
         var combined = new StringBuilder();
-        combined.AppendLine($"# {title}");
-        combined.AppendLine();
-
+        
         var contentsList = markdownContents.ToList();
         if (!contentsList.Any())
         {
+            combined.AppendLine($"# {title}");
+            combined.AppendLine();
             combined.AppendLine("⚠️ **Warning:** No test reports were found.");
             combined.AppendLine();
             return combined.ToString();
@@ -164,21 +164,24 @@ public static class TrxToMarkdownConverter
             var lines = content.Split('\n');
             foreach (var line in lines)
             {
-                if (line.StartsWith("**Total Tests:**"))
+                var trimmedLine = line.Trim();
+                if (trimmedLine.StartsWith("**Total Tests:**"))
                 {
                     // Parse line like: **Total Tests:** 18  
-                    var parts = line.Split(':');
+                    var parts = trimmedLine.Split(':');
                     if (parts.Length > 1)
                     {
                         var totalStr = parts[1].Trim().Split(' ')[0];
                         if (int.TryParse(totalStr, out var total))
+                        {
                             totalTests += total;
+                        }
                     }
                 }
-                else if (line.StartsWith("**Passed:**") && line.Contains("|"))
+                else if (trimmedLine.StartsWith("**Passed:**") && trimmedLine.Contains("|"))
                 {
                     // Parse line like: **Passed:** 18 | **Failed:** 0 | **Skipped:** 0
-                    var parts = line.Split('|');
+                    var parts = trimmedLine.Split('|');
                     if (parts.Length >= 1)
                     {
                         var passedPart = parts[0].Trim();
@@ -186,7 +189,9 @@ public static class TrxToMarkdownConverter
                         {
                             var passedStr = passedPart.Split(':')[1].Trim();
                             if (int.TryParse(passedStr, out var passed))
+                            {
                                 totalPassed += passed;
+                            }
                         }
                     }
                     if (parts.Length >= 2)
@@ -205,6 +210,10 @@ public static class TrxToMarkdownConverter
                 }
             }
         }
+
+        // Now build the combined report with corrected overall statistics
+        combined.AppendLine($"# {title}");
+        combined.AppendLine();
 
         // Overall summary
         var overallResult = overallPassed ? "✅ Passed" : "❌ Failed";

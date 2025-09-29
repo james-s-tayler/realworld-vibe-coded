@@ -157,7 +157,7 @@ public class Build : NukeBuild
             // Convert TRX files to markdown using our custom converter
             var combinedReportPath = markdownReportsDirectory / "testResults.md";
             var trxToMarkdownProject = RootDirectory / "Task" / "Runner" / "TrxToMarkdown" / "TrxToMarkdown.csproj";
-            
+
             Console.WriteLine("Converting TRX files to markdown...");
             DotNetRun(s => s
                 .SetProjectFile(trxToMarkdownProject)
