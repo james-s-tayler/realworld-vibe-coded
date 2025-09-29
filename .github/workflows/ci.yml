@@ -149,35 +149,12 @@ jobs:
           name: xunit-test-reports
           path: |
             TestResults/*.trx
+            Reports/Server/testResults.md
           retention-days: 30
 
-      - name: Parse test results and create PR comment
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
-
-            try {
-              const commentBody = parseMultipleXUnitReports('TestResults', context);
-
-              if (!commentBody) {
-                console.log('No comment body generated, skipping PR comment');
-                return;
-              }
-
-              // Always create a new comment for each test run
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: commentBody
-              });
-              console.log('Created new PR comment');
-
-            } catch (error) {
-              console.error('Error creating/updating PR comment:', error);
-            }
+      - name: Add test results to step summary
+        if: always()
+        run: cat $(find . -name Reports/Server/testResults.md) >> $GITHUB_STEP_SUMMARY
 
       - name: Fail job if tests failed
         if: steps.xunit_tests.outputs.exit_code != '0'

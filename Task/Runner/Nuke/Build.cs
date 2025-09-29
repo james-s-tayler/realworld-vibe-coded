@@ -128,6 +128,12 @@ public class Build : NukeBuild
                 Directory.Delete(TestResultsDirectory, true);
             Directory.CreateDirectory(TestResultsDirectory);
 
+            // Create Reports/Server directory for markdown reports
+            var markdownReportsDirectory = RootDirectory / "Reports" / "Server";
+            if (Directory.Exists(markdownReportsDirectory))
+                Directory.Delete(markdownReportsDirectory, true);
+            Directory.CreateDirectory(markdownReportsDirectory);
+
             // Get all test projects in the solution
             var testsDirectory = RootDirectory / "App" / "Server" / "tests";
             var testProjects = Directory.GetDirectories(testsDirectory)
@@ -140,12 +146,40 @@ public class Build : NukeBuild
             {
                 var projectName = Path.GetFileNameWithoutExtension(testProject);
                 var logFileName = $"{projectName}-results.trx";
+                var markdownFileName = $"{projectName}-testResults.md";
+                var absoluteMarkdownPath = markdownReportsDirectory / markdownFileName;
 
                 Console.WriteLine($"Running tests for {projectName}...");
                 DotNetTest(s => s
                     .SetProjectFile(testProject)
-                    .SetLoggers($"trx;LogFileName={logFileName}")
+                    .SetLoggers($"trx;LogFileName={logFileName}", $"liquid.md;logfilename={absoluteMarkdownPath}")
                     .SetResultsDirectory(TestResultsDirectory));
+            }
+
+            // Combine all markdown reports into testResults.md
+            var combinedReportPath = markdownReportsDirectory / "testResults.md";
+            var individualReports = Directory.GetFiles(markdownReportsDirectory, "*-testResults.md");
+            
+            if (individualReports.Length > 0)
+            {
+                using (var combinedWriter = File.CreateText(combinedReportPath))
+                {
+                    combinedWriter.WriteLine("# Combined Test Results");
+                    combinedWriter.WriteLine();
+                    
+                    foreach (var reportFile in individualReports)
+                    {
+                        var content = File.ReadAllText(reportFile);
+                        // Remove the BOM if present and adjust the header level
+                        content = content.TrimStart('\uFEFF');
+                        content = content.Replace("# Test Run", "## " + Path.GetFileNameWithoutExtension(reportFile).Replace("-testResults", ""));
+                        combinedWriter.WriteLine(content);
+                        combinedWriter.WriteLine();
+                        combinedWriter.WriteLine("---");
+                        combinedWriter.WriteLine();
+                    }
+                }
+                Console.WriteLine($"Combined test report created at: {combinedReportPath}");
             }
         });
 
