@@ -154,7 +154,12 @@ jobs:
 
       - name: Add test results to step summary
         if: always()
-        run: cat Reports/Server/testResults.md >> $GITHUB_STEP_SUMMARY
+        run: |
+          if [ -f "Reports/Server/testResults.md" ]; then
+            cat Reports/Server/testResults.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Test report not found at Reports/Server/testResults.md" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Fail job if tests failed
         if: steps.xunit_tests.outputs.exit_code != '0'

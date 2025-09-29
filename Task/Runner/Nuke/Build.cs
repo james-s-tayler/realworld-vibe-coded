@@ -181,6 +181,22 @@ public class Build : NukeBuild
                 }
                 Console.WriteLine($"Combined test report created at: {combinedReportPath}");
             }
+            else
+            {
+                // Create a fallback report if no individual reports were generated
+                using (var fallbackWriter = File.CreateText(combinedReportPath))
+                {
+                    fallbackWriter.WriteLine("# Test Results");
+                    fallbackWriter.WriteLine();
+                    fallbackWriter.WriteLine("⚠️ **Warning:** No markdown test reports were generated.");
+                    fallbackWriter.WriteLine();
+                    fallbackWriter.WriteLine("This might indicate an issue with the LiquidTestReports.Markdown logger.");
+                    fallbackWriter.WriteLine("Please check the test execution logs for more details.");
+                    fallbackWriter.WriteLine();
+                    fallbackWriter.WriteLine("Traditional TRX reports should still be available in the TestResults directory.");
+                }
+                Console.WriteLine($"Fallback test report created at: {combinedReportPath}");
+            }
         });
 
     Target TestClient => _ => _
