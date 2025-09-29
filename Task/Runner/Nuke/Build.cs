@@ -159,14 +159,14 @@ public class Build : NukeBuild
             // Combine all markdown reports into testResults.md
             var combinedReportPath = markdownReportsDirectory / "testResults.md";
             var individualReports = Directory.GetFiles(markdownReportsDirectory, "*-testResults.md");
-            
+
             if (individualReports.Length > 0)
             {
                 using (var combinedWriter = File.CreateText(combinedReportPath))
                 {
                     combinedWriter.WriteLine("# Combined Test Results");
                     combinedWriter.WriteLine();
-                    
+
                     foreach (var reportFile in individualReports)
                     {
                         var content = File.ReadAllText(reportFile);
