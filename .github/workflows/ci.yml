@@ -57,10 +57,6 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
-      - name: Explain skip
-        if: ${{ needs.changes.outputs.task_runner != 'true' }}
-        run: echo "No TaskRunner changes detected; skipping Nuke build checks."
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -86,10 +82,6 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
-      - name: Explain skip
-        if: ${{ needs.changes.outputs.server != 'true' }}
-        run: echo "No Server changes detected; skipping server build checks."
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -116,10 +108,6 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
-      - name: Explain skip
-        if: ${{ needs.changes.outputs.server != 'true' }}
-        run: echo "No Server changes detected; skipping server tests."
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -148,6 +136,7 @@ jobs:
         with:
           issue-number: ${{ github.event.number }}
           body-path: TestResults/report.md
+          edit-mode: replace
 
       - name: Comment coverage results on PR
         if: always() && github.event_name == 'pull_request'
@@ -155,6 +144,7 @@ jobs:
         with:
           issue-number: ${{ github.event.number }}
           body-path: TestResults/artifacts/coverage/SummaryGithub.md
+          edit-mode: replace
 
       - name: Fail job if tests failed
         if: steps.xunit_tests.outputs.exit_code != '0'
@@ -171,10 +161,6 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
-      - name: Explain skip
-        if: ${{ needs.changes.outputs.server != 'true' }}
-        run: echo "No Server changes detected; skipping server linting."
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -200,10 +186,6 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
-      - name: Explain skip
-        if: ${{ needs.changes.outputs.task_runner != 'true' }}
-        run: echo "No TaskRunner changes detected; skipping Nuke linting."
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -226,10 +208,6 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.client == 'true' }}
     steps:
-      - name: Explain skip
-        if: ${{ needs.changes.outputs.client != 'true' }}
-        run: echo "No Client changes detected; skipping client build checks."
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -252,10 +230,6 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.client == 'true' }}
     steps:
-      - name: Explain skip
-        if: ${{ needs.changes.outputs.client != 'true' }}
-        run: echo "No Client changes detected; skipping client tests."
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -278,10 +252,6 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.client == 'true' }}
     steps:
-      - name: Explain skip
-        if: ${{ needs.changes.outputs.client != 'true' }}
-        run: echo "No Client changes detected; skipping client linting."
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -307,10 +277,6 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
-      - name: Explain skip
-        if: ${{ needs.changes.outputs.server != 'true' && needs.changes.outputs.test_postman != 'true' }}
-        run: echo "No Server or Test changes detected; skipping Postman integration tests."
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -385,10 +351,6 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
-      - name: Explain skip
-        if: ${{ needs.changes.outputs.server != 'true' && needs.changes.outputs.client != 'true' && needs.changes.outputs.test_e2e != 'true' }}
-        run: echo "No App/Client, App/Server, or Test/e2e changes detected; skipping E2E tests."
-
       - name: Checkout
         uses: actions/checkout@v4
 
