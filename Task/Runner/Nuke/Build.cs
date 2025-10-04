@@ -8,7 +8,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 
-public class Build : NukeBuild
+public partial class Build : NukeBuild
 {
   // LiquidTestReports.Cli dotnet global tool isn't available as a built-in Nuke tool under Nuke.Common.Tools, so we resolve it manually
   private Tool Liquid => ToolResolver.GetPathTool("liquid");
@@ -26,7 +26,6 @@ public class Build : NukeBuild
   AbsolutePath ServerSolution => RootDirectory / "App" / "Server" / "Server.sln";
   AbsolutePath ServerProject => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "Server.Web.csproj";
   AbsolutePath ClientDirectory => RootDirectory / "App" / "Client";
-  AbsolutePath TestResultsDirectory => RootDirectory / "TestResults";
   AbsolutePath ReportsDirectory => RootDirectory / "Reports";
   AbsolutePath ReportsServerDirectory => ReportsDirectory / "Server";
   AbsolutePath ReportsServerResultsDirectory => ReportsServerDirectory / "Results";
@@ -275,7 +274,7 @@ public class Build : NukeBuild
         // Explicitly fail the target if Docker Compose failed
         if (exitCode != 0)
         {
-          Console.WriteLine($"Docker Compose exited with code: {exitCode}");
+          Console.WriteLine($"E2E tests failed with exit code: {exitCode}");
           throw new Exception($"E2E tests failed with exit code: {exitCode}");
         }
       });
@@ -286,36 +285,6 @@ public class Build : NukeBuild
       {
         DotNetRun(s => s.SetProjectFile(ServerProject));
       });
-
-  Target InstallClient => _ => _
-      .Description("Install client dependencies if needed")
-      .Executes(() =>
-      {
-        var packageLock = ClientDirectory / "package-lock.json";
-        var nodeModules = ClientDirectory / "node_modules";
-
-        if (!Directory.Exists(nodeModules) ||
-              (File.Exists(packageLock) && File.GetLastWriteTime(packageLock) > Directory.GetLastWriteTime(nodeModules)))
-        {
-          Console.WriteLine("Installing/updating client dependencies...");
-          NpmInstall(s => s
-                .SetProcessWorkingDirectory(ClientDirectory));
-        }
-        else
-        {
-          Console.WriteLine("Client dependencies are up to date.");
-        }
-      });
-
-  Target InstallGitHooks => _ => _
-    .Description("Install git hooks from .husky")
-    .Executes(() =>
-    {
-      NpmCi();
-      NpmRun(s => s
-        .SetProcessWorkingDirectory(RootDirectory)
-        .SetCommand("prepare"));
-    });
 
   Target RunLocalClient => _ => _
       .Description("Run client locally")
@@ -361,27 +330,5 @@ public class Build : NukeBuild
           File.Delete(DatabaseFile);
         }
         Console.WriteLine("Done.");
-      });
-
-  Target InstallDotnetToolLiquidReports => _ => _
-      .Description("Install LiquidTestReports.Cli as a global dotnet tool")
-      .Executes(() =>
-      {
-        try
-        {
-          Console.WriteLine("Updating LiquidTestReports.Cli global tool...");
-          DotNetToolUpdate(s => s
-                .SetPackageName("LiquidTestReports.Cli")
-                .SetGlobal(true)
-                .SetProcessAdditionalArguments("--prerelease"));
-        }
-        catch
-        {
-          Console.WriteLine("Tool not found. Installing LiquidTestReports.Cli globally...");
-          DotNetToolInstall(s => s
-                .SetPackageName("LiquidTestReports.Cli")
-                .SetGlobal(true)
-                .SetProcessAdditionalArguments("--prerelease"));
-        }
       });
 }
