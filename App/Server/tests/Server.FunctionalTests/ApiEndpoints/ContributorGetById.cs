@@ -8,7 +8,7 @@ namespace Server.FunctionalTests.ApiEndpoints;
 public class ContributorGetById(CustomWebApplicationFactory<Program> factory) : IClassFixture<CustomWebApplicationFactory<Program>>
 {
   private readonly HttpClient _client = factory.CreateClient();
-  
+
   [Fact]
   public async Task ReturnsSeedContributorGivenId1()
   {

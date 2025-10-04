@@ -18,7 +18,7 @@ public static class UserMappers
       user.Username,
       user.Bio,
       user.Image,
-      token +" broken test"
+      token + " broken test"
     );
   }
 }
