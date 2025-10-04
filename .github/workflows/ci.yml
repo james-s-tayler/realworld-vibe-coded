@@ -135,7 +135,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.number }}
-          body-path: TestResults/report.md
+          body-path: Reports/Server/Artifacts/Tests/Report.md
           edit-mode: replace
 
       - name: Comment coverage results on PR
@@ -143,7 +143,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.number }}
-          body-path: TestResults/artifacts/coverage/SummaryGithub.md
+          body-path: Reports/Server/Artifacts/Coverage/SummaryGithub.md
           edit-mode: replace
 
       - name: Fail job if tests failed
@@ -305,8 +305,8 @@ jobs:
         with:
           name: postman-test-reports
           path: |
-            reports/newman-report.json
-          retention-days: 30
+            Reports/Test/Postman/newman-report.json
+          retention-days: 7
 
       - name: Parse test results and create PR comment
         if: always() && github.event_name == 'pull_request'
@@ -316,7 +316,7 @@ jobs:
             const { parseNewmanReport } = require('./.github/scripts/newman-report-parser.js');
 
             try {
-              const commentBody = parseNewmanReport('reports/newman-report.json', context);
+              const commentBody = parseNewmanReport('Reports/Test/Postman/newman-report.json', context);
 
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');
@@ -379,8 +379,8 @@ jobs:
         with:
           name: e2e-test-reports
           path: |
-            Reports/e2e/*.trx
-          retention-days: 30
+            Reports/Test/e2e/*.trx
+          retention-days: 7
 
       - name: Upload E2E Test Traces
         uses: actions/upload-artifact@v4
@@ -388,8 +388,8 @@ jobs:
         with:
           name: e2e-test-traces
           path: |
-            Reports/e2e/traces/*.zip
-          retention-days: 30
+            Reports/Test/e2e/traces/*.zip
+          retention-days: 7
 
       - name: Parse test results and create PR comment
         if: always() && github.event_name == 'pull_request'
@@ -399,7 +399,7 @@ jobs:
             const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
 
             try {
-              const commentBody = parseMultipleXUnitReports('Reports/e2e', context, '(E2E)');
+              const commentBody = parseMultipleXUnitReports('Reports/Test/e2e', context, '(E2E)');
 
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');

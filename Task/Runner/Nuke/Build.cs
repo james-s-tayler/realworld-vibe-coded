@@ -27,7 +27,15 @@ public class Build : NukeBuild
   AbsolutePath ServerProject => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "Server.Web.csproj";
   AbsolutePath ClientDirectory => RootDirectory / "App" / "Client";
   AbsolutePath TestResultsDirectory => RootDirectory / "TestResults";
-  AbsolutePath ReportsDirectory => RootDirectory / "reports";
+  AbsolutePath ReportsDirectory => RootDirectory / "Reports";
+  AbsolutePath ReportsServerDirectory => ReportsDirectory / "Server";
+  AbsolutePath ReportsServerResultsDirectory => ReportsServerDirectory / "Results";
+  AbsolutePath ReportsServerArtifactsDirectory => ReportsServerDirectory / "Artifacts";
+  AbsolutePath ReportsTestDirectory => ReportsDirectory / "Test";
+  AbsolutePath ReportsTestE2eDirectory => ReportsTestDirectory / "e2e";
+  AbsolutePath ReportsTestPostmanDirectory => ReportsTestDirectory / "Postman";
+  
+  
   AbsolutePath DatabaseFile => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "database.sqlite";
 
   Target LintServerVerify => _ => _
@@ -126,12 +134,12 @@ public class Build : NukeBuild
       .DependsOn(InstallDotnetToolLiquidReports)
       .Executes(() =>
       {
-        if (Directory.Exists(TestResultsDirectory))
+        if (Directory.Exists(ReportsServerDirectory))
         {
-          Directory.Delete(TestResultsDirectory, true);
+          Directory.Delete(ReportsServerDirectory, true);
         }
 
-        Directory.CreateDirectory(TestResultsDirectory);
+        Directory.CreateDirectory(ReportsServerDirectory);
 
         // Get all test projects in the solution
         var testsDirectory = RootDirectory / "App" / "Server" / "tests";
@@ -155,7 +163,7 @@ public class Build : NukeBuild
             DotNetTest(s => s
                   .SetProjectFile(testProject)
                   .SetLoggers($"trx;LogFileName={logFileName}")
-                  .SetResultsDirectory(TestResultsDirectory)
+                  .SetResultsDirectory(ReportsServerResultsDirectory)
                   .AddProcessAdditionalArguments("--collect:\"XPlat Code Coverage\""));
           }
           catch (ProcessException)
@@ -164,15 +172,15 @@ public class Build : NukeBuild
           }
         }
 
-        var reportFile = TestResultsDirectory / "report.md";
+        var reportFile = ReportsServerArtifactsDirectory / "Tests" / "Report.md";
 
-        Liquid($"--inputs \"File=*.trx;Folder={TestResultsDirectory}\" --output-file {reportFile}");
+        Liquid($"--inputs \"File=*.trx;Folder={ReportsServerResultsDirectory}\" --output-file {reportFile}");
 
         ReportGenerator(s => s
-              .SetReports(TestResultsDirectory / "**" / "coverage.cobertura.xml")
-              .SetTargetDirectory(TestResultsDirectory / "artifacts" / "coverage")
+              .SetReports(ReportsServerResultsDirectory / "**" / "coverage.cobertura.xml")
+              .SetTargetDirectory(ReportsServerArtifactsDirectory / "Coverage")
               .SetReportTypes(ReportTypes.Html, ReportTypes.MarkdownSummaryGithub));
-
+        
         if (failures.Any())
         {
           var failedProjects = string.Join(", ", failures);
@@ -196,9 +204,9 @@ public class Build : NukeBuild
       .DependsOn(DbResetForce)
       .Executes(() =>
       {
-        if (Directory.Exists(ReportsDirectory))
-          Directory.Delete(ReportsDirectory, true);
-        Directory.CreateDirectory(ReportsDirectory);
+        if (Directory.Exists(ReportsTestPostmanDirectory))
+          Directory.Delete(ReportsTestPostmanDirectory, true);
+        Directory.CreateDirectory(ReportsTestPostmanDirectory);
 
         Console.WriteLine("Running Postman tests with Docker Compose...");
 
@@ -241,9 +249,9 @@ public class Build : NukeBuild
       .DependsOn(DbResetForce)
       .Executes(() =>
       {
-        if (Directory.Exists(ReportsDirectory))
-          Directory.Delete(ReportsDirectory, true);
-        Directory.CreateDirectory(ReportsDirectory);
+        if (Directory.Exists(ReportsTestE2eDirectory))
+          Directory.Delete(ReportsTestE2eDirectory, true);
+        Directory.CreateDirectory(ReportsTestE2eDirectory);
 
         Console.WriteLine("Running E2E tests with Docker Compose...");
 
