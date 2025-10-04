@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using FastEndpoints;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Server.Core.ContributorAggregate;
 

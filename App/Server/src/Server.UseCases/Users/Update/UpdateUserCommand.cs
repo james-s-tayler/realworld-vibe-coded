@@ -1,7 +1,4 @@
-﻿using Ardalis.Result;
-using Ardalis.SharedKernel;
-
-namespace Server.UseCases.Users.Update;
+﻿namespace Server.UseCases.Users.Update;
 
 public record UpdateUserCommand(
   int UserId,

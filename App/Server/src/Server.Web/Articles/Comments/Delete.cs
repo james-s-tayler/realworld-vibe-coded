@@ -1,6 +1,4 @@
-﻿using FastEndpoints;
-using MediatR;
-using Server.Core.Interfaces;
+﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles.Comments.Delete;
 
 namespace Server.Web.Articles.Comments;

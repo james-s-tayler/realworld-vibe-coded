@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Server.Core.UserAggregate;
+﻿using Server.Core.UserAggregate;
 
 namespace Server.Infrastructure.Data.Config;
 

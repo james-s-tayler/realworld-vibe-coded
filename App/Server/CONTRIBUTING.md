@@ -22,6 +22,17 @@ Mostly. But pretty much exclusively for non-maintainers. You'll need to fork the
 5. Make sure your code lints.
 6. Issue that pull request!
 
+## Code Quality Standards
+
+### Linting Rules
+
+The project enforces strict linting rules to maintain code quality:
+
+- **No Unused Usings**: All `using` directives must be necessary. Unused imports are treated as errors (IDE0005).
+- Run `./build.sh lint-server-fix` to automatically fix formatting and remove unused usings.
+- Run `./build.sh lint-server-verify` to check for linting issues without making changes.
+- The CI pipeline will fail if any linting issues are detected, including unused usings.
+
 - [Pull Request Check List](https://ardalis.com/github-pull-request-checklist/)
 - [Resync your fork with this upstream repo](https://ardalis.com/syncing-a-fork-of-a-github-repository-with-upstream/)
 

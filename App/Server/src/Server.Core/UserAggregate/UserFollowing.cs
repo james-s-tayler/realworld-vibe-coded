@@ -1,6 +1,4 @@
-﻿using Ardalis.SharedKernel;
-
-namespace Server.Core.UserAggregate;
+﻿namespace Server.Core.UserAggregate;
 
 public class UserFollowing : EntityBase
 {

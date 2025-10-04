@@ -1,6 +1,4 @@
-﻿using FastEndpoints;
-
-namespace Server.Web.Infrastructure;
+﻿namespace Server.Web.Infrastructure;
 
 /// <summary>
 /// Base endpoint class that provides standardized validation error handling

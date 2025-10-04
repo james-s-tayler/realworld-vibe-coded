@@ -1,7 +1,4 @@
-﻿using Ardalis.GuardClauses;
-using Ardalis.SharedKernel;
-
-namespace Server.Core.UserAggregate;
+﻿namespace Server.Core.UserAggregate;
 
 public class User : EntityBase, IAggregateRoot
 {

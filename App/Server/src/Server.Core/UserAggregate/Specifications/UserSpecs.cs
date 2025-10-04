@@ -1,6 +1,4 @@
-﻿using Ardalis.Specification;
-
-namespace Server.Core.UserAggregate;
+﻿namespace Server.Core.UserAggregate;
 
 public class UserByEmailSpec : Specification<User>
 {

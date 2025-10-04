@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace Server.Web.Articles;
+﻿namespace Server.Web.Articles;
 
 public static class QueryParameterValidator
 {

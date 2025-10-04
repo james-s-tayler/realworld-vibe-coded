@@ -1,6 +1,4 @@
-﻿using Server.UseCases.Articles;
-
-namespace Server.UseCases.Articles.Feed;
+﻿namespace Server.UseCases.Articles.Feed;
 
 public record GetFeedQuery(
   int UserId,
