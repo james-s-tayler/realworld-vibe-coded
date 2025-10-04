@@ -142,12 +142,19 @@ jobs:
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
         
-      - name: Comment results on PR
+      - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.number }}
           body-path: TestResults/report.md
+
+      - name: Comment coverage results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.number }}
+          body-path: TestResults/artifacts/coverage/SummaryGithub.md
 
       - name: Fail job if tests failed
         if: steps.xunit_tests.outputs.exit_code != '0'
