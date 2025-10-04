@@ -8,7 +8,7 @@ namespace Server.UseCases.Users;
 public static class UserMappers
 {
   /// <summary>
-  /// Maps User entity to UserDto with provided token.
+  /// Maps User entity to UserDto with provided token
   /// </summary>
   public static UserDto MapToDto(User user, string token)
   {

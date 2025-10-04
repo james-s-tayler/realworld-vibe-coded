@@ -87,6 +87,7 @@ Mark these job names as required in your branch protection settings:
 - `build-nuke` - Nuke build system validation  
 - `build-server` - Server application build
 - `test-server` - Server unit tests
+- `code-coverage-threshold` - Code coverage threshold validation
 - `lint-server-verify` - Server code linting
 - `lint-nuke-verify` - Nuke build script linting  
 - `test-server-postman` - Server integration tests
