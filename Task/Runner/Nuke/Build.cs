@@ -32,10 +32,10 @@ public class Build : NukeBuild
   AbsolutePath ReportsServerResultsDirectory => ReportsServerDirectory / "Results";
   AbsolutePath ReportsServerArtifactsDirectory => ReportsServerDirectory / "Artifacts";
   AbsolutePath ReportsTestDirectory => ReportsDirectory / "Test";
-  AbsolutePath ReportsTestE2eDirectory => ReportsTestDirectory / "e2e"; 
+  AbsolutePath ReportsTestE2eDirectory => ReportsTestDirectory / "e2e";
   AbsolutePath ReportsTestPostmanDirectory => ReportsTestDirectory / "Postman";
-  
-  
+
+
   AbsolutePath DatabaseFile => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "database.sqlite";
 
   Target LintServerVerify => _ => _
@@ -180,7 +180,7 @@ public class Build : NukeBuild
               .SetReports(ReportsServerResultsDirectory / "**" / "coverage.cobertura.xml")
               .SetTargetDirectory(ReportsServerArtifactsDirectory / "Coverage")
               .SetReportTypes(ReportTypes.Html, ReportTypes.MarkdownSummaryGithub));
-        
+
         if (failures.Any())
         {
           var failedProjects = string.Join(", ", failures);
@@ -306,6 +306,16 @@ public class Build : NukeBuild
           Console.WriteLine("Client dependencies are up to date.");
         }
       });
+
+  Target InstallGitHooks => _ => _
+    .Description("Install git hooks from .husky")
+    .Executes(() =>
+    {
+      NpmCi();
+      NpmRun(s => s
+        .SetProcessWorkingDirectory(RootDirectory)
+        .SetCommand("prepare"));
+    });
 
   Target RunLocalClient => _ => _
       .Description("Run client locally")
