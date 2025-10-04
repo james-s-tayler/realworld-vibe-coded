@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
@@ -12,6 +13,9 @@ using static Nuke.Common.Tools.Npm.NpmTasks;
 
 public class Build : NukeBuild
 {
+    // LiquidTestReports.Cli dotnet global tool isn't available as a built-in Nuke tool under Nuke.Common.Tools, so we resolve it manually
+    private Tool Liquid => ToolResolver.GetPathTool("liquid");
+    
     public static int Main() => Execute<Build>();
 
     [Parameter("Postman folder to test")]
@@ -119,13 +123,17 @@ public class Build : NukeBuild
                 .SetProcessWorkingDirectory(ClientDirectory)
                 .SetCommand("build"));
         });
-
+    
     Target TestServer => _ => _
         .Description("Run backend tests")
+        .DependsOn(InstallDotnetToolLiquidReports)
         .Executes(() =>
         {
             if (Directory.Exists(TestResultsDirectory))
+            {
                 Directory.Delete(TestResultsDirectory, true);
+            }
+            
             Directory.CreateDirectory(TestResultsDirectory);
 
             // Get all test projects in the solution
@@ -147,6 +155,10 @@ public class Build : NukeBuild
                     .SetLoggers($"trx;LogFileName={logFileName}")
                     .SetResultsDirectory(TestResultsDirectory));
             }
+            
+            var reportFile = TestResultsDirectory / "report.md";
+
+            Liquid($"--inputs \"File=*.trx;Folder={TestResultsDirectory}\" --output-file {reportFile}");
         });
 
     Target TestClient => _ => _
@@ -312,5 +324,27 @@ public class Build : NukeBuild
                 File.Delete(DatabaseFile);
             }
             Console.WriteLine("Done.");
+        });
+
+    Target InstallDotnetToolLiquidReports => _ => _
+        .Description("Install LiquidTestReports.Cli as a global dotnet tool")
+        .Executes(() =>
+        {
+            try
+            {
+                Console.WriteLine("Updating LiquidTestReports.Cli global tool...");
+                DotNetToolUpdate(s => s
+                    .SetPackageName("LiquidTestReports.Cli")
+                    .SetGlobal(true)
+                    .SetProcessAdditionalArguments("--prerelease"));
+            }
+            catch
+            {
+                Console.WriteLine("Tool not found. Installing LiquidTestReports.Cli globally...");
+                DotNetToolInstall(s => s
+                    .SetPackageName("LiquidTestReports.Cli")
+                    .SetGlobal(true)
+                    .SetProcessAdditionalArguments("--prerelease"));
+            }
         });
 }
