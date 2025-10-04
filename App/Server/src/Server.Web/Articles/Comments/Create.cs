@@ -1,6 +1,4 @@
-﻿using FastEndpoints;
-using MediatR;
-using Server.Core.ArticleAggregate.Dtos;
+﻿using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.Interfaces;
 using Server.UseCases.Articles.Comments.Create;
 using Server.Web.Infrastructure;

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Server.Web.Users;
+﻿namespace Server.Web.Users;
 
 public class UpdateUserRequest
 {

@@ -1,6 +1,5 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications;
-using Server.Core.Interfaces;
 
 namespace Server.UseCases.Articles.Delete;
 

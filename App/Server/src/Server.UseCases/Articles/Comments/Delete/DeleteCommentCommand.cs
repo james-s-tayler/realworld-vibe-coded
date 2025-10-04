@@ -1,5 +1,4 @@
-﻿using Ardalis.Result;
-using MediatR;
+﻿using MediatR;
 
 namespace Server.UseCases.Articles.Comments.Delete;
 
