@@ -404,13 +404,22 @@ jobs:
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
 
+      - name: Comment test results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.number }}
+          body-path: Reports/Test/e2e/Artifacts/Tests/Report.md
+          edit-mode: replace
+
       - name: Upload E2E Test Reports
         uses: actions/upload-artifact@v4
         if: always()  # Upload even if tests failed
         with:
           name: e2e-test-reports
           path: |
-            Reports/Test/e2e/*.trx
+            Reports/Test/e2e/Artifacts
+            Reports/Test/e2e/Results
           retention-days: 7
 
       - name: Upload E2E Test Traces
@@ -421,34 +430,6 @@ jobs:
           path: |
             Reports/Test/e2e/traces/*.zip
           retention-days: 7
-
-      - name: Parse test results and create PR comment
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
-
-            try {
-              const commentBody = parseMultipleXUnitReports('Reports/Test/e2e', context, '(E2E)');
-
-              if (!commentBody) {
-                console.log('No comment body generated, skipping PR comment');
-                return;
-              }
-
-              // Always create a new comment for each test run
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: commentBody
-              });
-              console.log('Created new PR comment');
-
-            } catch (error) {
-              console.error('Error creating/updating PR comment:', error);
-            }
 
       - name: Fail job if tests failed
         if: steps.e2e_tests.outputs.exit_code != '0'
