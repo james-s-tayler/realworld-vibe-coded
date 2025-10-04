@@ -137,8 +137,30 @@ public partial class Build
       .DependsOn(InstallDotnetToolLiquidReports)
       .Executes(() =>
       {
-        if (Directory.Exists(ReportsTestE2eDirectory))
-          Directory.Delete(ReportsTestE2eDirectory, true);
+        // Clean up Results and Artifacts directories, but handle permission issues gracefully
+        // (Docker containers may create files with different ownership)
+        try
+        {
+          if (Directory.Exists(ReportsTestE2eResultsDirectory))
+            Directory.Delete(ReportsTestE2eResultsDirectory, true);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+          Console.WriteLine($"Warning: Could not delete Results directory due to permissions: {ex.Message}");
+          Console.WriteLine("You may need to manually delete files created by Docker containers.");
+        }
+
+        try
+        {
+          if (Directory.Exists(ReportsTestE2eArtifactsDirectory))
+            Directory.Delete(ReportsTestE2eArtifactsDirectory, true);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+          Console.WriteLine($"Warning: Could not delete Artifacts directory due to permissions: {ex.Message}");
+        }
+
+        // Ensure directories exist
         Directory.CreateDirectory(ReportsTestE2eDirectory);
         Directory.CreateDirectory(ReportsTestE2eResultsDirectory);
         Directory.CreateDirectory(ReportsTestE2eArtifactsDirectory);
