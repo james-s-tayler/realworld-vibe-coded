@@ -142,42 +142,9 @@ jobs:
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
 
-      - name: Upload xUnit Test Reports
-        uses: actions/upload-artifact@v4
-        if: always()  # Upload even if tests failed
-        with:
-          name: xunit-test-reports
-          path: |
-            TestResults/*.trx
-          retention-days: 30
-
-      - name: Parse test results and create PR comment
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { parseMultipleXUnitReports } = require('./.github/scripts/xunit-report-parser.js');
-
-            try {
-              const commentBody = parseMultipleXUnitReports('TestResults', context);
-
-              if (!commentBody) {
-                console.log('No comment body generated, skipping PR comment');
-                return;
-              }
-
-              // Always create a new comment for each test run
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: commentBody
-              });
-              console.log('Created new PR comment');
-
-            } catch (error) {
-              console.error('Error creating/updating PR comment:', error);
-            }
+      - name: Output the results to the actions jobsummary
+        if: always()
+        run: cat TestResults/report.md >> $GITHUB_STEP_SUMMARY
 
       - name: Fail job if tests failed
         if: steps.xunit_tests.outputs.exit_code != '0'
