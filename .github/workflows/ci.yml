@@ -145,6 +145,15 @@ jobs:
           issue-number: ${{ github.event.number }}
           body-path: Reports/Server/Artifacts/Coverage/SummaryGithub.md
           edit-mode: replace
+          
+      - name: Upload TestServer Reports
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: test-server-reports
+          path: |
+            Reports/Server/Artifacts
+          retention-days: 7
 
       - name: Fail job if tests failed
         if: steps.xunit_tests.outputs.exit_code != '0'
