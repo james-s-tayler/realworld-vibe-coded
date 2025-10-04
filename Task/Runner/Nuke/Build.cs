@@ -7,8 +7,11 @@ using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
+using Nuke.Common.Tools.Coverlet;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
+using Nuke.Common.Tools.ReportGenerator;
+using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 
@@ -126,7 +129,7 @@ public class Build : NukeBuild
         });
     
     Target TestServer => _ => _
-        .Description("Run backend tests")
+        .Description("Run backend tests and generate test and coverage reports")
         .DependsOn(InstallDotnetToolLiquidReports)
         .Executes(() =>
         {
@@ -159,7 +162,8 @@ public class Build : NukeBuild
                     DotNetTest(s => s
                         .SetProjectFile(testProject)
                         .SetLoggers($"trx;LogFileName={logFileName}")
-                        .SetResultsDirectory(TestResultsDirectory));
+                        .SetResultsDirectory(TestResultsDirectory)
+                        .AddProcessAdditionalArguments("--collect:\"XPlat Code Coverage\""));
                 }
                 catch (ProcessException)
                 {
@@ -170,6 +174,11 @@ public class Build : NukeBuild
             var reportFile = TestResultsDirectory / "report.md";
 
             Liquid($"--inputs \"File=*.trx;Folder={TestResultsDirectory}\" --output-file {reportFile}");
+            
+            ReportGenerator(s => s
+                .SetReports(TestResultsDirectory / "**" / "coverage.cobertura.xml")
+                .SetTargetDirectory(TestResultsDirectory / "artifacts" / "coverage")
+                .SetReportTypes(ReportTypes.Html, ReportTypes.MarkdownSummaryGithub));
             
             if (failures.Any())
             {
