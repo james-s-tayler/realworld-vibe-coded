@@ -1,7 +1,4 @@
-﻿using Ardalis.SharedKernel;
-using FastEndpoints;
-using Server.Core.ContributorAggregate;
-using Server.UseCases.Contributors.Create;
+﻿using FastEndpoints;
 
 namespace Server.UseCases.Contributors.List;
 

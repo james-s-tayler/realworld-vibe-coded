@@ -1,5 +1,4 @@
-﻿using FastEndpoints;
-using FluentValidation;
+﻿using FluentValidation;
 using Server.Infrastructure.Data.Config;
 
 namespace Server.Web.Contributors;

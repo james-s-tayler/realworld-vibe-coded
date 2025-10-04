@@ -1,5 +1,4 @@
-﻿using Ardalis.Result;
-using MediatR;
+﻿using MediatR;
 using Server.Core.ArticleAggregate.Dtos;
 
 namespace Server.UseCases.Articles.Comments.Create;

@@ -1,6 +1,4 @@
-﻿using Server.Core.ArticleAggregate;
-
-namespace Server.Core.ArticleAggregate.Specifications;
+﻿namespace Server.Core.ArticleAggregate.Specifications;
 
 public class ArticleSpec : Specification<Article>
 {

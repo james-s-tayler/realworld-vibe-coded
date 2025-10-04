@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Ardalis.SharedKernel;
-using MediatR;
 using Server.Core.ContributorAggregate;
 using Server.UseCases.Contributors.Create;
 

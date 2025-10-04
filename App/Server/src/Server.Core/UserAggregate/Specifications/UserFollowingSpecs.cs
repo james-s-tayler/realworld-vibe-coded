@@ -1,7 +1,4 @@
-﻿using Ardalis.Specification;
-using Server.Core.UserAggregate;
-
-namespace Server.Core.UserAggregate.Specifications;
+﻿namespace Server.Core.UserAggregate.Specifications;
 
 public class UserByUsernameWithFollowingSpec : Specification<User>
 {
