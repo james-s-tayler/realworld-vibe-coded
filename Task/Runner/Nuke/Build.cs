@@ -15,7 +15,7 @@ public class Build : NukeBuild
 {
     // LiquidTestReports.Cli dotnet global tool isn't available as a built-in Nuke tool under Nuke.Common.Tools, so we resolve it manually
     private Tool Liquid => ToolResolver.GetPathTool("liquid");
-    
+
     public static int Main() => Execute<Build>();
 
     [Parameter("Postman folder to test")]
@@ -123,7 +123,7 @@ public class Build : NukeBuild
                 .SetProcessWorkingDirectory(ClientDirectory)
                 .SetCommand("build"));
         });
-    
+
     Target TestServer => _ => _
         .Description("Run backend tests")
         .DependsOn(InstallDotnetToolLiquidReports)
@@ -133,7 +133,7 @@ public class Build : NukeBuild
             {
                 Directory.Delete(TestResultsDirectory, true);
             }
-            
+
             Directory.CreateDirectory(TestResultsDirectory);
 
             // Get all test projects in the solution
@@ -155,7 +155,7 @@ public class Build : NukeBuild
                     .SetLoggers($"trx;LogFileName={logFileName}")
                     .SetResultsDirectory(TestResultsDirectory));
             }
-            
+
             var reportFile = TestResultsDirectory / "report.md";
 
             Liquid($"--inputs \"File=*.trx;Folder={TestResultsDirectory}\" --output-file {reportFile}");
