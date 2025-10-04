@@ -11,7 +11,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "husky": "^9.1.7",
-    "playwright": "^1.55.1"
+    "husky": "^9.1.7"
   }
 }

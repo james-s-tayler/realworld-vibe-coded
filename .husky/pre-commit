@@ -15,9 +15,9 @@ task_runner_changes=$(echo "$staged_files" | grep "^Task/Runner/" | wc -l)
 
 # Run lint-server-fix if there are server changes
 if [ "$server_changes" -gt 0 ]; then
-  echo "🔧 Server changes detected, running lint-server-fix..."
-  if ! ./build.sh lint-server-fix; then
-    echo "❌ Server linting failed. Please fix the issues and try again."
+  echo "🔧 Server changes detected, running lint-server-verify..."
+  if ! ./build.sh lint-server-verify; then
+    echo "❌ Server linting failed. Run nuke LintServerFix to try and fix the issues."
     exit 1
   fi
   echo "✅ Server linting completed successfully."
@@ -25,9 +25,9 @@ fi
 
 # Run lint-client-fix if there are client changes
 if [ "$client_changes" -gt 0 ]; then
-  echo "🔧 Client changes detected, running lint-client-fix..."
-  if ! ./build.sh lint-client-fix; then
-    echo "❌ Client linting failed. Please fix the issues and try again."
+  echo "🔧 Client changes detected, running lint-client-verify..."
+  if ! ./build.sh lint-client-verify; then
+    echo "❌ Client linting failed. Run nuke LintClientFix to try and fix the issues."
     exit 1
   fi
   echo "✅ Client linting completed successfully."
@@ -35,9 +35,9 @@ fi
 
 # Run lint-nuke-fix if there are Task/Runner changes
 if [ "$task_runner_changes" -gt 0 ]; then
-  echo "🔧 Task/Runner changes detected, running lint-nuke-fix..."
-  if ! ./build.sh lint-nuke-fix; then
-    echo "❌ Nuke linting failed. Please fix the issues and try again."
+  echo "🔧 Task/Runner changes detected, running lint-nuke-verify..."
+  if ! ./build.sh lint-nuke-verify; then
+    echo "❌ Nuke linting failed. Run nuke LintNukeFix to try and fix the issues."
     exit 1
   fi
   echo "✅ Nuke linting completed successfully."

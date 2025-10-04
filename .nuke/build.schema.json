@@ -29,6 +29,8 @@
         "DbReset",
         "DbResetForce",
         "InstallClient",
+        "InstallDotnetToolLiquidReports",
+        "InstallGitHooks",
         "LintClientFix",
         "LintClientVerify",
         "LintNukeFix",
