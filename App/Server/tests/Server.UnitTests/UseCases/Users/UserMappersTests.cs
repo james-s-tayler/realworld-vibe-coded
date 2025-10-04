@@ -9,12 +9,6 @@ namespace Server.UnitTests.UseCases.Users;
 public class UserMappersTests
 {
   [Fact]
-  public void Fail()
-  {
-    Assert.True(false);
-  }
-  
-  [Fact]
   public void MapToDto_Should_Map_User_To_UserDto_With_Token()
   {
     // Arrange

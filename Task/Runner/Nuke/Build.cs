@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using Nuke.Common;
 using Nuke.Common.IO;
+using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
@@ -123,7 +124,7 @@ public class Build : NukeBuild
                 .SetProcessWorkingDirectory(ClientDirectory)
                 .SetCommand("build"));
         });
-
+    
     Target TestServer => _ => _
         .Description("Run backend tests")
         .DependsOn(InstallDotnetToolLiquidReports)
@@ -142,6 +143,8 @@ public class Build : NukeBuild
                 .Select(dir => (AbsolutePath)dir / $"{Path.GetFileName(dir)}.csproj")
                 .Where(project => File.Exists(project))
                 .ToArray();
+            
+            var failures = new List<string>();
 
             // Run tests for each project with unique result files
             foreach (var testProject in testProjects)
@@ -150,15 +153,29 @@ public class Build : NukeBuild
                 var logFileName = $"{projectName}-results.trx";
 
                 Console.WriteLine($"Running tests for {projectName}...");
-                DotNetTest(s => s
-                    .SetProjectFile(testProject)
-                    .SetLoggers($"trx;LogFileName={logFileName}")
-                    .SetResultsDirectory(TestResultsDirectory));
-            }
 
+                try
+                {
+                    DotNetTest(s => s
+                        .SetProjectFile(testProject)
+                        .SetLoggers($"trx;LogFileName={logFileName}")
+                        .SetResultsDirectory(TestResultsDirectory));
+                }
+                catch (ProcessException)
+                {
+                    failures.Add(testProject.Name);
+                }
+            }
+            
             var reportFile = TestResultsDirectory / "report.md";
 
             Liquid($"--inputs \"File=*.trx;Folder={TestResultsDirectory}\" --output-file {reportFile}");
+            
+            if (failures.Any())
+            {
+                var failedProjects = string.Join(", ", failures);
+                throw new Exception($"Some test projects failed: {failedProjects}");
+            }
         });
 
     Target TestClient => _ => _
