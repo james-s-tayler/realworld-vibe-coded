@@ -13,8 +13,6 @@ concurrency:
 
 permissions:
   contents: read
-  issues: read
-  checks: write
   pull-requests: write
 
 jobs:
@@ -150,13 +148,6 @@ jobs:
         with:
           issue-number: ${{ github.event.number }}
           body-path: TestResults/report.md
-          
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: (!cancelled())
-        with:
-          files: |
-            TestResults/*.trx
 
       - name: Fail job if tests failed
         if: steps.xunit_tests.outputs.exit_code != '0'
