@@ -32,7 +32,7 @@ public class Build : NukeBuild
   AbsolutePath ReportsServerResultsDirectory => ReportsServerDirectory / "Results";
   AbsolutePath ReportsServerArtifactsDirectory => ReportsServerDirectory / "Artifacts";
   AbsolutePath ReportsTestDirectory => ReportsDirectory / "Test";
-  AbsolutePath ReportsTestE2eDirectory => ReportsTestDirectory / "e2e";
+  AbsolutePath ReportsTestE2eDirectory => ReportsTestDirectory / "e2e"; 
   AbsolutePath ReportsTestPostmanDirectory => ReportsTestDirectory / "Postman";
   
   
