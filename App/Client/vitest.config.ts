@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
+import TrxReporter from 'vitest-trx-results-processor'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -8,9 +9,11 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    reporters: ['default', 'junit'],
-    outputFile: {
-      junit: '../../Reports/Client/Results/junit.xml',
-    },
+    reporters: [
+      'default',
+      new TrxReporter({
+        outputFile: '../../Reports/Client/Results/test-results.trx',
+      }),
+    ],
   },
 })

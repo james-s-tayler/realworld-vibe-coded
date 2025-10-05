@@ -78,6 +78,7 @@ public partial class Build
   Target TestClient => _ => _
       .Description("Run client tests")
       .DependsOn(InstallClient)
+      .DependsOn(InstallDotnetToolLiquidReports)
       .Executes(() =>
       {
         if (Directory.Exists(ReportsClientDirectory))
@@ -86,11 +87,38 @@ public partial class Build
         }
 
         Directory.CreateDirectory(ReportsClientResultsDirectory);
+        Directory.CreateDirectory(ReportsClientArtifactsDirectory);
 
         Console.WriteLine($"Running client tests in {ClientDirectory}");
-        NpmRun(s => s
-              .SetProcessWorkingDirectory(ClientDirectory)
-              .SetCommand("test:run"));
+
+        var testsFailed = false;
+        try
+        {
+          NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("test:run"));
+        }
+        catch (ProcessException)
+        {
+          testsFailed = true;
+        }
+
+        // Generate LiquidTestReport from TRX files
+        var reportFile = ReportsClientArtifactsDirectory / "Report.md";
+
+        try
+        {
+          Liquid($"--inputs \"File=*.trx;Folder={ReportsClientResultsDirectory}\" --output-file {reportFile} --title \"Client Tests\"");
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"Warning: Failed to generate LiquidTestReport: {ex.Message}");
+        }
+
+        if (testsFailed)
+        {
+          throw new Exception("Client tests failed");
+        }
       });
 
   Target TestServerPostman => _ => _
