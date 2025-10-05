@@ -64,7 +64,7 @@ public partial class Build
         Liquid($"--inputs \"File=*.trx;Folder={ReportsServerResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestServer)} Results\"");
 
         ReportGenerator(s => s
-              .SetReports(ReportsServerResultsDirectory / "**" / "coverage.cobertura.xml")
+              .SetReports(ReportsServerResultsDirectory / "*" / "coverage.cobertura.xml")
               .SetTargetDirectory(ReportsServerArtifactsDirectory / "Coverage")
               .SetReportTypes(ReportTypes.Html));
 
