@@ -49,44 +49,9 @@ Any complex JavaScript logic executed as part of a GitHub Actions step should be
 
 ## PR and Issue Comments
 
-### Principle: Always Create New Comments
+### Principle: Always Update Existing Comments If Possible
 
-Any comments made by a GitHub Actions step should always create a new comment and not update an existing one.
-
-**✅ Do:**
-- Always use `github.rest.issues.createComment()` to create fresh comments
-- Include timestamps or run identifiers in comments for traceability
-- Use footer text like "Generated on each test run" or "Created at ${new Date().toISOString()}"
-
-**❌ Don't:**
-- Search for existing comments to update them
-- Use `github.rest.issues.updateComment()` in workflows
-- Implement "idempotent" commenting that overwrites previous results
-
-### Example:
-
-**Bad:**
-```yaml
-script: |
-  const comments = await github.rest.issues.listComments({...});
-  const existingComment = comments.data.find(...);
-  if (existingComment) {
-    await github.rest.issues.updateComment({...});
-  } else {
-    await github.rest.issues.createComment({...});
-  }
-```
-
-**Good:**
-```yaml
-script: |
-  await github.rest.issues.createComment({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    issue_number: context.issue.number,
-    body: commentBody
-  });
-```
+Any comments made by a GitHub Actions step should always update an existing one if one exists, else create a new one.
 
 ## CI Status Check Naming
 
