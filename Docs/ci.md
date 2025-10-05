@@ -87,10 +87,14 @@ Mark these job names as required in your branch protection settings:
 - `build-nuke` - Nuke build system validation  
 - `build-server` - Server application build
 - `test-server` - Server unit tests
-- `code-coverage-threshold` - Code coverage threshold validation
+- `server-code-coverage-threshold` - Server code coverage threshold validation
 - `lint-server-verify` - Server code linting
 - `lint-nuke-verify` - Nuke build script linting  
 - `test-server-postman` - Server integration tests
+- `build-client` - Client application build
+- `test-client` - Client unit tests
+- `client-code-coverage-threshold` - Client code coverage threshold validation
+- `lint-client-verify` - Client code linting
 - `test-e2e` - End-to-end Playwright tests
 
 All jobs will appear in every PR's status checks, but will skip execution when their associated folders haven't changed.

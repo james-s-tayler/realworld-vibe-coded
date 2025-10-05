@@ -96,7 +96,8 @@ public partial class Build
         {
           NpmRun(s => s
                 .SetProcessWorkingDirectory(ClientDirectory)
-                .SetCommand("test:run"));
+                .SetCommand("test:run")
+                .SetArguments("--coverage"));
         }
         catch (ProcessException)
         {
