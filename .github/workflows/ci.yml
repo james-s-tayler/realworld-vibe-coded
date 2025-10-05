@@ -409,26 +409,16 @@ jobs:
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.number }}
-          body-path: Reports/Test/e2e/Artifacts/Tests/Report.md
+          body-path: Reports/Test/e2e/Artifacts/Report.md
           edit-mode: replace
 
       - name: Upload E2E Test Reports
         uses: actions/upload-artifact@v4
-        if: always()  # Upload even if tests failed
+        if: always()  # This should actually be failure(), but I will optimize later
         with:
           name: e2e-test-reports
           path: |
             Reports/Test/e2e/Artifacts
-            Reports/Test/e2e/Results
-          retention-days: 7
-
-      - name: Upload E2E Test Traces
-        uses: actions/upload-artifact@v4
-        if: always()  # Upload even if tests failed
-        with:
-          name: e2e-test-traces
-          path: |
-            Reports/Test/e2e/traces/*.zip
           retention-days: 7
 
       - name: Fail job if tests failed

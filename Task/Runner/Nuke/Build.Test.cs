@@ -137,18 +137,11 @@ public partial class Build
       .DependsOn(InstallDotnetToolLiquidReports)
       .Executes(() =>
       {
-        // would prefer to clean the entire ReportsTestE2eDirectory but Docker is writing Playwright trace files to
-        // a traces subfolder with root permissions, so they can't be deleted here. Instead, we just clean the results and artifacts folders.
-        if (Directory.Exists(ReportsTestE2eResultsDirectory))
+        if (Directory.Exists(ReportsTestE2eDirectory))
         {
-          Directory.Delete(ReportsTestE2eResultsDirectory, true);
+          Directory.Delete(ReportsTestE2eDirectory, true);
         }
         Directory.CreateDirectory(ReportsTestE2eResultsDirectory);
-
-        if (Directory.Exists(ReportsTestE2eArtifactsDirectory))
-        {
-          Directory.Delete(ReportsTestE2eArtifactsDirectory, true);
-        }
         Directory.CreateDirectory(ReportsTestE2eArtifactsDirectory);
 
         Console.WriteLine("Running E2E tests with Docker Compose...");
@@ -171,7 +164,7 @@ public partial class Build
         }
 
         // Generate LiquidTestReport from TRX files
-        var reportFile = ReportsTestE2eArtifactsDirectory / "Tests" / "Report.md";
+        var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
 
         try
         {

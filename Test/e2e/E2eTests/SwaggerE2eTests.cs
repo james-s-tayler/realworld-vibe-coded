@@ -66,13 +66,15 @@ public class SwaggerE2eTests : PageTest
         finally
         {
             // Use absolute path that matches Docker volume mount
-            var tracesDir = "/Reports/e2e/traces";
-            Directory.CreateDirectory(tracesDir);
+            if (!Directory.Exists(Constants.TracesDirectory))
+            {
+              Directory.CreateDirectory(Constants.TracesDirectory);
+            }
             
             // Stop tracing and save to file
             await Context.Tracing.StopAsync(new()
             {
-                Path = Path.Combine(tracesDir, $"swagger_test_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip")
+                Path = Path.Combine(Constants.TracesDirectory, $"swagger_test_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip")
             });
         }
     }

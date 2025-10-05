@@ -13,12 +13,9 @@ WORKDIR /tests
 # Copy the entire test project directory structure
 COPY E2eTests/ ./E2eTests/
 
-# Create directories for results
-RUN mkdir -p /Reports/e2e/Results /Reports/e2e/traces
-
 # Set environment variables for headless operation
 ENV CI=true
 ENV PLAYWRIGHT_HEADLESS=true
 
 # Set the entry point to run the tests (build and run in one step)
-ENTRYPOINT ["dotnet", "test", "./E2eTests/E2eTests.csproj", "-c", "Release", "--logger", "trx;LogFileName=e2e-results.trx", "--results-directory", "/Reports/e2e/Results", "--verbosity", "normal"]
+ENTRYPOINT ["dotnet", "test", "./E2eTests/E2eTests.csproj", "-c", "Release", "--logger", "trx;LogFileName=e2e-results.trx", "--results-directory", "/Reports/Test/e2e/Results", "--verbosity", "normal"]
