@@ -29,9 +29,10 @@ Mostly. But pretty much exclusively for non-maintainers. You'll need to fork the
 The project enforces strict linting rules to maintain code quality:
 
 - **No Unused Usings**: All `using` directives must be necessary. Unused imports are treated as errors (IDE0005).
-- Run `./build.sh lint-server-fix` to automatically fix formatting and remove unused usings.
+- **Curly Braces Required**: All `if`, `else`, `for`, `foreach`, `while`, and `do` statements must use curly braces, even for single-line blocks (IDE0011). This prevents ambiguous code and reduces the risk of errors when modifying code.
+- Run `./build.sh lint-server-fix` to automatically fix formatting, remove unused usings, and add missing curly braces.
 - Run `./build.sh lint-server-verify` to check for linting issues without making changes.
-- The CI pipeline will fail if any linting issues are detected, including unused usings.
+- The CI pipeline will fail if any linting issues are detected, including unused usings and missing curly braces.
 
 - [Pull Request Check List](https://ardalis.com/github-pull-request-checklist/)
 - [Resync your fork with this upstream repo](https://ardalis.com/syncing-a-fork-of-a-github-repository-with-upstream/)

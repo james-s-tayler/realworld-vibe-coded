@@ -45,9 +45,20 @@ public static class QueryParameterValidator
     }
 
     // Validate string parameters for empty values
-    if (tagParam == "") errors.Add("tag cannot be empty");
-    if (authorParam == "") errors.Add("author cannot be empty");
-    if (favoritedParam == "") errors.Add("favorited cannot be empty");
+    if (tagParam == "")
+    {
+      errors.Add("tag cannot be empty");
+    }
+
+    if (authorParam == "")
+    {
+      errors.Add("author cannot be empty");
+    }
+
+    if (favoritedParam == "")
+    {
+      errors.Add("favorited cannot be empty");
+    }
 
     return new ValidationResults.ValidationResult(
       !errors.Any(),

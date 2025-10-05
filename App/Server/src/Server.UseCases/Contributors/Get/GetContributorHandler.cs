@@ -13,7 +13,10 @@ public class GetContributorHandler(IReadRepository<Contributor> _repository)
   {
     var spec = new ContributorByIdSpec(request.ContributorId);
     var entity = await _repository.FirstOrDefaultAsync(spec, cancellationToken);
-    if (entity == null) return Result.NotFound();
+    if (entity == null)
+    {
+      return Result.NotFound();
+    }
 
     return ContributorMappers.MapToDto(entity);
   }
