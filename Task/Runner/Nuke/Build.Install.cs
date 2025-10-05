@@ -8,7 +8,7 @@ using static Nuke.Common.Tools.Npm.NpmTasks;
 public partial class Build
 {
   Target InstallClient => _ => _
-      .Description("Install client dependencies if needed")
+      .Description("Run npm ci")
       .Executes(() =>
       {
         var packageLock = ClientDirectory / "package-lock.json";
@@ -18,7 +18,7 @@ public partial class Build
               (File.Exists(packageLock) && File.GetLastWriteTime(packageLock) > Directory.GetLastWriteTime(nodeModules)))
         {
           Console.WriteLine("Installing/updating client dependencies...");
-          NpmInstall(s => s
+          NpmCi(s => s
                 .SetProcessWorkingDirectory(ClientDirectory));
         }
         else
