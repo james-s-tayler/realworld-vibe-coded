@@ -47,7 +47,9 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
+app.UseStaticFiles();
 await app.UseAppMiddlewareAndSeedDatabase();
+app.MapFallbackToFile("index.html");
 
 app.Run();
 
