@@ -32,6 +32,7 @@ build.cmd                 # Cross-platform build script (Windows)
 | Nuke Target | Description |
 |-------------|-------------|
 | `build-server` | Build the .NET backend |
+| `build-server-publish` | Publish backend for linux-x64 in Release configuration |
 | `build-client` | Build the frontend (placeholder) |
 | `test-server` | Run backend unit/integration tests |
 | `test-server-postman` | Run Postman API tests |
