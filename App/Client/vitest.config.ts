@@ -15,5 +15,10 @@ export default defineConfig({
         outputFile: '../../Reports/Client/Results/test-results.trx',
       }),
     ],
+    coverage: {
+      provider: 'v8',
+      reporter: ['cobertura', 'html', 'text'],
+      reportsDirectory: '../../Reports/Client/Results/coverage',
+    },
   },
 })
