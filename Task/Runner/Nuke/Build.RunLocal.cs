@@ -2,6 +2,7 @@
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
+using Serilog;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 
@@ -19,7 +20,7 @@ public partial class Build
     .DependsOn(InstallClient)
     .Executes(() =>
     {
-      Console.WriteLine($"Starting Vite dev server in {ClientDirectory}");
+      Log.Information($"Starting Vite dev server in {ClientDirectory}");
       NpmRun(s => s
         .SetProcessWorkingDirectory(ClientDirectory)
         .SetCommand("dev"));

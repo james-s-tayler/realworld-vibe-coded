@@ -86,13 +86,10 @@ public partial class Build
       .DependsOn(InstallDotnetToolLiquidReports)
       .Executes(() =>
       {
-        if (Directory.Exists(ReportsClientDirectory))
-        {
-          Directory.Delete(ReportsClientDirectory, true);
-        }
-
-        Directory.CreateDirectory(ReportsClientResultsDirectory);
-        Directory.CreateDirectory(ReportsClientArtifactsDirectory);
+        ReportsClientDirectory.CreateOrCleanDirectory();
+        // explicitly create these so that docker doesn't create them with root permissions making them hard to delete later
+        ReportsClientResultsDirectory.CreateOrCleanDirectory();
+        ReportsClientArtifactsDirectory.CreateOrCleanDirectory();
 
         Log.Information("Running client tests in {ClientDirectory}", ClientDirectory);
 
@@ -137,9 +134,7 @@ public partial class Build
       .DependsOn(DbResetForce)
       .Executes(() =>
       {
-        if (Directory.Exists(ReportsTestPostmanDirectory))
-          Directory.Delete(ReportsTestPostmanDirectory, true);
-        Directory.CreateDirectory(ReportsTestPostmanDirectory);
+        ReportsTestPostmanDirectory.CreateOrCleanDirectory();
 
         Log.Information("Running Postman tests with Docker Compose");
 
@@ -184,12 +179,10 @@ public partial class Build
       .DependsOn(InstallDotnetToolLiquidReports)
       .Executes(() =>
       {
-        if (Directory.Exists(ReportsTestE2eDirectory))
-        {
-          Directory.Delete(ReportsTestE2eDirectory, true);
-        }
-        Directory.CreateDirectory(ReportsTestE2eResultsDirectory);
-        Directory.CreateDirectory(ReportsTestE2eArtifactsDirectory);
+        ReportsTestE2eDirectory.CreateOrCleanDirectory();
+        // explicitly create these so that docker doesn't create them with root permissions making them hard to delete later
+        ReportsTestE2eResultsDirectory.CreateOrCleanDirectory();
+        ReportsTestE2eArtifactsDirectory.CreateOrCleanDirectory();
 
         Log.Information("Running E2E tests with Docker Compose");
 
