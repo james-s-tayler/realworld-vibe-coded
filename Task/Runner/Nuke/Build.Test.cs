@@ -80,6 +80,13 @@ public partial class Build
       .DependsOn(InstallClient)
       .Executes(() =>
       {
+        if (Directory.Exists(ReportsClientDirectory))
+        {
+          Directory.Delete(ReportsClientDirectory, true);
+        }
+
+        Directory.CreateDirectory(ReportsClientResultsDirectory);
+
         Console.WriteLine($"Running client tests in {ClientDirectory}");
         NpmRun(s => s
               .SetProcessWorkingDirectory(ClientDirectory)

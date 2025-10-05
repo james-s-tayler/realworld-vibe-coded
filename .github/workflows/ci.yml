@@ -275,7 +275,36 @@ jobs:
         run: cd App/Client && npm ci
 
       - name: Test (client)
-        run: ./build.sh test-client
+        id: vitest_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-client
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts and publish results
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always() && github.event_name == 'pull_request'
+        with:
+          files: Reports/Client/Results/junit.xml
+          check_name: Client Test Results
+          comment_title: Client Test Results
+
+      - name: Upload TestClient Reports
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: test-client-reports
+          path: |
+            Reports/Client/Results
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.vitest_tests.outputs.exit_code != '0'
+        run: |
+          echo "Client tests failed with exit code ${{ steps.vitest_tests.outputs.exit_code }}"
+          exit ${{ steps.vitest_tests.outputs.exit_code }}
 
   lint-client-verify:
     name: lint-client-verify
