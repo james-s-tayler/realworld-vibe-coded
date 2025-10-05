@@ -15,6 +15,14 @@ public partial class Build
   #region App/Client
 
   AbsolutePath ClientDirectory => RootDirectory / "App" / "Client";
+  AbsolutePath ClientDistDirectory => ClientDirectory / "dist";
+
+  #endregion
+
+  #region Publish
+
+  AbsolutePath PublishDirectory => RootDirectory / "publish";
+  AbsolutePath PublishWwwRootDirectory => PublishDirectory / "wwwroot";
 
   #endregion
 

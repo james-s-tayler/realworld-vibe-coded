@@ -96,6 +96,7 @@ Mark these job names as required in your branch protection settings:
 - `client-code-coverage-threshold` - Client code coverage threshold validation
 - `lint-client-verify` - Client code linting
 - `test-e2e` - End-to-end Playwright tests
+- `package` - Combines frontend and backend artifacts into deployment ZIP
 
 All jobs will appear in every PR's status checks, but will skip execution when their associated folders haven't changed.
 

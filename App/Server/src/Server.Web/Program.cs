@@ -2,7 +2,6 @@
 using Server.Web.Configurations;
 using Server.Web.Infrastructure;
 
-// setup server
 var builder = WebApplication.CreateBuilder(args);
 
 var logger = Log.Logger = new LoggerConfiguration()
@@ -47,7 +46,9 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
+app.UseStaticFiles();
 await app.UseAppMiddlewareAndSeedDatabase();
+app.MapFallbackToFile("index.html");
 
 app.Run();
 
