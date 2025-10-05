@@ -26,6 +26,7 @@
       "enum": [
         "BuildClient",
         "BuildServer",
+        "BuildServerPublish",
         "DbReset",
         "DbResetForce",
         "InstallClient",

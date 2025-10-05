@@ -14,6 +14,18 @@ public partial class Build
       DotNetBuild(s => s.SetProjectFile(ServerSolution));
     });
 
+  Target BuildServerPublish => _ => _
+    .Description("Publish backend for linux-x64 in Release configuration")
+    .Executes(() =>
+    {
+      Console.WriteLine($"Publishing server to {PublishDirectory}");
+      DotNetPublish(s => s
+        .SetProject(ServerProject)
+        .SetConfiguration("Release")
+        .SetRuntime("linux-x64")
+        .SetOutput(PublishDirectory));
+    });
+
   Target BuildClient => _ => _
     .Description("Build client (frontend)")
     .DependsOn(InstallClient)

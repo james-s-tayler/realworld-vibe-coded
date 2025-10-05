@@ -73,3 +73,6 @@ Reports/
 
 # Node.js dependencies
 node_modules/
+
+# Publish/package artifacts
+publish/
