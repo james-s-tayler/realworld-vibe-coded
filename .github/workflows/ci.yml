@@ -308,6 +308,46 @@ jobs:
           echo "Client tests failed with exit code ${{ steps.vitest_tests.outputs.exit_code }}"
           exit ${{ steps.vitest_tests.outputs.exit_code }}
 
+  client-code-coverage-threshold:
+    name: client-code-coverage-threshold
+    runs-on: ubuntu-latest
+    needs: [changes, test-client]
+    if: ${{ needs.changes.outputs.client == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download test-client-reports artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: test-client-reports
+          path: Reports/Client
+
+      - name: Client Code Coverage Summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: Reports/Client/Results/coverage/cobertura-coverage.xml
+          format: markdown
+          output: both
+          badge: true
+          fail_below_min: true
+          thresholds: '60 80'
+
+      - name: Add Coverage PR Comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const commentBody = fs.readFileSync('code-coverage-results.md', 'utf8');
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            });
+
   lint-client-verify:
     name: lint-client-verify
     runs-on: ubuntu-latest
