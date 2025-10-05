@@ -235,6 +235,14 @@ public partial class Build
   /// <summary>
   /// Extracts the summary section from a LiquidTestReport Report.md file.
   /// The summary is everything before the first "---" separator.
+  /// 
+  /// In the CI pipeline we output the full report to the job summary,
+  /// and we append the link to the full report to this ReportSummary.md.
+  /// That way the PR comment shows the high level pass/fail stats,
+  /// and allows developers to click through to the full report if needed.
+  ///
+  /// This is necessary since having the full report in the comment wont scale
+  /// and is likely to hit size limits on comments.
   /// </summary>
   private void ExtractReportSummary(AbsolutePath reportFile, AbsolutePath summaryFile)
   {
