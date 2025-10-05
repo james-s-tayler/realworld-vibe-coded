@@ -4,6 +4,7 @@ using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
 using Nuke.Common.Tools.ReportGenerator;
+using Serilog;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
@@ -43,7 +44,7 @@ public partial class Build
           var projectName = Path.GetFileNameWithoutExtension(testProject);
           var logFileName = $"{projectName}-results.trx";
 
-          Console.WriteLine($"Running tests for {projectName}...");
+          Log.Information("Running tests for {ProjectName}", projectName);
 
           try
           {
@@ -62,6 +63,10 @@ public partial class Build
         var reportFile = ReportsServerArtifactsDirectory / "Tests" / "Report.md";
 
         Liquid($"--inputs \"File=*.trx;Folder={ReportsServerResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestServer)} Results\"");
+
+        // Extract summary from Report.md (everything before first "---")
+        var reportSummaryFile = ReportsServerArtifactsDirectory / "Tests" / "ReportSummary.md";
+        ExtractReportSummary(reportFile, reportSummaryFile);
 
         ReportGenerator(s => s
               .SetReports(ReportsServerResultsDirectory / "**" / "coverage.cobertura.xml")
@@ -89,7 +94,7 @@ public partial class Build
         Directory.CreateDirectory(ReportsClientResultsDirectory);
         Directory.CreateDirectory(ReportsClientArtifactsDirectory);
 
-        Console.WriteLine($"Running client tests in {ClientDirectory}");
+        Log.Information("Running client tests in {ClientDirectory}", ClientDirectory);
 
         var testsFailed = false;
         try
@@ -110,10 +115,14 @@ public partial class Build
         try
         {
           Liquid($"--inputs \"File=*.trx;Folder={ReportsClientResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestClient)} Results\"");
+
+          // Extract summary from Report.md (everything before first "---")
+          var reportSummaryFile = ReportsClientArtifactsDirectory / "ReportSummary.md";
+          ExtractReportSummary(reportFile, reportSummaryFile);
         }
         catch (Exception ex)
         {
-          Console.WriteLine($"Warning: Failed to generate LiquidTestReport: {ex.Message}");
+          Log.Warning("Failed to generate LiquidTestReport: {Message}", ex.Message);
         }
 
         if (testsFailed)
@@ -131,13 +140,13 @@ public partial class Build
           Directory.Delete(ReportsTestPostmanDirectory, true);
         Directory.CreateDirectory(ReportsTestPostmanDirectory);
 
-        Console.WriteLine("Running Postman tests with Docker Compose...");
+        Log.Information("Running Postman tests with Docker Compose");
 
         var envVars = new Dictionary<string, string>();
         if (!string.IsNullOrEmpty(Folder))
         {
           envVars["FOLDER"] = Folder;
-          Console.WriteLine($"Setting FOLDER environment variable to: {Folder}");
+          Log.Information("Setting FOLDER environment variable to: {Folder}", Folder);
         }
 
         int exitCode = 0;
@@ -162,7 +171,7 @@ public partial class Build
         // Explicitly fail the target if Docker Compose failed
         if (exitCode != 0)
         {
-          Console.WriteLine($"Docker Compose exited with code: {exitCode}");
+          Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
           throw new Exception($"Postman tests failed with exit code: {exitCode}");
         }
       });
@@ -180,7 +189,7 @@ public partial class Build
         Directory.CreateDirectory(ReportsTestE2eResultsDirectory);
         Directory.CreateDirectory(ReportsTestE2eArtifactsDirectory);
 
-        Console.WriteLine("Running E2E tests with Docker Compose...");
+        Log.Information("Running E2E tests with Docker Compose");
 
         int exitCode = 0;
         try
@@ -205,17 +214,57 @@ public partial class Build
         try
         {
           Liquid($"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestE2e)} Results\"");
+
+          // Extract summary from Report.md (everything before first "---")
+          var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";
+          ExtractReportSummary(reportFile, reportSummaryFile);
         }
         catch (Exception ex)
         {
-          Console.WriteLine($"Warning: Failed to generate LiquidTestReport: {ex.Message}");
+          Log.Warning("Failed to generate LiquidTestReport: {Message}", ex.Message);
         }
 
         // Explicitly fail the target if Docker Compose failed
         if (exitCode != 0)
         {
-          Console.WriteLine($"E2E tests failed with exit code: {exitCode}");
+          Log.Error("E2E tests failed with exit code: {ExitCode}", exitCode);
           throw new Exception($"E2E tests failed with exit code: {exitCode}");
         }
       });
+
+  /// <summary>
+  /// Extracts the summary section from a LiquidTestReport Report.md file.
+  /// The summary is everything before the first "---" separator.
+  /// 
+  /// In the CI pipeline we output the full report to the job summary,
+  /// and we append the link to the full report to this ReportSummary.md.
+  /// That way the PR comment shows the high level pass/fail stats,
+  /// and allows developers to click through to the full report if needed.
+  ///
+  /// This is necessary since having the full report in the comment wont scale
+  /// and is likely to hit size limits on comments.
+  /// </summary>
+  private void ExtractReportSummary(AbsolutePath reportFile, AbsolutePath summaryFile)
+  {
+    if (!File.Exists(reportFile))
+    {
+      Log.Warning("Report file not found: {ReportFile}", reportFile);
+      return;
+    }
+
+    var lines = File.ReadAllLines(reportFile);
+    var summaryLines = new List<string>();
+
+    foreach (var line in lines)
+    {
+      if (line.Trim() == "---")
+      {
+        break;
+      }
+      summaryLines.Add(line);
+    }
+
+    File.WriteAllLines(summaryFile, summaryLines);
+    Log.Information("Extracted report summary to: {SummaryFile}", summaryFile);
+  }
 }

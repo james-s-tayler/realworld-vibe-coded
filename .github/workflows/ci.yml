@@ -131,12 +131,23 @@ jobs:
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
 
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Server/Artifacts/Tests/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Append full report link to ReportSummary.md
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          echo "" >> Reports/Server/Artifacts/Tests/ReportSummary.md
+          echo "---" >> Reports/Server/Artifacts/Tests/ReportSummary.md
+          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Server/Artifacts/Tests/ReportSummary.md
+
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.number }}
-          body-path: Reports/Server/Artifacts/Tests/Report.md
+          body-path: Reports/Server/Artifacts/Tests/ReportSummary.md
           edit-mode: replace
 
       - name: Upload TestServer Reports
@@ -305,12 +316,23 @@ jobs:
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
 
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Client/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Append full report link to ReportSummary.md
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          echo "" >> Reports/Client/Artifacts/ReportSummary.md
+          echo "---" >> Reports/Client/Artifacts/ReportSummary.md
+          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Client/Artifacts/ReportSummary.md
+
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.number }}
-          body-path: Reports/Client/Artifacts/Report.md
+          body-path: Reports/Client/Artifacts/ReportSummary.md
           edit-mode: replace
 
       - name: Upload TestClient Reports
@@ -506,12 +528,23 @@ jobs:
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
 
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Append full report link to ReportSummary.md
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+          echo "---" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.number }}
-          body-path: Reports/Test/e2e/Artifacts/Report.md
+          body-path: Reports/Test/e2e/Artifacts/ReportSummary.md
           edit-mode: replace
 
       - name: Upload E2E Test Reports
