@@ -178,11 +178,29 @@ jobs:
           thresholds: '60 80'
 
       - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
         if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
         with:
-          recreate: true
-          path: code-coverage-results.md
+          script: |
+            const { wrapCoverageComment } = require('./.github/scripts/wrap-coverage-comment.js');
+
+            const commentBody = wrapCoverageComment(
+              'code-coverage-results.md',
+              'nuke TestServer Code Coverage',
+              context
+            );
+
+            if (!commentBody) {
+              console.log('No comment body generated, skipping PR comment');
+              return;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            });
 
   lint-server-verify:
     name: lint-server-verify
@@ -497,9 +515,9 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()  # This should actually be failure(), but I will optimize later
         with:
-          name: e2e-test-reports
+          name: test-e2e-reports
           path: |
-            Reports/Test/e2e/Artifacts
+            Reports/Test/e2e
           retention-days: 7
 
       - name: Fail job if tests failed
