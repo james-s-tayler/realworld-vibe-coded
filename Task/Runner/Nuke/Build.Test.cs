@@ -66,7 +66,7 @@ public partial class Build
         ReportGenerator(s => s
               .SetReports(ReportsServerResultsDirectory / "**" / "coverage.cobertura.xml")
               .SetTargetDirectory(ReportsServerArtifactsDirectory / "Coverage")
-              .SetReportTypes(ReportTypes.Html));
+              .SetReportTypes(ReportTypes.Html, ReportTypes.Cobertura));
 
         if (failures.Any())
         {

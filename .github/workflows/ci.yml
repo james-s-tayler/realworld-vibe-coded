@@ -173,7 +173,7 @@ jobs:
       - name: Server Code Coverage Summary
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: Reports/Server/Results/**/coverage.cobertura.xml
+          filename: Reports/Server/Artifacts/Coverage/Cobertura.xml
           format: markdown
           output: both
           badge: true
