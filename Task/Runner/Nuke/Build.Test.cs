@@ -137,6 +137,8 @@ public partial class Build
       .DependsOn(InstallDotnetToolLiquidReports)
       .Executes(() =>
       {
+        // would prefer to clean the entire ReportsTestE2eDirectory but Docker is writing Playwright trace files to
+        // a traces subfolder with root permissions, so they can't be deleted here. Instead, we just clean the results and artifacts folders.
         if (Directory.Exists(ReportsTestE2eResultsDirectory))
         {
           Directory.Delete(ReportsTestE2eResultsDirectory, true);
