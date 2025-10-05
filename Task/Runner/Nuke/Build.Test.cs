@@ -61,7 +61,7 @@ public partial class Build
 
         var reportFile = ReportsServerArtifactsDirectory / "Tests" / "Report.md";
 
-        Liquid($"--inputs \"File=*.trx;Folder={ReportsServerResultsDirectory}\" --output-file {reportFile}");
+        Liquid($"--inputs \"File=*.trx;Folder={ReportsServerResultsDirectory}\" --output-file {reportFile} --title \"{nameof(TestServer)}\"");
 
         ReportGenerator(s => s
               .SetReports(ReportsServerResultsDirectory / "**" / "coverage.cobertura.xml")
@@ -108,7 +108,7 @@ public partial class Build
 
         try
         {
-          Liquid($"--inputs \"File=*.trx;Folder={ReportsClientResultsDirectory}\" --output-file {reportFile} --title \"Client Tests\"");
+          Liquid($"--inputs \"File=*.trx;Folder={ReportsClientResultsDirectory}\" --output-file {reportFile} --title \"{nameof(TestClient)}\"");
         }
         catch (Exception ex)
         {
@@ -203,7 +203,7 @@ public partial class Build
 
         try
         {
-          Liquid($"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile}");
+          Liquid($"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"{nameof(TestE2e)}\"");
         }
         catch (Exception ex)
         {
