@@ -282,15 +282,15 @@ jobs:
           ./build.sh test-client
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
-          exit 0  # Always succeed so we can upload artifacts and publish results
+          exit 0  # Always succeed so we can upload artifacts and comment
 
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+      - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
         with:
-          files: Reports/Client/Results/junit.xml
-          check_name: Client Test Results
-          comment_title: Client Test Results
+          issue-number: ${{ github.event.number }}
+          body-path: Reports/Client/Artifacts/Report.md
+          edit-mode: replace
 
       - name: Upload TestClient Reports
         uses: actions/upload-artifact@v4
@@ -298,6 +298,7 @@ jobs:
         with:
           name: test-client-reports
           path: |
+            Reports/Client/Artifacts
             Reports/Client/Results
           retention-days: 7
 
