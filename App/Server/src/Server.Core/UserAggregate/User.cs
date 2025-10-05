@@ -66,7 +66,9 @@ public class User : EntityBase, IAggregateRoot
   public void Follow(User userToFollow)
   {
     if (Id == userToFollow.Id)
+    {
       throw new InvalidOperationException("Cannot follow yourself");
+    }
 
     if (!IsFollowing(userToFollow))
     {
