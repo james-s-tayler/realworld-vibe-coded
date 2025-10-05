@@ -1,24 +1,30 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
 import App from './App'
 
 describe('App', () => {
-  it('renders Vite and React logos', () => {
-    render(<App />)
-    
-    expect(screen.getByAltText('Vite logo')).toBeInTheDocument()
-    expect(screen.getByAltText('React logo')).toBeInTheDocument()
+  beforeEach(() => {
+    // Clear localStorage before each test
+    localStorage.clear()
   })
 
-  it('renders the main heading', () => {
+  it('renders the app without crashing', () => {
     render(<App />)
-    
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Vite + React')
+    expect(screen.getByText('Conduit')).toBeInTheDocument()
   })
 
-  it('renders the counter button', () => {
+  it('renders the homepage when no route is specified', async () => {
     render(<App />)
-    
-    expect(screen.getByRole('button', { name: /count is 0/i })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Welcome to Conduit')).toBeInTheDocument()
+    })
+  })
+
+  it('shows sign in and sign up buttons when not authenticated', async () => {
+    render(<App />)
+    await waitFor(() => {
+      expect(screen.getByText('Sign In')).toBeInTheDocument()
+      expect(screen.getByText('Sign Up')).toBeInTheDocument()
+    })
   })
 })
