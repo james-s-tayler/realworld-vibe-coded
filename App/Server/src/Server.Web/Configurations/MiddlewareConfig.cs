@@ -10,6 +10,7 @@ public static class MiddlewareConfig
     if (app.Environment.IsDevelopment())
     {
       app.UseShowAllServicesMiddleware(); // see https://github.com/ardalis/AspNetCoreStartupServices
+      app.UseCors("AllowLocalhost");
     }
     else
     {

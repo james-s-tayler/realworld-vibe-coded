@@ -16,6 +16,18 @@ public static class ServiceConfigs
     services.AddInfrastructureServices(builder.Configuration, logger)
             .AddMediatrConfigs();
 
+    // Configure CORS for local development
+    services.AddCors(options =>
+    {
+      options.AddPolicy("AllowLocalhost", policy =>
+      {
+        policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+      });
+    });
+
     // Configure JWT Authentication
     var jwtSettings = new JwtSettings();
     builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
