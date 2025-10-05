@@ -2,7 +2,6 @@
 using Server.Web.Configurations;
 using Server.Web.Infrastructure;
 
-// setup server
 var builder = WebApplication.CreateBuilder(args);
 
 var logger = Log.Logger = new LoggerConfiguration()
