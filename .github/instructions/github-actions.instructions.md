@@ -47,12 +47,6 @@ Any complex JavaScript logic executed as part of a GitHub Actions step should be
       const result = processData('data.json');
 ```
 
-## PR and Issue Comments
-
-### Principle: Always Update Existing Comments If Possible
-
-Any comments made by a GitHub Actions step should always update an existing one if one exists, else create a new one.
-
 ## CI Status Check Naming
 
 ### Principle: Match Kebab-Case NUKE Target Names
