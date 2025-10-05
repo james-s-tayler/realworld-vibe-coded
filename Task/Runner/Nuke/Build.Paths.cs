@@ -28,6 +28,9 @@ public partial class Build
   AbsolutePath ReportsServerDirectory => RootDirectory / "Reports" / "Server";
   AbsolutePath ReportsServerResultsDirectory => RootDirectory / "Reports" / "Server" / "Results";
   AbsolutePath ReportsServerArtifactsDirectory => RootDirectory / "Reports" / "Server" / "Artifacts";
+  AbsolutePath ReportsClientDirectory => RootDirectory / "Reports" / "Client";
+  AbsolutePath ReportsClientResultsDirectory => RootDirectory / "Reports" / "Client" / "Results";
+  AbsolutePath ReportsClientArtifactsDirectory => RootDirectory / "Reports" / "Client" / "Artifacts";
   AbsolutePath ReportsTestE2eDirectory => RootDirectory / "Reports" / "Test" / "e2e";
   AbsolutePath ReportsTestE2eResultsDirectory => RootDirectory / "Reports" / "Test" / "e2e" / "Results";
   AbsolutePath ReportsTestE2eArtifactsDirectory => RootDirectory / "Reports" / "Test" / "e2e" / "Artifacts";

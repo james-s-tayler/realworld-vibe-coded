@@ -13,6 +13,7 @@ concurrency:
 
 permissions:
   contents: read
+  checks: write
   pull-requests: write
 
 jobs:
@@ -275,7 +276,37 @@ jobs:
         run: cd App/Client && npm ci
 
       - name: Test (client)
-        run: ./build.sh test-client
+        id: vitest_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-client
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts and comment
+
+      - name: Comment test results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.number }}
+          body-path: Reports/Client/Artifacts/Report.md
+          edit-mode: replace
+
+      - name: Upload TestClient Reports
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: test-client-reports
+          path: |
+            Reports/Client/Artifacts
+            Reports/Client/Results
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.vitest_tests.outputs.exit_code != '0'
+        run: |
+          echo "Client tests failed with exit code ${{ steps.vitest_tests.outputs.exit_code }}"
+          exit ${{ steps.vitest_tests.outputs.exit_code }}
 
   lint-client-verify:
     name: lint-client-verify

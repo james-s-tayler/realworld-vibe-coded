@@ -61,7 +61,7 @@ public partial class Build
 
         var reportFile = ReportsServerArtifactsDirectory / "Tests" / "Report.md";
 
-        Liquid($"--inputs \"File=*.trx;Folder={ReportsServerResultsDirectory}\" --output-file {reportFile}");
+        Liquid($"--inputs \"File=*.trx;Folder={ReportsServerResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestServer)} Results\"");
 
         ReportGenerator(s => s
               .SetReports(ReportsServerResultsDirectory / "**" / "coverage.cobertura.xml")
@@ -78,12 +78,47 @@ public partial class Build
   Target TestClient => _ => _
       .Description("Run client tests")
       .DependsOn(InstallClient)
+      .DependsOn(InstallDotnetToolLiquidReports)
       .Executes(() =>
       {
+        if (Directory.Exists(ReportsClientDirectory))
+        {
+          Directory.Delete(ReportsClientDirectory, true);
+        }
+
+        Directory.CreateDirectory(ReportsClientResultsDirectory);
+        Directory.CreateDirectory(ReportsClientArtifactsDirectory);
+
         Console.WriteLine($"Running client tests in {ClientDirectory}");
-        NpmRun(s => s
-              .SetProcessWorkingDirectory(ClientDirectory)
-              .SetCommand("test:run"));
+
+        var testsFailed = false;
+        try
+        {
+          NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("test:run"));
+        }
+        catch (ProcessException)
+        {
+          testsFailed = true;
+        }
+
+        // Generate LiquidTestReport from TRX files
+        var reportFile = ReportsClientArtifactsDirectory / "Report.md";
+
+        try
+        {
+          Liquid($"--inputs \"File=*.trx;Folder={ReportsClientResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestClient)} Results\"");
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"Warning: Failed to generate LiquidTestReport: {ex.Message}");
+        }
+
+        if (testsFailed)
+        {
+          throw new Exception("Client tests failed");
+        }
       });
 
   Target TestServerPostman => _ => _
@@ -168,7 +203,7 @@ public partial class Build
 
         try
         {
-          Liquid($"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile}");
+          Liquid($"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestE2e)} Results\"");
         }
         catch (Exception ex)
         {
