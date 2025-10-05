@@ -13,7 +13,7 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<ContributorListR
 {
   public override void Configure()
   {
-    Get("/Contributors");
+    Get("/api/contributors");
     AllowAnonymous();
   }
 

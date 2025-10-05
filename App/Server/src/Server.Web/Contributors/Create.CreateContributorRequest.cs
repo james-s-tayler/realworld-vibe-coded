@@ -4,7 +4,7 @@ namespace Server.Web.Contributors;
 
 public class CreateContributorRequest
 {
-  public const string Route = "/Contributors";
+  public const string Route = "/api/contributors";
 
   [Required]
   public string? Name { get; set; }
