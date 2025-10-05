@@ -133,46 +133,22 @@ jobs:
 
       - name: Add full report to step summary
         if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { generateStepSummary } = require('./.github/scripts/liquid-report-summary.js');
-            const fs = require('fs');
-            
-            const stepSummary = generateStepSummary(
-              'Reports/Server/Artifacts/Tests/Report.md',
-              'nuke TestServer Results'
-            );
-            
-            if (stepSummary) {
-              await core.summary.addRaw(stepSummary).write();
-              console.log('Added full report to step summary');
-            }
+        run: cat Reports/Server/Artifacts/Tests/Report.md >> $GITHUB_STEP_SUMMARY
 
-      - name: Comment test results summary on PR
+      - name: Append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        run: |
+          echo "" >> Reports/Server/Artifacts/Tests/ReportSummary.md
+          echo "---" >> Reports/Server/Artifacts/Tests/ReportSummary.md
+          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Server/Artifacts/Tests/ReportSummary.md
+
+      - name: Comment test results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
         with:
-          script: |
-            const { parseLiquidReportSummary } = require('./.github/scripts/liquid-report-summary.js');
-            
-            const commentBody = parseLiquidReportSummary(
-              'Reports/Server/Artifacts/Tests/Report.md',
-              context,
-              'nuke TestServer Results'
-            );
-            
-            if (!commentBody) {
-              console.log('No comment body generated, skipping PR comment');
-              return;
-            }
-            
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: commentBody
-            });
+          issue-number: ${{ github.event.number }}
+          body-path: Reports/Server/Artifacts/Tests/ReportSummary.md
+          edit-mode: replace
 
       - name: Upload TestServer Reports
         uses: actions/upload-artifact@v4
@@ -342,46 +318,22 @@ jobs:
 
       - name: Add full report to step summary
         if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { generateStepSummary } = require('./.github/scripts/liquid-report-summary.js');
-            const fs = require('fs');
-            
-            const stepSummary = generateStepSummary(
-              'Reports/Client/Artifacts/Report.md',
-              'nuke TestClient Results'
-            );
-            
-            if (stepSummary) {
-              await core.summary.addRaw(stepSummary).write();
-              console.log('Added full report to step summary');
-            }
+        run: cat Reports/Client/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
 
-      - name: Comment test results summary on PR
+      - name: Append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        run: |
+          echo "" >> Reports/Client/Artifacts/ReportSummary.md
+          echo "---" >> Reports/Client/Artifacts/ReportSummary.md
+          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Client/Artifacts/ReportSummary.md
+
+      - name: Comment test results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
         with:
-          script: |
-            const { parseLiquidReportSummary } = require('./.github/scripts/liquid-report-summary.js');
-            
-            const commentBody = parseLiquidReportSummary(
-              'Reports/Client/Artifacts/Report.md',
-              context,
-              'nuke TestClient Results'
-            );
-            
-            if (!commentBody) {
-              console.log('No comment body generated, skipping PR comment');
-              return;
-            }
-            
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: commentBody
-            });
+          issue-number: ${{ github.event.number }}
+          body-path: Reports/Client/Artifacts/ReportSummary.md
+          edit-mode: replace
 
       - name: Upload TestClient Reports
         uses: actions/upload-artifact@v4
@@ -578,46 +530,22 @@ jobs:
 
       - name: Add full report to step summary
         if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { generateStepSummary } = require('./.github/scripts/liquid-report-summary.js');
-            const fs = require('fs');
-            
-            const stepSummary = generateStepSummary(
-              'Reports/Test/e2e/Artifacts/Report.md',
-              'nuke TestE2e Results'
-            );
-            
-            if (stepSummary) {
-              await core.summary.addRaw(stepSummary).write();
-              console.log('Added full report to step summary');
-            }
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
 
-      - name: Comment test results summary on PR
+      - name: Append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        run: |
+          echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+          echo "---" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+
+      - name: Comment test results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v5
         with:
-          script: |
-            const { parseLiquidReportSummary } = require('./.github/scripts/liquid-report-summary.js');
-            
-            const commentBody = parseLiquidReportSummary(
-              'Reports/Test/e2e/Artifacts/Report.md',
-              context,
-              'nuke TestE2e Results'
-            );
-            
-            if (!commentBody) {
-              console.log('No comment body generated, skipping PR comment');
-              return;
-            }
-            
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: commentBody
-            });
+          issue-number: ${{ github.event.number }}
+          body-path: Reports/Test/e2e/Artifacts/ReportSummary.md
+          edit-mode: replace
 
       - name: Upload E2E Test Reports
         uses: actions/upload-artifact@v4

@@ -63,6 +63,10 @@ public partial class Build
 
         Liquid($"--inputs \"File=*.trx;Folder={ReportsServerResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestServer)} Results\"");
 
+        // Extract summary from Report.md (everything before first "---")
+        var reportSummaryFile = ReportsServerArtifactsDirectory / "Tests" / "ReportSummary.md";
+        ExtractReportSummary(reportFile, reportSummaryFile);
+
         ReportGenerator(s => s
               .SetReports(ReportsServerResultsDirectory / "**" / "coverage.cobertura.xml")
               .SetTargetDirectory(ReportsServerArtifactsDirectory / "Coverage")
@@ -110,6 +114,10 @@ public partial class Build
         try
         {
           Liquid($"--inputs \"File=*.trx;Folder={ReportsClientResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestClient)} Results\"");
+
+          // Extract summary from Report.md (everything before first "---")
+          var reportSummaryFile = ReportsClientArtifactsDirectory / "ReportSummary.md";
+          ExtractReportSummary(reportFile, reportSummaryFile);
         }
         catch (Exception ex)
         {
@@ -205,6 +213,10 @@ public partial class Build
         try
         {
           Liquid($"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestE2e)} Results\"");
+
+          // Extract summary from Report.md (everything before first "---")
+          var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";
+          ExtractReportSummary(reportFile, reportSummaryFile);
         }
         catch (Exception ex)
         {
@@ -218,4 +230,32 @@ public partial class Build
           throw new Exception($"E2E tests failed with exit code: {exitCode}");
         }
       });
+
+  /// <summary>
+  /// Extracts the summary section from a LiquidTestReport Report.md file.
+  /// The summary is everything before the first "---" separator.
+  /// </summary>
+  private void ExtractReportSummary(AbsolutePath reportFile, AbsolutePath summaryFile)
+  {
+    if (!File.Exists(reportFile))
+    {
+      Console.WriteLine($"Warning: Report file not found: {reportFile}");
+      return;
+    }
+
+    var lines = File.ReadAllLines(reportFile);
+    var summaryLines = new List<string>();
+
+    foreach (var line in lines)
+    {
+      if (line.Trim() == "---")
+      {
+        break;
+      }
+      summaryLines.Add(line);
+    }
+
+    File.WriteAllLines(summaryFile, summaryLines);
+    Console.WriteLine($"Extracted report summary to: {summaryFile}");
+  }
 }
