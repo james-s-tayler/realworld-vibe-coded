@@ -16,6 +16,7 @@ public partial class Build
 
   Target BuildServerPublish => _ => _
     .Description("Publish backend for linux-x64 in Release configuration")
+    .DependsOn(BuildClient)
     .Executes(() =>
     {
       Console.WriteLine($"Publishing server to {PublishDirectory}");
@@ -24,6 +25,26 @@ public partial class Build
         .SetConfiguration("Release")
         .SetRuntime("linux-x64")
         .SetOutput(PublishDirectory));
+
+      // Copy client dist to publish/wwwroot
+      Console.WriteLine($"Copying client dist from {ClientDistDirectory} to {PublishWwwRootDirectory}");
+      if (Directory.Exists(PublishWwwRootDirectory))
+      {
+        Directory.Delete(PublishWwwRootDirectory, true);
+      }
+      Directory.CreateDirectory(PublishWwwRootDirectory);
+
+      foreach (var file in Directory.GetFiles(ClientDistDirectory, "*", SearchOption.AllDirectories))
+      {
+        var relativePath = Path.GetRelativePath(ClientDistDirectory, file);
+        var targetPath = Path.Combine(PublishWwwRootDirectory, relativePath);
+        var targetDir = Path.GetDirectoryName(targetPath);
+        if (targetDir != null && !Directory.Exists(targetDir))
+        {
+          Directory.CreateDirectory(targetDir);
+        }
+        File.Copy(file, targetPath, true);
+      }
     });
 
   Target BuildClient => _ => _

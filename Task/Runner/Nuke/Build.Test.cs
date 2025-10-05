@@ -133,6 +133,7 @@ public partial class Build
 
   Target TestServerPostman => _ => _
       .Description("Run postman tests using Docker Compose. Optionally specify a FOLDER parameter to run a specific Postman collection folder. E.g. FOLDER=Auth nuke TestServerPostman")
+      .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
       .Executes(() =>
       {
@@ -178,6 +179,7 @@ public partial class Build
 
   Target TestE2e => _ => _
       .Description("Run E2E Playwright tests using Docker Compose")
+      .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
       .DependsOn(InstallDotnetToolLiquidReports)
       .Executes(() =>
