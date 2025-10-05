@@ -282,9 +282,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: App/Client/package-lock.json
 
-      - name: Install dependencies
-        run: cd App/Client && npm ci
-
       - name: Build (client)
         run: ./build.sh build-client
 
@@ -303,9 +300,6 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: App/Client/package-lock.json
-
-      - name: Install dependencies
-        run: cd App/Client && npm ci
 
       - name: Test (client)
         id: vitest_tests
@@ -416,9 +410,6 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: App/Client/package-lock.json
-
-      - name: Install dependencies
-        run: cd App/Client && npm ci
 
       - name: Lint (client)
         run: ./build.sh lint-client-verify
@@ -587,9 +578,6 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: App/Client/package-lock.json
-
-      - name: Install client dependencies
-        run: cd App/Client && npm ci
 
       - name: Build and publish (server + client)
         run: ./build.sh build-server-publish

@@ -8,7 +8,7 @@ using static Nuke.Common.Tools.Npm.NpmTasks;
 public partial class Build
 {
   Target InstallClient => _ => _
-      .Description("Run npm ci")
+      .Description("Run npm ci if node_modules is missing or package-lock.json is newer")
       .Executes(() =>
       {
         var packageLock = ClientDirectory / "package-lock.json";
