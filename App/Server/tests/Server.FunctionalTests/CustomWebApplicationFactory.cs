@@ -1,4 +1,6 @@
-﻿using Server.Infrastructure.Data;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Server.Infrastructure.Data;
 
 namespace Server.FunctionalTests;
 
@@ -54,31 +56,54 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
     return host;
   }
 
+  private SqliteConnection? _connection;
+
   protected override void ConfigureWebHost(IWebHostBuilder builder)
   {
     builder
         .ConfigureServices(services =>
         {
-          // Configure test dependencies here
+          // Remove the app's ApplicationDbContext registration completely
+          var dbContextDescriptor = services.SingleOrDefault(
+              d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
+          if (dbContextDescriptor != null)
+          {
+            services.Remove(dbContextDescriptor);
+          }
 
-          //// Remove the app's ApplicationDbContext registration.
-          //var descriptor = services.SingleOrDefault(
-          //d => d.ServiceType ==
-          //    typeof(DbContextOptions<AppDbContext>));
+          // Remove the factory and other DbContext-related services
+          var toRemove = services.Where(d =>
+              d.ServiceType.ToString().Contains("AppDbContext") ||
+              d.ServiceType == typeof(DbContextOptions) ||
+              (d.ServiceType.IsGenericType &&
+               d.ServiceType.GetGenericTypeDefinition() == typeof(DbContextOptions<>)))
+              .ToList();
 
-          //if (descriptor != null)
-          //{
-          //  services.Remove(descriptor);
-          //}
+          foreach (var descriptor in toRemove)
+          {
+            services.Remove(descriptor);
+          }
 
-          //// This should be set for each individual test run
-          //string inMemoryCollectionName = Guid.NewGuid().ToString();
+          // Use SQLite in-memory database for functional tests
+          // Note: Cannot use EF Core InMemory provider due to raw SQL queries in the codebase
+          _connection = new SqliteConnection("DataSource=:memory:");
+          _connection.Open();
 
-          //// Add ApplicationDbContext using an in-memory database for testing.
-          //services.AddDbContext<AppDbContext>(options =>
-          //{
-          //  options.UseInMemoryDatabase(inMemoryCollectionName);
-          //});
+          services.AddDbContext<AppDbContext>((sp, options) =>
+          {
+            options.UseSqlite(_connection);
+            // Don't use internal service provider to avoid conflicts
+          }, ServiceLifetime.Scoped, ServiceLifetime.Scoped);
         });
+  }
+
+  protected override void Dispose(bool disposing)
+  {
+    if (disposing)
+    {
+      _connection?.Close();
+      _connection?.Dispose();
+    }
+    base.Dispose(disposing);
   }
 }
