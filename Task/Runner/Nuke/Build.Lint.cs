@@ -2,6 +2,7 @@
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
+using Serilog;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 
@@ -11,7 +12,7 @@ public partial class Build
       .Description("Verify backend formatting & analyzers (no changes). Fails if issues found")
       .Executes(() =>
       {
-        Console.WriteLine($"Running dotnet format (verify only) on {ServerSolution}");
+        Log.Information($"Running dotnet format (verify only) on {ServerSolution}");
         DotNetFormat(s => s
               .SetProject(ServerSolution)
               .SetVerifyNoChanges(true));
@@ -21,7 +22,7 @@ public partial class Build
       .Description("Fix backend formatting & analyzer issues automatically")
       .Executes(() =>
       {
-        Console.WriteLine($"Running dotnet format (fix mode) on {ServerSolution}");
+        Log.Information($"Running dotnet format (fix mode) on {ServerSolution}");
         DotNetFormat(s => s
               .SetProject(ServerSolution));
       });
@@ -31,7 +32,7 @@ public partial class Build
       .DependsOn(InstallClient)
       .Executes(() =>
       {
-        Console.WriteLine($"Running ESLint on {ClientDirectory}");
+        Log.Information($"Running ESLint on {ClientDirectory}");
         NpmRun(s => s
               .SetProcessWorkingDirectory(ClientDirectory)
               .SetCommand("lint"));
@@ -42,7 +43,7 @@ public partial class Build
       .DependsOn(InstallClient)
       .Executes(() =>
       {
-        Console.WriteLine($"Running ESLint fix on {ClientDirectory}");
+        Log.Information($"Running ESLint fix on {ClientDirectory}");
         NpmRun(s => s
               .SetProcessWorkingDirectory(ClientDirectory)
               .SetCommand("lint:fix"));
@@ -55,7 +56,7 @@ public partial class Build
         var nukeSolution = TaskRunnerDirectory / "Nuke.sln";
 
         // Run dotnet format on the Nuke solution (only check whitespace and style, not warnings)
-        Console.WriteLine($"Running dotnet format (verify only) on {nukeSolution}");
+        Log.Information($"Running dotnet format (verify only) on {nukeSolution}");
         DotNetFormat(s => s
               .SetProject(nukeSolution)
               .SetSeverity("error")
@@ -74,7 +75,7 @@ public partial class Build
         var nukeSolution = TaskRunnerDirectory / "Nuke.sln";
 
         // Run dotnet format on the Nuke solution to fix formatting issues
-        Console.WriteLine($"Running dotnet format (fix mode) on {nukeSolution}");
+        Log.Information($"Running dotnet format (fix mode) on {nukeSolution}");
         DotNetFormat(s => s
               .SetProject(nukeSolution)
               .SetSeverity("error"));

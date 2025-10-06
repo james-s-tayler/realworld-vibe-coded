@@ -2,13 +2,14 @@
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
+using Serilog;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 
 public partial class Build
 {
   Target InstallClient => _ => _
-      .Description("Install client dependencies if needed")
+      .Description("Run npm ci if node_modules is missing or package-lock.json is newer")
       .Executes(() =>
       {
         var packageLock = ClientDirectory / "package-lock.json";
@@ -17,13 +18,13 @@ public partial class Build
         if (!Directory.Exists(nodeModules) ||
               (File.Exists(packageLock) && File.GetLastWriteTime(packageLock) > Directory.GetLastWriteTime(nodeModules)))
         {
-          Console.WriteLine("Installing/updating client dependencies...");
-          NpmInstall(s => s
+          Log.Information("Installing/updating client dependencies...");
+          NpmCi(s => s
                 .SetProcessWorkingDirectory(ClientDirectory));
         }
         else
         {
-          Console.WriteLine("Client dependencies are up to date.");
+          Log.Information("Client dependencies are up to date.");
         }
       });
 
@@ -43,7 +44,7 @@ public partial class Build
       {
         try
         {
-          Console.WriteLine("Updating LiquidTestReports.Cli global tool...");
+          Log.Information("Updating LiquidTestReports.Cli global tool...");
           DotNetToolUpdate(s => s
                 .SetPackageName("LiquidTestReports.Cli")
                 .SetGlobal(true)
@@ -51,7 +52,7 @@ public partial class Build
         }
         catch
         {
-          Console.WriteLine("Tool not found. Installing LiquidTestReports.Cli globally...");
+          Log.Information("Tool not found. Installing LiquidTestReports.Cli globally...");
           DotNetToolInstall(s => s
                 .SetPackageName("LiquidTestReports.Cli")
                 .SetGlobal(true)

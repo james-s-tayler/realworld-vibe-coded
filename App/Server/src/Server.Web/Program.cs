@@ -2,6 +2,7 @@
 using Server.Web.Configurations;
 using Server.Web.Infrastructure;
 
+// setup app
 var builder = WebApplication.CreateBuilder(args);
 
 var logger = Log.Logger = new LoggerConfiguration()
@@ -48,7 +49,15 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 await app.UseAppMiddlewareAndSeedDatabase();
-app.MapFallbackToFile("index.html");
+
+// Only serve SPA fallback for non-API routes to prevent API 404s from returning index.html
+app.MapWhen(
+  context => !context.Request.Path.StartsWithSegments("/api"),
+  builder => builder.Run(async context =>
+  {
+    context.Response.ContentType = "text/html";
+    await context.Response.SendFileAsync(Path.Combine(app.Environment.WebRootPath, "index.html"));
+  }));
 
 app.Run();
 

@@ -1,8 +1,8 @@
 services:
   api:
     build:
-      context: ../../App/Server
-      dockerfile: Dockerfile
+      context: ../../
+      dockerfile: Test/e2e/Dockerfile.api
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:5000
