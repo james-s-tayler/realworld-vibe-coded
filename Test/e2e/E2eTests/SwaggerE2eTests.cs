@@ -34,8 +34,8 @@ public class SwaggerE2eTests : PageTest
 
         try
         {
-            // Use environment variable for URL if available (for Docker), otherwise use localhost
-            var baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
+            // Use environment variable for URL if available (for Docker), otherwise use localhost with HTTPS
+            var baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "https://localhost:5001";
             var swaggerUrl = $"{baseUrl}/swagger/index.html";
             
             // Navigate to Swagger docs
