@@ -5,12 +5,14 @@ services:
       dockerfile: Test/Postman/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:5000
+      ASPNETCORE_URLS: https://+:5001
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ""
       ConnectionStrings__SqliteConnection: "Data Source=database.sqlite"
     ports:
-      - "5000:5000"
+      - "5001:5001"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/swagger/index.html"]
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:5001/swagger/index.html"]
       interval: 5s
       timeout: 10s
       retries: 20
@@ -25,7 +27,7 @@ services:
       - ./:/etc/newman
       - ../../Reports/Test/Postman:/Reports/Test/Postman
     environment:
-      - APIURL=http://api:5000/api
+      - APIURL=https://api:5001/api
       - USERNAME=soloyolo
       - EMAIL=soloyolo@mail.com
       - PASSWORD=password123
@@ -33,7 +35,7 @@ services:
     entrypoint: >
       sh -c '
       if [ -n "$$FOLDER" ]; then
-        newman run /etc/newman/Conduit.postman_collection.json --folder "$$FOLDER" --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+        newman run /etc/newman/Conduit.postman_collection.json --folder "$$FOLDER" --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD" --insecure
       else
-        newman run /etc/newman/Conduit.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+        newman run /etc/newman/Conduit.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD" --insecure
       fi'

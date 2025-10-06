@@ -6,16 +6,24 @@ WORKDIR /app
 # Copy the published application
 COPY publish/ ./
 
-# Set environment variables to force HTTP only
+# Install openssl and curl
+RUN apt-get update && apt-get install -y openssl curl && rm -rf /var/lib/apt/lists/*
+
+# Copy certificate generation script
+COPY Test/Postman/generate-dev-cert.sh /app/generate-dev-cert.sh
+RUN chmod +x /app/generate-dev-cert.sh
+
+# Generate self-signed certificate
+RUN /app/generate-dev-cert.sh
+
+# Set environment variables for HTTPS
 ENV ASPNETCORE_ENVIRONMENT=Development
-ENV ASPNETCORE_URLS=http://+:5000
-ENV ASPNETCORE_HTTPS_PORT=
+ENV ASPNETCORE_URLS=https://+:5001
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=
 
-# Install curl for health checks
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-# Expose port
-EXPOSE 5000
+# Expose HTTPS port
+EXPOSE 5001
 
 # Run the published application
 ENTRYPOINT ["./Server.Web"]
