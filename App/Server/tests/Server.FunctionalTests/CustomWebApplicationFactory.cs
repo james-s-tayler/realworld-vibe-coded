@@ -29,8 +29,7 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
       var logger = scopedServices
           .GetRequiredService<ILogger<CustomWebApplicationFactory<TProgram>>>();
 
-      // Reset Sqlite database for each test run
-      // If using a real database, you'll likely want to remove this step.
+      // Reset database for each test run
       db.Database.EnsureDeleted();
 
       // Ensure the database is created.
