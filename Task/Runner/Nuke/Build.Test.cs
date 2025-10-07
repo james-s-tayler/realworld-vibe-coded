@@ -129,46 +129,89 @@ public partial class Build
       });
 
   Target TestServerPostman => _ => _
-      .Description("Run postman tests using Docker Compose. Optionally specify a FOLDER parameter to run a specific Postman collection folder. E.g. FOLDER=Auth nuke TestServerPostman")
-      .DependsOn(BuildServerPublish)
+      .Description("Run postman tests using Docker Compose with code coverage. Optionally specify a FOLDER parameter to run a specific Postman collection folder. E.g. FOLDER=Auth nuke TestServerPostman")
+      .DependsOn(BuildServer)
       .DependsOn(DbResetForce)
+      .DependsOn(InstallDotnetToolDotnetCoverage)
       .Executes(() =>
       {
         ReportsTestPostmanDirectory.CreateOrCleanDirectory();
+        ReportsTestPostmanResultsDirectory.CreateOrCleanDirectory();
+        ReportsTestPostmanArtifactsDirectory.CreateOrCleanDirectory();
 
-        Log.Information("Running Postman tests with Docker Compose");
+        Log.Information("Starting server with code coverage instrumentation");
 
-        var envVars = new Dictionary<string, string>();
-        if (!string.IsNullOrEmpty(Folder))
-        {
-          envVars["FOLDER"] = Folder;
-          Log.Information("Setting FOLDER environment variable to: {Folder}", Folder);
-        }
+        var coverageFile = ReportsTestPostmanResultsDirectory / "coverage.cobertura.xml";
+        var serverProcess = default(IProcess);
+        var testsFailed = false;
 
-        int exitCode = 0;
         try
         {
-          var args = "compose -f Test/Postman/docker-compose.yml up --build --abort-on-container-exit";
-          var process = ProcessTasks.StartProcess("docker", args,
+          // Start server with dotnet-coverage
+          var serverArgs = $"code coverage collect --output {coverageFile} --output-format cobertura --include-assembly Server.* -- run --no-build --project {ServerProject}";
+          serverProcess = ProcessTasks.StartProcess("dotnet-coverage", serverArgs,
                 workingDirectory: RootDirectory,
-                environmentVariables: envVars);
-          process.WaitForExit();
-          exitCode = process.ExitCode;
+                logOutput: true);
+
+          // Wait for server to be ready
+          Log.Information("Waiting for server to start...");
+          System.Threading.Thread.Sleep(10000); // Give server time to start
+
+          // Run Newman tests
+          Log.Information("Running Postman tests with Newman");
+          var newmanArgs = "run Test/Postman/Conduit.postman_collection.json " +
+                          "--delay-request 25 " +
+                          "--reporters cli,json " +
+                          $"--reporter-json-export {ReportsTestPostmanDirectory}/newman-report.json " +
+                          "--global-var \"APIURL=http://localhost:5000/api\" " +
+                          "--global-var \"USERNAME=soloyolo\" " +
+                          "--global-var \"EMAIL=soloyolo@mail.com\" " +
+                          "--global-var \"PASSWORD=password123\"";
+
+          if (!string.IsNullOrEmpty(Folder))
+          {
+            newmanArgs += $" --folder \"{Folder}\"";
+            Log.Information("Running only folder: {Folder}", Folder);
+          }
+
+          try
+          {
+            ProcessTasks.StartProcess("newman", newmanArgs,
+                  workingDirectory: RootDirectory).WaitForExit();
+          }
+          catch (ProcessException)
+          {
+            testsFailed = true;
+          }
         }
         finally
         {
-          var downArgs = "compose -f Test/Postman/docker-compose.yml down";
-          var downProcess = ProcessTasks.StartProcess("docker", downArgs,
-                workingDirectory: RootDirectory,
-                environmentVariables: envVars);
-          downProcess.WaitForExit();
+          // Stop the server gracefully
+          if (serverProcess != null)
+          {
+            Log.Information("Stopping server...");
+            serverProcess.Kill();
+            serverProcess.WaitForExit();
+          }
         }
 
-        // Explicitly fail the target if Docker Compose failed
-        if (exitCode != 0)
+        // Generate coverage report if coverage file exists
+        if (File.Exists(coverageFile))
         {
-          Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
-          throw new Exception($"Postman tests failed with exit code: {exitCode}");
+          Log.Information("Generating code coverage report");
+          ReportGenerator(s => s
+                .SetReports(coverageFile)
+                .SetTargetDirectory(ReportsTestPostmanArtifactsDirectory / "Coverage")
+                .SetReportTypes(ReportTypes.Html, ReportTypes.Cobertura));
+        }
+        else
+        {
+          Log.Warning("Code coverage file not found at: {CoverageFile}", coverageFile);
+        }
+
+        if (testsFailed)
+        {
+          throw new Exception("Postman tests failed");
         }
       });
 
