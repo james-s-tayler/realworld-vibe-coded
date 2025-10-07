@@ -148,14 +148,26 @@ public partial class Build
         try
         {
           // Start server with dotnet-coverage
-          var serverArgs = $"code coverage collect --output {coverageFile} --output-format cobertura --include-assembly Server.* -- run --no-build --project {ServerProject}";
+          var serverBinary = RootDirectory / "App" / "Server" / "src" / "Server.Web" / "bin" / "Debug" / "net9.0" / "Server.Web.dll";
+          var dotnetPath = ToolPathResolver.GetPathExecutable("dotnet");
+          var serverArgs = $"collect --output {coverageFile} --output-format cobertura -- {dotnetPath} exec {serverBinary}";
+
+          var serverEnvVars = new Dictionary<string, string>
+          {
+            ["ASPNETCORE_ENVIRONMENT"] = "Development",
+            ["ASPNETCORE_URLS"] = "http://localhost:5000",
+            ["ConnectionStrings__SqliteConnection"] = "Data Source=database.sqlite",
+            ["PATH"] = Environment.GetEnvironmentVariable("PATH") ?? "/usr/local/bin:/usr/bin:/bin"
+          };
+
           serverProcess = ProcessTasks.StartProcess("dotnet-coverage", serverArgs,
                 workingDirectory: RootDirectory,
+                environmentVariables: serverEnvVars,
                 logOutput: true);
 
           // Wait for server to be ready
           Log.Information("Waiting for server to start...");
-          System.Threading.Thread.Sleep(10000); // Give server time to start
+          System.Threading.Thread.Sleep(15000); // Give server time to start
 
           // Run Newman tests
           Log.Information("Running Postman tests with Newman");
