@@ -43,5 +43,7 @@ public partial class Build
   AbsolutePath ReportsTestE2eResultsDirectory => RootDirectory / "Reports" / "Test" / "e2e" / "Results";
   AbsolutePath ReportsTestE2eArtifactsDirectory => RootDirectory / "Reports" / "Test" / "e2e" / "Artifacts";
   AbsolutePath ReportsTestPostmanDirectory => RootDirectory / "Reports" / "Test" / "Postman";
+  AbsolutePath ReportsTestPostmanResultsDirectory => RootDirectory / "Reports" / "Test" / "Postman" / "Results";
+  AbsolutePath ReportsTestPostmanArtifactsDirectory => RootDirectory / "Reports" / "Test" / "Postman" / "Artifacts";
   #endregion
 }

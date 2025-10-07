@@ -135,6 +135,8 @@ public partial class Build
       .Executes(() =>
       {
         ReportsTestPostmanDirectory.CreateOrCleanDirectory();
+        ReportsTestPostmanResultsDirectory.CreateOrCleanDirectory();
+        ReportsTestPostmanArtifactsDirectory.CreateOrCleanDirectory();
 
         Log.Information("Running Postman tests with Docker Compose");
 
@@ -162,6 +164,21 @@ public partial class Build
                 workingDirectory: RootDirectory,
                 environmentVariables: envVars);
           downProcess.WaitForExit();
+        }
+
+        // Generate coverage report using ReportGenerator
+        var coverageFile = ReportsTestPostmanResultsDirectory / "coverage.cobertura.xml";
+        if (File.Exists(coverageFile))
+        {
+          Log.Information("Generating code coverage report");
+          ReportGenerator(s => s
+                .SetReports(coverageFile)
+                .SetTargetDirectory(ReportsTestPostmanArtifactsDirectory / "Coverage")
+                .SetReportTypes(ReportTypes.Html, ReportTypes.Cobertura));
+        }
+        else
+        {
+          Log.Warning("Coverage file not found at: {CoverageFile}", coverageFile);
         }
 
         // Explicitly fail the target if Docker Compose failed
