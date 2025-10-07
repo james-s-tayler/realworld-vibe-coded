@@ -4,8 +4,8 @@ using Server.Web.Contributors;
 
 namespace Server.FunctionalTests.ApiEndpoints;
 
-[Collection("Sequential")]
-public class ContributorGetById(CustomWebApplicationFactory<Program> factory) : IClassFixture<CustomWebApplicationFactory<Program>>
+[Collection("Functional Tests")]
+public class ContributorGetById(CustomWebApplicationFactory<Program> factory)
 {
   private readonly HttpClient _client = factory.CreateClient();
 

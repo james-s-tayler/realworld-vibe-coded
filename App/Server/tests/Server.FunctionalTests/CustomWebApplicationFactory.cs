@@ -1,11 +1,31 @@
-﻿using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
+using Testcontainers.MsSql;
 
 namespace Server.FunctionalTests;
 
-public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
+public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram>, IAsyncLifetime where TProgram : class
 {
+  private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder()
+    .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+    .WithPassword("YourStrong@Passw0rd")
+    .Build();
+
+  private bool _isInitialized = false;
+  private readonly SemaphoreSlim _initLock = new(1, 1);
+
+  public async Task InitializeAsync()
+  {
+    await _msSqlContainer.StartAsync();
+  }
+
+  public new async Task DisposeAsync()
+  {
+    await _msSqlContainer.StopAsync();
+    await _msSqlContainer.DisposeAsync();
+    _initLock.Dispose();
+  }
+
   /// <summary>
   /// Overriding CreateHost to avoid creating a separate ServiceProvider per this thread:
   /// https://github.com/dotnet-architecture/eShopOnWeb/issues/465
@@ -18,60 +38,66 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
     var host = builder.Build();
     host.Start();
 
-    // Get service provider.
-    var serviceProvider = host.Services;
-
-    // Create a scope to obtain a reference to the database
-    // context (AppDbContext).
-    using (var scope = serviceProvider.CreateScope())
+    // Initialize database only once across all test classes
+    _initLock.Wait();
+    try
     {
-      var scopedServices = scope.ServiceProvider;
-      var db = scopedServices.GetRequiredService<AppDbContext>();
-
-      var logger = scopedServices
-          .GetRequiredService<ILogger<CustomWebApplicationFactory<TProgram>>>();
-
-      // Reset database for each test run
-      db.Database.EnsureDeleted();
-
-      // Ensure the database is created.
-      db.Database.EnsureCreated();
-
-      try
+      if (!_isInitialized)
       {
-        // Can also skip creating the items
-        //if (!db.ToDoItems.Any())
-        //{
-        // Seed the database with test data.
-        SeedData.PopulateTestDataAsync(db).Wait();
-        //}
+        // Get service provider.
+        var serviceProvider = host.Services;
+
+        // Create a scope to obtain a reference to the database context (AppDbContext).
+        using (var scope = serviceProvider.CreateScope())
+        {
+          var scopedServices = scope.ServiceProvider;
+          var db = scopedServices.GetRequiredService<AppDbContext>();
+
+          var logger = scopedServices
+              .GetRequiredService<ILogger<CustomWebApplicationFactory<TProgram>>>();
+
+          // Ensure the database is created.
+          db.Database.EnsureCreated();
+
+          try
+          {
+            // Seed the database with test data.
+            SeedData.PopulateTestDataAsync(db).Wait();
+          }
+          catch (Exception ex)
+          {
+            logger.LogError(ex, "An error occurred seeding the " +
+                                "database with test messages. Error: {exceptionMessage}", ex.Message);
+          }
+        }
+
+        _isInitialized = true;
       }
-      catch (Exception ex)
-      {
-        logger.LogError(ex, "An error occurred seeding the " +
-                            "database with test messages. Error: {exceptionMessage}", ex.Message);
-      }
+    }
+    finally
+    {
+      _initLock.Release();
     }
 
     return host;
   }
-
-  private SqliteConnection? _connection;
 
   protected override void ConfigureWebHost(IWebHostBuilder builder)
   {
     builder
         .ConfigureServices(services =>
         {
-          // Remove the app's ApplicationDbContext registration completely
-          var dbContextDescriptor = services.SingleOrDefault(
-              d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-          if (dbContextDescriptor != null)
+          // Remove the app's ApplicationDbContext registration.
+          var descriptor = services.SingleOrDefault(
+          d => d.ServiceType ==
+              typeof(DbContextOptions<AppDbContext>));
+
+          if (descriptor != null)
           {
-            services.Remove(dbContextDescriptor);
+            services.Remove(descriptor);
           }
 
-          // Remove the factory and other DbContext-related services
+          // Remove other DbContext-related services to avoid conflicts
           var toRemove = services.Where(d =>
               d.ServiceType.ToString().Contains("AppDbContext") ||
               d.ServiceType == typeof(DbContextOptions) ||
@@ -79,31 +105,18 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
                d.ServiceType.GetGenericTypeDefinition() == typeof(DbContextOptions<>)))
               .ToList();
 
-          foreach (var descriptor in toRemove)
+          foreach (var desc in toRemove)
           {
-            services.Remove(descriptor);
+            services.Remove(desc);
           }
 
-          // Use SQLite in-memory database for functional tests
-          // Note: Cannot use EF Core InMemory provider due to raw SQL queries in the codebase
-          _connection = new SqliteConnection("DataSource=:memory:");
-          _connection.Open();
-
-          services.AddDbContext<AppDbContext>((sp, options) =>
+          // Add ApplicationDbContext using SQL Server from Testcontainers
+          // Add Database=TestDb to the connection string to avoid using master
+          var connectionString = _msSqlContainer.GetConnectionString() + ";Database=TestDb";
+          services.AddDbContext<AppDbContext>(options =>
           {
-            options.UseSqlite(_connection);
-            // Don't use internal service provider to avoid conflicts
-          }, ServiceLifetime.Scoped, ServiceLifetime.Scoped);
+            options.UseSqlServer(connectionString);
+          });
         });
-  }
-
-  protected override void Dispose(bool disposing)
-  {
-    if (disposing)
-    {
-      _connection?.Close();
-      _connection?.Dispose();
-    }
-    base.Dispose(disposing);
   }
 }
