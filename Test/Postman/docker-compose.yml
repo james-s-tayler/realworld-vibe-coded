@@ -10,23 +10,26 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ../../Reports/Test/Postman/Results:/coverage
+      # Share the dotnet diagnostic port directory with newman container
+      - diagnostics:/tmp
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/swagger/index.html"]
       interval: 5s
       timeout: 10s
       retries: 20
       start_period: 30s
-    stop_grace_period: 60s
     
   newman:
-    image: postman/newman:alpine
+    # Use .NET SDK image so we can install dotnet-coverage
+    image: mcr.microsoft.com/dotnet/sdk:9.0-alpine
     depends_on:
       api:
         condition: service_healthy
     volumes:
       - ./:/etc/newman
       - ../../Reports/Test/Postman:/Reports/Test/Postman
+      # Share the dotnet diagnostic port directory with API container
+      - diagnostics:/tmp
     environment:
       - APIURL=http://api:5000/api
       - USERNAME=soloyolo
@@ -35,8 +38,43 @@ services:
       - FOLDER=${FOLDER}
     entrypoint: >
       sh -c '
+      echo "Installing newman and dotnet-coverage..." &&
+      apk add --no-cache nodejs npm curl &&
+      npm install -g newman &&
+      dotnet tool install --global dotnet-coverage &&
+      export PATH="$$PATH:/root/.dotnet/tools" &&
+      
+      echo "Running Postman tests..." &&
       if [ -n "$$FOLDER" ]; then
         newman run /etc/newman/Conduit.postman_collection.json --folder "$$FOLDER" --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
       else
         newman run /etc/newman/Conduit.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
-      fi'
+      fi
+      
+      TEST_EXIT_CODE=$$?
+      
+      echo "Tests complete with exit code $$TEST_EXIT_CODE. Collecting coverage snapshot from server mode session..." &&
+      echo "Listing diagnostic sockets..." &&
+      ls -la /tmp/ &&
+      
+      echo "Taking coverage snapshot from session postman-api-coverage (while API is still running)..." &&
+      dotnet-coverage snapshot postman-api-coverage --output /tmp/coverage.coverage &&
+      echo "Coverage snapshot file size:" &&
+      ls -lh /tmp/coverage.coverage &&
+      
+      echo "Converting coverage file to Cobertura format..." &&
+      dotnet-coverage merge -o /Reports/Test/Postman/Results/coverage.cobertura.xml -f cobertura /tmp/coverage.coverage &&
+      
+      echo "Shutting down coverage session..." &&
+      dotnet-coverage shutdown postman-api-coverage || echo "Shutdown command failed or not needed" &&
+      
+      echo "Coverage collection complete" &&
+      ls -la /Reports/Test/Postman/Results/ &&
+      echo "Cobertura file content:" &&
+      cat /Reports/Test/Postman/Results/coverage.cobertura.xml | head -30 &&
+      
+      exit $$TEST_EXIT_CODE
+      '
+
+volumes:
+  diagnostics:
