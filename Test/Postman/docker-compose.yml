@@ -9,6 +9,8 @@ services:
       ConnectionStrings__SqliteConnection: "Data Source=database.sqlite"
     ports:
       - "5000:5000"
+    volumes:
+      - ../../Reports/Test/Postman/Results:/coverage
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/swagger/index.html"]
       interval: 5s

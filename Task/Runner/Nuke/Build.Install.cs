@@ -59,4 +59,24 @@ public partial class Build
                 .SetProcessAdditionalArguments("--prerelease"));
         }
       });
+
+  Target InstallDotnetToolCoverage => _ => _
+      .Description("Install dotnet-coverage as a global dotnet tool")
+      .Executes(() =>
+      {
+        try
+        {
+          Log.Information("Updating dotnet-coverage global tool...");
+          DotNetToolUpdate(s => s
+                .SetPackageName("dotnet-coverage")
+                .SetGlobal(true));
+        }
+        catch
+        {
+          Log.Information("Tool not found. Installing dotnet-coverage globally...");
+          DotNetToolInstall(s => s
+                .SetPackageName("dotnet-coverage")
+                .SetGlobal(true));
+        }
+      });
 }
