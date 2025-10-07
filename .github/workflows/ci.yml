@@ -451,7 +451,7 @@ jobs:
         with:
           name: postman-test-reports
           path: |
-            Reports/Test/Postman/newman-report.json
+            Reports/Test/Postman
           retention-days: 7
 
       - name: Parse test results and create PR comment
@@ -487,6 +487,56 @@ jobs:
         run: |
           echo "Postman tests failed with exit code ${{ steps.postman_tests.outputs.exit_code }}"
           exit ${{ steps.postman_tests.outputs.exit_code }}
+
+  postman-code-coverage-threshold:
+    name: postman-code-coverage-threshold
+    runs-on: ubuntu-latest
+    needs: [changes, test-server-postman]
+    if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.test_postman == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download postman-test-reports artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: postman-test-reports
+          path: Reports/Test/Postman
+
+      - name: Postman Code Coverage Summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: Reports/Test/Postman/Artifacts/Coverage/Cobertura.xml
+          format: markdown
+          output: both
+          badge: true
+          fail_below_min: true
+          thresholds: '60 80'
+
+      - name: Add Coverage PR Comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { wrapCoverageComment } = require('./.github/scripts/wrap-coverage-comment.js');
+
+            const commentBody = wrapCoverageComment(
+              'code-coverage-results.md',
+              'nuke TestServerPostman Code Coverage',
+              context
+            );
+
+            if (!commentBody) {
+              console.log('No comment body generated, skipping PR comment');
+              return;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            });
 
   test-e2e:
     name: test-e2e

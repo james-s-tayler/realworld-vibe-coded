@@ -91,6 +91,7 @@ Mark these job names as required in your branch protection settings:
 - `lint-server-verify` - Server code linting
 - `lint-nuke-verify` - Nuke build script linting  
 - `test-server-postman` - Server integration tests
+- `postman-code-coverage-threshold` - Postman integration tests code coverage threshold validation
 - `build-client` - Client application build
 - `test-client` - Client unit tests
 - `client-code-coverage-threshold` - Client code coverage threshold validation

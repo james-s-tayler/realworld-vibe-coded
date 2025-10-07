@@ -34,8 +34,8 @@ build.cmd                 # Cross-platform build script (Windows)
 | `build-server` | Build the .NET backend |
 | `build-server-publish` | Publish backend for linux-x64 in Release configuration |
 | `build-client` | Build the frontend (placeholder) |
-| `test-server` | Run backend unit/integration tests |
-| `test-server-postman` | Run Postman API tests |
+| `test-server` | Run backend unit/integration tests with code coverage |
+| `test-server-postman` | Run Postman API tests with code coverage |
 | `test-e2e` | Run E2E Playwright tests |
 | `lint-server-verify` | Verify backend formatting & analyzers (no changes). Fails if issues found |
 | `lint-server-fix` | Fix backend formatting & analyzer issues automatically |
