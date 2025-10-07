@@ -30,6 +30,7 @@
         "DbReset",
         "DbResetForce",
         "InstallClient",
+        "InstallDotnetToolCoverage",
         "InstallDotnetToolLiquidReports",
         "InstallGitHooks",
         "LintClientFix",
