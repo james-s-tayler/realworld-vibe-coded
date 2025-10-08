@@ -5,35 +5,74 @@ using Serilog;
 public partial class Build
 {
   Target DbMigrationsCheckUncommitted => _ => _
-    .Description("Check for uncommitted EF Core migrations in source control")
+    .Description("Check if entity model changes exist without corresponding migrations")
+    .DependsOn(BuildServer)
     .Executes(() =>
     {
-      Log.Information("Checking for uncommitted migrations in {MigrationsDirectory}", MigrationsDirectory);
+      Log.Information("Checking if pending model changes exist without migrations...");
 
-      // Get list of untracked and modified files in git
-      var gitStatusOutput = ProcessTasks.StartProcess("git",
-          "status --porcelain",
-          workingDirectory: RootDirectory)
-        .AssertZeroExitCode()
-        .Output;
+      // Try to add a migration to detect if there are uncommitted entity changes
+      var tempMigrationName = $"PendingChangesCheck_{DateTime.UtcNow:yyyyMMddHHmmss}";
+      var exitCode = 0;
+      var hasPendingChanges = false;
 
-      var uncommittedMigrationFiles = gitStatusOutput
-        .Where(o => o.Text.Contains("Migrations/") &&
-                    (o.Text.StartsWith("??") || o.Text.StartsWith(" M") || o.Text.StartsWith("A ")))
-        .Select(o => o.Text)
-        .ToList();
-
-      if (uncommittedMigrationFiles.Any())
+      try
       {
-        Log.Error("Found {Count} uncommitted migration file(s):", uncommittedMigrationFiles.Count);
-        foreach (var file in uncommittedMigrationFiles)
-        {
-          Log.Error("  {File}", file);
-        }
-        throw new Exception("Uncommitted migrations detected. Please commit all migrations to source control before proceeding.");
+        // Attempt to add a migration - if this succeeds, it means there are pending changes
+        var process = ProcessTasks.StartProcess("dotnet",
+          $"ef migrations add {tempMigrationName} --project \"{ServerInfrastructureProject}\" --startup-project \"{ServerProject}\" --no-build",
+          workingDirectory: RootDirectory,
+          logOutput: true,
+          logInvocation: true);
+
+        process.WaitForExit();
+        exitCode = process.ExitCode;
+      }
+      catch (Exception ex)
+      {
+        Log.Debug("Migration add failed: {Message}", ex.Message);
       }
 
-      Log.Information("✓ No uncommitted migrations found");
+      // Check if any migration files were created and if they contain actual operations
+      var migrationFiles = Directory.GetFiles(MigrationsDirectory, $"*{tempMigrationName}.cs")
+        .Where(f => !f.EndsWith(".Designer.cs"))
+        .ToList();
+
+      if (exitCode == 0 && migrationFiles.Any())
+      {
+        // Check if the migration has any actual operations
+        foreach (var migrationFile in migrationFiles)
+        {
+          var content = File.ReadAllText(migrationFile);
+
+          // Check if Up() method has any operations (more than just the empty method)
+          // Look for migrationBuilder calls which indicate actual operations
+          if (content.Contains("migrationBuilder."))
+          {
+            hasPendingChanges = true;
+            Log.Warning("Generated migration contains operations: {File}", Path.GetFileName(migrationFile));
+            break;
+          }
+        }
+      }
+
+      // Clean up any generated migration files
+      var allMigrationFiles = Directory.GetFiles(MigrationsDirectory, $"*{tempMigrationName}*");
+      foreach (var file in allMigrationFiles)
+      {
+        Log.Debug("Removing temporary migration file: {File}", Path.GetFileName(file));
+        File.Delete(file);
+      }
+
+      // If a migration with operations was created, it means there are pending changes
+      if (hasPendingChanges)
+      {
+        Log.Error("Entity model changes detected without corresponding migration!");
+        Log.Error("Please run 'dotnet ef migrations add <MigrationName>' and commit the generated migration files.");
+        throw new Exception("Uncommitted entity model changes detected. A migration needs to be created and committed.");
+      }
+
+      Log.Information("✓ No pending model changes without migrations");
     });
 
   Target DbMigrationsCheckDataLoss => _ => _
