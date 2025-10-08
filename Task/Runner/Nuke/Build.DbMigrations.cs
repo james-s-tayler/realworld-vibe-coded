@@ -147,102 +147,41 @@ public partial class Build
     .Description("Test EF Core migrations by applying them to a throwaway SQL Server database in Docker")
     .Executes(() =>
     {
-      Log.Information("Testing migrations against a throwaway SQL Server database");
+      Log.Information("Testing migrations against a throwaway SQL Server database using Docker Compose");
 
-      var containerName = "ef-migration-test-sqlserver";
-      var saPassword = "TestPassword123!";
-      var databaseName = "ConduitMigrationTest";
-      var connectionString = $"Server=localhost,1433;Database={databaseName};User Id=sa;Password={saPassword};TrustServerCertificate=True;";
+      var composeFile = RootDirectory / "Test" / "Migrations" / "docker-compose.yml";
 
+      int exitCode = 0;
       try
       {
-        // Clean up any existing container
-        Log.Information("Cleaning up any existing test container...");
-        ProcessTasks.StartProcess("docker", $"rm -f {containerName}",
-          workingDirectory: RootDirectory,
-          logOutput: false,
-          logInvocation: false);
-
-        // Start SQL Server container
-        Log.Information("Starting SQL Server container...");
-        var startArgs = $"run -d --name {containerName} -e \"ACCEPT_EULA=Y\" -e \"SA_PASSWORD={saPassword}\" -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest";
-        ProcessTasks.StartProcess("docker", startArgs,
-            workingDirectory: RootDirectory)
-          .AssertZeroExitCode();
-
-        // Wait for SQL Server to be ready
-        Log.Information("Waiting for SQL Server to be ready (up to 120 seconds)...");
-
-        // Initial wait for container to start
-        System.Threading.Thread.Sleep(5000);
-
-        var maxRetries = 60;
-        var retryCount = 0;
-        var isReady = false;
-
-        while (retryCount < maxRetries && !isReady)
-        {
-          try
-          {
-            var result = ProcessTasks.StartProcess("docker",
-              $"exec {containerName} /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P {saPassword} -Q \"SELECT 1\" -C",
-              workingDirectory: RootDirectory,
-              logOutput: false,
-              logInvocation: false);
-
-            result.WaitForExit();
-
-            if (result.ExitCode == 0)
-            {
-              isReady = true;
-              Log.Information("✓ SQL Server is ready");
-            }
-          }
-          catch (Exception ex)
-          {
-            // Ignore errors during health check
-            Log.Debug("Health check attempt {Attempt} failed: {Message}", retryCount + 1, ex.Message);
-          }
-
-          if (!isReady)
-          {
-            System.Threading.Thread.Sleep(2000);
-            retryCount++;
-          }
-        }
-
-        if (!isReady)
-        {
-          throw new Exception("SQL Server failed to start within the timeout period");
-        }
-
-        // Apply migrations using dotnet ef
-        Log.Information("Applying migrations to test database...");
-
-        // Quote the connection string properly for shell execution
-        var quotedConnectionString = $"\\\"{connectionString}\\\"";
-        var customArguments = $"ef database update --project {ServerInfrastructureProject} --startup-project {ServerProject} --connection {quotedConnectionString}";
-        var efProcess = ProcessTasks.StartProcess(ToolPathResolver.GetPathExecutable("dotnet"),
-            customArguments,
-            workingDirectory: RootDirectory)
-          .AssertZeroExitCode();
-
-        Log.Information("✓ Migrations applied successfully to test database");
-      }
-      catch (Exception ex)
-      {
-        Log.Error("Migration test failed: {Message}", ex.Message);
-        throw;
+        // Run docker-compose to start SQL Server and apply migrations
+        Log.Information("Running Docker Compose to test migrations...");
+        var args = $"compose -f {composeFile} up --build --abort-on-container-exit";
+        var process = ProcessTasks.StartProcess("docker", args,
+              workingDirectory: RootDirectory);
+        process.WaitForExit();
+        exitCode = process.ExitCode;
       }
       finally
       {
-        // Clean up container
-        Log.Information("Cleaning up test container...");
-        ProcessTasks.StartProcess("docker", $"rm -f {containerName}",
-          workingDirectory: RootDirectory,
-          logOutput: false,
-          logInvocation: false);
-        Log.Information("✓ Test container cleaned up");
+        // Clean up containers
+        Log.Information("Cleaning up Docker Compose resources...");
+        var downArgs = $"compose -f {composeFile} down";
+        var downProcess = ProcessTasks.StartProcess("docker", downArgs,
+              workingDirectory: RootDirectory,
+              logOutput: false,
+              logInvocation: false);
+        downProcess.WaitForExit();
+        Log.Information("✓ Docker Compose resources cleaned up");
       }
+
+      // Explicitly fail the target if Docker Compose failed
+      if (exitCode != 0)
+      {
+        Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
+        throw new Exception($"Migration test failed with exit code: {exitCode}");
+      }
+
+      Log.Information("✓ Migrations applied successfully to test database");
     });
 }
