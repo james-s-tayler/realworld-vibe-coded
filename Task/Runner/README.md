@@ -47,6 +47,9 @@ build.cmd                 # Cross-platform build script (Windows)
 | `run-local-client` | Run frontend locally (placeholder) |
 | `db-reset` | Reset SQLite database with confirmation |
 | `db-reset-force` | Reset SQLite database without confirmation |
+| `db-migrations-check-uncommitted` | Check for uncommitted EF Core migrations in source control |
+| `db-migrations-check-data-loss` | Check EF Core migrations for potentially destructive operations that could cause data loss |
+| `db-migrations-test-apply` | Test EF Core migrations by applying them to a throwaway SQL Server database in Docker |
 
 ### Target Naming Conventions
 
@@ -56,7 +59,8 @@ All Nuke targets follow specific naming conventions:
   - `LintServerVerify`, `LintServerFix`, `LintNukeVerify`, `LintNukeFix`
 - **Build targets**: Start with `Build` - `BuildServer`, `BuildClient`
 - **Test targets**: Start with `Test` - `TestServer`, `TestServerPostman`
-- **Utility targets**: Use descriptive names - `RunLocalServer`, `DbReset`, etc.
+- **Database targets**: Start with `Db` or `DbMigrations` - `DbReset`, `DbMigrationsCheckUncommitted`
+- **Utility targets**: Use descriptive names - `RunLocalServer`, `InstallClient`, etc.
 
 These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` target.
 
