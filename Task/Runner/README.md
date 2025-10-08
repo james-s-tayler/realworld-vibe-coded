@@ -47,7 +47,6 @@ build.cmd                 # Cross-platform build script (Windows)
 | `run-local-client` | Run frontend locally (placeholder) |
 | `db-reset` | Reset SQLite database with confirmation |
 | `db-reset-force` | Reset SQLite database without confirmation |
-| `db-migrations-check-data-loss` | Check new/modified EF Core migrations in PR for destructive operations (--base-branch to specify comparison branch, defaults to main) |
 | `db-migrations-test-apply` | Test EF Core migrations by applying them to a throwaway SQL Server database in Docker (also detects pending model changes via EF Core 9.0) |
 
 ### Target Naming Conventions
