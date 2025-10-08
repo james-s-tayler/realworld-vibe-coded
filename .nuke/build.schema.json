@@ -119,6 +119,10 @@
   "allOf": [
     {
       "properties": {
+        "BaseBranch": {
+          "type": "string",
+          "description": "Base branch to compare migrations against (default: main)"
+        },
         "Folder": {
           "type": "string",
           "description": "Postman folder to test"

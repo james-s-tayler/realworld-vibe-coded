@@ -1,24 +1,49 @@
-﻿using Nuke.Common;
+﻿using System.Text;
+using Nuke.Common;
 using Nuke.Common.Tooling;
 using Serilog;
 
 public partial class Build
 {
+  [Parameter("Base branch to compare migrations against (default: main)")]
+  readonly string BaseBranch = "main";
+
   Target DbMigrationsCheckDataLoss => _ => _
     .Description("Check EF Core migrations for potentially destructive operations that could cause data loss")
     .Executes(() =>
     {
       Log.Information("Checking migrations for destructive operations in {MigrationsDirectory}", MigrationsDirectory);
+      Log.Information("Comparing against base branch: {BaseBranch}", BaseBranch);
 
-      var migrationFiles = Directory.GetFiles(MigrationsDirectory, "*.cs")
-        .Where(f => !f.EndsWith(".Designer.cs") && !f.EndsWith("ModelSnapshot.cs"))
+      // Get list of changed migration files using git diff
+      var gitDiffArgs = $"diff --name-only {BaseBranch}...HEAD -- {MigrationsDirectory}";
+      var gitProcess = ProcessTasks.StartProcess("git", gitDiffArgs,
+        workingDirectory: RootDirectory,
+        logOutput: false);
+      gitProcess.AssertZeroExitCode();
+
+      var changedFiles = gitProcess.Output
+        .Where(o => o.Type == OutputType.Std)
+        .Select(o => o.Text.Trim())
+        .Where(f => f.EndsWith(".cs") && !f.EndsWith(".Designer.cs") && !f.EndsWith("ModelSnapshot.cs"))
+        .Select(f => RootDirectory / f)
+        .Where(f => File.Exists(f))
         .ToList();
 
-      if (!migrationFiles.Any())
+      // Define output file path
+      var outputFilePath = RootDirectory / "migration-check-output.md";
+
+      if (!changedFiles.Any())
       {
-        Log.Warning("No migration files found in {MigrationsDirectory}", MigrationsDirectory);
+        Log.Information("✓ No new or modified migrations found in this PR");
+
+        // Write empty markdown file to indicate no issues
+        File.WriteAllText(outputFilePath, "✅ No new or modified migrations in this PR.");
+        Log.Information("Output written to {OutputFile}", outputFilePath);
         return;
       }
+
+      Log.Information("Found {Count} new/modified migration file(s) in this PR", changedFiles.Count);
 
       var destructiveOperations = new[]
       {
@@ -32,7 +57,7 @@ public partial class Build
 
       var migrationsWithDestructiveOps = new List<(string File, List<string> Operations)>();
 
-      foreach (var migrationFile in migrationFiles)
+      foreach (var migrationFile in changedFiles)
       {
         var content = File.ReadAllText(migrationFile);
         var foundOps = destructiveOperations
@@ -45,31 +70,52 @@ public partial class Build
         }
       }
 
+      // Generate markdown output
+      var markdown = new StringBuilder();
+
       if (migrationsWithDestructiveOps.Any())
       {
-        Log.Warning("Found {Count} migration(s) with potentially destructive operations:", migrationsWithDestructiveOps.Count);
+        markdown.AppendLine("## ⚠️ Migration Data Loss Warning");
+        markdown.AppendLine();
+        markdown.AppendLine($"Found **{migrationsWithDestructiveOps.Count}** migration(s) with potentially destructive operations:");
+        markdown.AppendLine();
+
         foreach (var (file, ops) in migrationsWithDestructiveOps)
         {
-          Log.Warning("  {File}:", file);
+          markdown.AppendLine($"### 📄 `{file}`");
+          markdown.AppendLine();
+          markdown.AppendLine("Destructive operations detected:");
           foreach (var op in ops)
           {
-            Log.Warning("    - {Operation}", op);
+            markdown.AppendLine($"- `{op}`");
           }
+          markdown.AppendLine();
         }
 
-        Log.Warning("");
-        Log.Warning("⚠ IMPORTANT: These migrations contain operations that may cause data loss.");
-        Log.Warning("Please review these migrations and ensure they include manual data migration steps if needed.");
-        Log.Warning("Consider adding custom SQL or data migration code to preserve existing data.");
+        markdown.AppendLine("---");
+        markdown.AppendLine();
+        markdown.AppendLine("**⚠️ IMPORTANT:** These migrations contain operations that may cause data loss.");
+        markdown.AppendLine();
+        markdown.AppendLine("Please ensure:");
+        markdown.AppendLine("- Manual data migration steps are included if needed");
+        markdown.AppendLine("- Custom SQL or code preserves existing data where appropriate");
+        markdown.AppendLine("- These changes have been reviewed and approved");
 
-        // Note: We're not throwing an exception here to allow manual review.
-        // In a real-world scenario, you might want to add a --fail-on-destructive flag
-        // or check for comments indicating manual review was done.
+        Log.Warning("Found {Count} migration(s) with potentially destructive operations", migrationsWithDestructiveOps.Count);
+        foreach (var (file, ops) in migrationsWithDestructiveOps)
+        {
+          Log.Warning("  {File}: {Operations}", file, string.Join(", ", ops));
+        }
       }
       else
       {
-        Log.Information("✓ No destructive operations found in migrations");
+        markdown.AppendLine("✅ No destructive operations found in new/modified migrations.");
+        Log.Information("✓ No destructive operations found in new/modified migrations");
       }
+
+      // Write markdown output to file
+      File.WriteAllText(outputFilePath, markdown.ToString());
+      Log.Information("Migration check output written to {OutputFile}", outputFilePath);
     });
 
   Target DbMigrationsTestApply => _ => _
