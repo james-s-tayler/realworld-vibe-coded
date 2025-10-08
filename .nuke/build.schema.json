@@ -28,7 +28,6 @@
         "BuildServer",
         "BuildServerPublish",
         "DbMigrationsCheckDataLoss",
-        "DbMigrationsCheckUncommitted",
         "DbMigrationsTestApply",
         "DbReset",
         "DbResetForce",
