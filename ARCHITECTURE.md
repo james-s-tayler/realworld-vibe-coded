@@ -93,12 +93,12 @@ When adding new DTOs or entities:
 Following clean architecture principles and the FastEndpoints pattern:
 
 1. **Infrastructure Layer**: 
-   - Returns domain entities or performs direct LINQ projections to read models
+   - Returns domain entities OR performs direct LINQ/SQL projections to read models
    - Does NOT call Application layer mappers
-   - Does NOT depend on Application layer
+   - Does NOT depend on Application layer for mapping logic
 
 2. **Application Layer (UseCases/Handlers)**:
-   - Performs all DTO mapping using mapper classes
+   - Performs all DTO mapping using mapper classes (for complex mappings)
    - Maps domain entities to response DTOs
    - Maps request DTOs to domain entities (for commands)
 
@@ -108,7 +108,11 @@ Following clean architecture principles and the FastEndpoints pattern:
    - Mapping logic centralized in Application layer
    - Easier to test and maintain
 
-#### Example Pattern
+#### Supported Patterns
+
+We support two patterns for read operations:
+
+##### Pattern 1: Domain Entities with Application Mapping (Recommended for Complex Scenarios)
 
 **Infrastructure Query Service:**
 ```csharp
@@ -139,3 +143,29 @@ public async Task<Result<ArticlesResponse>> Handle(...)
     return Result.Success(new ArticlesResponse(articleDtos, articleDtos.Count));
 }
 ```
+
+**Use when:**
+- DTOs require computed values based on user context (favorited, following)
+- Complex domain logic is needed for mapping
+- Full aggregate loading is necessary for business rules
+
+##### Pattern 2: Direct Projection to Read Models (Recommended for Simple Queries)
+
+**Infrastructure Query Service:**
+```csharp
+public async Task<IEnumerable<ContributorDTO>> ListAsync()
+{
+    // Project directly to DTO shape using LINQ or SQL
+    var result = await _db.Database.SqlQuery<ContributorDTO>(
+        $"SELECT Id, Name, PhoneNumber_Number AS PhoneNumber FROM Contributors")
+        .ToListAsync();
+    
+    return result;
+}
+```
+
+**Use when:**
+- Read-only operations without user context
+- Simple field mapping without complex logic
+- Performance optimization (avoid loading full aggregates)
+- DTOs don't require computed values
