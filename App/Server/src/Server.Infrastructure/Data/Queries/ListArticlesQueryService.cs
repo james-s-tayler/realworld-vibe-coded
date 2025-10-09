@@ -1,20 +1,16 @@
 ﻿using Server.Core.ArticleAggregate;
-using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.Interfaces;
-using Server.Core.UserAggregate;
-using Server.UseCases.Articles;
 
 namespace Server.Infrastructure.Data.Queries;
 
 public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQueryService
 {
-  public async Task<IEnumerable<ArticleDto>> ListAsync(
+  public async Task<IEnumerable<Article>> ListAsync(
     string? tag = null,
     string? author = null,
     string? favorited = null,
     int limit = 20,
-    int offset = 0,
-    int? currentUserId = null)
+    int offset = 0)
   {
     var query = BuildQuery(tag, author, favorited);
 
@@ -24,17 +20,7 @@ public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQuer
       .AsNoTracking()
       .ToListAsync();
 
-    // Get current user with following relationships if authenticated
-    User? currentUser = null;
-    if (currentUserId.HasValue)
-    {
-      currentUser = await _context.Users
-        .Include(u => u.Following)
-        .AsNoTracking()
-        .FirstOrDefaultAsync(u => u.Id == currentUserId.Value);
-    }
-
-    return articles.Select(a => ArticleMappers.MapToDto(a, currentUser));
+    return articles;
   }
 
   public async Task<int> CountAsync(

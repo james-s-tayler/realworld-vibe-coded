@@ -5,6 +5,8 @@
 ### Overview
 To reduce code duplication and ensure consistency across handlers, mapping logic between domain entities and DTOs has been extracted into static mapper classes. These mappers follow a consistent pattern and are organized by feature area.
 
+This approach aligns with the [FastEndpoints Domain Entity Mapping](https://fast-endpoints.com/docs/domain-entity-mapping) pattern, where mapping logic resides in the Application layer (UseCases/Handlers), not in the Infrastructure layer.
+
 ### Mapper Organization
 
 #### Location Strategy
@@ -84,3 +86,56 @@ When adding new DTOs or entities:
 4. Add unit tests for the mapper
 5. Update handlers to use the mapper
 6. Remove duplicated inline mapping code
+
+### Architecture Guidelines
+
+#### Separation of Concerns
+Following clean architecture principles and the FastEndpoints pattern:
+
+1. **Infrastructure Layer**: 
+   - Returns domain entities or performs direct LINQ projections to read models
+   - Does NOT call Application layer mappers
+   - Does NOT depend on Application layer
+
+2. **Application Layer (UseCases/Handlers)**:
+   - Performs all DTO mapping using mapper classes
+   - Maps domain entities to response DTOs
+   - Maps request DTOs to domain entities (for commands)
+
+3. **Benefits**:
+   - Clear dependency direction (Infrastructure → Core, Application → Core)
+   - Infrastructure remains focused on data access
+   - Mapping logic centralized in Application layer
+   - Easier to test and maintain
+
+#### Example Pattern
+
+**Infrastructure Query Service:**
+```csharp
+public async Task<IEnumerable<Article>> ListAsync(...)
+{
+    var query = BuildQuery(...);
+    var articles = await query
+        .AsNoTracking()
+        .ToListAsync();
+    
+    return articles; // Return entities, not DTOs
+}
+```
+
+**Application Handler:**
+```csharp
+public async Task<Result<ArticlesResponse>> Handle(...)
+{
+    // Get entities from Infrastructure
+    var articles = await _query.ListAsync(...);
+    
+    // Get user context if needed
+    var currentUser = await _userRepository.FirstOrDefaultAsync(...);
+    
+    // Map entities to DTOs in Application layer
+    var articleDtos = articles.Select(a => ArticleMappers.MapToDto(a, currentUser)).ToList();
+    
+    return Result.Success(new ArticlesResponse(articleDtos, articleDtos.Count));
+}
+```

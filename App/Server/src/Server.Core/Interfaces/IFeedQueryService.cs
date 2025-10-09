@@ -1,10 +1,10 @@
-﻿using Server.Core.ArticleAggregate.Dtos;
+﻿using Server.Core.ArticleAggregate;
 
 namespace Server.Core.Interfaces;
 
 public interface IFeedQueryService
 {
-  Task<IEnumerable<ArticleDto>> GetFeedAsync(
+  Task<IEnumerable<Article>> GetFeedAsync(
     int userId,
     int limit = 20,
     int offset = 0);
