@@ -11,7 +11,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Updates an existing article. Authentication required. User must be the author.
 /// </remarks>
-public class Update(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<UpdateArticleRequest, ArticleResponse>
+public class Update(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<UpdateArticleRequest, ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -38,9 +38,8 @@ public class Update(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.IsSuccess)
     {
-      // Use FastEndpoints mapper to convert Article to ArticleResponse
-      var mapper = Resolve<ArticleMapper>();
-      Response = await mapper.FromEntityAsync(result.Value, cancellationToken);
+      // Use FastEndpoints Map.FromEntityAsync to convert Article to ArticleResponse
+      Response = await Map.FromEntityAsync(result.Value, cancellationToken);
       return;
     }
 

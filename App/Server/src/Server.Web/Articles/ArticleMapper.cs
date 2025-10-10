@@ -62,47 +62,4 @@ public class ArticleMapper : Mapper<EmptyRequest, ArticleResponse, Article>
 
     return new ArticleResponse { Article = articleDto };
   }
-
-  /// <summary>
-  /// Maps ArticlesResult (list of entities) to ArticlesResponse
-  /// </summary>
-  public async Task<ArticlesResponse> FromResultAsync(ArticlesResult result, CancellationToken ct = default)
-  {
-    // Get current user with following relationships if authenticated
-    User? currentUser = null;
-    var currentUserId = _currentUserService.GetCurrentUserId();
-    if (currentUserId.HasValue)
-    {
-      currentUser = await _userRepository.FirstOrDefaultAsync(
-        new UserWithFollowingSpec(currentUserId.Value), ct);
-    }
-
-    var articleDtos = new List<ArticleDto>();
-    foreach (var article in result.Articles)
-    {
-      var isFavorited = currentUser != null && article.FavoritedBy.Any(u => u.Id == currentUser.Id);
-      var isFollowing = currentUser?.IsFollowing(article.AuthorId) ?? false;
-
-      var articleDto = new ArticleDto(
-        article.Slug,
-        article.Title,
-        article.Description,
-        article.Body,
-        article.Tags.Select(t => t.Name).ToList(),
-        article.CreatedAt,
-        article.UpdatedAt,
-        isFavorited,
-        article.FavoritesCount,
-        new AuthorDto(
-          article.Author.Username,
-          article.Author.Bio ?? string.Empty,
-          article.Author.Image,
-          isFollowing
-        )
-      );
-      articleDtos.Add(articleDto);
-    }
-
-    return new ArticlesResponse(articleDtos, result.ArticlesCount);
-  }
 }
