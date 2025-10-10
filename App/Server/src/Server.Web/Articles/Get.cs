@@ -35,7 +35,9 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
 
     if (result.IsSuccess)
     {
-      Response = result.Value;
+      // Use FastEndpoints mapper to convert Article to ArticleResponse
+      var mapper = Resolve<ArticleMapper>();
+      Response = await mapper.FromEntityAsync(result.Value, cancellationToken);
       return;
     }
 

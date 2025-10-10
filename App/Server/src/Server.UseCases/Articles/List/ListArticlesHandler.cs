@@ -1,15 +1,11 @@
 ﻿using Server.Core.Interfaces;
-using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.List;
 
-public class ListArticlesHandler(
-  IListArticlesQueryService _query,
-  IRepository<User> _userRepository)
-  : IQueryHandler<ListArticlesQuery, Result<ArticlesResponse>>
+public class ListArticlesHandler(IListArticlesQueryService _query)
+  : IQueryHandler<ListArticlesQuery, Result<ArticlesResult>>
 {
-  public async Task<Result<ArticlesResponse>> Handle(ListArticlesQuery request, CancellationToken cancellationToken)
+  public async Task<Result<ArticlesResult>> Handle(ListArticlesQuery request, CancellationToken cancellationToken)
   {
     var articles = await _query.ListAsync(
       request.Tag,
@@ -18,18 +14,9 @@ public class ListArticlesHandler(
       request.Limit,
       request.Offset);
 
-    // Get current user with following relationships if authenticated
-    User? currentUser = null;
-    if (request.CurrentUserId.HasValue)
-    {
-      currentUser = await _userRepository.FirstOrDefaultAsync(
-        new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken);
-    }
+    var articlesCount = articles.Count();
 
-    // Use FastEndpoints-style mapper to convert entities to response
-    var mapper = new ArticleResponseMapper(currentUser);
-    var response = mapper.FromEntities(articles);
-
-    return Result.Success(response);
+    // Return entities - mapping will happen in the endpoint
+    return Result.Success(new ArticlesResult(articles.ToList(), articlesCount));
   }
 }

@@ -1,14 +1,13 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Favorite;
 
 public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
-  : ICommandHandler<FavoriteArticleCommand, Result<ArticleResponse>>
+  : ICommandHandler<FavoriteArticleCommand, Result<Article>>
 {
-  public async Task<Result<ArticleResponse>> Handle(FavoriteArticleCommand request, CancellationToken cancellationToken)
+  public async Task<Result<Article>> Handle(FavoriteArticleCommand request, CancellationToken cancellationToken)
   {
     var article = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(request.Slug), cancellationToken);
@@ -28,14 +27,7 @@ public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRe
     await _articleRepository.UpdateAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
-    // Load current user with following relationships to check following status
-    var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
-      new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
-
-    // Use FastEndpoints-style mapper with explicit favorited = true since user just favorited
-    var mapper = new ArticleResponseMapper(currentUserWithFollowing);
-    var response = mapper.FromEntity(article, true);
-
-    return Result.Success(response);
+    // Return the entity - mapping will happen in the endpoint
+    return Result.Success(article);
   }
 }

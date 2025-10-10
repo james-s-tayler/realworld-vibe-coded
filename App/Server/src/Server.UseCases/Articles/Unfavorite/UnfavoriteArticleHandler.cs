@@ -1,14 +1,13 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Unfavorite;
 
 public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
-  : ICommandHandler<UnfavoriteArticleCommand, Result<ArticleResponse>>
+  : ICommandHandler<UnfavoriteArticleCommand, Result<Article>>
 {
-  public async Task<Result<ArticleResponse>> Handle(UnfavoriteArticleCommand request, CancellationToken cancellationToken)
+  public async Task<Result<Article>> Handle(UnfavoriteArticleCommand request, CancellationToken cancellationToken)
   {
     var article = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(request.Slug), cancellationToken);
@@ -28,14 +27,7 @@ public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, I
     await _articleRepository.UpdateAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
-    // Load current user with following relationships to check following status
-    var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
-      new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
-
-    // Use FastEndpoints-style mapper with explicit favorited = false since user just unfavorited
-    var mapper = new ArticleResponseMapper(currentUserWithFollowing);
-    var response = mapper.FromEntity(article, false);
-
-    return Result.Success(response);
+    // Return the entity - mapping will happen in the endpoint
+    return Result.Success(article);
   }
 }

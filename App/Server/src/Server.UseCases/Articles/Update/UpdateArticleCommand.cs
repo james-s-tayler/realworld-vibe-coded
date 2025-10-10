@@ -1,4 +1,6 @@
-﻿namespace Server.UseCases.Articles.Update;
+﻿using Server.Core.ArticleAggregate;
+
+namespace Server.UseCases.Articles.Update;
 
 public record UpdateArticleCommand(
   string Slug,
@@ -7,4 +9,4 @@ public record UpdateArticleCommand(
   string? Body,
   int UserId,
   int CurrentUserId
-) : ICommand<Result<ArticleResponse>>;
+) : ICommand<Result<Article>>;

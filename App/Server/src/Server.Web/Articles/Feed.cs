@@ -47,7 +47,9 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
 
     if (result.IsSuccess)
     {
-      Response = result.Value;
+      // Use FastEndpoints mapper to convert Articles to ArticlesResponse
+      var mapper = Resolve<ArticleMapper>();
+      Response = await mapper.FromResultAsync(result.Value, cancellationToken);
       return;
     }
 

@@ -40,7 +40,9 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
     if (result.IsSuccess)
     {
       HttpContext.Response.StatusCode = 201;
-      Response = result.Value;
+      // Use FastEndpoints mapper to convert Article to ArticleResponse
+      var mapper = Resolve<ArticleMapper>();
+      Response = await mapper.FromEntityAsync(result.Value, cancellationToken);
       return;
     }
 
