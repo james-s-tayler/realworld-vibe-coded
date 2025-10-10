@@ -32,8 +32,10 @@ public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRe
     var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
       new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
 
-    var articleDto = ArticleMappers.MapToDto(article, currentUserWithFollowing, true); // User just favorited this article
+    // Use FastEndpoints-style mapper with explicit favorited = true since user just favorited
+    var mapper = new ArticleResponseMapper(currentUserWithFollowing);
+    var response = mapper.FromEntity(article, true);
 
-    return Result.Success(new ArticleResponse { Article = articleDto });
+    return Result.Success(response);
   }
 }

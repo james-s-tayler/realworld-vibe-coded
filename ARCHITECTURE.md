@@ -3,57 +3,71 @@
 ## Mapping Conventions
 
 ### Overview
-To reduce code duplication and ensure consistency across handlers, mapping logic between domain entities and DTOs has been extracted into static mapper classes. These mappers follow a consistent pattern and are organized by feature area.
+To reduce code duplication and ensure consistency across handlers, mapping logic between domain entities and DTOs has been extracted into mapper classes following the [FastEndpoints Domain Entity Mapping](https://fast-endpoints.com/docs/domain-entity-mapping) pattern.
 
-This approach aligns with the [FastEndpoints Domain Entity Mapping](https://fast-endpoints.com/docs/domain-entity-mapping) pattern, where mapping logic resides in the Application layer (UseCases/Handlers), not in the Infrastructure layer.
+Our mappers are instance-based classes (not static) that accept context (e.g., current user) via constructor injection, aligning with FastEndpoints' recommended approach where mapping logic resides in the Application layer (UseCases), not in the Infrastructure layer.
 
 ### Mapper Organization
 
 #### Location Strategy
 Mappers are placed within the UseCases project, organized by feature:
-- `Server.UseCases.Articles.ArticleMappers` - Article and AuthorDto mapping
+- `Server.UseCases.Articles.ArticleResponseMapper` - Article to Response mapping (FastEndpoints-style)
+- `Server.UseCases.Articles.ArticleMappers` - Article utility methods (GenerateSlug)
 - `Server.UseCases.Articles.Comments.CommentMappers` - Comment mapping  
 - `Server.UseCases.Users.UserMappers` - User mapping
 - `Server.UseCases.Contributors.ContributorMappers` - Contributor mapping
 
 #### Naming Conventions
-- Mapper classes: `[Feature]Mappers` (e.g., `ArticleMappers`)
-- Main mapping method: `MapToDto(entity, ...)`
+- Mapper classes: `[Feature]ResponseMapper` for FastEndpoints-style mappers (e.g., `ArticleResponseMapper`)
+- Legacy static mappers: `[Feature]Mappers` for utility functions only
+- Mapping methods: `FromEntity(entity)` - Follows FastEndpoints convention
 - Utility methods: Descriptive names (e.g., `GenerateSlug`)
 
 ### Mapping Patterns
 
-#### Entity to DTO Mapping
+#### FastEndpoints-Style Mapper Pattern
+Following FastEndpoints Domain Entity Mapping, our mappers are instance-based classes that accept context via constructor:
+
 ```csharp
-public static ArticleDto MapToDto(Article article, User? currentUser = null)
+public class ArticleResponseMapper
 {
+  private readonly User? _currentUser;
+
+  public ArticleResponseMapper(User? currentUser = null)
+  {
+    _currentUser = currentUser;
+  }
+
+  public ArticleResponse FromEntity(Article article)
+  {
     // Calculate context-dependent values (favorited, following)
-    var isFavorited = currentUser != null && article.FavoritedBy.Any(u => u.Id == currentUser.Id);
-    var isFollowing = currentUser?.IsFollowing(article.AuthorId) ?? false;
+    var isFavorited = _currentUser != null && article.FavoritedBy.Any(u => u.Id == _currentUser.Id);
+    var isFollowing = _currentUser?.IsFollowing(article.AuthorId) ?? false;
 
     // Return DTO with all required properties
-    return new ArticleDto(/* ... */);
+    return new ArticleResponse { Article = new ArticleDto(/* ... */) };
+  }
 }
 ```
 
 #### Explicit State Overrides
 For cases where computed state needs to be overridden (e.g., favorite/unfavorite operations):
 ```csharp
-public static ArticleDto MapToDto(Article article, User? currentUser, bool isFavorited)
+public ArticleResponse FromEntity(Article article, bool isFavorited)
 {
     // Use explicit favorited state instead of computing from entity
 }
 ```
 
 ### Current User Context
-Mappers that require user context (for favorited/following status) accept an optional `User? currentUser` parameter:
+Following the FastEndpoints pattern, mappers accept user context via constructor injection:
 - **Null currentUser**: Returns default false values for user-dependent fields
 - **Non-null currentUser**: Computes actual favorited/following status
 
 ### Usage in Handlers
-Handlers should use mappers instead of inline mapping:
+Handlers instantiate mappers with context and use the `FromEntity` method:
 
-**Before:**
+**Before (inline mapping):**
 ```csharp
 var articleDto = new ArticleDto(
     article.Slug,
@@ -62,16 +76,20 @@ var articleDto = new ArticleDto(
 );
 ```
 
-**After:**
+**After (FastEndpoints-style mapper):**
 ```csharp
-var articleDto = ArticleMappers.MapToDto(article, currentUser);
+var mapper = new ArticleResponseMapper(currentUser);
+var response = mapper.FromEntity(article);
+return Result.Success(response);
 ```
 
 ### Benefits
-1. **Consistency**: All Article-to-ArticleDto mappings use identical logic
-2. **Maintainability**: Changes to mapping logic only need to be made in one place
-3. **Testability**: Mappers can be unit tested independently
-4. **Readability**: Handlers focus on business logic, not mapping details
+1. **FastEndpoints Alignment**: Follows the recommended Domain Entity Mapping pattern from FastEndpoints documentation
+2. **Consistency**: All Article-to-Response mappings use identical logic
+3. **Maintainability**: Changes to mapping logic only need to be made in one place
+4. **Testability**: Instance-based mappers can be easily unit tested with different contexts
+5. **Readability**: Handlers focus on business logic, not mapping details
+6. **Context Injection**: User context is injected once via constructor, not passed to every method
 
 ### Testing Strategy
 - Each mapper class has corresponding unit tests in `Server.UnitTests.UseCases.[Feature]`

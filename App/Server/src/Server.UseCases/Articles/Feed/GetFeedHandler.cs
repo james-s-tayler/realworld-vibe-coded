@@ -20,10 +20,10 @@ public class GetFeedHandler(
     var currentUser = await _userRepository.FirstOrDefaultAsync(
       new UserWithFollowingSpec(request.UserId), cancellationToken);
 
-    // Map entities to DTOs in the Application layer
-    var articleDtos = articles.Select(a => ArticleMappers.MapToDto(a, currentUser)).ToList();
-    var articlesCount = articleDtos.Count;
+    // Use FastEndpoints-style mapper to convert entities to response
+    var mapper = new ArticleResponseMapper(currentUser);
+    var response = mapper.FromEntities(articles);
 
-    return Result.Success(new ArticlesResponse(articleDtos, articlesCount));
+    return Result.Success(response);
   }
 }

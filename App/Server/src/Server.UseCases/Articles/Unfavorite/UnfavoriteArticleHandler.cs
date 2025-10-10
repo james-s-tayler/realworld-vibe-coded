@@ -32,8 +32,10 @@ public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, I
     var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
       new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
 
-    var articleDto = ArticleMappers.MapToDto(article, currentUserWithFollowing, false); // User just unfavorited this article
+    // Use FastEndpoints-style mapper with explicit favorited = false since user just unfavorited
+    var mapper = new ArticleResponseMapper(currentUserWithFollowing);
+    var response = mapper.FromEntity(article, false);
 
-    return Result.Success(new ArticleResponse { Article = articleDto });
+    return Result.Success(response);
   }
 }

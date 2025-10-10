@@ -55,9 +55,11 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository, IRepo
     // Check if current user has favorited this article
     var isFavorited = article.FavoritedBy.Any(u => u.Id == request.CurrentUserId);
 
-    var articleDto = ArticleMappers.MapToDto(article, currentUserWithFollowing, isFavorited);
+    // Use FastEndpoints-style mapper with computed favorited status
+    var mapper = new ArticleResponseMapper(currentUserWithFollowing);
+    var response = mapper.FromEntity(article, isFavorited);
 
-    return Result.Success(new ArticleResponse { Article = articleDto });
+    return Result.Success(response);
   }
 
   private static string GenerateSlug(string title)

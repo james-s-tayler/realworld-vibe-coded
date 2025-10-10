@@ -55,9 +55,11 @@ public class CreateArticleHandler(
     var currentUser = request.CurrentUserId.HasValue ?
         await _userRepository.FirstOrDefaultAsync(new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken) : null;
 
-    var articleDto = ArticleMappers.MapToDto(article, currentUser, false); // Always false for newly created articles
+    // Use FastEndpoints-style mapper with explicit favorited = false for newly created articles
+    var mapper = new ArticleResponseMapper(currentUser);
+    var response = mapper.FromEntity(article, false);
 
-    return Result.Success(new ArticleResponse { Article = articleDto });
+    return Result.Success(response);
   }
 
   private static string GenerateSlug(string title)

@@ -24,8 +24,10 @@ public class GetArticleHandler(
     var currentUser = request.CurrentUserId.HasValue ?
         await _userRepository.FirstOrDefaultAsync(new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken) : null;
 
-    var articleDto = ArticleMappers.MapToDto(article, currentUser);
+    // Use FastEndpoints-style mapper to convert entity to response
+    var mapper = new ArticleResponseMapper(currentUser);
+    var response = mapper.FromEntity(article);
 
-    return Result.Success(new ArticleResponse { Article = articleDto });
+    return Result.Success(response);
   }
 }
