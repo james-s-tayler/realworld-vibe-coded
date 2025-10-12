@@ -22,15 +22,17 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
     // Use domain methods to compute user-specific values
     var isFavorited = article.IsFavoritedBy(currentUserId);
 
-    // For following status, get current user and use domain method
-    bool isFollowing = false;
+    // Get current user for following status check
+    User? currentUser = null;
     if (currentUserId.HasValue)
     {
       var userRepository = Resolve<IRepository<User>>();
       var userSpec = new Server.Core.UserAggregate.Specifications.UserWithFollowingSpec(currentUserId.Value);
-      var currentUser = userRepository.FirstOrDefaultAsync(userSpec).GetAwaiter().GetResult();
-      isFollowing = currentUser?.IsFollowing(article.AuthorId) ?? false;
+      currentUser = userRepository.FirstOrDefaultAsync(userSpec).GetAwaiter().GetResult();
     }
+
+    // Use domain method to check if current user follows the article author
+    var isFollowing = article.IsAuthorFollowedBy(currentUser);
 
     var articleDto = new ArticleDto(
       article.Slug,

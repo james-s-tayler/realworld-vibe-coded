@@ -49,6 +49,18 @@ public class Article : EntityBase, IAggregateRoot
     return FavoritedBy.Any(u => u.Id == userId.Value);
   }
 
+  /// <summary>
+  /// Checks if a user is following the article's author
+  /// </summary>
+  public bool IsAuthorFollowedBy(User? user)
+  {
+    if (user == null)
+    {
+      return false;
+    }
+    return user.IsFollowing(AuthorId);
+  }
+
   public static string GenerateSlug(string title)
   {
     return title.ToLowerInvariant()
