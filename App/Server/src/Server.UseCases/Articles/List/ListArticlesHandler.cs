@@ -3,9 +3,9 @@
 namespace Server.UseCases.Articles.List;
 
 public class ListArticlesHandler(IListArticlesQueryService _query)
-  : IQueryHandler<ListArticlesQuery, Result<ArticlesResponse>>
+  : IQueryHandler<ListArticlesQuery, Result<ArticlesEntitiesResult>>
 {
-  public async Task<Result<ArticlesResponse>> Handle(ListArticlesQuery request, CancellationToken cancellationToken)
+  public async Task<Result<ArticlesEntitiesResult>> Handle(ListArticlesQuery request, CancellationToken cancellationToken)
   {
     var articles = await _query.ListAsync(
       request.Tag,
@@ -17,6 +17,6 @@ public class ListArticlesHandler(IListArticlesQueryService _query)
 
     var articlesCount = articles.Count();
 
-    return Result.Success(new ArticlesResponse(articles.ToList(), articlesCount));
+    return Result.Success(new ArticlesEntitiesResult(articles.ToList(), articlesCount));
   }
 }

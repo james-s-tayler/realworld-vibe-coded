@@ -1,11 +1,11 @@
-﻿using Server.Core.ArticleAggregate.Dtos;
+﻿using Server.Core.ArticleAggregate;
 using Server.Core.Interfaces;
 
 namespace Server.Infrastructure.Data.Queries;
 
 public class FeedQueryService(AppDbContext _context) : IFeedQueryService
 {
-  public async Task<IEnumerable<ArticleDto>> GetFeedAsync(
+  public async Task<IEnumerable<Article>> GetFeedAsync(
     int userId,
     int limit = 20,
     int offset = 0)
@@ -20,36 +20,22 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
     // If not following anyone, return empty list
     if (!followedUserIds.Any())
     {
-      return new List<ArticleDto>();
+      return new List<Article>();
     }
 
-    // Direct LINQ projection to DTO - no entity materialization
-    var articleDtos = await _context.Articles
+    // Get articles from followed users
+    var articles = await _context.Articles
+      .Include(a => a.Author)
+      .Include(a => a.Tags)
+      .Include(a => a.FavoritedBy)
       .Where(a => followedUserIds.Contains(a.AuthorId))
       .OrderByDescending(a => a.CreatedAt)
       .Skip(offset)
       .Take(Math.Min(limit, 100))
       .AsNoTracking()
-      .Select(a => new ArticleDto(
-        a.Slug,
-        a.Title,
-        a.Description,
-        a.Body,
-        a.Tags.Select(t => t.Name).ToList(),
-        a.CreatedAt,
-        a.UpdatedAt,
-        a.FavoritedBy.Any(u => u.Id == userId),
-        a.FavoritedBy.Count,
-        new AuthorDto(
-          a.Author.Username,
-          a.Author.Bio ?? string.Empty,
-          a.Author.Image,
-          true  // All authors in feed are followed by definition
-        )
-      ))
       .ToListAsync();
 
-    return articleDtos;
+    return articles;
   }
 
   public async Task<int> GetFeedCountAsync(int userId)

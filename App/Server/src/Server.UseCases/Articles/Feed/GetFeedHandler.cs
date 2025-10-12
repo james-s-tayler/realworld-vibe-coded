@@ -3,9 +3,9 @@
 namespace Server.UseCases.Articles.Feed;
 
 public class GetFeedHandler(IFeedQueryService _feedQuery)
-  : IQueryHandler<GetFeedQuery, Result<ArticlesResponse>>
+  : IQueryHandler<GetFeedQuery, Result<ArticlesEntitiesResult>>
 {
-  public async Task<Result<ArticlesResponse>> Handle(GetFeedQuery request, CancellationToken cancellationToken)
+  public async Task<Result<ArticlesEntitiesResult>> Handle(GetFeedQuery request, CancellationToken cancellationToken)
   {
     var articles = await _feedQuery.GetFeedAsync(
       request.UserId,
@@ -14,6 +14,6 @@ public class GetFeedHandler(IFeedQueryService _feedQuery)
 
     var articlesCount = articles.Count();
 
-    return Result.Success(new ArticlesResponse(articles.ToList(), articlesCount));
+    return Result.Success(new ArticlesEntitiesResult(articles.ToList(), articlesCount));
   }
 }

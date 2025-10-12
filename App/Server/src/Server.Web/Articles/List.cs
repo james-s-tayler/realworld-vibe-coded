@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// List articles globally. Optional filters for tag, author, favorited user. Authentication optional.
 /// </remarks>
-public class List(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticlesResponse>
+public class List(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticlesResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -53,7 +53,9 @@ public class List(IMediator _mediator, ICurrentUserService _currentUserService) 
 
     if (result.IsSuccess)
     {
-      Response = result.Value;
+      // Map each Article entity to ArticleDto using FastEndpoints mapper
+      var articleDtos = result.Value.Articles.Select(article => Map.FromEntity(article).Article).ToList();
+      Response = new ArticlesResponse(articleDtos, result.Value.ArticlesCount);
       return;
     }
 

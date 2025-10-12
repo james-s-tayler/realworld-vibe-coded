@@ -1,10 +1,10 @@
-﻿using Server.Core.ArticleAggregate.Dtos;
+﻿using Server.Core.ArticleAggregate;
 
 namespace Server.Core.Interfaces;
 
 public interface IListArticlesQueryService
 {
-  Task<IEnumerable<ArticleDto>> ListAsync(
+  Task<IEnumerable<Article>> ListAsync(
     string? tag = null,
     string? author = null,
     string? favorited = null,

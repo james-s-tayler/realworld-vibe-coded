@@ -57,48 +57,69 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
 }
 ```
 
-### Static Mappers (Legacy - Being Phased Out)
+### Static Utility Methods
 
-Static mappers in the UseCases project are being phased out in favor of FastEndpoints mappers:
-- `Server.UseCases.Articles.ArticleMappers` - Article and AuthorDto mapping (legacy utility methods remain)
-- `Server.UseCases.Articles.Comments.CommentMappers` - Comment mapping  
-- `Server.UseCases.Users.UserMappers` - User mapping
-- `Server.UseCases.Contributors.ContributorMappers` - Contributor mapping
+The UseCases project contains utility methods for domain operations:
+- `Server.UseCases.Articles.ArticleMappers.GenerateSlug()` - URL-friendly slug generation
+- `Server.UseCases.Articles.Comments.CommentMappers` - Comment mapping (legacy)
+- `Server.UseCases.Users.UserMappers` - User mapping (legacy)
+- `Server.UseCases.Contributors.ContributorMappers` - Contributor mapping (legacy)
 
-### Infrastructure Query Projections (For List Operations)
+### Infrastructure Query Services (For List Operations)
 
-For list/collection operations, Infrastructure services use direct LINQ projections:
+For list/collection operations, Infrastructure returns entity collections and endpoints use FastEndpoints mappers:
 
 **Pattern:**
-- Infrastructure projects directly to DTOs using LINQ `.Select()`
-- No entity materialization or mapper calls
-- Optimized for performance (single database query)
+- Infrastructure returns `IEnumerable<Article>` entities
+- Handlers return `ArticlesEntitiesResult` containing entities
+- Endpoints map each entity using `ArticleMapper.FromEntity()` in a loop
 
 **Example:**
 ```csharp
-public async Task<IEnumerable<ArticleDto>> ListAsync(...)
+// Infrastructure returns entities
+public async Task<IEnumerable<Article>> ListAsync(...)
 {
-  var articleDtos = await _context.Articles
-    .Select(a => new ArticleDto(
-      a.Slug,
-      a.Title,
-      // ... direct projection
-    ))
+  var query = BuildQuery(tag, author, favorited);
+  return await query
+    .Skip(offset)
+    .Take(limit)
+    .AsNoTracking()
     .ToListAsync();
-  return articleDtos;
+}
+
+// Handler returns entities
+public async Task<Result<ArticlesEntitiesResult>> Handle(...)
+{
+  var articles = await _query.ListAsync(...);
+  return Result.Success(new ArticlesEntitiesResult(articles.ToList(), articles.Count()));
+}
+
+// Endpoint maps using FastEndpoints mapper
+public override async Task HandleAsync(...)
+{
+  var result = await _mediator.Send(new ListArticlesQuery(...));
+  var articleDtos = result.Value.Articles.Select(article => Map.FromEntity(article).Article).ToList();
+  Response = new ArticlesResponse(articleDtos, result.Value.ArticlesCount);
 }
 ```
+
+**Benefits:**
+- Consistent mapping approach across single-entity and collection operations
+- Infrastructure remains independent (no Application mapper dependencies)
+- FastEndpoints mapper centralizes all DTO mapping logic with user context
 
 ### Migration Strategy
 
 **Do:**
-- Use FastEndpoints ResponseMapper for new single-entity endpoints
-- Use direct LINQ projections in Infrastructure for list queries
-- Keep Infrastructure layer independent of Application layer mappers
+- Use FastEndpoints ResponseMapper for all entity-to-DTO mappings
+- Have handlers return entities (single or collections)
+- Map entities at the endpoint layer using FastEndpoints mappers
+- Keep Infrastructure independent of Application layer
 
 **Don't:**
-- Call Application layer mappers from Infrastructure
-- Materialize full aggregates when only DTO data is needed
+- Create static mappers in UseCases for entity-to-DTO mapping
+- Call mappers from Infrastructure layer
+- Mix different mapping approaches without clear justification
 
 ### Mapping Patterns
 
