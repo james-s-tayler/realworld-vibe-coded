@@ -1,14 +1,13 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Unfavorite;
 
 public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
-  : ICommandHandler<UnfavoriteArticleCommand, Result<ArticleResponse>>
+  : ICommandHandler<UnfavoriteArticleCommand, Result<Article>>
 {
-  public async Task<Result<ArticleResponse>> Handle(UnfavoriteArticleCommand request, CancellationToken cancellationToken)
+  public async Task<Result<Article>> Handle(UnfavoriteArticleCommand request, CancellationToken cancellationToken)
   {
     var article = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(request.Slug), cancellationToken);
@@ -28,12 +27,6 @@ public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, I
     await _articleRepository.UpdateAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
-    // Load current user with following relationships to check following status
-    var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
-      new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
-
-    var articleDto = ArticleMappers.MapToDto(article, currentUserWithFollowing, false); // User just unfavorited this article
-
-    return Result.Success(new ArticleResponse { Article = articleDto });
+    return Result.Success(article);
   }
 }

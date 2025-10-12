@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Remove article from favorites. Authentication required.
 /// </remarks>
-public class Unfavorite(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse>
+public class Unfavorite(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -34,7 +34,8 @@ public class Unfavorite(IMediator _mediator, ICurrentUserService _currentUserSer
 
     if (result.IsSuccess)
     {
-      Response = result.Value;
+      // Use FastEndpoints mapper to convert entity to response DTO
+      Response = Map.FromEntity(result.Value);
       return;
     }
 
