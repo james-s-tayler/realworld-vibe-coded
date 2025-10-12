@@ -1,4 +1,6 @@
-﻿namespace Server.UseCases.Articles.List;
+﻿using Server.Core.ArticleAggregate;
+
+namespace Server.UseCases.Articles.List;
 
 public record ListArticlesQuery(
   string? Tag = null,
@@ -7,4 +9,4 @@ public record ListArticlesQuery(
   int Limit = 20,
   int Offset = 0,
   int? CurrentUserId = null
-) : IQuery<Result<ArticlesEntitiesResult>>;
+) : IQuery<Result<IEnumerable<Article>>>;

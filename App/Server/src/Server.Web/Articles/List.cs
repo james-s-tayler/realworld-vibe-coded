@@ -54,8 +54,9 @@ public class List(IMediator _mediator, ICurrentUserService _currentUserService) 
     if (result.IsSuccess)
     {
       // Map each Article entity to ArticleDto using FastEndpoints mapper
-      var articleDtos = result.Value.Articles.Select(article => Map.FromEntity(article).Article).ToList();
-      Response = new ArticlesResponse(articleDtos, result.Value.ArticlesCount);
+      var articles = result.Value.ToList();
+      var articleDtos = articles.Select(article => Map.FromEntity(article).Article).ToList();
+      Response = new ArticlesResponse(articleDtos, articleDtos.Count);
       return;
     }
 

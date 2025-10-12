@@ -19,15 +19,10 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
     var currentUserService = Resolve<ICurrentUserService>();
     var currentUserId = currentUserService.GetCurrentUserId();
 
-    // Calculate user-specific values
-    // Note: The article entity should already have FavoritedBy and Following loaded
-    // via appropriate specifications when fetched
-    var isFavorited = currentUserId.HasValue && article.FavoritedBy.Any(u => u.Id == currentUserId.Value);
+    // Use domain methods to compute user-specific values
+    var isFavorited = article.IsFavoritedBy(currentUserId);
 
-    // For following status, we need to check if current user follows the article author
-    // This requires the current user entity with Following relationship
-    // However, to avoid extra DB call here, we'll need the handler to pass this info
-    // For now, we'll get it from the repository (this is a temporary solution)
+    // For following status, get current user and use domain method
     bool isFollowing = false;
     if (currentUserId.HasValue)
     {

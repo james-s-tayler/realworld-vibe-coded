@@ -37,6 +37,18 @@ public class Article : EntityBase, IAggregateRoot
 
   public int FavoritesCount => FavoritedBy.Count;
 
+  /// <summary>
+  /// Checks if the article is favorited by a specific user
+  /// </summary>
+  public bool IsFavoritedBy(int? userId)
+  {
+    if (!userId.HasValue)
+    {
+      return false;
+    }
+    return FavoritedBy.Any(u => u.Id == userId.Value);
+  }
+
   public static string GenerateSlug(string title)
   {
     return title.ToLowerInvariant()
