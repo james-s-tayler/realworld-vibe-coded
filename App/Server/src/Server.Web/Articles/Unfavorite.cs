@@ -1,6 +1,7 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Unfavorite;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -41,22 +42,16 @@ public class Unfavorite(IMediator _mediator, ICurrentUserService _currentUserSer
 
     if (result.Status == ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = new[] { "Article not found" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+        Errors = new ConduitErrorBody { Body = new[] { "Article not found" } }
+      }, 404);
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+      Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
+    }, 400);
   }
 }

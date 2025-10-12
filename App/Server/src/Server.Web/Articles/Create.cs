@@ -11,7 +11,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Creates a new article. Authentication required.
 /// </remarks>
-public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<CreateArticleRequest, ArticleResponse, ArticleMapper>
+public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<CreateArticleRequest, ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -23,6 +23,35 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
       s.Summary = "Create article";
       s.Description = "Creates a new article. Authentication required.";
     });
+  }
+
+  public override void OnValidationFailed()
+  {
+    var errorBody = new List<string>();
+
+    foreach (var failure in ValidationFailures)
+    {
+      // Handle nested properties like Article.Title -> title
+      var propertyName = failure.PropertyName.ToLower();
+      if (propertyName.Contains('.'))
+      {
+        propertyName = propertyName.Split('.').Last();
+      }
+
+      // Handle array indexing for tags like Article.TagList[0] -> taglist[0]
+      if (propertyName.Contains("taglist["))
+      {
+        // Already in the right format, just ensure lowercase
+        propertyName = propertyName.Replace("taglist", "taglist");
+      }
+
+      errorBody.Add($"{propertyName} {failure.ErrorMessage}");
+    }
+
+    HttpContext.Response.SendAsync(new ConduitErrorResponse
+    {
+      Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
+    }, 422).GetAwaiter().GetResult();
   }
 
   public override async Task HandleAsync(CreateArticleRequest request, CancellationToken cancellationToken)
@@ -39,18 +68,15 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.IsSuccess)
     {
-      HttpContext.Response.StatusCode = 201;
       // Use FastEndpoints mapper to convert entity to response DTO
       Response = Map.FromEntity(result.Value);
+      await SendAsync(Response, 201);
       return;
     }
 
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+      Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
+    }, 422);
   }
 }

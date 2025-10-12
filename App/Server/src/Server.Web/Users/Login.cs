@@ -1,4 +1,5 @@
 ﻿using Server.UseCases.Users.Login;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Users;
 
@@ -38,13 +39,10 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
       errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
     }
 
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var json = System.Text.Json.JsonSerializer.Serialize(new
+    HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = errorBody }
-    });
-    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
+      Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
+    }, 422).GetAwaiter().GetResult();
   }
 
   public override async Task HandleAsync(
@@ -74,22 +72,16 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
 
     if (result.Status == ResultStatus.Unauthorized)
     {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var json = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = new[] { "email or password is invalid" } }
-      });
-      await HttpContext.Response.WriteAsync(json, cancellationToken);
+        Errors = new ConduitErrorBody { Body = new[] { "email or password is invalid" } }
+      }, 401);
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Login failed" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      Errors = new ConduitErrorBody { Body = new[] { result.Errors.FirstOrDefault() ?? "Login failed" } }
+    }, 400);
   }
 }

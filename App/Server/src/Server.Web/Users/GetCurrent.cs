@@ -1,5 +1,6 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Users.GetCurrent;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Users;
 
@@ -47,23 +48,17 @@ public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserSer
 
     if (result.Status == ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+        Errors = new ConduitErrorBody { Body = new[] { "Unauthorized" } }
+      }, 401);
       return;
     }
 
-    HttpContext.Response.StatusCode = 500;
-    HttpContext.Response.ContentType = "application/json";
-    var serverErrorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = new[] { "Internal server error" } }
-    });
-    await HttpContext.Response.WriteAsync(serverErrorJson, cancellationToken);
+      Errors = new ConduitErrorBody { Body = new[] { "Internal server error" } }
+    }, 500);
   }
 }
 

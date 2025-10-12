@@ -11,7 +11,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Updates an existing article. Authentication required. User must be the author.
 /// </remarks>
-public class Update(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<UpdateArticleRequest, ArticleResponse, ArticleMapper>
+public class Update(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<UpdateArticleRequest, ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -22,6 +22,35 @@ public class Update(IMediator _mediator, ICurrentUserService _currentUserService
       s.Summary = "Update article";
       s.Description = "Updates an existing article. Authentication required. User must be the author.";
     });
+  }
+
+  public override void OnValidationFailed()
+  {
+    var errorBody = new List<string>();
+
+    foreach (var failure in ValidationFailures)
+    {
+      // Handle nested properties like Article.Title -> title
+      var propertyName = failure.PropertyName.ToLower();
+      if (propertyName.Contains('.'))
+      {
+        propertyName = propertyName.Split('.').Last();
+      }
+
+      // Handle array indexing for tags like Article.TagList[0] -> taglist[0]
+      if (propertyName.Contains("taglist["))
+      {
+        // Already in the right format, just ensure lowercase
+        propertyName = propertyName.Replace("taglist", "taglist");
+      }
+
+      errorBody.Add($"{propertyName} {failure.ErrorMessage}");
+    }
+
+    HttpContext.Response.SendAsync(new ConduitErrorResponse
+    {
+      Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
+    }, 422).GetAwaiter().GetResult();
   }
 
   public override async Task HandleAsync(UpdateArticleRequest request, CancellationToken cancellationToken)
@@ -45,35 +74,26 @@ public class Update(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.Status == ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = new[] { "Article not found" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+        Errors = new ConduitErrorBody { Body = new[] { "Article not found" } }
+      }, 404);
       return;
     }
 
     if (result.Status == ResultStatus.Forbidden)
     {
-      HttpContext.Response.StatusCode = 403;
-      HttpContext.Response.ContentType = "application/json";
-      var forbiddenJson = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = new[] { "You can only update your own articles" } }
-      });
-      await HttpContext.Response.WriteAsync(forbiddenJson, cancellationToken);
+        Errors = new ConduitErrorBody { Body = new[] { "You can only update your own articles" } }
+      }, 403);
       return;
     }
 
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+      Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
+    }, 422);
   }
 }
 

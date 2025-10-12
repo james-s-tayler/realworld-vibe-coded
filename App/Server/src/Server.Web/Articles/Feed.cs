@@ -1,6 +1,7 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Feed;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -32,14 +33,10 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
 
     if (!validation.IsValid)
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-
-      var validationErrorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = validation.Errors.ToArray() }
-      });
-      await HttpContext.Response.WriteAsync(validationErrorJson, cancellationToken);
+        Errors = new ConduitErrorBody { Body = validation.Errors.ToArray() }
+      }, 422);
       return;
     }
 
@@ -54,12 +51,9 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+      Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
+    }, 400);
   }
 }

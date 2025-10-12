@@ -1,6 +1,7 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Get;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -40,13 +41,10 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
       return;
     }
 
-    HttpContext.Response.StatusCode = 404;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = new[] { "Article not found" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      Errors = new ConduitErrorBody { Body = new[] { "Article not found" } }
+    }, 404);
   }
 }
 

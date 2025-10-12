@@ -1,5 +1,6 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Users.Update;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Users;
 
@@ -41,13 +42,10 @@ public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserSer
       errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
     }
 
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var json = System.Text.Json.JsonSerializer.Serialize(new
+    HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = errorBody }
-    });
-    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
+      Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
+    }, 422).GetAwaiter().GetResult();
   }
 
   public override async Task HandleAsync(
@@ -89,34 +87,25 @@ public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserSer
         errorBody.Add($"{error.Identifier} {error.ErrorMessage}");
       }
 
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var validationJson = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = errorBody }
-      });
-      await HttpContext.Response.WriteAsync(validationJson, cancellationToken);
+        Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
+      }, 422);
       return;
     }
 
     if (result.Status == ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+        Errors = new ConduitErrorBody { Body = new[] { "Unauthorized" } }
+      }, 401);
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Update failed" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      Errors = new ConduitErrorBody { Body = new[] { result.Errors.FirstOrDefault() ?? "Update failed" } }
+    }, 400);
   }
 }

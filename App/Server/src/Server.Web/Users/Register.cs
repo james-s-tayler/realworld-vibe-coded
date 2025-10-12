@@ -1,4 +1,5 @@
 ﻿using Server.UseCases.Users.Register;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Users;
 
@@ -39,13 +40,10 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
       errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
     }
 
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var json = System.Text.Json.JsonSerializer.Serialize(new
+    HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = errorBody }
-    });
-    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
+      Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
+    }, 422).GetAwaiter().GetResult();
   }
 
   public override async Task HandleAsync(
@@ -71,7 +69,7 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
           Token = userDto.Token
         }
       };
-      HttpContext.Response.StatusCode = 201;
+      await SendAsync(Response, 201);
       return;
     }
 
@@ -83,22 +81,16 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
         errorBody.Add($"{error.Identifier} {error.ErrorMessage}");
       }
 
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var json = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = errorBody }
-      });
-      await HttpContext.Response.WriteAsync(json, cancellationToken);
+        Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
+      }, 422);
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Registration failed" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      Errors = new ConduitErrorBody { Body = new[] { result.Errors.FirstOrDefault() ?? "Registration failed" } }
+    }, 400);
   }
 }

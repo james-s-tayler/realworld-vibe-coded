@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Comments;
 /// <remarks>
 /// Create a new comment for an article. Authentication required.
 /// </remarks>
-public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<CreateCommentRequest, CommentResponse>
+public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<CreateCommentRequest, CommentResponse>
 {
   public override void Configure()
   {
@@ -22,6 +22,27 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
       s.Summary = "Create comment";
       s.Description = "Create a new comment for an article. Authentication required.";
     });
+  }
+
+  public override void OnValidationFailed()
+  {
+    var errorBody = new List<string>();
+
+    foreach (var failure in ValidationFailures)
+    {
+      var propertyName = failure.PropertyName.ToLower();
+      if (propertyName.Contains('.'))
+      {
+        propertyName = propertyName.Split('.').Last();
+      }
+
+      errorBody.Add($"{propertyName} {failure.ErrorMessage}");
+    }
+
+    HttpContext.Response.SendAsync(new ConduitErrorResponse
+    {
+      Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
+    }, 422).GetAwaiter().GetResult();
   }
 
   public override async Task HandleAsync(CreateCommentRequest request, CancellationToken cancellationToken)
@@ -35,30 +56,24 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.IsSuccess)
     {
-      HttpContext.Response.StatusCode = 201;
       Response = result.Value;
+      await SendAsync(Response, 201);
       return;
     }
 
     if (result.Status == Ardalis.Result.ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = new[] { "Article not found" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+        Errors = new ConduitErrorBody { Body = new[] { "Article not found" } }
+      }, 422);
       return;
     }
 
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
     {
-      errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+      Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
+    }, 422);
   }
 }
 

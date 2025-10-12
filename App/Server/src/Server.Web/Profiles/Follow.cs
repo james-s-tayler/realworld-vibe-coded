@@ -2,6 +2,7 @@
 using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Profiles;
 
@@ -37,13 +38,10 @@ public class Follow(IRepository<User> _userRepository, ICurrentUserService _curr
 
     if (userToFollow == null)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = new[] { "User not found" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+        Errors = new ConduitErrorBody { Body = new[] { "User not found" } }
+      }, 404);
       return;
     }
 
@@ -53,13 +51,10 @@ public class Follow(IRepository<User> _userRepository, ICurrentUserService _curr
 
     if (currentUser == null)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
       {
-        errors = new { body = new[] { "Current user not found" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+        Errors = new ConduitErrorBody { Body = new[] { "Current user not found" } }
+      }, 404);
       return;
     }
 
