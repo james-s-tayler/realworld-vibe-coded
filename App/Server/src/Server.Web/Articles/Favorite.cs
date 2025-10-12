@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Add article to favorites. Authentication required.
 /// </remarks>
-public class Favorite(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse>
+public class Favorite(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -34,7 +34,8 @@ public class Favorite(IMediator _mediator, ICurrentUserService _currentUserServi
 
     if (result.IsSuccess)
     {
-      Response = result.Value;
+      // Use FastEndpoints mapper to convert entity to response DTO
+      Response = Map.FromEntity(result.Value);
       return;
     }
 

@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Get articles from followed users. Authentication required.
 /// </remarks>
-public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticlesResponse>
+public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticlesResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -47,7 +47,10 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
 
     if (result.IsSuccess)
     {
-      Response = result.Value;
+      // Map each Article entity to ArticleDto using FastEndpoints mapper
+      var articles = result.Value.ToList();
+      var articleDtos = articles.Select(article => Map.FromEntity(article).Article).ToList();
+      Response = new ArticlesResponse(articleDtos, articleDtos.Count);
       return;
     }
 

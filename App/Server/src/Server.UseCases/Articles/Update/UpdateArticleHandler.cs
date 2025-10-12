@@ -1,14 +1,12 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications;
-using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Update;
 
-public class UpdateArticleHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
-  : ICommandHandler<UpdateArticleCommand, Result<ArticleResponse>>
+public class UpdateArticleHandler(IRepository<Article> _articleRepository)
+  : ICommandHandler<UpdateArticleCommand, Result<Article>>
 {
-  public async Task<Result<ArticleResponse>> Handle(UpdateArticleCommand request, CancellationToken cancellationToken)
+  public async Task<Result<Article>> Handle(UpdateArticleCommand request, CancellationToken cancellationToken)
   {
     var article = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(request.Slug), cancellationToken);
@@ -26,7 +24,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository, IRepo
     // Check for duplicate slug if title changed
     if (request.Title != null && article.Title != request.Title)
     {
-      var newSlug = ArticleMappers.GenerateSlug(request.Title);
+      var newSlug = Article.GenerateSlug(request.Title);
       if (newSlug != article.Slug)
       {
         var existingArticle = await _articleRepository.FirstOrDefaultAsync(
@@ -48,20 +46,6 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository, IRepo
     await _articleRepository.UpdateAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
-    // Load current user with following relationships to check following status
-    var currentUserWithFollowing = await _userRepository.FirstOrDefaultAsync(
-      new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
-
-    // Check if current user has favorited this article
-    var isFavorited = article.FavoritedBy.Any(u => u.Id == request.CurrentUserId);
-
-    var articleDto = ArticleMappers.MapToDto(article, currentUserWithFollowing, isFavorited);
-
-    return Result.Success(new ArticleResponse { Article = articleDto });
-  }
-
-  private static string GenerateSlug(string title)
-  {
-    return ArticleMappers.GenerateSlug(title);
+    return Result.Success(article);
   }
 }

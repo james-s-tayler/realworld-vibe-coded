@@ -37,7 +37,31 @@ public class Article : EntityBase, IAggregateRoot
 
   public int FavoritesCount => FavoritedBy.Count;
 
-  private static string GenerateSlug(string title)
+  /// <summary>
+  /// Checks if the article is favorited by a specific user
+  /// </summary>
+  public bool IsFavoritedBy(int? userId)
+  {
+    if (!userId.HasValue)
+    {
+      return false;
+    }
+    return FavoritedBy.Any(u => u.Id == userId.Value);
+  }
+
+  /// <summary>
+  /// Checks if a user is following the article's author
+  /// </summary>
+  public bool IsAuthorFollowedBy(User? user)
+  {
+    if (user == null)
+    {
+      return false;
+    }
+    return user.IsFollowing(AuthorId);
+  }
+
+  public static string GenerateSlug(string title)
   {
     return title.ToLowerInvariant()
       .Replace(" ", "-")

@@ -1,19 +1,18 @@
-﻿using Server.Core.Interfaces;
+﻿using Server.Core.ArticleAggregate;
+using Server.Core.Interfaces;
 
 namespace Server.UseCases.Articles.Feed;
 
 public class GetFeedHandler(IFeedQueryService _feedQuery)
-  : IQueryHandler<GetFeedQuery, Result<ArticlesResponse>>
+  : IQueryHandler<GetFeedQuery, Result<IEnumerable<Article>>>
 {
-  public async Task<Result<ArticlesResponse>> Handle(GetFeedQuery request, CancellationToken cancellationToken)
+  public async Task<Result<IEnumerable<Article>>> Handle(GetFeedQuery request, CancellationToken cancellationToken)
   {
     var articles = await _feedQuery.GetFeedAsync(
       request.UserId,
       request.Limit,
       request.Offset);
 
-    var articlesCount = articles.Count();
-
-    return Result.Success(new ArticlesResponse(articles.ToList(), articlesCount));
+    return Result.Success(articles);
   }
 }

@@ -1,12 +1,11 @@
-﻿using Server.Core.ArticleAggregate.Dtos;
+﻿using Server.Core.ArticleAggregate;
 using Server.Core.Interfaces;
-using Server.UseCases.Articles;
 
 namespace Server.Infrastructure.Data.Queries;
 
 public class FeedQueryService(AppDbContext _context) : IFeedQueryService
 {
-  public async Task<IEnumerable<ArticleDto>> GetFeedAsync(
+  public async Task<IEnumerable<Article>> GetFeedAsync(
     int userId,
     int limit = 20,
     int offset = 0)
@@ -21,7 +20,7 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
     // If not following anyone, return empty list
     if (!followedUserIds.Any())
     {
-      return new List<ArticleDto>();
+      return new List<Article>();
     }
 
     // Get articles from followed users
@@ -36,13 +35,7 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
       .AsNoTracking()
       .ToListAsync();
 
-    // Get current user with following relationships
-    var currentUser = await _context.Users
-      .Include(u => u.Following)
-      .AsNoTracking()
-      .FirstOrDefaultAsync(u => u.Id == userId);
-
-    return articles.Select(a => ArticleMappers.MapToDto(a, currentUser));
+    return articles;
   }
 
   public async Task<int> GetFeedCountAsync(int userId)
