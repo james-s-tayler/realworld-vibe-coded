@@ -3,21 +3,102 @@
 ## Mapping Conventions
 
 ### Overview
-To reduce code duplication and ensure consistency across handlers, mapping logic between domain entities and DTOs has been extracted into static mapper classes. These mappers follow a consistent pattern and are organized by feature area.
+The application uses a hybrid approach for mapping between domain entities and DTOs, following clean architecture principles and FastEndpoints best practices.
 
-### Mapper Organization
+### FastEndpoints Mappers (Preferred for Single-Entity Operations)
 
-#### Location Strategy
-Mappers are placed within the UseCases project, organized by feature:
-- `Server.UseCases.Articles.ArticleMappers` - Article and AuthorDto mapping
+For single-entity operations (Get, Create, Update, Favorite, etc.), we use FastEndpoints ResponseMapper classes:
+
+**Location:** `Server.Web.Articles.ArticleMapper`
+
+**Pattern:**
+- MediatR handlers return domain entities (e.g., `Result<Article>`)
+- FastEndpoints endpoints use `ResponseMapper<TResponse, TEntity>` to map entities to response DTOs
+- Mapping occurs at the endpoint layer using `Map.FromEntity(entity)`
+
+**Benefits:**
+- Clear separation: Domain logic returns entities, presentation layer handles DTO mapping
+- FastEndpoints integration: Built-in mapper support with dependency injection
+- User context: Mappers can resolve scoped services (e.g., `ICurrentUserService`) for user-specific data
+
+**Example:**
+```csharp
+// Handler returns entity
+public class GetArticleHandler : IQueryHandler<GetArticleQuery, Result<Article>>
+{
+  public async Task<Result<Article>> Handle(...)
+  {
+    var article = await _articleRepository.FirstOrDefaultAsync(...);
+    return Result.Success(article);
+  }
+}
+
+// Endpoint uses FastEndpoints mapper
+public class Get : EndpointWithoutRequest<ArticleResponse, ArticleMapper>
+{
+  public override async Task HandleAsync(...)
+  {
+    var result = await _mediator.Send(new GetArticleQuery(...));
+    if (result.IsSuccess)
+    {
+      Response = Map.FromEntity(result.Value);
+    }
+  }
+}
+
+// Mapper handles DTO conversion
+public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
+{
+  public override ArticleResponse FromEntity(Article article)
+  {
+    var currentUserService = Resolve<ICurrentUserService>();
+    // ... mapping logic with user context
+  }
+}
+```
+
+### Static Mappers (Legacy - Being Phased Out)
+
+Static mappers in the UseCases project are being phased out in favor of FastEndpoints mappers:
+- `Server.UseCases.Articles.ArticleMappers` - Article and AuthorDto mapping (legacy utility methods remain)
 - `Server.UseCases.Articles.Comments.CommentMappers` - Comment mapping  
 - `Server.UseCases.Users.UserMappers` - User mapping
 - `Server.UseCases.Contributors.ContributorMappers` - Contributor mapping
 
-#### Naming Conventions
-- Mapper classes: `[Feature]Mappers` (e.g., `ArticleMappers`)
-- Main mapping method: `MapToDto(entity, ...)`
-- Utility methods: Descriptive names (e.g., `GenerateSlug`)
+### Infrastructure Query Projections (For List Operations)
+
+For list/collection operations, Infrastructure services use direct LINQ projections:
+
+**Pattern:**
+- Infrastructure projects directly to DTOs using LINQ `.Select()`
+- No entity materialization or mapper calls
+- Optimized for performance (single database query)
+
+**Example:**
+```csharp
+public async Task<IEnumerable<ArticleDto>> ListAsync(...)
+{
+  var articleDtos = await _context.Articles
+    .Select(a => new ArticleDto(
+      a.Slug,
+      a.Title,
+      // ... direct projection
+    ))
+    .ToListAsync();
+  return articleDtos;
+}
+```
+
+### Migration Strategy
+
+**Do:**
+- Use FastEndpoints ResponseMapper for new single-entity endpoints
+- Use direct LINQ projections in Infrastructure for list queries
+- Keep Infrastructure layer independent of Application layer mappers
+
+**Don't:**
+- Call Application layer mappers from Infrastructure
+- Materialize full aggregates when only DTO data is needed
 
 ### Mapping Patterns
 

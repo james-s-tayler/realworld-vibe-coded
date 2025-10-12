@@ -10,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Gets a single article by its slug. Authentication optional.
 /// </remarks>
-public class Get(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse>
+public class Get(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -35,7 +35,8 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
 
     if (result.IsSuccess)
     {
-      Response = result.Value;
+      // Use FastEndpoints mapper to convert entity to response DTO
+      Response = Map.FromEntity(result.Value);
       return;
     }
 

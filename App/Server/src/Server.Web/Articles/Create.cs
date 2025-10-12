@@ -11,7 +11,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Creates a new article. Authentication required.
 /// </remarks>
-public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<CreateArticleRequest, ArticleResponse>
+public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<CreateArticleRequest, ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -40,7 +40,8 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
     if (result.IsSuccess)
     {
       HttpContext.Response.StatusCode = 201;
-      Response = result.Value;
+      // Use FastEndpoints mapper to convert entity to response DTO
+      Response = Map.FromEntity(result.Value);
       return;
     }
 

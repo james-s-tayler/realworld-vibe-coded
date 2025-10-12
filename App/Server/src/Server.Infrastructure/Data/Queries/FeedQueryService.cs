@@ -1,6 +1,5 @@
 ﻿using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.Interfaces;
-using Server.UseCases.Articles;
 
 namespace Server.Infrastructure.Data.Queries;
 
@@ -24,25 +23,33 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
       return new List<ArticleDto>();
     }
 
-    // Get articles from followed users
-    var articles = await _context.Articles
-      .Include(a => a.Author)
-      .Include(a => a.Tags)
-      .Include(a => a.FavoritedBy)
+    // Direct LINQ projection to DTO - no entity materialization
+    var articleDtos = await _context.Articles
       .Where(a => followedUserIds.Contains(a.AuthorId))
       .OrderByDescending(a => a.CreatedAt)
       .Skip(offset)
       .Take(Math.Min(limit, 100))
       .AsNoTracking()
+      .Select(a => new ArticleDto(
+        a.Slug,
+        a.Title,
+        a.Description,
+        a.Body,
+        a.Tags.Select(t => t.Name).ToList(),
+        a.CreatedAt,
+        a.UpdatedAt,
+        a.FavoritedBy.Any(u => u.Id == userId),
+        a.FavoritedBy.Count,
+        new AuthorDto(
+          a.Author.Username,
+          a.Author.Bio ?? string.Empty,
+          a.Author.Image,
+          true  // All authors in feed are followed by definition
+        )
+      ))
       .ToListAsync();
 
-    // Get current user with following relationships
-    var currentUser = await _context.Users
-      .Include(u => u.Following)
-      .AsNoTracking()
-      .FirstOrDefaultAsync(u => u.Id == userId);
-
-    return articles.Select(a => ArticleMappers.MapToDto(a, currentUser));
+    return articleDtos;
   }
 
   public async Task<int> GetFeedCountAsync(int userId)

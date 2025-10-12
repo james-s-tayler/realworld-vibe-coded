@@ -1,4 +1,6 @@
-﻿namespace Server.UseCases.Articles.Create;
+﻿using Server.Core.ArticleAggregate;
+
+namespace Server.UseCases.Articles.Create;
 
 public record CreateArticleCommand(
   string Title,
@@ -7,4 +9,4 @@ public record CreateArticleCommand(
   List<string> TagList,
   int AuthorId,
   int? CurrentUserId = null
-) : ICommand<Result<ArticleResponse>>;
+) : ICommand<Result<Article>>;

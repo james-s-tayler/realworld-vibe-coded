@@ -1,8 +1,6 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.Interfaces;
-using Server.Core.UserAggregate;
-using Server.UseCases.Articles;
 
 namespace Server.Infrastructure.Data.Queries;
 
@@ -16,25 +14,44 @@ public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQuer
     int offset = 0,
     int? currentUserId = null)
   {
+    // Get list of user IDs that current user follows (for following status)
+    List<int> followedUserIds = new();
+    if (currentUserId.HasValue)
+    {
+      followedUserIds = await _context.UserFollowings
+        .AsNoTracking()
+        .Where(uf => uf.FollowerId == currentUserId.Value)
+        .Select(uf => uf.FollowedId)
+        .ToListAsync();
+    }
+
     var query = BuildQuery(tag, author, favorited);
 
-    var articles = await query
+    // Direct LINQ projection to DTO - no entity materialization
+    var articleDtos = await query
       .Skip(offset)
       .Take(Math.Min(limit, 100))
       .AsNoTracking()
+      .Select(a => new ArticleDto(
+        a.Slug,
+        a.Title,
+        a.Description,
+        a.Body,
+        a.Tags.Select(t => t.Name).ToList(),
+        a.CreatedAt,
+        a.UpdatedAt,
+        currentUserId.HasValue && a.FavoritedBy.Any(u => u.Id == currentUserId.Value),
+        a.FavoritedBy.Count,
+        new AuthorDto(
+          a.Author.Username,
+          a.Author.Bio ?? string.Empty,
+          a.Author.Image,
+          followedUserIds.Contains(a.AuthorId)
+        )
+      ))
       .ToListAsync();
 
-    // Get current user with following relationships if authenticated
-    User? currentUser = null;
-    if (currentUserId.HasValue)
-    {
-      currentUser = await _context.Users
-        .Include(u => u.Following)
-        .AsNoTracking()
-        .FirstOrDefaultAsync(u => u.Id == currentUserId.Value);
-    }
-
-    return articles.Select(a => ArticleMappers.MapToDto(a, currentUser));
+    return articleDtos;
   }
 
   public async Task<int> CountAsync(

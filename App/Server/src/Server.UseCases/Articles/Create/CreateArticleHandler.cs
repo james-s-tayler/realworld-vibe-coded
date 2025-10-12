@@ -1,7 +1,6 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Create;
 
@@ -9,9 +8,9 @@ public class CreateArticleHandler(
   IRepository<User> _userRepository,
   IRepository<Article> _articleRepository,
   IRepository<Tag> _tagRepository)
-  : ICommandHandler<CreateArticleCommand, Result<ArticleResponse>>
+  : ICommandHandler<CreateArticleCommand, Result<Article>>
 {
-  public async Task<Result<ArticleResponse>> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
+  public async Task<Result<Article>> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
   {
     // Get the author
     var author = await _userRepository.GetByIdAsync(request.AuthorId, cancellationToken);
@@ -51,13 +50,7 @@ public class CreateArticleHandler(
     await _articleRepository.AddAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
-    // Get current user with following relationships if authenticated
-    var currentUser = request.CurrentUserId.HasValue ?
-        await _userRepository.FirstOrDefaultAsync(new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken) : null;
-
-    var articleDto = ArticleMappers.MapToDto(article, currentUser, false); // Always false for newly created articles
-
-    return Result.Success(new ArticleResponse { Article = articleDto });
+    return Result.Success(article);
   }
 
   private static string GenerateSlug(string title)
