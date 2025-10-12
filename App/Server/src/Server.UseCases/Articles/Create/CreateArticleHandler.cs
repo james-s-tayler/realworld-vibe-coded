@@ -20,7 +20,7 @@ public class CreateArticleHandler(
     }
 
     // Check for duplicate slug
-    var slug = ArticleMappers.GenerateSlug(request.Title);
+    var slug = Article.GenerateSlug(request.Title);
     var existingArticle = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(slug), cancellationToken);
 
@@ -51,10 +51,5 @@ public class CreateArticleHandler(
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
     return Result.Success(article);
-  }
-
-  private static string GenerateSlug(string title)
-  {
-    return ArticleMappers.GenerateSlug(title);
   }
 }

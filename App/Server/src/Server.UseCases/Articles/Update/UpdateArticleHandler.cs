@@ -24,7 +24,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
     // Check for duplicate slug if title changed
     if (request.Title != null && article.Title != request.Title)
     {
-      var newSlug = ArticleMappers.GenerateSlug(request.Title);
+      var newSlug = Article.GenerateSlug(request.Title);
       if (newSlug != article.Slug)
       {
         var existingArticle = await _articleRepository.FirstOrDefaultAsync(
@@ -47,10 +47,5 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
     return Result.Success(article);
-  }
-
-  private static string GenerateSlug(string title)
-  {
-    return ArticleMappers.GenerateSlug(title);
   }
 }

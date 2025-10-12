@@ -37,7 +37,7 @@ public class Article : EntityBase, IAggregateRoot
 
   public int FavoritesCount => FavoritedBy.Count;
 
-  private static string GenerateSlug(string title)
+  public static string GenerateSlug(string title)
   {
     return title.ToLowerInvariant()
       .Replace(" ", "-")
