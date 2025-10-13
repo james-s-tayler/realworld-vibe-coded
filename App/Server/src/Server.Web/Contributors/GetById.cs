@@ -26,7 +26,7 @@ public class GetById(IMediator _mediator)
 
     if (result.Status == ResultStatus.NotFound)
     {
-      await SendNotFoundAsync(cancellationToken);
+      await Send.NotFoundAsync(cancellationToken);
       return;
     }
 

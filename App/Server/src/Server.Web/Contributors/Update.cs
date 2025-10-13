@@ -27,7 +27,7 @@ public class Update(IMediator _mediator)
 
     if (result.Status == ResultStatus.NotFound)
     {
-      await SendNotFoundAsync(cancellationToken);
+      await Send.NotFoundAsync(cancellationToken);
       return;
     }
 
@@ -37,7 +37,7 @@ public class Update(IMediator _mediator)
 
     if (queryResult.Status == ResultStatus.NotFound)
     {
-      await SendNotFoundAsync(cancellationToken);
+      await Send.NotFoundAsync(cancellationToken);
       return;
     }
 

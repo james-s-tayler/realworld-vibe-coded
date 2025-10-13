@@ -27,13 +27,13 @@ public class Delete(IMediator _mediator)
 
     if (result.Status == ResultStatus.NotFound)
     {
-      await SendNotFoundAsync(cancellationToken);
+      await Send.NotFoundAsync(cancellationToken);
       return;
     }
 
     if (result.IsSuccess)
     {
-      await SendNoContentAsync(cancellationToken);
+      await Send.NoContentAsync(cancellationToken);
     }
     ;
     // TODO: Handle other issues as needed
