@@ -1,7 +1,6 @@
 ﻿using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.Interfaces;
 using Server.UseCases.Articles.Comments.Create;
-using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles.Comments;
 
@@ -11,7 +10,7 @@ namespace Server.Web.Articles.Comments;
 /// <remarks>
 /// Create a new comment for an article. Authentication required.
 /// </remarks>
-public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<CreateCommentRequest, CommentResponse>
+public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<CreateCommentRequest, CommentResponse>
 {
   public override void Configure()
   {

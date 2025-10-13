@@ -1,7 +1,6 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Update;
-using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -11,7 +10,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Updates an existing article. Authentication required. User must be the author.
 /// </remarks>
-public class Update(IMediator _mediator, ICurrentUserService _currentUserService) : BaseValidatedEndpoint<UpdateArticleRequest, ArticleResponse, ArticleMapper>
+public class Update(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<UpdateArticleRequest, ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
