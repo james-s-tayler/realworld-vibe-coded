@@ -26,13 +26,7 @@ public class GetById(IMediator _mediator)
 
     if (result.Status == ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Contributor not found" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+      await Send.NotFoundAsync(cancellationToken);
       return;
     }
 

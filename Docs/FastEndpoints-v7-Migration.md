@@ -52,13 +52,7 @@ public override async Task HandleAsync(GetContributorByIdRequest request,
 
     if (result.Status == ResultStatus.NotFound)
     {
-        HttpContext.Response.StatusCode = 404;
-        HttpContext.Response.ContentType = "application/json";
-        var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
-        {
-            errors = new { body = new[] { "Contributor not found" } }
-        });
-        await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+        await Send.NotFoundAsync(cancellationToken);
         return;
     }
 
@@ -70,15 +64,10 @@ public override async Task HandleAsync(GetContributorByIdRequest request,
 ```
 
 **Key Changes:**
-1. Replace `await SendNotFoundAsync(cancellationToken)` with:
-   - `HttpContext.Response.StatusCode = 404`
-   - Set `ContentType` to `"application/json"`
-   - Serialize and write error response body
+1. Replace `await SendNotFoundAsync(cancellationToken)` with `await Send.NotFoundAsync(cancellationToken)`
+2. Replace `await SendNoContentAsync(cancellationToken)` with `await Send.NoContentAsync(cancellationToken)`
 
-2. Replace `await SendNoContentAsync(cancellationToken)` with:
-   - `HttpContext.Response.StatusCode = 204`
-
-**Important:** In FastEndpoints v7, endpoints that set a status code but don't write a response body may get their status code overridden. Always provide a response body for error responses.
+**Important:** In FastEndpoints v7, the helper methods moved from being instance methods on the `Endpoint` base class to static methods on the `Send` property. The functionality remains the same, just the syntax changed.
 
 ## Files Modified
 

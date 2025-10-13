@@ -27,19 +27,13 @@ public class Delete(IMediator _mediator)
 
     if (result.Status == ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Contributor not found" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+      await Send.NotFoundAsync(cancellationToken);
       return;
     }
 
     if (result.IsSuccess)
     {
-      HttpContext.Response.StatusCode = 204;
+      await Send.NoContentAsync(cancellationToken);
     }
     ;
     // TODO: Handle other issues as needed
