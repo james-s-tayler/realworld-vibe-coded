@@ -6,21 +6,22 @@ public class CreateArticleValidator : Validator<CreateArticleRequest>
 {
   public CreateArticleValidator()
   {
+    RuleLevelCascadeMode = CascadeMode.Stop;
+
     RuleFor(x => x.Article.Title)
       .NotEmpty()
-      .WithMessage("can't be blank");
+      .WithMessage("can't be blank")
+      .OverridePropertyName("title");
 
     RuleFor(x => x.Article.Description)
       .NotEmpty()
-      .WithMessage("can't be blank");
+      .WithMessage("can't be blank")
+      .OverridePropertyName("description");
 
     RuleFor(x => x.Article.Body)
       .NotEmpty()
-      .WithMessage("can't be blank");
-
-    RuleFor(x => x.Article.TagList)
-      .Must(tags => tags == null || tags.All(tag => !string.IsNullOrWhiteSpace(tag) && !tag.Contains(",")))
-      .WithMessage("must not be empty or contain commas");
+      .WithMessage("can't be blank")
+      .OverridePropertyName("body");
 
     // Add individual tag validation for better error messages
     RuleForEach(x => x.Article.TagList)

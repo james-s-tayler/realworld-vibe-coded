@@ -6,6 +6,8 @@ public class LoginValidator : Validator<LoginRequest>
 {
   public LoginValidator()
   {
+    RuleLevelCascadeMode = CascadeMode.Stop;
+
     RuleFor(x => x.User.Email)
       .NotEmpty()
       .WithMessage("is required.")

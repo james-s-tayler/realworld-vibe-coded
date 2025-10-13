@@ -6,6 +6,8 @@ public class RegisterValidator : Validator<RegisterRequest>
 {
   public RegisterValidator()
   {
+    RuleLevelCascadeMode = CascadeMode.Stop;
+
     RuleFor(x => x.User.Email)
       .NotEmpty()
       .WithMessage("is required.")
