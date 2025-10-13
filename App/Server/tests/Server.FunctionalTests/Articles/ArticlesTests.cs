@@ -27,9 +27,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   {
     var response = await App.Client.GetAsync("/api/articles?author=nonexistentauthor999");
     var result = await response.Content.ReadFromJsonAsync<ArticlesResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.ShouldNotBeNull();
     result.Articles.ShouldNotBeNull();
     result.Articles.ShouldBeEmpty();
     result.ArticlesCount.ShouldBe(0);
@@ -40,9 +40,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   {
     var response = await App.Client.GetAsync("/api/articles?favorited=nonexistentuser999");
     var result = await response.Content.ReadFromJsonAsync<ArticlesResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.ShouldNotBeNull();
     result.Articles.ShouldNotBeNull();
     result.Articles.ShouldBeEmpty();
     result.ArticlesCount.ShouldBe(0);
@@ -53,9 +53,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   {
     var response = await App.Client.GetAsync("/api/articles?tag=nonexistenttag999");
     var result = await response.Content.ReadFromJsonAsync<ArticlesResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.ShouldNotBeNull();
     result.Articles.ShouldNotBeNull();
     result.Articles.ShouldBeEmpty();
     result.ArticlesCount.ShouldBe(0);
@@ -247,9 +247,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.GetAsync($"/api/articles/{slug}");
     var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.ShouldNotBeNull();
     result.Article.ShouldNotBeNull();
     result.Article.Slug.ShouldBe(slug);
     result.Article.Title.ShouldBe("Get Article Test");
@@ -273,9 +273,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.Client.GetAsync($"/api/articles/{slug}");
     var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.ShouldNotBeNull();
     result.Article.ShouldNotBeNull();
     result.Article.Slug.ShouldBe(slug);
   }
@@ -306,9 +306,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
     var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.ShouldNotBeNull();
     result.Article.ShouldNotBeNull();
     result.Article.Slug.ShouldBe(slug);
     result.Article.Favorited.ShouldBe(true);
@@ -335,9 +335,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
     var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.ShouldNotBeNull();
     result.Article.Favorited.ShouldBe(true);
     result.Article.FavoritesCount.ShouldBe(1);
   }
@@ -362,9 +362,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser2Client.PostAsync($"/api/articles/{slug}/favorite", null);
     var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.ShouldNotBeNull();
     result.Article.Favorited.ShouldBe(true);
     result.Article.FavoritesCount.ShouldBe(2);
   }
@@ -418,9 +418,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/favorite");
     var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.ShouldNotBeNull();
     result.Article.ShouldNotBeNull();
     result.Article.Favorited.ShouldBe(false);
     result.Article.FavoritesCount.ShouldBe(0);
@@ -444,9 +444,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/favorite");
     var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.ShouldNotBeNull();
     result.Article.Favorited.ShouldBe(false);
     result.Article.FavoritesCount.ShouldBe(0);
   }
@@ -506,9 +506,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest);
     var result = await response.Content.ReadFromJsonAsync<CommentResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.Created);
-    result.ShouldNotBeNull();
     result.Comment.ShouldNotBeNull();
     result.Comment.Body.ShouldBe("This is a test comment");
     result.Comment.Author.ShouldNotBeNull();
@@ -641,9 +641,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest);
 
-    var response = await App.ArticlesUser1Client.GetAsync($"/api/articles/{slug}/comments");
-    var result = await response.Content.ReadFromJsonAsync<CommentsResponse>();
-    result.ShouldNotBeNull();
+    var (response, result) = await App.ArticlesUser1Client.GETAsync<Server.Web.Articles.Comments.Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Comments.ShouldNotBeNull();
@@ -677,9 +675,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest);
 
-    var response = await App.Client.GetAsync($"/api/articles/{slug}/comments");
-    var result = await response.Content.ReadFromJsonAsync<CommentsResponse>();
-    result.ShouldNotBeNull();
+    var (response, result) = await App.Client.GETAsync<Server.Web.Articles.Comments.Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Comments.ShouldNotBeNull();
@@ -702,9 +698,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
-    var response = await App.Client.GetAsync($"/api/articles/{slug}/comments");
-    var result = await response.Content.ReadFromJsonAsync<CommentsResponse>();
-    result.ShouldNotBeNull();
+    var (response, result) = await App.Client.GETAsync<Server.Web.Articles.Comments.Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Comments.ShouldNotBeNull();
@@ -714,7 +708,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task GetComments_WithNonExistentArticle_ReturnsNotFound()
   {
-    var response = await App.Client.GetAsync($"/api/articles/no-such-article/comments");
+    var (response, _) = await App.Client.GETAsync<Server.Web.Articles.Comments.Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -898,9 +892,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var response = await App.ArticlesUser1Client.PutAsJsonAsync($"/api/articles/{slug}", updateRequest);
-    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
-    result.ShouldNotBeNull();
+    var (response, result) = await App.ArticlesUser1Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, ArticleResponse>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -935,7 +927,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var response = await App.Client.PutAsJsonAsync($"/api/articles/{slug}", updateRequest);
+    var (response, _) = await App.Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -952,7 +944,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var response = await App.ArticlesUser1Client.PutAsJsonAsync($"/api/articles/no-such-article", updateRequest);
+    var (response, _) = await App.ArticlesUser1Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -982,7 +974,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var response = await App.ArticlesUser2Client.PutAsJsonAsync($"/api/articles/{slug}", updateRequest);
+    var (response, _) = await App.ArticlesUser2Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }
@@ -1014,7 +1006,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var response = await App.ArticlesUser1Client.PutAsJsonAsync($"/api/articles/{slug}", updateRequest);
+    var (response, _) = await App.ArticlesUser1Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
   }
@@ -1043,7 +1035,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task DeleteArticle_WithNonExistentArticle_ReturnsNotFound()
   {
-    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/no-such-article");
+    var response = await App.ArticlesUser1Client.DeleteAsync("/api/articles/no-such-article");
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
