@@ -1,4 +1,5 @@
-﻿global using Ardalis.HttpClientTestExtensions;
+﻿global using FastEndpoints;
+global using FastEndpoints.Testing;
 global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.AspNetCore.Mvc.Testing;
 global using Microsoft.Extensions.DependencyInjection;
