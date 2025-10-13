@@ -30,7 +30,7 @@ General functionality:
 - You are not permitted to suppress warnings or errors in code unless explicitly instructed to do so.
 - You are not permitted to modify any Archunit rules unless explicitly instructed to do so.
 - Don't hardcode things or use magic strings.
-- Do not use python, perl, or regex to perform mass refactorings. Only do direct updates.
+- Do not use python, perl, awk, sed, or regex to perform mass refactorings. Only do direct updates.
 - Make sure to lint the code before committing.
 - Make sure the postman tests are passing before finishing.
 - Do not add any extraneous documentation unless asked to do so.
