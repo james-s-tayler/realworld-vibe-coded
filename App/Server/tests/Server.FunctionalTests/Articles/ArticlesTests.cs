@@ -245,7 +245,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await App.ArticlesUser1Client.GETAsync<Server.Web.Articles.Get, GetArticleRequest, ArticleResponse>(new GetArticleRequest { Slug = slug });
+    var response = await App.ArticlesUser1Client.GetAsync($"/api/articles/{slug}");
+    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -269,7 +271,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await App.Client.GETAsync<Server.Web.Articles.Get, GetArticleRequest, ArticleResponse>(new GetArticleRequest { Slug = slug });
+    var response = await App.Client.GetAsync($"/api/articles/{slug}");
+    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -279,7 +283,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task GetArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var (response, _) = await App.Client.GETAsync<Server.Web.Articles.Get, GetArticleRequest, object>(new GetArticleRequest { Slug = "no-such-article" });
+    var response = await App.Client.GetAsync("/api/articles/no-such-article");
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -300,7 +304,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    var response = await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
+    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -325,9 +331,11 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
 
-    var (response, result) = await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    var response = await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
+    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(true);
@@ -350,9 +358,11 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
 
-    var (response, result) = await App.ArticlesUser2Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    var response = await App.ArticlesUser2Client.PostAsync($"/api/articles/{slug}/favorite", null);
+    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(true);
@@ -375,7 +385,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, _) = await App.Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    var response = await App.Client.PostAsync($"/api/articles/{slug}/favorite", null);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -383,7 +393,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task FavoriteArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = "no-such-article" });
+    var response = await App.ArticlesUser1Client.PostAsync("/api/articles/no-such-article/favorite", null);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -404,9 +414,11 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
 
-    var (response, result) = await App.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, ArticleResponse>(new UnfavoriteArticleRequest { Slug = slug });
+    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/favorite");
+    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -430,7 +442,9 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await App.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, ArticleResponse>(new UnfavoriteArticleRequest { Slug = slug });
+    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/favorite");
+    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>();
+    result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(false);
@@ -453,7 +467,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await App.Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, ArticleResponse>(new UnfavoriteArticleRequest { Slug = slug });
+    var response = await App.Client.DeleteAsync($"/api/articles/{slug}/favorite");
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -461,7 +475,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task UnfavoriteArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, ArticleResponse>(new UnfavoriteArticleRequest { Slug = "no-such-article" });
+    var response = await App.ArticlesUser1Client.DeleteAsync("/api/articles/no-such-article/favorite");
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -728,7 +742,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     createCommentResult.ShouldNotBeNull();
     var commentId = createCommentResult.Comment.Id;
 
-    var response = await App.ArticlesUser1Client.DELETEAsync<Server.Web.Articles.Comments.Delete, DeleteCommentRequest>(new DeleteCommentRequest { Slug = slug, Id = commentId.ToString() });
+    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/{commentId}");
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
   }
@@ -762,7 +776,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     createCommentResult.ShouldNotBeNull();
     var commentId = createCommentResult.Comment.Id;
 
-    var response = await App.Client.DELETEAsync<Server.Web.Articles.Comments.Delete, DeleteCommentRequest>(new DeleteCommentRequest { Slug = slug, Id = commentId.ToString() });
+    var response = await App.Client.DeleteAsync($"/api/articles/{slug}/comments/{commentId}");
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -796,7 +810,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     createCommentResult.ShouldNotBeNull();
     var commentId = createCommentResult.Comment.Id;
 
-    var response = await App.ArticlesUser2Client.DELETEAsync<Server.Web.Articles.Comments.Delete, DeleteCommentRequest>(new DeleteCommentRequest { Slug = slug, Id = commentId.ToString() });
+    var response = await App.ArticlesUser2Client.DeleteAsync($"/api/articles/{slug}/comments/{commentId}");
 
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }
@@ -804,7 +818,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task DeleteComment_WithNonExistentArticle_ReturnsValidationError()
   {
-    var response = await App.ArticlesUser1Client.DELETEAsync<Server.Web.Articles.Comments.Delete, DeleteCommentRequest>(new DeleteCommentRequest { Slug = "no-such-article", Id = "1" });
+    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/no-such-article/comments/1");
 
     response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
   }
@@ -825,7 +839,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
-    var response = await App.ArticlesUser1Client.DELETEAsync<Server.Web.Articles.Comments.Delete, DeleteCommentRequest>(new DeleteCommentRequest { Slug = "{slug}", Id = "999999" });
+    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/999999");
 
     response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
   }
@@ -1013,7 +1027,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var response = await App.ArticlesUser1Client.DELETEAsync<Server.Web.Articles.Delete, DeleteArticleRequest>(new DeleteArticleRequest { Slug = slug });
+    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}");
 
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
   }
@@ -1021,7 +1035,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task DeleteArticle_WithNonExistentArticle_ReturnsNotFound()
   {
-    var response = await App.ArticlesUser1Client.DELETEAsync<Server.Web.Articles.Delete, DeleteArticleRequest>(new DeleteArticleRequest { Slug = "no-such-article" });
+    var response = await App.ArticlesUser1Client.DeleteAsync("/api/articles/no-such-article");
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -1042,7 +1056,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var response = await App.Client.DELETEAsync<Server.Web.Articles.Delete, DeleteArticleRequest>(new DeleteArticleRequest { Slug = slug });
+    var response = await App.Client.DeleteAsync($"/api/articles/{slug}");
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -1063,7 +1077,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var response = await App.ArticlesUser2Client.DELETEAsync<Server.Web.Articles.Delete, DeleteArticleRequest>(new DeleteArticleRequest { Slug = slug });
+    var response = await App.ArticlesUser2Client.DeleteAsync($"/api/articles/{slug}");
 
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }

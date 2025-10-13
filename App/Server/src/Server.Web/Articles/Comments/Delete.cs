@@ -3,22 +3,13 @@ using Server.UseCases.Articles.Comments.Delete;
 
 namespace Server.Web.Articles.Comments;
 
-public class DeleteCommentRequest
-{
-  [RouteParam]
-  public string Slug { get; set; } = string.Empty;
-
-  [RouteParam]
-  public string Id { get; set; } = string.Empty;
-}
-
 /// <summary>
 /// Delete comment
 /// </summary>
 /// <remarks>
 /// Delete a comment. Authentication required. Only comment author can delete.
 /// </remarks>
-public class Delete(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<DeleteCommentRequest>
+public class Delete(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest
 {
   public override void Configure()
   {
@@ -31,12 +22,13 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
     });
   }
 
-  public override async Task HandleAsync(DeleteCommentRequest request, CancellationToken cancellationToken)
+  public override async Task HandleAsync(CancellationToken cancellationToken)
   {
     var userId = _currentUserService.GetRequiredCurrentUserId();
 
-    var slug = request.Slug;
-    var commentIdStr = request.Id;
+    // Get parameters from route
+    var slug = Route<string>("slug") ?? string.Empty;
+    var commentIdStr = Route<string>("id") ?? string.Empty;
 
     if (string.IsNullOrEmpty(slug))
     {

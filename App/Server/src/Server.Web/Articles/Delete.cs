@@ -3,19 +3,13 @@ using Server.UseCases.Articles.Delete;
 
 namespace Server.Web.Articles;
 
-public class DeleteArticleRequest
-{
-  [RouteParam]
-  public string Slug { get; set; } = string.Empty;
-}
-
 /// <summary>
 /// Delete article
 /// </summary>
 /// <remarks>
 /// Deletes an existing article. Authentication required. User must be the author.
 /// </remarks>
-public class Delete(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<DeleteArticleRequest>
+public class Delete(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest
 {
   public override void Configure()
   {
@@ -28,11 +22,12 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
     });
   }
 
-  public override async Task HandleAsync(DeleteArticleRequest request, CancellationToken cancellationToken)
+  public override async Task HandleAsync(CancellationToken cancellationToken)
   {
     var userId = _currentUserService.GetRequiredCurrentUserId();
 
-    var slug = request.Slug;
+    // Get slug from route
+    var slug = Route<string>("slug") ?? string.Empty;
 
     var result = await _mediator.Send(new DeleteArticleCommand(slug, userId), cancellationToken);
 
