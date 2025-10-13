@@ -37,13 +37,10 @@ public class Unfollow(IRepository<User> _userRepository, ICurrentUserService _cu
 
     if (userToUnfollow == null)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "User not found" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      }, 404, cancellationToken);
       return;
     }
 
@@ -53,26 +50,20 @@ public class Unfollow(IRepository<User> _userRepository, ICurrentUserService _cu
 
     if (currentUser == null)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "Current user not found" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      }, 404, cancellationToken);
       return;
     }
 
     // Check if the user is currently following the target user
     if (!currentUser.IsFollowing(userToUnfollow))
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { $"username is not being followed" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      }, 422, cancellationToken);
       return;
     }
 

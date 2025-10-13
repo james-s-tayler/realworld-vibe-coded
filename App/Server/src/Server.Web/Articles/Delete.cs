@@ -33,40 +33,31 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.IsSuccess)
     {
-      HttpContext.Response.StatusCode = 204;
+      await SendNoContentAsync(cancellationToken);
       return;
     }
 
     if (result.Status == ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "Article not found" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+      }, 404, cancellationToken);
       return;
     }
 
     if (result.Status == ResultStatus.Forbidden)
     {
-      HttpContext.Response.StatusCode = 403;
-      HttpContext.Response.ContentType = "application/json";
-      var forbiddenJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "You can only delete your own articles" } }
-      });
-      await HttpContext.Response.WriteAsync(forbiddenJson, cancellationToken);
+      }, 403, cancellationToken);
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    }, 400, cancellationToken);
   }
 }

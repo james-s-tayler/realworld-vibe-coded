@@ -32,14 +32,10 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
 
     if (!validation.IsValid)
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-
-      var validationErrorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = validation.Errors.ToArray() }
-      });
-      await HttpContext.Response.WriteAsync(validationErrorJson, cancellationToken);
+      }, 422, cancellationToken);
       return;
     }
 
@@ -54,12 +50,9 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    }, 400, cancellationToken);
   }
 }

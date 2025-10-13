@@ -32,25 +32,19 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (string.IsNullOrEmpty(slug))
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var slugErrorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "Article slug is required" } }
-      });
-      await HttpContext.Response.WriteAsync(slugErrorJson);
+      }, 422, cancellationToken);
       return;
     }
 
     if (!int.TryParse(commentIdStr, out var commentId))
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var idErrorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "id is invalid" } }
-      });
-      await HttpContext.Response.WriteAsync(idErrorJson);
+      }, 422, cancellationToken);
       return;
     }
 
@@ -58,42 +52,31 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.IsSuccess)
     {
-      HttpContext.Response.StatusCode = 200;
-      HttpContext.Response.ContentType = "application/json";
-      await HttpContext.Response.WriteAsync("{}", cancellationToken);
+      await SendAsync(new { }, 200, cancellationToken);
       return;
     }
 
     if (result.Status == Ardalis.Result.ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = result.Errors.ToArray() }
-      });
-      await HttpContext.Response.WriteAsync(errorJson);
+      }, 422, cancellationToken);
       return;
     }
 
     if (result.Status == Ardalis.Result.ResultStatus.Forbidden)
     {
-      HttpContext.Response.StatusCode = 403;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = result.Errors.ToArray() }
-      });
-      await HttpContext.Response.WriteAsync(errorJson);
+      }, 403, cancellationToken);
       return;
     }
 
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var defaultErrorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(defaultErrorJson);
+    }, 422, cancellationToken);
   }
 }

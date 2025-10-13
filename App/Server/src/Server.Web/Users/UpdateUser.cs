@@ -71,34 +71,25 @@ public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserSer
         errorBody.Add($"{error.Identifier} {error.ErrorMessage}");
       }
 
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var validationJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = errorBody }
-      });
-      await HttpContext.Response.WriteAsync(validationJson, cancellationToken);
+      }, 422, cancellationToken);
       return;
     }
 
     if (result.Status == ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+      }, 401, cancellationToken);
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Update failed" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+    }, 400, cancellationToken);
   }
 }

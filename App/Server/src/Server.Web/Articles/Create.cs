@@ -38,18 +38,14 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.IsSuccess)
     {
-      HttpContext.Response.StatusCode = 201;
       // Use FastEndpoints mapper to convert entity to response DTO
-      Response = Map.FromEntity(result.Value);
+      await SendAsync(Map.FromEntity(result.Value), 201, cancellationToken);
       return;
     }
 
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    }, 422, cancellationToken);
   }
 }
