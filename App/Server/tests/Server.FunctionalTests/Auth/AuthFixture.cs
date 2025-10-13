@@ -1,13 +1,12 @@
-﻿using System.Data.Common;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
+using Testcontainers.MsSql;
 
 namespace Server.FunctionalTests.Auth;
 
 public class AuthFixture : AppFixture<Program>
 {
-  private DbConnection? _connection;
+  private MsSqlContainer? _container;
 
   protected override void ConfigureServices(IServiceCollection services)
   {
@@ -29,12 +28,17 @@ public class AuthFixture : AppFixture<Program>
       services.Remove(desc);
     }
 
-    _connection = new SqliteConnection("DataSource=:memory:");
-    _connection.Open();
+    _container = new MsSqlBuilder()
+        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+        .Build();
+
+    _container.StartAsync().GetAwaiter().GetResult();
+
+    var connectionString = _container.GetConnectionString();
 
     services.AddDbContext<AppDbContext>(options =>
     {
-      options.UseSqlite(_connection);
+      options.UseSqlServer(connectionString);
       options.EnableSensitiveDataLogging();
     });
   }
@@ -43,15 +47,17 @@ public class AuthFixture : AppFixture<Program>
   {
     using var scope = Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    // Create database schema (uses model from DbContext, not migrations)
     await db.Database.EnsureCreatedAsync();
   }
 
   protected override async ValueTask TearDownAsync()
   {
-    if (_connection != null)
+    if (_container != null)
     {
-      await _connection.CloseAsync();
-      await _connection.DisposeAsync();
+      await _container.StopAsync();
+      await _container.DisposeAsync();
     }
   }
 }
