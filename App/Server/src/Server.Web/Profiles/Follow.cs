@@ -37,13 +37,10 @@ public class Follow(IRepository<User> _userRepository, ICurrentUserService _curr
 
     if (userToFollow == null)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "User not found" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      }, 404, cancellationToken);
       return;
     }
 
@@ -53,13 +50,10 @@ public class Follow(IRepository<User> _userRepository, ICurrentUserService _curr
 
     if (currentUser == null)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "Current user not found" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      }, 404, cancellationToken);
       return;
     }
 

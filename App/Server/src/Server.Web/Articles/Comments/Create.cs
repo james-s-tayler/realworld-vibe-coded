@@ -34,30 +34,23 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.IsSuccess)
     {
-      HttpContext.Response.StatusCode = 201;
-      Response = result.Value;
+      await SendAsync(result.Value, 201, cancellationToken);
       return;
     }
 
     if (result.Status == Ardalis.Result.ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "Article not found" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+      }, 422, cancellationToken);
       return;
     }
 
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    }, 422, cancellationToken);
   }
 }
 

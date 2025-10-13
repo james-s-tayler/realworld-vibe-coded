@@ -32,12 +32,9 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<TagsResponse>
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Failed to retrieve tags" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+    }, 400, cancellationToken);
   }
 }

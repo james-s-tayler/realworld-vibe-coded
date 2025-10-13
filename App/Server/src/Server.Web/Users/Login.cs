@@ -56,22 +56,16 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
 
     if (result.Status == ResultStatus.Unauthorized)
     {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var json = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "email or password is invalid" } }
-      });
-      await HttpContext.Response.WriteAsync(json, cancellationToken);
+      }, 401, cancellationToken);
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Login failed" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+    }, 400, cancellationToken);
   }
 }

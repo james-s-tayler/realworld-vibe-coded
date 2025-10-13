@@ -41,22 +41,16 @@ public class Unfavorite(IMediator _mediator, ICurrentUserService _currentUserSer
 
     if (result.Status == ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "Article not found" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+      }, 404, cancellationToken);
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    }, 400, cancellationToken);
   }
 }

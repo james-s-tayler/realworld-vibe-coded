@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Diagnostics;
 
 namespace Server.Web.Infrastructure;
 
@@ -27,15 +26,10 @@ public class UnauthorizedExceptionHandler : IExceptionHandler
 
     _logger.LogWarning(unauthorizedException, "Unauthorized access attempt");
 
-    httpContext.Response.StatusCode = 401;
-    httpContext.Response.ContentType = "application/json";
-
-    var errorResponse = JsonSerializer.Serialize(new
+    await httpContext.Response.SendAsync(new
     {
       errors = new { body = new[] { "Unauthorized" } }
-    });
-
-    await httpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    }, 401, cancellation: cancellationToken);
     return true;
   }
 }

@@ -47,23 +47,17 @@ public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserSer
 
     if (result.Status == ResultStatus.NotFound)
     {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
+      }, 401, cancellationToken);
       return;
     }
 
-    HttpContext.Response.StatusCode = 500;
-    HttpContext.Response.ContentType = "application/json";
-    var serverErrorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = new[] { "Internal server error" } }
-    });
-    await HttpContext.Response.WriteAsync(serverErrorJson, cancellationToken);
+    }, 500, cancellationToken);
   }
 }
 

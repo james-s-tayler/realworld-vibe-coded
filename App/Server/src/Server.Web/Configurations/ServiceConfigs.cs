@@ -66,27 +66,17 @@ public static class ServiceConfigs
             // Skip the default logic that adds WWW-Authenticate header
             context.HandleResponse();
 
-            context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/json";
-
-            var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+            return context.Response.SendAsync(new
             {
               errors = new { body = new[] { "Unauthorized" } }
-            });
-
-            return context.Response.WriteAsync(errorResponse);
+            }, 401);
           },
           OnForbidden = context =>
           {
-            context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/json";
-
-            var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+            return context.Response.SendAsync(new
             {
               errors = new { body = new[] { "Unauthorized" } }
-            });
-
-            return context.Response.WriteAsync(errorResponse);
+            }, 401);
           }
         };
       });

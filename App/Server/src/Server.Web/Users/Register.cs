@@ -42,7 +42,7 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
     if (result.IsSuccess)
     {
       var userDto = result.Value;
-      Response = new RegisterResponse
+      await SendAsync(new RegisterResponse
       {
         User = new UserResponse
         {
@@ -52,8 +52,7 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
           Image = userDto.Image,
           Token = userDto.Token
         }
-      };
-      HttpContext.Response.StatusCode = 201;
+      }, 201, cancellationToken);
       return;
     }
 
@@ -65,22 +64,16 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
         errorBody.Add($"{error.Identifier} {error.ErrorMessage}");
       }
 
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var json = System.Text.Json.JsonSerializer.Serialize(new
+      await SendAsync(new
       {
         errors = new { body = errorBody }
-      });
-      await HttpContext.Response.WriteAsync(json, cancellationToken);
+      }, 422, cancellationToken);
       return;
     }
 
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
+    await SendAsync(new
     {
       errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Registration failed" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+    }, 400, cancellationToken);
   }
 }
