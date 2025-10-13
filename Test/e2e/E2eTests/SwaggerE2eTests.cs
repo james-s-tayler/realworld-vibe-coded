@@ -1,5 +1,5 @@
 using Microsoft.Playwright;
-using Microsoft.Playwright.Xunit;
+using Microsoft.Playwright.Xunit.v3;
 
 namespace E2eTests;
 
