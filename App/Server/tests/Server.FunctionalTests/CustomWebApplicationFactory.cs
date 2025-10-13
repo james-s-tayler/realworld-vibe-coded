@@ -14,12 +14,12 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
   private bool _isInitialized = false;
   private readonly SemaphoreSlim _initLock = new(1, 1);
 
-  public async Task InitializeAsync()
+  public async ValueTask InitializeAsync()
   {
     await _msSqlContainer.StartAsync();
   }
 
-  public new async Task DisposeAsync()
+  public new async ValueTask DisposeAsync()
   {
     await _msSqlContainer.StopAsync();
     await _msSqlContainer.DisposeAsync();

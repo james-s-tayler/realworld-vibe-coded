@@ -1,7 +1,7 @@
 ﻿using ArchUnitNET.Domain;
 using ArchUnitNET.Fluent;
 using ArchUnitNET.Loader;
-using ArchUnitNET.xUnit;
+using ArchUnitNET.xUnitV3;
 using Nuke.Common;
 using Xunit;
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
