@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Server.Web.Users;
+﻿namespace Server.Web.Users;
 
 public class RegisterRequest
 {
@@ -11,13 +9,8 @@ public class RegisterRequest
 
 public class UserData
 {
-  [Required]
   public string Email { get; set; } = default!;
-
-  [Required]
   public string Username { get; set; } = default!;
-
-  [Required]
   public string Password { get; set; } = default!;
 }
 

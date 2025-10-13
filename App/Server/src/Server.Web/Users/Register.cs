@@ -30,24 +30,6 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
     });
   }
 
-  public override void OnValidationFailed()
-  {
-    var errorBody = new List<string>();
-
-    foreach (var failure in ValidationFailures)
-    {
-      errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
-    }
-
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var json = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = errorBody }
-    });
-    HttpContext.Response.WriteAsync(json).GetAwaiter().GetResult();
-  }
-
   public override async Task HandleAsync(
     RegisterRequest request,
     CancellationToken cancellationToken)

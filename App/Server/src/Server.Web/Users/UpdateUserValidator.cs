@@ -6,6 +6,8 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
 {
   public UpdateUserValidator()
   {
+    RuleLevelCascadeMode = CascadeMode.Stop;
+
     // Email validation - if provided, must be valid
     When(x => x.User.Email != null, () =>
     {

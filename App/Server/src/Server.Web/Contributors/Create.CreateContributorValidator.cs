@@ -10,6 +10,8 @@ public class CreateContributorValidator : Validator<CreateContributorRequest>
 {
   public CreateContributorValidator()
   {
+    RuleLevelCascadeMode = CascadeMode.Stop;
+
     RuleFor(x => x.Name)
       .NotEmpty()
       .WithMessage("Name is required.")
