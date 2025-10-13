@@ -26,6 +26,15 @@ General functionality:
 | DELETE /api/articles/:slug/favorite | Unfavorite an article | Article | Authentication Required |
 | GET /api/tags | Get all tags | Multiple Tags | Allow Anonymous         |
 
+## Contributing
+- You are not permitted to suppress warnings or errors in code unless explicitly instructed to do so.
+- You are not permitted to modify any Archunit rules unless explicitly instructed to do so.
+- Don't hardcode things or use magic strings.
+- Do not use python, perl, or regex to perform mass refactorings. Only do direct updates.
+- Make sure to lint the code before committing.
+- Make sure the postman tests are passing before finishing.
+- Do not add any extraneous documentation unless asked to do so.
+
 ## Folder Structure
 
 - `/App`: Contains the source code for the application.
@@ -61,9 +70,3 @@ General functionality:
 - Deployment to Azure App Service
 - Nuke build system for lint, build, test and deployment tasks
   - The same Nuke build system is used for both local development and GitHub Actions CI/CD.
-
-## Contributing
-- Do a code review before finishing your work.
-- You are not permitted to suppress warnings or errors in code unless explicitly instructed to do so.
-- You are not permitted to modify any Archunit rules unless explicitly instructed to do so.
-- Don't hardcode things or use magic strings.
