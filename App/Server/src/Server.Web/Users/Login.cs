@@ -39,7 +39,7 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
       errorBody.Add($"{failure.PropertyName.ToLower()} {failure.ErrorMessage}");
     }
 
-    HttpContext.Response.SendAsync(new ConduitErrorResponse
+    Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
     }, 422).GetAwaiter().GetResult();
@@ -72,14 +72,14 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
 
     if (result.Status == ResultStatus.Unauthorized)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "email or password is invalid" } }
       }, 401);
       return;
     }
 
-    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+    await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = new[] { result.Errors.FirstOrDefault() ?? "Login failed" } }
     }, 400);

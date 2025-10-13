@@ -40,7 +40,7 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.Status == ResultStatus.NotFound)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "Article not found" } }
       }, 404);
@@ -49,14 +49,14 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.Status == ResultStatus.Forbidden)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "You can only delete your own articles" } }
       }, 403);
       return;
     }
 
-    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+    await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
     }, 400);

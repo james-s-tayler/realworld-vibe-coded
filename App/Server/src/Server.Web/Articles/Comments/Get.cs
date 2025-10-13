@@ -39,14 +39,14 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
 
     if (result.Status == ResultStatus.NotFound)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "Article not found" } }
       }, 404);
       return;
     }
 
-    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+    await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
     }, 400);

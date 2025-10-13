@@ -33,7 +33,7 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (string.IsNullOrEmpty(slug))
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "Article slug is required" } }
       }, 422);
@@ -42,7 +42,7 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (!int.TryParse(commentIdStr, out var commentId))
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "id is invalid" } }
       }, 422);
@@ -59,7 +59,7 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.Status == Ardalis.Result.ResultStatus.NotFound)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
       }, 422);
@@ -68,14 +68,14 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.Status == Ardalis.Result.ResultStatus.Forbidden)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
       }, 403);
       return;
     }
 
-    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+    await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
     }, 422);

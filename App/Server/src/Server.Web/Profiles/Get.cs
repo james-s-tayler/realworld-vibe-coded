@@ -39,7 +39,7 @@ public class Get(IRepository<User> _userRepository, ICurrentUserService _current
 
     if (user == null)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "User not found" } }
       }, 404);

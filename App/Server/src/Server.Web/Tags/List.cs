@@ -33,7 +33,7 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<TagsResponse>
       return;
     }
 
-    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+    await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = new[] { result.Errors.FirstOrDefault() ?? "Failed to retrieve tags" } }
     }, 400);

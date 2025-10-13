@@ -38,7 +38,7 @@ public class Follow(IRepository<User> _userRepository, ICurrentUserService _curr
 
     if (userToFollow == null)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "User not found" } }
       }, 404);
@@ -51,7 +51,7 @@ public class Follow(IRepository<User> _userRepository, ICurrentUserService _curr
 
     if (currentUser == null)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "Current user not found" } }
       }, 404);

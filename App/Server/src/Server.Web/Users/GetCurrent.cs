@@ -48,14 +48,14 @@ public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserSer
 
     if (result.Status == ResultStatus.NotFound)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "Unauthorized" } }
       }, 401);
       return;
     }
 
-    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+    await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = new[] { "Internal server error" } }
     }, 500);

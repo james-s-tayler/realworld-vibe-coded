@@ -48,7 +48,7 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
       errorBody.Add($"{propertyName} {failure.ErrorMessage}");
     }
 
-    HttpContext.Response.SendAsync(new ConduitErrorResponse
+    Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
     }, 422).GetAwaiter().GetResult();
@@ -74,7 +74,7 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
       return;
     }
 
-    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+    await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
     }, 422);

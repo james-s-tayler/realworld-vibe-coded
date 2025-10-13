@@ -41,7 +41,7 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
       return;
     }
 
-    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+    await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = new[] { "Article not found" } }
     }, 404);

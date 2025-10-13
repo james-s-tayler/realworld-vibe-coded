@@ -47,7 +47,7 @@ public class Update(IMediator _mediator, ICurrentUserService _currentUserService
       errorBody.Add($"{propertyName} {failure.ErrorMessage}");
     }
 
-    HttpContext.Response.SendAsync(new ConduitErrorResponse
+    Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = errorBody.ToArray() }
     }, 422).GetAwaiter().GetResult();
@@ -74,7 +74,7 @@ public class Update(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.Status == ResultStatus.NotFound)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "Article not found" } }
       }, 404);
@@ -83,14 +83,14 @@ public class Update(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (result.Status == ResultStatus.Forbidden)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "You can only update your own articles" } }
       }, 403);
       return;
     }
 
-    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+    await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
     }, 422);

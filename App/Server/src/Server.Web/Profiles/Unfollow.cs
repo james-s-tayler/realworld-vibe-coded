@@ -38,7 +38,7 @@ public class Unfollow(IRepository<User> _userRepository, ICurrentUserService _cu
 
     if (userToUnfollow == null)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "User not found" } }
       }, 404);
@@ -51,7 +51,7 @@ public class Unfollow(IRepository<User> _userRepository, ICurrentUserService _cu
 
     if (currentUser == null)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { "Current user not found" } }
       }, 404);
@@ -61,7 +61,7 @@ public class Unfollow(IRepository<User> _userRepository, ICurrentUserService _cu
     // Check if the user is currently following the target user
     if (!currentUser.IsFollowing(userToUnfollow))
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = new[] { $"username is not being followed" } }
       }, 422);

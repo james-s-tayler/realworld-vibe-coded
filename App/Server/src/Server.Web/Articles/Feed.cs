@@ -33,7 +33,7 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
 
     if (!validation.IsValid)
     {
-      await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+      await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
       {
         Errors = new ConduitErrorBody { Body = validation.Errors.ToArray() }
       }, 422);
@@ -51,7 +51,7 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
       return;
     }
 
-    await HttpContext.Response.HttpContext.Response.SendAsync(new ConduitErrorResponse
+    await Send.ResponseAsync<ConduitErrorResponse>(new ConduitErrorResponse
     {
       Errors = new ConduitErrorBody { Body = result.Errors.ToArray() }
     }, 400);
