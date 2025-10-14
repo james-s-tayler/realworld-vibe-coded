@@ -1,5 +1,6 @@
 ﻿using Server.UseCases.Contributors.Get;
 using Server.UseCases.Contributors.Update;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Contributors;
 
@@ -25,27 +26,15 @@ public class Update(IMediator _mediator)
   {
     var result = await _mediator.Send(new UpdateContributorCommand(request.Id, request.Name!), cancellationToken);
 
-    if (result.Status == ResultStatus.NotFound)
+    if (!result.IsSuccess)
     {
-      await Send.NotFoundAsync(cancellationToken);
+      await this.SendAsync(result, cancellationToken);
       return;
     }
 
     var query = new GetContributorQuery(request.ContributorId);
-
     var queryResult = await _mediator.Send(query, cancellationToken);
 
-    if (queryResult.Status == ResultStatus.NotFound)
-    {
-      await Send.NotFoundAsync(cancellationToken);
-      return;
-    }
-
-    if (queryResult.IsSuccess)
-    {
-      var dto = queryResult.Value;
-      Response = new UpdateContributorResponse(new ContributorRecord(dto.Id, dto.Name, dto.PhoneNumber));
-      return;
-    }
+    await this.SendAsync(queryResult, dto => new UpdateContributorResponse(new ContributorRecord(dto.Id, dto.Name, dto.PhoneNumber)), cancellationToken);
   }
 }

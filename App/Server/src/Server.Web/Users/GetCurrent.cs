@@ -1,5 +1,6 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Users.GetCurrent;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Users;
 
@@ -9,7 +10,7 @@ namespace Server.Web.Users;
 /// <remarks>
 /// Get the currently authenticated user details.
 /// </remarks>
-public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<UserCurrentResponse>
+public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<UserCurrentResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -28,42 +29,10 @@ public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserSer
 
     var result = await _mediator.Send(new GetCurrentUserQuery(userId), cancellationToken);
 
-    if (result.IsSuccess)
+    await this.SendAsync(result, userDto => new UserCurrentResponse
     {
-      var userDto = result.Value;
-      Response = new UserCurrentResponse
-      {
-        User = new UserResponse
-        {
-          Email = userDto.Email,
-          Username = userDto.Username,
-          Bio = userDto.Bio,
-          Image = userDto.Image,
-          Token = userDto.Token
-        }
-      };
-      return;
-    }
-
-    if (result.Status == ResultStatus.NotFound)
-    {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Unauthorized" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 500;
-    HttpContext.Response.ContentType = "application/json";
-    var serverErrorJson = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = new[] { "Internal server error" } }
-    });
-    await HttpContext.Response.WriteAsync(serverErrorJson, cancellationToken);
+      User = Map.FromEntity(userDto)
+    }, cancellationToken);
   }
 }
 

@@ -1,3 +1,5 @@
-﻿namespace Server.UseCases.Users.GetCurrent;
+﻿using Server.Core.UserAggregate;
 
-public record GetCurrentUserQuery(int UserId) : IQuery<Result<UserDto>>;
+namespace Server.UseCases.Users.GetCurrent;
+
+public record GetCurrentUserQuery(int UserId) : IQuery<Result<User>>;

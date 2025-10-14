@@ -29,6 +29,6 @@ public class DeleteContributorService(IRepository<Contributor> _repository,
     var domainEvent = new ContributorDeletedEvent(contributorId);
     await _mediator.Publish(domainEvent);
 
-    return Result.Success();
+    return Result.NoContent();
   }
 }

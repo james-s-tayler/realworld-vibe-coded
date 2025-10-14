@@ -1,5 +1,6 @@
 ﻿using Server.UseCases.Tags;
 using Server.UseCases.Tags.List;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Tags;
 
@@ -26,18 +27,6 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<TagsResponse>
   {
     var result = await _mediator.Send(new ListTagsQuery(), cancellationToken);
 
-    if (result.IsSuccess)
-    {
-      Response = result.Value;
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Failed to retrieve tags" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+    await this.SendAsync(result, cancellationToken);
   }
 }

@@ -1,4 +1,5 @@
 ﻿using Server.UseCases.Contributors.Create;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Contributors;
 
@@ -34,11 +35,6 @@ public class Create(IMediator _mediator)
     var result2 = await new CreateContributorCommand2(request.Name!)
       .ExecuteAsync(cancellationToken);
 
-    if (result.IsSuccess)
-    {
-      Response = new CreateContributorResponse(result.Value, request.Name!);
-      return;
-    }
-    // TODO: Handle other cases as necessary
+    await this.SendAsync(result, id => new CreateContributorResponse(id, request.Name!), cancellationToken);
   }
 }

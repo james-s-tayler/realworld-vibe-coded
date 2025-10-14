@@ -1,6 +1,7 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Unfavorite;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -32,31 +33,6 @@ public class Unfavorite(IMediator _mediator, ICurrentUserService _currentUserSer
 
     var result = await _mediator.Send(new UnfavoriteArticleCommand(slug, userId, userId), cancellationToken);
 
-    if (result.IsSuccess)
-    {
-      // Use FastEndpoints mapper to convert entity to response DTO
-      Response = Map.FromEntity(result.Value);
-      return;
-    }
-
-    if (result.Status == ResultStatus.NotFound)
-    {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Article not found" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    await this.SendAsync(result, article => Map.FromEntity(article), cancellationToken);
   }
 }

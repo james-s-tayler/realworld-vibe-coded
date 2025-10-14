@@ -4,26 +4,23 @@ using Server.Core.UserAggregate;
 
 namespace Server.UseCases.Users.Login;
 
-public class LoginUserHandler : IQueryHandler<LoginUserQuery, Result<UserDto>>
+public class LoginUserHandler : IQueryHandler<LoginUserQuery, Result<User>>
 {
   private readonly IRepository<User> _repository;
   private readonly IPasswordHasher _passwordHasher;
-  private readonly IJwtTokenGenerator _jwtTokenGenerator;
   private readonly ILogger<LoginUserHandler> _logger;
 
   public LoginUserHandler(
     IRepository<User> repository,
     IPasswordHasher passwordHasher,
-    IJwtTokenGenerator jwtTokenGenerator,
     ILogger<LoginUserHandler> logger)
   {
     _repository = repository;
     _passwordHasher = passwordHasher;
-    _jwtTokenGenerator = jwtTokenGenerator;
     _logger = logger;
   }
 
-  public async Task<Result<UserDto>> Handle(LoginUserQuery request, CancellationToken cancellationToken)
+  public async Task<Result<User>> Handle(LoginUserQuery request, CancellationToken cancellationToken)
   {
     _logger.LogInformation("Handling user login for {Email}", request.Email);
 
@@ -44,11 +41,8 @@ public class LoginUserHandler : IQueryHandler<LoginUserQuery, Result<UserDto>>
       return Result.Unauthorized();
     }
 
-    // Generate token
-    var token = _jwtTokenGenerator.GenerateToken(user);
-
     _logger.LogInformation("User {Username} logged in successfully", user.Username);
 
-    return Result.Success(UserMappers.MapToDto(user, token));
+    return Result.Success(user);
   }
 }

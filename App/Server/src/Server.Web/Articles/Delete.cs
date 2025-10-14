@@ -1,5 +1,6 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles.Delete;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -31,42 +32,6 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     var result = await _mediator.Send(new DeleteArticleCommand(slug, userId), cancellationToken);
 
-    if (result.IsSuccess)
-    {
-      HttpContext.Response.StatusCode = 204;
-      return;
-    }
-
-    if (result.Status == ResultStatus.NotFound)
-    {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var notFoundJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Article not found" } }
-      });
-      await HttpContext.Response.WriteAsync(notFoundJson, cancellationToken);
-      return;
-    }
-
-    if (result.Status == ResultStatus.Forbidden)
-    {
-      HttpContext.Response.StatusCode = 403;
-      HttpContext.Response.ContentType = "application/json";
-      var forbiddenJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "You can only delete your own articles" } }
-      });
-      await HttpContext.Response.WriteAsync(forbiddenJson, cancellationToken);
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    await this.SendAsync(result, cancellationToken);
   }
 }

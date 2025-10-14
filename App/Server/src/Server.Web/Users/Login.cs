@@ -1,4 +1,5 @@
 ﻿using Server.UseCases.Users.Login;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Users;
 
@@ -8,7 +9,7 @@ namespace Server.Web.Users;
 /// <remarks>
 /// Authenticate user with email and password. Returns user details with JWT token.
 /// </remarks>
-public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
+public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -37,41 +38,9 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
       request.User.Email,
       request.User.Password), cancellationToken);
 
-    if (result.IsSuccess)
+    await this.SendAsync(result, userDto => new LoginResponse
     {
-      var userDto = result.Value;
-      Response = new LoginResponse
-      {
-        User = new UserResponse
-        {
-          Email = userDto.Email,
-          Username = userDto.Username,
-          Bio = userDto.Bio,
-          Image = userDto.Image,
-          Token = userDto.Token
-        }
-      };
-      return;
-    }
-
-    if (result.Status == ResultStatus.Unauthorized)
-    {
-      HttpContext.Response.StatusCode = 401;
-      HttpContext.Response.ContentType = "application/json";
-      var json = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "email or password is invalid" } }
-      });
-      await HttpContext.Response.WriteAsync(json, cancellationToken);
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Login failed" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      User = Map.FromEntity(userDto)
+    }, cancellationToken);
   }
 }

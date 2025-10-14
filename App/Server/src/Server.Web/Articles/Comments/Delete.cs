@@ -1,5 +1,6 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles.Comments.Delete;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles.Comments;
 
@@ -32,68 +33,18 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (string.IsNullOrEmpty(slug))
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var slugErrorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "Article slug is required" } }
-      });
-      await HttpContext.Response.WriteAsync(slugErrorJson);
+      await this.SendValidationErrorAsync(new[] { "Article slug is required" }, cancellationToken);
       return;
     }
 
     if (!int.TryParse(commentIdStr, out var commentId))
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var idErrorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "id is invalid" } }
-      });
-      await HttpContext.Response.WriteAsync(idErrorJson);
+      await this.SendValidationErrorAsync(new[] { "id is invalid" }, cancellationToken);
       return;
     }
 
     var result = await _mediator.Send(new DeleteCommentCommand(slug, commentId, userId), cancellationToken);
 
-    if (result.IsSuccess)
-    {
-      HttpContext.Response.StatusCode = 200;
-      HttpContext.Response.ContentType = "application/json";
-      await HttpContext.Response.WriteAsync("{}", cancellationToken);
-      return;
-    }
-
-    if (result.Status == Ardalis.Result.ResultStatus.NotFound)
-    {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = result.Errors.ToArray() }
-      });
-      await HttpContext.Response.WriteAsync(errorJson);
-      return;
-    }
-
-    if (result.Status == Ardalis.Result.ResultStatus.Forbidden)
-    {
-      HttpContext.Response.StatusCode = 403;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = result.Errors.ToArray() }
-      });
-      await HttpContext.Response.WriteAsync(errorJson);
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 422;
-    HttpContext.Response.ContentType = "application/json";
-    var defaultErrorJson = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = result.Errors.ToArray() }
-    });
-    await HttpContext.Response.WriteAsync(defaultErrorJson);
+    await this.SendAsync(result, _ => new { }, cancellationToken, treatNotFoundAsValidation: true);
   }
 }
