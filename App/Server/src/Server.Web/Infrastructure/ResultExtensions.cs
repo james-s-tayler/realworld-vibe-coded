@@ -86,7 +86,7 @@ public static class ResultExtensions
   }
 
   /// <summary>
-  /// Sends a validation error response (422) with custom error messages.
+  /// Sends a validation error response (400) with custom error messages.
   /// </summary>
   public static async Task SendValidationErrorAsync(
     this IEndpoint endpoint,
@@ -94,7 +94,7 @@ public static class ResultExtensions
     CancellationToken cancellationToken = default)
   {
     var httpContext = endpoint.HttpContext;
-    httpContext.Response.StatusCode = 422;
+    httpContext.Response.StatusCode = 400;
     httpContext.Response.ContentType = "application/json";
 
     var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
@@ -119,13 +119,13 @@ public static class ResultExtensions
       ResultStatus.NoContent => (204, "No content"),
       ResultStatus.Unauthorized => (401, "Unauthorized"),
       ResultStatus.Forbidden => (403, "Forbidden"),
-      ResultStatus.NotFound when treatNotFoundAsValidation => (422, "Validation failed"),
+      ResultStatus.NotFound when treatNotFoundAsValidation => (400, "Bad request"),
       ResultStatus.NotFound => (404, "Not found"),
-      ResultStatus.Invalid => (422, "Validation failed"),
+      ResultStatus.Invalid => (400, "Bad request"),
       ResultStatus.Conflict => (409, "Conflict"),
       ResultStatus.Unavailable => (503, "Service unavailable"),
       ResultStatus.CriticalError => (500, "Internal server error"),
-      ResultStatus.Error => (422, "Validation failed"), // Map generic errors to 422 for RealWorld API convention
+      ResultStatus.Error => (400, "Bad request"),
       _ => (400, "Bad request")
     };
   }
