@@ -9,15 +9,32 @@ public class ListArticlesValidator : Validator<ListArticlesRequest>
     RuleLevelCascadeMode = CascadeMode.Stop;
 
     RuleFor(x => x.Limit)
-      .GreaterThan(0)
-      .WithMessage("must be greater than 0")
-      .LessThanOrEqualTo(100)
-      .WithMessage("must be less than or equal to 100")
+      .Must(BeValidInteger)
+      .When(x => !string.IsNullOrEmpty(x.Limit))
+      .WithMessage("must be a valid integer")
+      .DependentRules(() =>
+      {
+        RuleFor(x => x.Limit)
+          .Must(x => int.Parse(x!) > 0)
+          .When(x => !string.IsNullOrEmpty(x.Limit))
+          .WithMessage("must be greater than 0")
+          .Must(x => int.Parse(x!) <= 100)
+          .When(x => !string.IsNullOrEmpty(x.Limit))
+          .WithMessage("must be less than or equal to 100");
+      })
       .OverridePropertyName("limit");
 
     RuleFor(x => x.Offset)
-      .GreaterThanOrEqualTo(0)
-      .WithMessage("must be greater than or equal to 0")
+      .Must(BeValidInteger)
+      .When(x => !string.IsNullOrEmpty(x.Offset))
+      .WithMessage("must be a valid integer")
+      .DependentRules(() =>
+      {
+        RuleFor(x => x.Offset)
+          .Must(x => int.Parse(x!) >= 0)
+          .When(x => !string.IsNullOrEmpty(x.Offset))
+          .WithMessage("must be greater than or equal to 0");
+      })
       .OverridePropertyName("offset");
 
     RuleFor(x => x.Tag)
@@ -37,5 +54,10 @@ public class ListArticlesValidator : Validator<ListArticlesRequest>
       .When(x => x.Favorited != null)
       .WithMessage("cannot be empty")
       .OverridePropertyName("favorited");
+  }
+
+  private static bool BeValidInteger(string? value)
+  {
+    return int.TryParse(value, out _);
   }
 }

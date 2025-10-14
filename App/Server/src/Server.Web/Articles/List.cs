@@ -29,12 +29,16 @@ public class List(IMediator _mediator, ICurrentUserService _currentUserService) 
     // Get current user ID if authenticated
     var currentUserId = _currentUserService.GetCurrentUserId();
 
+    // Parse query parameters with defaults
+    var limit = string.IsNullOrEmpty(request.Limit) ? 20 : int.Parse(request.Limit);
+    var offset = string.IsNullOrEmpty(request.Offset) ? 0 : int.Parse(request.Offset);
+
     var result = await _mediator.Send(new ListArticlesQuery(
       request.Tag,
       request.Author,
       request.Favorited,
-      request.Limit,
-      request.Offset,
+      limit,
+      offset,
       currentUserId), cancellationToken);
 
     await this.SendAsync(result, articles =>
@@ -50,6 +54,6 @@ public class ListArticlesRequest
   public string? Tag { get; set; }
   public string? Author { get; set; }
   public string? Favorited { get; set; }
-  public int Limit { get; set; } = 20;
-  public int Offset { get; set; } = 0;
+  public string? Limit { get; set; }
+  public string? Offset { get; set; }
 }

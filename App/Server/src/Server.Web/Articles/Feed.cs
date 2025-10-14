@@ -29,7 +29,11 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
     // Get current user ID from service
     var userId = _currentUserService.GetRequiredCurrentUserId();
 
-    var result = await _mediator.Send(new GetFeedQuery(userId, request.Limit, request.Offset), cancellationToken);
+    // Parse query parameters with defaults
+    var limit = string.IsNullOrEmpty(request.Limit) ? 20 : int.Parse(request.Limit);
+    var offset = string.IsNullOrEmpty(request.Offset) ? 0 : int.Parse(request.Offset);
+
+    var result = await _mediator.Send(new GetFeedQuery(userId, limit, offset), cancellationToken);
 
     await this.SendAsync(result, articles =>
     {
@@ -41,6 +45,6 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
 
 public class FeedRequest
 {
-  public int Limit { get; set; } = 20;
-  public int Offset { get; set; } = 0;
+  public string? Limit { get; set; }
+  public string? Offset { get; set; }
 }
