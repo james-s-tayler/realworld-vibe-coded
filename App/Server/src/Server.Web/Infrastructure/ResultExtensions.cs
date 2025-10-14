@@ -69,10 +69,24 @@ public static class ResultExtensions
     httpContext.Response.StatusCode = statusCode;
     httpContext.Response.ContentType = "application/json";
 
-    // Build error array - use errors from result if available, otherwise use default message
-    var errorMessages = result.Errors.Any()
-      ? result.Errors
-      : new[] { errorMessage };
+    // Build error array
+    // For Invalid status with ValidationErrors, format as "identifier message"
+    // Otherwise use errors from result or default message
+    string[] errorMessages;
+    if (result.Status == ResultStatus.Invalid && result.ValidationErrors.Any())
+    {
+      errorMessages = result.ValidationErrors
+        .Select(error => $"{error.Identifier} {error.ErrorMessage}")
+        .ToArray();
+    }
+    else if (result.Errors.Any())
+    {
+      errorMessages = result.Errors.ToArray();
+    }
+    else
+    {
+      errorMessages = new[] { errorMessage };
+    }
 
     var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
     {
