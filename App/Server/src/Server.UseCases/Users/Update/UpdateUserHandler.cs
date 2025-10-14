@@ -4,26 +4,23 @@ using Server.Core.UserAggregate;
 
 namespace Server.UseCases.Users.Update;
 
-public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, Result<UserDto>>
+public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, Result<User>>
 {
   private readonly IRepository<User> _repository;
   private readonly IPasswordHasher _passwordHasher;
-  private readonly IJwtTokenGenerator _jwtTokenGenerator;
   private readonly ILogger<UpdateUserHandler> _logger;
 
   public UpdateUserHandler(
     IRepository<User> repository,
     IPasswordHasher passwordHasher,
-    IJwtTokenGenerator jwtTokenGenerator,
     ILogger<UpdateUserHandler> logger)
   {
     _repository = repository;
     _passwordHasher = passwordHasher;
-    _jwtTokenGenerator = jwtTokenGenerator;
     _logger = logger;
   }
 
-  public async Task<Result<UserDto>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+  public async Task<Result<User>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
   {
     _logger.LogInformation("Updating user {UserId}", request.UserId);
 
@@ -93,17 +90,10 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, Result<UserD
     try
     {
       await _repository.UpdateAsync(user, cancellationToken);
-      var token = _jwtTokenGenerator.GenerateToken(user);
 
       _logger.LogInformation("User {Username} updated successfully", user.Username);
 
-      return Result.Success(new UserDto(
-        user.Id,
-        user.Email,
-        user.Username,
-        user.Bio,
-        user.Image,
-        token));
+      return Result.Success(user);
     }
     catch (Exception ex)
     {

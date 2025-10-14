@@ -1,4 +1,6 @@
-﻿namespace Server.UseCases.Users.Update;
+﻿using Server.Core.UserAggregate;
+
+namespace Server.UseCases.Users.Update;
 
 public record UpdateUserCommand(
   int UserId,
@@ -7,4 +9,4 @@ public record UpdateUserCommand(
   string? Password = null,
   string? Bio = null,
   string? Image = null
-) : ICommand<Result<UserDto>>;
+) : ICommand<Result<User>>;
