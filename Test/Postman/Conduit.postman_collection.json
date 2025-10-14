@@ -166,8 +166,8 @@
               "script": {
                 "exec": [
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Response is HTTP 422', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "    pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "    })",
                   "",
                   "    var responseJSON = JSON.parse(pm.response.text());",
@@ -232,8 +232,8 @@
               "script": {
                 "exec": [
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Response is HTTP 422', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "    pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "    })",
                   "",
                   "    var responseJSON = JSON.parse(pm.response.text());",
@@ -298,8 +298,8 @@
               "script": {
                 "exec": [
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Response is HTTP 422', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "    pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "    })",
                   "",
                   "    var responseJSON = JSON.parse(pm.response.text());",
@@ -364,8 +364,8 @@
               "script": {
                 "exec": [
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Response is HTTP 422', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "    pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "    })",
                   "",
                   "    var responseJSON = JSON.parse(pm.response.text());",
@@ -432,8 +432,8 @@
               "script": {
                 "exec": [
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Response is HTTP 422', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "    pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "    })",
                   "",
                   "    var responseJSON = JSON.parse(pm.response.text());",
@@ -992,8 +992,8 @@
                 "exec": [
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.test('Response is HTTP 422', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "pm.test('Response contains \"errors\" property', function() {",
@@ -1067,8 +1067,8 @@
                 "exec": [
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.test('Response is HTTP 422', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "pm.test('Response contains \"errors\" property', function() {",
@@ -1141,8 +1141,8 @@
                 "exec": [
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.test('Response is HTTP 422', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "pm.test('Response contains \"errors\" property', function() {",
@@ -2091,8 +2091,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -2151,8 +2151,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -2211,8 +2211,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -2285,8 +2285,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -2359,8 +2359,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -4164,8 +4164,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})"
                 ],
                 "type": "text/javascript",
@@ -4225,8 +4225,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -4298,8 +4298,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -4496,8 +4496,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})"
                 ],
                 "type": "text/javascript",
@@ -4558,8 +4558,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})"
                 ],
                 "type": "text/javascript",
@@ -4620,8 +4620,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -5302,8 +5302,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -5377,8 +5377,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -5454,8 +5454,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -7499,8 +7499,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity');",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -8663,8 +8663,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity');",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -8746,8 +8746,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity');",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -8828,8 +8828,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity');",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -8905,8 +8905,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity');",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -8982,8 +8982,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity');",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
@@ -9999,8 +9999,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 422', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
