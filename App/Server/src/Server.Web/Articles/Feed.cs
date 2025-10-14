@@ -45,6 +45,9 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
 
 public class FeedRequest
 {
+  [QueryParam]
   public string? Limit { get; set; }
+  
+  [QueryParam]
   public string? Offset { get; set; }
 }

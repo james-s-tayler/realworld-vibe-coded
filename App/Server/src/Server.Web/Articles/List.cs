@@ -51,9 +51,18 @@ public class List(IMediator _mediator, ICurrentUserService _currentUserService) 
 
 public class ListArticlesRequest
 {
+  [QueryParam]
   public string? Tag { get; set; }
+  
+  [QueryParam]
   public string? Author { get; set; }
+  
+  [QueryParam]
   public string? Favorited { get; set; }
+  
+  [QueryParam]
   public string? Limit { get; set; }
+  
+  [QueryParam]
   public string? Offset { get; set; }
 }
