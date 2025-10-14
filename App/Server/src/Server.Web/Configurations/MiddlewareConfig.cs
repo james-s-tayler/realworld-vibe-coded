@@ -20,7 +20,6 @@ public static class MiddlewareConfig
     app.UseFastEndpoints(c =>
         {
           c.Errors.StatusCode = 422;
-          c.Binding.ValueParserFor<string>(rawValue => rawValue); // Bind all query params as raw strings
           c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
           {
             var errorBody = new List<string>();
