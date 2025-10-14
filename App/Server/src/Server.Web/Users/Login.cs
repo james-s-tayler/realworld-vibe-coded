@@ -9,7 +9,7 @@ namespace Server.Web.Users;
 /// <remarks>
 /// Authenticate user with email and password. Returns user details with JWT token.
 /// </remarks>
-public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
+public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -40,14 +40,7 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse>
 
     await this.SendAsync(result, userDto => new LoginResponse
     {
-      User = new UserResponse
-      {
-        Email = userDto.Email,
-        Username = userDto.Username,
-        Bio = userDto.Bio,
-        Image = userDto.Image,
-        Token = userDto.Token
-      }
+      User = Map.FromEntity(userDto)
     }, cancellationToken);
   }
 }

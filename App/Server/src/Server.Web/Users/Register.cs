@@ -9,7 +9,7 @@ namespace Server.Web.Users;
 /// <remarks>
 /// Creates a new user account given email, username, and password.
 /// </remarks>
-public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterResponse>
+public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -42,14 +42,7 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
 
     await this.SendAsync(result, userDto => new RegisterResponse
     {
-      User = new UserResponse
-      {
-        Email = userDto.Email,
-        Username = userDto.Username,
-        Bio = userDto.Bio,
-        Image = userDto.Image,
-        Token = userDto.Token
-      }
+      User = Map.FromEntity(userDto)
     }, cancellationToken);
   }
 }

@@ -10,7 +10,7 @@ namespace Server.Web.Users;
 /// <remarks>
 /// Update the currently authenticated user's details.
 /// </remarks>
-public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<UpdateUserRequest, UpdateUserResponse>
+public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<UpdateUserRequest, UpdateUserResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -49,14 +49,7 @@ public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserSer
 
     await this.SendAsync(result, userDto => new UpdateUserResponse
     {
-      User = new UserResponse
-      {
-        Email = userDto.Email,
-        Username = userDto.Username,
-        Bio = userDto.Bio,
-        Image = userDto.Image,
-        Token = userDto.Token
-      }
+      User = Map.FromEntity(userDto)
     }, cancellationToken);
   }
 }

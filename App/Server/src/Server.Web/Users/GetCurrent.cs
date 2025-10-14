@@ -10,7 +10,7 @@ namespace Server.Web.Users;
 /// <remarks>
 /// Get the currently authenticated user details.
 /// </remarks>
-public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<UserCurrentResponse>
+public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<UserCurrentResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -31,14 +31,7 @@ public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserSer
 
     await this.SendAsync(result, userDto => new UserCurrentResponse
     {
-      User = new UserResponse
-      {
-        Email = userDto.Email,
-        Username = userDto.Username,
-        Bio = userDto.Bio,
-        Image = userDto.Image,
-        Token = userDto.Token
-      }
+      User = Map.FromEntity(userDto)
     }, cancellationToken);
   }
 }
