@@ -63,7 +63,6 @@ The UseCases project contains utility methods for domain operations:
 - `Server.UseCases.Articles.ArticleMappers.GenerateSlug()` - URL-friendly slug generation
 - `Server.UseCases.Articles.Comments.CommentMappers` - Comment mapping (legacy)
 - `Server.UseCases.Users.UserMappers` - User mapping (legacy)
-- `Server.UseCases.Contributors.ContributorMappers` - Contributor mapping (legacy)
 
 ### Infrastructure Query Services (For List Operations)
 
