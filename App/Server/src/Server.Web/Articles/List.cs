@@ -11,7 +11,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// List articles globally. Optional filters for tag, author, favorited user. Authentication optional.
 /// </remarks>
-public class List(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticlesResponse, ArticleMapper>
+public class List(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<ListArticlesRequest, ArticlesResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -24,25 +24,17 @@ public class List(IMediator _mediator, ICurrentUserService _currentUserService) 
     });
   }
 
-  public override async Task HandleAsync(CancellationToken cancellationToken)
+  public override async Task HandleAsync(ListArticlesRequest request, CancellationToken cancellationToken)
   {
-    var validation = QueryParameterValidator.ValidateListArticlesParameters(HttpContext.Request);
-
-    if (!validation.IsValid)
-    {
-      await this.SendValidationErrorAsync(validation.Errors, cancellationToken);
-      return;
-    }
-
     // Get current user ID if authenticated
     var currentUserId = _currentUserService.GetCurrentUserId();
 
     var result = await _mediator.Send(new ListArticlesQuery(
-      validation.Tag,
-      validation.Author,
-      validation.Favorited,
-      validation.Limit,
-      validation.Offset,
+      request.Tag,
+      request.Author,
+      request.Favorited,
+      request.Limit,
+      request.Offset,
       currentUserId), cancellationToken);
 
     await this.SendAsync(result, articles =>
@@ -51,4 +43,13 @@ public class List(IMediator _mediator, ICurrentUserService _currentUserService) 
       return new ArticlesResponse(articleDtos, articleDtos.Count);
     }, cancellationToken);
   }
+}
+
+public class ListArticlesRequest
+{
+  public string? Tag { get; set; }
+  public string? Author { get; set; }
+  public string? Favorited { get; set; }
+  public int Limit { get; set; } = 20;
+  public int Offset { get; set; } = 0;
 }
