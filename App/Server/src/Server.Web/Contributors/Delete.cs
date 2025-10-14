@@ -1,4 +1,5 @@
 ﻿using Server.UseCases.Contributors.Delete;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Contributors;
 
@@ -25,17 +26,6 @@ public class Delete(IMediator _mediator)
 
     var result = await _mediator.Send(command, cancellationToken);
 
-    if (result.Status == ResultStatus.NotFound)
-    {
-      await Send.NotFoundAsync(cancellationToken);
-      return;
-    }
-
-    if (result.IsSuccess)
-    {
-      await Send.NoContentAsync(cancellationToken);
-    }
-    ;
-    // TODO: Handle other issues as needed
+    await this.SendAsync(result, cancellationToken, successStatusCode: 204);
   }
 }

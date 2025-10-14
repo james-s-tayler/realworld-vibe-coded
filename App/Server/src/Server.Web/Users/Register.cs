@@ -1,4 +1,5 @@
 ﻿using Server.UseCases.Users.Register;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Users;
 
@@ -39,48 +40,16 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
       request.User.Username,
       request.User.Password), cancellationToken);
 
-    if (result.IsSuccess)
+    await this.SendAsync(result, userDto => new RegisterResponse
     {
-      var userDto = result.Value;
-      Response = new RegisterResponse
+      User = new UserResponse
       {
-        User = new UserResponse
-        {
-          Email = userDto.Email,
-          Username = userDto.Username,
-          Bio = userDto.Bio,
-          Image = userDto.Image,
-          Token = userDto.Token
-        }
-      };
-      HttpContext.Response.StatusCode = 201;
-      return;
-    }
-
-    if (result.IsInvalid())
-    {
-      var errorBody = new List<string>();
-      foreach (var error in result.ValidationErrors)
-      {
-        errorBody.Add($"{error.Identifier} {error.ErrorMessage}");
+        Email = userDto.Email,
+        Username = userDto.Username,
+        Bio = userDto.Bio,
+        Image = userDto.Image,
+        Token = userDto.Token
       }
-
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-      var json = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = errorBody }
-      });
-      await HttpContext.Response.WriteAsync(json, cancellationToken);
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Registration failed" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+    }, cancellationToken, successStatusCode: 201);
   }
 }

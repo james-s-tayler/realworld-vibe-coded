@@ -1,5 +1,6 @@
 ﻿using Server.UseCases.Contributors;
 using Server.UseCases.Contributors.List;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Contributors;
 
@@ -24,12 +25,9 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<ContributorListR
     var result2 = await new ListContributorsQuery2(null, null)
       .ExecuteAsync(cancellationToken);
 
-    if (result.IsSuccess)
+    await this.SendAsync(result, contributors => new ContributorListResponse
     {
-      Response = new ContributorListResponse
-      {
-        Contributors = result.Value.Select(c => new ContributorRecord(c.Id, c.Name, c.PhoneNumber)).ToList()
-      };
-    }
+      Contributors = contributors.Select(c => new ContributorRecord(c.Id, c.Name, c.PhoneNumber)).ToList()
+    }, cancellationToken);
   }
 }

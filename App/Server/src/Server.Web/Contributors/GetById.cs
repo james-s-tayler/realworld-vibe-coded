@@ -1,4 +1,5 @@
 ﻿using Server.UseCases.Contributors.Get;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Contributors;
 
@@ -24,15 +25,6 @@ public class GetById(IMediator _mediator)
 
     var result = await _mediator.Send(query, cancellationToken);
 
-    if (result.Status == ResultStatus.NotFound)
-    {
-      await Send.NotFoundAsync(cancellationToken);
-      return;
-    }
-
-    if (result.IsSuccess)
-    {
-      Response = new ContributorRecord(result.Value.Id, result.Value.Name, result.Value.PhoneNumber);
-    }
+    await this.SendAsync(result, contributor => new ContributorRecord(contributor.Id, contributor.Name, contributor.PhoneNumber), cancellationToken);
   }
 }

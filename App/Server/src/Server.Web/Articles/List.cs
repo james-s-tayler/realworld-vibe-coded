@@ -1,6 +1,7 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.List;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -29,14 +30,7 @@ public class List(IMediator _mediator, ICurrentUserService _currentUserService) 
 
     if (!validation.IsValid)
     {
-      HttpContext.Response.StatusCode = 422;
-      HttpContext.Response.ContentType = "application/json";
-
-      var validationErrorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = validation.Errors.ToArray() }
-      });
-      await HttpContext.Response.WriteAsync(validationErrorJson, cancellationToken);
+      await this.SendValidationErrorAsync(validation.Errors, cancellationToken);
       return;
     }
 
@@ -51,21 +45,10 @@ public class List(IMediator _mediator, ICurrentUserService _currentUserService) 
       validation.Offset,
       currentUserId), cancellationToken);
 
-    if (result.IsSuccess)
+    await this.SendAsync(result, articles =>
     {
-      // Map each Article entity to ArticleDto using FastEndpoints mapper
-      var articles = result.Value.ToList();
       var articleDtos = articles.Select(article => Map.FromEntity(article).Article).ToList();
-      Response = new ArticlesResponse(articleDtos, articleDtos.Count);
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 400;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = new[] { result.Errors.FirstOrDefault() ?? "Failed to retrieve articles" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+      return new ArticlesResponse(articleDtos, articleDtos.Count);
+    }, cancellationToken);
   }
 }

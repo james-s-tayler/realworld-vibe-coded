@@ -1,6 +1,7 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Get;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles;
 
@@ -33,20 +34,7 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
 
     var result = await _mediator.Send(new GetArticleQuery(slug, currentUserId), cancellationToken);
 
-    if (result.IsSuccess)
-    {
-      // Use FastEndpoints mapper to convert entity to response DTO
-      Response = Map.FromEntity(result.Value);
-      return;
-    }
-
-    HttpContext.Response.StatusCode = 404;
-    HttpContext.Response.ContentType = "application/json";
-    var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = new[] { "Article not found" } }
-    });
-    await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
+    await this.SendAsync(result, article => Map.FromEntity(article), cancellationToken);
   }
 }
 
