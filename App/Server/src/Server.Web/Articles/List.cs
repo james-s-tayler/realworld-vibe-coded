@@ -17,6 +17,7 @@ public class List(IMediator _mediator, ICurrentUserService _currentUserService) 
   {
     Get("/api/articles");
     AllowAnonymous();
+    DontAutoTag();
     Summary(s =>
     {
       s.Summary = "List articles";

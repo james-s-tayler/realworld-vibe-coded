@@ -17,6 +17,7 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
   {
     Get("/api/articles/feed");
     AuthSchemes("Token");
+    DontAutoTag();
     Summary(s =>
     {
       s.Summary = "Get user's feed";
