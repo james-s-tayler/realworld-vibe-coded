@@ -1,7 +1,6 @@
-﻿using Ardalis.SharedKernel;
-using Server.Core.Interfaces;
-using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
+﻿using Server.Core.Interfaces;
+using Server.UseCases.Profiles.Get;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Profiles;
 
@@ -11,7 +10,7 @@ namespace Server.Web.Profiles;
 /// <remarks>
 /// Get a user profile by username. Authentication optional.
 /// </remarks>
-public class Get(IRepository<User> _userRepository, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ProfileResponse>
+public class Get(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ProfileResponse, ProfileMapper>
 {
   public override void Configure()
   {
@@ -32,45 +31,8 @@ public class Get(IRepository<User> _userRepository, ICurrentUserService _current
     // Get current user ID if authenticated
     var currentUserId = _currentUserService.GetCurrentUserId();
 
-    // Find the user profile
-    var user = await _userRepository.FirstOrDefaultAsync(
-      new UserByUsernameWithFollowingSpec(username), cancellationToken);
+    var result = await _mediator.Send(new GetProfileQuery(username, currentUserId), cancellationToken);
 
-    if (user == null)
-    {
-      HttpContext.Response.StatusCode = 404;
-      HttpContext.Response.ContentType = "application/json";
-      var errorJson = System.Text.Json.JsonSerializer.Serialize(new
-      {
-        errors = new { body = new[] { "User not found" } }
-      });
-      await HttpContext.Response.WriteAsync(errorJson, cancellationToken);
-      return;
-    }
-
-    // Determine if the current user is following this profile
-    bool isFollowing = false;
-    if (currentUserId.HasValue)
-    {
-      // Get the current user to check if they are following
-      var currentUser = await _userRepository.FirstOrDefaultAsync(
-        new UserWithFollowingSpec(currentUserId.Value), cancellationToken);
-
-      if (currentUser != null)
-      {
-        isFollowing = currentUser.IsFollowing(user);
-      }
-    }
-
-    Response = new ProfileResponse
-    {
-      Profile = new ProfileDto
-      {
-        Username = user.Username,
-        Bio = user.Bio,
-        Image = user.Image,
-        Following = isFollowing
-      }
-    };
+    await this.SendAsync(result, user => Map.FromEntity(user), cancellationToken);
   }
 }
