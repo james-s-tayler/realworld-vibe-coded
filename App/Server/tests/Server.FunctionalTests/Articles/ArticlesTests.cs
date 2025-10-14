@@ -122,7 +122,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var (response, _) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -140,7 +140,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var (response, _) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -159,7 +159,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var (response, _) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -178,7 +178,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var (response, _) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -208,7 +208,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var (response, _) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request2);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -557,7 +557,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/no-such-article/comments", createCommentRequest);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -583,7 +583,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -612,7 +612,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -820,7 +820,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   {
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/no-such-article/comments/1");
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -841,7 +841,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/999999");
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -862,7 +862,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/abc");
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -1008,7 +1008,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var (response, _) = await App.ArticlesUser1Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, object>(updateRequest);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]

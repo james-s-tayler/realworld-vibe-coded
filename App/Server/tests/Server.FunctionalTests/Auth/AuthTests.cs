@@ -57,7 +57,7 @@ public class AuthTests(AuthFixture App) : TestBase<AuthFixture>
 
     var (response, _) = await App.Client.POSTAsync<Server.Web.Users.Register, RegisterRequest, object>(request2);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]

@@ -19,7 +19,7 @@ public static class MiddlewareConfig
 
     app.UseFastEndpoints(c =>
         {
-          c.Errors.StatusCode = 422;
+          c.Errors.StatusCode = 400;
           c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
           {
             var errorBody = new List<string>();
