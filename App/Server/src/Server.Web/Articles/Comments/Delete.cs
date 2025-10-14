@@ -10,7 +10,7 @@ namespace Server.Web.Articles.Comments;
 /// <remarks>
 /// Delete a comment. Authentication required. Only comment author can delete.
 /// </remarks>
-public class Delete(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest
+public class Delete(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<DeleteCommentRequest>
 {
   public override void Configure()
   {
@@ -23,27 +23,11 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
     });
   }
 
-  public override async Task HandleAsync(CancellationToken cancellationToken)
+  public override async Task HandleAsync(DeleteCommentRequest request, CancellationToken cancellationToken)
   {
     var userId = _currentUserService.GetRequiredCurrentUserId();
 
-    // Get parameters from route
-    var slug = Route<string>("slug") ?? string.Empty;
-    var commentIdStr = Route<string>("id") ?? string.Empty;
-
-    if (string.IsNullOrEmpty(slug))
-    {
-      await this.SendValidationErrorAsync(new[] { "Article slug is required" }, cancellationToken);
-      return;
-    }
-
-    if (!int.TryParse(commentIdStr, out var commentId))
-    {
-      await this.SendValidationErrorAsync(new[] { "id is invalid" }, cancellationToken);
-      return;
-    }
-
-    var result = await _mediator.Send(new DeleteCommentCommand(slug, commentId, userId), cancellationToken);
+    var result = await _mediator.Send(new DeleteCommentCommand(request.Slug, request.Id, userId), cancellationToken);
 
     await this.SendAsync(result, _ => new { }, cancellationToken, treatNotFoundAsValidation: true);
   }

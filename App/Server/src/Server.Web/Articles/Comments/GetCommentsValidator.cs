@@ -1,0 +1,16 @@
+﻿using FluentValidation;
+
+namespace Server.Web.Articles.Comments;
+
+public class GetCommentsValidator : Validator<GetCommentsRequest>
+{
+  public GetCommentsValidator()
+  {
+    RuleLevelCascadeMode = CascadeMode.Stop;
+
+    RuleFor(x => x.Slug)
+      .NotEmpty()
+      .WithMessage("can't be blank")
+      .OverridePropertyName("slug");
+  }
+}

@@ -11,7 +11,7 @@ namespace Server.Web.Articles;
 /// <remarks>
 /// Get articles from followed users. Authentication required.
 /// </remarks>
-public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticlesResponse, ArticleMapper>
+public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<FeedRequest, ArticlesResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -24,20 +24,12 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
     });
   }
 
-  public override async Task HandleAsync(CancellationToken cancellationToken)
+  public override async Task HandleAsync(FeedRequest request, CancellationToken cancellationToken)
   {
     // Get current user ID from service
     var userId = _currentUserService.GetRequiredCurrentUserId();
 
-    var validation = QueryParameterValidator.ValidateFeedParameters(HttpContext.Request);
-
-    if (!validation.IsValid)
-    {
-      await this.SendValidationErrorAsync(validation.Errors, cancellationToken);
-      return;
-    }
-
-    var result = await _mediator.Send(new GetFeedQuery(userId, validation.Limit, validation.Offset), cancellationToken);
+    var result = await _mediator.Send(new GetFeedQuery(userId, request.Limit, request.Offset), cancellationToken);
 
     await this.SendAsync(result, articles =>
     {
