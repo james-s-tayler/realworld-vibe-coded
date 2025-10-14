@@ -26,6 +26,6 @@ public class Delete(IMediator _mediator)
 
     var result = await _mediator.Send(command, cancellationToken);
 
-    await this.SendAsync(result, cancellationToken, successStatusCode: 204);
+    await this.SendAsync(result, cancellationToken);
   }
 }

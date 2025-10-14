@@ -33,7 +33,7 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
 
     var result = await _mediator.Send(new CreateCommentCommand(slug, request.Comment.Body, userId, userId), cancellationToken);
 
-    await this.SendAsync(result, cancellationToken, successStatusCode: 201, treatNotFoundAsValidation: true);
+    await this.SendAsync(result, cancellationToken, treatNotFoundAsValidation: true);
   }
 }
 

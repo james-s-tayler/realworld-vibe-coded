@@ -50,6 +50,6 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
         Image = userDto.Image,
         Token = userDto.Token
       }
-    }, cancellationToken, successStatusCode: 201);
+    }, cancellationToken);
   }
 }

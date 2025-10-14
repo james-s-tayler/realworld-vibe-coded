@@ -50,6 +50,6 @@ public class CreateArticleHandler(
     await _articleRepository.AddAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
-    return Result.Success(article);
+    return Result.Created(article);
   }
 }

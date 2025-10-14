@@ -66,7 +66,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Result<U
       _logger.LogInformation("User {Username} registered successfully with ID {UserId}",
         createdUser.Username, createdUser.Id);
 
-      return Result.Success(UserMappers.MapToDto(createdUser, token));
+      return Result.Created(UserMappers.MapToDto(createdUser, token));
     }
     catch (Exception ex)
     {

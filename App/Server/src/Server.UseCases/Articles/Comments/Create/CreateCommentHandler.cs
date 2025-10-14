@@ -61,6 +61,6 @@ public class CreateCommentHandler : IRequestHandler<CreateCommentCommand, Result
     // Return the comment response
     var response = new CommentResponse(CommentMappers.MapToDto(comment, currentUser));
 
-    return Result.Success(response);
+    return Result.Created(response);
   }
 }
