@@ -61,7 +61,7 @@ public static class ResultExtensions
     // Build ProblemDetails response
     var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
     {
-      Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1 soloyolo",
+      Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
       Title = GetTitleForStatus(statusCode),
       Status = statusCode,
       Instance = httpContext.Request.Path
