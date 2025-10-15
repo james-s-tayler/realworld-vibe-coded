@@ -33,7 +33,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Result<U
       _logger.LogWarning("Registration failed: Email {Email} already exists", request.Email);
       return Result.Invalid(new ValidationError
       {
-        Identifier = "email",
+        Identifier = nameof(request.Email),
         ErrorMessage = "Email already exists",
       });
     }
@@ -46,7 +46,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Result<U
       _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
       return Result.Invalid(new ValidationError
       {
-        Identifier = "username",
+        Identifier = nameof(request.Username),
         ErrorMessage = "Username already exists",
       });
     }
