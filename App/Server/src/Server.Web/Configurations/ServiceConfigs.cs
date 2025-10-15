@@ -61,48 +61,54 @@ public static class ServiceConfigs
 
             return Task.CompletedTask;
           },
-          OnChallenge = context =>
+          OnChallenge = async context =>
           {
             // Skip the default logic that adds WWW-Authenticate header
             context.HandleResponse();
 
-            context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/problem+json";
+            var problemDetailsService = context.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
 
-            var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
+            context.HttpContext.Response.StatusCode = 401;
+
+            var problemDetailsContext = new ProblemDetailsContext
             {
-              Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-              Title = "Unauthorized",
-              Status = 401,
-              Instance = context.Request.Path,
-              Extensions =
+              HttpContext = context.HttpContext,
+              ProblemDetails =
               {
-                ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } },
-                ["traceId"] = context.HttpContext.TraceIdentifier
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                Title = "Unauthorized",
+                Status = 401,
+                Extensions =
+                {
+                  ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } }
+                }
               }
             };
 
-            return context.Response.WriteAsJsonAsync(problemDetails);
+            await problemDetailsService.WriteAsync(problemDetailsContext);
           },
-          OnForbidden = context =>
+          OnForbidden = async context =>
           {
-            context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/problem+json";
+            var problemDetailsService = context.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
 
-            var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
+            context.HttpContext.Response.StatusCode = 401;
+
+            var problemDetailsContext = new ProblemDetailsContext
             {
-              Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-              Title = "Unauthorized",
-              Status = 401,
-              Instance = context.Request.Path,
-              Extensions =
+              HttpContext = context.HttpContext,
+              ProblemDetails =
               {
-                ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } },
-                ["traceId"] = context.HttpContext.TraceIdentifier
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                Title = "Unauthorized",
+                Status = 401,
+                Extensions =
+                {
+                  ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } }
+                }
               }
             };
 
-            return context.Response.WriteAsJsonAsync(problemDetails);
+            await problemDetailsService.WriteAsync(problemDetailsContext);
           }
         };
       });
