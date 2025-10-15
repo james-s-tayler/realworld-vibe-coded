@@ -19,7 +19,7 @@ services:
   api:
     build:
       context: ../../App/Server
-      dockerfile: ../../Task/LocalDev/Dockerfile
+      dockerfile: ../../Task/LocalDev/Dockerfile.dev
     depends_on:
       sqlserver:
         condition: service_healthy
