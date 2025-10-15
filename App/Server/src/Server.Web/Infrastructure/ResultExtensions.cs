@@ -12,10 +12,9 @@ public static class ResultExtensions
   public static async Task ResultAsync<TResult>(
     this IResponseSender ep,
     Result<TResult> result,
-    CancellationToken cancellationToken = default,
-    bool treatNotFoundAsValidation = false)
+    CancellationToken cancellationToken = default)
   {
-    await ResultAsync<TResult, TResult>(ep, result, null, cancellationToken, treatNotFoundAsValidation);
+    await ResultAsync<TResult, TResult>(ep, result, null, cancellationToken);
   }
 
   /// <summary>
@@ -28,8 +27,7 @@ public static class ResultExtensions
     this IResponseSender ep,
     Result<TResult> result,
     Func<TResult, TResponse>? mapper = null,
-    CancellationToken cancellationToken = default,
-    bool treatNotFoundAsValidation = false)
+    CancellationToken cancellationToken = default)
   {
     switch (result.Status)
     {
@@ -114,28 +112,4 @@ public static class ResultExtensions
     await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
   }
 
-  /// <summary>
-  /// Maps ResultStatus to HTTP status code and error message.
-  /// </summary>
-  private static (int statusCode, string errorMessage) GetStatusCodeAndMessage(
-    ResultStatus status,
-    bool treatNotFoundAsValidation = false)
-  {
-    return status switch
-    {
-      ResultStatus.Ok => (200, "OK"),
-      ResultStatus.Created => (201, "Created"),
-      ResultStatus.NoContent => (204, "No content"),
-      ResultStatus.Unauthorized => (401, "Unauthorized"),
-      ResultStatus.Forbidden => (403, "Forbidden"),
-      ResultStatus.NotFound when treatNotFoundAsValidation => (400, "Bad request"),
-      ResultStatus.NotFound => (404, "Not found"),
-      ResultStatus.Invalid => (400, "Bad request"),
-      ResultStatus.Conflict => (409, "Conflict"),
-      ResultStatus.Unavailable => (503, "Service unavailable"),
-      ResultStatus.CriticalError => (500, "Internal server error"),
-      ResultStatus.Error => (400, "Bad request"),
-      _ => (400, "Bad request")
-    };
-  }
 }
