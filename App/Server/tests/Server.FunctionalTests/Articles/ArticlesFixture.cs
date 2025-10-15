@@ -8,7 +8,8 @@ namespace Server.FunctionalTests.Articles;
 
 public class ArticlesFixture : AppFixture<Program>
 {
-  private MsSqlContainer? _container;
+  private MsSqlContainer _container = null!;
+  private string _connectionString = null!;
 
   public HttpClient ArticlesUser1Client { get; private set; } = null!;
   public HttpClient ArticlesUser2Client { get; private set; } = null!;
@@ -16,6 +17,35 @@ public class ArticlesFixture : AppFixture<Program>
   public string ArticlesUser2Username { get; private set; } = null!;
   public string ArticlesUser1Email { get; private set; } = null!;
   public string ArticlesUser2Email { get; private set; } = null!;
+
+  protected override async ValueTask PreSetupAsync()
+  {
+    // PreSetupAsync is called once per test assembly, before the WAF/SUT is created.
+    // This ensures a single container and schema for all tests using this fixture.
+    _container = new MsSqlBuilder()
+        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+        .Build();
+
+    await _container.StartAsync();
+
+    _connectionString = _container.GetConnectionString();
+
+    // Create database schema once per assembly
+    // Services is not available yet, so create a temporary service provider
+    var serviceCollection = new ServiceCollection();
+    serviceCollection.AddDbContext<AppDbContext>(options =>
+    {
+      options.UseSqlServer(_connectionString);
+      options.EnableSensitiveDataLogging();
+    });
+
+    using var serviceProvider = serviceCollection.BuildServiceProvider();
+    // AppDbContext constructor requires IDomainEventDispatcher but it's nullable,
+    // so we can create it with a null DbContextOptions
+    var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
+    using var db = new AppDbContext(dbContextOptions, null);
+    await db.Database.EnsureCreatedAsync();
+  }
 
   protected override void ConfigureServices(IServiceCollection services)
   {
@@ -37,27 +67,17 @@ public class ArticlesFixture : AppFixture<Program>
       services.Remove(desc);
     }
 
-    _container = new MsSqlBuilder()
-        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-        .Build();
-
-    _container.StartAsync().GetAwaiter().GetResult();
-
-    var connectionString = _container.GetConnectionString();
-
     services.AddDbContext<AppDbContext>(options =>
     {
-      options.UseSqlServer(connectionString);
+      options.UseSqlServer(_connectionString);
       options.EnableSensitiveDataLogging();
     });
   }
 
   protected override async ValueTask SetupAsync()
   {
-    using var scope = Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    await db.Database.EnsureCreatedAsync();
+    // Schema is already created in PreSetupAsync
+    // SetupAsync still needs to run to create test data (users, clients, etc.)
 
     ArticlesUser1Username = $"articlesuser1-{Guid.NewGuid()}";
     ArticlesUser1Email = $"articlesuser1-{Guid.NewGuid()}@example.com";
@@ -104,12 +124,10 @@ public class ArticlesFixture : AppFixture<Program>
     });
   }
 
-  protected override async ValueTask TearDownAsync()
+  protected override ValueTask TearDownAsync()
   {
-    if (_container != null)
-    {
-      await _container.StopAsync();
-      await _container.DisposeAsync();
-    }
+    // No need to dispose the container when WAF caching is enabled.
+    // TestContainers will automatically dispose it when the test run finishes.
+    return ValueTask.CompletedTask;
   }
 }

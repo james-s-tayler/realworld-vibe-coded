@@ -6,7 +6,37 @@ namespace Server.FunctionalTests.Auth;
 
 public class AuthFixture : AppFixture<Program>
 {
-  private MsSqlContainer? _container;
+  private MsSqlContainer _container = null!;
+  private string _connectionString = null!;
+
+  protected override async ValueTask PreSetupAsync()
+  {
+    // PreSetupAsync is called once per test assembly, before the WAF/SUT is created.
+    // This ensures a single container and schema for all tests using this fixture.
+    _container = new MsSqlBuilder()
+        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+        .Build();
+
+    await _container.StartAsync();
+
+    _connectionString = _container.GetConnectionString();
+
+    // Create database schema once per assembly
+    // Services is not available yet, so create a temporary service provider
+    var serviceCollection = new ServiceCollection();
+    serviceCollection.AddDbContext<AppDbContext>(options =>
+    {
+      options.UseSqlServer(_connectionString);
+      options.EnableSensitiveDataLogging();
+    });
+
+    using var serviceProvider = serviceCollection.BuildServiceProvider();
+    // AppDbContext constructor requires IDomainEventDispatcher but it's nullable,
+    // so we can create it with a null DbContextOptions
+    var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
+    using var db = new AppDbContext(dbContextOptions, null);
+    await db.Database.EnsureCreatedAsync();
+  }
 
   protected override void ConfigureServices(IServiceCollection services)
   {
@@ -28,36 +58,23 @@ public class AuthFixture : AppFixture<Program>
       services.Remove(desc);
     }
 
-    _container = new MsSqlBuilder()
-        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-        .Build();
-
-    _container.StartAsync().GetAwaiter().GetResult();
-
-    var connectionString = _container.GetConnectionString();
-
     services.AddDbContext<AppDbContext>(options =>
     {
-      options.UseSqlServer(connectionString);
+      options.UseSqlServer(_connectionString);
       options.EnableSensitiveDataLogging();
     });
   }
 
-  protected override async ValueTask SetupAsync()
+  protected override ValueTask SetupAsync()
   {
-    using var scope = Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    // Create database schema (uses model from DbContext, not migrations)
-    await db.Database.EnsureCreatedAsync();
+    // No longer need to create schema here - it's done once in PreSetupAsync
+    return ValueTask.CompletedTask;
   }
 
-  protected override async ValueTask TearDownAsync()
+  protected override ValueTask TearDownAsync()
   {
-    if (_container != null)
-    {
-      await _container.StopAsync();
-      await _container.DisposeAsync();
-    }
+    // No need to dispose the container when WAF caching is enabled.
+    // TestContainers will automatically dispose it when the test run finishes.
+    return ValueTask.CompletedTask;
   }
 }
