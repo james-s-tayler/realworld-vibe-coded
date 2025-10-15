@@ -22,7 +22,7 @@ public class RegisterValidator : Validator<RegisterRequest>
       .WithMessage("must be at least 2 characters.")
       .MaximumLength(100)
       .WithMessage("cannot exceed 100 characters.")
-      /*.OverridePropertyName("username")*/;
+      .OverridePropertyName("username");
 
     RuleFor(x => x.User.Password)
       .NotEmpty()
