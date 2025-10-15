@@ -67,26 +67,42 @@ public static class ServiceConfigs
             context.HandleResponse();
 
             context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/json";
+            context.Response.ContentType = "application/problem+json";
 
-            var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+            var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
             {
-              errors = new { body = new[] { "Unauthorized" } }
-            });
+              Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+              Title = "Unauthorized",
+              Status = 401,
+              Instance = context.Request.Path,
+              Extensions =
+              {
+                ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } },
+                ["traceId"] = context.HttpContext.TraceIdentifier
+              }
+            };
 
-            return context.Response.WriteAsync(errorResponse);
+            return context.Response.WriteAsJsonAsync(problemDetails);
           },
           OnForbidden = context =>
           {
             context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/json";
+            context.Response.ContentType = "application/problem+json";
 
-            var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+            var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
             {
-              errors = new { body = new[] { "Unauthorized" } }
-            });
+              Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+              Title = "Unauthorized",
+              Status = 401,
+              Instance = context.Request.Path,
+              Extensions =
+              {
+                ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } },
+                ["traceId"] = context.HttpContext.TraceIdentifier
+              }
+            };
 
-            return context.Response.WriteAsync(errorResponse);
+            return context.Response.WriteAsJsonAsync(problemDetails);
           }
         };
       });

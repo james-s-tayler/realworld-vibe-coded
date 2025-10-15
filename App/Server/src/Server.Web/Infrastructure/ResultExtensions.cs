@@ -55,38 +55,53 @@ public static class ResultExtensions
       return;
     }
 
-    // Handle error cases
-    httpContext.Response.ContentType = "application/json";
+    // Handle error cases using ProblemDetails
+    httpContext.Response.ContentType = "application/problem+json";
 
-    // Build error array
-    // For Invalid status with ValidationErrors, format as "identifier message"
-    // Otherwise use errors from result or default message
-    string[] errorMessages;
+    // Build ProblemDetails response
+    var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
+    {
+      Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+      Title = GetTitleForStatus(statusCode),
+      Status = statusCode,
+      Instance = httpContext.Request.Path
+    };
+
+    // Add errors to extensions
+    var errors = new List<object>();
     if (result.Status == ResultStatus.Invalid && result.ValidationErrors.Any())
     {
-      errorMessages = result.ValidationErrors
-        .Select(error => $"{error.Identifier} {error.ErrorMessage}")
-        .ToArray();
+      errors.AddRange(result.ValidationErrors.Select(error => new
+      {
+        name = error.Identifier.ToLower(),
+        reason = error.ErrorMessage
+      }));
     }
     else if (result.Errors.Any())
     {
-      errorMessages = result.Errors.ToArray();
+      errors.AddRange(result.Errors.Select(error => new
+      {
+        name = "body",
+        reason = error
+      }));
     }
     else
     {
-      errorMessages = new[] { errorMessage };
+      errors.Add(new
+      {
+        name = "body",
+        reason = errorMessage
+      });
     }
 
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = errorMessages }
-    });
+    problemDetails.Extensions["errors"] = errors;
+    problemDetails.Extensions["traceId"] = httpContext.TraceIdentifier;
 
-    await httpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
   }
 
   /// <summary>
-  /// Sends a validation error response (400) with custom error messages.
+  /// Sends a validation error response (400) with custom error messages using ProblemDetails format.
   /// </summary>
   public static async Task SendValidationErrorAsync(
     this IEndpoint endpoint,
@@ -95,14 +110,22 @@ public static class ResultExtensions
   {
     var httpContext = endpoint.HttpContext;
     httpContext.Response.StatusCode = 400;
-    httpContext.Response.ContentType = "application/json";
+    httpContext.Response.ContentType = "application/problem+json";
 
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+    var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
     {
-      errors = new { body = errors.ToArray() }
-    });
+      Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+      Title = "One or more validation errors occurred.",
+      Status = 400,
+      Instance = httpContext.Request.Path,
+      Extensions =
+      {
+        ["errors"] = errors.Select(e => new { name = "body", reason = e }).ToList(),
+        ["traceId"] = httpContext.TraceIdentifier
+      }
+    };
 
-    await httpContext.Response.WriteAsync(errorResponse, cancellationToken);
+    await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
   }
 
   /// <summary>
@@ -127,6 +150,24 @@ public static class ResultExtensions
       ResultStatus.CriticalError => (500, "Internal server error"),
       ResultStatus.Error => (400, "Bad request"),
       _ => (400, "Bad request")
+    };
+  }
+
+  /// <summary>
+  /// Maps HTTP status code to a human-readable title for ProblemDetails.
+  /// </summary>
+  private static string GetTitleForStatus(int statusCode)
+  {
+    return statusCode switch
+    {
+      400 => "One or more validation errors occurred.",
+      401 => "Unauthorized",
+      403 => "Forbidden",
+      404 => "Not found",
+      409 => "Conflict",
+      500 => "Internal server error",
+      503 => "Service unavailable",
+      _ => "An error occurred"
     };
   }
 }
