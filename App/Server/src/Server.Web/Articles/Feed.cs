@@ -33,13 +33,13 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
 
     if (!validation.IsValid)
     {
-      await this.SendValidationErrorAsync(validation.Errors, cancellationToken);
+      await Send.ValidationErrorAsync(validation.Errors, cancellationToken);
       return;
     }
 
     var result = await _mediator.Send(new GetFeedQuery(userId, validation.Limit, validation.Offset), cancellationToken);
 
-    await this.SendAsync(result, articles =>
+    await Send.ResultAsync(result, articles =>
     {
       var articleDtos = articles.Select(article => Map.FromEntity(article).Article).ToList();
       return new ArticlesResponse(articleDtos, articleDtos.Count);

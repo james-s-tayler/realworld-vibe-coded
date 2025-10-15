@@ -38,7 +38,7 @@ public class Login(IMediator _mediator) : Endpoint<LoginRequest, LoginResponse, 
       request.User.Email,
       request.User.Password), cancellationToken);
 
-    await this.SendAsync(result, userDto => new LoginResponse
+    await Send.ResultAsync(result, userDto => new LoginResponse
     {
       User = Map.FromEntity(userDto)
     }, cancellationToken);

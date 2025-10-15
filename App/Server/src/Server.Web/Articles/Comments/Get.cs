@@ -31,7 +31,7 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
 
     var result = await _mediator.Send(new GetCommentsQuery(request.Slug, currentUserId), cancellationToken);
 
-    await this.SendAsync(result, cancellationToken);
+    await Send.ResultAsync(result, cancellationToken);
   }
 }
 

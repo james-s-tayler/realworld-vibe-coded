@@ -7,13 +7,13 @@ public static class ResultExtensions
   /// Handles success, error, and validation scenarios consistently.
   /// Automatically uses the correct status code based on Result.Status.
   /// </summary>
-  public static async Task SendAsync<TResult>(
-    this IEndpoint endpoint,
+  public static async Task ResultAsync<TResult>(
+    this IResponseSender sender,
     Result<TResult> result,
     CancellationToken cancellationToken = default,
     bool treatNotFoundAsValidation = false)
   {
-    await SendAsync<TResult, TResult>(endpoint, result, null, cancellationToken, treatNotFoundAsValidation);
+    await ResultAsync<TResult, TResult>(sender, result, null, cancellationToken, treatNotFoundAsValidation);
   }
 
   /// <summary>
@@ -22,14 +22,14 @@ public static class ResultExtensions
   /// Maps the result value using the provided mapper function.
   /// Automatically uses the correct status code based on Result.Status.
   /// </summary>
-  public static async Task SendAsync<TResult, TResponse>(
-    this IEndpoint endpoint,
+  public static async Task ResultAsync<TResult, TResponse>(
+    this IResponseSender sender,
     Result<TResult> result,
     Func<TResult, TResponse>? mapper = null,
     CancellationToken cancellationToken = default,
     bool treatNotFoundAsValidation = false)
   {
-    var httpContext = endpoint.HttpContext;
+    var httpContext = sender.HttpContext;
 
     // Determine status code from Result.Status
     var (statusCode, errorMessage) = GetStatusCodeAndMessage(result.Status, treatNotFoundAsValidation);
@@ -103,12 +103,12 @@ public static class ResultExtensions
   /// <summary>
   /// Sends a validation error response (400) with custom error messages using ProblemDetails format.
   /// </summary>
-  public static async Task SendValidationErrorAsync(
-    this IEndpoint endpoint,
+  public static async Task ValidationErrorAsync(
+    this IResponseSender sender,
     IEnumerable<string> errors,
     CancellationToken cancellationToken = default)
   {
-    var httpContext = endpoint.HttpContext;
+    var httpContext = sender.HttpContext;
     httpContext.Response.StatusCode = 400;
     httpContext.Response.ContentType = "application/problem+json";
 
