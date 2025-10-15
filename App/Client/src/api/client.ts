@@ -38,7 +38,17 @@ export async function apiRequest<T>(
   const data = await response.json();
 
   if (!response.ok) {
-    const errors = data?.errors?.body || ['An error occurred'];
+    // Handle ProblemDetails format: errors is an array of {name, reason}
+    let errors: string[];
+    if (data?.errors && Array.isArray(data.errors)) {
+      // ProblemDetails format
+      errors = data.errors.map((err: { name: string; reason: string }) => 
+        `${err.name} ${err.reason}`
+      );
+    } else {
+      // Fallback for other error formats
+      errors = ['An error occurred'];
+    }
     throw new ApiError(response.status, errors);
   }
 
