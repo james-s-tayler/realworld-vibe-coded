@@ -1,15 +1,17 @@
-﻿namespace Server.Web.Articles;
+﻿using FluentValidation.Results;
+
+namespace Server.Web.Articles;
 
 public static class QueryParameterValidator
 {
   public static class ValidationResults
   {
-    public record ValidationResult(bool IsValid, List<string> Errors, int Limit, int Offset, string? Tag = null, string? Author = null, string? Favorited = null);
+    public record ValidationResult(bool IsValid, List<ValidationFailure> Errors, int Limit, int Offset, string? Tag = null, string? Author = null, string? Favorited = null);
   }
 
   public static ValidationResults.ValidationResult ValidateListArticlesParameters(HttpRequest request)
   {
-    var errors = new List<string>();
+    var errors = new List<ValidationFailure>();
     var tagParam = request.Query["tag"].FirstOrDefault();
     var authorParam = request.Query["author"].FirstOrDefault();
     var favoritedParam = request.Query["favorited"].FirstOrDefault();
@@ -22,11 +24,11 @@ public static class QueryParameterValidator
     {
       if (!int.TryParse(limitParam, out limit))
       {
-        errors.Add("limit must be a valid integer");
+        errors.Add(new ValidationFailure("limit", "must be a valid integer"));
       }
       else if (limit <= 0)
       {
-        errors.Add("limit must be greater than 0");
+        errors.Add(new ValidationFailure("limit", "must be greater than 0"));
       }
     }
 
@@ -36,28 +38,28 @@ public static class QueryParameterValidator
     {
       if (!int.TryParse(offsetParam, out offset))
       {
-        errors.Add("offset must be a valid integer");
+        errors.Add(new ValidationFailure("offset", "must be a valid integer"));
       }
       else if (offset < 0)
       {
-        errors.Add("offset must be greater than or equal to 0");
+        errors.Add(new ValidationFailure("offset", "must be greater than or equal to 0"));
       }
     }
 
     // Validate string parameters for empty values
     if (tagParam == "")
     {
-      errors.Add("tag cannot be empty");
+      errors.Add(new ValidationFailure("tag", "cannot be empty"));
     }
 
     if (authorParam == "")
     {
-      errors.Add("author cannot be empty");
+      errors.Add(new ValidationFailure("author", "cannot be empty"));
     }
 
     if (favoritedParam == "")
     {
-      errors.Add("favorited cannot be empty");
+      errors.Add(new ValidationFailure("favorited", "cannot be empty"));
     }
 
     return new ValidationResults.ValidationResult(
@@ -73,7 +75,7 @@ public static class QueryParameterValidator
 
   public static ValidationResults.ValidationResult ValidateFeedParameters(HttpRequest request)
   {
-    var errors = new List<string>();
+    var errors = new List<ValidationFailure>();
     var limitParam = request.Query["limit"].FirstOrDefault();
     var offsetParam = request.Query["offset"].FirstOrDefault();
 
@@ -83,11 +85,11 @@ public static class QueryParameterValidator
     {
       if (!int.TryParse(limitParam, out limit))
       {
-        errors.Add("limit must be a valid integer");
+        errors.Add(new ValidationFailure("limit", "must be a valid integer"));
       }
       else if (limit <= 0)
       {
-        errors.Add("limit must be greater than 0");
+        errors.Add(new ValidationFailure("limit", "must be greater than 0"));
       }
     }
 
@@ -97,11 +99,11 @@ public static class QueryParameterValidator
     {
       if (!int.TryParse(offsetParam, out offset))
       {
-        errors.Add("offset must be a valid integer");
+        errors.Add(new ValidationFailure("offset", "must be a valid integer"));
       }
       else if (offset < 0)
       {
-        errors.Add("offset must be greater than or equal to 0");
+        errors.Add(new ValidationFailure("offset", "must be greater than or equal to 0"));
       }
     }
 

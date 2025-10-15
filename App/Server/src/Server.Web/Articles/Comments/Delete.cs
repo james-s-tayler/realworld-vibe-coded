@@ -33,13 +33,13 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     if (string.IsNullOrEmpty(slug))
     {
-      await Send.ValidationErrorAsync(new[] { "Article slug is required" }, cancellationToken);
+      await Send.ValidationErrorAsync(new[] { new FluentValidation.Results.ValidationFailure("slug", "is required") }, cancellationToken);
       return;
     }
 
     if (!int.TryParse(commentIdStr, out var commentId))
     {
-      await Send.ValidationErrorAsync(new[] { "id is invalid" }, cancellationToken);
+      await Send.ValidationErrorAsync(new[] { new FluentValidation.Results.ValidationFailure("id", "is invalid") }, cancellationToken);
       return;
     }
 

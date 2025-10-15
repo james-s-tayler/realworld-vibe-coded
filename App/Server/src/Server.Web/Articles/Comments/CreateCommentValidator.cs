@@ -10,7 +10,7 @@ public class CreateCommentValidator : Validator<CreateCommentRequest>
 
     RuleFor(x => x.Comment.Body)
       .NotEmpty()
-      .WithMessage("can't be blank")
+      .WithMessage("must not be empty")
       .OverridePropertyName("body");
   }
 }

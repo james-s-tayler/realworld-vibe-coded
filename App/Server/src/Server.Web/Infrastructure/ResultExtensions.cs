@@ -78,6 +78,28 @@ public static class ResultExtensions
       case ResultStatus.Forbidden:
         await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
         break;
+      case ResultStatus.Conflict:
+        // For conflict errors, try to extract field name from error message
+        foreach (var error in result.Errors)
+        {
+          // Extract field name if message format is "fieldName has already been taken" or similar
+          var fieldName = "body";
+          if (error.Contains("slug", StringComparison.OrdinalIgnoreCase))
+          {
+            fieldName = "slug";
+          }
+          else if (error.Contains("username", StringComparison.OrdinalIgnoreCase))
+          {
+            fieldName = "username";
+          }
+          else if (error.Contains("email", StringComparison.OrdinalIgnoreCase))
+          {
+            fieldName = "email";
+          }
+          ep.ValidationFailures.Add(new ValidationFailure(fieldName, error));
+        }
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, StatusCodes.Status409Conflict, cancellation: cancellationToken);
+        break;
       case ResultStatus.Error:
         await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("body", string.Join(";", result.Errors)) }, cancellation: cancellationToken);
         break;
@@ -89,27 +111,14 @@ public static class ResultExtensions
   /// </summary>
   public static async Task ValidationErrorAsync(
     this IResponseSender sender,
-    IEnumerable<string> errors,
+    IEnumerable<ValidationFailure> errors,
     CancellationToken cancellationToken = default)
   {
-    var httpContext = sender.HttpContext;
-    httpContext.Response.StatusCode = 400;
-    httpContext.Response.ContentType = "application/problem+json";
-
-    var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
+    foreach (var error in errors)
     {
-      Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-      Title = "One or more validation errors occurred.",
-      Status = 400,
-      Instance = httpContext.Request.Path,
-      Extensions =
-      {
-        ["errors"] = errors.Select(e => new { name = "body", reason = e }).ToList(),
-        ["traceId"] = httpContext.TraceIdentifier
-      }
-    };
-
-    await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+      sender.ValidationFailures.Add(error);
+    }
+    await sender.HttpContext.Response.SendErrorsAsync(sender.ValidationFailures, cancellation: cancellationToken);
   }
 
 }
