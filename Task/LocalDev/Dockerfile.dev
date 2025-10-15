@@ -2,9 +2,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0
 WORKDIR /app
 
-# Copy everything
-COPY . .
-
 # Set environment variables to force HTTP only
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENV ASPNETCORE_URLS=http://+:5000
@@ -17,4 +14,5 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 EXPOSE 5000
 
 # Run the application with dotnet watch for hot reload
+# Note: Source code is mounted as a volume in docker-compose.yml
 ENTRYPOINT ["dotnet", "watch", "run", "--project", "src/Server.Web/Server.Web.csproj", "--no-hot-reload", "--urls", "http://0.0.0.0:5000"]
