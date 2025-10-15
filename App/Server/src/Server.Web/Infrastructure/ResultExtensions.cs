@@ -1,4 +1,6 @@
-﻿namespace Server.Web.Infrastructure;
+﻿using FluentValidation.Results;
+
+namespace Server.Web.Infrastructure;
 
 public static class ResultExtensions
 {
@@ -8,12 +10,12 @@ public static class ResultExtensions
   /// Automatically uses the correct status code based on Result.Status.
   /// </summary>
   public static async Task ResultAsync<TResult>(
-    this IResponseSender sender,
+    this IResponseSender ep,
     Result<TResult> result,
     CancellationToken cancellationToken = default,
     bool treatNotFoundAsValidation = false)
   {
-    await ResultAsync<TResult, TResult>(sender, result, null, cancellationToken, treatNotFoundAsValidation);
+    await ResultAsync<TResult, TResult>(ep, result, null, cancellationToken, treatNotFoundAsValidation);
   }
 
   /// <summary>
@@ -23,81 +25,65 @@ public static class ResultExtensions
   /// Automatically uses the correct status code based on Result.Status.
   /// </summary>
   public static async Task ResultAsync<TResult, TResponse>(
-    this IResponseSender sender,
+    this IResponseSender ep,
     Result<TResult> result,
     Func<TResult, TResponse>? mapper = null,
     CancellationToken cancellationToken = default,
     bool treatNotFoundAsValidation = false)
   {
-    var httpContext = sender.HttpContext;
-
-    // Determine status code from Result.Status
-    var (statusCode, errorMessage) = GetStatusCodeAndMessage(result.Status, treatNotFoundAsValidation);
-
-    httpContext.Response.StatusCode = statusCode;
-
-    // Handle success cases
-    if (result.IsSuccess)
+    switch (result.Status)
     {
-      // NoContent (204) should not have a response body
-      if (result.Status != ResultStatus.NoContent)
-      {
+      case ResultStatus.Ok:
         if (mapper != null)
         {
-          var response = mapper(result.Value);
-          await httpContext.Response.WriteAsJsonAsync(response, cancellationToken);
+          await ep.HttpContext.Response.SendOkAsync(mapper(result), cancellation: cancellationToken);
         }
         else if (result.Value != null)
         {
-          await httpContext.Response.WriteAsJsonAsync(result.Value, cancellationToken);
+          await ep.HttpContext.Response.SendOkAsync(result.Value, cancellation: cancellationToken);
         }
-      }
-      return;
+        else
+        {
+          await ep.HttpContext.Response.SendOkAsync(cancellation: cancellationToken);
+        }
+        break;
+      case ResultStatus.Created:
+        if (mapper != null)
+        {
+          await ep.HttpContext.Response.SendAsync(mapper(result), statusCode: StatusCodes.Status201Created, cancellation: cancellationToken);
+        }
+        else if (result.Value != null)
+        {
+          await ep.HttpContext.Response.SendAsync(result.Value, statusCode: StatusCodes.Status201Created, cancellation: cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendResultAsync(TypedResults.Created());
+        }
+        break;
+      case ResultStatus.NoContent:
+        await ep.HttpContext.Response.SendNoContentAsync(cancellation: cancellationToken);
+        break;
+      case ResultStatus.Invalid:
+        foreach (var error in result.ValidationErrors)
+        {
+          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
+        }
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
+        break;
+      case ResultStatus.NotFound:
+        await ep.HttpContext.Response.SendNotFoundAsync(cancellation: cancellationToken);
+        break;
+      case ResultStatus.Unauthorized:
+        await ep.HttpContext.Response.SendUnauthorizedAsync(cancellation: cancellationToken);
+        break;
+      case ResultStatus.Forbidden:
+        await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
+        break;
+      case ResultStatus.Error:
+        await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("body", string.Join(";", result.Errors)) }, cancellation: cancellationToken);
+        break;
     }
-
-    // Handle error cases using ProblemDetails
-    httpContext.Response.ContentType = "application/problem+json";
-
-    // Build ProblemDetails response
-    var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
-    {
-      Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-      Title = GetTitleForStatus(statusCode),
-      Status = statusCode,
-      Instance = httpContext.Request.Path
-    };
-
-    // Add errors to extensions
-    var errors = new List<object>();
-    if (result.Status == ResultStatus.Invalid && result.ValidationErrors.Any())
-    {
-      errors.AddRange(result.ValidationErrors.Select(error => new
-      {
-        name = error.Identifier.ToLower(),
-        reason = error.ErrorMessage
-      }));
-    }
-    else if (result.Errors.Any())
-    {
-      errors.AddRange(result.Errors.Select(error => new
-      {
-        name = "body",
-        reason = error
-      }));
-    }
-    else
-    {
-      errors.Add(new
-      {
-        name = "body",
-        reason = errorMessage
-      });
-    }
-
-    problemDetails.Extensions["errors"] = errors;
-    problemDetails.Extensions["traceId"] = httpContext.TraceIdentifier;
-
-    await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
   }
 
   /// <summary>
@@ -150,24 +136,6 @@ public static class ResultExtensions
       ResultStatus.CriticalError => (500, "Internal server error"),
       ResultStatus.Error => (400, "Bad request"),
       _ => (400, "Bad request")
-    };
-  }
-
-  /// <summary>
-  /// Maps HTTP status code to a human-readable title for ProblemDetails.
-  /// </summary>
-  private static string GetTitleForStatus(int statusCode)
-  {
-    return statusCode switch
-    {
-      400 => "One or more validation errors occurred.",
-      401 => "Unauthorized",
-      403 => "Forbidden",
-      404 => "Not found",
-      409 => "Conflict",
-      500 => "Internal server error",
-      503 => "Service unavailable",
-      _ => "An error occurred"
     };
   }
 }
