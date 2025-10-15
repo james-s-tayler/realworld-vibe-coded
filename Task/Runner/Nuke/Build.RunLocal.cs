@@ -1,14 +1,12 @@
 ﻿using Nuke.Common;
 using Nuke.Common.Tooling;
-using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
 using Serilog;
-using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 
 public partial class Build
 {
-  Target RunServerLocal => _ => _
+  Target RunLocalServer => _ => _
     .Description("Run backend locally using Docker Compose with SQL Server and hot-reload")
     .Executes(() =>
     {
@@ -37,13 +35,6 @@ public partial class Build
         downProcess.WaitForExit();
         Log.Information("✓ Docker Compose resources cleaned up");
       }
-    });
-
-  Target RunLocalServer => _ => _
-    .Description("Run backend locally")
-    .Executes(() =>
-    {
-      DotNetRun(s => s.SetProjectFile(ServerProject));
     });
 
   Target RunLocalClient => _ => _

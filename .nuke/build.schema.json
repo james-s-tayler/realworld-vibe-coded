@@ -41,7 +41,6 @@
         "LintServerVerify",
         "RunLocalClient",
         "RunLocalServer",
-        "RunServerLocal",
         "TestClient",
         "TestE2e",
         "TestServer",
