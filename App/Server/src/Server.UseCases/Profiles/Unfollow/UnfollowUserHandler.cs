@@ -29,7 +29,7 @@ public class UnfollowUserHandler(IRepository<User> _userRepository)
     // Check if the user is currently following the target user
     if (!currentUser.IsFollowing(userToUnfollow))
     {
-      return Result.Error("username is not being followed");
+      return Result.Invalid(new ValidationError("username", "is not being followed"));
     }
 
     // Unfollow the user
