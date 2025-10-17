@@ -26,7 +26,7 @@ public class CreateArticleHandler(
 
     if (existingArticle != null)
     {
-      return Result.Error("slug has already been taken");
+      return Result.Invalid(new ValidationError("slug", "has already been taken"));
     }
 
     // Create the article
