@@ -32,7 +32,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
 
         if (existingArticle != null)
         {
-          return Result.Error("slug has already been taken");
+          return Result.Invalid(new ValidationError("slug", "duplicate slug"));
         }
       }
     }
