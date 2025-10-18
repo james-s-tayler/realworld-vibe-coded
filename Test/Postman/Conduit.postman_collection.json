@@ -4707,7 +4707,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}3\"\n    }\n}"
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/{{DELETE_COMMENT_ID}}",
@@ -5653,7 +5653,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/no-such-article",
@@ -5719,7 +5719,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
@@ -5784,7 +5784,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
@@ -5849,7 +5849,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
@@ -5914,7 +5914,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}3",
