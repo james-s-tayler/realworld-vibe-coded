@@ -17,43 +17,8 @@ public static class MiddlewareConfig
       app.UseHsts();
     }
 
-    app.UseFastEndpoints(c =>
-        {
-          c.Errors.StatusCode = 400;
-          c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
-          {
-            var errors = failures.Select(failure =>
-            {
-              var propertyName = failure.PropertyName;
-              // Handle nested properties like User.Username -> username
-              if (propertyName.Contains('.'))
-              {
-                var parts = propertyName.Split('.');
-                propertyName = parts[parts.Length - 1];
-              }
-              return new
-              {
-                name = propertyName.ToLower(),
-                reason = failure.ErrorMessage
-              };
-            }).ToList();
-
-            return new Microsoft.AspNetCore.Mvc.ProblemDetails
-            {
-              Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-              Title = "One or more validation errors occurred.",
-              Status = statusCode,
-              Instance = ctx.Request.Path,
-              Extensions =
-              {
-                ["errors"] = errors,
-                ["traceId"] = ctx.TraceIdentifier
-              }
-            };
-          };
-        })
-        .UseSwaggerGen(); // Includes AddFileServer and static files middleware
-
+    app.UseFastEndpoints(config => config.Errors.UseProblemDetails());
+    app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
     app.UseAuthentication();
     app.UseAuthorization();

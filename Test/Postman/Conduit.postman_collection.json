@@ -2211,7 +2211,7 @@
 									"});",
 									"",
 									"",
-									"utils.assertErrorStartsWith(\"taglist[0]\", pm);"
+									"utils.assertErrorStartsWith(\"article.TagList[0]\", pm);"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -2284,7 +2284,7 @@
 									"});",
 									"",
 									"",
-									"utils.assertErrorStartsWith(\"taglist[0]\", pm);"
+									"utils.assertErrorStartsWith(\"article.TagList[0]\", pm);"
 								],
 								"type": "text/javascript",
 								"packages": {}
