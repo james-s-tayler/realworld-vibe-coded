@@ -11,7 +11,7 @@ namespace Server.Web.Users.GetCurrent;
 /// <remarks>
 /// Get the currently authenticated user details.
 /// </remarks>
-public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<UserCurrentResponse, UserMapper>
+public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<GetCurrentRequest, UserCurrentResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -24,7 +24,7 @@ public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserSer
     });
   }
 
-  public override async Task HandleAsync(CancellationToken cancellationToken)
+  public override async Task HandleAsync(GetCurrentRequest request, CancellationToken cancellationToken)
   {
     var userId = _currentUserService.GetRequiredCurrentUserId();
 

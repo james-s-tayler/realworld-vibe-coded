@@ -1,16 +1,21 @@
-﻿namespace Server.Web.Articles.Feed;
+﻿using FluentValidation;
+
+namespace Server.Web.Articles.Feed;
 
 public class FeedRequestValidator : Validator<FeedRequest>
 {
   public FeedRequestValidator()
   {
-    /*RuleFor(x => x.Limit)
+    RuleLevelCascadeMode = CascadeMode.Stop;
+
+    RuleFor(x => x.Limit)
       .GreaterThan(0)
-      .LessThanOrEqualTo(100)
+      .WithMessage("must be greater than 0")
       .OverridePropertyName("limit");
-    
+
     RuleFor(x => x.Offset)
       .GreaterThanOrEqualTo(0)
-      .OverridePropertyName("offset");*/
+      .WithMessage("must be greater than or equal to 0")
+      .OverridePropertyName("offset");
   }
 }

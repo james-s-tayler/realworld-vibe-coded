@@ -10,7 +10,7 @@ namespace Server.Web.Tags.List;
 /// <remarks>
 /// Get all tags used in articles. No authentication required.
 /// </remarks>
-public class List(IMediator _mediator) : EndpointWithoutRequest<TagsResponse>
+public class List(IMediator _mediator) : Endpoint<ListTagsRequest, TagsResponse>
 {
   public override void Configure()
   {
@@ -23,7 +23,7 @@ public class List(IMediator _mediator) : EndpointWithoutRequest<TagsResponse>
     });
   }
 
-  public override async Task HandleAsync(CancellationToken cancellationToken)
+  public override async Task HandleAsync(ListTagsRequest request, CancellationToken cancellationToken)
   {
     var result = await _mediator.Send(new ListTagsQuery(), cancellationToken);
 

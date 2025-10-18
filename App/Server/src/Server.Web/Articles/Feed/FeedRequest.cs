@@ -3,7 +3,8 @@
 public class FeedRequest
 {
   [BindFrom("limit")]
-  public int? Limit { get; set; } = 20;
+  public int Limit { get; set; } = 20;
+
   [BindFrom("offset")]
-  public int? Offset { get; set; } = 0;
+  public int Offset { get; set; } = 0;
 }
