@@ -70,41 +70,4 @@ public static class QueryParameterValidator
       favoritedParam
     );
   }
-
-  public static ValidationResults.ValidationResult ValidateFeedParameters(HttpRequest request)
-  {
-    var errors = new List<string>();
-    var limitParam = request.Query["limit"].FirstOrDefault();
-    var offsetParam = request.Query["offset"].FirstOrDefault();
-
-    // Parse and validate limit
-    int limit = 20;
-    if (!string.IsNullOrEmpty(limitParam))
-    {
-      if (!int.TryParse(limitParam, out limit))
-      {
-        errors.Add("limit must be a valid integer");
-      }
-      else if (limit <= 0)
-      {
-        errors.Add("limit must be greater than 0");
-      }
-    }
-
-    // Parse and validate offset
-    int offset = 0;
-    if (!string.IsNullOrEmpty(offsetParam))
-    {
-      if (!int.TryParse(offsetParam, out offset))
-      {
-        errors.Add("offset must be a valid integer");
-      }
-      else if (offset < 0)
-      {
-        errors.Add("offset must be greater than or equal to 0");
-      }
-    }
-
-    return new ValidationResults.ValidationResult(!errors.Any(), errors, limit, offset);
-  }
 }
