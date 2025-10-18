@@ -74,8 +74,9 @@ public partial class Build
       var output = string.Join("\n", psProcess.Output.Select(o => o.Text));
       return output.Contains("sqlserver");
     }
-    catch
+    catch (Exception ex)
     {
+      Log.Debug("Failed to check if SQL Server is running: {Message}", ex.Message);
       return false;
     }
   }
@@ -83,7 +84,10 @@ public partial class Build
   void ResetSqlServerDatabase()
   {
     // Connection string from docker-compose.yml
+    // Note: When running from host machine (not inside docker), we use localhost:1433
+    // The docker-compose.yml API service uses sqlserver:1433 (internal docker network)
     var connectionString = "Server=localhost,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true";
+    const int commandTimeoutSeconds = 120;
 
     try
     {
@@ -91,7 +95,9 @@ public partial class Build
       connection.Open();
       Log.Information("Connected to SQL Server");
 
-      // Get all user tables, views, stored procedures, functions, and other objects
+      // Drop all user schema objects
+      // Note: This uses dynamic SQL in T-SQL to enumerate and drop objects.
+      // The QUOTENAME function is used to properly escape object names and prevent SQL injection.
       var dropScript = @"
 -- Drop all foreign key constraints first
 DECLARE @sql NVARCHAR(MAX) = N'';
@@ -132,7 +138,7 @@ EXEC sp_executesql @sql;
 ";
 
       using var command = new SqlCommand(dropScript, connection);
-      command.CommandTimeout = 120; // 2 minutes timeout
+      command.CommandTimeout = commandTimeoutSeconds;
       command.ExecuteNonQuery();
 
       Log.Information("✓ SQL Server database reset complete - all schema and data removed");
