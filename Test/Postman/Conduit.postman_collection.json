@@ -1795,7 +1795,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/profiles/{{ARTICLES_USER_USERNAME}}/follow",
@@ -3011,7 +3011,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
@@ -3153,7 +3153,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
@@ -3295,7 +3295,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
@@ -3346,7 +3346,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
@@ -3396,7 +3396,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/no-such-article/favorite",
@@ -6296,7 +6296,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/profiles/{{FEED_USER_USERNAME}}2/follow",
@@ -6346,7 +6346,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/profiles/{{FEED_USER_USERNAME}}3/follow",
@@ -6692,7 +6692,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}_feed_2/favorite",
@@ -6742,7 +6742,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}_feed_2/favorite",
@@ -6792,7 +6792,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}_feed_5/favorite",
@@ -8854,7 +8854,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{EMAIL}}\"}}"
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
@@ -8923,7 +8923,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{EMAIL}}\"}}"
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
@@ -8992,7 +8992,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{EMAIL}}\"}}"
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
@@ -9042,7 +9042,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{EMAIL}}\"}}"
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{APIURL}}/profiles/nonexistentuser_{{USERNAME}}/follow",
