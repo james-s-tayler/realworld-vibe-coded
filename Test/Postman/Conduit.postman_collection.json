@@ -771,18 +771,17 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"packages": {},
-								"type": "text/javascript"
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -824,10 +823,6 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -868,10 +863,6 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -1277,10 +1268,6 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							}
@@ -1322,10 +1309,6 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -1375,10 +1358,6 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							}
@@ -1427,10 +1406,6 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							}
@@ -1478,10 +1453,6 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -2487,10 +2458,6 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							}
@@ -2625,16 +2592,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -2644,10 +2604,6 @@
 								"value": "Token {{articles_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
 							"host": [
@@ -2703,16 +2659,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -2722,10 +2671,6 @@
 								"value": "Token {{articles_user_token_2}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
 							"host": [
@@ -2857,16 +2802,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -2877,10 +2815,6 @@
 								"disabled": true
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
 							"host": [
@@ -2926,16 +2860,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -2945,10 +2872,6 @@
 								"value": "Token {{articles_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/no-such-article",
 							"host": [
@@ -4450,10 +4373,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -4462,10 +4381,6 @@
 								"value": "Token {{articles_user_token_2}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}3\"\n    }\n}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/no-such-article/comments/{{DELETE_COMMENT_ID}}",
 							"host": [
@@ -4755,16 +4670,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -4774,10 +4682,6 @@
 								"value": "Token {{articles_user_token_2}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}\"\n    }\n}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
 							"host": [
@@ -4831,16 +4735,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -4851,10 +4748,6 @@
 								"disabled": true
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}\"\n    }\n}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
 							"host": [
@@ -4903,16 +4796,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -4923,10 +4809,6 @@
 								"disabled": true
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}\"\n    }\n}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2/comments",
 							"host": [
@@ -4967,16 +4849,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -4986,10 +4861,6 @@
 								"value": "Token {{articles_user_token_2}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}\"\n    }\n}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/no-such-article/comments",
 							"host": [
@@ -6981,16 +6852,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7000,10 +6864,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/feed",
 							"host": [
@@ -7060,16 +6920,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7079,10 +6932,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/feed?limit=2",
 							"host": [
@@ -7144,16 +6993,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7163,10 +7005,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/feed?limit=1&offset=1",
 							"host": [
@@ -7232,16 +7070,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7251,10 +7082,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/feed?offset=2",
 							"host": [
@@ -7312,16 +7139,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7331,10 +7151,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/feed?offset=10",
 							"host": [
@@ -7391,16 +7207,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7410,10 +7219,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/feed?offset=-1&limit=0",
 							"host": [
@@ -7463,16 +7268,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7483,10 +7281,6 @@
 								"disabled": true
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/feed",
 							"host": [
@@ -7546,16 +7340,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7565,10 +7352,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles",
 							"host": [
@@ -7627,16 +7410,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7647,10 +7423,6 @@
 								"disabled": true
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles",
 							"host": [
@@ -7708,16 +7480,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7727,10 +7492,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?limit=4",
 							"host": [
@@ -7794,16 +7555,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7813,10 +7567,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?offset=1",
 							"host": [
@@ -7883,16 +7633,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7902,10 +7645,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?author={{FEED_USER_USERNAME}}2",
 							"host": [
@@ -7962,16 +7701,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -7981,10 +7713,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?author=no-such-author",
 							"host": [
@@ -8047,16 +7775,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8066,10 +7787,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?tag={{TAG_1}}",
 							"host": [
@@ -8132,16 +7849,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8151,10 +7861,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?tag={{TAG_2}}",
 							"host": [
@@ -8211,16 +7917,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8230,10 +7929,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?tag=no-such-tag",
 							"host": [
@@ -8310,16 +8005,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8329,10 +8017,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?favorited={{FEED_USER_USERNAME}}3",
 							"host": [
@@ -8389,16 +8073,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8408,10 +8085,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?favorited=no-such-user",
 							"host": [
@@ -8473,16 +8146,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8492,10 +8158,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?limit=2&offset=2",
 							"host": [
@@ -8556,16 +8218,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8575,10 +8230,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?offset=-1&limit=0",
 							"host": [
@@ -8638,16 +8289,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8657,10 +8301,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?offset=abc&limit=xyz",
 							"host": [
@@ -8719,16 +8359,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8738,10 +8371,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?tag=",
 							"host": [
@@ -8796,16 +8425,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8815,10 +8437,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?author=",
 							"host": [
@@ -8873,16 +8491,9 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -8892,10 +8503,6 @@
 								"value": "Token {{feed_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles?favorited=",
 							"host": [
@@ -9734,10 +9341,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -9747,10 +9350,6 @@
 								"disabled": true
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
 							"host": [
@@ -9804,10 +9403,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -9816,10 +9411,6 @@
 								"value": "Token {{token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
 							"host": [
@@ -9863,10 +9454,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -9875,10 +9462,6 @@
 								"value": "Token {{token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
 							"host": [
