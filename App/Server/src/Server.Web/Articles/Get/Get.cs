@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Get;
 /// <remarks>
 /// Gets a single article by its slug. Authentication optional.
 /// </remarks>
-public class Get(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<GetArticleRequest, ArticleResponse, ArticleMapper>
+public class Get(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -24,12 +24,15 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
     });
   }
 
-  public override async Task HandleAsync(GetArticleRequest request, CancellationToken cancellationToken)
+  public override async Task HandleAsync(CancellationToken cancellationToken)
   {
+    // Get slug from route parameter
+    var slug = Route<string>("slug") ?? string.Empty;
+
     // Get current user ID if authenticated
     var currentUserId = _currentUserService.GetCurrentUserId();
 
-    var result = await _mediator.Send(new GetArticleQuery(request.Slug, currentUserId), cancellationToken);
+    var result = await _mediator.Send(new GetArticleQuery(slug, currentUserId), cancellationToken);
 
     await Send.ResultAsync(result, article => Map.FromEntity(article), cancellationToken);
   }
