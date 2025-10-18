@@ -3601,10 +3601,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -3613,10 +3609,6 @@
 								"value": "Token {{articles_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
 							"host": [
@@ -3675,10 +3667,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -3687,10 +3675,6 @@
 								"value": "Token {{articles_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2/favorite",
 							"host": [
@@ -3725,10 +3709,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -3738,10 +3718,6 @@
 								"disabled": true
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
 							"host": [
@@ -3776,10 +3752,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -3788,10 +3760,6 @@
 								"value": "Token {{articles_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/no-such-article/favorite",
 							"host": [
@@ -4373,10 +4341,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -4386,10 +4350,6 @@
 								"disabled": true
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}3\"\n    }\n}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/{{DELETE_COMMENT_ID}}",
 							"host": [
@@ -4436,10 +4396,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -4448,10 +4404,6 @@
 								"value": "Token {{articles_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}3\"\n    }\n}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/{{DELETE_COMMENT_ID}}",
 							"host": [
@@ -4560,10 +4512,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -4572,10 +4520,6 @@
 								"value": "Token {{articles_user_token_2}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}3\"\n    }\n}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/0",
 							"host": [
@@ -4631,10 +4575,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -4643,10 +4583,6 @@
 								"value": "Token {{articles_user_token_2}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}3\"\n    }\n}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/abc",
 							"host": [
@@ -4693,10 +4629,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -4705,10 +4637,6 @@
 								"value": "Token {{articles_user_token_2}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/{{DELETE_COMMENT_ID}}",
 							"host": [
@@ -5639,10 +5567,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -5651,10 +5575,6 @@
 								"value": "Token {{articles_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/no-such-article",
 							"host": [
@@ -5704,10 +5624,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -5717,10 +5633,6 @@
 								"disabled": true
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
 							"host": [
@@ -5770,10 +5682,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -5782,10 +5690,6 @@
 								"value": "Token {{articles_user_token_2}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
 							"host": [
@@ -5835,10 +5739,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -5847,10 +5747,6 @@
 								"value": "Token {{articles_user_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
 							"host": [
@@ -5900,10 +5796,6 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -5912,10 +5804,6 @@
 								"value": "Token {{articles_user_token_2}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{}"
-						},
 						"url": {
 							"raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}3",
 							"host": [
