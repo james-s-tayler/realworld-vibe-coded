@@ -45,8 +45,8 @@ build.cmd                 # Cross-platform build script (Windows)
 | `lint-nuke-fix` | Fix Nuke build formatting and style issues automatically |
 | `run-local-server` | Run backend locally |
 | `run-local-client` | Run frontend locally (placeholder) |
-| `db-reset` | Reset local database - drops SQL Server schema/data from docker-compose or deletes SQLite file (with confirmation) |
-| `db-reset-force` | Reset local database without confirmation - drops SQL Server schema/data from docker-compose or deletes SQLite file |
+| `db-reset` | Reset local database - removes SQL Server docker volume or deletes SQLite file (with confirmation) |
+| `db-reset-force` | Reset local database without confirmation - removes SQL Server docker volume or deletes SQLite file |
 | `db-migrations-test-apply` | Test EF Core migrations by applying them to a throwaway SQL Server database in Docker (also detects pending model changes via EF Core 9.0) |
 
 ### Target Naming Conventions
@@ -91,7 +91,7 @@ These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` t
 # Run Postman tests with specific folder
 ./build.sh test-server-postman --folder Auth
 
-# Reset database (SQL Server if running via docker-compose, otherwise SQLite)
+# Reset database (removes SQL Server docker volume if exists, otherwise SQLite)
 ./build.sh db-reset-force
 
 # Start SQL Server locally for development
@@ -102,21 +102,14 @@ docker compose -f Task/LocalDev/docker-compose.yml up -d sqlserver
 
 The `db-reset` and `db-reset-force` targets intelligently handle database resets based on your environment:
 
-**SQL Server Reset (when running via docker-compose)**:
-- Detects if SQL Server is running via `Task/LocalDev/docker-compose.yml`
-- Connects to the SQL Server instance
-- Drops all user schema objects:
-  - Foreign key constraints
-  - Views
-  - Tables
-  - Stored procedures
-  - Functions
-  - User-defined types
-- Leaves system objects intact
-- Preserves the database itself (only removes schema and data)
+**SQL Server Reset (when docker volume exists)**:
+- Detects if the SQL Server docker volume (`localdev_sqlserver-data`) exists
+- Stops any running SQL Server containers via docker-compose
+- Removes the docker volume completely
+- This is a clean slate - all data and schema are removed
 
 **SQLite Reset (fallback)**:
-- If SQL Server is not detected, falls back to deleting the SQLite database file
+- If SQL Server volume is not detected, falls back to deleting the SQLite database file
 - Deletes `App/Server/src/Server.Web/database.sqlite`
 
 **Usage**:
@@ -128,8 +121,12 @@ The `db-reset` and `db-reset-force` targets intelligently handle database resets
 ./build.sh db-reset-force
 ```
 
-**Note**: To use SQL Server reset, ensure the SQL Server container is running:
+**Note**: To start fresh after reset:
 ```bash
+# Reset will stop containers and remove the volume
+./build.sh db-reset-force
+
+# Start SQL Server again with a clean database
 docker compose -f Task/LocalDev/docker-compose.yml up -d sqlserver
 ```
 

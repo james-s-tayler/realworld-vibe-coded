@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-using Nuke.Common;
+﻿using Nuke.Common;
 using Nuke.Common.Tooling;
 using Serilog;
 
@@ -9,7 +8,7 @@ public partial class Build
   readonly bool Force = false;
 
   Target DbReset => _ => _
-    .Description("Reset local database - drops SQL Server schema/data from docker-compose or deletes SQLite file (confirm or --force to skip)")
+    .Description("Reset local database - removes SQL Server docker volume or deletes SQLite file (confirm or --force to skip)")
     .Executes(() =>
     {
       if (!Force)
@@ -27,7 +26,7 @@ public partial class Build
     });
 
   Target DbResetForce => _ => _
-    .Description("Reset local database without confirmation - drops SQL Server schema/data from docker-compose or deletes SQLite file")
+    .Description("Reset local database without confirmation - removes SQL Server docker volume or deletes SQLite file")
     .Executes(() =>
     {
       ResetDatabase();
@@ -35,16 +34,18 @@ public partial class Build
 
   void ResetDatabase()
   {
-    // Check if SQL Server from docker-compose is running
-    if (IsSqlServerRunning())
+    var composeFile = RootDirectory / "Task" / "LocalDev" / "docker-compose.yml";
+
+    // Check if docker-compose file exists and if SQL Server volume exists
+    if (File.Exists(composeFile) && DoesDockerVolumeExist("localdev_sqlserver-data"))
     {
-      Log.Information("Detected running SQL Server from docker-compose. Resetting SQL Server database...");
-      ResetSqlServerDatabase();
+      Log.Information("Detected SQL Server docker volume. Removing volume to reset database...");
+      RemoveSqlServerVolume(composeFile);
     }
     else
     {
       // Fallback to SQLite reset
-      Log.Information("SQL Server not detected. Falling back to SQLite database reset...");
+      Log.Information("SQL Server volume not detected. Falling back to SQLite database reset...");
       Console.WriteLine($"Deleting {DatabaseFile}...");
       if (File.Exists(DatabaseFile))
       {
@@ -54,100 +55,57 @@ public partial class Build
     }
   }
 
-  bool IsSqlServerRunning()
+  bool DoesDockerVolumeExist(string volumeName)
   {
     try
     {
-      var composeFile = RootDirectory / "Task" / "LocalDev" / "docker-compose.yml";
-      if (!File.Exists(composeFile))
-      {
-        return false;
-      }
-
-      // Check if docker-compose containers are running
-      var psArgs = $"compose -f {composeFile} ps --services --filter status=running";
-      var psProcess = ProcessTasks.StartProcess("docker", psArgs,
+      var inspectArgs = $"volume inspect {volumeName}";
+      var inspectProcess = ProcessTasks.StartProcess("docker", inspectArgs,
             workingDirectory: RootDirectory,
-            logOutput: false);
-      psProcess.WaitForExit();
-
-      var output = string.Join("\n", psProcess.Output.Select(o => o.Text));
-      return output.Contains("sqlserver");
+            logOutput: false,
+            logInvocation: false);
+      inspectProcess.WaitForExit();
+      return inspectProcess.ExitCode == 0;
     }
     catch (Exception ex)
     {
-      Log.Debug("Failed to check if SQL Server is running: {Message}", ex.Message);
+      Log.Debug("Failed to check if docker volume exists: {Message}", ex.Message);
       return false;
     }
   }
 
-  void ResetSqlServerDatabase()
+  void RemoveSqlServerVolume(string composeFile)
   {
-    // Connection string from docker-compose.yml
-    // Note: When running from host machine (not inside docker), we use localhost:1433
-    // The docker-compose.yml API service uses sqlserver:1433 (internal docker network)
-    var connectionString = "Server=localhost,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true";
-    const int commandTimeoutSeconds = 120;
-
     try
     {
-      using var connection = new SqlConnection(connectionString);
-      connection.Open();
-      Log.Information("Connected to SQL Server");
+      // Stop any running containers first
+      Log.Information("Stopping SQL Server container if running...");
+      var downArgs = $"compose -f {composeFile} down";
+      var downProcess = ProcessTasks.StartProcess("docker", downArgs,
+            workingDirectory: RootDirectory);
+      downProcess.WaitForExit();
 
-      // Drop all user schema objects
-      // Note: This uses dynamic SQL in T-SQL to enumerate and drop objects.
-      // The QUOTENAME function is used to properly escape object names and prevent SQL injection.
-      var dropScript = @"
--- Drop all foreign key constraints first
-DECLARE @sql NVARCHAR(MAX) = N'';
-SELECT @sql += N'ALTER TABLE ' + QUOTENAME(OBJECT_SCHEMA_NAME(parent_object_id)) + '.' 
-    + QUOTENAME(OBJECT_NAME(parent_object_id)) + ' DROP CONSTRAINT ' + QUOTENAME(name) + ';'
-FROM sys.foreign_keys;
-EXEC sp_executesql @sql;
+      // Remove the volume
+      Log.Information("Removing SQL Server docker volume...");
+      var volumeRemoveArgs = "volume rm localdev_sqlserver-data";
+      var volumeRemoveProcess = ProcessTasks.StartProcess("docker", volumeRemoveArgs,
+            workingDirectory: RootDirectory);
+      volumeRemoveProcess.WaitForExit();
 
--- Drop all views
-SET @sql = N'';
-SELECT @sql += N'DROP VIEW ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ';'
-FROM sys.views WHERE is_ms_shipped = 0;
-EXEC sp_executesql @sql;
-
--- Drop all tables
-SET @sql = N'';
-SELECT @sql += N'DROP TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ';'
-FROM sys.tables WHERE is_ms_shipped = 0;
-EXEC sp_executesql @sql;
-
--- Drop all stored procedures
-SET @sql = N'';
-SELECT @sql += N'DROP PROCEDURE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ';'
-FROM sys.procedures WHERE is_ms_shipped = 0;
-EXEC sp_executesql @sql;
-
--- Drop all functions
-SET @sql = N'';
-SELECT @sql += N'DROP FUNCTION ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ';'
-FROM sys.objects WHERE type IN ('FN', 'IF', 'TF') AND is_ms_shipped = 0;
-EXEC sp_executesql @sql;
-
--- Drop all user-defined types
-SET @sql = N'';
-SELECT @sql += N'DROP TYPE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' + QUOTENAME(name) + ';'
-FROM sys.types WHERE is_user_defined = 1;
-EXEC sp_executesql @sql;
-";
-
-      using var command = new SqlCommand(dropScript, connection);
-      command.CommandTimeout = commandTimeoutSeconds;
-      command.ExecuteNonQuery();
-
-      Log.Information("✓ SQL Server database reset complete - all schema and data removed");
+      if (volumeRemoveProcess.ExitCode == 0)
+      {
+        Log.Information("✓ SQL Server database reset complete - docker volume removed");
+      }
+      else
+      {
+        Log.Error("Failed to remove docker volume. You may need to run: docker volume rm localdev_sqlserver-data");
+        throw new Exception("Failed to remove SQL Server docker volume");
+      }
     }
-    catch (SqlException ex)
+    catch (Exception ex)
     {
-      Log.Error("Failed to connect to SQL Server: {Message}", ex.Message);
-      Log.Warning("Make sure SQL Server is running via: docker compose -f Task/LocalDev/docker-compose.yml up");
-      throw new Exception($"SQL Server reset failed: {ex.Message}");
+      Log.Error("Failed to reset SQL Server database: {Message}", ex.Message);
+      throw;
     }
   }
 }
