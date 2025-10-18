@@ -1,5 +1,5 @@
 ﻿using Nuke.Common;
-using Nuke.Common.Tooling;
+using Nuke.Common.Tools.Docker;
 using Serilog;
 
 public partial class Build
@@ -54,17 +54,12 @@ public partial class Build
   {
     try
     {
-      var inspectArgs = $"volume inspect {volumeName}";
-      var inspectProcess = ProcessTasks.StartProcess("docker", inspectArgs,
-            workingDirectory: RootDirectory,
-            logOutput: false,
-            logInvocation: false);
-      inspectProcess.WaitForExit();
-      return inspectProcess.ExitCode == 0;
+      DockerTasks.DockerVolumeInspect(_ => _
+        .SetVolumes(volumeName));
+      return true;
     }
-    catch (Exception ex)
+    catch
     {
-      Log.Debug("Failed to check if docker volume exists: {Message}", ex.Message);
       return false;
     }
   }
@@ -75,27 +70,14 @@ public partial class Build
     {
       // Stop any running containers first
       Log.Information("Stopping SQL Server container if running...");
-      var downArgs = $"compose -f {composeFile} down";
-      var downProcess = ProcessTasks.StartProcess("docker", downArgs,
-            workingDirectory: RootDirectory);
-      downProcess.WaitForExit();
+      DockerTasks.Docker($"compose -f {composeFile} down", workingDirectory: RootDirectory);
 
       // Remove the volume
       Log.Information("Removing SQL Server docker volume...");
-      var volumeRemoveArgs = "volume rm localdev_sqlserver-data";
-      var volumeRemoveProcess = ProcessTasks.StartProcess("docker", volumeRemoveArgs,
-            workingDirectory: RootDirectory);
-      volumeRemoveProcess.WaitForExit();
+      DockerTasks.DockerVolumeRm(_ => _
+        .SetVolumes("localdev_sqlserver-data"));
 
-      if (volumeRemoveProcess.ExitCode == 0)
-      {
-        Log.Information("✓ SQL Server database reset complete - docker volume removed");
-      }
-      else
-      {
-        Log.Error("Failed to remove docker volume. You may need to run: docker volume rm localdev_sqlserver-data");
-        throw new Exception("Failed to remove SQL Server docker volume");
-      }
+      Log.Information("✓ SQL Server database reset complete - docker volume removed");
     }
     catch (Exception ex)
     {
