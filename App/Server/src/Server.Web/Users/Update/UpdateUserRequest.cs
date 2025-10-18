@@ -1,4 +1,6 @@
-﻿namespace Server.Web.Users;
+﻿using Server.Web.Users.Register;
+
+namespace Server.Web.Users.Update;
 
 public class UpdateUserRequest
 {

@@ -1,8 +1,9 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Users.GetCurrent;
 using Server.Web.Infrastructure;
+using Server.Web.Users.Register;
 
-namespace Server.Web.Users;
+namespace Server.Web.Users.GetCurrent;
 
 /// <summary>
 /// Get current user

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Server.Web.Users;
+namespace Server.Web.Users.Login;
 
 public class LoginValidator : Validator<LoginRequest>
 {

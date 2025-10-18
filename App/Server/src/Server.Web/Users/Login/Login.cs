@@ -1,7 +1,7 @@
 ﻿using Server.UseCases.Users.Login;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Users;
+namespace Server.Web.Users.Login;
 
 /// <summary>
 /// Login user

@@ -1,11 +1,12 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
-using Server.Web.Users;
+﻿using System.Net.Http.Headers;
+using Server.Web.Users.GetCurrent;
+using Server.Web.Users.Login;
+using Server.Web.Users.Register;
 
-namespace Server.FunctionalTests.Auth;
+namespace Server.FunctionalTests.Users;
 
-[Collection("Auth Integration Tests")]
-public class AuthTests(AuthFixture App) : TestBase<AuthFixture>
+[Collection("Users Integration Tests")]
+public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
 {
   [Fact]
   public async Task Register_WithValidCredentials_ReturnsJwtAndUser()
@@ -20,7 +21,7 @@ public class AuthTests(AuthFixture App) : TestBase<AuthFixture>
       }
     };
 
-    var (response, result) = await App.Client.POSTAsync<Server.Web.Users.Register, RegisterRequest, RegisterResponse>(request);
+    var (response, result) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Created);
     result.User.ShouldNotBeNull();
@@ -43,7 +44,7 @@ public class AuthTests(AuthFixture App) : TestBase<AuthFixture>
       }
     };
 
-    await App.Client.POSTAsync<Server.Web.Users.Register, RegisterRequest, RegisterResponse>(request1);
+    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
 
     var request2 = new RegisterRequest
     {
@@ -55,7 +56,7 @@ public class AuthTests(AuthFixture App) : TestBase<AuthFixture>
       }
     };
 
-    var (response, _) = await App.Client.POSTAsync<Server.Web.Users.Register, RegisterRequest, object>(request2);
+    var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request2);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -77,7 +78,7 @@ public class AuthTests(AuthFixture App) : TestBase<AuthFixture>
       }
     };
 
-    await App.Client.POSTAsync<Server.Web.Users.Register, RegisterRequest, RegisterResponse>(registerRequest);
+    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
 
     var loginRequest = new LoginRequest
     {
@@ -88,7 +89,7 @@ public class AuthTests(AuthFixture App) : TestBase<AuthFixture>
       }
     };
 
-    var (response, result) = await App.Client.POSTAsync<Server.Web.Users.Login, LoginRequest, LoginResponse>(loginRequest);
+    var (response, result) = await App.Client.POSTAsync<Login, LoginRequest, LoginResponse>(loginRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.User.ShouldNotBeNull();
@@ -109,7 +110,7 @@ public class AuthTests(AuthFixture App) : TestBase<AuthFixture>
       }
     };
 
-    var (response, _) = await App.Client.POSTAsync<Server.Web.Users.Login, LoginRequest, object>(loginRequest);
+    var (response, _) = await App.Client.POSTAsync<Login, LoginRequest, object>(loginRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -131,7 +132,7 @@ public class AuthTests(AuthFixture App) : TestBase<AuthFixture>
       }
     };
 
-    var (_, registerResult) = await App.Client.POSTAsync<Server.Web.Users.Register, RegisterRequest, RegisterResponse>(registerRequest);
+    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
 
     var token = registerResult.User.Token;
 

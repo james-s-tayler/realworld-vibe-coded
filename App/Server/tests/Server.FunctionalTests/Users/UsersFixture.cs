@@ -2,9 +2,9 @@
 using Server.Infrastructure.Data;
 using Testcontainers.MsSql;
 
-namespace Server.FunctionalTests.Articles;
+namespace Server.FunctionalTests.Users;
 
-public class EmptyArticlesFixture : AppFixture<Program>
+public class UsersFixture : AppFixture<Program>
 {
   private MsSqlContainer _container = null!;
   private string _connectionString = null!;

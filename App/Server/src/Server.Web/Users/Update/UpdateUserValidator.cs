@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Server.Web.Users;
+namespace Server.Web.Users.Update;
 
 public class UpdateUserValidator : Validator<UpdateUserRequest>
 {
