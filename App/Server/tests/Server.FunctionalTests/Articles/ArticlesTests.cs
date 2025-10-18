@@ -4,8 +4,12 @@ using System.Net;
 using System.Net.Http.Json;
 using Server.Core.ArticleAggregate.Dtos;
 using Server.UseCases.Articles;
-using Server.Web.Articles;
-using Server.Web.Articles.Comments;
+using Server.Web.Articles.Comments.Create;
+using Server.Web.Articles.Comments.Get;
+using Server.Web.Articles.Create;
+using Server.Web.Articles.List;
+using Server.Web.Articles.Update;
+using Create = Server.Web.Articles.Create.Create;
 
 namespace Server.FunctionalTests.Articles;
 
@@ -75,7 +79,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, result) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(request);
+    var (response, result) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Created);
     result.Article.ShouldNotBeNull();
@@ -104,7 +108,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, result) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(request);
+    var (response, result) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Created);
     result.Article.ShouldNotBeNull();
@@ -120,7 +124,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Article = new ArticleData()
     };
 
-    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request);
+    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -138,7 +142,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request);
+    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -157,7 +161,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request);
+    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -176,7 +180,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request);
+    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -194,7 +198,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(request1);
+    await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request1);
 
     var request2 = new CreateArticleRequest
     {
@@ -206,7 +210,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request2);
+    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request2);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -224,7 +228,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, _) = await App.Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, object>(request);
+    var (response, _) = await App.Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -242,7 +246,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var response = await App.ArticlesUser1Client.GetAsync($"/api/articles/{slug}");
@@ -268,7 +272,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var response = await App.Client.GetAsync($"/api/articles/{slug}");
@@ -301,7 +305,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var response = await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
@@ -328,7 +332,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
@@ -355,7 +359,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
@@ -382,7 +386,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var response = await App.Client.PostAsync($"/api/articles/{slug}/favorite", null);
@@ -411,7 +415,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null);
@@ -439,7 +443,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/favorite");
@@ -464,7 +468,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var response = await App.Client.DeleteAsync($"/api/articles/{slug}/favorite");
@@ -493,7 +497,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -528,7 +532,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -573,7 +577,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -599,7 +603,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -628,7 +632,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -641,7 +645,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest);
 
-    var (response, result) = await App.ArticlesUser1Client.GETAsync<Server.Web.Articles.Comments.Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
+    var (response, result) = await App.ArticlesUser1Client.GETAsync<Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Comments.ShouldNotBeNull();
@@ -662,7 +666,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -675,7 +679,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest);
 
-    var (response, result) = await App.Client.GETAsync<Server.Web.Articles.Comments.Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
+    var (response, result) = await App.Client.GETAsync<Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Comments.ShouldNotBeNull();
@@ -695,10 +699,10 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
-    var (response, result) = await App.Client.GETAsync<Server.Web.Articles.Comments.Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
+    var (response, result) = await App.Client.GETAsync<Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Comments.ShouldNotBeNull();
@@ -708,7 +712,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task GetComments_WithNonExistentArticle_ReturnsNotFound()
   {
-    var (response, _) = await App.Client.GETAsync<Server.Web.Articles.Comments.Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = "no-such-article" });
+    var (response, _) = await App.Client.GETAsync<Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -726,7 +730,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -760,7 +764,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -794,7 +798,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -836,7 +840,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/999999");
@@ -857,7 +861,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/abc");
@@ -878,7 +882,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -892,7 +896,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, result) = await App.ArticlesUser1Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, ArticleResponse>(updateRequest);
+    var (response, result) = await App.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, ArticleResponse>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -915,7 +919,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -927,7 +931,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, _) = await App.Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, object>(updateRequest);
+    var (response, _) = await App.Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -944,7 +948,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, _) = await App.ArticlesUser1Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, object>(updateRequest);
+    var (response, _) = await App.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -962,7 +966,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -974,7 +978,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, _) = await App.ArticlesUser2Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, object>(updateRequest);
+    var (response, _) = await App.ArticlesUser2Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }
@@ -992,7 +996,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -1006,7 +1010,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (response, _) = await App.ArticlesUser1Client.PUTAsync<Server.Web.Articles.Update, UpdateArticleRequest, object>(updateRequest);
+    var (response, _) = await App.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -1024,7 +1028,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}");
@@ -1053,7 +1057,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var response = await App.Client.DeleteAsync($"/api/articles/{slug}");
@@ -1074,7 +1078,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       }
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Server.Web.Articles.Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var response = await App.ArticlesUser2Client.DeleteAsync($"/api/articles/{slug}");

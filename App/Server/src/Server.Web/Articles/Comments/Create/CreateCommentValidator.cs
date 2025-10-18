@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Server.Web.Articles.Comments;
+namespace Server.Web.Articles.Comments.Create;
 
 public class CreateCommentValidator : Validator<CreateCommentRequest>
 {

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Server.Web.Articles;
+namespace Server.Web.Articles.Update;
 
 public class UpdateArticleValidator : Validator<UpdateArticleRequest>
 {

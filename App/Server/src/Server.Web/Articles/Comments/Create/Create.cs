@@ -3,7 +3,7 @@ using Server.Core.Interfaces;
 using Server.UseCases.Articles.Comments.Create;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Articles.Comments;
+namespace Server.Web.Articles.Comments.Create;
 
 /// <summary>
 /// Create comment for an article
