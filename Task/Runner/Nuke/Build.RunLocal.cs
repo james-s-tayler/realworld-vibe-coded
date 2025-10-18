@@ -8,6 +8,7 @@ public partial class Build
 {
   Target RunLocalServer => _ => _
     .Description("Run backend locally using Docker Compose with SQL Server and hot-reload")
+    .DependsOn(DbResetForce)
     .Executes(() =>
     {
       Log.Information("Starting local development environment with Docker Compose...");
