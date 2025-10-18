@@ -5,7 +5,7 @@ using Serilog;
 public partial class Build
 {
   [Parameter("Force operation without confirmation")]
-  readonly bool Force = false;
+  readonly bool Force;
 
   Target DbReset => _ => _
     .Description("Reset local SQL Server database by removing docker volume (confirm or --force to skip)")
@@ -13,7 +13,7 @@ public partial class Build
     {
       if (!Force)
       {
-        Console.Write("Are you sure? This will delete all database data and schema. [y/N] ");
+        Console.Write("Are you sure? This will delete local dev database by removing the docker volume. [y/N] ");
         var response = Console.ReadLine();
         if (response?.ToLowerInvariant() != "y")
         {
@@ -26,27 +26,21 @@ public partial class Build
     });
 
   Target DbResetForce => _ => _
-    .Description("Reset local SQL Server database without confirmation by removing docker volume")
-    .Executes(() =>
-    {
-      ResetDatabase();
-    });
+    .Description("Reset local dev database without confirmation by removing the docker volume")
+    .Executes(ResetDatabase);
 
   void ResetDatabase()
   {
-    var composeFile = RootDirectory / "Task" / "LocalDev" / "docker-compose.yml";
+    var composeFile = TaskLocalDevDirectory / "docker-compose.yml";
 
-    // Check if docker-compose file exists and if SQL Server volume exists
-    if (File.Exists(composeFile) && DoesDockerVolumeExist("localdev_sqlserver-data"))
+    if (DoesDockerVolumeExist("localdev_sqlserver-data"))
     {
       Log.Information("Detected SQL Server docker volume. Removing volume to reset database...");
       RemoveSqlServerVolume(composeFile);
     }
     else
     {
-      Log.Error("SQL Server docker volume not found. Make sure to start SQL Server first:");
-      Log.Information("  docker compose -f Task/LocalDev/docker-compose.yml up -d sqlserver");
-      throw new Exception("SQL Server docker volume 'localdev_sqlserver-data' not found");
+      Log.Information("SQL Server docker volume not found. Nothing to do.");
     }
   }
 

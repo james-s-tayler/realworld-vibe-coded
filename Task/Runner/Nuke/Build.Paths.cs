@@ -30,6 +30,7 @@ public partial class Build
   #region Task
 
   AbsolutePath TaskRunnerDirectory => RootDirectory / "Task" / "Runner";
+  AbsolutePath TaskLocalDevDirectory => RootDirectory / "Task" / "LocalDev";
 
   #endregion
 
