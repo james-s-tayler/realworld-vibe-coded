@@ -545,7 +545,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task CreateComment_WithNonExistentArticle_ReturnsValidationError()
+  public async Task CreateComment_WithNonExistentArticle_ReturnsNotFound()
   {
     var createCommentRequest = new CreateCommentRequest
     {
@@ -557,7 +557,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/no-such-article/comments", createCommentRequest);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
 
   [Fact]
@@ -816,15 +816,15 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task DeleteComment_WithNonExistentArticle_ReturnsValidationError()
+  public async Task DeleteComment_WithNonExistentArticle_ReturnsNotFound()
   {
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/no-such-article/comments/1");
 
-    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
 
   [Fact]
-  public async Task DeleteComment_WithNonExistentComment_ReturnsValidationError()
+  public async Task DeleteComment_WithNonExistentComment_ReturnsNotFound()
   {
     var createArticleRequest = new CreateArticleRequest
     {
@@ -841,7 +841,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/999999");
 
-    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
 
   [Fact]
