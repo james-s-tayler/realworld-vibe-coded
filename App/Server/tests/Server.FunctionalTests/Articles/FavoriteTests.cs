@@ -1,6 +1,7 @@
 ﻿using Server.FunctionalTests.Articles.Fixture;
 using Server.UseCases.Articles;
 using Server.Web.Articles.Create;
+using Server.Web.Articles.Favorite;
 
 namespace Server.FunctionalTests.Articles;
 
@@ -23,9 +24,7 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var response = await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null, TestContext.Current.CancellationToken);
-    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>(cancellationToken: TestContext.Current.CancellationToken);
-    result.ShouldNotBeNull();
+    var (response, result) = await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -50,11 +49,9 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null, TestContext.Current.CancellationToken);
+    await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
-    var response = await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null, TestContext.Current.CancellationToken);
-    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>(cancellationToken: TestContext.Current.CancellationToken);
-    result.ShouldNotBeNull();
+    var (response, result) = await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(true);
@@ -77,11 +74,9 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null, TestContext.Current.CancellationToken);
+    await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
-    var response = await App.ArticlesUser2Client.PostAsync($"/api/articles/{slug}/favorite", null, TestContext.Current.CancellationToken);
-    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>(cancellationToken: TestContext.Current.CancellationToken);
-    result.ShouldNotBeNull();
+    var (response, result) = await App.ArticlesUser2Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(true);
@@ -104,7 +99,7 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var response = await App.Client.PostAsync($"/api/articles/{slug}/favorite", null, TestContext.Current.CancellationToken);
+    var (response, _) = await App.Client.POSTAsync<Favorite, FavoriteArticleRequest, object>(new FavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -112,7 +107,7 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task FavoriteArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var response = await App.ArticlesUser1Client.PostAsync("/api/articles/no-such-article/favorite", null, TestContext.Current.CancellationToken);
+    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, object>(new FavoriteArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }

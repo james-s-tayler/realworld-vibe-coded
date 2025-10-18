@@ -1,6 +1,7 @@
 ﻿using Server.FunctionalTests.Articles.Fixture;
 using Server.UseCases.Articles;
 using Server.Web.Articles.Create;
+using Server.Web.Articles.Delete;
 
 namespace Server.FunctionalTests.Articles;
 
@@ -23,7 +24,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}", TestContext.Current.CancellationToken);
+    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
   }
@@ -31,7 +32,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task DeleteArticle_WithNonExistentArticle_ReturnsNotFound()
   {
-    var response = await App.ArticlesUser1Client.DeleteAsync("/api/articles/no-such-article", TestContext.Current.CancellationToken);
+    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -52,7 +53,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var response = await App.Client.DeleteAsync($"/api/articles/{slug}", TestContext.Current.CancellationToken);
+    var (response, _) = await App.Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -73,7 +74,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var response = await App.ArticlesUser2Client.DeleteAsync($"/api/articles/{slug}", TestContext.Current.CancellationToken);
+    var (response, _) = await App.ArticlesUser2Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }

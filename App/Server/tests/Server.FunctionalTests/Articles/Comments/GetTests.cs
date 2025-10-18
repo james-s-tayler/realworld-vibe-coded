@@ -2,6 +2,7 @@
 using Server.FunctionalTests.Articles.Fixture;
 using Server.UseCases.Articles;
 using Server.Web.Articles.Comments.Create;
+using Server.Web.Articles.Comments.Delete;
 using Server.Web.Articles.Comments.Get;
 using Server.Web.Articles.Create;
 using Create = Server.Web.Articles.Create.Create;
@@ -138,7 +139,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     createCommentResult.ShouldNotBeNull();
     var commentId = createCommentResult.Comment.Id;
 
-    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/{commentId}", TestContext.Current.CancellationToken);
+    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = commentId });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
   }
