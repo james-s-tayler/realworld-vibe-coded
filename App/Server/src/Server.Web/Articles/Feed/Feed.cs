@@ -1,9 +1,10 @@
-﻿using Server.Core.Interfaces;
+﻿using FluentValidation.Results;
+using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Feed;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Articles;
+namespace Server.Web.Articles.Feed;
 
 /// <summary>
 /// Get user's feed
@@ -31,11 +32,38 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
 
     var validation = QueryParameterValidator.ValidateFeedParameters(HttpContext.Request);
 
-    if (!validation.IsValid)
+    var limitParam = HttpContext.Request.Query["limit"].FirstOrDefault();
+    var offsetParam = HttpContext.Request.Query["offset"].FirstOrDefault();
+
+    // Parse and validate limit
+    int limit = 20;
+    if (!string.IsNullOrEmpty(limitParam))
     {
-      await Send.ValidationErrorAsync(validation.Errors, cancellationToken);
-      return;
+      if (!int.TryParse(limitParam, out limit))
+      {
+        AddError(new ValidationFailure("limit", "limit must be a valid integer"));
+      }
+      else if (limit <= 0)
+      {
+        AddError(new ValidationFailure("limit", "limit must be greater than 0"));
+      }
     }
+
+    // Parse and validate offset
+    int offset = 0;
+    if (!string.IsNullOrEmpty(offsetParam))
+    {
+      if (!int.TryParse(offsetParam, out offset))
+      {
+        AddError(new ValidationFailure("offset", "offset must be a valid integer"));
+      }
+      else if (offset < 0)
+      {
+        AddError(new ValidationFailure("offset", "offset must be greater than or equal to 0"));
+      }
+    }
+
+    ThrowIfAnyErrors();
 
     var result = await _mediator.Send(new GetFeedQuery(userId, validation.Limit, validation.Offset), cancellationToken);
 

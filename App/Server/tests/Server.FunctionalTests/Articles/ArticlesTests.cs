@@ -15,7 +15,7 @@ public class ArticlesTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task ListArticles_ReturnsArticles()
   {
-    var (response, result) = await App.Client.GETAsync<List, ArticlesResponse>();
+    var (response, result) = await App.Client.GETAsync<ListArticles, ArticlesResponse>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
