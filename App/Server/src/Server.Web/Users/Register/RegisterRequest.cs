@@ -1,4 +1,4 @@
-﻿namespace Server.Web.Users;
+﻿namespace Server.Web.Users.Register;
 
 public class RegisterRequest
 {

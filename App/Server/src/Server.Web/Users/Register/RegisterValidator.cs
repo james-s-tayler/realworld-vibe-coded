@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Server.Web.Users;
+namespace Server.Web.Users.Register;
 
 public class RegisterValidator : Validator<RegisterRequest>
 {

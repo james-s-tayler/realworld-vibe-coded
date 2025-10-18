@@ -2,7 +2,7 @@
 using Server.UseCases.Users.Update;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Users;
+namespace Server.Web.Users.Update;
 
 /// <summary>
 /// Update current user

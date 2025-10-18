@@ -2,7 +2,7 @@
 using Server.UseCases.Profiles.Get;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Profiles;
+namespace Server.Web.Profiles.Get;
 
 /// <summary>
 /// Get user profile

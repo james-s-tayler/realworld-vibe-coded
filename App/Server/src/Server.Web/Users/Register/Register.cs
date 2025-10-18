@@ -1,7 +1,7 @@
 ﻿using Server.UseCases.Users.Register;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Users;
+namespace Server.Web.Users.Register;
 
 /// <summary>
 /// Register a new user

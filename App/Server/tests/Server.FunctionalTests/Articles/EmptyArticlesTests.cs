@@ -1,10 +1,10 @@
 ﻿#pragma warning disable xUnit1051
 
-using System.Net;
-using System.Net.Http.Json;
+using Server.FunctionalTests.Articles.Fixture;
 using Server.UseCases.Articles;
 using Server.UseCases.Tags;
 using Server.Web.Articles.List;
+using Server.Web.Tags.List;
 
 namespace Server.FunctionalTests.Articles;
 
@@ -64,7 +64,7 @@ public class EmptyArticlesTests(EmptyArticlesFixture App) : TestBase<EmptyArticl
   [Fact]
   public async Task GetTags_WhenEmpty_ReturnsEmptyList()
   {
-    var (response, result) = await App.Client.GETAsync<Server.Web.Tags.List, TagsResponse>();
+    var (response, result) = await App.Client.GETAsync<List, TagsResponse>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Tags.ShouldNotBeNull();

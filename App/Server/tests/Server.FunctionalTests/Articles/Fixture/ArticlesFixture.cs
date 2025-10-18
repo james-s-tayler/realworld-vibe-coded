@@ -1,10 +1,10 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
-using Server.Web.Users;
+using Server.Web.Users.Register;
 using Testcontainers.MsSql;
 
-namespace Server.FunctionalTests.Articles;
+namespace Server.FunctionalTests.Articles.Fixture;
 
 public class ArticlesFixture : AppFixture<Program>
 {
@@ -97,7 +97,7 @@ public class ArticlesFixture : AppFixture<Program>
       }
     };
 
-    var (_, registerResult1) = await Client.POSTAsync<Server.Web.Users.Register, RegisterRequest, RegisterResponse>(registerRequest1);
+    var (_, registerResult1) = await Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest1);
     var token1 = registerResult1.User.Token;
 
     ArticlesUser1Client = CreateClient(c =>
@@ -115,7 +115,7 @@ public class ArticlesFixture : AppFixture<Program>
       }
     };
 
-    var (_, registerResult2) = await Client.POSTAsync<Server.Web.Users.Register, RegisterRequest, RegisterResponse>(registerRequest2);
+    var (_, registerResult2) = await Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest2);
     var token2 = registerResult2.User.Token;
 
     ArticlesUser2Client = CreateClient(c =>

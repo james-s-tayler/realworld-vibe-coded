@@ -2,7 +2,7 @@
 using Server.UseCases.Tags.List;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Tags;
+namespace Server.Web.Tags.List;
 
 /// <summary>
 /// Get all tags

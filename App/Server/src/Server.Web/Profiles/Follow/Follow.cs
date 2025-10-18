@@ -1,25 +1,25 @@
 ﻿using Server.Core.Interfaces;
-using Server.UseCases.Profiles.Unfollow;
+using Server.UseCases.Profiles.Follow;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Profiles;
+namespace Server.Web.Profiles.Follow;
 
 /// <summary>
-/// Unfollow user profile
+/// Follow user profile
 /// </summary>
 /// <remarks>
-/// Unfollow a user by username. Authentication required.
+/// Follow a user by username. Authentication required.
 /// </remarks>
-public class Unfollow(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ProfileResponse, ProfileMapper>
+public class Follow(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ProfileResponse, ProfileMapper>
 {
   public override void Configure()
   {
-    Delete("/api/profiles/{username}/follow");
+    Post("/api/profiles/{username}/follow");
     AuthSchemes("Token");
     Summary(s =>
     {
-      s.Summary = "Unfollow user profile";
-      s.Description = "Unfollow a user by username. Authentication required.";
+      s.Summary = "Follow user profile";
+      s.Description = "Follow a user by username. Authentication required.";
     });
   }
 
@@ -30,7 +30,7 @@ public class Unfollow(IMediator _mediator, ICurrentUserService _currentUserServi
 
     var userId = _currentUserService.GetRequiredCurrentUserId();
 
-    var result = await _mediator.Send(new UnfollowUserCommand(username, userId), cancellationToken);
+    var result = await _mediator.Send(new FollowUserCommand(username, userId), cancellationToken);
 
     await Send.ResultAsync(result, user => Map.FromEntity(user), cancellationToken);
   }
