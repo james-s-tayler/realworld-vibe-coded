@@ -29,14 +29,16 @@ public class ListArticles(IMediator _mediator, ICurrentUserService _currentUserS
   {
     var validation = QueryParameterValidator.ValidateListArticlesParameters(HttpContext.Request);
 
-    var errors = new List<string>();
     var tagParam = HttpContext.Request.Query["tag"].FirstOrDefault();
     var authorParam = HttpContext.Request.Query["author"].FirstOrDefault();
     var favoritedParam = HttpContext.Request.Query["favorited"].FirstOrDefault();
     var limitParam = HttpContext.Request.Query["limit"].FirstOrDefault();
     var offsetParam = HttpContext.Request.Query["offset"].FirstOrDefault();
 
-    // Parse and validate limit
+    // The fact you can't specify a default value in Query<T> is a huge gap in fast endpoints IMHO.
+    // If you do the following you can kinda make it work, but when you wont get validation failures on garbage input
+    //var limit2 = Query<int?>("limit", false) ?? 20;
+
     int limit = 20;
     if (!string.IsNullOrEmpty(limitParam))
     {

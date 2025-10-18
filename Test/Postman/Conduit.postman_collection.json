@@ -2093,7 +2093,6 @@
 									"    pm.expect(responseJSON).to.have.property('errors');",
 									"});",
 									"",
-									"",
 									"utils.assertErrorStartsWith(\"title\", pm);",
 									"utils.assertErrorStartsWith(\"description\", pm);",
 									"utils.assertErrorStartsWith(\"body\", pm);"
@@ -4222,10 +4221,7 @@
 									"    pm.expect(responseJSON).to.have.property('errors');",
 									"});",
 									"",
-									"",
-									"pm.test('\"body\" must not be empty', function() {",
-									"    pm.expect(errors).to.have.property('body')",
-									"});"
+									"utils.assertErrorStartsWith(\"body\", pm);"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -4294,10 +4290,7 @@
 									"    pm.expect(responseJSON).to.have.property('errors');",
 									"});",
 									"",
-									"",
-									"pm.test('\"body\" must not be empty', function() {",
-									"    pm.expect(errors).to.have.property('body')",
-									"});"
+									"utils.assertErrorStartsWith(\"body\", pm);"
 								],
 								"type": "text/javascript",
 								"packages": {}
