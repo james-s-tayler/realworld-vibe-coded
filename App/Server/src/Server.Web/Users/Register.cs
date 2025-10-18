@@ -40,7 +40,7 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
       request.User.Username,
       request.User.Password), cancellationToken);
 
-    await this.SendAsync(result, userDto => new RegisterResponse
+    await Send.ResultAsync(result, userDto => new RegisterResponse
     {
       User = Map.FromEntity(userDto)
     }, cancellationToken);

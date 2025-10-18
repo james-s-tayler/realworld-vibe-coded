@@ -21,12 +21,11 @@ public class CreateArticleHandler(
 
     // Check for duplicate slug
     var slug = Article.GenerateSlug(request.Title);
-    var existingArticle = await _articleRepository.FirstOrDefaultAsync(
-      new ArticleBySlugSpec(slug), cancellationToken);
+    var existingArticle = await _articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(slug), cancellationToken);
 
     if (existingArticle != null)
     {
-      return Result.Error("slug has already been taken");
+      return Result.Invalid(new ValidationError("slug", "has already been taken"));
     }
 
     // Create the article

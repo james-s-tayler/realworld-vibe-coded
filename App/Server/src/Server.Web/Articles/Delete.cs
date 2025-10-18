@@ -32,6 +32,6 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     var result = await _mediator.Send(new DeleteArticleCommand(slug, userId), cancellationToken);
 
-    await this.SendAsync(result, cancellationToken);
+    await Send.ResultAsync(result, cancellationToken);
   }
 }

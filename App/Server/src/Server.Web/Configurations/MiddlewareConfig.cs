@@ -17,33 +17,8 @@ public static class MiddlewareConfig
       app.UseHsts();
     }
 
-    app.UseFastEndpoints(c =>
-        {
-          c.Errors.StatusCode = 400;
-          c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
-          {
-            var errorBody = new List<string>();
-            foreach (var failure in failures)
-            {
-              // Handle nested properties like Article.Title -> title
-              var propertyName = failure.PropertyName.ToLower();
-              if (propertyName.Contains('.'))
-              {
-                // Split on dot and take the last part
-                var parts = propertyName.Split('.');
-                propertyName = parts[parts.Length - 1];
-              }
-
-              errorBody.Add($"{propertyName} {failure.ErrorMessage}");
-            }
-            return new
-            {
-              errors = new { body = errorBody }
-            };
-          };
-        })
-        .UseSwaggerGen(); // Includes AddFileServer and static files middleware
-
+    app.UseFastEndpoints(config => config.Errors.UseProblemDetails());
+    app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
     app.UseAuthentication();
     app.UseAuthorization();

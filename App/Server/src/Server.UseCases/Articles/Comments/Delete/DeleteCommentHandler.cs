@@ -20,11 +20,6 @@ public class DeleteCommentHandler : IRequestHandler<DeleteCommentCommand, Result
 
   public async Task<Result> Handle(DeleteCommentCommand request, CancellationToken cancellationToken)
   {
-    _logger.LogInformation("Handling DeleteCommentCommand");
-    _logger.LogInformation("Property Slug : {Slug}", request.Slug);
-    _logger.LogInformation("Property CommentId : {CommentId}", request.CommentId);
-    _logger.LogInformation("Property UserId : {UserId}", request.UserId);
-
     // Find the article
     var article = await _articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(request.Slug), cancellationToken);
     if (article == null)

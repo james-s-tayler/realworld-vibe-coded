@@ -13,7 +13,7 @@ public class EmptyArticlesTests(EmptyArticlesFixture App) : TestBase<EmptyArticl
   [Fact]
   public async Task AllArticles_WhenEmpty_ReturnsEmptyList()
   {
-    var (response, result) = await App.Client.GETAsync<Server.Web.Articles.List, ArticlesResponse>();
+    var (response, result) = await App.Client.GETAsync<Server.Web.Articles.ListArticles, ArticlesResponse>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();

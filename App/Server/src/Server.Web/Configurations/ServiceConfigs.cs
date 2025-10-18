@@ -61,32 +61,54 @@ public static class ServiceConfigs
 
             return Task.CompletedTask;
           },
-          OnChallenge = context =>
+          OnChallenge = async context =>
           {
             // Skip the default logic that adds WWW-Authenticate header
             context.HandleResponse();
 
-            context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/json";
+            var problemDetailsService = context.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
 
-            var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+            context.HttpContext.Response.StatusCode = 401;
+
+            var problemDetailsContext = new ProblemDetailsContext
             {
-              errors = new { body = new[] { "Unauthorized" } }
-            });
+              HttpContext = context.HttpContext,
+              ProblemDetails =
+              {
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                Title = "Unauthorized",
+                Status = 401,
+                Extensions =
+                {
+                  ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } }
+                }
+              }
+            };
 
-            return context.Response.WriteAsync(errorResponse);
+            await problemDetailsService.WriteAsync(problemDetailsContext);
           },
-          OnForbidden = context =>
+          OnForbidden = async context =>
           {
-            context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/json";
+            var problemDetailsService = context.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
 
-            var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
+            context.HttpContext.Response.StatusCode = 401;
+
+            var problemDetailsContext = new ProblemDetailsContext
             {
-              errors = new { body = new[] { "Unauthorized" } }
-            });
+              HttpContext = context.HttpContext,
+              ProblemDetails =
+              {
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                Title = "Unauthorized",
+                Status = 401,
+                Extensions =
+                {
+                  ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } }
+                }
+              }
+            };
 
-            return context.Response.WriteAsync(errorResponse);
+            await problemDetailsService.WriteAsync(problemDetailsContext);
           }
         };
       });

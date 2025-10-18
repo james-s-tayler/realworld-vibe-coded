@@ -1,4 +1,6 @@
-﻿namespace Server.Web.Infrastructure;
+﻿using FluentValidation.Results;
+
+namespace Server.Web.Infrastructure;
 
 public static class ResultExtensions
 {
@@ -7,13 +9,12 @@ public static class ResultExtensions
   /// Handles success, error, and validation scenarios consistently.
   /// Automatically uses the correct status code based on Result.Status.
   /// </summary>
-  public static async Task SendAsync<TResult>(
-    this IEndpoint endpoint,
+  public static async Task ResultAsync<TResult>(
+    this IResponseSender ep,
     Result<TResult> result,
-    CancellationToken cancellationToken = default,
-    bool treatNotFoundAsValidation = false)
+    CancellationToken cancellationToken = default)
   {
-    await SendAsync<TResult, TResult>(endpoint, result, null, cancellationToken, treatNotFoundAsValidation);
+    await ResultAsync<TResult, TResult>(ep, result, null, cancellationToken);
   }
 
   /// <summary>
@@ -22,111 +23,64 @@ public static class ResultExtensions
   /// Maps the result value using the provided mapper function.
   /// Automatically uses the correct status code based on Result.Status.
   /// </summary>
-  public static async Task SendAsync<TResult, TResponse>(
-    this IEndpoint endpoint,
+  public static async Task ResultAsync<TResult, TResponse>(
+    this IResponseSender ep,
     Result<TResult> result,
     Func<TResult, TResponse>? mapper = null,
-    CancellationToken cancellationToken = default,
-    bool treatNotFoundAsValidation = false)
+    CancellationToken cancellationToken = default)
   {
-    var httpContext = endpoint.HttpContext;
-
-    // Determine status code from Result.Status
-    var (statusCode, errorMessage) = GetStatusCodeAndMessage(result.Status, treatNotFoundAsValidation);
-
-    httpContext.Response.StatusCode = statusCode;
-
-    // Handle success cases
-    if (result.IsSuccess)
+    switch (result.Status)
     {
-      // NoContent (204) should not have a response body
-      if (result.Status != ResultStatus.NoContent)
-      {
+      case ResultStatus.Ok:
         if (mapper != null)
         {
-          var response = mapper(result.Value);
-          await httpContext.Response.WriteAsJsonAsync(response, cancellationToken);
+          await ep.HttpContext.Response.SendOkAsync(mapper(result.Value), cancellation: cancellationToken);
         }
         else if (result.Value != null)
         {
-          await httpContext.Response.WriteAsJsonAsync(result.Value, cancellationToken);
+          await ep.HttpContext.Response.SendOkAsync(result.Value, cancellation: cancellationToken);
         }
-      }
-      return;
+        else
+        {
+          await ep.HttpContext.Response.SendOkAsync(cancellation: cancellationToken);
+        }
+        break;
+      case ResultStatus.Created:
+        if (mapper != null)
+        {
+          await ep.HttpContext.Response.SendAsync(mapper(result.Value), statusCode: StatusCodes.Status201Created, cancellation: cancellationToken);
+        }
+        else if (result.Value != null)
+        {
+          await ep.HttpContext.Response.SendAsync(result.Value, statusCode: StatusCodes.Status201Created, cancellation: cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendResultAsync(TypedResults.Created());
+        }
+        break;
+      case ResultStatus.NoContent:
+        await ep.HttpContext.Response.SendNoContentAsync(cancellation: cancellationToken);
+        break;
+      case ResultStatus.Invalid:
+        foreach (var error in result.ValidationErrors)
+        {
+          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
+        }
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
+        break;
+      case ResultStatus.NotFound:
+        await ep.HttpContext.Response.SendNotFoundAsync(cancellation: cancellationToken);
+        break;
+      case ResultStatus.Unauthorized:
+        await ep.HttpContext.Response.SendUnauthorizedAsync(cancellation: cancellationToken);
+        break;
+      case ResultStatus.Forbidden:
+        await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
+        break;
+      case ResultStatus.Error:
+        await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("body", string.Join(";", result.Errors)) }, cancellation: cancellationToken);
+        break;
     }
-
-    // Handle error cases
-    httpContext.Response.ContentType = "application/json";
-
-    // Build error array
-    // For Invalid status with ValidationErrors, format as "identifier message"
-    // Otherwise use errors from result or default message
-    string[] errorMessages;
-    if (result.Status == ResultStatus.Invalid && result.ValidationErrors.Any())
-    {
-      errorMessages = result.ValidationErrors
-        .Select(error => $"{error.Identifier} {error.ErrorMessage}")
-        .ToArray();
-    }
-    else if (result.Errors.Any())
-    {
-      errorMessages = result.Errors.ToArray();
-    }
-    else
-    {
-      errorMessages = new[] { errorMessage };
-    }
-
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = errorMessages }
-    });
-
-    await httpContext.Response.WriteAsync(errorResponse, cancellationToken);
-  }
-
-  /// <summary>
-  /// Sends a validation error response (400) with custom error messages.
-  /// </summary>
-  public static async Task SendValidationErrorAsync(
-    this IEndpoint endpoint,
-    IEnumerable<string> errors,
-    CancellationToken cancellationToken = default)
-  {
-    var httpContext = endpoint.HttpContext;
-    httpContext.Response.StatusCode = 400;
-    httpContext.Response.ContentType = "application/json";
-
-    var errorResponse = System.Text.Json.JsonSerializer.Serialize(new
-    {
-      errors = new { body = errors.ToArray() }
-    });
-
-    await httpContext.Response.WriteAsync(errorResponse, cancellationToken);
-  }
-
-  /// <summary>
-  /// Maps ResultStatus to HTTP status code and error message.
-  /// </summary>
-  private static (int statusCode, string errorMessage) GetStatusCodeAndMessage(
-    ResultStatus status,
-    bool treatNotFoundAsValidation = false)
-  {
-    return status switch
-    {
-      ResultStatus.Ok => (200, "OK"),
-      ResultStatus.Created => (201, "Created"),
-      ResultStatus.NoContent => (204, "No content"),
-      ResultStatus.Unauthorized => (401, "Unauthorized"),
-      ResultStatus.Forbidden => (403, "Forbidden"),
-      ResultStatus.NotFound when treatNotFoundAsValidation => (400, "Bad request"),
-      ResultStatus.NotFound => (404, "Not found"),
-      ResultStatus.Invalid => (400, "Bad request"),
-      ResultStatus.Conflict => (409, "Conflict"),
-      ResultStatus.Unavailable => (503, "Service unavailable"),
-      ResultStatus.CriticalError => (500, "Internal server error"),
-      ResultStatus.Error => (400, "Bad request"),
-      _ => (400, "Bad request")
-    };
   }
 }

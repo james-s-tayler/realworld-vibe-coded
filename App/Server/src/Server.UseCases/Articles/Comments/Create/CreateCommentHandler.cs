@@ -26,11 +26,6 @@ public class CreateCommentHandler : IRequestHandler<CreateCommentCommand, Result
 
   public async Task<Result<CommentResponse>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
   {
-    _logger.LogInformation("Handling CreateCommentCommand");
-    _logger.LogInformation("Property Slug : {Slug}", request.Slug);
-    _logger.LogInformation("Property Body : {Body}", request.Body);
-    _logger.LogInformation("Property AuthorId : {AuthorId}", request.AuthorId);
-
     // Find the article
     var article = await _articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(request.Slug), cancellationToken);
     if (article == null)

@@ -14,6 +14,15 @@ public partial class Build
 
       var composeFile = RootDirectory / "Task" / "LocalDev" / "docker-compose.yml";
 
+      ConsoleCancelEventHandler? handler = null;
+      handler = (_, e) =>
+      {
+        // Don’t let NUKE abort the build on Ctrl+C; let docker handle it.
+        e.Cancel = true;
+        Log.Warning("Ctrl+C received; waiting for Docker to stop containers...");
+      };
+      Console.CancelKeyPress += handler;
+
       try
       {
         // Run docker-compose to start SQL Server and API with hot-reload
@@ -25,6 +34,7 @@ public partial class Build
       }
       finally
       {
+        Console.CancelKeyPress -= handler;
         // Clean up containers when user stops the process
         Log.Information("Cleaning up Docker Compose resources...");
         var downArgs = $"compose -f {composeFile} down";

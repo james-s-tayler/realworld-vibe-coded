@@ -32,6 +32,6 @@ public class Unfollow(IMediator _mediator, ICurrentUserService _currentUserServi
 
     var result = await _mediator.Send(new UnfollowUserCommand(username, userId), cancellationToken);
 
-    await this.SendAsync(result, user => Map.FromEntity(user), cancellationToken);
+    await Send.ResultAsync(result, user => Map.FromEntity(user), cancellationToken);
   }
 }

@@ -17,7 +17,6 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
   {
     Post("/api/articles");
     AuthSchemes("Token");
-    DontAutoTag();
     Summary(s =>
     {
       s.Summary = "Create article";
@@ -37,6 +36,6 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
       userId,
       userId), cancellationToken);
 
-    await this.SendAsync(result, article => Map.FromEntity(article), cancellationToken);
+    await Send.ResultAsync(result, article => Map.FromEntity(article), cancellationToken);
   }
 }

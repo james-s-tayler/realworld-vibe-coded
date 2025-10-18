@@ -29,7 +29,7 @@ public class GetCurrent(IMediator _mediator, ICurrentUserService _currentUserSer
 
     var result = await _mediator.Send(new GetCurrentUserQuery(userId), cancellationToken);
 
-    await this.SendAsync(result, userDto => new UserCurrentResponse
+    await Send.ResultAsync(result, userDto => new UserCurrentResponse
     {
       User = Map.FromEntity(userDto)
     }, cancellationToken);
