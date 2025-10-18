@@ -8,7 +8,7 @@ public partial class Build
   readonly bool Force = false;
 
   Target DbReset => _ => _
-    .Description("Reset local database - removes SQL Server docker volume or deletes SQLite file (confirm or --force to skip)")
+    .Description("Reset local SQL Server database by removing docker volume (confirm or --force to skip)")
     .Executes(() =>
     {
       if (!Force)
@@ -26,7 +26,7 @@ public partial class Build
     });
 
   Target DbResetForce => _ => _
-    .Description("Reset local database without confirmation - removes SQL Server docker volume or deletes SQLite file")
+    .Description("Reset local SQL Server database without confirmation by removing docker volume")
     .Executes(() =>
     {
       ResetDatabase();
@@ -44,14 +44,9 @@ public partial class Build
     }
     else
     {
-      // Fallback to SQLite reset
-      Log.Information("SQL Server volume not detected. Falling back to SQLite database reset...");
-      Console.WriteLine($"Deleting {DatabaseFile}...");
-      if (File.Exists(DatabaseFile))
-      {
-        File.Delete(DatabaseFile);
-      }
-      Console.WriteLine("Done.");
+      Log.Error("SQL Server docker volume not found. Make sure to start SQL Server first:");
+      Log.Information("  docker compose -f Task/LocalDev/docker-compose.yml up -d sqlserver");
+      throw new Exception("SQL Server docker volume 'localdev_sqlserver-data' not found");
     }
   }
 

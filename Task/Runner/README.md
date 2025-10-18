@@ -45,8 +45,8 @@ build.cmd                 # Cross-platform build script (Windows)
 | `lint-nuke-fix` | Fix Nuke build formatting and style issues automatically |
 | `run-local-server` | Run backend locally |
 | `run-local-client` | Run frontend locally (placeholder) |
-| `db-reset` | Reset local database - removes SQL Server docker volume or deletes SQLite file (with confirmation) |
-| `db-reset-force` | Reset local database without confirmation - removes SQL Server docker volume or deletes SQLite file |
+| `db-reset` | Reset local SQL Server database by removing docker volume (with confirmation) |
+| `db-reset-force` | Reset local SQL Server database without confirmation by removing docker volume |
 | `db-migrations-test-apply` | Test EF Core migrations by applying them to a throwaway SQL Server database in Docker (also detects pending model changes via EF Core 9.0) |
 
 ### Target Naming Conventions
@@ -91,7 +91,7 @@ These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` t
 # Run Postman tests with specific folder
 ./build.sh test-server-postman --folder Auth
 
-# Reset database (removes SQL Server docker volume if exists, otherwise SQLite)
+# Reset SQL Server database
 ./build.sh db-reset-force
 
 # Start SQL Server locally for development
@@ -100,17 +100,13 @@ docker compose -f Task/LocalDev/docker-compose.yml up -d sqlserver
 
 ### Database Reset
 
-The `db-reset` and `db-reset-force` targets intelligently handle database resets based on your environment:
+The `db-reset` and `db-reset-force` targets reset the SQL Server database used for local development:
 
-**SQL Server Reset (when docker volume exists)**:
+**How it works:**
 - Detects if the SQL Server docker volume (`localdev_sqlserver-data`) exists
 - Stops any running SQL Server containers via docker-compose
 - Removes the docker volume completely
-- This is a clean slate - all data and schema are removed
-
-**SQLite Reset (fallback)**:
-- If SQL Server volume is not detected, falls back to deleting the SQLite database file
-- Deletes `App/Server/src/Server.Web/database.sqlite`
+- This provides a clean slate - all data and schema are removed
 
 **Usage**:
 ```bash
