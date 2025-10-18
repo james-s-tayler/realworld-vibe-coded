@@ -780,10 +780,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -823,10 +819,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -868,10 +860,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -1277,10 +1265,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               }
@@ -1322,10 +1306,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -1375,10 +1355,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               }
@@ -1427,10 +1403,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               }
@@ -1478,10 +1450,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -1810,21 +1778,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{articles_user_token_2}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/profiles/{{ARTICLES_USER_USERNAME}}/follow",
@@ -2487,10 +2455,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               }
@@ -2632,10 +2596,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -2709,10 +2669,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -2864,10 +2820,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -2932,10 +2884,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -3074,21 +3022,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{articles_user_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
@@ -3216,21 +3164,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{articles_user_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
@@ -3358,21 +3306,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{articles_user_token_2}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
@@ -3408,10 +3356,6 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -3419,11 +3363,15 @@
                 "key": "Authorization",
                 "value": "Token {{articles_user_token}}",
                 "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
@@ -3459,21 +3407,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{articles_user_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/articles/no-such-article/favorite",
@@ -3601,10 +3549,6 @@
             "method": "DELETE",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -3675,10 +3619,6 @@
             "method": "DELETE",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -3724,10 +3664,6 @@
           "request": {
             "method": "DELETE",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -3775,10 +3711,6 @@
           "request": {
             "method": "DELETE",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -4810,10 +4742,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -4886,10 +4814,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -4958,10 +4882,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -5021,10 +4941,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -6479,21 +6395,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/profiles/{{FEED_USER_USERNAME}}2/follow",
@@ -6529,21 +6445,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/profiles/{{FEED_USER_USERNAME}}3/follow",
@@ -6875,21 +6791,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}_feed_2/favorite",
@@ -6925,21 +6841,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token_3}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}_feed_2/favorite",
@@ -6975,21 +6891,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token_3}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": ""
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}_feed_5/favorite",
@@ -7055,10 +6971,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -7134,10 +7046,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -7218,10 +7126,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -7307,10 +7211,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -7387,10 +7287,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -7466,10 +7362,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -7537,10 +7429,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -7621,10 +7509,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -7702,10 +7586,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -7782,10 +7662,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -7868,10 +7744,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -7958,10 +7830,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -8036,10 +7904,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -8122,10 +7986,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -8207,10 +8067,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -8285,10 +8141,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -8385,10 +8237,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -8463,10 +8311,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -8548,10 +8392,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -8631,10 +8471,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -8713,10 +8549,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -8794,10 +8626,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -8871,10 +8699,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -8947,10 +8771,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -9300,10 +9120,6 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -9311,11 +9127,15 @@
                 "key": "Authorization",
                 "value": "Token {{token}}",
                 "disabled": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\"}}"
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
@@ -9370,21 +9190,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\"}}"
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
@@ -9439,21 +9259,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\"}}"
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
@@ -9489,21 +9309,21 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\"}}"
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/profiles/nonexistentuser_{{USERNAME}}/follow",
@@ -9557,10 +9377,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -9622,10 +9438,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -9667,10 +9479,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -9711,10 +9519,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -9776,10 +9580,6 @@
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -9821,10 +9621,6 @@
           "request": {
             "method": "DELETE",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -9892,10 +9688,6 @@
             "method": "DELETE",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
               },
@@ -9950,10 +9742,6 @@
           "request": {
             "method": "DELETE",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
@@ -10019,10 +9807,6 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"

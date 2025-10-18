@@ -10,7 +10,7 @@ namespace Server.Web.Profiles.Follow;
 /// <remarks>
 /// Follow a user by username. Authentication required.
 /// </remarks>
-public class Follow(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ProfileResponse, ProfileMapper>
+public class Follow(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<FollowProfileRequest, ProfileResponse, ProfileMapper>
 {
   public override void Configure()
   {
@@ -23,14 +23,11 @@ public class Follow(IMediator _mediator, ICurrentUserService _currentUserService
     });
   }
 
-  public override async Task HandleAsync(CancellationToken cancellationToken)
+  public override async Task HandleAsync(FollowProfileRequest request, CancellationToken cancellationToken)
   {
-    // Get username from route parameter
-    var username = Route<string>("username") ?? string.Empty;
-
     var userId = _currentUserService.GetRequiredCurrentUserId();
 
-    var result = await _mediator.Send(new FollowUserCommand(username, userId), cancellationToken);
+    var result = await _mediator.Send(new FollowUserCommand(request.Username, userId), cancellationToken);
 
     await Send.ResultAsync(result, user => Map.FromEntity(user), cancellationToken);
   }
