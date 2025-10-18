@@ -45,8 +45,8 @@ build.cmd                 # Cross-platform build script (Windows)
 | `lint-nuke-fix` | Fix Nuke build formatting and style issues automatically |
 | `run-local-server` | Run backend locally |
 | `run-local-client` | Run frontend locally (placeholder) |
-| `db-reset` | Reset SQLite database with confirmation |
-| `db-reset-force` | Reset SQLite database without confirmation |
+| `db-reset` | Reset local database - drops SQL Server schema/data from docker-compose or deletes SQLite file (with confirmation) |
+| `db-reset-force` | Reset local database without confirmation - drops SQL Server schema/data from docker-compose or deletes SQLite file |
 | `db-migrations-test-apply` | Test EF Core migrations by applying them to a throwaway SQL Server database in Docker (also detects pending model changes via EF Core 9.0) |
 
 ### Target Naming Conventions
@@ -91,8 +91,46 @@ These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` t
 # Run Postman tests with specific folder
 ./build.sh test-server-postman --folder Auth
 
-# Reset database
+# Reset database (SQL Server if running via docker-compose, otherwise SQLite)
 ./build.sh db-reset-force
+
+# Start SQL Server locally for development
+docker compose -f Task/LocalDev/docker-compose.yml up -d sqlserver
+```
+
+### Database Reset
+
+The `db-reset` and `db-reset-force` targets intelligently handle database resets based on your environment:
+
+**SQL Server Reset (when running via docker-compose)**:
+- Detects if SQL Server is running via `Task/LocalDev/docker-compose.yml`
+- Connects to the SQL Server instance
+- Drops all user schema objects:
+  - Foreign key constraints
+  - Views
+  - Tables
+  - Stored procedures
+  - Functions
+  - User-defined types
+- Leaves system objects intact
+- Preserves the database itself (only removes schema and data)
+
+**SQLite Reset (fallback)**:
+- If SQL Server is not detected, falls back to deleting the SQLite database file
+- Deletes `App/Server/src/Server.Web/database.sqlite`
+
+**Usage**:
+```bash
+# With confirmation prompt
+./build.sh db-reset
+
+# Without confirmation (useful for CI/CD)
+./build.sh db-reset-force
+```
+
+**Note**: To use SQL Server reset, ensure the SQL Server container is running:
+```bash
+docker compose -f Task/LocalDev/docker-compose.yml up -d sqlserver
 ```
 
 ### Windows
