@@ -34,7 +34,7 @@ public static class ResultExtensions
       case ResultStatus.Ok:
         if (mapper != null)
         {
-          await ep.HttpContext.Response.SendOkAsync(mapper(result), cancellation: cancellationToken);
+          await ep.HttpContext.Response.SendOkAsync(mapper(result.Value), cancellation: cancellationToken);
         }
         else if (result.Value != null)
         {
@@ -48,7 +48,7 @@ public static class ResultExtensions
       case ResultStatus.Created:
         if (mapper != null)
         {
-          await ep.HttpContext.Response.SendAsync(mapper(result), statusCode: StatusCodes.Status201Created, cancellation: cancellationToken);
+          await ep.HttpContext.Response.SendAsync(mapper(result.Value), statusCode: StatusCodes.Status201Created, cancellation: cancellationToken);
         }
         else if (result.Value != null)
         {
@@ -83,33 +83,4 @@ public static class ResultExtensions
         break;
     }
   }
-
-  /// <summary>
-  /// Sends a validation error response (400) with custom error messages using ProblemDetails format.
-  /// </summary>
-  public static async Task ValidationErrorAsync(
-    this IResponseSender sender,
-    IEnumerable<string> errors,
-    CancellationToken cancellationToken = default)
-  {
-    var httpContext = sender.HttpContext;
-    httpContext.Response.StatusCode = 400;
-    httpContext.Response.ContentType = "application/problem+json";
-
-    var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
-    {
-      Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-      Title = "One or more validation errors occurred.",
-      Status = 400,
-      Instance = httpContext.Request.Path,
-      Extensions =
-      {
-        ["errors"] = errors.Select(e => new { name = "body", reason = e }).ToList(),
-        ["traceId"] = httpContext.TraceIdentifier
-      }
-    };
-
-    await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-  }
-
 }

@@ -17,7 +17,6 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
   {
     Post("/api/articles");
     AuthSchemes("Token");
-    DontAutoTag();
     Summary(s =>
     {
       s.Summary = "Create article";
