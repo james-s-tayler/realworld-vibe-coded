@@ -10,7 +10,7 @@ namespace Server.Web.Profiles.Get;
 /// <remarks>
 /// Get a user profile by username. Authentication optional.
 /// </remarks>
-public class Get(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ProfileResponse, ProfileMapper>
+public class Get(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<GetProfileRequest, ProfileResponse, ProfileMapper>
 {
   public override void Configure()
   {
@@ -23,15 +23,12 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
     });
   }
 
-  public override async Task HandleAsync(CancellationToken cancellationToken)
+  public override async Task HandleAsync(GetProfileRequest request, CancellationToken cancellationToken)
   {
-    // Get username from route parameter
-    var username = Route<string>("username") ?? string.Empty;
-
     // Get current user ID if authenticated
     var currentUserId = _currentUserService.GetCurrentUserId();
 
-    var result = await _mediator.Send(new GetProfileQuery(username, currentUserId), cancellationToken);
+    var result = await _mediator.Send(new GetProfileQuery(request.Username, currentUserId), cancellationToken);
 
     await Send.ResultAsync(result, user => Map.FromEntity(user), cancellationToken);
   }

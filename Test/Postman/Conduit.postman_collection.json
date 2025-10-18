@@ -9602,10 +9602,6 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -9666,10 +9662,6 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -9711,10 +9703,6 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
 							},
@@ -9755,10 +9743,6 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -9819,10 +9803,6 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
@@ -10063,10 +10043,6 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
