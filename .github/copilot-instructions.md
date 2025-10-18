@@ -34,6 +34,7 @@ General functionality:
 - Make sure to lint the code before committing.
 - Make sure the postman tests are passing before finishing.
 - Do not add any extraneous documentation unless asked to do so.
+- All the nuke targets that run tests produce reports under `Reports` folder. Make sure to check them if any test fails.
 
 ## Folder Structure
 
