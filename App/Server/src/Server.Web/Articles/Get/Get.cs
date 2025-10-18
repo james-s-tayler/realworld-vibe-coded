@@ -3,7 +3,7 @@ using Server.UseCases.Articles;
 using Server.UseCases.Articles.Get;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Articles;
+namespace Server.Web.Articles.Get;
 
 /// <summary>
 /// Get article by slug

@@ -2,7 +2,7 @@
 using Server.UseCases.Articles.Delete;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Articles;
+namespace Server.Web.Articles.Delete;
 
 /// <summary>
 /// Delete article

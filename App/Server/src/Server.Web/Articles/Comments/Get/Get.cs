@@ -3,7 +3,7 @@ using Server.Core.Interfaces;
 using Server.UseCases.Articles.Comments.Get;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Articles.Comments;
+namespace Server.Web.Articles.Comments.Get;
 
 /// <summary>
 /// Get article comments

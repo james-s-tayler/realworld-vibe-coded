@@ -1,26 +1,26 @@
 ﻿using Server.Core.Interfaces;
 using Server.UseCases.Articles;
-using Server.UseCases.Articles.Unfavorite;
+using Server.UseCases.Articles.Favorite;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Articles;
+namespace Server.Web.Articles.Favorite;
 
 /// <summary>
-/// Unfavorite article
+/// Favorite article
 /// </summary>
 /// <remarks>
-/// Remove article from favorites. Authentication required.
+/// Add article to favorites. Authentication required.
 /// </remarks>
-public class Unfavorite(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse, ArticleMapper>
+public class Favorite(IMediator _mediator, ICurrentUserService _currentUserService) : EndpointWithoutRequest<ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
-    Delete("/api/articles/{slug}/favorite");
+    Post("/api/articles/{slug}/favorite");
     AuthSchemes("Token");
     Summary(s =>
     {
-      s.Summary = "Unfavorite article";
-      s.Description = "Remove article from favorites. Authentication required.";
+      s.Summary = "Favorite article";
+      s.Description = "Add article to favorites. Authentication required.";
     });
   }
 
@@ -31,7 +31,7 @@ public class Unfavorite(IMediator _mediator, ICurrentUserService _currentUserSer
 
     var userId = _currentUserService.GetRequiredCurrentUserId();
 
-    var result = await _mediator.Send(new UnfavoriteArticleCommand(slug, userId, userId), cancellationToken);
+    var result = await _mediator.Send(new FavoriteArticleCommand(slug, userId, userId), cancellationToken);
 
     await Send.ResultAsync(result, article => Map.FromEntity(article), cancellationToken);
   }

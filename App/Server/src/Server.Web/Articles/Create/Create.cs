@@ -3,7 +3,7 @@ using Server.UseCases.Articles;
 using Server.UseCases.Articles.Create;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Articles;
+namespace Server.Web.Articles.Create;
 
 /// <summary>
 /// Create article

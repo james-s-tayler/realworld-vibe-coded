@@ -1,10 +1,12 @@
 ﻿using FluentValidation.Results;
+using Server.Core.ArticleAggregate;
+using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.Interfaces;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.List;
 using Server.Web.Infrastructure;
 
-namespace Server.Web.Articles;
+namespace Server.Web.Articles.List;
 
 /// <summary>
 /// List articles
@@ -97,7 +99,7 @@ public class ListArticles(IMediator _mediator, ICurrentUserService _currentUserS
 
     await Send.ResultAsync(result, articles =>
     {
-      var articleDtos = articles.Select(article => Map.FromEntity(article).Article).ToList();
+      var articleDtos = Enumerable.Select<Article, ArticleDto>(articles, article => Map.FromEntity(article).Article).ToList();
       return new ArticlesResponse(articleDtos, articleDtos.Count);
     }, cancellationToken);
   }
