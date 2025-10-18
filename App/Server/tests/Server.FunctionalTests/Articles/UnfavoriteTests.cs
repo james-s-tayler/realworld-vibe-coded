@@ -1,6 +1,8 @@
 ﻿using Server.FunctionalTests.Articles.Fixture;
 using Server.UseCases.Articles;
 using Server.Web.Articles.Create;
+using Server.Web.Articles.Favorite;
+using Server.Web.Articles.Unfavorite;
 
 namespace Server.FunctionalTests.Articles;
 
@@ -23,11 +25,9 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await App.ArticlesUser1Client.PostAsync($"/api/articles/{slug}/favorite", null, TestContext.Current.CancellationToken);
+    await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
-    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/favorite", TestContext.Current.CancellationToken);
-    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>(cancellationToken: TestContext.Current.CancellationToken);
-    result.ShouldNotBeNull();
+    var (response, result) = await App.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, ArticleResponse>(new UnfavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -51,9 +51,7 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/favorite", TestContext.Current.CancellationToken);
-    var result = await response.Content.ReadFromJsonAsync<ArticleResponse>(cancellationToken: TestContext.Current.CancellationToken);
-    result.ShouldNotBeNull();
+    var (response, result) = await App.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, ArticleResponse>(new UnfavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(false);
@@ -76,7 +74,7 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var response = await App.Client.DeleteAsync($"/api/articles/{slug}/favorite", TestContext.Current.CancellationToken);
+    var (response, _) = await App.Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, object>(new UnfavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -84,7 +82,7 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task UnfavoriteArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var response = await App.ArticlesUser1Client.DeleteAsync("/api/articles/no-such-article/favorite", TestContext.Current.CancellationToken);
+    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, object>(new UnfavoriteArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
