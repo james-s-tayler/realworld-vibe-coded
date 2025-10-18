@@ -57,10 +57,16 @@ describe('apiRequest', () => {
   })
 
   it('throws ApiError on failed request', async () => {
+    // ProblemDetails format
     const errorResponse = {
-      errors: {
-        body: ['email or password is invalid'],
-      },
+      type: 'https://tools.ietf.org/html/rfc7231#section-6.5.1',
+      title: 'Unauthorized',
+      status: 401,
+      instance: '/api/users/login',
+      errors: [
+        { name: 'body', reason: 'email or password is invalid' }
+      ],
+      traceId: '0HNGBGGOMKEVE:00000001'
     }
 
     vi.mocked(fetch).mockResolvedValue({
@@ -77,7 +83,7 @@ describe('apiRequest', () => {
       expect(error).toBeInstanceOf(ApiError)
       if (error instanceof ApiError) {
         expect(error.status).toBe(401)
-        expect(error.errors).toEqual(['email or password is invalid'])
+        expect(error.errors).toEqual(['body email or password is invalid'])
       }
     }
   })
