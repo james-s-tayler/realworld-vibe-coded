@@ -4,10 +4,13 @@ namespace Server.Web.Infrastructure;
 
 /// <summary>
 /// MediatR pipeline behavior that catches exceptions thrown in handlers
-/// and converts them to Result.Error for consistent error handling
+/// and converts them to Result.Error for consistent error handling.
+/// Note: This behavior applies to all MediatR handlers but only converts exceptions to Result.Error
+/// when the handler returns a Result&lt;T&gt; type. Other return types will re-throw the exception.
 /// </summary>
 public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
   where TRequest : notnull
+  where TResponse : class
 {
   private readonly ILogger<ExceptionHandlingBehavior<TRequest, TResponse>> _logger;
 
