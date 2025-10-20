@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Server.Core.Interfaces;
@@ -66,57 +67,49 @@ public static class ServiceConfigs
             // Skip the default logic that adds WWW-Authenticate header
             context.HandleResponse();
 
-            var problemDetailsService = context.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
-
             context.HttpContext.Response.StatusCode = 401;
+            context.HttpContext.Response.ContentType = "application/problem+json";
 
-            var problemDetailsContext = new ProblemDetailsContext
+            var errorResponse = JsonSerializer.Serialize(new
             {
-              HttpContext = context.HttpContext,
-              ProblemDetails =
-              {
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-                Title = "Unauthorized",
-                Status = 401,
-                Extensions =
-                {
-                  ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } }
-                }
-              }
-            };
+              type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+              title = "Unauthorized",
+              status = 401,
+              errors = new { error = new[] { "Unauthorized" } }
+            }, new JsonSerializerOptions
+            {
+              PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
 
-            await problemDetailsService.WriteAsync(problemDetailsContext);
+            await context.HttpContext.Response.WriteAsync(errorResponse);
           },
           OnForbidden = async context =>
           {
-            var problemDetailsService = context.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
-
             context.HttpContext.Response.StatusCode = 401;
+            context.HttpContext.Response.ContentType = "application/problem+json";
 
-            var problemDetailsContext = new ProblemDetailsContext
+            var errorResponse = JsonSerializer.Serialize(new
             {
-              HttpContext = context.HttpContext,
-              ProblemDetails =
-              {
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-                Title = "Unauthorized",
-                Status = 401,
-                Extensions =
-                {
-                  ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } }
-                }
-              }
-            };
+              type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+              title = "Unauthorized",
+              status = 401,
+              errors = new { error = new[] { "Unauthorized" } }
+            }, new JsonSerializerOptions
+            {
+              PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
 
-            await problemDetailsService.WriteAsync(problemDetailsContext);
+            await context.HttpContext.Response.WriteAsync(errorResponse);
           }
         };
       });
 
     services.AddAuthorization();
 
-    // Register global exception handler for unauthorized access
+    // Register global exception handlers
+    // Order matters: more specific handlers first, then general ones
     services.AddExceptionHandler<UnauthorizedExceptionHandler>();
+    services.AddExceptionHandler<GlobalExceptionHandler>();
     services.AddProblemDetails();
 
     // Register IHttpContextAccessor for CurrentUserService

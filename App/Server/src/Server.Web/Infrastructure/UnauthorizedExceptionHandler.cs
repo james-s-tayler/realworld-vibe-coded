@@ -32,7 +32,7 @@ public class UnauthorizedExceptionHandler : IExceptionHandler
 
     var errorResponse = JsonSerializer.Serialize(new
     {
-      errors = new { body = new[] { "Unauthorized" } }
+      errors = new { error = new[] { "Unauthorized" } }
     });
 
     await httpContext.Response.WriteAsync(errorResponse, cancellationToken);

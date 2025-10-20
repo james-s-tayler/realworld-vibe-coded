@@ -2,6 +2,7 @@
 using Ardalis.SharedKernel;
 using Server.Core.UserAggregate;
 using Server.UseCases.Users.Register;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Configurations;
 
@@ -17,6 +18,7 @@ public static class MediatrConfigs
 
     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!))
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>))
+            .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>))
             .AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
 
     return services;
