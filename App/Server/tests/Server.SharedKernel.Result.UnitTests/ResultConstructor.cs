@@ -330,9 +330,37 @@ public class ResultConstructor
   [Fact]
   public void InitializedIsSuccessFalseForCriticalErrorFactoryCall()
   {
-    var result = Result<object>.CriticalError();
+    var result = Result<object>.CriticalError(Array.Empty<string>());
 
     Assert.False(result.IsSuccess);
+  }
+
+  [Fact]
+  public void InitializesStatusToCriticalErrorGivenCriticalErrorFactoryCallWithString()
+  {
+    var errorMessage = "Critical system error";
+    var result = Result<object>.CriticalError(errorMessage);
+
+    Assert.Equal(ResultStatus.CriticalError, result.Status);
+    Assert.Equal(errorMessage, result.Errors.First());
+    Assert.False(result.IsSuccess);
+  }
+
+  [Fact]
+  public void InitializesStatusToCriticalErrorAndSetsValidationErrorsGivenCriticalErrorFactoryCall()
+  {
+    var validationErrors = new[]
+    {
+      new ValidationError("exception.type", "System.InvalidOperationException"),
+      new ValidationError("exception.message", "An unexpected error occurred")
+    };
+    var result = Result<object>.CriticalError(validationErrors);
+
+    result.Status.Should().Be(ResultStatus.CriticalError);
+    result.ValidationErrors.Should().HaveCount(2);
+    result.ValidationErrors.Should().ContainEquivalentOf(new ValidationError { Identifier = "exception.type", ErrorMessage = "System.InvalidOperationException" });
+    result.ValidationErrors.Should().ContainEquivalentOf(new ValidationError { Identifier = "exception.message", ErrorMessage = "An unexpected error occurred" });
+    result.IsSuccess.Should().BeFalse();
   }
 
   [Fact]

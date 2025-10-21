@@ -202,6 +202,17 @@ public class Result<T> : IResult
   public static Result<T> CriticalError(params string[] errorMessages) => new(ResultStatus.CriticalError) { Errors = errorMessages };
 
   /// <summary>
+  /// Represents a critical error that occurred during the execution of the service.
+  /// Everything provided by the user was valid, but the service was unable to complete due to an exception.
+  /// Validation errors may be provided and will be exposed via the ValidationErrors property.
+  /// See also HTTP 500 Internal Server Error: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_server_errors
+  /// </summary>
+  /// <param name="validationErrors">A list of validation errors encountered</param>
+  /// <returns>A Result<typeparamref name="T"/></returns>
+  public static Result<T> CriticalError(params ValidationError[] validationErrors) =>
+      new(ResultStatus.CriticalError) { ValidationErrors = new List<ValidationError>(validationErrors) };
+
+  /// <summary>
   /// Represents a situation where a service is unavailable, such as when the underlying data store is unavailable.
   /// Errors may be transient, so the caller may wish to retry the operation.
   /// See also HTTP 503 Service Unavailable: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_server_errors
