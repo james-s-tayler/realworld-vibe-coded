@@ -157,11 +157,6 @@
         "resolved": "2.14.1",
         "contentHash": "lQKvtaTDOXnoVJ20ibTuSIOf2i0uO0MPbDhd1jm238I+U/2ZnRENj0cktKZhtchBMtCUSRQ5v4xBCUbKNmyVMw=="
       },
-      "MediatR.Contracts": {
-        "type": "Transitive",
-        "resolved": "2.0.1",
-        "contentHash": "FYv95bNT4UwcNA+G/J1oX5OpRiSUxteXaUt2BJbRSdRNiIUNbggJF69wy6mnk2wYToaanpdXZdCwVylt96MpwQ=="
-      },
       "Microsoft.AspNetCore.Http.Abstractions": {
         "type": "Transitive",
         "resolved": "2.2.0",
@@ -946,17 +941,16 @@
         "dependencies": {
           "Ardalis.GuardClauses": "[5.0.0, )",
           "Ardalis.Result": "[10.1.0, )",
-          "Ardalis.SharedKernel": "[3.0.1, )",
           "Ardalis.SmartEnum": "[8.2.0, )",
           "Ardalis.Specification": "[9.2.0, )",
           "MediatR": "[12.5.0, )",
-          "Microsoft.Extensions.Logging.Abstractions": "[9.0.6, )"
+          "Microsoft.Extensions.Logging.Abstractions": "[9.0.6, )",
+          "Server.SharedKernel": "[1.0.0, )"
         }
       },
       "server.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Ardalis.SharedKernel": "[3.0.1, )",
           "Ardalis.Specification.EntityFrameworkCore": "[9.2.0, )",
           "Azure.Identity": "[1.13.1, )",
           "BCrypt.Net-Next": "[4.0.3, )",
@@ -970,8 +964,19 @@
           "Microsoft.Extensions.Logging": "[9.0.6, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[9.0.6, )",
           "Server.Core": "[1.0.0, )",
+          "Server.SharedKernel": "[1.0.0, )",
           "Server.UseCases": "[1.0.0, )",
           "System.IdentityModel.Tokens.Jwt": "[8.2.1, )"
+        }
+      },
+      "server.sharedkernel": {
+        "type": "Project",
+        "dependencies": {
+          "Ardalis.GuardClauses": "[5.0.0, )",
+          "Ardalis.Specification": "[9.2.0, )",
+          "MediatR": "[12.5.0, )",
+          "MediatR.Contracts": "[2.0.1, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[9.0.6, )"
         }
       },
       "server.usecases": {
@@ -980,7 +985,8 @@
           "Ardalis.Result": "[10.1.0, )",
           "FastEndpoints": "[7.0.1, )",
           "MediatR": "[12.5.0, )",
-          "Server.Core": "[1.0.0, )"
+          "Server.Core": "[1.0.0, )",
+          "Server.SharedKernel": "[1.0.0, )"
         }
       },
       "Ardalis.GuardClauses": {
@@ -988,18 +994,6 @@
         "requested": "[5.0.0, )",
         "resolved": "5.0.0",
         "contentHash": "jVPRvLw0xIUFto2cMrKgRYADWIHbEEfzZHGiU/swwNgl1zo28Q1zfSa3VUC3C0s9DyhFDPSaF4dEDQRyTZUcyQ=="
-      },
-      "Ardalis.SharedKernel": {
-        "type": "CentralTransitive",
-        "requested": "[3.0.1, )",
-        "resolved": "3.0.1",
-        "contentHash": "q4d7N/XTP+FdpG5lmEWjUUiUkwSYCzjBDWIWSUK5Kegsy7D38mL/FyftyUkXZgkecEQruWojmT6l4IBxrPsZPA==",
-        "dependencies": {
-          "Ardalis.GuardClauses": "5.0.0",
-          "Ardalis.Specification": "9.2.0",
-          "MediatR": "12.5.0",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.6"
-        }
       },
       "Ardalis.SmartEnum": {
         "type": "CentralTransitive",
@@ -1053,6 +1047,12 @@
           "MimeKit": "4.13.0",
           "System.Formats.Asn1": "8.0.1"
         }
+      },
+      "MediatR.Contracts": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.1, )",
+        "resolved": "2.0.1",
+        "contentHash": "FYv95bNT4UwcNA+G/J1oX5OpRiSUxteXaUt2BJbRSdRNiIUNbggJF69wy6mnk2wYToaanpdXZdCwVylt96MpwQ=="
       },
       "Microsoft.EntityFrameworkCore.Relational": {
         "type": "CentralTransitive",

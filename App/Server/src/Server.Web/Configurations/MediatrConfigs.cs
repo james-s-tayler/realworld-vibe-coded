@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
-using Ardalis.SharedKernel;
 using Server.Core.UserAggregate;
+using Server.SharedKernel;
 using Server.UseCases.Users.Register;
 
 namespace Server.Web.Configurations;
