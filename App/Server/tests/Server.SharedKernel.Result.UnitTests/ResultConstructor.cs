@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Xunit;
 
-namespace Server.SharedKernel.Result.UnitTests;
+namespace Server.SharedKernel.ResultUnitTests;
 
 public class ResultConstructor
 {
@@ -350,7 +350,7 @@ public class ResultConstructor
   public void InitializesStatusToCriticalErrorAndSetsValidationErrorGivenCriticalErrorFactoryCall()
   {
     var validationError = new ValidationError("InvalidOperationException", "An unexpected error occurred");
-    var result = Result<object>.CriticalError(validationError);
+    var result = ResultCriticalErrorExtensions.CriticalError<object>(validationError);
 
     result.Status.Should().Be(ResultStatus.CriticalError);
     result.ValidationErrors.Should().HaveCount(1);

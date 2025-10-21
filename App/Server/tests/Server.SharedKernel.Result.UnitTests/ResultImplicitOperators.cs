@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Server.SharedKernel.Result.UnitTests;
+namespace Server.SharedKernel.ResultUnitTests;
 
 public class ResultImplicitOperators
 {

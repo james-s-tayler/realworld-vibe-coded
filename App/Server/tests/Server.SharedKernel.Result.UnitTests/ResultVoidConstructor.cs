@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Xunit;
 
-namespace Server.SharedKernel.Result.UnitTests;
+namespace Server.SharedKernel.ResultUnitTests;
 
 public class ResultVoidConstructor
 {
