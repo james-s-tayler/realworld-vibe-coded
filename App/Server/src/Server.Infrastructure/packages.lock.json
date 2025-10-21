@@ -2,18 +2,6 @@
   "version": 2,
   "dependencies": {
     "net9.0": {
-      "Ardalis.SharedKernel": {
-        "type": "Direct",
-        "requested": "[3.0.1, )",
-        "resolved": "3.0.1",
-        "contentHash": "q4d7N/XTP+FdpG5lmEWjUUiUkwSYCzjBDWIWSUK5Kegsy7D38mL/FyftyUkXZgkecEQruWojmT6l4IBxrPsZPA==",
-        "dependencies": {
-          "Ardalis.GuardClauses": "5.0.0",
-          "Ardalis.Specification": "9.2.0",
-          "MediatR": "12.5.0",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.6"
-        }
-      },
       "Ardalis.Specification.EntityFrameworkCore": {
         "type": "Direct",
         "requested": "[9.2.0, )",
@@ -212,11 +200,6 @@
         "type": "Transitive",
         "resolved": "2.14.1",
         "contentHash": "lQKvtaTDOXnoVJ20ibTuSIOf2i0uO0MPbDhd1jm238I+U/2ZnRENj0cktKZhtchBMtCUSRQ5v4xBCUbKNmyVMw=="
-      },
-      "MediatR.Contracts": {
-        "type": "Transitive",
-        "resolved": "2.0.1",
-        "contentHash": "FYv95bNT4UwcNA+G/J1oX5OpRiSUxteXaUt2BJbRSdRNiIUNbggJF69wy6mnk2wYToaanpdXZdCwVylt96MpwQ=="
       },
       "Microsoft.Bcl.AsyncInterfaces": {
         "type": "Transitive",
@@ -772,10 +755,20 @@
         "dependencies": {
           "Ardalis.GuardClauses": "[5.0.0, )",
           "Ardalis.Result": "[10.1.0, )",
-          "Ardalis.SharedKernel": "[3.0.1, )",
           "Ardalis.SmartEnum": "[8.2.0, )",
           "Ardalis.Specification": "[9.2.0, )",
           "MediatR": "[12.5.0, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[9.0.6, )",
+          "Server.SharedKernel": "[1.0.0, )"
+        }
+      },
+      "server.sharedkernel": {
+        "type": "Project",
+        "dependencies": {
+          "Ardalis.GuardClauses": "[5.0.0, )",
+          "Ardalis.Specification": "[9.2.0, )",
+          "MediatR": "[12.5.0, )",
+          "MediatR.Contracts": "[2.0.1, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.6, )"
         }
       },
@@ -785,7 +778,8 @@
           "Ardalis.Result": "[10.1.0, )",
           "FastEndpoints": "[7.0.1, )",
           "MediatR": "[12.5.0, )",
-          "Server.Core": "[1.0.0, )"
+          "Server.Core": "[1.0.0, )",
+          "Server.SharedKernel": "[1.0.0, )"
         }
       },
       "Ardalis.GuardClauses": {
@@ -822,6 +816,12 @@
           "FastEndpoints.Messaging.Core": "7.0.1",
           "FluentValidation": "12.0.0"
         }
+      },
+      "MediatR.Contracts": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.1, )",
+        "resolved": "2.0.1",
+        "contentHash": "FYv95bNT4UwcNA+G/J1oX5OpRiSUxteXaUt2BJbRSdRNiIUNbggJF69wy6mnk2wYToaanpdXZdCwVylt96MpwQ=="
       },
       "Microsoft.EntityFrameworkCore.Design": {
         "type": "CentralTransitive",

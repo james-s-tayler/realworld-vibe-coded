@@ -47,11 +47,6 @@
         "resolved": "12.0.0",
         "contentHash": "8NVLxtMUXynRHJIX3Hn1ACovaqZIJASufXIIFkD0EUbcd5PmMsL1xUD5h548gCezJ5BzlITaR9CAMrGe29aWpA=="
       },
-      "MediatR.Contracts": {
-        "type": "Transitive",
-        "resolved": "2.0.1",
-        "contentHash": "FYv95bNT4UwcNA+G/J1oX5OpRiSUxteXaUt2BJbRSdRNiIUNbggJF69wy6mnk2wYToaanpdXZdCwVylt96MpwQ=="
-      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
         "resolved": "9.0.6",
@@ -67,10 +62,20 @@
         "dependencies": {
           "Ardalis.GuardClauses": "[5.0.0, )",
           "Ardalis.Result": "[10.1.0, )",
-          "Ardalis.SharedKernel": "[3.0.1, )",
           "Ardalis.SmartEnum": "[8.2.0, )",
           "Ardalis.Specification": "[9.2.0, )",
           "MediatR": "[12.5.0, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[9.0.6, )",
+          "Server.SharedKernel": "[1.0.0, )"
+        }
+      },
+      "server.sharedkernel": {
+        "type": "Project",
+        "dependencies": {
+          "Ardalis.GuardClauses": "[5.0.0, )",
+          "Ardalis.Specification": "[9.2.0, )",
+          "MediatR": "[12.5.0, )",
+          "MediatR.Contracts": "[2.0.1, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.6, )"
         }
       },
@@ -79,18 +84,6 @@
         "requested": "[5.0.0, )",
         "resolved": "5.0.0",
         "contentHash": "jVPRvLw0xIUFto2cMrKgRYADWIHbEEfzZHGiU/swwNgl1zo28Q1zfSa3VUC3C0s9DyhFDPSaF4dEDQRyTZUcyQ=="
-      },
-      "Ardalis.SharedKernel": {
-        "type": "CentralTransitive",
-        "requested": "[3.0.1, )",
-        "resolved": "3.0.1",
-        "contentHash": "q4d7N/XTP+FdpG5lmEWjUUiUkwSYCzjBDWIWSUK5Kegsy7D38mL/FyftyUkXZgkecEQruWojmT6l4IBxrPsZPA==",
-        "dependencies": {
-          "Ardalis.GuardClauses": "5.0.0",
-          "Ardalis.Specification": "9.2.0",
-          "MediatR": "12.5.0",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.6"
-        }
       },
       "Ardalis.SmartEnum": {
         "type": "CentralTransitive",
@@ -103,6 +96,12 @@
         "requested": "[9.2.0, )",
         "resolved": "9.2.0",
         "contentHash": "bggkCJU1tLIV/hSK5s0lbyFAOLsNpiafFPfrg2/0arWhmst8Y90CWQFTNE5aVJJLV1Ja6Jdf4rogsG9mYiRUSA=="
+      },
+      "MediatR.Contracts": {
+        "type": "CentralTransitive",
+        "requested": "[2.0.1, )",
+        "resolved": "2.0.1",
+        "contentHash": "FYv95bNT4UwcNA+G/J1oX5OpRiSUxteXaUt2BJbRSdRNiIUNbggJF69wy6mnk2wYToaanpdXZdCwVylt96MpwQ=="
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "CentralTransitive",
