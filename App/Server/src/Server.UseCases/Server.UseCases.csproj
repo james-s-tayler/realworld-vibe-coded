@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Ardalis.Result" />
     <PackageReference Include="FastEndpoints" />
     <PackageReference Include="MediatR" />
   </ItemGroup>

@@ -1,2 +1,2 @@
-﻿global using Ardalis.Result;
-global using Server.SharedKernel;
+﻿global using Server.SharedKernel;
+global using Server.SharedKernel.Result;
