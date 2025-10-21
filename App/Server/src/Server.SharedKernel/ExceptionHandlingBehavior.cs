@@ -30,29 +30,25 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
     {
       _logger.LogError(ex, "An unhandled exception occurred while processing {RequestName}", typeof(TRequest).Name);
 
-      // Create validation errors from the exception
-      var validationErrors = new[]
-      {
-        new ValidationError("exception.type", ex.GetType().Name),
-        new ValidationError("exception.message", ex.Message)
-      };
-
       // Create a CriticalError result with validation errors
       var resultType = typeof(TResponse);
       if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Result<>))
       {
+        // Create validation error from the exception
+        var validationError = new ValidationError(ex.GetType().Name, ex.Message);
+
         var valueType = resultType.GetGenericArguments()[0];
-        var criticalErrorMethod = resultType.GetMethod(nameof(Result<object>.CriticalError), new[] { typeof(ValidationError[]) });
+        var criticalErrorMethod = resultType.GetMethod(nameof(Result<object>.CriticalError), new[] { typeof(ValidationError) });
 
         if (criticalErrorMethod != null)
         {
-          var result = criticalErrorMethod.Invoke(null, new object[] { validationErrors });
+          var result = criticalErrorMethod.Invoke(null, new object[] { validationError });
           return (TResponse)result!;
         }
       }
 
       // Fallback for non-generic Result types
-      throw new InvalidOperationException($"Unable to create CriticalError result for type {resultType.Name}", ex);
+      throw;
     }
   }
 }

@@ -330,7 +330,7 @@ public class ResultConstructor
   [Fact]
   public void InitializedIsSuccessFalseForCriticalErrorFactoryCall()
   {
-    var result = Result<object>.CriticalError(Array.Empty<string>());
+    var result = Result<object>.CriticalError();
 
     Assert.False(result.IsSuccess);
   }
@@ -347,19 +347,14 @@ public class ResultConstructor
   }
 
   [Fact]
-  public void InitializesStatusToCriticalErrorAndSetsValidationErrorsGivenCriticalErrorFactoryCall()
+  public void InitializesStatusToCriticalErrorAndSetsValidationErrorGivenCriticalErrorFactoryCall()
   {
-    var validationErrors = new[]
-    {
-      new ValidationError("exception.type", "System.InvalidOperationException"),
-      new ValidationError("exception.message", "An unexpected error occurred")
-    };
-    var result = Result<object>.CriticalError(validationErrors);
+    var validationError = new ValidationError("InvalidOperationException", "An unexpected error occurred");
+    var result = Result<object>.CriticalError(validationError);
 
     result.Status.Should().Be(ResultStatus.CriticalError);
-    result.ValidationErrors.Should().HaveCount(2);
-    result.ValidationErrors.Should().ContainEquivalentOf(new ValidationError { Identifier = "exception.type", ErrorMessage = "System.InvalidOperationException" });
-    result.ValidationErrors.Should().ContainEquivalentOf(new ValidationError { Identifier = "exception.message", ErrorMessage = "An unexpected error occurred" });
+    result.ValidationErrors.Should().HaveCount(1);
+    result.ValidationErrors.Should().ContainEquivalentOf(new ValidationError { Identifier = "InvalidOperationException", ErrorMessage = "An unexpected error occurred" });
     result.IsSuccess.Should().BeFalse();
   }
 
