@@ -17,6 +17,9 @@ public static class MiddlewareConfig
       app.UseHsts();
     }
 
+    // Exception handling must come early in the pipeline to catch exceptions from all middleware
+    app.UseExceptionHandler(options => { });
+    
     app.UseFastEndpoints(config => config.Errors.UseProblemDetails());
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
