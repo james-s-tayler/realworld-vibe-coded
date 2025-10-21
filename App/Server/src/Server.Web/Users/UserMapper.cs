@@ -12,9 +12,22 @@ public class UserMapper : ResponseMapper<UserResponse, User>
 {
   public override UserResponse FromEntity(User user)
   {
-    // Resolve JWT token generator to create token
-    var jwtTokenGenerator = Resolve<IJwtTokenGenerator>();
-    var token = jwtTokenGenerator.GenerateToken(user);
+    // Check if there's already a valid token in the current request
+    var currentUserService = Resolve<ICurrentUserService>();
+    var existingToken = currentUserService.GetCurrentToken();
+
+    // Use existing token if present and user is authenticated, otherwise generate new one
+    string token;
+    if (!string.IsNullOrEmpty(existingToken) && currentUserService.IsAuthenticated())
+    {
+      token = existingToken;
+    }
+    else
+    {
+      // Generate a new token for Login/Register or when no valid token exists
+      var jwtTokenGenerator = Resolve<IJwtTokenGenerator>();
+      token = jwtTokenGenerator.GenerateToken(user);
+    }
 
     return new UserResponse
     {
