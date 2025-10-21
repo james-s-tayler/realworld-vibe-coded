@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Ardalis.SharedKernel;
 using Server.Core.UserAggregate;
 using Server.UseCases.Users.Register;
 using Server.Web.Infrastructure;

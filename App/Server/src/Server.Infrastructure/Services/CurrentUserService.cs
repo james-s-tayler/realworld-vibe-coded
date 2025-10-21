@@ -60,4 +60,31 @@ public class CurrentUserService : ICurrentUserService
   {
     return GetCurrentUserId().HasValue;
   }
+
+  /// <summary>
+  /// Gets the current JWT token from the Authorization header
+  /// </summary>
+  /// <returns>The JWT token if present, otherwise null</returns>
+  public string? GetCurrentToken()
+  {
+    var httpContext = _httpContextAccessor.HttpContext;
+    if (httpContext == null)
+    {
+      return null;
+    }
+
+    var authorizationHeader = httpContext.Request.Headers["Authorization"].ToString();
+    if (string.IsNullOrEmpty(authorizationHeader))
+    {
+      return null;
+    }
+
+    // The token format is "Token <jwt-token>"
+    if (authorizationHeader.StartsWith("Token ", StringComparison.OrdinalIgnoreCase))
+    {
+      return authorizationHeader.Substring("Token ".Length).Trim();
+    }
+
+    return null;
+  }
 }

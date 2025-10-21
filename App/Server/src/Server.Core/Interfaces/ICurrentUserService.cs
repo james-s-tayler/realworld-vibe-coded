@@ -23,4 +23,10 @@ public interface ICurrentUserService
   /// </summary>
   /// <returns>True if authenticated, false otherwise</returns>
   bool IsAuthenticated();
+
+  /// <summary>
+  /// Gets the current JWT token from the Authorization header
+  /// </summary>
+  /// <returns>The JWT token if present, otherwise null</returns>
+  string? GetCurrentToken();
 }

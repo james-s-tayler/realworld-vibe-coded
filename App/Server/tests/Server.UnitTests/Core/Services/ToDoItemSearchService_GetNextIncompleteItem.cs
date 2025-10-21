@@ -22,7 +22,7 @@ namespace Server.UnitTests.Core.Services
 
             var result = await service.GetNextIncompleteItemAsync();
 
-            Assert.Equal(Ardalis.Result.ResultStatus.NotFound, result.Status);
+            Assert.Equal(Server.SharedKernel.Result.ResultStatus.NotFound, result.Status);
         }
 
         [Fact]

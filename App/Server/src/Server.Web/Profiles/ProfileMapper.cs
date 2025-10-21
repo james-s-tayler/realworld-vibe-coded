@@ -1,5 +1,4 @@
-﻿using Ardalis.SharedKernel;
-using Server.Core.Interfaces;
+﻿using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
 
