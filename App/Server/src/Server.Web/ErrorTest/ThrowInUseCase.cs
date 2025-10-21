@@ -1,0 +1,31 @@
+﻿using Server.UseCases.ErrorTest;
+using Server.Web.Infrastructure;
+
+namespace Server.Web.ErrorTest;
+
+/// <summary>
+/// Test endpoint that throws an exception in the use case
+/// </summary>
+/// <remarks>
+/// This endpoint is used to test the exception handling pipeline behavior.
+/// It throws an InvalidOperationException inside the MediatR handler.
+/// </remarks>
+public class ThrowInUseCase(IMediator _mediator) : Endpoint<EmptyRequest>
+{
+  public override void Configure()
+  {
+    Get("/api/error-test/throw-in-use-case");
+    AllowAnonymous();
+    Summary(s =>
+    {
+      s.Summary = "Test endpoint - throws exception in use case";
+      s.Description = "This endpoint throws an exception inside the MediatR handler to test exception handling pipeline behavior.";
+    });
+  }
+
+  public override async Task HandleAsync(EmptyRequest req, CancellationToken cancellationToken)
+  {
+    var result = await _mediator.Send(new ThrowInUseCaseCommand(), cancellationToken);
+    await Send.ResultAsync(result, cancellationToken);
+  }
+}

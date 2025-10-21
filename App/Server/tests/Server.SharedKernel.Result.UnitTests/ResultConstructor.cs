@@ -336,6 +336,29 @@ public class ResultConstructor
   }
 
   [Fact]
+  public void InitializesStatusToCriticalErrorGivenCriticalErrorFactoryCallWithString()
+  {
+    var errorMessage = "Critical system error";
+    var result = Result<object>.CriticalError(errorMessage);
+
+    Assert.Equal(ResultStatus.CriticalError, result.Status);
+    Assert.Equal(errorMessage, result.Errors.First());
+    Assert.False(result.IsSuccess);
+  }
+
+  [Fact]
+  public void InitializesStatusToCriticalErrorAndSetsValidationErrorGivenCriticalErrorFactoryCall()
+  {
+    var validationError = new ValidationError("InvalidOperationException", "An unexpected error occurred");
+    var result = Result<object>.CriticalError(validationError);
+
+    result.Status.Should().Be(ResultStatus.CriticalError);
+    result.ValidationErrors.Should().HaveCount(1);
+    result.ValidationErrors.Should().ContainEquivalentOf(new ValidationError { Identifier = "InvalidOperationException", ErrorMessage = "An unexpected error occurred" });
+    result.IsSuccess.Should().BeFalse();
+  }
+
+  [Fact]
   public void InitializesStatusToNoContentForNoContentFactoryCall()
   {
     var result = Result<object>.NoContent();

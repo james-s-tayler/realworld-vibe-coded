@@ -81,6 +81,20 @@ public static class ResultExtensions
       case ResultStatus.Error:
         await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("body", string.Join(";", result.Errors)) }, cancellation: cancellationToken);
         break;
+      case ResultStatus.CriticalError:
+        if (result.ValidationErrors.Any())
+        {
+          foreach (var error in result.ValidationErrors)
+          {
+            ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
+          }
+          await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status500InternalServerError, cancellation: cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("body", string.Join(";", result.Errors)) }, statusCode: StatusCodes.Status500InternalServerError, cancellation: cancellationToken);
+        }
+        break;
     }
   }
 }
