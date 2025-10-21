@@ -5,7 +5,7 @@ namespace Server.Web.Infrastructure;
 public static class ResultExtensions
 {
   /// <summary>
-  /// Sends a standardized response based on Ardalis Result pattern.
+  /// Sends a standardized response based on Result pattern.
   /// Handles success, error, and validation scenarios consistently.
   /// Automatically uses the correct status code based on Result.Status.
   /// </summary>
@@ -18,7 +18,7 @@ public static class ResultExtensions
   }
 
   /// <summary>
-  /// Sends a standardized response based on Ardalis Result pattern with mapping support.
+  /// Sends a standardized response based on Result pattern with mapping support.
   /// Handles success, error, and validation scenarios consistently.
   /// Maps the result value using the provided mapper function.
   /// Automatically uses the correct status code based on Result.Status.

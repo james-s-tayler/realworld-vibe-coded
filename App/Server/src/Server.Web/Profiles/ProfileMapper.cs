@@ -1,7 +1,6 @@
 ﻿using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
-using Server.SharedKernel;
 
 namespace Server.Web.Profiles;
 
