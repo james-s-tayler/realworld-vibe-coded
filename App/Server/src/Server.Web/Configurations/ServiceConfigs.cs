@@ -115,8 +115,10 @@ public static class ServiceConfigs
 
     services.AddAuthorization();
 
-    // Register global exception handler for unauthorized access
+    // Register global exception handlers
+    // Order matters: specific handlers first, then global handler
     services.AddExceptionHandler<UnauthorizedExceptionHandler>();
+    services.AddExceptionHandler<GlobalExceptionHandler>();
     services.AddProblemDetails();
 
     // Register IHttpContextAccessor for CurrentUserService

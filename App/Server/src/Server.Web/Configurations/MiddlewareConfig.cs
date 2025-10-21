@@ -17,6 +17,7 @@ public static class MiddlewareConfig
       app.UseHsts();
     }
 
+    app.UseExceptionHandler();
     app.UseFastEndpoints(config => config.Errors.UseProblemDetails());
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
