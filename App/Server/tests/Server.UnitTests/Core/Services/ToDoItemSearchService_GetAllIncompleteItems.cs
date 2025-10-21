@@ -24,7 +24,7 @@ namespace Server.UnitTests.Core.Services
         {
             var result = await _searchService.GetAllIncompleteItemsAsync(null);
 
-            Assert.Equal(Server.SharedKernel.ResultStatus.Invalid, result.Status);
+            Assert.Equal(Server.SharedKernel.Result.ResultStatus.Invalid, result.Status);
             Assert.Equal("searchString is required.", result.ValidationErrors.First().ErrorMessage);
         }
 
@@ -37,7 +37,7 @@ namespace Server.UnitTests.Core.Services
 
             var result = await _searchService.GetAllIncompleteItemsAsync("something");
 
-            Assert.Equal(Server.SharedKernel.ResultStatus.Error, result.Status);
+            Assert.Equal(Server.SharedKernel.Result.ResultStatus.Error, result.Status);
             Assert.Equal(expectedErrorMessage, result.Errors.First());
         }
 
@@ -46,7 +46,7 @@ namespace Server.UnitTests.Core.Services
         {
             var result = await _searchService.GetAllIncompleteItemsAsync("foo");
 
-            Assert.Equal(Server.SharedKernel.ResultStatus.Ok, result.Status);
+            Assert.Equal(Server.SharedKernel.Result.ResultStatus.Ok, result.Status);
         }
     }
 }

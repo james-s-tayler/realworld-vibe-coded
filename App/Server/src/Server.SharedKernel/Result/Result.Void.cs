@@ -1,4 +1,5 @@
-﻿namespace Server.SharedKernel;
+﻿#nullable disable
+namespace Server.SharedKernel.Result;
 
 public class Result : Result<Result>
 {
@@ -65,7 +66,7 @@ public class Result : Result<Result>
   /// </summary>
   /// <param name="error">An optional instance of ErrorList with list of string error messages and CorrelationId.</param>
   /// <returns>A Result</returns>
-  public new static Result Error(ErrorList? error = null) => new(ResultStatus.Error)
+  public new static Result Error(ErrorList error = null) => new(ResultStatus.Error)
   {
     CorrelationId = error?.CorrelationId ?? string.Empty,
     Errors = error?.ErrorMessages ?? []

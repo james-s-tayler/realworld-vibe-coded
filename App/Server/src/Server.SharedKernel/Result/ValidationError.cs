@@ -1,4 +1,5 @@
-﻿namespace Server.SharedKernel;
+﻿#nullable disable
+namespace Server.SharedKernel.Result;
 
 public class ValidationError
 {
@@ -22,8 +23,8 @@ public class ValidationError
     Severity = severity;
   }
 
-  public string? Identifier { get; set; }
-  public string? ErrorMessage { get; set; }
-  public string? ErrorCode { get; set; }
+  public string Identifier { get; set; }
+  public string ErrorMessage { get; set; }
+  public string ErrorCode { get; set; }
   public ValidationSeverity Severity { get; set; } = ValidationSeverity.Error;
 }

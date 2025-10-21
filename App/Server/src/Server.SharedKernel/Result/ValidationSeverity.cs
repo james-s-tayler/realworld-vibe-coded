@@ -1,4 +1,5 @@
-﻿namespace Server.SharedKernel;
+﻿#nullable disable
+namespace Server.SharedKernel.Result;
 
 public enum ValidationSeverity
 {

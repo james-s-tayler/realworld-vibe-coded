@@ -1,28 +1,22 @@
-﻿using System.Text.Json.Serialization;
+﻿#nullable disable
+using System.Text.Json.Serialization;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.Result;
 
 public class Result<T> : IResult
 {
-  protected Result()
-  {
-    Value = default!;
-  }
+  protected Result() { }
 
   public Result(T value) => Value = value;
 
   protected internal Result(T value, string successMessage) : this(value) => SuccessMessage = successMessage;
 
-  protected Result(ResultStatus status)
-  {
-    Status = status;
-    Value = default!;
-  }
+  protected Result(ResultStatus status) => Status = status;
 
   public static implicit operator T(Result<T> result) => result.Value;
   public static implicit operator Result<T>(T value) => new Result<T>(value);
 
-  public static implicit operator Result<T>(Result result) => new(default(T)!)
+  public static implicit operator Result<T>(Result result) => new(default(T))
   {
     Status = result.Status,
     Errors = result.Errors,
@@ -56,7 +50,7 @@ public class Result<T> : IResult
   /// Returns the current value.
   /// </summary>
   /// <returns></returns>
-  public object? GetValue() => this.Value;
+  public object GetValue() => this.Value;
 
   /// <summary>
   /// Represents a successful operation and accepts a values as the result of the operation
@@ -105,7 +99,7 @@ public class Result<T> : IResult
   /// </summary>
   /// <param name="error">An optional instance of ErrorList with list of string error messages and CorrelationId.</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Error(ErrorList? error = null) => new(ResultStatus.Error)
+  public static Result<T> Error(ErrorList error = null) => new(ResultStatus.Error)
   {
     CorrelationId = error?.CorrelationId ?? string.Empty,
     Errors = error?.ErrorMessages ?? []

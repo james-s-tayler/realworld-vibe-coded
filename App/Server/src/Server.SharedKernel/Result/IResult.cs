@@ -1,4 +1,5 @@
-﻿namespace Server.SharedKernel;
+﻿#nullable disable
+namespace Server.SharedKernel.Result;
 
 public interface IResult
 {
@@ -6,6 +7,6 @@ public interface IResult
   IEnumerable<string> Errors { get; }
   IEnumerable<ValidationError> ValidationErrors { get; }
   Type ValueType { get; }
-  object? GetValue();
+  object GetValue();
   string Location { get; }
 }
