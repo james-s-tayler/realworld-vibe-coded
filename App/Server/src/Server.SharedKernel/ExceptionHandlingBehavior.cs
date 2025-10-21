@@ -32,7 +32,7 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
 
       // Create a CriticalError result with validation errors
       var resultType = typeof(TResponse);
-      if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Result<>))
+      if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Ardalis.Result.Result<>))
       {
         // Create validation error from the exception
         var validationError = new ValidationError(ex.GetType().Name, ex.Message);

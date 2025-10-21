@@ -1,5 +1,7 @@
-﻿using FluentAssertions;
+﻿using Ardalis.Result;
+using FluentAssertions;
 using Xunit;
+using Result = Ardalis.Result.Result;
 
 namespace Server.SharedKernel.ResultUnitTests;
 

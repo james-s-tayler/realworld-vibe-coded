@@ -1,4 +1,4 @@
-﻿namespace Ardalis.Result;
+﻿namespace Server.SharedKernel;
 
 /// <summary>
 /// Extensions to Ardalis.Result.Result to support custom CriticalError overloads with ValidationError.
@@ -14,19 +14,19 @@ public static class ResultCriticalErrorExtensions
   /// </summary>
   /// <param name="validationError">The validation error encountered</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> CriticalError<T>(ValidationError validationError)
+  public static Ardalis.Result.Result<T> CriticalError<T>(Ardalis.Result.ValidationError validationError)
   {
     // Use reflection to create Result<T> with CriticalError status and set ValidationErrors
-    var result = (Result<T>)Activator.CreateInstance(
-      typeof(Result<T>),
+    var result = (Ardalis.Result.Result<T>)Activator.CreateInstance(
+      typeof(Ardalis.Result.Result<T>),
       System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
       null,
-      new object[] { ResultStatus.CriticalError },
+      new object[] { Ardalis.Result.ResultStatus.CriticalError },
       null
     )!;
 
     // Set ValidationErrors via reflection since it has a protected setter
-    var validationErrorsProp = typeof(Result<T>).GetProperty(nameof(Result<T>.ValidationErrors))!;
+    var validationErrorsProp = typeof(Ardalis.Result.Result<T>).GetProperty(nameof(Ardalis.Result.Result<T>.ValidationErrors))!;
     validationErrorsProp.SetValue(result, new[] { validationError });
 
     return result;
@@ -40,19 +40,19 @@ public static class ResultCriticalErrorExtensions
   /// </summary>
   /// <param name="validationErrors">A list of validation errors encountered</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> CriticalError<T>(ValidationError[] validationErrors)
+  public static Ardalis.Result.Result<T> CriticalError<T>(Ardalis.Result.ValidationError[] validationErrors)
   {
     // Use reflection to create Result<T> with CriticalError status and set ValidationErrors
-    var result = (Result<T>)Activator.CreateInstance(
-      typeof(Result<T>),
+    var result = (Ardalis.Result.Result<T>)Activator.CreateInstance(
+      typeof(Ardalis.Result.Result<T>),
       System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
       null,
-      new object[] { ResultStatus.CriticalError },
+      new object[] { Ardalis.Result.ResultStatus.CriticalError },
       null
     )!;
 
     // Set ValidationErrors via reflection since it has a protected setter
-    var validationErrorsProp = typeof(Result<T>).GetProperty(nameof(Result<T>.ValidationErrors))!;
+    var validationErrorsProp = typeof(Ardalis.Result.Result<T>).GetProperty(nameof(Ardalis.Result.Result<T>.ValidationErrors))!;
     validationErrorsProp.SetValue(result, validationErrors);
 
     return result;
