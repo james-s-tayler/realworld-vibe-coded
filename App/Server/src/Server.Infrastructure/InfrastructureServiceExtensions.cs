@@ -20,6 +20,7 @@ public static class InfrastructureServiceExtensions
 
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
            .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
+           .AddScoped<IUnitOfWork, UnitOfWork>()
            .AddScoped<IListArticlesQueryService, ListArticlesQueryService>()
            .AddScoped<IFeedQueryService, FeedQueryService>()
            .AddScoped<IListTagsQueryService, ListTagsQueryService>()
