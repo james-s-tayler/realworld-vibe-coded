@@ -1,5 +1,6 @@
 ﻿using Ardalis.ListStartupServices;
 using Server.Infrastructure.Data;
+using Server.Web.Infrastructure;
 
 namespace Server.Web.Configurations;
 
@@ -18,7 +19,14 @@ public static class MiddlewareConfig
     }
 
     app.UseExceptionHandler();
-    app.UseFastEndpoints(config => config.Errors.UseProblemDetails());
+    app.UseFastEndpoints(config =>
+    {
+      config.Errors.UseProblemDetails();
+      config.Endpoints.Configurator = ep =>
+      {
+        ep.PostProcessor<GlobalExceptionHandler>(Order.After);
+      };
+    });
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
     app.UseAuthentication();
