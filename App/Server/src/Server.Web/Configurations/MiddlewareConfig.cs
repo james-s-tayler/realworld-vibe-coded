@@ -26,6 +26,18 @@ public static class MiddlewareConfig
       {
         ep.PostProcessor<GlobalExceptionHandler>(Order.After);
       };
+      if (!app.Environment.IsDevelopment())
+      {
+        config.Endpoints.Filter = ep =>
+        {
+          if (ep.Routes.Contains("/api/error-test"))
+          {
+            return false; // don't register these endpoints in non-development environments
+          }
+
+          return true;
+        };
+      }
     });
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
