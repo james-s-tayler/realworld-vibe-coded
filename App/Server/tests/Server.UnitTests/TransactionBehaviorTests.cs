@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Server.Infrastructure.Data;
 using Server.SharedKernel;
 
 namespace Server.UnitTests;
@@ -14,14 +13,14 @@ namespace Server.UnitTests;
 public class TransactionBehaviorTests
 {
   private readonly IUnitOfWork _unitOfWork;
-  private readonly ILogger<TransactionBehavior<TestCommand, Result<string>>> _logger;
-  private readonly TransactionBehavior<TestCommand, Result<string>> _behavior;
+  private readonly ILogger<Server.Infrastructure.Data.TransactionBehavior<TestCommand, Result<string>>> _logger;
+  private readonly Server.Infrastructure.Data.TransactionBehavior<TestCommand, Result<string>> _behavior;
 
   public TransactionBehaviorTests()
   {
     _unitOfWork = Substitute.For<IUnitOfWork>();
-    _logger = NullLogger<TransactionBehavior<TestCommand, Result<string>>>.Instance;
-    _behavior = new TransactionBehavior<TestCommand, Result<string>>(_unitOfWork, _logger);
+    _logger = NullLogger<Server.Infrastructure.Data.TransactionBehavior<TestCommand, Result<string>>>.Instance;
+    _behavior = new Server.Infrastructure.Data.TransactionBehavior<TestCommand, Result<string>>(_unitOfWork, _logger);
   }
 
   [Fact]
@@ -56,8 +55,8 @@ public class TransactionBehaviorTests
     // Arrange
     var query = new TestQuery();
     var expectedResult = Result<string>.Success("test");
-    var queryBehavior = new TransactionBehavior<TestQuery, Result<string>>(_unitOfWork,
-      NullLogger<TransactionBehavior<TestQuery, Result<string>>>.Instance);
+    var queryBehavior = new Server.Infrastructure.Data.TransactionBehavior<TestQuery, Result<string>>(_unitOfWork,
+      NullLogger<Server.Infrastructure.Data.TransactionBehavior<TestQuery, Result<string>>>.Instance);
 
     // Act
     var result = await queryBehavior.Handle(query, (ct) => Task.FromResult(expectedResult), CancellationToken.None);
@@ -213,7 +212,11 @@ public class TransactionBehaviorTests
     _unitOfWork.ExecuteInTransactionAsync(
       Arg.Any<Func<CancellationToken, Task<Result<string>>>>(),
       Arg.Any<CancellationToken>())
-      .Returns<Task<Result<string>>>(callInfo => throw concurrencyException);
+      .Returns<Task<Result<string>>>(callInfo =>
+      {
+        // Throw the exception when the operation is executed
+        throw concurrencyException;
+      });
 
     // Act
     var result = await _behavior.Handle(command, (ct) => Task.FromResult(Result<string>.Success("test")), CancellationToken.None);

@@ -97,7 +97,7 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
     return true; // Default to true for non-Result responses
   }
 
-  private static TResponse CreateConflictResult(DbUpdateConcurrencyException ex)
+  private TResponse CreateConflictResult(DbUpdateConcurrencyException ex)
   {
     var responseType = typeof(TResponse);
 
@@ -105,15 +105,23 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
     if (responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(Result<>))
     {
       var valueType = responseType.GetGenericArguments()[0];
-      var conflictMethod = typeof(Result<>).MakeGenericType(valueType)
-        .GetMethod(nameof(Result<object>.Conflict), new[] { typeof(string) });
+      var resultType = typeof(Result<>).MakeGenericType(valueType);
 
-      if (conflictMethod != null)
-      {
-        var errorMessage = "A concurrency conflict occurred. The data has been modified by another process.";
-        var result = conflictMethod.Invoke(null, new object[] { errorMessage });
-        return (TResponse)result!;
-      }
+      // Create using Activator with Conflict status
+      var result = Activator.CreateInstance(
+        resultType,
+        BindingFlags.NonPublic | BindingFlags.Instance,
+        null,
+        new object[] { ResultStatus.Conflict },
+        null
+      )!;
+
+      // Set the error message via the Errors property
+      var errorsProp = resultType.GetProperty(nameof(Result<object>.Errors))!;
+      var errorMessage = "A concurrency conflict occurred. The data has been modified by another process.";
+      errorsProp.SetValue(result, new[] { errorMessage });
+
+      return (TResponse)result;
     }
 
     // If we can't create a Conflict result, rethrow the exception
