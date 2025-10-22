@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Server.Core.UserAggregate;
+using Server.Infrastructure.Data;
 using Server.UseCases.Users.Register;
 
 namespace Server.Web.Configurations;
@@ -17,6 +18,7 @@ public static class MediatrConfigs
     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!))
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>))
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>))
+            .AddScoped(typeof(IPipelineBehavior<,>), typeof(ConcurrencyExceptionHandlingBehavior<,>))
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>))
             .AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
 
