@@ -4,7 +4,7 @@
 /// Extensions to Ardalis.Result.Result to support custom CriticalError overloads with ValidationError.
 /// These methods are used by ExceptionHandlingBehavior via reflection.
 /// </summary>
-public static class ResultCriticalErrorExtensions
+public static class CustomArdalisResultFactory
 {
   /// <summary>
   /// Represents a critical error that occurred during the execution of the service.

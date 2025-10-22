@@ -352,7 +352,7 @@ public class ResultConstructor
   public void InitializesStatusToCriticalErrorAndSetsValidationErrorGivenCriticalErrorFactoryCall()
   {
     var validationError = new ValidationError("InvalidOperationException", "An unexpected error occurred");
-    var result = Server.SharedKernel.ResultCriticalErrorExtensions.CriticalError<object>(validationError);
+    var result = Server.SharedKernel.CustomArdalisResultFactory.CriticalError<object>(validationError);
 
     result.Status.Should().Be(ResultStatus.CriticalError);
     result.ValidationErrors.Should().HaveCount(1);
