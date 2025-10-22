@@ -79,7 +79,7 @@ public static class ResultExtensions
         await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
         break;
       case ResultStatus.Error:
-        await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("body", string.Join(";", result.Errors)) }, cancellation: cancellationToken);
+        await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("error", string.Join(";", result.Errors)) }, cancellation: cancellationToken);
         break;
       case ResultStatus.CriticalError:
         if (result.ValidationErrors.Any())
@@ -92,7 +92,7 @@ public static class ResultExtensions
         }
         else
         {
-          await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("body", string.Join(";", result.Errors)) }, statusCode: StatusCodes.Status500InternalServerError, cancellation: cancellationToken);
+          await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("error", string.Join(";", result.Errors)) }, statusCode: StatusCodes.Status500InternalServerError, cancellation: cancellationToken);
         }
         break;
     }

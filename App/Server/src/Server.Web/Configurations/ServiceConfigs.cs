@@ -5,7 +5,7 @@ using Server.Core.Interfaces;
 using Server.Infrastructure;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Email;
-using Server.Web.Infrastructure;
+using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace Server.Web.Configurations;
 
@@ -63,60 +63,21 @@ public static class ServiceConfigs
           },
           OnChallenge = async context =>
           {
-            // Skip the default logic that adds WWW-Authenticate header
             context.HandleResponse();
-
-            var problemDetailsService = context.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
-
-            context.HttpContext.Response.StatusCode = 401;
-
-            var problemDetailsContext = new ProblemDetailsContext
-            {
-              HttpContext = context.HttpContext,
-              ProblemDetails =
-              {
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-                Title = "Unauthorized",
-                Status = 401,
-                Extensions =
-                {
-                  ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } }
-                }
-              }
-            };
-
-            await problemDetailsService.WriteAsync(problemDetailsContext);
+            await context.HttpContext.Response.SendErrorsAsync(
+              new List<ValidationFailure>([new ValidationFailure(context.Error ?? "authorization", context.ErrorDescription ?? "Unauthorized")
+            ]), StatusCodes.Status401Unauthorized);
           },
           OnForbidden = async context =>
           {
-            var problemDetailsService = context.HttpContext.RequestServices.GetRequiredService<IProblemDetailsService>();
-
-            context.HttpContext.Response.StatusCode = 401;
-
-            var problemDetailsContext = new ProblemDetailsContext
-            {
-              HttpContext = context.HttpContext,
-              ProblemDetails =
-              {
-                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-                Title = "Unauthorized",
-                Status = 401,
-                Extensions =
-                {
-                  ["errors"] = new[] { new { name = "body", reason = "Unauthorized" } }
-                }
-              }
-            };
-
-            await problemDetailsService.WriteAsync(problemDetailsContext);
+            await context.HttpContext.Response.SendErrorsAsync(
+              new List<ValidationFailure>([new ValidationFailure("authorization", context.Result?.Failure?.Message ?? "Forbidden")
+              ]), StatusCodes.Status403Forbidden);
           }
         };
       });
 
     services.AddAuthorization();
-
-    // Register global exception handler for unauthorized access
-    services.AddExceptionHandler<UnauthorizedExceptionHandler>();
     services.AddProblemDetails();
 
     // Register IHttpContextAccessor for CurrentUserService
