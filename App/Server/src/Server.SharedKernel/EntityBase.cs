@@ -1,4 +1,6 @@
-﻿namespace Server.SharedKernel;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Server.SharedKernel;
 
 /// <summary>
 /// A base class for DDD Entities. Includes support for domain events dispatched post-persistence.
@@ -8,12 +10,24 @@
 public abstract class EntityBase : HasDomainEventsBase
 {
   public int Id { get; set; }
+
+  /// <summary>
+  /// Row version for optimistic concurrency control
+  /// </summary>
+  [Timestamp]
+  public byte[] ChangeCheck { get; set; } = Array.Empty<byte>();
 }
 
 public abstract class EntityBase<TId> : HasDomainEventsBase
   where TId : struct, IEquatable<TId>
 {
   public TId Id { get; set; } = default!;
+
+  /// <summary>
+  /// Row version for optimistic concurrency control
+  /// </summary>
+  [Timestamp]
+  public byte[] ChangeCheck { get; set; } = Array.Empty<byte>();
 }
 
 /// <summary>
@@ -26,4 +40,10 @@ public abstract class EntityBase<T, TId> : HasDomainEventsBase
   where T : EntityBase<T, TId>
 {
   public TId Id { get; set; } = default!;
+
+  /// <summary>
+  /// Row version for optimistic concurrency control
+  /// </summary>
+  [Timestamp]
+  public byte[] ChangeCheck { get; set; } = Array.Empty<byte>();
 }

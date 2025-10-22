@@ -1,6 +1,8 @@
 ﻿using Ardalis.Result;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Server.Infrastructure.Data;
 using Server.SharedKernel;
 
 namespace Server.UnitTests;
@@ -199,6 +201,27 @@ public class TransactionBehaviorTests
     result.IsSuccess.ShouldBeTrue();
     result.Status.ShouldBe(ResultStatus.Created);
     executedInTransaction.ShouldBeTrue();
+  }
+
+  [Fact]
+  public async Task Handle_WithDbUpdateConcurrencyException_ShouldReturnConflictResult()
+  {
+    // Arrange
+    var command = new TestCommand();
+    var concurrencyException = new DbUpdateConcurrencyException("Concurrency conflict");
+
+    _unitOfWork.ExecuteInTransactionAsync(
+      Arg.Any<Func<CancellationToken, Task<Result<string>>>>(),
+      Arg.Any<CancellationToken>())
+      .Returns<Task<Result<string>>>(callInfo => throw concurrencyException);
+
+    // Act
+    var result = await _behavior.Handle(command, (ct) => Task.FromResult(Result<string>.Success("test")), CancellationToken.None);
+
+    // Assert
+    result.IsSuccess.ShouldBeFalse();
+    result.Status.ShouldBe(ResultStatus.Conflict);
+    result.Errors.ShouldContain(e => e.Contains("concurrency conflict"));
   }
 
   // Test command and query classes

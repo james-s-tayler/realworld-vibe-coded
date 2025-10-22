@@ -78,6 +78,13 @@ public static class ResultExtensions
       case ResultStatus.Forbidden:
         await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
         break;
+      case ResultStatus.Conflict:
+        foreach (var error in result.Errors)
+        {
+          ep.ValidationFailures.Add(new(nameof(ResultStatus.Conflict), error));
+        }
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status409Conflict, cancellation: cancellationToken);
+        break;
       case ResultStatus.Error:
         await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("error", string.Join(";", result.Errors)) }, cancellation: cancellationToken);
         break;
