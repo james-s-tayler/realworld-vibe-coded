@@ -5,7 +5,6 @@ using Server.Core.Interfaces;
 using Server.Infrastructure;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Email;
-using Server.Web.Infrastructure;
 using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace Server.Web.Configurations;
@@ -66,7 +65,7 @@ public static class ServiceConfigs
           {
             context.HandleResponse();
             await context.HttpContext.Response.SendErrorsAsync(
-              new List<ValidationFailure>([new ValidationFailure("authorization", "Unauthorized")
+              new List<ValidationFailure>([new ValidationFailure(context.Error ?? "authorization", context.ErrorDescription ?? "Unauthorized")
             ]), StatusCodes.Status401Unauthorized);
           },
           OnForbidden = async context =>
@@ -79,9 +78,6 @@ public static class ServiceConfigs
       });
 
     services.AddAuthorization();
-
-    // Register global exception handler for unauthorized access
-    services.AddExceptionHandler<UnauthorizedExceptionHandler>();
     services.AddProblemDetails();
 
     // Register IHttpContextAccessor for CurrentUserService

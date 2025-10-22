@@ -17,13 +17,6 @@ public class GlobalExceptionHandler : IGlobalPostProcessor
 
     var exception = ctx.ExceptionDispatchInfo.SourceException;
 
-    // Let specific exception handlers (like UnauthorizedExceptionHandler) handle their exceptions
-    if (exception is UnauthorizedAccessException)
-    {
-      ctx.ExceptionDispatchInfo.Throw();
-      return;
-    }
-
     var logger = ctx.HttpContext.Resolve<ILogger<GlobalExceptionHandler>>();
     logger.LogError(exception, "An unhandled exception occurred: {ExceptionType} - {Message}",
       exception.GetType().Name, exception.Message);
