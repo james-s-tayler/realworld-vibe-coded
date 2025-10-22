@@ -166,6 +166,40 @@ public class CustomArdalisResultFactoryTests
   }
 
   /// <summary>
+  /// This test validates that all reflection-based invariants required by CustomArdalisResultFactory
+  /// continue to hold. If this test fails after a library upgrade, it indicates that Ardalis.Result
+  /// has changed in an incompatible way and CustomArdalisResultFactory needs to be updated.
+  /// 
+  /// Validates:
+  /// - Protected constructor Result(ResultStatus) exists and is accessible
+  /// - ValidationErrors property exists
+  /// - ValidationErrors property has a protected setter
+  /// </summary>
+  [Fact]
+  public void ReflectionInvariants_ShouldBeValid()
+  {
+    // Arrange
+    var resultType = typeof(Result<string>);
+
+    // Act & Assert - Verify protected constructor exists
+    var constructor = resultType.GetConstructor(
+      System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
+      null,
+      new[] { typeof(ResultStatus) },
+      null
+    );
+    constructor.ShouldNotBeNull("Ardalis.Result.Result<T> must have a protected constructor that accepts ResultStatus");
+
+    // Act & Assert - Verify ValidationErrors property exists
+    var validationErrorsProp = resultType.GetProperty(nameof(Result<string>.ValidationErrors));
+    validationErrorsProp.ShouldNotBeNull("Ardalis.Result.Result<T> must have a ValidationErrors property");
+
+    // Act & Assert - Verify ValidationErrors property has a protected setter
+    var setter = validationErrorsProp.GetSetMethod(nonPublic: true);
+    setter.ShouldNotBeNull("Ardalis.Result.Result<T>.ValidationErrors must have a protected setter");
+  }
+
+  /// <summary>
   /// This test ensures that if reflection fails, it throws a clear InvalidOperationException
   /// rather than a generic NullReferenceException or similar.
   /// </summary>
