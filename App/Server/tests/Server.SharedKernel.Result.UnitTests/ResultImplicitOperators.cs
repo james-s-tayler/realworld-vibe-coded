@@ -1,6 +1,8 @@
-﻿using Xunit;
+﻿using Ardalis.Result;
+using Xunit;
+using Result = Ardalis.Result.Result;
 
-namespace Server.SharedKernel.Result.UnitTests;
+namespace Server.SharedKernel.ResultUnitTests;
 
 public class ResultImplicitOperators
 {
@@ -94,8 +96,8 @@ public class ResultImplicitOperators
     Assert.Equal(expectedString, convertedResult.Errors.First());
   }
 
-  public Result<T> DoBusinessOperationExample<T>(T testValue) => testValue;
-  public T GetValueForResultExample<T>(Result<T> testResult) => testResult;
+  public Ardalis.Result.Result<T> DoBusinessOperationExample<T>(T testValue) => testValue;
+  public T GetValueForResultExample<T>(Ardalis.Result.Result<T> testResult) => testResult;
 
   private class TestObject { }
 }

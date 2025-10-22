@@ -1,6 +1,6 @@
-﻿using MediatR;
+﻿using Ardalis.Result;
+using MediatR;
 using Microsoft.Extensions.Logging;
-using Server.SharedKernel.Result;
 
 namespace Server.SharedKernel;
 
@@ -32,17 +32,19 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
 
       // Create a CriticalError result with validation errors
       var resultType = typeof(TResponse);
-      if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Result<>))
+      if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Ardalis.Result.Result<>))
       {
         // Create validation error from the exception
         var validationError = new ValidationError(ex.GetType().Name, ex.Message);
 
         var valueType = resultType.GetGenericArguments()[0];
-        var criticalErrorMethod = resultType.GetMethod(nameof(Result<object>.CriticalError), new[] { typeof(ValidationError) });
+        var helperType = typeof(CustomArdalisResultFactory);
+        var criticalErrorMethod = helperType.GetMethod(nameof(CustomArdalisResultFactory.CriticalError), new[] { typeof(ValidationError) });
 
         if (criticalErrorMethod != null)
         {
-          var result = criticalErrorMethod.Invoke(null, new object[] { validationError });
+          var genericMethod = criticalErrorMethod.MakeGenericMethod(valueType);
+          var result = genericMethod.Invoke(null, new object[] { validationError });
           return (TResponse)result!;
         }
       }
