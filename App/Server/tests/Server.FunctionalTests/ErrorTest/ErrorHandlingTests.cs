@@ -15,10 +15,15 @@ public class ErrorHandlingTests(ErrorTestFixture App)
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
     var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-    var errorResponse = JsonSerializer.Deserialize<JsonElement>(content);
+    var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(content, new JsonSerializerOptions
+    {
+      PropertyNameCaseInsensitive = true
+    });
 
-    errorResponse.GetProperty("status").GetInt32().ShouldBe(400);
-    errorResponse.GetProperty("errors").GetArrayLength().ShouldBeGreaterThanOrEqualTo(1);
+    problemDetails.ShouldNotBeNull();
+    problemDetails.Status.ShouldBe(400);
+    problemDetails.Errors.ShouldNotBeNull();
+    problemDetails.Errors.Count().ShouldBeGreaterThanOrEqualTo(1);
   }
 
   [Fact]
@@ -31,10 +36,15 @@ public class ErrorHandlingTests(ErrorTestFixture App)
     response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
 
     var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-    var errorResponse = JsonSerializer.Deserialize<JsonElement>(content);
+    var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(content, new JsonSerializerOptions
+    {
+      PropertyNameCaseInsensitive = true
+    });
 
-    errorResponse.GetProperty("status").GetInt32().ShouldBe(500);
-    errorResponse.GetProperty("errors").GetArrayLength().ShouldBeGreaterThanOrEqualTo(1);
+    problemDetails.ShouldNotBeNull();
+    problemDetails.Status.ShouldBe(500);
+    problemDetails.Errors.ShouldNotBeNull();
+    problemDetails.Errors.Count().ShouldBeGreaterThanOrEqualTo(1);
   }
 
   [Fact]
@@ -47,10 +57,15 @@ public class ErrorHandlingTests(ErrorTestFixture App)
     response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
 
     var content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-    var errorResponse = JsonSerializer.Deserialize<JsonElement>(content);
+    var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(content, new JsonSerializerOptions
+    {
+      PropertyNameCaseInsensitive = true
+    });
 
-    errorResponse.GetProperty("status").GetInt32().ShouldBe(500);
-    errorResponse.GetProperty("errors").GetArrayLength().ShouldBeGreaterThanOrEqualTo(1);
+    problemDetails.ShouldNotBeNull();
+    problemDetails.Status.ShouldBe(500);
+    problemDetails.Errors.ShouldNotBeNull();
+    problemDetails.Errors.Count().ShouldBeGreaterThanOrEqualTo(1);
   }
 
   [Fact]
@@ -66,31 +81,36 @@ public class ErrorHandlingTests(ErrorTestFixture App)
     var useCaseContent = await useCaseResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
     var endpointContent = await endpointResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
-    var validationError = JsonSerializer.Deserialize<JsonElement>(validationContent);
-    var useCaseError = JsonSerializer.Deserialize<JsonElement>(useCaseContent);
-    var endpointError = JsonSerializer.Deserialize<JsonElement>(endpointContent);
+    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+    var validationError = JsonSerializer.Deserialize<ProblemDetails>(validationContent, options);
+    var useCaseError = JsonSerializer.Deserialize<ProblemDetails>(useCaseContent, options);
+    var endpointError = JsonSerializer.Deserialize<ProblemDetails>(endpointContent, options);
 
     // All should have the same structure with type, title, status, and errors properties
-    validationError.TryGetProperty("type", out _).ShouldBeTrue();
-    useCaseError.TryGetProperty("type", out _).ShouldBeTrue();
-    endpointError.TryGetProperty("type", out _).ShouldBeTrue();
+    validationError.ShouldNotBeNull();
+    useCaseError.ShouldNotBeNull();
+    endpointError.ShouldNotBeNull();
 
-    validationError.TryGetProperty("title", out _).ShouldBeTrue();
-    useCaseError.TryGetProperty("title", out _).ShouldBeTrue();
-    endpointError.TryGetProperty("title", out _).ShouldBeTrue();
+    validationError.Type.ShouldNotBeNull();
+    useCaseError.Type.ShouldNotBeNull();
+    endpointError.Type.ShouldNotBeNull();
 
-    validationError.TryGetProperty("status", out _).ShouldBeTrue();
-    useCaseError.TryGetProperty("status", out _).ShouldBeTrue();
-    endpointError.TryGetProperty("status", out _).ShouldBeTrue();
+    validationError.Title.ShouldNotBeNull();
+    useCaseError.Title.ShouldNotBeNull();
+    endpointError.Title.ShouldNotBeNull();
 
-    validationError.TryGetProperty("errors", out _).ShouldBeTrue();
-    useCaseError.TryGetProperty("errors", out _).ShouldBeTrue();
-    endpointError.TryGetProperty("errors", out _).ShouldBeTrue();
+    validationError.Status.ShouldBeGreaterThan(0);
+    useCaseError.Status.ShouldBeGreaterThan(0);
+    endpointError.Status.ShouldBeGreaterThan(0);
+
+    validationError.Errors.ShouldNotBeNull();
+    useCaseError.Errors.ShouldNotBeNull();
+    endpointError.Errors.ShouldNotBeNull();
 
     // The critical error responses from use case and endpoint should be identical in format
-    useCaseError.GetProperty("status").GetInt32().ShouldBe(500);
-    endpointError.GetProperty("status").GetInt32().ShouldBe(500);
-    useCaseError.GetProperty("type").GetString().ShouldBe(endpointError.GetProperty("type").GetString());
-    useCaseError.GetProperty("title").GetString().ShouldBe(endpointError.GetProperty("title").GetString());
+    useCaseError.Status.ShouldBe(500);
+    endpointError.Status.ShouldBe(500);
+    useCaseError.Type.ShouldBe(endpointError.Type);
+    useCaseError.Title.ShouldBe(endpointError.Title);
   }
 }
