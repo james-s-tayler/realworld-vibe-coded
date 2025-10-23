@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Server.UseCases.ErrorTest;
 
-public class ThrowConcurrencyNonGenericHandler : IQueryHandler<ThrowConcurrencyNonGenericQuery, Result>
+public class ThrowConcurrencyNonGenericHandler : IQueryHandler<ThrowConcurrencyNonGenericQuery, Result<Unit>>
 {
-  public Task<Result> Handle(ThrowConcurrencyNonGenericQuery request, CancellationToken cancellationToken)
+  public Task<Result<Unit>> Handle(ThrowConcurrencyNonGenericQuery request, CancellationToken cancellationToken)
   {
     throw new DbUpdateConcurrencyException("Test concurrency conflict for non-generic Result");
   }
