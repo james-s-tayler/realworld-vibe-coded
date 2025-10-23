@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Server.SharedKernel;
@@ -26,31 +27,50 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
     {
       return await next();
     }
+    catch (DbUpdateConcurrencyException ex)
+    {
+      _logger.LogWarning(ex, "Concurrency conflict occurred while processing {RequestName}", typeof(TRequest).Name);
+
+      return CreateResultFromException(ex, nameof(CustomArdalisResultFactory.Conflict));
+    }
     catch (Exception ex)
     {
       _logger.LogError(ex, "An unhandled exception occurred while processing {RequestName}", typeof(TRequest).Name);
-
-      // Create a CriticalError result with validation errors
-      var resultType = typeof(TResponse);
-      if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Ardalis.Result.Result<>))
-      {
-        // Create validation error from the exception
-        var validationError = new ValidationError(ex.GetType().Name, ex.Message);
-
-        var valueType = resultType.GetGenericArguments()[0];
-        var helperType = typeof(CustomArdalisResultFactory);
-        var criticalErrorMethod = helperType.GetMethod(nameof(CustomArdalisResultFactory.CriticalError), new[] { typeof(ValidationError) });
-
-        if (criticalErrorMethod != null)
-        {
-          var genericMethod = criticalErrorMethod.MakeGenericMethod(valueType);
-          var result = genericMethod.Invoke(null, new object[] { validationError });
-          return (TResponse)result!;
-        }
-      }
-
-      // Fallback for non-generic Result types
-      throw;
+      return CreateResultFromException(ex, nameof(CustomArdalisResultFactory.CriticalError));
     }
+  }
+
+  private TResponse CreateResultFromException(Exception exception, string factoryMethodName)
+  {
+    var resultType = typeof(TResponse);
+    var customArdalisResultFactory = typeof(CustomArdalisResultFactory);
+
+    // Check if this is a generic Result<T>
+    if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Result<>))
+    {
+      // Use reflection to call the generic factory method
+      var valueType = resultType.GetGenericArguments()[0];
+
+      // Get the generic factory method - invariant: this method must exist
+      var method = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+        .First(m => m.Name == factoryMethodName && m.IsGenericMethodDefinition);
+
+      var genericMethod = method.MakeGenericMethod(valueType);
+      var result = genericMethod.Invoke(null, new object[] { exception });
+      return (TResponse)result!;
+    }
+    // Check if this is a non-generic Result
+    else if (resultType == typeof(Result))
+    {
+      // Get the non-generic factory method - invariant: this method must exist
+      var method = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+        .First(m => m.Name == factoryMethodName && !m.IsGenericMethodDefinition && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(Exception));
+
+      var result = method.Invoke(null, new object[] { exception });
+      return (TResponse)result!;
+    }
+
+    // If not a Result type, rethrow the exception
+    throw exception;
   }
 }

@@ -125,7 +125,7 @@ public class TransactionBehaviorTests
     // Arrange
     var command = new TestCommand();
     var criticalErrorResult = CustomArdalisResultFactory.CriticalError<string>(
-      new ValidationError("TestError", "Critical error occurred"));
+      new InvalidOperationException("Critical error occurred"));
     var executedInTransaction = false;
 
     _unitOfWork.ExecuteInTransactionAsync(
