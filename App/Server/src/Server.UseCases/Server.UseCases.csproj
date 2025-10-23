@@ -8,9 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Server.Core\Server.Core.csproj" />
     <ProjectReference Include="..\Server.SharedKernel\Server.SharedKernel.csproj" />
-    <ProjectReference Include="..\..\analyzers\Server.SourceGenerators\Server.SourceGenerators.csproj" 
-                      OutputItemType="Analyzer" 
-                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
