@@ -51,35 +51,26 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
       // Use reflection to call the generic factory method
       var valueType = resultType.GetGenericArguments()[0];
 
-      // Get all methods with the specified name
-      var methods = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
-        .Where(m => m.Name == factoryMethodName && m.IsGenericMethodDefinition)
-        .ToArray();
+      // Get the generic factory method - invariant: this method must exist
+      var method = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+        .First(m => m.Name == factoryMethodName && m.IsGenericMethodDefinition);
 
-      if (methods.Length > 0)
-      {
-        var genericMethod = methods[0].MakeGenericMethod(valueType);
-        var result = genericMethod.Invoke(null, new object[] { exception });
-        return (TResponse)result!;
-      }
+      var genericMethod = method.MakeGenericMethod(valueType);
+      var result = genericMethod.Invoke(null, new object[] { exception });
+      return (TResponse)result!;
     }
     // Check if this is a non-generic Result
     else if (resultType == typeof(Result))
     {
-      // Get all non-generic methods with the specified name
-      var methods = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
-        .Where(m => m.Name == factoryMethodName && !m.IsGenericMethodDefinition && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(Exception))
-        .ToArray();
+      // Get the non-generic factory method - invariant: this method must exist
+      var method = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+        .First(m => m.Name == factoryMethodName && !m.IsGenericMethodDefinition && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(Exception));
 
-      if (methods.Length > 0)
-      {
-        var result = methods[0].Invoke(null, new object[] { exception });
-        return (TResponse)result!;
-      }
+      var result = method.Invoke(null, new object[] { exception });
+      return (TResponse)result!;
     }
 
-    // If not a Result type or factory method not found, rethrow the exception
-    _logger.LogWarning("Not an Ardalis.Result type or no CustomArdalisResultFactory method found for {FactoryMethod}", factoryMethodName);
-    throw new InvalidOperationException($"Not an Ardalis.Result type or no CustomArdalisResultFactory method found for {factoryMethodName}", exception);
+    // If not a Result type, rethrow the exception
+    throw exception;
   }
 }
