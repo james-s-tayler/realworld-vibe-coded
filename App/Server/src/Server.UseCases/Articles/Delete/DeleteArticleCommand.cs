@@ -3,4 +3,4 @@
 public record DeleteArticleCommand(
   string Slug,
   int UserId
-) : ICommand<Result<Unit>>;
+) : ICommand<Unit>;

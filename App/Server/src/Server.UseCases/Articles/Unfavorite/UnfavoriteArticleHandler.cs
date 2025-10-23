@@ -5,7 +5,7 @@ using Server.Core.UserAggregate;
 namespace Server.UseCases.Articles.Unfavorite;
 
 public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
-  : ICommandHandler<UnfavoriteArticleCommand, Result<Article>>
+  : ICommandHandler<UnfavoriteArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(UnfavoriteArticleCommand request, CancellationToken cancellationToken)
   {

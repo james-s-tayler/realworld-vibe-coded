@@ -9,4 +9,4 @@ public record CreateArticleCommand(
   List<string> TagList,
   int AuthorId,
   int? CurrentUserId = null
-) : ICommand<Result<Article>>;
+) : ICommand<Article>;

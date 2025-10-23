@@ -4,7 +4,7 @@ using Server.Core.Interfaces;
 namespace Server.UseCases.Articles.Feed;
 
 public class GetFeedHandler(IFeedQueryService _feedQuery)
-  : IQueryHandler<GetFeedQuery, Result<IEnumerable<Article>>>
+  : IQueryHandler<GetFeedQuery, IEnumerable<Article>>
 {
   public async Task<Result<IEnumerable<Article>>> Handle(GetFeedQuery request, CancellationToken cancellationToken)
   {

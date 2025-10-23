@@ -8,20 +8,22 @@ namespace Server.SharedKernel;
 /// <summary>
 /// MediatR pipeline behavior that catches exceptions during request handling
 /// and transforms them into Result.CriticalError with ProblemDetails format.
+/// This behavior uses the constrained generic parameter T from IResultRequest{T}
+/// to call factory methods directly without reflection.
 /// </summary>
-/// <typeparam name="TRequest">The request type</typeparam>
-/// <typeparam name="TResponse">The response type</typeparam>
-public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-  where TRequest : IRequest<TResponse>
+/// <typeparam name="TRequest">The request type implementing IResultRequest{T}</typeparam>
+/// <typeparam name="T">The inner value type of Result{T}</typeparam>
+public class ExceptionHandlingBehavior<TRequest, T> : IPipelineBehavior<TRequest, Result<T>>
+  where TRequest : IResultRequest<T>
 {
-  private readonly ILogger<ExceptionHandlingBehavior<TRequest, TResponse>> _logger;
+  private readonly ILogger<ExceptionHandlingBehavior<TRequest, T>> _logger;
 
-  public ExceptionHandlingBehavior(ILogger<ExceptionHandlingBehavior<TRequest, TResponse>> logger)
+  public ExceptionHandlingBehavior(ILogger<ExceptionHandlingBehavior<TRequest, T>> logger)
   {
     _logger = logger;
   }
 
-  public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+  public async Task<Result<T>> Handle(TRequest request, RequestHandlerDelegate<Result<T>> next, CancellationToken cancellationToken)
   {
     try
     {
@@ -31,36 +33,13 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
     {
       _logger.LogWarning(ex, "Concurrency conflict occurred while processing {RequestName}", typeof(TRequest).Name);
 
-      return CreateResultFromException(ex, nameof(CustomArdalisResultFactory.Conflict));
+      return CustomArdalisResultFactory.Conflict<T>(ex);
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "An unhandled exception occurred while processing {RequestName}", typeof(TRequest).Name);
-      return CreateResultFromException(ex, nameof(CustomArdalisResultFactory.CriticalError));
+
+      return CustomArdalisResultFactory.CriticalError<T>(ex);
     }
-  }
-
-  private TResponse CreateResultFromException(Exception exception, string factoryMethodName)
-  {
-    var resultType = typeof(TResponse);
-    var customArdalisResultFactory = typeof(CustomArdalisResultFactory);
-
-    // Check if this is a generic Result<T>
-    if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Result<>))
-    {
-      // Use reflection to call the generic factory method
-      var valueType = resultType.GetGenericArguments()[0];
-
-      // Get the generic factory method - invariant: this method must exist
-      var method = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
-        .First(m => m.Name == factoryMethodName && m.IsGenericMethodDefinition);
-
-      var genericMethod = method.MakeGenericMethod(valueType);
-      var result = genericMethod.Invoke(null, new object[] { exception });
-      return (TResponse)result!;
-    }
-
-    // If not a Result<T> type, rethrow the exception
-    throw exception;
   }
 }

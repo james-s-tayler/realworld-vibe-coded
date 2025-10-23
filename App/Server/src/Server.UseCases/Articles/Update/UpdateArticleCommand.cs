@@ -9,4 +9,4 @@ public record UpdateArticleCommand(
   string? Body,
   int UserId,
   int CurrentUserId
-) : ICommand<Result<Article>>;
+) : ICommand<Article>;

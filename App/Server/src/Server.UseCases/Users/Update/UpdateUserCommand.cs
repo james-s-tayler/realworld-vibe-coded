@@ -9,4 +9,4 @@ public record UpdateUserCommand(
   string? Password = null,
   string? Bio = null,
   string? Image = null
-) : ICommand<Result<User>>;
+) : ICommand<User>;

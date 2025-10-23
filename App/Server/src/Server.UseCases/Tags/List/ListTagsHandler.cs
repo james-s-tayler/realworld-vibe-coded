@@ -3,7 +3,7 @@
 namespace Server.UseCases.Tags.List;
 
 public class ListTagsHandler(IListTagsQueryService _query)
-  : IQueryHandler<ListTagsQuery, Result<TagsResponse>>
+  : IQueryHandler<ListTagsQuery, TagsResponse>
 {
   public async Task<Result<TagsResponse>> Handle(ListTagsQuery request, CancellationToken cancellationToken)
   {

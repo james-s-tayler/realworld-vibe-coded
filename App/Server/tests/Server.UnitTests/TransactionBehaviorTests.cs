@@ -12,14 +12,14 @@ namespace Server.UnitTests;
 public class TransactionBehaviorTests
 {
   private readonly IUnitOfWork _unitOfWork;
-  private readonly ILogger<TransactionBehavior<TestCommand, Result<string>>> _logger;
-  private readonly TransactionBehavior<TestCommand, Result<string>> _behavior;
+  private readonly ILogger<TransactionBehavior<TestCommand, string>> _logger;
+  private readonly TransactionBehavior<TestCommand, string> _behavior;
 
   public TransactionBehaviorTests()
   {
     _unitOfWork = Substitute.For<IUnitOfWork>();
-    _logger = NullLogger<TransactionBehavior<TestCommand, Result<string>>>.Instance;
-    _behavior = new TransactionBehavior<TestCommand, Result<string>>(_unitOfWork, _logger);
+    _logger = NullLogger<TransactionBehavior<TestCommand, string>>.Instance;
+    _behavior = new TransactionBehavior<TestCommand, string>(_unitOfWork, _logger);
   }
 
   [Fact]
@@ -54,8 +54,8 @@ public class TransactionBehaviorTests
     // Arrange
     var query = new TestQuery();
     var expectedResult = Result<string>.Success("test");
-    var queryBehavior = new TransactionBehavior<TestQuery, Result<string>>(_unitOfWork,
-      NullLogger<TransactionBehavior<TestQuery, Result<string>>>.Instance);
+    var queryBehavior = new TransactionBehavior<TestQuery, string>(_unitOfWork,
+      NullLogger<TransactionBehavior<TestQuery, string>>.Instance);
 
     // Act
     var result = await queryBehavior.Handle(query, (ct) => Task.FromResult(expectedResult), CancellationToken.None);
@@ -202,7 +202,7 @@ public class TransactionBehaviorTests
   }
 
   // Test command and query classes
-  private record TestCommand : ICommand<Result<string>>;
-  private record TestQuery : IQuery<Result<string>>;
+  private record TestCommand : ICommand<string>;
+  private record TestQuery : IQuery<string>;
 }
 

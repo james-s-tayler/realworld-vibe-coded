@@ -6,29 +6,29 @@ namespace Server.SharedKernel;
 
 /// <summary>
 /// MediatR pipeline behavior that wraps Command handling in an EF Core transaction.
-/// Only applies to ICommand&lt;&gt; requests; IQuery&lt;&gt; requests are not wrapped.
+/// Only applies to ICommand{T} requests; IQuery{T} requests are not wrapped.
 /// Commits the transaction if Result.IsSuccess is true; otherwise, rolls back.
 /// </summary>
-/// <typeparam name="TRequest">The request type</typeparam>
-/// <typeparam name="TResponse">The response type</typeparam>
-public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-  where TRequest : IRequest<TResponse>
+/// <typeparam name="TRequest">The request type implementing IResultRequest{T}</typeparam>
+/// <typeparam name="T">The inner value type of Result{T}</typeparam>
+public class TransactionBehavior<TRequest, T> : IPipelineBehavior<TRequest, Result<T>>
+  where TRequest : IResultRequest<T>
 {
   private readonly IUnitOfWork _unitOfWork;
-  private readonly ILogger<TransactionBehavior<TRequest, TResponse>> _logger;
+  private readonly ILogger<TransactionBehavior<TRequest, T>> _logger;
 
   public TransactionBehavior(
     IUnitOfWork unitOfWork,
-    ILogger<TransactionBehavior<TRequest, TResponse>> logger)
+    ILogger<TransactionBehavior<TRequest, T>> logger)
   {
     _unitOfWork = unitOfWork;
     _logger = logger;
   }
 
-  public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+  public async Task<Result<T>> Handle(TRequest request, RequestHandlerDelegate<Result<T>> next, CancellationToken cancellationToken)
   {
     // Only wrap commands in transactions, not queries
-    if (!IsCommand(request))
+    if (request is not ICommand<T>)
     {
       return await next();
     }
@@ -40,8 +40,7 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
       return await next();
     }, cancellationToken);
 
-    // Check if the response is a Result with IsSuccess property
-    if (IsSuccessResult(response))
+    if (response.IsSuccess)
     {
       _logger.LogInformation("Transaction committed for {RequestName}", typeof(TRequest).Name);
     }
@@ -51,39 +50,5 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
     }
 
     return response;
-  }
-
-  private static bool IsCommand(TRequest request)
-  {
-    // Check if request implements ICommand<>
-    var requestType = request.GetType();
-    var interfaces = requestType.GetInterfaces();
-
-    return interfaces.Any(i =>
-      i.IsGenericType &&
-      i.GetGenericTypeDefinition() == typeof(ICommand<>));
-  }
-
-  private static bool IsSuccessResult(TResponse response)
-  {
-    if (response == null)
-    {
-      return false;
-    }
-
-    var responseType = response.GetType();
-
-    // Check if response is Result<T>
-    if (responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(Result<>))
-    {
-      var isSuccessProperty = responseType.GetProperty(nameof(Result<object>.IsSuccess));
-      if (isSuccessProperty != null)
-      {
-        var isSuccess = (bool?)isSuccessProperty.GetValue(response);
-        return isSuccess == true;
-      }
-    }
-
-    return true; // Default to true for non-Result responses
   }
 }

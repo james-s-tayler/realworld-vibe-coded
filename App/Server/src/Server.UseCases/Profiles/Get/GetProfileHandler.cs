@@ -4,7 +4,7 @@ using Server.Core.UserAggregate.Specifications;
 namespace Server.UseCases.Profiles.Get;
 
 public class GetProfileHandler(IRepository<User> _userRepository)
-  : IQueryHandler<GetProfileQuery, Result<User>>
+  : IQueryHandler<GetProfileQuery, User>
 {
   public async Task<Result<User>> Handle(GetProfileQuery request, CancellationToken cancellationToken)
   {

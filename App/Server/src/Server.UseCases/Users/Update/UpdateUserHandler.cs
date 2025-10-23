@@ -4,7 +4,7 @@ using Server.Core.UserAggregate;
 
 namespace Server.UseCases.Users.Update;
 
-public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, Result<User>>
+public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
 {
   private readonly IRepository<User> _repository;
   private readonly IPasswordHasher _passwordHasher;

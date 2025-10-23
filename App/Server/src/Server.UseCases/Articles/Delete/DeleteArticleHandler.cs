@@ -4,7 +4,7 @@ using Server.Core.ArticleAggregate.Specifications;
 namespace Server.UseCases.Articles.Delete;
 
 public class DeleteArticleHandler(IRepository<Article> _articleRepository)
-  : ICommandHandler<DeleteArticleCommand, Result<Unit>>
+  : ICommandHandler<DeleteArticleCommand, Unit>
 {
   public async Task<Result<Unit>> Handle(DeleteArticleCommand request, CancellationToken cancellationToken)
   {

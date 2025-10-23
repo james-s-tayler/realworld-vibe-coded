@@ -6,4 +6,4 @@ public record FavoriteArticleCommand(
   string Slug,
   int UserId,
   int CurrentUserId
-) : ICommand<Result<Article>>;
+) : ICommand<Article>;

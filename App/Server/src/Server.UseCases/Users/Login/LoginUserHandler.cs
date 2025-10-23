@@ -4,7 +4,7 @@ using Server.Core.UserAggregate;
 
 namespace Server.UseCases.Users.Login;
 
-public class LoginUserHandler : IQueryHandler<LoginUserQuery, Result<User>>
+public class LoginUserHandler : IQueryHandler<LoginUserQuery, User>
 {
   private readonly IRepository<User> _repository;
   private readonly IPasswordHasher _passwordHasher;

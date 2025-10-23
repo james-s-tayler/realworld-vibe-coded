@@ -7,7 +7,7 @@ using Server.Core.UserAggregate.Specifications;
 namespace Server.UseCases.Articles.Comments.Get;
 
 public class GetCommentsHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
-  : IQueryHandler<GetCommentsQuery, Result<CommentsResponse>>
+  : IQueryHandler<GetCommentsQuery, CommentsResponse>
 {
   public async Task<Result<CommentsResponse>> Handle(GetCommentsQuery request, CancellationToken cancellationToken)
   {
