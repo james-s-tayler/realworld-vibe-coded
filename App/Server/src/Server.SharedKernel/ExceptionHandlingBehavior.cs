@@ -33,14 +33,12 @@ public class ExceptionHandlingBehavior<TRequest, T> : IPipelineBehavior<TRequest
     {
       _logger.LogWarning(ex, "Concurrency conflict occurred while processing {RequestName}", typeof(TRequest).Name);
 
-      // Call factory method directly - no reflection needed!
       return CustomArdalisResultFactory.Conflict<T>(ex);
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "An unhandled exception occurred while processing {RequestName}", typeof(TRequest).Name);
 
-      // Call factory method directly - no reflection needed!
       return CustomArdalisResultFactory.CriticalError<T>(ex);
     }
   }

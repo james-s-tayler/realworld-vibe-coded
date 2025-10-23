@@ -8,8 +8,6 @@ namespace Server.SharedKernel;
 /// MediatR pipeline behavior that wraps Command handling in an EF Core transaction.
 /// Only applies to ICommand{T} requests; IQuery{T} requests are not wrapped.
 /// Commits the transaction if Result.IsSuccess is true; otherwise, rolls back.
-/// This behavior uses the constrained generic parameter T from IResultRequest{T}
-/// to access Result properties directly without reflection.
 /// </summary>
 /// <typeparam name="TRequest">The request type implementing IResultRequest{T}</typeparam>
 /// <typeparam name="T">The inner value type of Result{T}</typeparam>
@@ -42,7 +40,6 @@ public class TransactionBehavior<TRequest, T> : IPipelineBehavior<TRequest, Resu
       return await next();
     }, cancellationToken);
 
-    // Access Result.IsSuccess directly - no reflection needed!
     if (response.IsSuccess)
     {
       _logger.LogInformation("Transaction committed for {RequestName}", typeof(TRequest).Name);
