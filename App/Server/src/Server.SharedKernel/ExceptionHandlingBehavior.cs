@@ -1,5 +1,4 @@
-﻿using Ardalis.Result;
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -40,20 +39,18 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
 
       // Create a Conflict result for concurrency exceptions
       var valueType = resultType.GetGenericArguments()[0];
-      var result = Activator.CreateInstance(
-        typeof(Ardalis.Result.Result<>).MakeGenericType(valueType),
-        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
-        null,
-        new object[] { ResultStatus.Conflict },
-        null
-      )!;
+      var helperType = typeof(CustomArdalisResultFactory);
+      var conflictMethod = helperType.GetMethod(nameof(CustomArdalisResultFactory.Conflict), new[] { typeof(Exception) });
 
-      // Set the error message via the Errors property
-      var errorsProp = result.GetType().GetProperty(nameof(Result<object>.Errors))!;
-      var errorMessage = "A concurrency conflict occurred. The data has been modified by another process.";
-      errorsProp.SetValue(result, new[] { errorMessage });
+      if (conflictMethod != null)
+      {
+        var genericMethod = conflictMethod.MakeGenericMethod(valueType);
+        var result = genericMethod.Invoke(null, new object[] { ex });
+        return (TResponse)result!;
+      }
 
-      return (TResponse)result;
+      // Fallback for non-generic Result types
+      throw;
     }
     catch (Exception ex)
     {
@@ -66,17 +63,15 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
         throw;
       }
 
-      // Create a CriticalError result with validation errors
-      var validationError = new ValidationError(ex.GetType().Name, ex.Message);
-
+      // Create a CriticalError result
       var valueType = resultType.GetGenericArguments()[0];
       var helperType = typeof(CustomArdalisResultFactory);
-      var criticalErrorMethod = helperType.GetMethod(nameof(CustomArdalisResultFactory.CriticalError), new[] { typeof(ValidationError) });
+      var criticalErrorMethod = helperType.GetMethod(nameof(CustomArdalisResultFactory.CriticalError), new[] { typeof(Exception) });
 
       if (criticalErrorMethod != null)
       {
         var genericMethod = criticalErrorMethod.MakeGenericMethod(valueType);
-        var result = genericMethod.Invoke(null, new object[] { validationError });
+        var result = genericMethod.Invoke(null, new object[] { ex });
         return (TResponse)result!;
       }
 

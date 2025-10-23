@@ -10,13 +10,13 @@ namespace Server.UnitTests;
 public class CustomArdalisResultFactoryTests
 {
   [Fact]
-  public void CriticalError_WithSingleValidationError_ShouldCreateResultWithCriticalErrorStatus()
+  public void CriticalError_WithException_ShouldCreateResultWithCriticalErrorStatus()
   {
     // Arrange
-    var validationError = new ValidationError("TestIdentifier", "Test error message");
+    var exception = new InvalidOperationException("Test error message");
 
     // Act
-    var result = CustomArdalisResultFactory.CriticalError<string>(validationError);
+    var result = CustomArdalisResultFactory.CriticalError<string>(exception);
 
     // Assert
     result.ShouldNotBeNull();
@@ -25,69 +25,28 @@ public class CustomArdalisResultFactoryTests
   }
 
   [Fact]
-  public void CriticalError_WithSingleValidationError_ShouldSetValidationErrors()
+  public void CriticalError_WithException_ShouldSetValidationErrors()
   {
     // Arrange
-    var validationError = new ValidationError("TestIdentifier", "Test error message");
+    var exception = new InvalidOperationException("Test error message");
 
     // Act
-    var result = CustomArdalisResultFactory.CriticalError<string>(validationError);
+    var result = CustomArdalisResultFactory.CriticalError<string>(exception);
 
     // Assert
     result.ValidationErrors.Count().ShouldBe(1);
-    result.ValidationErrors.First().Identifier.ShouldBe("TestIdentifier");
+    result.ValidationErrors.First().Identifier.ShouldBe("InvalidOperationException");
     result.ValidationErrors.First().ErrorMessage.ShouldBe("Test error message");
-  }
-
-  [Fact]
-  public void CriticalError_WithMultipleValidationErrors_ShouldCreateResultWithCriticalErrorStatus()
-  {
-    // Arrange
-    var validationErrors = new[]
-    {
-      new ValidationError("Error1", "First error"),
-      new ValidationError("Error2", "Second error"),
-      new ValidationError("Error3", "Third error")
-    };
-
-    // Act
-    var result = CustomArdalisResultFactory.CriticalError<string>(validationErrors);
-
-    // Assert
-    result.ShouldNotBeNull();
-    result.Status.ShouldBe(ResultStatus.CriticalError);
-    result.IsSuccess.ShouldBeFalse();
-  }
-
-  [Fact]
-  public void CriticalError_WithMultipleValidationErrors_ShouldSetAllValidationErrors()
-  {
-    // Arrange
-    var validationErrors = new[]
-    {
-      new ValidationError("Error1", "First error"),
-      new ValidationError("Error2", "Second error"),
-      new ValidationError("Error3", "Third error")
-    };
-
-    // Act
-    var result = CustomArdalisResultFactory.CriticalError<string>(validationErrors);
-
-    // Assert
-    result.ValidationErrors.Count().ShouldBe(3);
-    result.ValidationErrors.Any(e => e.Identifier == "Error1" && e.ErrorMessage == "First error").ShouldBeTrue();
-    result.ValidationErrors.Any(e => e.Identifier == "Error2" && e.ErrorMessage == "Second error").ShouldBeTrue();
-    result.ValidationErrors.Any(e => e.Identifier == "Error3" && e.ErrorMessage == "Third error").ShouldBeTrue();
   }
 
   [Fact]
   public void CriticalError_WithDifferentGenericTypes_ShouldWorkForString()
   {
     // Arrange
-    var validationError = new ValidationError("TestError", "Test message");
+    var exception = new Exception("Test message");
 
     // Act
-    var result = CustomArdalisResultFactory.CriticalError<string>(validationError);
+    var result = CustomArdalisResultFactory.CriticalError<string>(exception);
 
     // Assert
     result.ShouldBeOfType<Result<string>>();
@@ -98,10 +57,10 @@ public class CustomArdalisResultFactoryTests
   public void CriticalError_WithDifferentGenericTypes_ShouldWorkForInt()
   {
     // Arrange
-    var validationError = new ValidationError("TestError", "Test message");
+    var exception = new Exception("Test message");
 
     // Act
-    var result = CustomArdalisResultFactory.CriticalError<int>(validationError);
+    var result = CustomArdalisResultFactory.CriticalError<int>(exception);
 
     // Assert
     result.ShouldBeOfType<Result<int>>();
@@ -112,10 +71,10 @@ public class CustomArdalisResultFactoryTests
   public void CriticalError_WithDifferentGenericTypes_ShouldWorkForComplexType()
   {
     // Arrange
-    var validationError = new ValidationError("TestError", "Test message");
+    var exception = new Exception("Test message");
 
     // Act
-    var result = CustomArdalisResultFactory.CriticalError<TestComplexType>(validationError);
+    var result = CustomArdalisResultFactory.CriticalError<TestComplexType>(exception);
 
     // Assert
     result.ShouldBeOfType<Result<TestComplexType>>();
@@ -126,10 +85,10 @@ public class CustomArdalisResultFactoryTests
   public void CriticalError_ResultValue_ShouldBeDefault()
   {
     // Arrange
-    var validationError = new ValidationError("TestError", "Test message");
+    var exception = new Exception("Test message");
 
     // Act
-    var result = CustomArdalisResultFactory.CriticalError<string>(validationError);
+    var result = CustomArdalisResultFactory.CriticalError<string>(exception);
 
     // Assert
     result.Value.ShouldBeNull();
@@ -139,10 +98,10 @@ public class CustomArdalisResultFactoryTests
   public void CriticalError_ShouldBeCompatibleWithArdalisResultType()
   {
     // Arrange
-    var validationError = new ValidationError("TestError", "Test message");
+    var exception = new Exception("Test message");
 
     // Act
-    var result = CustomArdalisResultFactory.CriticalError<string>(validationError);
+    var result = CustomArdalisResultFactory.CriticalError<string>(exception);
 
     // Assert - Should be assignable to Ardalis.Result.Result<T>
     Result<string> ardalisResult = result;
@@ -150,19 +109,114 @@ public class CustomArdalisResultFactoryTests
     ardalisResult.Status.ShouldBe(ResultStatus.CriticalError);
   }
 
-  /// <summary>
-  /// This test verifies that the reflection-based approach can access the protected constructor.
-  /// If this test fails after a library upgrade, it indicates that Ardalis.Result has changed
-  /// its internal structure and CustomArdalisResultFactory needs to be updated.
-  /// </summary>
   [Fact]
   public void CriticalError_ReflectionAccessToProtectedConstructor_ShouldSucceed()
   {
     // Arrange
-    var validationError = new ValidationError("ReflectionTest", "Testing reflection access");
+    var exception = new Exception("Testing reflection access");
 
     // Act & Assert
-    Should.NotThrow(() => CustomArdalisResultFactory.CriticalError<string>(validationError));
+    Should.NotThrow(() => CustomArdalisResultFactory.CriticalError<string>(exception));
+  }
+
+  [Fact]
+  public void Conflict_WithException_ShouldCreateResultWithConflictStatus()
+  {
+    // Arrange
+    var exception = new InvalidOperationException("Conflict occurred");
+
+    // Act
+    var result = CustomArdalisResultFactory.Conflict<string>(exception);
+
+    // Assert
+    result.ShouldNotBeNull();
+    result.Status.ShouldBe(ResultStatus.Conflict);
+    result.IsSuccess.ShouldBeFalse();
+  }
+
+  [Fact]
+  public void Conflict_WithException_ShouldSetValidationErrors()
+  {
+    // Arrange
+    var exception = new InvalidOperationException("Conflict message");
+
+    // Act
+    var result = CustomArdalisResultFactory.Conflict<string>(exception);
+
+    // Assert
+    result.ValidationErrors.Count().ShouldBe(1);
+    result.ValidationErrors.First().Identifier.ShouldBe("InvalidOperationException");
+    result.ValidationErrors.First().ErrorMessage.ShouldBe("Conflict message");
+  }
+
+  [Fact]
+  public void Conflict_WithDifferentGenericTypes_ShouldWorkForString()
+  {
+    // Arrange
+    var exception = new Exception("Conflict");
+
+    // Act
+    var result = CustomArdalisResultFactory.Conflict<string>(exception);
+
+    // Assert
+    result.ShouldBeOfType<Result<string>>();
+    result.Status.ShouldBe(ResultStatus.Conflict);
+  }
+
+  [Fact]
+  public void Conflict_WithDifferentGenericTypes_ShouldWorkForInt()
+  {
+    // Arrange
+    var exception = new Exception("Conflict");
+
+    // Act
+    var result = CustomArdalisResultFactory.Conflict<int>(exception);
+
+    // Assert
+    result.ShouldBeOfType<Result<int>>();
+    result.Status.ShouldBe(ResultStatus.Conflict);
+  }
+
+  [Fact]
+  public void Conflict_WithDifferentGenericTypes_ShouldWorkForComplexType()
+  {
+    // Arrange
+    var exception = new Exception("Conflict");
+
+    // Act
+    var result = CustomArdalisResultFactory.Conflict<TestComplexType>(exception);
+
+    // Assert
+    result.ShouldBeOfType<Result<TestComplexType>>();
+    result.Status.ShouldBe(ResultStatus.Conflict);
+  }
+
+  [Fact]
+  public void Conflict_ResultValue_ShouldBeDefault()
+  {
+    // Arrange
+    var exception = new Exception("Conflict");
+
+    // Act
+    var result = CustomArdalisResultFactory.Conflict<string>(exception);
+
+    // Assert
+    result.Value.ShouldBeNull();
+  }
+
+  [Fact]
+  public void Conflict_ShouldBeCompatibleWithArdalisResultType()
+  {
+    // Arrange
+    var exception = new Exception("Conflict");
+
+    // Act
+    var result = CustomArdalisResultFactory.Conflict<string>(exception);
+
+    // Assert - Should be assignable to Ardalis.Result.Result<T>
+    Result<string> ardalisResult = result;
+    ardalisResult.ShouldNotBeNull();
+    ardalisResult.Status.ShouldBe(ResultStatus.Conflict);
   }
 
   /// <summary>
@@ -197,25 +251,6 @@ public class CustomArdalisResultFactoryTests
     // Act & Assert - Verify ValidationErrors property has a protected setter
     var setter = validationErrorsProp.GetSetMethod(nonPublic: true);
     setter.ShouldNotBeNull("Ardalis.Result.Result<T>.ValidationErrors must have a protected setter");
-  }
-
-  /// <summary>
-  /// This test ensures that if reflection fails, it throws a clear InvalidOperationException
-  /// rather than a generic NullReferenceException or similar.
-  /// </summary>
-  [Fact]
-  public void CriticalError_WithEmptyValidationErrorArray_ShouldStillWork()
-  {
-    // Arrange
-    var validationErrors = Array.Empty<ValidationError>();
-
-    // Act
-    var result = CustomArdalisResultFactory.CriticalError<string>(validationErrors);
-
-    // Assert
-    result.ShouldNotBeNull();
-    result.Status.ShouldBe(ResultStatus.CriticalError);
-    result.ValidationErrors.ShouldBeEmpty();
   }
 
   private class TestComplexType

@@ -79,11 +79,18 @@ public static class ResultExtensions
         await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
         break;
       case ResultStatus.Conflict:
-        foreach (var error in result.Errors)
+        if (result.ValidationErrors.Any())
         {
-          ep.ValidationFailures.Add(new(nameof(ResultStatus.Conflict), error));
+          foreach (var error in result.ValidationErrors)
+          {
+            ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
+          }
+          await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status409Conflict, cancellation: cancellationToken);
         }
-        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status409Conflict, cancellation: cancellationToken);
+        else
+        {
+          await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("error", string.Join(";", result.Errors)) }, statusCode: StatusCodes.Status409Conflict, cancellation: cancellationToken);
+        }
         break;
       case ResultStatus.Error:
         await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("error", string.Join(";", result.Errors)) }, cancellation: cancellationToken);
