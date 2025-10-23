@@ -4,7 +4,7 @@ using Server.Core.UserAggregate;
 
 namespace Server.UseCases.Users.Register;
 
-public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Result<User>>
+public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
 {
   private readonly IRepository<User> _repository;
   private readonly IPasswordHasher _passwordHasher;

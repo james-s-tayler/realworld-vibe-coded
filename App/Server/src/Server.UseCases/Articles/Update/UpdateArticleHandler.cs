@@ -4,7 +4,7 @@ using Server.Core.ArticleAggregate.Specifications;
 namespace Server.UseCases.Articles.Update;
 
 public class UpdateArticleHandler(IRepository<Article> _articleRepository)
-  : ICommandHandler<UpdateArticleCommand, Result<Article>>
+  : ICommandHandler<UpdateArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(UpdateArticleCommand request, CancellationToken cancellationToken)
   {

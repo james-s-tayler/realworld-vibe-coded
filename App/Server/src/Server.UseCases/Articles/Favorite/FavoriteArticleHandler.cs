@@ -5,7 +5,7 @@ using Server.Core.UserAggregate;
 namespace Server.UseCases.Articles.Favorite;
 
 public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
-  : ICommandHandler<FavoriteArticleCommand, Result<Article>>
+  : ICommandHandler<FavoriteArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(FavoriteArticleCommand request, CancellationToken cancellationToken)
   {

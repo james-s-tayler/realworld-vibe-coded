@@ -2,7 +2,7 @@
 
 namespace Server.UseCases.ErrorTest;
 
-public class ThrowConcurrencyHandler : IQueryHandler<ThrowConcurrencyQuery, Result<string>>
+public class ThrowConcurrencyHandler : IQueryHandler<ThrowConcurrencyQuery, string>
 {
   public Task<Result<string>> Handle(ThrowConcurrencyQuery request, CancellationToken cancellationToken)
   {

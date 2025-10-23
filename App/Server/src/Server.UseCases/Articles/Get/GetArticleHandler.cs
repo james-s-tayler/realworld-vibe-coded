@@ -4,7 +4,7 @@ using Server.Core.ArticleAggregate.Specifications;
 namespace Server.UseCases.Articles.Get;
 
 public class GetArticleHandler(IRepository<Article> _articleRepository)
-  : IQueryHandler<GetArticleQuery, Result<Article>>
+  : IQueryHandler<GetArticleQuery, Article>
 {
   public async Task<Result<Article>> Handle(GetArticleQuery request, CancellationToken cancellationToken)
   {

@@ -4,7 +4,7 @@ using Server.Core.UserAggregate.Specifications;
 namespace Server.UseCases.Profiles.Follow;
 
 public class FollowUserHandler(IRepository<User> _userRepository)
-  : ICommandHandler<FollowUserCommand, Result<User>>
+  : ICommandHandler<FollowUserCommand, User>
 {
   public async Task<Result<User>> Handle(FollowUserCommand request, CancellationToken cancellationToken)
   {

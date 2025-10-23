@@ -4,7 +4,7 @@ using Server.Core.UserAggregate.Specifications;
 namespace Server.UseCases.Profiles.Unfollow;
 
 public class UnfollowUserHandler(IRepository<User> _userRepository)
-  : ICommandHandler<UnfollowUserCommand, Result<User>>
+  : ICommandHandler<UnfollowUserCommand, User>
 {
   public async Task<Result<User>> Handle(UnfollowUserCommand request, CancellationToken cancellationToken)
   {

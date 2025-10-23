@@ -4,7 +4,7 @@ using Server.Core.Interfaces;
 namespace Server.UseCases.Articles.List;
 
 public class ListArticlesHandler(IListArticlesQueryService _query)
-  : IQueryHandler<ListArticlesQuery, Result<IEnumerable<Article>>>
+  : IQueryHandler<ListArticlesQuery, IEnumerable<Article>>
 {
   public async Task<Result<IEnumerable<Article>>> Handle(ListArticlesQuery request, CancellationToken cancellationToken)
   {

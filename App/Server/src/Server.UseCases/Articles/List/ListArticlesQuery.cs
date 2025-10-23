@@ -9,4 +9,4 @@ public record ListArticlesQuery(
   int Limit = 20,
   int Offset = 0,
   int? CurrentUserId = null
-) : IQuery<Result<IEnumerable<Article>>>;
+) : IQuery<IEnumerable<Article>>;

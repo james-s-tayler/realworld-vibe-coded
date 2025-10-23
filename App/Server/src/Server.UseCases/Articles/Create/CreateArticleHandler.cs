@@ -8,7 +8,7 @@ public class CreateArticleHandler(
   IRepository<User> _userRepository,
   IRepository<Article> _articleRepository,
   IRepository<Tag> _tagRepository)
-  : ICommandHandler<CreateArticleCommand, Result<Article>>
+  : ICommandHandler<CreateArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
   {

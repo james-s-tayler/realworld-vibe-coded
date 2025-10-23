@@ -1,6 +1,6 @@
 ﻿namespace Server.UseCases.ErrorTest;
 
-public class ThrowInUseCaseHandler : IQueryHandler<ThrowInUseCaseQuery, Result<string>>
+public class ThrowInUseCaseHandler : IQueryHandler<ThrowInUseCaseQuery, string>
 {
   public Task<Result<string>> Handle(ThrowInUseCaseQuery request, CancellationToken cancellationToken)
   {

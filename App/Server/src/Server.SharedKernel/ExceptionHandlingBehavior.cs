@@ -1,5 +1,4 @@
-﻿using Ardalis.Result;
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -8,6 +7,8 @@ namespace Server.SharedKernel;
 /// <summary>
 /// MediatR pipeline behavior that catches exceptions during request handling
 /// and transforms them into Result.CriticalError with ProblemDetails format.
+/// This behavior uses IResultRequest{T} to obtain the inner type T from the request interface
+/// rather than using reflection on the Result{T} response type.
 /// </summary>
 /// <typeparam name="TRequest">The request type</typeparam>
 /// <typeparam name="TResponse">The response type</typeparam>
@@ -42,25 +43,30 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
 
   private TResponse CreateResultFromException(Exception exception, string factoryMethodName)
   {
-    var resultType = typeof(TResponse);
-    var customArdalisResultFactory = typeof(CustomArdalisResultFactory);
+    // Check if TRequest implements IResultRequest<T> to get inner type from the request interface
+    // This is the key improvement: we get the type from the REQUEST interface (which we control)
+    // rather than from the RESPONSE type Result<T> (from the Ardalis library)
+    var resultRequestInterface = typeof(TRequest).GetInterfaces()
+      .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IResultRequest<>));
 
-    // Check if this is a generic Result<T>
-    if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Result<>))
+    if (resultRequestInterface != null)
     {
-      // Use reflection to call the generic factory method
-      var valueType = resultType.GetGenericArguments()[0];
+      // Extract the inner type T from IResultRequest<T>
+      var innerType = resultRequestInterface.GetGenericArguments()[0];
 
-      // Get the generic factory method - invariant: this method must exist
-      var method = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+      // Call the generic factory method with the inner type
+      // Note: We still use reflection to invoke the generic method, but the key improvement
+      // is that we obtained the type from the request interface, not from Result<T>
+      var method = typeof(CustomArdalisResultFactory)
+        .GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
         .First(m => m.Name == factoryMethodName && m.IsGenericMethodDefinition);
 
-      var genericMethod = method.MakeGenericMethod(valueType);
+      var genericMethod = method.MakeGenericMethod(innerType);
       var result = genericMethod.Invoke(null, new object[] { exception });
       return (TResponse)result!;
     }
 
-    // If not a Result<T> type, rethrow the exception
+    // If not a IResultRequest<T> type, rethrow the exception
     throw exception;
   }
 }

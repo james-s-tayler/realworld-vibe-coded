@@ -3,7 +3,7 @@ using Server.Core.UserAggregate;
 
 namespace Server.UseCases.Users.GetCurrent;
 
-public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, Result<User>>
+public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
 {
   private readonly IRepository<User> _repository;
   private readonly ILogger<GetCurrentUserHandler> _logger;

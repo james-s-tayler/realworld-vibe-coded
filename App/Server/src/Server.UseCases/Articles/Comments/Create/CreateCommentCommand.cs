@@ -7,4 +7,4 @@ public record CreateCommentCommand(
   string Body,
   int AuthorId,
   int? CurrentUserId = null
-) : IRequest<Result<CommentResponse>>;
+) : ICommand<CommentResponse>;

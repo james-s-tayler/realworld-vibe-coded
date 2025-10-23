@@ -5,4 +5,4 @@ namespace Server.UseCases.Profiles.Unfollow;
 public record UnfollowUserCommand(
   string Username,
   int CurrentUserId
-) : ICommand<Result<User>>;
+) : ICommand<User>;

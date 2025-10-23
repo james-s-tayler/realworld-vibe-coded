@@ -4,7 +4,7 @@ using Server.Core.ArticleAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Comments.Delete;
 
-public class DeleteCommentHandler : IRequestHandler<DeleteCommentCommand, Result<Unit>>
+public class DeleteCommentHandler : ICommandHandler<DeleteCommentCommand, Unit>
 {
   private readonly IRepository<Article> _articleRepository;
   private readonly ILogger<DeleteCommentHandler> _logger;

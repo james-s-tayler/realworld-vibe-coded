@@ -7,7 +7,7 @@ using Server.Core.UserAggregate.Specifications;
 
 namespace Server.UseCases.Articles.Comments.Create;
 
-public class CreateCommentHandler : IRequestHandler<CreateCommentCommand, Result<CommentResponse>>
+public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, CommentResponse>
 {
   private readonly IRepository<Article> _articleRepository;
   private readonly IRepository<User> _userRepository;

@@ -6,4 +6,4 @@ public record UnfavoriteArticleCommand(
   string Slug,
   int UserId,
   int CurrentUserId
-) : ICommand<Result<Article>>;
+) : ICommand<Article>;
