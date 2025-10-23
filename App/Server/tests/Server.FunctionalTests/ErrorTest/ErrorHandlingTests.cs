@@ -12,6 +12,9 @@ public class ErrorHandlingTests(ErrorTestFixture App)
   [InlineData("/api/error-test/validation-error-endpoint", 400, 1, "field2", "This is a test validation error for field2")]
   [InlineData("/api/error-test/throw-in-use-case", 500, 0, "invalidOperationException", "This is a test exception thrown in the use case")]
   [InlineData("/api/error-test/throw-in-endpoint", 500, 0, "invalidOperationException", "This is a test exception thrown in the endpoint")]
+  [InlineData("/api/error-test/throw-concurrency", 409, 0, "dbUpdateConcurrencyException", "Test concurrency conflict")]
+  [InlineData("/api/error-test/throw-in-use-case-non-generic", 500, 0, "invalidOperationException", "Test exception for non-generic Result")]
+  [InlineData("/api/error-test/throw-concurrency-non-generic", 409, 0, "dbUpdateConcurrencyException", "Test concurrency conflict for non-generic Result")]
   [Theory]
   public async Task AllErrorTypes_UseSameFormat(string route, int statusCode, int errorIndex, string name, string reason)
   {
