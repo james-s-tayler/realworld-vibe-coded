@@ -18,6 +18,7 @@ public static class MediatrConfigs
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>))
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>))
             .AddScoped(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>))
+            .AddScoped(typeof(IExceptionResultFactory<>), typeof(ExceptionResultFactory<>))
             .AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
 
     return services;

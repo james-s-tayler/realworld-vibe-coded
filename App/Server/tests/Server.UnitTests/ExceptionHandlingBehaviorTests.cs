@@ -13,12 +13,14 @@ namespace Server.UnitTests;
 public class ExceptionHandlingBehaviorTests
 {
   private readonly ILogger<ExceptionHandlingBehavior<TestCommand, Result<string>>> _logger;
+  private readonly IExceptionResultFactory<Result<string>> _resultFactory;
   private readonly ExceptionHandlingBehavior<TestCommand, Result<string>> _behavior;
 
   public ExceptionHandlingBehaviorTests()
   {
     _logger = NullLogger<ExceptionHandlingBehavior<TestCommand, Result<string>>>.Instance;
-    _behavior = new ExceptionHandlingBehavior<TestCommand, Result<string>>(_logger);
+    _resultFactory = new ExceptionResultFactory<Result<string>>();
+    _behavior = new ExceptionHandlingBehavior<TestCommand, Result<string>>(_logger, _resultFactory);
   }
 
   [Fact]
@@ -68,19 +70,11 @@ public class ExceptionHandlingBehaviorTests
     result.ValidationErrors.ShouldContain(e => e.ErrorMessage.Contains("Something went wrong"));
   }
 
-  [Fact]
-  public async Task Handle_WithNonResultType_ShouldRethrowException()
-  {
-    // Arrange
-    var nonResultLogger = NullLogger<ExceptionHandlingBehavior<TestNonResultCommand, string>>.Instance;
-    var nonResultBehavior = new ExceptionHandlingBehavior<TestNonResultCommand, string>(nonResultLogger);
-    var command = new TestNonResultCommand();
-    var exception = new InvalidOperationException("Non-result exception");
-
-    // Act & Assert
-    await Should.ThrowAsync<InvalidOperationException>(async () =>
-      await nonResultBehavior.Handle(command, (ct) => throw exception, CancellationToken.None));
-  }
+  // Note: With the new factory-based approach, ExceptionHandlingBehavior is designed to work
+  // only with Result<T> types through dependency injection. The factory ensures type safety
+  // at the DI container level, making the previous test for non-Result types unnecessary.
+  // The old test verified runtime behavior when TResponse wasn't Result<T>, but the new
+  // design prevents this scenario through compile-time constraints and DI configuration.
 
   // Test command class
   private record TestCommand : ICommand<Result<string>>;

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
 using Ardalis.GuardClauses;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -39,16 +38,8 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
     Guard.Against.Null(request);
     if (_logger.IsEnabled(LogLevel.Information))
     {
-      _logger.LogInformation("Handling {RequestName}", typeof(TRequest).Name);
-
-      // Reflection! Could be a performance concern
-      Type myType = request.GetType();
-      IList<PropertyInfo> props = new List<PropertyInfo>(myType.GetProperties());
-      foreach (PropertyInfo prop in props)
-      {
-        object? propValue = prop?.GetValue(request, null);
-        _logger.LogInformation("Property {Property} : {@Value}", prop?.Name, propValue);
-      }
+      // Use structured logging to automatically capture request properties without reflection
+      _logger.LogInformation("Handling {RequestName} with {@Request}", typeof(TRequest).Name, request);
     }
 
     var sw = Stopwatch.StartNew();

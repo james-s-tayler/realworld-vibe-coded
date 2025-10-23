@@ -55,13 +55,8 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
 
   private static bool IsCommand(TRequest request)
   {
-    // Check if request implements ICommand<>
-    var requestType = request.GetType();
-    var interfaces = requestType.GetInterfaces();
-
-    return interfaces.Any(i =>
-      i.IsGenericType &&
-      i.GetGenericTypeDefinition() == typeof(ICommand<>));
+    // Check if request implements ICommand<> using pattern matching instead of reflection
+    return request is ICommand<TResponse>;
   }
 
   private static bool IsSuccessResult(TResponse response)
@@ -71,17 +66,12 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
       return false;
     }
 
-    var responseType = response.GetType();
-
-    // Check if response is Result<T>
-    if (responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(Result<>))
+    // Check if response is IResult and has a successful status
+    // Result<T> implements IResult and exposes Status property
+    if (response is Ardalis.Result.IResult result)
     {
-      var isSuccessProperty = responseType.GetProperty(nameof(Result<object>.IsSuccess));
-      if (isSuccessProperty != null)
-      {
-        var isSuccess = (bool?)isSuccessProperty.GetValue(response);
-        return isSuccess == true;
-      }
+      // Success includes Ok, NoContent, and Created statuses
+      return result.Status is ResultStatus.Ok or ResultStatus.NoContent or ResultStatus.Created;
     }
 
     return true; // Default to true for non-Result responses
