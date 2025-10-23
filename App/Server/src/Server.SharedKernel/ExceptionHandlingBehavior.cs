@@ -31,51 +31,53 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
     {
       _logger.LogWarning(ex, "Concurrency conflict occurred while processing {RequestName}", typeof(TRequest).Name);
 
-      // Create a Conflict result for concurrency exceptions
+      // Only handle Result<T> types, rethrow for non-Result types
       var resultType = typeof(TResponse);
-      if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Ardalis.Result.Result<>))
+      if (!resultType.IsGenericType || resultType.GetGenericTypeDefinition() != typeof(Ardalis.Result.Result<>))
       {
-        var valueType = resultType.GetGenericArguments()[0];
-        var result = Activator.CreateInstance(
-          typeof(Ardalis.Result.Result<>).MakeGenericType(valueType),
-          System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
-          null,
-          new object[] { ResultStatus.Conflict },
-          null
-        )!;
-
-        // Set the error message via the Errors property
-        var errorsProp = result.GetType().GetProperty(nameof(Result<object>.Errors))!;
-        var errorMessage = "A concurrency conflict occurred. The data has been modified by another process.";
-        errorsProp.SetValue(result, new[] { errorMessage });
-
-        return (TResponse)result;
+        throw;
       }
 
-      // Fallback for non-generic Result types
-      throw;
+      // Create a Conflict result for concurrency exceptions
+      var valueType = resultType.GetGenericArguments()[0];
+      var result = Activator.CreateInstance(
+        typeof(Ardalis.Result.Result<>).MakeGenericType(valueType),
+        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
+        null,
+        new object[] { ResultStatus.Conflict },
+        null
+      )!;
+
+      // Set the error message via the Errors property
+      var errorsProp = result.GetType().GetProperty(nameof(Result<object>.Errors))!;
+      var errorMessage = "A concurrency conflict occurred. The data has been modified by another process.";
+      errorsProp.SetValue(result, new[] { errorMessage });
+
+      return (TResponse)result;
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "An unhandled exception occurred while processing {RequestName}", typeof(TRequest).Name);
 
-      // Create a CriticalError result with validation errors
+      // Only handle Result<T> types, rethrow for non-Result types
       var resultType = typeof(TResponse);
-      if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Ardalis.Result.Result<>))
+      if (!resultType.IsGenericType || resultType.GetGenericTypeDefinition() != typeof(Ardalis.Result.Result<>))
       {
-        // Create validation error from the exception
-        var validationError = new ValidationError(ex.GetType().Name, ex.Message);
+        throw;
+      }
 
-        var valueType = resultType.GetGenericArguments()[0];
-        var helperType = typeof(CustomArdalisResultFactory);
-        var criticalErrorMethod = helperType.GetMethod(nameof(CustomArdalisResultFactory.CriticalError), new[] { typeof(ValidationError) });
+      // Create a CriticalError result with validation errors
+      var validationError = new ValidationError(ex.GetType().Name, ex.Message);
 
-        if (criticalErrorMethod != null)
-        {
-          var genericMethod = criticalErrorMethod.MakeGenericMethod(valueType);
-          var result = genericMethod.Invoke(null, new object[] { validationError });
-          return (TResponse)result!;
-        }
+      var valueType = resultType.GetGenericArguments()[0];
+      var helperType = typeof(CustomArdalisResultFactory);
+      var criticalErrorMethod = helperType.GetMethod(nameof(CustomArdalisResultFactory.CriticalError), new[] { typeof(ValidationError) });
+
+      if (criticalErrorMethod != null)
+      {
+        var genericMethod = criticalErrorMethod.MakeGenericMethod(valueType);
+        var result = genericMethod.Invoke(null, new object[] { validationError });
+        return (TResponse)result!;
       }
 
       // Fallback for non-generic Result types

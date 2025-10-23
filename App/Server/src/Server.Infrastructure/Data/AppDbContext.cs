@@ -21,7 +21,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
     // Configure ChangeCheck property for all entities inheriting from EntityBase
     foreach (var entityType in modelBuilder.Model.GetEntityTypes())
     {
-      if (typeof(HasDomainEventsBase).IsAssignableFrom(entityType.ClrType))
+      // Check if the entity inherits from any of the EntityBase variants
+      if (typeof(EntityBase).IsAssignableFrom(entityType.ClrType) ||
+          (entityType.ClrType.BaseType?.IsGenericType == true &&
+           entityType.ClrType.BaseType.GetGenericTypeDefinition().Name.StartsWith("EntityBase")))
       {
         var property = entityType.FindProperty("ChangeCheck");
         if (property != null)
