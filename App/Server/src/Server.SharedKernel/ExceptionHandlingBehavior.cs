@@ -59,18 +59,8 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
       var result = genericMethod.Invoke(null, new object[] { exception });
       return (TResponse)result!;
     }
-    // Check if this is a non-generic Result
-    else if (resultType == typeof(Result))
-    {
-      // Get the non-generic factory method - invariant: this method must exist
-      var method = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
-        .First(m => m.Name == factoryMethodName && !m.IsGenericMethodDefinition && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(Exception));
 
-      var result = method.Invoke(null, new object[] { exception });
-      return (TResponse)result!;
-    }
-
-    // If not a Result type, rethrow the exception
+    // If not a Result<T> type, rethrow the exception
     throw exception;
   }
 }
