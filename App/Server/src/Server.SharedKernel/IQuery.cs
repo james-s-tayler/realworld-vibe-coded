@@ -1,11 +1,15 @@
-﻿using MediatR;
+﻿using Ardalis.Result;
+using MediatR;
 
 namespace Server.SharedKernel;
 
 /// <summary>
+/// Marker interface for all queries.
+/// Queries must return either Result or Result&lt;T&gt; to ensure consistent error handling.
 /// Source: https://code-maze.com/cqrs-mediatr-fluentvalidation/
 /// </summary>
-/// <typeparam name="TResponse"></typeparam>
+/// <typeparam name="TResponse">Must be either Result or Result&lt;T&gt;</typeparam>
 public interface IQuery<out TResponse> : IRequest<TResponse>
+  where TResponse : IResult
 {
 }

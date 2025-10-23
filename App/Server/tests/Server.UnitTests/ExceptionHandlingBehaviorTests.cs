@@ -69,22 +69,44 @@ public class ExceptionHandlingBehaviorTests
   }
 
   [Fact]
-  public async Task Handle_WithNonResultType_ShouldRethrowException()
+  public async Task Handle_WithNonGenericResult_WithGenericException_ShouldReturnCriticalErrorResult()
   {
     // Arrange
-    var nonResultLogger = NullLogger<ExceptionHandlingBehavior<TestNonResultCommand, string>>.Instance;
-    var nonResultBehavior = new ExceptionHandlingBehavior<TestNonResultCommand, string>(nonResultLogger);
-    var command = new TestNonResultCommand();
-    var exception = new InvalidOperationException("Non-result exception");
+    var logger = NullLogger<ExceptionHandlingBehavior<TestNonGenericCommand, Result>>.Instance;
+    var behavior = new ExceptionHandlingBehavior<TestNonGenericCommand, Result>(logger);
+    var command = new TestNonGenericCommand();
+    var exception = new InvalidOperationException("Something went wrong");
 
-    // Act & Assert
-    await Should.ThrowAsync<InvalidOperationException>(async () =>
-      await nonResultBehavior.Handle(command, (ct) => throw exception, CancellationToken.None));
+    // Act
+    var result = await behavior.Handle(command, (ct) => throw exception, CancellationToken.None);
+
+    // Assert
+    result.IsSuccess.ShouldBeFalse();
+    result.Status.ShouldBe(ResultStatus.CriticalError);
+    result.ValidationErrors.ShouldContain(e => e.ErrorMessage.Contains("Something went wrong"));
+  }
+
+  [Fact]
+  public async Task Handle_WithNonGenericResult_WithDbUpdateConcurrencyException_ShouldReturnConflictResult()
+  {
+    // Arrange
+    var logger = NullLogger<ExceptionHandlingBehavior<TestNonGenericCommand, Result>>.Instance;
+    var behavior = new ExceptionHandlingBehavior<TestNonGenericCommand, Result>(logger);
+    var command = new TestNonGenericCommand();
+    var concurrencyException = new DbUpdateConcurrencyException("Concurrency conflict");
+
+    // Act
+    var result = await behavior.Handle(command, (ct) => throw concurrencyException, CancellationToken.None);
+
+    // Assert
+    result.IsSuccess.ShouldBeFalse();
+    result.Status.ShouldBe(ResultStatus.Conflict);
+    result.ValidationErrors.ShouldContain(e => e.ErrorMessage.Contains("Concurrency conflict"));
   }
 
   // Test command class
   private record TestCommand : ICommand<Result<string>>;
 
-  // Test command with non-Result response type
-  private record TestNonResultCommand : ICommand<string>;
+  // Test command with non-generic Result response type
+  private record TestNonGenericCommand : ICommand<Result>;
 }
