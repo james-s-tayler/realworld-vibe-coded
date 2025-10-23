@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Server.SharedKernel;
@@ -25,6 +26,34 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
     try
     {
       return await next();
+    }
+    catch (DbUpdateConcurrencyException ex)
+    {
+      _logger.LogWarning(ex, "Concurrency conflict occurred while processing {RequestName}", typeof(TRequest).Name);
+
+      // Create a Conflict result for concurrency exceptions
+      var resultType = typeof(TResponse);
+      if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Ardalis.Result.Result<>))
+      {
+        var valueType = resultType.GetGenericArguments()[0];
+        var result = Activator.CreateInstance(
+          typeof(Ardalis.Result.Result<>).MakeGenericType(valueType),
+          System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
+          null,
+          new object[] { ResultStatus.Conflict },
+          null
+        )!;
+
+        // Set the error message via the Errors property
+        var errorsProp = result.GetType().GetProperty(nameof(Result<object>.Errors))!;
+        var errorMessage = "A concurrency conflict occurred. The data has been modified by another process.";
+        errorsProp.SetValue(result, new[] { errorMessage });
+
+        return (TResponse)result;
+      }
+
+      // Fallback for non-generic Result types
+      throw;
     }
     catch (Exception ex)
     {

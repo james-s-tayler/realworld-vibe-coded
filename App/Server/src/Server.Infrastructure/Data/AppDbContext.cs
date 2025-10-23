@@ -17,6 +17,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
   {
     base.OnModelCreating(modelBuilder);
     modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+    // Configure ChangeCheck property for all entities inheriting from EntityBase
+    foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+    {
+      if (typeof(HasDomainEventsBase).IsAssignableFrom(entityType.ClrType))
+      {
+        var property = entityType.FindProperty("ChangeCheck");
+        if (property != null)
+        {
+          modelBuilder.Entity(entityType.ClrType)
+            .Property("ChangeCheck")
+            .IsRowVersion();
+        }
+      }
+    }
   }
 
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
