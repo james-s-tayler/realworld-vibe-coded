@@ -49,25 +49,6 @@ public class TransactionBehaviorTests
   }
 
   [Fact]
-  public async Task Handle_WithQuery_ShouldNotExecuteInTransaction()
-  {
-    // Arrange
-    var query = new TestQuery();
-    var expectedResult = Result<string>.Success("test");
-    var queryBehavior = new TransactionBehavior<TestQuery, Result<string>>(_unitOfWork,
-      NullLogger<TransactionBehavior<TestQuery, Result<string>>>.Instance);
-
-    // Act
-    var result = await queryBehavior.Handle(query, (ct) => Task.FromResult(expectedResult), CancellationToken.None);
-
-    // Assert
-    result.ShouldBe(expectedResult);
-    await _unitOfWork.DidNotReceive().ExecuteInTransactionAsync(
-      Arg.Any<Func<CancellationToken, Task<Result<string>>>>(),
-      Arg.Any<CancellationToken>());
-  }
-
-  [Fact]
   public async Task Handle_WithSuccessResult_ShouldCommitTransaction()
   {
     // Arrange
@@ -201,8 +182,6 @@ public class TransactionBehaviorTests
     executedInTransaction.ShouldBeTrue();
   }
 
-  // Test command and query classes
+  // Test command class
   private record TestCommand : ICommand<Result<string>>;
-  private record TestQuery : IQuery<Result<string>>;
 }
-

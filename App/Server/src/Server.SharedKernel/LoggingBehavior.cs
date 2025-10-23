@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
 using Ardalis.GuardClauses;
+using Ardalis.Result;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -8,6 +8,7 @@ namespace Server.SharedKernel;
 
 /// <summary>
 /// Adds logging for all requests in MediatR pipeline.
+/// Works with any IRequest but provides enhanced logging for Result&lt;T&gt; responses.
 /// Configure by adding the service with a scoped lifetime
 /// 
 /// Example for Autofac:
@@ -22,8 +23,8 @@ namespace Server.SharedKernel;
 ///   .InstancePerLifetimeScope();
 ///
 /// </summary>
-/// <typeparam name="TRequest"></typeparam>
-/// <typeparam name="TResponse"></typeparam>
+/// <typeparam name="TRequest">The request type</typeparam>
+/// <typeparam name="TResponse">The response type</typeparam>
 public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
   where TRequest : IRequest<TResponse>
 {
@@ -37,26 +38,34 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
   public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
   {
     Guard.Against.Null(request);
+
     if (_logger.IsEnabled(LogLevel.Information))
     {
-      _logger.LogInformation("Handling {RequestName}", typeof(TRequest).Name);
-
-      // Reflection! Could be a performance concern
-      Type myType = request.GetType();
-      IList<PropertyInfo> props = new List<PropertyInfo>(myType.GetProperties());
-      foreach (PropertyInfo prop in props)
-      {
-        object? propValue = prop?.GetValue(request, null);
-        _logger.LogInformation("Property {Property} : {@Value}", prop?.Name, propValue);
-      }
+      _logger.LogInformation("Handling {RequestName}: {@Request}", typeof(TRequest).Name, request);
     }
 
     var sw = Stopwatch.StartNew();
 
     var response = await next();
 
-    _logger.LogInformation("Handled {RequestName} with {Response} in {ms} ms", typeof(TRequest).Name, response, sw.ElapsedMilliseconds);
+    // Check if response is a Result<T> by checking the type
+    var responseType = response?.GetType();
+    if (responseType != null && responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(Result<>))
+    {
+      // Use dynamic to get Status property value, then cast it for logging
+      dynamic resultDynamic = response!;
+      ResultStatus status = resultDynamic.Status;
+      _logger.LogInformation("Handled {RequestName} with {Status} in {ms} ms",
+        typeof(TRequest).Name, status, sw.ElapsedMilliseconds);
+    }
+    else
+    {
+      _logger.LogInformation("Handled {RequestName} in {ms} ms",
+        typeof(TRequest).Name, sw.ElapsedMilliseconds);
+    }
+
     sw.Stop();
+
     return response;
   }
 }
