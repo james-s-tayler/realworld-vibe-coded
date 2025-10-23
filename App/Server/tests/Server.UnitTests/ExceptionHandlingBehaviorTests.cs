@@ -12,13 +12,13 @@ namespace Server.UnitTests;
 /// </summary>
 public class ExceptionHandlingBehaviorTests
 {
-  private readonly ILogger<ExceptionHandlingBehavior<TestCommand, Result<string>>> _logger;
-  private readonly ExceptionHandlingBehavior<TestCommand, Result<string>> _behavior;
+  private readonly ILogger<ExceptionHandlingBehavior<TestCommand, string>> _logger;
+  private readonly ExceptionHandlingBehavior<TestCommand, string> _behavior;
 
   public ExceptionHandlingBehaviorTests()
   {
-    _logger = NullLogger<ExceptionHandlingBehavior<TestCommand, Result<string>>>.Instance;
-    _behavior = new ExceptionHandlingBehavior<TestCommand, Result<string>>(_logger);
+    _logger = NullLogger<ExceptionHandlingBehavior<TestCommand, string>>.Instance;
+    _behavior = new ExceptionHandlingBehavior<TestCommand, string>(_logger);
   }
 
   [Fact]
