@@ -42,23 +42,6 @@ public class ExceptionHandlingBehaviorReflectionInvariantsTests
   }
 
   [Fact]
-  public void CustomArdalisResultFactory_ShouldHaveNonGenericCriticalErrorMethod()
-  {
-    // Arrange & Act
-    var method = _factoryType.GetMethods(BindingFlags.Public | BindingFlags.Static)
-      .FirstOrDefault(m =>
-        m.Name == nameof(CustomArdalisResultFactory.CriticalError) &&
-        !m.IsGenericMethodDefinition &&
-        m.GetParameters().Length == 1 &&
-        m.GetParameters()[0].ParameterType == typeof(Exception));
-
-    // Assert
-    method.ShouldNotBeNull("CustomArdalisResultFactory must have a non-generic CriticalError(Exception) method for ExceptionHandlingBehavior to function correctly.");
-    method.IsGenericMethodDefinition.ShouldBeFalse("Non-generic CriticalError must not be a generic method definition.");
-    method.ReturnType.ShouldBe(typeof(Result), "Non-generic CriticalError must return Result.");
-  }
-
-  [Fact]
   public void CustomArdalisResultFactory_ShouldHaveGenericConflictMethod()
   {
     // Arrange & Act
@@ -79,23 +62,6 @@ public class ExceptionHandlingBehaviorReflectionInvariantsTests
     var returnType = method.ReturnType;
     returnType.IsGenericType.ShouldBeTrue("Conflict<T> must return a generic Result<T>.");
     returnType.GetGenericTypeDefinition().ShouldBe(typeof(Result<>), "Conflict<T> must return Result<T>.");
-  }
-
-  [Fact]
-  public void CustomArdalisResultFactory_ShouldHaveNonGenericConflictMethod()
-  {
-    // Arrange & Act
-    var method = _factoryType.GetMethods(BindingFlags.Public | BindingFlags.Static)
-      .FirstOrDefault(m =>
-        m.Name == nameof(CustomArdalisResultFactory.Conflict) &&
-        !m.IsGenericMethodDefinition &&
-        m.GetParameters().Length == 1 &&
-        m.GetParameters()[0].ParameterType == typeof(Exception));
-
-    // Assert
-    method.ShouldNotBeNull("CustomArdalisResultFactory must have a non-generic Conflict(Exception) method for ExceptionHandlingBehavior to function correctly.");
-    method.IsGenericMethodDefinition.ShouldBeFalse("Non-generic Conflict must not be a generic method definition.");
-    method.ReturnType.ShouldBe(typeof(Result), "Non-generic Conflict must return Result.");
   }
 
   [Fact]
@@ -120,28 +86,6 @@ public class ExceptionHandlingBehaviorReflectionInvariantsTests
   }
 
   [Fact]
-  public void ExceptionHandlingBehavior_CanInvokeNonGenericCriticalErrorMethod()
-  {
-    // Arrange
-    var exception = new InvalidOperationException("Test exception");
-    var method = _factoryType.GetMethods(BindingFlags.Public | BindingFlags.Static)
-      .First(m =>
-        m.Name == nameof(CustomArdalisResultFactory.CriticalError) &&
-        !m.IsGenericMethodDefinition &&
-        m.GetParameters().Length == 1 &&
-        m.GetParameters()[0].ParameterType == typeof(Exception));
-
-    // Act
-    var result = method.Invoke(null, new object[] { exception });
-
-    // Assert
-    result.ShouldNotBeNull("Invoking CriticalError should return a result.");
-    result.ShouldBeOfType<Result>("Result should be of type Result.");
-    var typedResult = (Result)result;
-    typedResult.Status.ShouldBe(ResultStatus.CriticalError, "Result status should be CriticalError.");
-  }
-
-  [Fact]
   public void ExceptionHandlingBehavior_CanInvokeGenericConflictMethod()
   {
     // Arrange
@@ -159,28 +103,6 @@ public class ExceptionHandlingBehaviorReflectionInvariantsTests
     result.ShouldNotBeNull("Invoking Conflict<T> should return a result.");
     result.ShouldBeOfType<Result<string>>("Result should be of type Result<string>.");
     var typedResult = (Result<string>)result;
-    typedResult.Status.ShouldBe(ResultStatus.Conflict, "Result status should be Conflict.");
-  }
-
-  [Fact]
-  public void ExceptionHandlingBehavior_CanInvokeNonGenericConflictMethod()
-  {
-    // Arrange
-    var exception = new InvalidOperationException("Test exception");
-    var method = _factoryType.GetMethods(BindingFlags.Public | BindingFlags.Static)
-      .First(m =>
-        m.Name == nameof(CustomArdalisResultFactory.Conflict) &&
-        !m.IsGenericMethodDefinition &&
-        m.GetParameters().Length == 1 &&
-        m.GetParameters()[0].ParameterType == typeof(Exception));
-
-    // Act
-    var result = method.Invoke(null, new object[] { exception });
-
-    // Assert
-    result.ShouldNotBeNull("Invoking Conflict should return a result.");
-    result.ShouldBeOfType<Result>("Result should be of type Result.");
-    var typedResult = (Result)result;
     typedResult.Status.ShouldBe(ResultStatus.Conflict, "Result status should be Conflict.");
   }
 }

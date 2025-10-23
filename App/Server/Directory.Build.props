@@ -9,4 +9,9 @@
   <PropertyGroup>
     <NoWarn>1591</NoWarn> <!-- Remove this to turn on warnings for missing XML Comments -->
   </PropertyGroup>
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'Server.Analyzers'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)analyzers\Server.Analyzers\Server.Analyzers.csproj" 
+                      OutputItemType="Analyzer" 
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
 </Project>
