@@ -35,6 +35,7 @@ General functionality:
 - Make sure the postman tests are passing before finishing.
 - Do not add any extraneous documentation unless asked to do so.
 - All the nuke targets that run tests produce reports under `Reports` folder. Make sure to check them if any test fails.
+- If you get stuck on an implementation detail related to a particular library use the docs-mcp-server to search for the relevant documentation.
 
 ## Folder Structure
 

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Ardalis.Result;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -29,6 +30,7 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
     catch (DbUpdateConcurrencyException ex)
     {
       _logger.LogWarning(ex, "Concurrency conflict occurred while processing {RequestName}", typeof(TRequest).Name);
+
       return CreateResultFromException(ex, nameof(CustomArdalisResultFactory.Conflict));
     }
     catch (Exception ex)
@@ -41,16 +43,16 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
   private TResponse CreateResultFromException(Exception exception, string factoryMethodName)
   {
     var resultType = typeof(TResponse);
-    var helperType = typeof(CustomArdalisResultFactory);
+    var customArdalisResultFactory = typeof(CustomArdalisResultFactory);
 
     // Check if this is a generic Result<T>
-    if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Ardalis.Result.Result<>))
+    if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Result<>))
     {
       // Use reflection to call the generic factory method
       var valueType = resultType.GetGenericArguments()[0];
 
       // Get all methods with the specified name
-      var methods = helperType.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+      var methods = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
         .Where(m => m.Name == factoryMethodName && m.IsGenericMethodDefinition)
         .ToArray();
 
@@ -62,10 +64,10 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
       }
     }
     // Check if this is a non-generic Result
-    else if (resultType == typeof(Ardalis.Result.Result))
+    else if (resultType == typeof(Result))
     {
       // Get all non-generic methods with the specified name
-      var methods = helperType.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+      var methods = customArdalisResultFactory.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
         .Where(m => m.Name == factoryMethodName && !m.IsGenericMethodDefinition && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(Exception))
         .ToArray();
 
@@ -77,6 +79,7 @@ public class ExceptionHandlingBehavior<TRequest, TResponse> : IPipelineBehavior<
     }
 
     // If not a Result type or factory method not found, rethrow the exception
-    throw exception;
+    _logger.LogWarning("Not an Ardalis.Result type or no CustomArdalisResultFactory method found for {FactoryMethod}", factoryMethodName);
+    throw new InvalidOperationException($"Not an Ardalis.Result type or no CustomArdalisResultFactory method found for {factoryMethodName}", exception);
   }
 }
