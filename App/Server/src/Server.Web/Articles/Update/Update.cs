@@ -36,7 +36,7 @@ public class Update(IMediator _mediator, ICurrentUserService _currentUserService
       userId,
       userId), cancellationToken);
 
-    await Send.ResultAsync(result, article => Map.FromEntity(article), cancellationToken);
+    await Send.ResultMapperAsync(result, article => Map.FromEntity(article), cancellationToken);
   }
 }
 

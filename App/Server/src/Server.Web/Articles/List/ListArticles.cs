@@ -39,7 +39,7 @@ public class ListArticles(IMediator _mediator, ICurrentUserService _currentUserS
       request.Offset,
       currentUserId), cancellationToken);
 
-    await Send.ResultAsync(result, articles =>
+    await Send.ResultMapperAsync(result, articles =>
     {
       var articleDtos = Enumerable.Select<Article, ArticleDto>(articles, article => Map.FromEntity(article).Article).ToList();
       return new ArticlesResponse(articleDtos, articleDtos.Count);

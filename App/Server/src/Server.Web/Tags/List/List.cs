@@ -27,6 +27,6 @@ public class List(IMediator _mediator) : Endpoint<EmptyRequest, TagsResponse>
   {
     var result = await _mediator.Send(new ListTagsQuery(), cancellationToken);
 
-    await Send.ResultAsync(result, cancellationToken);
+    await Send.ResultValueAsync(result, cancellationToken);
   }
 }

@@ -22,6 +22,6 @@ public class ThrowConcurrencyNonGeneric(IMediator _mediator) : Endpoint<EmptyReq
   public override async Task HandleAsync(EmptyRequest req, CancellationToken cancellationToken)
   {
     var result = await _mediator.Send(new ThrowConcurrencyNonGenericQuery(), cancellationToken);
-    await Send.ResultAsync(result, cancellationToken);
+    await Send.ResultValueAsync(result, cancellationToken);
   }
 }

@@ -5,11 +5,12 @@ namespace Server.Web.Infrastructure;
 public static class ResultExtensions
 {
   /// <summary>
-  /// Sends a standardized response based on Result pattern.
+  /// Sends a standardized response based on Result pattern with a value.
   /// Handles success, error, and validation scenarios consistently.
+  /// Handles Result&lt;Unit&gt; (empty results) by not sending a value.
   /// Automatically uses the correct status code based on Result.Status.
   /// </summary>
-  public static async Task ResultAsync<TResult>(
+  public static async Task ResultValueAsync<TResult>(
     this IResponseSender ep,
     Result<TResult> result,
     CancellationToken cancellationToken = default)
@@ -20,14 +21,23 @@ public static class ResultExtensions
   /// <summary>
   /// Sends a standardized response based on Result pattern with mapping support.
   /// Handles success, error, and validation scenarios consistently.
-  /// Maps the result value using the provided mapper function.
+  /// Maps the result value using the provided mapper function before sending.
   /// Automatically uses the correct status code based on Result.Status.
   /// </summary>
-  public static async Task ResultAsync<TResult, TResponse>(
+  public static async Task ResultMapperAsync<TResult, TResponse>(
     this IResponseSender ep,
     Result<TResult> result,
-    Func<TResult, TResponse>? mapper = null,
+    Func<TResult, TResponse> mapper,
     CancellationToken cancellationToken = default)
+  {
+    await ResultAsync(ep, result, mapper, cancellationToken);
+  }
+
+  private static async Task ResultAsync<TResult, TResponse>(
+    this IResponseSender ep,
+    Result<TResult> result,
+    Func<TResult, TResponse>? mapper,
+    CancellationToken cancellationToken)
   {
     switch (result.Status)
     {

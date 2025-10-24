@@ -30,6 +30,6 @@ public class Favorite(IMediator _mediator, ICurrentUserService _currentUserServi
 
     var result = await _mediator.Send(new FavoriteArticleCommand(request.Slug, userId, userId), cancellationToken);
 
-    await Send.ResultAsync(result, article => Map.FromEntity(article), cancellationToken);
+    await Send.ResultMapperAsync(result, article => Map.FromEntity(article), cancellationToken);
   }
 }

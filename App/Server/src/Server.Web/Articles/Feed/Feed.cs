@@ -31,7 +31,7 @@ public class Feed(IMediator _mediator, ICurrentUserService _currentUserService) 
 
     var result = await _mediator.Send(new GetFeedQuery(userId, request.Limit, request.Offset), cancellationToken);
 
-    await Send.ResultAsync(result, articles =>
+    await Send.ResultMapperAsync(result, articles =>
     {
       var articleDtos = articles.Select(article => Map.FromEntity(article).Article).ToList();
       return new ArticlesResponse(articleDtos, articleDtos.Count);

@@ -22,6 +22,6 @@ public class ThrowInUseCaseNonGeneric(IMediator _mediator) : Endpoint<EmptyReque
   public override async Task HandleAsync(EmptyRequest req, CancellationToken cancellationToken)
   {
     var result = await _mediator.Send(new ThrowInUseCaseNonGenericQuery(), cancellationToken);
-    await Send.ResultAsync(result, cancellationToken);
+    await Send.ResultValueAsync(result, cancellationToken);
   }
 }
