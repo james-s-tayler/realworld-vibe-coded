@@ -183,7 +183,7 @@ jobs:
           output: both
           badge: true
           fail_below_min: true
-          thresholds: '60 80'
+          thresholds: '95 95'
 
       - name: Add Coverage PR Comment
         if: always() && github.event_name == 'pull_request'

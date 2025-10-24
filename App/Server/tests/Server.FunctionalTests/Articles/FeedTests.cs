@@ -4,6 +4,7 @@ using Server.Web.Articles.Create;
 using Server.Web.Articles.Feed;
 using Server.Web.Profiles;
 using Server.Web.Profiles.Follow;
+using Server.Web.Users.Register;
 
 namespace Server.FunctionalTests.Articles;
 
@@ -97,5 +98,40 @@ public class FeedTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
+  }
+
+  [Fact]
+  public async Task GetFeed_WhenNotFollowingAnyone_ReturnsEmptyList()
+  {
+    // Create a new user who doesn't follow anyone
+    var username = $"loner-{Guid.NewGuid()}";
+    var email = $"loner-{Guid.NewGuid()}@example.com";
+    var password = "password123";
+
+    var registerRequest = new RegisterRequest
+    {
+      User = new UserData
+      {
+        Email = email,
+        Username = username,
+        Password = password
+      }
+    };
+
+    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    var token = registerResult.User.Token;
+
+    var client = App.CreateClient(c =>
+    {
+      c.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Token", token);
+    });
+
+    var feedRequest = new FeedRequest();
+    var (response, result) = await client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.Articles.ShouldNotBeNull();
+    result.Articles.ShouldBeEmpty();
+    result.ArticlesCount.ShouldBe(0);
   }
 }
