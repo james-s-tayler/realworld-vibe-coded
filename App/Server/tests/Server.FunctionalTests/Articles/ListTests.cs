@@ -20,13 +20,8 @@ public class ListTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task ListArticles_WithNonExistentAuthorFilter_ReturnsEmptyList()
   {
-    // SRV007: Using raw HttpClient.GetAsync is acceptable here for this existing test
-    // that was written before the analyzer was introduced.
-#pragma warning disable SRV007
-    var response = await App.Client.GetAsync("/api/articles?author=nonexistentauthor999", TestContext.Current.CancellationToken);
-    var result = await response.Content.ReadFromJsonAsync<ArticlesResponse>(cancellationToken: TestContext.Current.CancellationToken);
-#pragma warning restore SRV007
-    result.ShouldNotBeNull();
+    var request = new ListArticlesRequest();
+    var (response, result) = await App.Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?author=nonexistentauthor999", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -37,13 +32,8 @@ public class ListTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task ListArticles_WithNonExistentFavoritedFilter_ReturnsEmptyList()
   {
-    // SRV007: Using raw HttpClient.GetAsync is acceptable here for this existing test
-    // that was written before the analyzer was introduced.
-#pragma warning disable SRV007
-    var response = await App.Client.GetAsync("/api/articles?favorited=nonexistentuser999", TestContext.Current.CancellationToken);
-    var result = await response.Content.ReadFromJsonAsync<ArticlesResponse>(cancellationToken: TestContext.Current.CancellationToken);
-#pragma warning restore SRV007
-    result.ShouldNotBeNull();
+    var request = new ListArticlesRequest();
+    var (response, result) = await App.Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?favorited=nonexistentuser999", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -54,13 +44,8 @@ public class ListTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task ListArticles_WithNonExistentTagFilter_ReturnsEmptyList()
   {
-    // SRV007: Using raw HttpClient.GetAsync is acceptable here for this existing test
-    // that was written before the analyzer was introduced.
-#pragma warning disable SRV007
-    var response = await App.Client.GetAsync("/api/articles?tag=nonexistenttag999", TestContext.Current.CancellationToken);
-    var result = await response.Content.ReadFromJsonAsync<ArticlesResponse>(cancellationToken: TestContext.Current.CancellationToken);
-#pragma warning restore SRV007
-    result.ShouldNotBeNull();
+    var request = new ListArticlesRequest();
+    var (response, result) = await App.Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?tag=nonexistenttag999", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
