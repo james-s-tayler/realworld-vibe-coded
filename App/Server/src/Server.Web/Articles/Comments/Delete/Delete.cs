@@ -29,6 +29,6 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
     var result = await _mediator.Send(new DeleteCommentCommand(request.Slug, request.Id, userId), cancellationToken);
 
-    await Send.ResultMapperAsync(result, _ => new { }, cancellationToken);
+    await Send.ResultValueAsync(result, cancellationToken);
   }
 }
