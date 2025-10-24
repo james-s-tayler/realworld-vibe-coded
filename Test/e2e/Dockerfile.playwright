@@ -10,12 +10,18 @@ ENV DOTNET_ROOT="/usr/share/dotnet"
 
 WORKDIR /tests
 
-# Copy the entire test project directory structure
-COPY E2eTests/ ./E2eTests/
+# Copy project file first for better layer caching
+COPY E2eTests/E2eTests.csproj E2eTests/
+
+# Restore dependencies in a separate layer for better caching
+RUN dotnet restore E2eTests/E2eTests.csproj
+
+# Copy the rest of the test files
+COPY E2eTests/ E2eTests/
 
 # Set environment variables for headless operation
 ENV CI=true
 ENV PLAYWRIGHT_HEADLESS=true
 
-# Set the entry point to run the tests (build and run in one step)
+# Set the entry point to run the tests
 ENTRYPOINT ["dotnet", "test", "./E2eTests/E2eTests.csproj", "-c", "Release", "--logger", "trx;LogFileName=e2e-results.trx", "--results-directory", "/Reports/Test/e2e/Results", "--verbosity", "normal"]
