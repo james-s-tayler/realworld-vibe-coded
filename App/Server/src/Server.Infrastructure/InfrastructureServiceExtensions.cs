@@ -3,6 +3,7 @@ using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Queries;
 using Server.Infrastructure.Services;
+using Server.SharedKernel.Interfaces;
 
 
 namespace Server.Infrastructure;
@@ -26,7 +27,8 @@ public static class InfrastructureServiceExtensions
            .AddScoped<IListTagsQueryService, ListTagsQueryService>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
            .AddScoped<IJwtTokenGenerator, JwtTokenGenerator>()
-           .AddScoped<ICurrentUserService, CurrentUserService>();
+           .AddScoped<ICurrentUserService, CurrentUserService>()
+           .AddSingleton<ITimeProvider, SystemTimeProvider>();
 
     // Configure JWT settings
     var jwtSettings = new JwtSettings();

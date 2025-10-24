@@ -1,11 +1,14 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.UserAggregate;
+using Server.SharedKernel.Interfaces;
 
 namespace Server.Infrastructure.Data;
 public class AppDbContext(DbContextOptions<AppDbContext> options,
-  IDomainEventDispatcher? dispatcher) : DbContext(options)
+  IDomainEventDispatcher? dispatcher,
+  ITimeProvider timeProvider) : DbContext(options)
 {
   private readonly IDomainEventDispatcher? _dispatcher = dispatcher;
+  private readonly ITimeProvider _timeProvider = timeProvider;
 
   public DbSet<User> Users => Set<User>();
   public DbSet<Article> Articles => Set<Article>();
@@ -24,31 +27,31 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
       // Check if the entity inherits from any of the EntityBase variants
       if (typeof(EntityBase).IsAssignableFrom(entityType.ClrType) ||
           (entityType.ClrType.BaseType?.IsGenericType == true &&
-           entityType.ClrType.BaseType.GetGenericTypeDefinition().Name.StartsWith("EntityBase")))
+           entityType.ClrType.BaseType.GetGenericTypeDefinition().Name.StartsWith(nameof(EntityBase))))
       {
         // Configure ChangeCheck for optimistic concurrency
-        var changeCheckProperty = entityType.FindProperty("ChangeCheck");
+        var changeCheckProperty = entityType.FindProperty(nameof(EntityBase.ChangeCheck));
         if (changeCheckProperty != null)
         {
           modelBuilder.Entity(entityType.ClrType)
-            .Property("ChangeCheck")
+            .Property(nameof(EntityBase.ChangeCheck))
             .IsRowVersion();
         }
 
         // Configure audit timestamps
-        var createdAtProperty = entityType.FindProperty("CreatedAt");
+        var createdAtProperty = entityType.FindProperty(nameof(EntityBase.CreatedAt));
         if (createdAtProperty != null)
         {
           modelBuilder.Entity(entityType.ClrType)
-            .Property("CreatedAt")
+            .Property(nameof(EntityBase.CreatedAt))
             .IsRequired();
         }
 
-        var updatedAtProperty = entityType.FindProperty("UpdatedAt");
+        var updatedAtProperty = entityType.FindProperty(nameof(EntityBase.UpdatedAt));
         if (updatedAtProperty != null)
         {
           modelBuilder.Entity(entityType.ClrType)
-            .Property("UpdatedAt")
+            .Property(nameof(EntityBase.UpdatedAt))
             .IsRequired();
         }
       }
@@ -58,13 +61,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
   {
     // Set audit timestamps for entities
+    var currentTime = _timeProvider.UtcNow;
     var entries = ChangeTracker.Entries<EntityBase>();
     foreach (var entry in entries)
     {
       if (entry.State == EntityState.Added)
       {
-        entry.Entity.CreatedAt = DateTime.UtcNow;
-        entry.Entity.UpdatedAt = DateTime.UtcNow;
+        entry.Entity.CreatedAt = currentTime;
+        entry.Entity.UpdatedAt = currentTime;
       }
       else if (entry.State == EntityState.Modified)
       {
@@ -79,7 +83,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
 
         if (hasActualChanges)
         {
-          entry.Entity.UpdatedAt = DateTime.UtcNow;
+          entry.Entity.UpdatedAt = currentTime;
         }
         else
         {
