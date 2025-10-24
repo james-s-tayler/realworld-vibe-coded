@@ -27,4 +27,8 @@
     <ProjectReference Include="..\Server.UseCases\Server.UseCases.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\analyzers\Server.Analyzers\Server.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
 </Project>
