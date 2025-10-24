@@ -17,43 +17,11 @@ public static class MediatrConfigs
     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!))
             .AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
 
-    // Register LoggingBehavior for all MediatR request types using reflection
-    // Uses reflection at startup to discover all IRequest types, avoiding open generic registration
-    RegisterLoggingBehavior(services, mediatRAssemblies.Where(a => a != null).ToArray()!);
-
-    // Automatically register TransactionBehavior and ExceptionHandlingBehavior for all ICommand<T> and IQuery<T> types
+    // Automatically register pipeline behaviors for all ICommand<T> and IQuery<T> types
     // Uses reflection to discover types, but the behaviors themselves use constrained generics (no reflection at runtime)
     RegisterPipelineBehaviorsForResultRequests(services, mediatRAssemblies.Where(a => a != null).ToArray()!);
 
     return services;
-  }
-
-  /// <summary>
-  /// Registers LoggingBehavior for all MediatR request types discovered at startup.
-  /// Uses reflection at startup to discover all IRequest types and registers LoggingBehavior
-  /// with closed generics for each request/response pair to avoid open generic registration.
-  /// </summary>
-  private static void RegisterLoggingBehavior(IServiceCollection services, Assembly[] assemblies)
-  {
-    var requestTypes = assemblies
-      .SelectMany(assembly => assembly.GetTypes())
-      .Where(type => !type.IsAbstract && !type.IsInterface)
-      .SelectMany(type => type.GetInterfaces()
-        .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequest<>))
-        .Select(i => new
-        {
-          RequestType = type,
-          ResponseType = i.GetGenericArguments()[0]
-        }))
-      .Distinct()
-      .ToList();
-
-    foreach (var typeInfo in requestTypes)
-    {
-      var loggingBehaviorType = typeof(LoggingBehavior<,>).MakeGenericType(typeInfo.RequestType, typeInfo.ResponseType);
-      var interfaceType = typeof(IPipelineBehavior<,>).MakeGenericType(typeInfo.RequestType, typeInfo.ResponseType);
-      services.AddScoped(interfaceType, loggingBehaviorType);
-    }
   }
 
   /// <summary>
@@ -84,8 +52,10 @@ public static class MediatrConfigs
       var resultType = typeof(Result<>).MakeGenericType(innerType);
 
       // Register behaviors in the correct order:
-      // 1. TransactionBehavior (wraps handler execution in transaction)
-      // 2. ExceptionHandlingBehavior (catches exceptions and converts to Result)
+      // 1. LoggingBehavior (logs request handling)
+      // 2. TransactionBehavior (wraps handler execution in transaction)
+      // 3. ExceptionHandlingBehavior (catches exceptions and converts to Result)
+      RegisterBehavior(services, typeof(LoggingBehavior<,>), requestType, innerType, resultType);
       RegisterBehavior(services, typeof(TransactionBehavior<,>), requestType, innerType, resultType);
       RegisterBehavior(services, typeof(ExceptionHandlingBehavior<,>), requestType, innerType, resultType);
     }

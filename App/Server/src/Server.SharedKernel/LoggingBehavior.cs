@@ -1,40 +1,30 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using Ardalis.GuardClauses;
+using Ardalis.Result;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Server.SharedKernel;
 
 /// <summary>
-/// Adds logging for all requests in MediatR pipeline.
-/// Configure by adding the service with a scoped lifetime
-/// 
-/// Example for Autofac:
-/// builder
-///   .RegisterType&lt;Mediator&gt;()
-///   .As&lt;IMediator&gt;()
-///   .InstancePerLifetimeScope();
-///
-/// builder
-///   .RegisterGeneric(typeof(LoggingBehavior&lt;,&gt;))
-///      .As(typeof(IPipelineBehavior&lt;,&gt;))
-///   .InstancePerLifetimeScope();
-///
+/// MediatR pipeline behavior that adds logging for all requests in the pipeline.
+/// Logs request handling start, request properties, and completion with timing.
+/// This behavior uses IResultRequest{T} to align with the constrained generic pattern.
 /// </summary>
-/// <typeparam name="TRequest"></typeparam>
-/// <typeparam name="TResponse"></typeparam>
-public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-  where TRequest : IRequest<TResponse>
+/// <typeparam name="TRequest">The request type implementing IResultRequest{T}</typeparam>
+/// <typeparam name="T">The inner value type of Result{T}</typeparam>
+public class LoggingBehavior<TRequest, T> : IPipelineBehavior<TRequest, Result<T>>
+  where TRequest : IResultRequest<T>
 {
-  private readonly ILogger<Mediator> _logger;
+  private readonly ILogger<LoggingBehavior<TRequest, T>> _logger;
 
-  public LoggingBehavior(ILogger<Mediator> logger)
+  public LoggingBehavior(ILogger<LoggingBehavior<TRequest, T>> logger)
   {
     _logger = logger;
   }
 
-  public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+  public async Task<Result<T>> Handle(TRequest request, RequestHandlerDelegate<Result<T>> next, CancellationToken cancellationToken)
   {
     Guard.Against.Null(request);
     if (_logger.IsEnabled(LogLevel.Information))
