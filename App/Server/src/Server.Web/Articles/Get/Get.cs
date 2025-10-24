@@ -31,7 +31,7 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
 
     var result = await _mediator.Send(new GetArticleQuery(request.Slug, currentUserId), cancellationToken);
 
-    await Send.ResultAsync(result, article => Map.FromEntity(article), cancellationToken);
+    await Send.MappedResultAsync(result, article => Map.FromEntity(article), cancellationToken);
   }
 }
 

@@ -30,6 +30,6 @@ public class Unfavorite(IMediator _mediator, ICurrentUserService _currentUserSer
 
     var result = await _mediator.Send(new UnfavoriteArticleCommand(request.Slug, userId, userId), cancellationToken);
 
-    await Send.ResultAsync(result, article => Map.FromEntity(article), cancellationToken);
+    await Send.MappedResultAsync(result, article => Map.FromEntity(article), cancellationToken);
   }
 }
