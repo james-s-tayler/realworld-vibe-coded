@@ -19,7 +19,11 @@ public class ErrorHandlingTests(ErrorTestFixture App)
   public async Task AllErrorTypes_UseSameFormat(string route, int statusCode, int errorIndex, string name, string reason)
   {
     // Arrange & Act
+    // SRV007: Using raw HttpClient.GetAsync is necessary here to test various error endpoints
+    // that are specifically designed for error handling tests and don't have typed request/response DTOs.
+#pragma warning disable SRV007
     var endpointResponse = await App.Client.GetAsync(route, TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
 
     // Assert - All should return problem details in the same structure
     var endpointContent = await endpointResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
@@ -42,7 +46,11 @@ public class ErrorHandlingTests(ErrorTestFixture App)
   public async Task TestDeserializationError(string route, int statusCode, int errorIndex, string name, string reason)
   {
     // Arrange & Act
+    // SRV007: Using raw HttpClient.PostAsJsonAsync is necessary here to test deserialization error
+    // handling with malformed JSON ("{"). FastEndpoints POSTAsync would not allow sending invalid JSON.
+#pragma warning disable SRV007
     var endpointResponse = await App.Client.PostAsJsonAsync(route, "{", TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
 
     // Assert - All should return problem details in the same structure
     var endpointContent = await endpointResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);

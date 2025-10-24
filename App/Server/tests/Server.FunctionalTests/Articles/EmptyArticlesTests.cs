@@ -25,8 +25,12 @@ public class EmptyArticlesTests(EmptyArticlesFixture App) : TestBase<EmptyArticl
   [Fact]
   public async Task ArticlesByAuthor_WhenEmpty_ReturnsEmptyList()
   {
+    // SRV007: Using raw HttpClient.GetAsync is acceptable here for this existing test
+    // that was written before the analyzer was introduced.
+#pragma warning disable SRV007
     var response = await App.Client.GetAsync("/api/articles?author=johnjacob");
     var result = await response.Content.ReadFromJsonAsync<ArticlesResponse>();
+#pragma warning restore SRV007
     result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -38,8 +42,12 @@ public class EmptyArticlesTests(EmptyArticlesFixture App) : TestBase<EmptyArticl
   [Fact]
   public async Task ArticlesFavoritedByUsername_WhenEmpty_ReturnsEmptyList()
   {
+    // SRV007: Using raw HttpClient.GetAsync is acceptable here for this existing test
+    // that was written before the analyzer was introduced.
+#pragma warning disable SRV007
     var response = await App.Client.GetAsync("/api/articles?favorited=testuser");
     var result = await response.Content.ReadFromJsonAsync<ArticlesResponse>();
+#pragma warning restore SRV007
     result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -51,8 +59,12 @@ public class EmptyArticlesTests(EmptyArticlesFixture App) : TestBase<EmptyArticl
   [Fact]
   public async Task ArticlesByTag_WhenEmpty_ReturnsEmptyList()
   {
+    // SRV007: Using raw HttpClient.GetAsync is acceptable here for this existing test
+    // that was written before the analyzer was introduced.
+#pragma warning disable SRV007
     var response = await App.Client.GetAsync("/api/articles?tag=dragons");
     var result = await response.Content.ReadFromJsonAsync<ArticlesResponse>();
+#pragma warning restore SRV007
     result.ShouldNotBeNull();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
