@@ -18,7 +18,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
     base.OnModelCreating(modelBuilder);
     modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-    // Configure ChangeCheck property for all entities inheriting from EntityBase
+    // Configure properties for all entities inheriting from EntityBase
     foreach (var entityType in modelBuilder.Model.GetEntityTypes())
     {
       // Check if the entity inherits from any of the EntityBase variants
@@ -26,12 +26,30 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
           (entityType.ClrType.BaseType?.IsGenericType == true &&
            entityType.ClrType.BaseType.GetGenericTypeDefinition().Name.StartsWith("EntityBase")))
       {
-        var property = entityType.FindProperty("ChangeCheck");
-        if (property != null)
+        // Configure ChangeCheck for optimistic concurrency
+        var changeCheckProperty = entityType.FindProperty("ChangeCheck");
+        if (changeCheckProperty != null)
         {
           modelBuilder.Entity(entityType.ClrType)
             .Property("ChangeCheck")
             .IsRowVersion();
+        }
+
+        // Configure audit timestamps
+        var createdAtProperty = entityType.FindProperty("CreatedAt");
+        if (createdAtProperty != null)
+        {
+          modelBuilder.Entity(entityType.ClrType)
+            .Property("CreatedAt")
+            .IsRequired();
+        }
+
+        var updatedAtProperty = entityType.FindProperty("UpdatedAt");
+        if (updatedAtProperty != null)
+        {
+          modelBuilder.Entity(entityType.ClrType)
+            .Property("UpdatedAt")
+            .IsRequired();
         }
       }
     }
@@ -39,6 +57,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
 
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
   {
+    // Set audit timestamps for entities
+    var entries = ChangeTracker.Entries<EntityBase>();
+    foreach (var entry in entries)
+    {
+      if (entry.State == EntityState.Added)
+      {
+        entry.Entity.CreatedAt = DateTime.UtcNow;
+        entry.Entity.UpdatedAt = DateTime.UtcNow;
+      }
+      else if (entry.State == EntityState.Modified)
+      {
+        entry.Entity.UpdatedAt = DateTime.UtcNow;
+      }
+    }
+
     int result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
     // ignore events if no dispatcher provided

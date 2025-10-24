@@ -16,6 +16,16 @@ public abstract class EntityBase : HasDomainEventsBase
   /// </summary>
   [Timestamp]
   public byte[] ChangeCheck { get; set; } = Array.Empty<byte>();
+
+  /// <summary>
+  /// Timestamp when the entity was created (UTC)
+  /// </summary>
+  public DateTime CreatedAt { get; set; }
+
+  /// <summary>
+  /// Timestamp when the entity was last updated (UTC)
+  /// </summary>
+  public DateTime UpdatedAt { get; set; }
 }
 
 public abstract class EntityBase<TId> : HasDomainEventsBase
@@ -28,6 +38,16 @@ public abstract class EntityBase<TId> : HasDomainEventsBase
   /// </summary>
   [Timestamp]
   public byte[] ChangeCheck { get; set; } = Array.Empty<byte>();
+
+  /// <summary>
+  /// Timestamp when the entity was created (UTC)
+  /// </summary>
+  public DateTime CreatedAt { get; set; }
+
+  /// <summary>
+  /// Timestamp when the entity was last updated (UTC)
+  /// </summary>
+  public DateTime UpdatedAt { get; set; }
 }
 
 /// <summary>
@@ -46,4 +66,14 @@ public abstract class EntityBase<T, TId> : HasDomainEventsBase
   /// </summary>
   [Timestamp]
   public byte[] ChangeCheck { get; set; } = Array.Empty<byte>();
+
+  /// <summary>
+  /// Timestamp when the entity was created (UTC)
+  /// </summary>
+  public DateTime CreatedAt { get; set; }
+
+  /// <summary>
+  /// Timestamp when the entity was last updated (UTC)
+  /// </summary>
+  public DateTime UpdatedAt { get; set; }
 }
