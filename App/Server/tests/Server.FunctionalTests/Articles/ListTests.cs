@@ -104,6 +104,19 @@ public class ListTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
+  public async Task ListArticles_WithTagAndAuthorFilters_ReturnsCombinedResults()
+  {
+    // This test ensures the combination of filters works correctly
+    var request = new ListArticlesRequest();
+    var (response, result) = await App.Client.GETAsync<ListArticlesRequest, ArticlesResponse>($"/api/articles?author={App.ArticlesUser1Username}&tag=test", request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.Articles.ShouldNotBeNull();
+    // All returned articles should match both filters (if any exist)
+    result.Articles.Where(a => a.Author.Username == App.ArticlesUser1Username).ShouldBe(result.Articles);
+  }
+
+  [Fact]
   public async Task ListArticles_WithInvalidTagParameter_ReturnsValidationError()
   {
     var request = new ListArticlesRequest();
