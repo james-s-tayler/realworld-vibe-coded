@@ -68,7 +68,25 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
       }
       else if (entry.State == EntityState.Modified)
       {
-        entry.Entity.UpdatedAt = DateTime.UtcNow;
+        // Only update UpdatedAt if actual scalar properties have changed values
+        // We check if any property's original value differs from its current value
+        // Exclude: UpdatedAt itself, ChangeCheck (concurrency token), and CreatedAt
+        var hasActualChanges = entry.Properties
+          .Where(p => p.Metadata.Name != nameof(EntityBase.UpdatedAt)
+                      && p.Metadata.Name != nameof(EntityBase.ChangeCheck)
+                      && p.Metadata.Name != nameof(EntityBase.CreatedAt))
+          .Any(p => p.IsModified && !Equals(p.OriginalValue, p.CurrentValue));
+
+        if (hasActualChanges)
+        {
+          entry.Entity.UpdatedAt = DateTime.UtcNow;
+        }
+        else
+        {
+          // If no actual properties changed, don't update UpdatedAt
+          // and mark it as not modified to prevent unnecessary updates
+          entry.Property(nameof(EntityBase.UpdatedAt)).IsModified = false;
+        }
       }
     }
 
