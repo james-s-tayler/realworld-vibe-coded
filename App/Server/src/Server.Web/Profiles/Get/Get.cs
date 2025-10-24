@@ -30,6 +30,6 @@ public class Get(IMediator _mediator, ICurrentUserService _currentUserService) :
 
     var result = await _mediator.Send(new GetProfileQuery(request.Username, currentUserId), cancellationToken);
 
-    await Send.MappedResultAsync(result, user => Map.FromEntity(user), cancellationToken);
+    await Send.ResultMapperAsync(result, user => Map.FromEntity(user), cancellationToken);
   }
 }

@@ -47,7 +47,7 @@ public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserSer
       request.User.Bio,
       request.User.Image), cancellationToken);
 
-    await Send.MappedResultAsync(result, userDto => new UpdateUserResponse
+    await Send.ResultMapperAsync(result, userDto => new UpdateUserResponse
     {
       User = Map.FromEntity(userDto)
     }, cancellationToken);
