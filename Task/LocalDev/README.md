@@ -13,7 +13,7 @@ To start the local development environment:
 
 ```bash
 # From the repository root
-./build.sh run-local-server
+./build.sh RunLocalServer
 ```
 
 This will start:
@@ -30,7 +30,7 @@ The development container includes vsdbg (Visual Studio Debugger) for remote deb
 
 1. Start the local development environment:
    ```bash
-   ./build.sh run-local-server
+   ./build.sh RunLocalServer
    ```
 
 2. In Rider, go to **Run → Attach to Process...**
