@@ -499,4 +499,98 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
+
+  [Fact]
+  public async Task UpdateUser_WithNewPassword_CanLoginWithNewPassword()
+  {
+    var email = $"password-test-{Guid.NewGuid()}@example.com";
+    var username = $"passworduser-{Guid.NewGuid()}";
+    var oldPassword = "oldpassword123";
+    var newPassword = "newpassword456";
+
+    var registerRequest = new RegisterRequest
+    {
+      User = new UserData
+      {
+        Email = email,
+        Username = username,
+        Password = oldPassword
+      }
+    };
+
+    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    var token = registerResult.User.Token;
+
+    var client = App.CreateClient(c =>
+    {
+      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
+    });
+
+    // Update password
+    var updateRequest = new UpdateUserRequest
+    {
+      User = new UpdateUserData
+      {
+        Password = newPassword
+      }
+    };
+
+    var (response, result) = await client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+    // Try to login with new password
+    var loginRequest = new LoginRequest
+    {
+      User = new LoginUserData
+      {
+        Email = email,
+        Password = newPassword
+      }
+    };
+
+    var (loginResponse, loginResult) = await App.Client.POSTAsync<Login, LoginRequest, LoginResponse>(loginRequest);
+    loginResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+    loginResult.User.ShouldNotBeNull();
+    loginResult.User.Email.ShouldBe(email);
+  }
+
+  [Fact]
+  public async Task UpdateUser_WithUsernameChange_UpdatesUsername()
+  {
+    var email = $"username-test-{Guid.NewGuid()}@example.com";
+    var oldUsername = $"olduser-{Guid.NewGuid()}";
+    var newUsername = $"newuser-{Guid.NewGuid()}";
+    var password = "password123";
+
+    var registerRequest = new RegisterRequest
+    {
+      User = new UserData
+      {
+        Email = email,
+        Username = oldUsername,
+        Password = password
+      }
+    };
+
+    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    var token = registerResult.User.Token;
+
+    var client = App.CreateClient(c =>
+    {
+      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
+    });
+
+    // Update username
+    var updateRequest = new UpdateUserRequest
+    {
+      User = new UpdateUserData
+      {
+        Username = newUsername
+      }
+    };
+
+    var (response, result) = await client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.User.Username.ShouldBe(newUsername);
+  }
 }
