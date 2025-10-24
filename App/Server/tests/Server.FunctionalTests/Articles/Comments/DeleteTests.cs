@@ -124,7 +124,12 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
+    // SRV007: Using raw HttpClient.DeleteAsync is necessary here to test invalid comment ID format
+    // (non-numeric "abc"). FastEndpoints DELETEAsync would require a valid DeleteCommentRequest with int Id,
+    // which would not allow testing this edge case.
+#pragma warning disable SRV007
     var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/abc", TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
