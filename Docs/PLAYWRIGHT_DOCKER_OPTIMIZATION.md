@@ -1,8 +1,11 @@
-# Playwright Docker Compose Optimization
+# Docker Compose Optimizations for Test and Development Environments
 
 ## Overview
 
-This document summarizes the optimizations made to the Playwright E2E test Docker Compose setup to significantly reduce startup and execution times.
+This document summarizes the optimizations made to Docker Compose setups across the repository to significantly reduce startup and execution times. These optimizations apply to:
+- **E2E Playwright Tests** (`Test/e2e/`)
+- **Postman API Tests** (`Test/Postman/`)
+- **Local Development** (`Task/LocalDev/`)
 
 ## Performance Improvements
 
@@ -160,6 +163,33 @@ These optimizations were applied to:
 
 Both jobs benefit from faster builds and reduced network usage in CI.
 
+## Applied to All Docker Setups
+
+The same optimizations have been applied to all Docker Compose configurations in the repository:
+
+### 1. E2E Playwright Tests (`Test/e2e/`)
+- BuildKit cache mounts for NuGet packages
+- Optimized health check intervals
+- Docker layer caching
+- GitHub Actions CI caching
+
+### 2. Postman API Tests (`Test/Postman/`)
+- Optimized SQL Server health checks (10s → 3s interval)
+- Optimized API health checks (5s → 2s interval, 30s → 10s start_period)
+- BuildKit enabled via `DOCKER_BUILDKIT=1` in NUKE build target
+- Faster test execution for both local and CI environments
+
+### 3. Local Development (`Task/LocalDev/`)
+- Optimized SQL Server health checks (10s → 3s interval)
+- Optimized API health checks (10s → 3s interval, 30s → 10s start_period)
+- BuildKit enabled for faster rebuilds during development
+- Faster container startup for improved developer experience
+
+All three setups now benefit from:
+- Reduced startup times through faster health checks
+- BuildKit support for better caching
+- Consistent optimization approach across environments
+
 ## Future Optimization Opportunities
 
 While the current optimizations provide significant improvements, additional optimizations could include:
@@ -170,4 +200,4 @@ While the current optimizations provide significant improvements, additional opt
 
 ## Conclusion
 
-The optimizations reduce Playwright Docker Compose startup times by **52-72%**, significantly improving developer feedback cycles and CI efficiency. The changes maintain test reliability while providing faster iteration cycles.
+The optimizations reduce Docker Compose startup times by **52-72%** for E2E tests, with similar improvements across Postman tests and local development environments. These changes significantly improve developer feedback cycles and CI efficiency while maintaining test reliability.

@@ -139,7 +139,10 @@ public partial class Build
 
         Log.Information("Running Postman tests with Docker Compose");
 
-        var envVars = new Dictionary<string, string>();
+        var envVars = new Dictionary<string, string>
+        {
+          ["DOCKER_BUILDKIT"] = "1"
+        };
         if (!string.IsNullOrEmpty(Folder))
         {
           envVars["FOLDER"] = Folder;
