@@ -163,6 +163,120 @@ public class AuditableEntityInterceptorTests : IDisposable
     Assert.Equal(fixedTime, tag.UpdatedAt);
   }
 
+  [Fact]
+  public async Task Interceptor_OverridesManualCreatedAtSetting()
+  {
+    // Arrange
+    var manualTime = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    var actualTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    _timeProvider.SetTime(actualTime);
+
+    var user = new User("test@example.com", "testuser", "hashedpass");
+
+    // Act - Try to manually set CreatedAt (should be overridden by interceptor)
+    user.CreatedAt = manualTime;
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    // Assert - Framework should override manual value
+    Assert.Equal(actualTime, user.CreatedAt);
+    Assert.NotEqual(manualTime, user.CreatedAt);
+  }
+
+  [Fact]
+  public async Task Interceptor_OverridesManualUpdatedAtSetting()
+  {
+    // Arrange
+    var createTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    _timeProvider.SetTime(createTime);
+
+    var user = new User("test@example.com", "testuser", "hashedpass");
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    // Act - Try to manually set UpdatedAt (should be overridden by interceptor)
+    var manualTime = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    var actualUpdateTime = new DateTime(2025, 10, 25, 13, 0, 0, DateTimeKind.Utc);
+    _timeProvider.SetTime(actualUpdateTime);
+
+    user.UpdateBio("New bio");
+    user.UpdatedAt = manualTime; // Try to override
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    // Assert - Framework should override manual value
+    Assert.Equal(actualUpdateTime, user.UpdatedAt);
+    Assert.NotEqual(manualTime, user.UpdatedAt);
+  }
+
+  [Fact]
+  public async Task Interceptor_OverridesManualCreatedBySetting()
+  {
+    // Arrange
+    var fixedTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    _timeProvider.SetTime(fixedTime);
+
+    var user = new User("test@example.com", "testuser", "hashedpass");
+
+    // Act - Try to manually set CreatedBy (should be overridden by interceptor)
+    user.CreatedBy = "ManualUser";
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    // Assert - Framework should override with "SYSTEM" (no authenticated user in test)
+    Assert.Equal("SYSTEM", user.CreatedBy);
+    Assert.NotEqual("ManualUser", user.CreatedBy);
+  }
+
+  [Fact]
+  public async Task Interceptor_OverridesManualUpdatedBySetting()
+  {
+    // Arrange
+    var createTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    _timeProvider.SetTime(createTime);
+
+    var user = new User("test@example.com", "testuser", "hashedpass");
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    // Act - Try to manually set UpdatedBy (should be overridden by interceptor)
+    var updateTime = new DateTime(2025, 10, 25, 13, 0, 0, DateTimeKind.Utc);
+    _timeProvider.SetTime(updateTime);
+
+    user.UpdateBio("New bio");
+    user.UpdatedBy = "ManualUser"; // Try to override
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    // Assert - Framework should override with "SYSTEM" (no authenticated user in test)
+    Assert.Equal("SYSTEM", user.UpdatedBy);
+    Assert.NotEqual("ManualUser", user.UpdatedBy);
+  }
+
+  [Fact]
+  public async Task Interceptor_OverridesAllManualAuditFieldSettings()
+  {
+    // Arrange
+    var manualTime = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    var actualTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    _timeProvider.SetTime(actualTime);
+
+    var user = new User("test@example.com", "testuser", "hashedpass");
+
+    // Act - Try to manually set ALL audit fields (should all be overridden)
+    user.CreatedAt = manualTime;
+    user.UpdatedAt = manualTime;
+    user.CreatedBy = "ManualCreator";
+    user.UpdatedBy = "ManualUpdater";
+
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    // Assert - Framework should override all manual values
+    Assert.Equal(actualTime, user.CreatedAt);
+    Assert.Equal(actualTime, user.UpdatedAt);
+    Assert.Equal("SYSTEM", user.CreatedBy);
+    Assert.Equal("SYSTEM", user.UpdatedBy);
+  }
+
   public void Dispose()
   {
     _dbContext?.Dispose();

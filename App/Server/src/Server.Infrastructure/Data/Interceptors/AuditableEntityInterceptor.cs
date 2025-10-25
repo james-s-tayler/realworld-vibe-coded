@@ -45,7 +45,7 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
     // Get the current user service from the scoped service provider
     // This may be null if called outside of an HTTP request context (e.g., during migrations or tests)
     var currentUserService = _serviceProvider.GetService<ICurrentUserService>();
-    var currentUsername = currentUserService?.GetCurrentUsername();
+    var currentUsername = currentUserService?.GetCurrentUsername() ?? "SYSTEM";
 
     var entries = context.ChangeTracker.Entries<IAuditableEntity>();
 

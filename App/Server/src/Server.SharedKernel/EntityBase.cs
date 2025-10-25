@@ -30,12 +30,12 @@ public abstract class EntityBase : HasDomainEventsBase, IAuditableEntity
   /// <summary>
   /// Username of the user who created the entity
   /// </summary>
-  public string? CreatedBy { get; set; }
+  public string CreatedBy { get; set; } = string.Empty;
 
   /// <summary>
   /// Username of the user who last updated the entity
   /// </summary>
-  public string? UpdatedBy { get; set; }
+  public string UpdatedBy { get; set; } = string.Empty;
 }
 
 public abstract class EntityBase<TId> : HasDomainEventsBase, IAuditableEntity
@@ -62,12 +62,12 @@ public abstract class EntityBase<TId> : HasDomainEventsBase, IAuditableEntity
   /// <summary>
   /// Username of the user who created the entity
   /// </summary>
-  public string? CreatedBy { get; set; }
+  public string CreatedBy { get; set; } = string.Empty;
 
   /// <summary>
   /// Username of the user who last updated the entity
   /// </summary>
-  public string? UpdatedBy { get; set; }
+  public string UpdatedBy { get; set; } = string.Empty;
 }
 
 /// <summary>
@@ -100,10 +100,10 @@ public abstract class EntityBase<T, TId> : HasDomainEventsBase, IAuditableEntity
   /// <summary>
   /// Username of the user who created the entity
   /// </summary>
-  public string? CreatedBy { get; set; }
+  public string CreatedBy { get; set; } = string.Empty;
 
   /// <summary>
   /// Username of the user who last updated the entity
   /// </summary>
-  public string? UpdatedBy { get; set; }
+  public string UpdatedBy { get; set; } = string.Empty;
 }

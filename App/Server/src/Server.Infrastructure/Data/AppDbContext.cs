@@ -52,12 +52,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
             .IsRequired();
         }
 
-        // Configure audit user tracking (nullable to handle system-generated entities)
+        // Configure audit user tracking
         var createdByProperty = entityType.FindProperty(nameof(EntityBase.CreatedBy));
         if (createdByProperty != null)
         {
           modelBuilder.Entity(entityType.ClrType)
             .Property(nameof(EntityBase.CreatedBy))
+            .IsRequired()
             .HasMaxLength(256);
         }
 
@@ -66,6 +67,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
         {
           modelBuilder.Entity(entityType.ClrType)
             .Property(nameof(EntityBase.UpdatedBy))
+            .IsRequired()
             .HasMaxLength(256);
         }
       }
