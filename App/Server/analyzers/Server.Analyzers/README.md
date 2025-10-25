@@ -114,6 +114,76 @@ var response = await client.PostAsJsonAsync(route, "{", cancellationToken);
 #pragma warning restore SRV007
 ```
 
+---
+
+### SRV008-SRV009: Other Analyzers
+Reserved for internal analyzers.
+
+---
+
+### SRV010: BanXunitAssertAnalyzer
+**Description:** Bans usage of `xunit.Assert` in test code, enforcing the use of Shouldly assertion methods instead.
+
+**Severity:** Error
+
+**Scope:** All test projects (Server.UnitTests, Server.IntegrationTests, Server.FunctionalTests, Server.SharedKernel.Result.UnitTests)
+
+**Rationale:** Direct usage of `xunit.Assert` methods should be avoided in test code. Shouldly provides more readable and expressive assertion methods that:
+- Produce better error messages that clearly show what was expected vs. what was actual
+- Improve test readability with natural language syntax
+- Make tests more maintainable and easier to understand
+- Align with the existing test code patterns in the codebase
+
+**Banned usage:**
+- Any method call on `Xunit.Assert` class
+
+**Preferred alternatives:**
+```csharp
+// ❌ Bad - xunit.Assert
+Assert.Equal(expected, actual);
+Assert.NotNull(result);
+Assert.True(condition);
+Assert.Empty(collection);
+
+// ✅ Good - Shouldly
+actual.ShouldBe(expected);
+result.ShouldNotBeNull();
+condition.ShouldBeTrue();
+collection.ShouldBeEmpty();
+```
+
+---
+
+### SRV011: BanNewDateTimeAnalyzer
+**Description:** Bans direct instantiation of `DateTime` objects using the `new` keyword in test code.
+
+**Severity:** Error
+
+**Scope:** All test projects (Server.UnitTests, Server.IntegrationTests, Server.FunctionalTests, Server.SharedKernel.Result.UnitTests)
+
+**Rationale:** Direct instantiation of `DateTime` objects using the `new` keyword should be avoided in test code. Using `DateTime.Parse` with human-readable date strings:
+- Makes tests more readable and self-documenting
+- Improves test maintainability
+- Makes it easier to understand test data at a glance
+- Reduces cognitive load when reading tests
+
+**Banned usage:**
+- `new DateTime(year, month, day)`
+- `new DateTime(year, month, day, hour, minute, second)`
+- Any other `DateTime` constructor invocation
+
+**Preferred alternatives:**
+```csharp
+// ❌ Bad - new DateTime()
+var date = new DateTime(2023, 1, 15);
+var dateTime = new DateTime(2023, 1, 15, 10, 30, 0);
+
+// ✅ Good - DateTime.Parse
+var date = DateTime.Parse("2023-01-15");
+var dateTime = DateTime.Parse("2023-01-15 10:30:00");
+```
+
+
 ## Adding a New Analyzer
 
 To add a new analyzer to this project:

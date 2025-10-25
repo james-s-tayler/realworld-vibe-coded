@@ -17,7 +17,7 @@ public class ResultConstructor
     string expectedString = "test string";
     var result = new Result<string>(expectedString);
 
-    Assert.Equal(expectedString, result.Value);
+    result.Value.Should().Be(expectedString);
   }
 
   [Fact]
@@ -26,7 +26,7 @@ public class ResultConstructor
     int expectedInt = 123;
     var result = new Result<int>(expectedInt);
 
-    Assert.Equal(expectedInt, result.Value);
+    result.Value.Should().Be(expectedInt);
   }
 
   [Fact]
@@ -35,7 +35,7 @@ public class ResultConstructor
     var expectedObject = new TestObject();
     var result = new Result<TestObject>(expectedObject);
 
-    Assert.Equal(expectedObject, result.Value);
+    result.Value.Should().Be(expectedObject);
   }
 
   [Fact]
@@ -43,7 +43,7 @@ public class ResultConstructor
   {
     var result = new Result<object>(null);
 
-    Assert.Null(result.Value);
+    result.Value.Should().BeNull();
   }
 
   [Theory]
@@ -54,7 +54,7 @@ public class ResultConstructor
   {
     var result = new Result<object>(value);
 
-    Assert.Equal(ResultStatus.Ok, result.Status);
+    result.Status.Should().Be(ResultStatus.Ok);
   }
 
   [Theory]
@@ -65,8 +65,8 @@ public class ResultConstructor
   {
     var result = Result<object>.Success(value);
 
-    Assert.Equal(ResultStatus.Ok, result.Status);
-    Assert.Equal(value, result.Value);
+    result.Status.Should().Be(ResultStatus.Ok);
+    result.Value.Should().Be(value);
   }
 
   [Theory]
@@ -77,8 +77,8 @@ public class ResultConstructor
   {
     var result = Result.Success(value);
 
-    Assert.Equal(ResultStatus.Ok, result.Status);
-    Assert.Equal(value, result.Value);
+    result.Status.Should().Be(ResultStatus.Ok);
+    result.Value.Should().Be(value);
   }
 
   [Theory]
@@ -90,9 +90,9 @@ public class ResultConstructor
     var message = "success";
     var result = Result.Success(value, message);
 
-    Assert.Equal(ResultStatus.Ok, result.Status);
-    Assert.Equal(value, result.Value);
-    Assert.Equal(message, result.SuccessMessage);
+    result.Status.Should().Be(ResultStatus.Ok);
+    result.Value.Should().Be(value);
+    result.SuccessMessage.Should().Be(message);
   }
 
   [Theory]
@@ -104,9 +104,9 @@ public class ResultConstructor
     string location = "https://github.com/ardalis/Result";
     var result = Result<object>.Created(value, location);
 
-    Assert.Equal(ResultStatus.Created, result.Status);
-    Assert.Equal(location, result.Location);
-    Assert.True(result.IsSuccess);
+    result.Status.Should().Be(ResultStatus.Created);
+    result.Location.Should().Be(location);
+    result.IsSuccess.Should().BeTrue();
   }
 
   [Theory]
@@ -117,9 +117,9 @@ public class ResultConstructor
   {
     var result = Result<object>.Created(value);
 
-    Assert.Equal(ResultStatus.Created, result.Status);
-    Assert.Equal(result.Location, string.Empty);
-    Assert.True(result.IsSuccess);
+    result.Status.Should().Be(ResultStatus.Created);
+    string.Empty.Should().Be(result.Location);
+    result.IsSuccess.Should().BeTrue();
   }
 
   [Fact]
@@ -127,7 +127,7 @@ public class ResultConstructor
   {
     var result = Result<object>.Error();
 
-    Assert.Equal(ResultStatus.Error, result.Status);
+    result.Status.Should().Be(ResultStatus.Error);
   }
 
   [Fact]
@@ -136,8 +136,8 @@ public class ResultConstructor
     string errorMessage = Guid.NewGuid().ToString();
     var result = Result<object>.Error(errorMessage);
 
-    Assert.Equal(ResultStatus.Error, result.Status);
-    Assert.Equal(errorMessage, result.Errors.Single());
+    result.Status.Should().Be(ResultStatus.Error);
+    result.Errors.Single().Should().Be(errorMessage);
   }
 
   [Fact]
@@ -148,9 +148,9 @@ public class ResultConstructor
     ErrorList errors = new(new[] { errorMessage }, correlationId);
     var result = Result<object>.Error(errors);
 
-    Assert.Equal(ResultStatus.Error, result.Status);
-    Assert.Equal(errorMessage, result.Errors.Single());
-    Assert.Equal(correlationId, result.CorrelationId);
+    result.Status.Should().Be(ResultStatus.Error);
+    result.Errors.Single().Should().Be(errorMessage);
+    result.CorrelationId.Should().Be(correlationId);
   }
 
   [Fact]
@@ -160,8 +160,8 @@ public class ResultConstructor
     ErrorList errors = new(new[] { errorMessage });
     var result = Result<object>.Error(errors);
 
-    Assert.Equal(ResultStatus.Error, result.Status);
-    Assert.Equal(errorMessage, result.Errors.Single());
+    result.Status.Should().Be(ResultStatus.Error);
+    result.Errors.Single().Should().Be(errorMessage);
   }
 
   [Fact]
@@ -193,7 +193,7 @@ public class ResultConstructor
   {
     var result = Result<object>.NotFound();
 
-    Assert.Equal(ResultStatus.NotFound, result.Status);
+    result.Status.Should().Be(ResultStatus.NotFound);
     result.Errors.Should().BeEmpty();
   }
 
@@ -203,8 +203,8 @@ public class ResultConstructor
     var errorMessage = "User Not Found";
     var result = Result<object>.NotFound(errorMessage);
 
-    Assert.Equal(ResultStatus.NotFound, result.Status);
-    Assert.Equal(errorMessage, result.Errors.First());
+    result.Status.Should().Be(ResultStatus.NotFound);
+    result.Errors.First().Should().Be(errorMessage);
   }
 
   [Fact]
@@ -231,7 +231,7 @@ public class ResultConstructor
   {
     var result = Result<object>.Forbidden();
 
-    Assert.Equal(ResultStatus.Forbidden, result.Status);
+    result.Status.Should().Be(ResultStatus.Forbidden);
   }
 
   [Fact]
@@ -249,7 +249,7 @@ public class ResultConstructor
   {
     var result = Result<object>.Unauthorized();
 
-    Assert.Equal(ResultStatus.Unauthorized, result.Status);
+    result.Status.Should().Be(ResultStatus.Unauthorized);
   }
 
   [Fact]
@@ -268,8 +268,8 @@ public class ResultConstructor
     var errorMessage = "Service Unavailable";
     var result = Result<object>.Unavailable(errorMessage);
 
-    Assert.Equal(ResultStatus.Unavailable, result.Status);
-    Assert.Equal(errorMessage, result.Errors.First());
+    result.Status.Should().Be(ResultStatus.Unavailable);
+    result.Errors.First().Should().Be(errorMessage);
   }
 
 
@@ -278,7 +278,7 @@ public class ResultConstructor
   {
     var result = Result<object>.Success(new object());
 
-    Assert.True(result.IsSuccess);
+    result.IsSuccess.Should().BeTrue();
   }
 
   [Fact]
@@ -286,7 +286,7 @@ public class ResultConstructor
   {
     var result = Result<object>.Error();
 
-    Assert.False(result.IsSuccess);
+    result.IsSuccess.Should().BeFalse();
   }
 
   [Fact]
@@ -294,7 +294,7 @@ public class ResultConstructor
   {
     var result = Result<object>.Forbidden();
 
-    Assert.False(result.IsSuccess);
+    result.IsSuccess.Should().BeFalse();
   }
 
   [Fact]
@@ -302,7 +302,7 @@ public class ResultConstructor
   {
     var result = Result<object>.Invalid(new List<ValidationError>());
 
-    Assert.False(result.IsSuccess);
+    result.IsSuccess.Should().BeFalse();
   }
 
   [Fact]
@@ -310,7 +310,7 @@ public class ResultConstructor
   {
     var result = Result<object>.Invalid(new ValidationError());
 
-    Assert.False(result.IsSuccess);
+    result.IsSuccess.Should().BeFalse();
   }
 
   [Fact]
@@ -318,7 +318,7 @@ public class ResultConstructor
   {
     var result = Result<object>.NotFound();
 
-    Assert.False(result.IsSuccess);
+    result.IsSuccess.Should().BeFalse();
   }
 
   [Fact]
@@ -334,7 +334,7 @@ public class ResultConstructor
   {
     var result = Result<object>.CriticalError();
 
-    Assert.False(result.IsSuccess);
+    result.IsSuccess.Should().BeFalse();
   }
 
   [Fact]
@@ -343,9 +343,9 @@ public class ResultConstructor
     var errorMessage = "Critical system error";
     var result = Result<object>.CriticalError(errorMessage);
 
-    Assert.Equal(ResultStatus.CriticalError, result.Status);
-    Assert.Equal(errorMessage, result.Errors.First());
-    Assert.False(result.IsSuccess);
+    result.Status.Should().Be(ResultStatus.CriticalError);
+    result.Errors.First().Should().Be(errorMessage);
+    result.IsSuccess.Should().BeFalse();
   }
 
   [Fact]
@@ -365,7 +365,7 @@ public class ResultConstructor
   {
     var result = Result<object>.NoContent();
 
-    Assert.True(result.IsSuccess);
+    result.IsSuccess.Should().BeTrue();
   }
 
   [Fact]
@@ -373,7 +373,7 @@ public class ResultConstructor
   {
     var result = Result<object>.Created(new object());
 
-    Assert.True(result.IsSuccess);
+    result.IsSuccess.Should().BeTrue();
   }
 
   [Fact]
@@ -381,6 +381,6 @@ public class ResultConstructor
   {
     var result = Result<object>.Created(new object(), "sample/endpoint");
 
-    Assert.True(result.IsSuccess);
+    result.IsSuccess.Should().BeTrue();
   }
 }

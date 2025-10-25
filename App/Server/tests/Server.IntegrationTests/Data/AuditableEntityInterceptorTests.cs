@@ -180,7 +180,7 @@ public class AuditableEntityInterceptorTests : IDisposable
 
     // Assert - Framework should override manual value
     user.CreatedAt.ShouldBe(actualTime);
-    Assert.NotEqual(manualTime, user.CreatedAt);
+    user.CreatedAt.ShouldNotBe(manualTime);
   }
 
   [Fact]
@@ -205,7 +205,7 @@ public class AuditableEntityInterceptorTests : IDisposable
 
     // Assert - Framework should override manual value
     user.UpdatedAt.ShouldBe(actualUpdateTime);
-    Assert.NotEqual(manualTime, user.UpdatedAt);
+    user.UpdatedAt.ShouldNotBe(manualTime);
   }
 
   [Fact]
@@ -224,7 +224,7 @@ public class AuditableEntityInterceptorTests : IDisposable
 
     // Assert - Framework should override with "SYSTEM" (no authenticated user in test)
     user.CreatedBy.ShouldBe("SYSTEM");
-    Assert.NotEqual("ManualUser", user.CreatedBy);
+    user.CreatedBy.ShouldNotBe("ManualUser");
   }
 
   [Fact]
@@ -248,7 +248,7 @@ public class AuditableEntityInterceptorTests : IDisposable
 
     // Assert - Framework should override with "SYSTEM" (no authenticated user in test)
     user.UpdatedBy.ShouldBe("SYSTEM");
-    Assert.NotEqual("ManualUser", user.UpdatedBy);
+    user.UpdatedBy.ShouldNotBe("ManualUser");
   }
 
   [Fact]
