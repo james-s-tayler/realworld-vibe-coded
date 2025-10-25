@@ -72,6 +72,8 @@ services:
       - /app/src/Server.UseCases/bin
       - /app/src/Server.Core/obj
       - /app/src/Server.Core/bin
+      - /app/analyzers/Server.Analyzers/obj
+      - /app/analyzers/Server.Analyzers/bin
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/swagger/index.html"]
       interval: 3s

@@ -49,6 +49,8 @@ public partial class Build
 
   #region Logs
   AbsolutePath LogsDirectory => RootDirectory / "Logs";
-  AbsolutePath LogsAuditDirectory => RootDirectory / "Logs" / "Audit";
+  AbsolutePath LogsServerWebDirectory => RootDirectory / "Logs" / "Server.Web";
+  AbsolutePath LogsSerilogDirectory => RootDirectory / "Logs" / "Server.Web" / "Serilog";
+  AbsolutePath LogsAuditDotNetDirectory => RootDirectory / "Logs" / "Server.Web" / "Audit.NET";
   #endregion
 }

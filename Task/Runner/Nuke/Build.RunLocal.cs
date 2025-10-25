@@ -28,7 +28,9 @@ public partial class Build
       ReportsTestPostmanDirectory.CreateOrCleanDirectory();
 
       // Create or clean Logs directories
-      LogsAuditDirectory.CreateOrCleanDirectory();
+      LogsDirectory.CreateOrCleanDirectory();
+      LogsAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsSerilogDirectory.CreateOrCleanDirectory();
 
       Log.Information("✓ Directories cleaned and pre-created");
     });
