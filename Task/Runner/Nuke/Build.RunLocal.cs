@@ -91,7 +91,7 @@ public partial class Build
 
       // Start Docs MCP Server in the background
       Log.Information("Starting Docs MCP Server in the background...");
-      var mcpProcess = StartBackgroundProcess("npx", "@arabold/docs-mcp-server@latest");
+      var mcpProcess = StartBackgroundProcess("npx", "--yes @arabold/docs-mcp-server@latest");
       DocsMcpPidFile.WriteAllText(mcpProcess.Id.ToString());
       Log.Information("Docs MCP Server started with PID: {PID}", mcpProcess.Id);
 
