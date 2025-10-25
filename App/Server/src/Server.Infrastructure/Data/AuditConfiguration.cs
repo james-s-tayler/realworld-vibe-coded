@@ -8,17 +8,15 @@ public static class AuditConfiguration
 {
   public static void ConfigureAudit(IServiceProvider serviceProvider, string auditLogsPath)
   {
-    // Ensure the audit logs directory exists
+    // Ensure the audit logs directory exists for fallback file logging
     if (!Directory.Exists(auditLogsPath))
     {
       Directory.CreateDirectory(auditLogsPath);
     }
 
     Audit.Core.Configuration.Setup()
-      .UseFileLogProvider(config => config
-        .Directory(auditLogsPath)
-        .FilenameBuilder(auditEvent =>
-          $"audit_{DateTime.UtcNow:yyyyMMdd_HHmmss_fff}_{Guid.NewGuid():N}.json"))
+      .UseSerilog(config => config
+        .Message(auditEvent => auditEvent.ToJson()))
       .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
       .WithAction(action => action
         .OnScopeCreated(scope =>
