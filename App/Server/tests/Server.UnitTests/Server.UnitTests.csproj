@@ -43,4 +43,8 @@
     <ProjectReference Include="..\..\src\Server.Infrastructure\Server.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\analyzers\Server.Analyzers\Server.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
 </Project>
