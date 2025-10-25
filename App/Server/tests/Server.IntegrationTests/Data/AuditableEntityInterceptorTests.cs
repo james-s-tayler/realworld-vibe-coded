@@ -44,7 +44,7 @@ public class AuditableEntityInterceptorTests : IDisposable
   public async Task Interceptor_SetsCreatedAtAndUpdatedAt_OnEntityCreation()
   {
     // Arrange
-    var fixedTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var fixedTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(fixedTime);
 
     var user = new User(
@@ -58,15 +58,15 @@ public class AuditableEntityInterceptorTests : IDisposable
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert
-    Assert.Equal(fixedTime, user.CreatedAt);
-    Assert.Equal(fixedTime, user.UpdatedAt);
+    user.CreatedAt.ShouldBe(fixedTime);
+    user.UpdatedAt.ShouldBe(fixedTime);
   }
 
   [Fact]
   public async Task Interceptor_UpdatesOnlyUpdatedAt_OnEntityModification()
   {
     // Arrange
-    var createTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var createTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
     var user = new User(
@@ -81,23 +81,23 @@ public class AuditableEntityInterceptorTests : IDisposable
     var originalCreatedAt = user.CreatedAt;
 
     // Act - modify entity with new time
-    var updateTime = new DateTime(2025, 10, 25, 13, 0, 0, DateTimeKind.Utc);
+    var updateTime = DateTime.Parse("2025-10-25 13:0:0").ToUniversalTime();
     _timeProvider.SetTime(updateTime);
 
     user.UpdateBio("New bio");
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert
-    Assert.Equal(originalCreatedAt, user.CreatedAt); // CreatedAt should not change
-    Assert.Equal(updateTime, user.UpdatedAt); // UpdatedAt should be updated
-    Assert.True(user.UpdatedAt > user.CreatedAt);
+    user.CreatedAt.ShouldBe(originalCreatedAt); // CreatedAt should not change
+    user.UpdatedAt.ShouldBe(updateTime); // UpdatedAt should be updated
+    (user.UpdatedAt > user.CreatedAt).ShouldBeTrue();
   }
 
   [Fact]
   public async Task Interceptor_DoesNotUpdateUpdatedAt_WhenOnlyNavigationPropertiesChange()
   {
     // Arrange
-    var createTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var createTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
     var user = new User(
@@ -120,7 +120,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     var originalUpdatedAt = article.UpdatedAt;
 
     // Act - modify only navigation property (add to favorites)
-    var favoriteTime = new DateTime(2025, 10, 25, 13, 0, 0, DateTimeKind.Utc);
+    var favoriteTime = DateTime.Parse("2025-10-25 13:0:0").ToUniversalTime();
     _timeProvider.SetTime(favoriteTime);
 
     var user2 = new User(
@@ -135,14 +135,14 @@ public class AuditableEntityInterceptorTests : IDisposable
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert
-    Assert.Equal(originalUpdatedAt, article.UpdatedAt); // UpdatedAt should NOT change for navigation-only changes
+    article.UpdatedAt.ShouldBe(originalUpdatedAt); // UpdatedAt should NOT change for navigation-only changes
   }
 
   [Fact]
   public async Task Interceptor_HandlesMultipleEntities_InSingleSaveChanges()
   {
     // Arrange
-    var fixedTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var fixedTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(fixedTime);
 
     var user1 = new User("user1@example.com", "user1", "pass1");
@@ -155,20 +155,20 @@ public class AuditableEntityInterceptorTests : IDisposable
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert
-    Assert.Equal(fixedTime, user1.CreatedAt);
-    Assert.Equal(fixedTime, user1.UpdatedAt);
-    Assert.Equal(fixedTime, user2.CreatedAt);
-    Assert.Equal(fixedTime, user2.UpdatedAt);
-    Assert.Equal(fixedTime, tag.CreatedAt);
-    Assert.Equal(fixedTime, tag.UpdatedAt);
+    user1.CreatedAt.ShouldBe(fixedTime);
+    user1.UpdatedAt.ShouldBe(fixedTime);
+    user2.CreatedAt.ShouldBe(fixedTime);
+    user2.UpdatedAt.ShouldBe(fixedTime);
+    tag.CreatedAt.ShouldBe(fixedTime);
+    tag.UpdatedAt.ShouldBe(fixedTime);
   }
 
   [Fact]
   public async Task Interceptor_OverridesManualCreatedAtSetting()
   {
     // Arrange
-    var manualTime = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-    var actualTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var manualTime = DateTime.Parse("2020-1-1 0:0:0").ToUniversalTime();
+    var actualTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(actualTime);
 
     var user = new User("test@example.com", "testuser", "hashedpass");
@@ -179,7 +179,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert - Framework should override manual value
-    Assert.Equal(actualTime, user.CreatedAt);
+    user.CreatedAt.ShouldBe(actualTime);
     Assert.NotEqual(manualTime, user.CreatedAt);
   }
 
@@ -187,7 +187,7 @@ public class AuditableEntityInterceptorTests : IDisposable
   public async Task Interceptor_OverridesManualUpdatedAtSetting()
   {
     // Arrange
-    var createTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var createTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
     var user = new User("test@example.com", "testuser", "hashedpass");
@@ -195,8 +195,8 @@ public class AuditableEntityInterceptorTests : IDisposable
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Act - Try to manually set UpdatedAt (should be overridden by interceptor)
-    var manualTime = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-    var actualUpdateTime = new DateTime(2025, 10, 25, 13, 0, 0, DateTimeKind.Utc);
+    var manualTime = DateTime.Parse("2020-1-1 0:0:0").ToUniversalTime();
+    var actualUpdateTime = DateTime.Parse("2025-10-25 13:0:0").ToUniversalTime();
     _timeProvider.SetTime(actualUpdateTime);
 
     user.UpdateBio("New bio");
@@ -204,7 +204,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert - Framework should override manual value
-    Assert.Equal(actualUpdateTime, user.UpdatedAt);
+    user.UpdatedAt.ShouldBe(actualUpdateTime);
     Assert.NotEqual(manualTime, user.UpdatedAt);
   }
 
@@ -212,7 +212,7 @@ public class AuditableEntityInterceptorTests : IDisposable
   public async Task Interceptor_OverridesManualCreatedBySetting()
   {
     // Arrange
-    var fixedTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var fixedTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(fixedTime);
 
     var user = new User("test@example.com", "testuser", "hashedpass");
@@ -223,7 +223,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert - Framework should override with "SYSTEM" (no authenticated user in test)
-    Assert.Equal("SYSTEM", user.CreatedBy);
+    user.CreatedBy.ShouldBe("SYSTEM");
     Assert.NotEqual("ManualUser", user.CreatedBy);
   }
 
@@ -231,7 +231,7 @@ public class AuditableEntityInterceptorTests : IDisposable
   public async Task Interceptor_OverridesManualUpdatedBySetting()
   {
     // Arrange
-    var createTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var createTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
     var user = new User("test@example.com", "testuser", "hashedpass");
@@ -239,7 +239,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Act - Try to manually set UpdatedBy (should be overridden by interceptor)
-    var updateTime = new DateTime(2025, 10, 25, 13, 0, 0, DateTimeKind.Utc);
+    var updateTime = DateTime.Parse("2025-10-25 13:0:0").ToUniversalTime();
     _timeProvider.SetTime(updateTime);
 
     user.UpdateBio("New bio");
@@ -247,7 +247,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert - Framework should override with "SYSTEM" (no authenticated user in test)
-    Assert.Equal("SYSTEM", user.UpdatedBy);
+    user.UpdatedBy.ShouldBe("SYSTEM");
     Assert.NotEqual("ManualUser", user.UpdatedBy);
   }
 
@@ -255,8 +255,8 @@ public class AuditableEntityInterceptorTests : IDisposable
   public async Task Interceptor_OverridesAllManualAuditFieldSettings()
   {
     // Arrange
-    var manualTime = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-    var actualTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var manualTime = DateTime.Parse("2020-1-1 0:0:0").ToUniversalTime();
+    var actualTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(actualTime);
 
     var user = new User("test@example.com", "testuser", "hashedpass");
@@ -271,17 +271,17 @@ public class AuditableEntityInterceptorTests : IDisposable
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert - Framework should override all manual values
-    Assert.Equal(actualTime, user.CreatedAt);
-    Assert.Equal(actualTime, user.UpdatedAt);
-    Assert.Equal("SYSTEM", user.CreatedBy);
-    Assert.Equal("SYSTEM", user.UpdatedBy);
+    user.CreatedAt.ShouldBe(actualTime);
+    user.UpdatedAt.ShouldBe(actualTime);
+    user.CreatedBy.ShouldBe("SYSTEM");
+    user.UpdatedBy.ShouldBe("SYSTEM");
   }
 
   [Fact]
   public void Interceptor_SetsCreatedAtAndUpdatedAt_OnEntityCreation_Synchronous()
   {
     // Arrange
-    var fixedTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var fixedTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(fixedTime);
 
     var user = new User("sync@example.com", "syncuser", "hashedpass");
@@ -291,17 +291,17 @@ public class AuditableEntityInterceptorTests : IDisposable
     _dbContext.SaveChanges(); // Synchronous save
 
     // Assert
-    Assert.Equal(fixedTime, user.CreatedAt);
-    Assert.Equal(fixedTime, user.UpdatedAt);
-    Assert.Equal("SYSTEM", user.CreatedBy);
-    Assert.Equal("SYSTEM", user.UpdatedBy);
+    user.CreatedAt.ShouldBe(fixedTime);
+    user.UpdatedAt.ShouldBe(fixedTime);
+    user.CreatedBy.ShouldBe("SYSTEM");
+    user.UpdatedBy.ShouldBe("SYSTEM");
   }
 
   [Fact]
   public void Interceptor_UpdatesOnlyUpdatedAtAndUpdatedBy_OnEntityModification_Synchronous()
   {
     // Arrange
-    var creationTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var creationTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(creationTime);
 
     var user = new User("sync2@example.com", "syncuser2", "hashedpass");
@@ -321,17 +321,17 @@ public class AuditableEntityInterceptorTests : IDisposable
     _dbContext.SaveChanges(); // Synchronous save
 
     // Assert
-    Assert.Equal(originalCreatedAt, user.CreatedAt); // Should not change
-    Assert.Equal(originalCreatedBy, user.CreatedBy); // Should not change
-    Assert.Equal(updateTime, user.UpdatedAt); // Should be updated
-    Assert.Equal("SYSTEM", user.UpdatedBy); // Should be updated
+    user.CreatedAt.ShouldBe(originalCreatedAt); // Should not change
+    user.CreatedBy.ShouldBe(originalCreatedBy); // Should not change
+    user.UpdatedAt.ShouldBe(updateTime); // Should be updated
+    user.UpdatedBy.ShouldBe("SYSTEM"); // Should be updated
   }
 
   [Fact]
   public void Interceptor_DoesNotUpdateAuditFields_WhenOnlyNavigationPropertiesChange_Synchronous()
   {
     // Arrange
-    var creationTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    var creationTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
     _timeProvider.SetTime(creationTime);
 
     var author = new User("author@example.com", "author", "hashedpass");
@@ -360,7 +360,7 @@ public class AuditableEntityInterceptorTests : IDisposable
 
     // Assert
     // Since no actual property values changed, UpdatedAt should NOT be updated
-    Assert.Equal(originalUpdatedAt, article.UpdatedAt);
+    article.UpdatedAt.ShouldBe(originalUpdatedAt);
   }
 
   public void Dispose()
