@@ -31,7 +31,7 @@ General functionality:
 - You are not permitted to modify any Archunit rules unless explicitly instructed to do so.
 - Don't hardcode things or use magic strings.
 - Do not use python, perl, awk, sed, or regex to perform mass refactorings. Only do direct updates.
-- Make sure to lint the code before committing.
+- Make sure to run `./build.sh LintAllVerify` before committing to ensure code formatting and linting rules are satisfied.
 - Make sure the postman tests are passing before finishing.
 - Do not add any extraneous documentation unless asked to do so.
 - All the nuke targets that run tests produce reports under `Reports` folder. Make sure to check them if any test fails.

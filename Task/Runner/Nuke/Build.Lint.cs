@@ -80,4 +80,29 @@ public partial class Build
               .SetProject(nukeSolution)
               .SetSeverity("error"));
       });
+
+  Target LintAllVerify => _ => _
+      .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
+      .DependsOn(LintServerVerify, LintNukeVerify)
+      .Executes(() =>
+      {
+        var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
+
+        Log.Information($"Running dotnet format (verify only) on {e2eTestProject}");
+        DotNetFormat(s => s
+              .SetProject(e2eTestProject)
+              .SetVerifyNoChanges(true));
+      });
+
+  Target LintAllFix => _ => _
+      .Description("Fix all C# formatting & analyzer issues automatically")
+      .DependsOn(LintServerFix, LintNukeFix)
+      .Executes(() =>
+      {
+        var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
+
+        Log.Information($"Running dotnet format (fix mode) on {e2eTestProject}");
+        DotNetFormat(s => s
+              .SetProject(e2eTestProject));
+      });
 }
