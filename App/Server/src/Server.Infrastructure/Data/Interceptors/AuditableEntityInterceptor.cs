@@ -56,7 +56,7 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
           .Where(p => p.Metadata.Name != nameof(IAuditableEntity.UpdatedAt)
                       && p.Metadata.Name != nameof(IAuditableEntity.ChangeCheck)
                       && p.Metadata.Name != nameof(IAuditableEntity.CreatedAt))
-          .Any(p => p.IsModified && !Equals(p.OriginalValue, p.CurrentValue));
+          .Any(p => p.IsModified);
 
         if (hasActualChanges)
         {
