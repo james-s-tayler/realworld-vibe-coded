@@ -14,6 +14,10 @@
     <PackageReference Include="FastEndpoints.Swagger" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Serilog.Enrichers.ClientInfo" />
+    <PackageReference Include="Serilog.Exceptions" />
+    <PackageReference Include="Serilog.Formatting.Compact" />
+    <PackageReference Include="Serilog.Sinks.Seq" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
