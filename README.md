@@ -44,3 +44,42 @@ Inside Github Copilot in the repo settings for copilot
 - [n8n MCP Server](https://github.com/leonardsellem/n8n-mcp-server)
 - [Unleash Feature Toggle MCP](https://github.com/cuongtl1992/unleash-mcp)
 - [Workflowy](https://github.com/danield137/mcp-workflowy)
+
+## Code Quality
+
+This repository enforces strict code quality standards:
+
+### Warnings as Errors
+All C# projects are configured to treat warnings as errors via a root-level `Directory.Build.props` file. This ensures that:
+- No code is committed with compiler warnings
+- Code quality standards are consistently enforced
+- Build failures occur immediately when warnings are introduced
+
+### Whitespace Linting
+The repository enforces strict whitespace rules via `.editorconfig`:
+- **Trailing whitespace**: Not allowed
+- **Final newline**: Required
+- **Line endings**: CRLF (Windows-style)
+- **Character encoding**: UTF-8 with BOM for C# files
+- **Formatting**: IDE0055 diagnostic is set to error severity
+
+### Linting Commands
+Use these Nuke build targets to verify and fix code formatting:
+
+```bash
+# Verify all C# code formatting (fails on violations)
+./build.sh LintAllVerify
+
+# Automatically fix all C# code formatting issues
+./build.sh LintAllFix
+
+# Verify/fix specific areas
+./build.sh LintServerVerify   # Backend only
+./build.sh LintServerFix       # Backend only
+./build.sh LintNukeVerify      # Build scripts only
+./build.sh LintNukeFix         # Build scripts only
+./build.sh LintClientVerify    # Frontend only
+./build.sh LintClientFix       # Frontend only
+```
+
+**Before committing**: Always run `./build.sh LintAllVerify` to ensure your changes meet code quality standards.
