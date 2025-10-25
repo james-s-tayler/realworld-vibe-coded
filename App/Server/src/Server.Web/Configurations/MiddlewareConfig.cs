@@ -8,6 +8,15 @@ public static class MiddlewareConfig
 {
   public static async Task<IApplicationBuilder> UseAppMiddlewareAndSeedDatabase(this WebApplication app)
   {
+    // Configure Audit.NET - use path from configuration
+    var auditLogsPath = app.Configuration["Audit:LogsPath"] ?? "Logs/Audit";
+    // Make path absolute if it's relative
+    if (!Path.IsPathRooted(auditLogsPath))
+    {
+      auditLogsPath = Path.Combine(Directory.GetCurrentDirectory(), auditLogsPath);
+    }
+    AuditConfiguration.ConfigureAudit(app.Services, auditLogsPath);
+
     if (app.Environment.IsDevelopment())
     {
       app.UseShowAllServicesMiddleware(); // see https://github.com/ardalis/AspNetCoreStartupServices

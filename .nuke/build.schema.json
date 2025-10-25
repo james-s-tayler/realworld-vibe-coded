@@ -41,6 +41,7 @@
         "LintNukeVerify",
         "LintServerFix",
         "LintServerVerify",
+        "RunLocalCleanDirectories",
         "RunLocalClient",
         "RunLocalDocsMcpServerDown",
         "RunLocalDocsMcpServerUp",
