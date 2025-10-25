@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Server.Core.Interfaces;
 using Server.SharedKernel.Interfaces;
 
@@ -42,9 +43,21 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
 
     var currentTime = _timeProvider.UtcNow;
 
-    // Get the current user service from the scoped service provider
+    // Get the current user service from the scoped service provider via the DbContext
     // This may be null if called outside of an HTTP request context (e.g., during migrations or tests)
-    var currentUserService = _serviceProvider.GetService<ICurrentUserService>();
+    ICurrentUserService? currentUserService = null;
+    try
+    {
+      // Try to get the scoped service provider from the context's service provider
+      // The context's service provider is scoped to the current request
+      var scopedProvider = context.GetInfrastructure();
+      currentUserService = scopedProvider.GetService<ICurrentUserService>();
+    }
+    catch
+    {
+      // Ignore errors - we'll fall back to "SYSTEM"
+    }
+
     var currentUsername = currentUserService?.GetCurrentUsername() ?? "SYSTEM";
 
     var entries = context.ChangeTracker.Entries<IAuditableEntity>();
