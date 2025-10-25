@@ -1,14 +1,11 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.UserAggregate;
-using Server.SharedKernel.Interfaces;
 
 namespace Server.Infrastructure.Data;
 public class AppDbContext(DbContextOptions<AppDbContext> options,
-  IDomainEventDispatcher? dispatcher,
-  ITimeProvider timeProvider) : DbContext(options)
+  IDomainEventDispatcher? dispatcher) : DbContext(options)
 {
   private readonly IDomainEventDispatcher? _dispatcher = dispatcher;
-  private readonly ITimeProvider _timeProvider = timeProvider;
 
   public DbSet<User> Users => Set<User>();
   public DbSet<Article> Articles => Set<Article>();
@@ -60,40 +57,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
 
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
   {
-    // Set audit timestamps for entities
-    var currentTime = _timeProvider.UtcNow;
-    var entries = ChangeTracker.Entries<EntityBase>();
-    foreach (var entry in entries)
-    {
-      if (entry.State == EntityState.Added)
-      {
-        entry.Entity.CreatedAt = currentTime;
-        entry.Entity.UpdatedAt = currentTime;
-      }
-      else if (entry.State == EntityState.Modified)
-      {
-        // Only update UpdatedAt if actual scalar properties have changed values
-        // We check if any property's original value differs from its current value
-        // Exclude: UpdatedAt itself, ChangeCheck (concurrency token), and CreatedAt
-        var hasActualChanges = entry.Properties
-          .Where(p => p.Metadata.Name != nameof(EntityBase.UpdatedAt)
-                      && p.Metadata.Name != nameof(EntityBase.ChangeCheck)
-                      && p.Metadata.Name != nameof(EntityBase.CreatedAt))
-          .Any(p => p.IsModified && !Equals(p.OriginalValue, p.CurrentValue));
-
-        if (hasActualChanges)
-        {
-          entry.Entity.UpdatedAt = currentTime;
-        }
-        else
-        {
-          // If no actual properties changed, don't update UpdatedAt
-          // and mark it as not modified to prevent unnecessary updates
-          entry.Property(nameof(EntityBase.UpdatedAt)).IsModified = false;
-        }
-      }
-    }
-
     int result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
     // ignore events if no dispatcher provided

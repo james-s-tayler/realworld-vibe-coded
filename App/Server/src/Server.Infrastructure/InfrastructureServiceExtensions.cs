@@ -1,6 +1,7 @@
 ﻿using Server.Core.Interfaces;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
+using Server.Infrastructure.Data.Interceptors;
 using Server.Infrastructure.Data.Queries;
 using Server.Infrastructure.Services;
 using Server.SharedKernel.Interfaces;
@@ -16,8 +17,16 @@ public static class InfrastructureServiceExtensions
   {
     string? connectionString = config.GetConnectionString("DefaultConnection");
     Guard.Against.Null(connectionString);
-    services.AddDbContext<AppDbContext>(options =>
-     options.UseSqlServer(connectionString));
+
+    // Register the interceptor
+    services.AddSingleton<ITimeProvider, UtcNowTimeProvider>();
+    services.AddSingleton<AuditableEntityInterceptor>();
+
+    services.AddDbContext<AppDbContext>((serviceProvider, options) =>
+    {
+      options.UseSqlServer(connectionString);
+      options.AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
+    });
 
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
            .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
@@ -27,8 +36,7 @@ public static class InfrastructureServiceExtensions
            .AddScoped<IListTagsQueryService, ListTagsQueryService>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
            .AddScoped<IJwtTokenGenerator, JwtTokenGenerator>()
-           .AddScoped<ICurrentUserService, CurrentUserService>()
-           .AddSingleton<ITimeProvider, SystemTimeProvider>();
+           .AddScoped<ICurrentUserService, CurrentUserService>();
 
     // Configure JWT settings
     var jwtSettings = new JwtSettings();
