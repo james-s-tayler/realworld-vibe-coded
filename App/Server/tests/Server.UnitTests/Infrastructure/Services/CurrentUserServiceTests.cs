@@ -49,7 +49,7 @@ public class CurrentUserServiceTests
   public void GetCurrentUserId_WhenUserHasValidUserId_ReturnsUserId()
   {
     // Arrange
-    const int expectedUserId = 123;
+    var expectedUserId = Guid.NewGuid();
     var identity = new ClaimsIdentity(new[]
     {
       new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString())
@@ -110,7 +110,7 @@ public class CurrentUserServiceTests
   public void GetRequiredCurrentUserId_WhenUserAuthenticated_ReturnsUserId()
   {
     // Arrange
-    const int expectedUserId = 123;
+    var expectedUserId = Guid.NewGuid();
     var identity = new ClaimsIdentity(new[]
     {
       new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString())
@@ -146,7 +146,7 @@ public class CurrentUserServiceTests
     // Arrange
     var identity = new ClaimsIdentity(new[]
     {
-      new Claim(ClaimTypes.NameIdentifier, "123")
+      new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
     }, "test");
     var user = new ClaimsPrincipal(identity);
 

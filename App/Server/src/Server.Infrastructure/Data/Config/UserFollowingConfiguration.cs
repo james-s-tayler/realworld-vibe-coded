@@ -6,6 +6,9 @@ public class UserFollowingConfiguration : IEntityTypeConfiguration<UserFollowing
 {
   public void Configure(EntityTypeBuilder<UserFollowing> builder)
   {
+    // Ignore the inherited Id property since we're using a composite key
+    builder.Ignore(uf => uf.Id);
+
     builder.HasKey(uf => new { uf.FollowerId, uf.FollowedId });
 
     builder.Property(uf => uf.FollowerId)

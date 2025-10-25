@@ -24,7 +24,7 @@ public class Article : EntityBase, IAggregateRoot
   public string Body { get; private set; } = string.Empty;
   public string Slug { get; private set; } = string.Empty;
 
-  public int AuthorId { get; private set; }
+  public Guid AuthorId { get; private set; }
   public User Author { get; private set; } = default!;
 
   public List<Tag> Tags { get; private set; } = new();
@@ -36,7 +36,7 @@ public class Article : EntityBase, IAggregateRoot
   /// <summary>
   /// Checks if the article is favorited by a specific user
   /// </summary>
-  public bool IsFavoritedBy(int? userId)
+  public bool IsFavoritedBy(Guid? userId)
   {
     if (!userId.HasValue)
     {

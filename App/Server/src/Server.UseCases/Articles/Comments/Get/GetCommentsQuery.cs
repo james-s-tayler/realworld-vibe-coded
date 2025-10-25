@@ -4,5 +4,5 @@ namespace Server.UseCases.Articles.Comments.Get;
 
 public record GetCommentsQuery(
   string Slug,
-  int? CurrentUserId = null
+  Guid? CurrentUserId = null
 ) : IQuery<CommentsResponse>;

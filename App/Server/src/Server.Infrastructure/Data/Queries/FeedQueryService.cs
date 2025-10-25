@@ -6,7 +6,7 @@ namespace Server.Infrastructure.Data.Queries;
 public class FeedQueryService(AppDbContext _context) : IFeedQueryService
 {
   public async Task<IEnumerable<Article>> GetFeedAsync(
-    int userId,
+    Guid userId,
     int limit = 20,
     int offset = 0)
   {
@@ -38,7 +38,7 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
     return articles;
   }
 
-  public async Task<int> GetFeedCountAsync(int userId)
+  public async Task<int> GetFeedCountAsync(Guid userId)
   {
     // Get IDs of users that the current user follows
     var followedUserIds = await _context.UserFollowings

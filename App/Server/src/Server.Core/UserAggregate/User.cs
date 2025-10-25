@@ -62,7 +62,7 @@ public class User : EntityBase, IAggregateRoot
     return Following.Any(f => f.FollowedId == user.Id);
   }
 
-  public bool IsFollowing(int userId)
+  public bool IsFollowing(Guid userId)
   {
     return Following.Any(f => f.FollowedId == userId);
   }

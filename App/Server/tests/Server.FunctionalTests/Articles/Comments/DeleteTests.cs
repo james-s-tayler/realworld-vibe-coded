@@ -82,7 +82,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task DeleteComment_WithNonExistentArticle_ReturnsNotFound()
   {
-    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = "no-such-article", Id = 1 });
+    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = "no-such-article", Id = Guid.NewGuid() });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -103,7 +103,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
-    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = 999999 });
+    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = Guid.NewGuid() });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }

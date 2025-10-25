@@ -2,4 +2,4 @@
 
 namespace Server.UseCases.Users.GetCurrent;
 
-public record GetCurrentUserQuery(int UserId) : IQuery<User>;
+public record GetCurrentUserQuery(Guid UserId) : IQuery<User>;

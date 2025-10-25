@@ -4,6 +4,6 @@ namespace Server.UseCases.Articles.Unfavorite;
 
 public record UnfavoriteArticleCommand(
   string Slug,
-  int UserId,
-  int CurrentUserId
+  Guid UserId,
+  Guid CurrentUserId
 ) : ICommand<Article>;

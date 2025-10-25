@@ -2,7 +2,7 @@
 
 public class UserFollowing : EntityBase
 {
-  public UserFollowing(int followerId, int followedId)
+  public UserFollowing(Guid followerId, Guid followedId)
   {
     FollowerId = followerId;
     FollowedId = followedId;
@@ -11,8 +11,8 @@ public class UserFollowing : EntityBase
   // Required by EF Core
   private UserFollowing() { }
 
-  public int FollowerId { get; private set; }
-  public int FollowedId { get; private set; }
+  public Guid FollowerId { get; private set; }
+  public Guid FollowedId { get; private set; }
 
   // Navigation properties
   public User Follower { get; private set; } = default!;

@@ -8,5 +8,5 @@ public record ListArticlesQuery(
   string? Favorited = null,
   int Limit = 20,
   int Offset = 0,
-  int? CurrentUserId = null
+  Guid? CurrentUserId = null
 ) : IQuery<IEnumerable<Article>>;

@@ -5,9 +5,9 @@ namespace Server.Core.Interfaces;
 public interface IFeedQueryService
 {
   Task<IEnumerable<Article>> GetFeedAsync(
-    int userId,
+    Guid userId,
     int limit = 20,
     int offset = 0);
 
-  Task<int> GetFeedCountAsync(int userId);
+  Task<int> GetFeedCountAsync(Guid userId);
 }

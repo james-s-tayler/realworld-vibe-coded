@@ -3,7 +3,7 @@
 namespace Server.UseCases.Users.Update;
 
 public record UpdateUserCommand(
-  int UserId,
+  Guid UserId,
   string? Email = null,
   string? Username = null,
   string? Password = null,

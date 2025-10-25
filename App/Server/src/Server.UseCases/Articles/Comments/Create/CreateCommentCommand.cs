@@ -5,6 +5,6 @@ namespace Server.UseCases.Articles.Comments.Create;
 public record CreateCommentCommand(
   string Slug,
   string Body,
-  int AuthorId,
-  int? CurrentUserId = null
+  Guid AuthorId,
+  Guid? CurrentUserId = null
 ) : ICommand<CommentResponse>;
