@@ -69,6 +69,9 @@ Reports/
 # Nuke build temp files
 .nuke/temp/
 
+# Nuke build PID files for background processes
+.nuke/pids/
+
 # Rider/Resharper DotSettings user files
 *.DotSettings.user
 
