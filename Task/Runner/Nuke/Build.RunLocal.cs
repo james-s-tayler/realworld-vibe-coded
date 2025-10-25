@@ -19,7 +19,7 @@ public partial class Build
     {
       // Pre-create Logs directory structure so docker doesn't create it with root permissions
       LogsAuditDirectory.CreateDirectory();
-      
+
       Log.Information("Starting local development environment with Docker Compose...");
 
       var composeFile = RootDirectory / "Task" / "LocalDev" / "docker-compose.yml";
