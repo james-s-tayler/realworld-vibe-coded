@@ -1,4 +1,5 @@
 ﻿using Ardalis.Result;
+using FluentAssertions;
 using Xunit;
 using Result = Ardalis.Result.Result;
 
@@ -17,15 +18,15 @@ public class ResultImplicitOperators
   {
     var result = DoBusinessOperationExample(expectedString);
 
-    Assert.Equal(expectedString, result.Value);
-    Assert.Equal(ResultStatus.Ok, result.Status);
+    result.Value.Should().Be(expectedString);
+    result.Status.Should().Be(ResultStatus.Ok);
   }
   [Fact]
   public void ConvertToStringValue()
   {
     var result = GetValueForResultExample(Result<string>.Success(expectedString));
 
-    Assert.Equal(expectedString, result);
+    result.Should().Be(expectedString);
   }
 
   [Fact]
@@ -33,8 +34,8 @@ public class ResultImplicitOperators
   {
     var result = Result<string>.Success(expectedString, successMessage);
 
-    Assert.Equal(successMessage, result.SuccessMessage);
-    Assert.Equal(expectedString, result.Value);
+    result.SuccessMessage.Should().Be(successMessage);
+    result.Value.Should().Be(expectedString);
   }
 
   [Fact]
@@ -42,15 +43,15 @@ public class ResultImplicitOperators
   {
     var result = DoBusinessOperationExample(expectedInt);
 
-    Assert.Equal(expectedInt, result.Value);
-    Assert.Equal(ResultStatus.Ok, result.Status);
+    result.Value.Should().Be(expectedInt);
+    result.Status.Should().Be(ResultStatus.Ok);
   }
   [Fact]
   public void ConvertToIntValue()
   {
     var result = GetValueForResultExample(Result<int>.Success(expectedInt));
 
-    Assert.Equal(expectedInt, result);
+    result.Should().Be(expectedInt);
   }
 
   [Fact]
@@ -58,15 +59,15 @@ public class ResultImplicitOperators
   {
     var result = DoBusinessOperationExample(expectedObject);
 
-    Assert.Equal(expectedObject, result.Value);
-    Assert.Equal(ResultStatus.Ok, result.Status);
+    result.Value.Should().Be(expectedObject);
+    result.Status.Should().Be(ResultStatus.Ok);
   }
   [Fact]
   public void ConvertToObjectValue()
   {
     var result = GetValueForResultExample(Result<TestObject>.Success(expectedObject));
 
-    Assert.Equal(expectedObject, result);
+    result.Should().Be(expectedObject);
   }
 
   [Fact]
@@ -74,15 +75,15 @@ public class ResultImplicitOperators
   {
     var result = DoBusinessOperationExample(expectedNullObject);
 
-    Assert.Equal(expectedNullObject, result.Value);
-    Assert.Equal(ResultStatus.Ok, result.Status);
+    result.Value.Should().Be(expectedNullObject);
+    result.Status.Should().Be(ResultStatus.Ok);
   }
   [Fact]
   public void ConvertToNullObjectValue()
   {
     var result = GetValueForResultExample(Result<TestObject>.Success(expectedNullObject));
 
-    Assert.Equal(expectedNullObject, result);
+    result.Should().Be(expectedNullObject);
   }
 
   [Fact]
@@ -92,8 +93,8 @@ public class ResultImplicitOperators
 
     Result convertedResult = result;
 
-    Assert.NotNull(convertedResult);
-    Assert.Equal(expectedString, convertedResult.Errors.First());
+    convertedResult.Should().NotBeNull();
+    convertedResult.Errors.First().Should().Be(expectedString);
   }
 
   public Ardalis.Result.Result<T> DoBusinessOperationExample<T>(T testValue) => testValue;

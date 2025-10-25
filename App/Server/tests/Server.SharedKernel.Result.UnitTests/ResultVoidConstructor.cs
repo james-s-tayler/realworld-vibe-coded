@@ -12,8 +12,8 @@ public class ResultVoidConstructor
   {
     var result = new Result();
 
-    Assert.Null(result.Value);
-    Assert.Equal(ResultStatus.Ok, result.Status);
+    result.Value.Should().BeNull();
+    result.Status.Should().Be(ResultStatus.Ok);
   }
 
   [Fact]
@@ -21,8 +21,8 @@ public class ResultVoidConstructor
   {
     var result = Result.Success();
 
-    Assert.Null(result.Value);
-    Assert.Equal(ResultStatus.Ok, result.Status);
+    result.Value.Should().BeNull();
+    result.Status.Should().Be(ResultStatus.Ok);
   }
 
   [Fact]
@@ -31,9 +31,9 @@ public class ResultVoidConstructor
     var message = "success";
     var result = Result.SuccessWithMessage(message);
 
-    Assert.Null(result.Value);
-    Assert.Equal(ResultStatus.Ok, result.Status);
-    Assert.Equal(message, result.SuccessMessage);
+    result.Value.Should().BeNull();
+    result.Status.Should().Be(ResultStatus.Ok);
+    result.SuccessMessage.Should().Be(message);
   }
 
   [Theory]
@@ -43,8 +43,8 @@ public class ResultVoidConstructor
   {
     var result = Result.Error(new ErrorList(errors, null));
 
-    Assert.Null(result.Value);
-    Assert.Equal(ResultStatus.Error, result.Status);
+    result.Value.Should().BeNull();
+    result.Status.Should().Be(ResultStatus.Error);
 
     if (errors == null)
     {
@@ -64,9 +64,9 @@ public class ResultVoidConstructor
     var errors = new string[] { "Error 1", "Error 2" };
     var result = Result.Error(new ErrorList(errors, correlationId));
 
-    Assert.Null(result.Value);
-    Assert.Equal(ResultStatus.Error, result.Status);
-    Assert.Equal(correlationId, result.CorrelationId);
+    result.Value.Should().BeNull();
+    result.Status.Should().Be(ResultStatus.Error);
+    result.CorrelationId.Should().Be(correlationId);
 
     foreach (var error in errors)
     {
@@ -93,8 +93,8 @@ public class ResultVoidConstructor
 
     var result = Result.Invalid(validationErrors);
 
-    Assert.Null(result.Value);
-    Assert.Equal(ResultStatus.Invalid, result.Status);
+    result.Value.Should().BeNull();
+    result.Status.Should().Be(ResultStatus.Invalid);
 
     result.ValidationErrors.Should().ContainEquivalentOf(new ValidationError { ErrorMessage = "Name is required", Identifier = "name" });
     result.ValidationErrors.Should().ContainEquivalentOf(new ValidationError { ErrorMessage = "PostalCode cannot exceed 10 characters", Identifier = "postalCode" });
@@ -111,8 +111,8 @@ public class ResultVoidConstructor
 
     var result = Result.Invalid(validationError);
 
-    Assert.Null(result.Value);
-    Assert.Equal(ResultStatus.Invalid, result.Status);
+    result.Value.Should().BeNull();
+    result.Status.Should().Be(ResultStatus.Invalid);
 
     result.ValidationErrors.Should().ContainEquivalentOf(new ValidationError { ErrorMessage = "Name is required", Identifier = "name" });
   }
@@ -122,8 +122,8 @@ public class ResultVoidConstructor
   {
     var result = Result.NotFound();
 
-    Assert.Null(result.Value);
-    Assert.Equal(ResultStatus.NotFound, result.Status);
+    result.Value.Should().BeNull();
+    result.Status.Should().Be(ResultStatus.NotFound);
   }
 
   [Fact]
@@ -142,8 +142,8 @@ public class ResultVoidConstructor
   {
     var result = Result.Forbidden();
 
-    Assert.Null(result.Value);
-    Assert.Equal(ResultStatus.Forbidden, result.Status);
+    result.Value.Should().BeNull();
+    result.Status.Should().Be(ResultStatus.Forbidden);
   }
 
   [Fact]
@@ -152,7 +152,7 @@ public class ResultVoidConstructor
     var errorMessage = "You are forbidden";
     var result = Result<object>.Forbidden(errorMessage);
 
-    Assert.Null(result.Value);
+    result.Value.Should().BeNull();
     result.Status.Should().Be(ResultStatus.Forbidden);
     result.Errors.Single().Should().Be(errorMessage);
   }
@@ -162,8 +162,8 @@ public class ResultVoidConstructor
   {
     var result = Result.Unauthorized();
 
-    Assert.Null(result.Value);
-    Assert.Equal(ResultStatus.Unauthorized, result.Status);
+    result.Value.Should().BeNull();
+    result.Status.Should().Be(ResultStatus.Unauthorized);
   }
 
   [Fact]

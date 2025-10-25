@@ -17,7 +17,7 @@ public class ArticleSlugTests
     var slug = Article.GenerateSlug(title);
 
     // Assert
-    Assert.Equal("hello-world-this-is-a-test", slug);
+    slug.ShouldBe("hello-world-this-is-a-test");
   }
 
   [Fact]
@@ -30,6 +30,6 @@ public class ArticleSlugTests
     var slug = Article.GenerateSlug(title);
 
     // Assert
-    Assert.Equal("whats-up-lets-test-quotes-and-more", slug);
+    slug.ShouldBe("whats-up-lets-test-quotes-and-more");
   }
 }
