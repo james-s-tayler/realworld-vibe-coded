@@ -73,11 +73,11 @@ public partial class Build
       PidDirectory.CreateDirectory();
 
       // Check if services are already running
-      if (File.Exists(DocsMcpPidFile) || File.Exists(NgrokPidFile))
+      if (DocsMcpPidFile.FileExists() || NgrokPidFile.FileExists())
       {
         Log.Warning("Services may already be running. Run RunLocalDocsMcpServerDown first.");
         var existingFiles = new[] { DocsMcpPidFile, NgrokPidFile }
-          .Where(f => File.Exists(f))
+          .Where(f => f.FileExists())
           .Select(f => f.ToString());
         Log.Warning("PID files found: {Files}", string.Join(", ", existingFiles));
         throw new Exception("Services may already be running. Clean up PID files first.");
@@ -86,7 +86,7 @@ public partial class Build
       // Start Docs MCP Server in the background
       Log.Information("Starting Docs MCP Server in the background...");
       var mcpProcess = StartBackgroundProcess("npx", "@arabold/docs-mcp-server@latest");
-      File.WriteAllText(DocsMcpPidFile, mcpProcess.Id.ToString());
+      DocsMcpPidFile.WriteAllText(mcpProcess.Id.ToString());
       Log.Information("Docs MCP Server started with PID: {PID}", mcpProcess.Id);
 
       // Wait for the server to be available
@@ -96,7 +96,7 @@ public partial class Build
         Log.Error("Docs MCP Server did not become available within the timeout period");
         // Clean up the started process
         KillProcess(mcpProcess.Id);
-        File.Delete(DocsMcpPidFile);
+        DocsMcpPidFile.DeleteFile();
         throw new Exception("Docs MCP Server failed to start - try run npx @arabold/docs-mcp-server@latest");
       }
       Log.Information("✓ Docs MCP Server is available at http://127.0.0.1:6280");
@@ -116,7 +116,7 @@ public partial class Build
       // Start ngrok in the background
       Log.Information("Starting ngrok in the background...");
       var ngrokProcess = StartBackgroundProcess("ngrok", "http 6280 --url noncognizably-chartographical-fae.ngrok-free.app");
-      File.WriteAllText(NgrokPidFile, ngrokProcess.Id.ToString());
+      NgrokPidFile.WriteAllText(ngrokProcess.Id.ToString());
       Log.Information("ngrok started with PID: {PID}", ngrokProcess.Id);
 
       // Give ngrok a moment to initialize
@@ -136,14 +136,14 @@ public partial class Build
       var errors = new List<string>();
 
       // Stop ngrok first (reverse order of startup)
-      if (File.Exists(NgrokPidFile))
+      if (NgrokPidFile.FileExists())
       {
-        var ngrokPid = int.Parse(File.ReadAllText(NgrokPidFile));
+        var ngrokPid = int.Parse(NgrokPidFile.ReadAllText());
         Log.Information("Stopping ngrok (PID: {PID})...", ngrokPid);
         try
         {
           KillProcess(ngrokPid);
-          File.Delete(NgrokPidFile);
+          NgrokPidFile.DeleteFile();
           Log.Information("✓ ngrok stopped");
         }
         catch (Exception ex)
@@ -159,14 +159,14 @@ public partial class Build
       }
 
       // Stop Docs MCP Server
-      if (File.Exists(DocsMcpPidFile))
+      if (DocsMcpPidFile.FileExists())
       {
-        var mcpPid = int.Parse(File.ReadAllText(DocsMcpPidFile));
+        var mcpPid = int.Parse(DocsMcpPidFile.ReadAllText());
         Log.Information("Stopping Docs MCP Server (PID: {PID})...", mcpPid);
         try
         {
           KillProcess(mcpPid);
-          File.Delete(DocsMcpPidFile);
+          DocsMcpPidFile.DeleteFile();
           Log.Information("✓ Docs MCP Server stopped");
         }
         catch (Exception ex)
