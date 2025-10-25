@@ -51,9 +51,12 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
       });
     }
 
-    // Hash password and create user
-    var hashedPassword = _passwordHasher.HashPassword(request.Password);
-    var newUser = new User(request.Email, request.Username, hashedPassword);
+    // Create user without password (will be set after hashing)
+    var newUser = new User(request.Email, request.Username);
+    
+    // Hash password using Identity's password hasher
+    var hashedPassword = _passwordHasher.HashPassword(newUser, request.Password);
+    newUser.UpdatePassword(hashedPassword);
 
     try
     {

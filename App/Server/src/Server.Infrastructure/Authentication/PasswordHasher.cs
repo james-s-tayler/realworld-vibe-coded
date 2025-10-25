@@ -1,16 +1,26 @@
-﻿using Server.Core.Interfaces;
+﻿using Microsoft.AspNetCore.Identity;
+using Server.Core.Interfaces;
+using Server.Core.UserAggregate;
 
 namespace Server.Infrastructure.Authentication;
 
-public class BcryptPasswordHasher : IPasswordHasher
+public class IdentityPasswordHasher : IPasswordHasher
 {
-  public string HashPassword(string password)
+  private readonly PasswordHasher<User> _passwordHasher;
+
+  public IdentityPasswordHasher()
   {
-    return BCrypt.Net.BCrypt.HashPassword(password);
+    _passwordHasher = new PasswordHasher<User>();
   }
 
-  public bool VerifyPassword(string password, string hashedPassword)
+  public string HashPassword(User user, string password)
   {
-    return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+    return _passwordHasher.HashPassword(user, password);
+  }
+
+  public bool VerifyPassword(User user, string password, string hashedPassword)
+  {
+    var result = _passwordHasher.VerifyHashedPassword(user, hashedPassword, password);
+    return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
   }
 }

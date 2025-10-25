@@ -35,7 +35,9 @@ public class UsersFixture : AppFixture<Program>
     // so we can create it with a null DbContextOptions
     var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
     using var db = new AppDbContext(dbContextOptions, null);
-    await db.Database.EnsureCreatedAsync();
+    
+    // Use migrations instead of EnsureCreated for Identity compatibility
+    await db.Database.MigrateAsync();
   }
 
   protected override void ConfigureServices(IServiceCollection services)

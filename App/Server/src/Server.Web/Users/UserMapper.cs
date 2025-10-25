@@ -31,7 +31,7 @@ public class UserMapper : ResponseMapper<UserResponse, User>
 
     return new UserResponse
     {
-      Email = user.Email,
+      Email = user.Email ?? string.Empty,
       Username = user.Username,
       Bio = user.Bio,
       Image = user.Image,

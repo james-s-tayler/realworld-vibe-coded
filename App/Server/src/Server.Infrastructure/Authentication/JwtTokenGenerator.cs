@@ -25,8 +25,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
       Subject = new ClaimsIdentity(new[]
       {
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Name, user.Username)
+        new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+        new Claim(ClaimTypes.Name, user.UserName ?? string.Empty)
       }),
       Expires = DateTime.UtcNow.AddDays(_jwtSettings.ExpirationInDays),
       SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),

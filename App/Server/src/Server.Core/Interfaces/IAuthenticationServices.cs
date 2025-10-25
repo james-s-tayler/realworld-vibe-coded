@@ -4,8 +4,8 @@ namespace Server.Core.Interfaces;
 
 public interface IPasswordHasher
 {
-  string HashPassword(string password);
-  bool VerifyPassword(string password, string hashedPassword);
+  string HashPassword(User user, string password);
+  bool VerifyPassword(User user, string password, string hashedPassword);
 }
 
 public interface IJwtTokenGenerator
