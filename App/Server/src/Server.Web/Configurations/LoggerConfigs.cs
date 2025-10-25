@@ -10,8 +10,8 @@ public static class LoggerConfigs
     builder.Host.UseSerilog((context, services, config) => config
       .ReadFrom.Configuration(builder.Configuration)
       .ReadFrom.Services(services)
-      .Enrich.WithClientIp()
-      .Enrich.WithCorrelationId()
+      .Enrich.FromLogContext()
+      .Enrich.WithProperty("Application", "Conduit")
       .Enrich.WithExceptionDetails()
       .Destructure.ToMaximumDepth(5)
       .Destructure.ToMaximumStringLength(10000)
