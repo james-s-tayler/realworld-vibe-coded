@@ -80,3 +80,6 @@ node_modules/
 
 # Publish/package artifacts
 publish/
+
+# Logs
+Logs/
