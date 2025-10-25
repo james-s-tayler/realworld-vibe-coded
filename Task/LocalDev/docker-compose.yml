@@ -28,10 +28,12 @@ services:
       ASPNETCORE_URLS: http://+:5000
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true"
       Audit__LogsPath: /app/Logs/Audit
+      Serilog__WriteTo__1__Args__Path: /app/Logs/Server.Web/serilog.txt
     ports:
       - "5000:5000"
     volumes:
       - ../../App/Server:/app
+      - ../../Logs:/app/Logs
       - /app/src/Server.Web/obj
       - /app/src/Server.Web/bin
       - /app/src/Server.Infrastructure/obj
