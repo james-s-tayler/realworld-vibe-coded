@@ -5,6 +5,7 @@
     <PackageReference Include="Ardalis.GuardClauses" />
     <PackageReference Include="Ardalis.SmartEnum" />
     <PackageReference Include="Ardalis.Specification" />
+    <PackageReference Include="Audit.EntityFramework.Core" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>

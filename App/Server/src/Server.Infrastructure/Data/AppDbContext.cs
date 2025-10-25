@@ -1,11 +1,19 @@
-﻿using Server.Core.ArticleAggregate;
+﻿using Audit.EntityFramework;
+using Server.Core.ArticleAggregate;
 using Server.Core.UserAggregate;
 
 namespace Server.Infrastructure.Data;
-public class AppDbContext(DbContextOptions<AppDbContext> options,
-  IDomainEventDispatcher? dispatcher) : DbContext(options)
+
+[AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false)]
+public class AppDbContext : AuditDbContext
 {
-  private readonly IDomainEventDispatcher? _dispatcher = dispatcher;
+  private readonly IDomainEventDispatcher? _dispatcher;
+
+  public AppDbContext(DbContextOptions<AppDbContext> options,
+    IDomainEventDispatcher? dispatcher) : base(options)
+  {
+    _dispatcher = dispatcher;
+  }
 
   public DbSet<User> Users => Set<User>();
   public DbSet<Article> Articles => Set<Article>();
