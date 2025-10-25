@@ -118,7 +118,7 @@ public class ResultConstructor
     var result = Result<object>.Created(value);
 
     result.Status.Should().Be(ResultStatus.Created);
-    string.Empty.Should().Be(result.Location);
+    result.Location.Should().Be(string.Empty);
     result.IsSuccess.Should().BeTrue();
   }
 
