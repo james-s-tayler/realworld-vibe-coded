@@ -95,12 +95,12 @@ public class CurrentUserService : ICurrentUserService
   public string? GetCurrentUsername()
   {
     var httpContext = _httpContextAccessor.HttpContext;
-    if (httpContext?.User?.Identity?.IsAuthenticated != true)
+    if (!IsAuthenticated())
     {
       return null;
     }
 
-    var usernameClaim = httpContext.User.FindFirst(ClaimTypes.Name);
+    var usernameClaim = httpContext!.User.FindFirst(ClaimTypes.Name);
     return usernameClaim?.Value;
   }
 }
