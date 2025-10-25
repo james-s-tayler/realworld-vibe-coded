@@ -74,12 +74,12 @@ Use these Nuke build targets to verify and fix code formatting:
 ./build.sh LintAllFix
 
 # Verify/fix specific areas
-./build.sh LintServerVerify   # Backend only
-./build.sh LintServerFix       # Backend only
-./build.sh LintNukeVerify      # Build scripts only
-./build.sh LintNukeFix         # Build scripts only
-./build.sh LintClientVerify    # Frontend only
-./build.sh LintClientFix       # Frontend only
+./build.sh LintServerVerify    # Backend only
+./build.sh LintServerFix        # Backend only
+./build.sh LintNukeVerify       # Build scripts only
+./build.sh LintNukeFix          # Build scripts only
+./build.sh LintClientVerify     # Frontend only
+./build.sh LintClientFix        # Frontend only
 ```
 
 **Before committing**: Always run `./build.sh LintAllVerify` to ensure your changes meet code quality standards.
