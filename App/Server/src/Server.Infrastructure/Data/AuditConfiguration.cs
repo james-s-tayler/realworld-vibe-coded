@@ -27,7 +27,8 @@ public static class AuditConfiguration
           var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
           if (httpContextAccessor?.HttpContext != null)
           {
-            var currentUserService = serviceProvider.GetService<ICurrentUserService>();
+            // Get ICurrentUserService from the scoped service provider (RequestServices) instead of root provider
+            var currentUserService = httpContextAccessor.HttpContext.RequestServices.GetService<ICurrentUserService>();
             var userId = currentUserService?.GetCurrentUserId();
             var username = httpContextAccessor.HttpContext.User?.Identity?.Name;
 
