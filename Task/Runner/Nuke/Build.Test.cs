@@ -52,6 +52,7 @@ public partial class Build
                   .SetProjectFile(testProject)
                   .SetLoggers($"trx;LogFileName={logFileName}")
                   .SetResultsDirectory(ReportsServerResultsDirectory)
+                  .SetSettingsFile(RootDirectory / "App" / "Server" / "coverlet.runsettings")
                   .AddProcessAdditionalArguments("--collect:\"XPlat Code Coverage\""));
           }
           catch (ProcessException)

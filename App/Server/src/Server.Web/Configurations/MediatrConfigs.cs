@@ -15,10 +15,9 @@ public static class MediatrConfigs
       };
 
     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!))
-            .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>))
             .AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
 
-    // Automatically register TransactionBehavior and ExceptionHandlingBehavior for all ICommand<T> and IQuery<T> types
+    // Automatically register pipeline behaviors for all ICommand<T> and IQuery<T> types
     // Uses reflection to discover types, but the behaviors themselves use constrained generics (no reflection at runtime)
     RegisterPipelineBehaviorsForResultRequests(services, mediatRAssemblies.Where(a => a != null).ToArray()!);
 
@@ -53,8 +52,10 @@ public static class MediatrConfigs
       var resultType = typeof(Result<>).MakeGenericType(innerType);
 
       // Register behaviors in the correct order:
-      // 1. TransactionBehavior (wraps handler execution in transaction)
-      // 2. ExceptionHandlingBehavior (catches exceptions and converts to Result)
+      // 1. LoggingBehavior (logs request handling)
+      // 2. TransactionBehavior (wraps handler execution in transaction)
+      // 3. ExceptionHandlingBehavior (catches exceptions and converts to Result)
+      RegisterBehavior(services, typeof(LoggingBehavior<,>), requestType, innerType, resultType);
       RegisterBehavior(services, typeof(TransactionBehavior<,>), requestType, innerType, resultType);
       RegisterBehavior(services, typeof(ExceptionHandlingBehavior<,>), requestType, innerType, resultType);
     }
