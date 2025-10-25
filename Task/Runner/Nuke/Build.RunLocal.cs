@@ -17,6 +17,11 @@ public partial class Build
     .DependsOn(DbResetForce)
     .Executes(() =>
     {
+      // Pre-create Logs directory structure so docker doesn't create it with root permissions
+      var logsDirectory = RootDirectory / "App" / "Server" / "Logs";
+      var logsAuditDirectory = logsDirectory / "Audit";
+      logsAuditDirectory.CreateDirectory();
+      
       Log.Information("Starting local development environment with Docker Compose...");
 
       var composeFile = RootDirectory / "Task" / "LocalDev" / "docker-compose.yml";

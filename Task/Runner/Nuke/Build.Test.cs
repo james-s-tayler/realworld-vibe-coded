@@ -131,6 +131,9 @@ public partial class Build
       .Executes(() =>
       {
         ReportsTestPostmanDirectory.CreateOrCleanDirectory();
+        // Pre-create Logs/Audit directory so docker doesn't create it with root permissions
+        var logsAuditDirectory = PublishDirectory / "Logs" / "Audit";
+        logsAuditDirectory.CreateOrCleanDirectory();
 
         Log.Information("Running Postman tests with Docker Compose");
 
@@ -182,6 +185,9 @@ public partial class Build
         // explicitly create these so that docker doesn't create them with root permissions making them hard to delete later
         ReportsTestE2eResultsDirectory.CreateOrCleanDirectory();
         ReportsTestE2eArtifactsDirectory.CreateOrCleanDirectory();
+        // Pre-create Logs/Audit directory so docker doesn't create it with root permissions
+        var logsAuditDirectory = PublishDirectory / "Logs" / "Audit";
+        logsAuditDirectory.CreateOrCleanDirectory();
 
         Log.Information("Running E2E tests with Docker Compose");
 

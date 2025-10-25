@@ -81,5 +81,5 @@ node_modules/
 # Publish/package artifacts
 publish/
 
-# Audit log files
-AuditLogs/
+# Logs
+Logs/

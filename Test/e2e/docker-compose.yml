@@ -27,6 +27,8 @@ services:
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true"
     ports:
       - "5000:5000"
+    volumes:
+      - ../../publish/Logs:/app/Logs
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/swagger/index.html"]
       interval: 2s

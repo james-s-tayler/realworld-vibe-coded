@@ -12,9 +12,9 @@ The audit system is configured in **opt-out mode**, which means:
 
 ### Audit Log Storage
 
-Audit logs are stored as JSON files in the `AuditLogs/` directory (excluded from version control via `.gitignore`).
+Audit logs are stored as JSON files in the `Logs/Audit/` directory (excluded from version control via `.gitignore`).
 
-File naming pattern: `audit_yyyyMMdd_HHmmss_<guid>.json`
+File naming pattern: `audit_yyyyMMdd_HHmmss_fff_<guid>.json`
 
 ### Custom Fields
 
@@ -29,7 +29,7 @@ Each audit log includes custom fields when available:
 The `AppDbContext` inherits from `AuditDbContext` instead of `DbContext`:
 
 ```csharp
-[AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = true)]
+[AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false)]
 public class AppDbContext : AuditDbContext
 ```
 
@@ -42,7 +42,7 @@ The `HashedPassword` property in the `User` entity is marked with `[AuditIgnore]
 public string HashedPassword { get; private set; } = default!;
 ```
 
-**Note:** The `[AuditIgnore]` attribute only excludes the property from the `ColumnValues` section. The full entity object graph (including ignored properties) may still appear in the `Entity` section of the audit log. This is a design decision in Audit.EntityFramework to maintain a complete picture of the entity state.
+**Note:** To ensure sensitive data is not logged, `IncludeEntityObjects` is set to `false`. This prevents the full entity object graph from being included in audit logs. A custom Roslyn analyzer (SRV008) enforces this setting at compile-time and will prevent setting `IncludeEntityObjects = true`, as it would bypass `[AuditIgnore]` attributes and potentially log sensitive information like passwords.
 
 ## Audit Log Format
 
@@ -61,7 +61,6 @@ Each audit log file contains a JSON object with the following structure:
         "Name": "User",
         "PrimaryKey": { "Id": 1 },
         "Action": "Insert",
-        "Entity": { /* Full entity object */ },
         "ColumnValues": { /* Database column values (excludes [AuditIgnore] properties) */ },
         "Valid": true
       }
@@ -88,25 +87,25 @@ Each audit log file contains a JSON object with the following structure:
 ### Find all changes by a specific user:
 
 ```bash
-grep -l '"UserId":123' AuditLogs/*.json
+grep -l '"UserId":123' Logs/Audit/*.json
 ```
 
 ### Find all inserts to the Users table:
 
 ```bash
-grep -l '"Table":"Users".*"Action":"Insert"' AuditLogs/*.json
+grep -l '"Table":"Users".*"Action":"Insert"' Logs/Audit/*.json
 ```
 
 ### View a specific audit log:
 
 ```bash
-cat AuditLogs/audit_20251025_111940_<guid>.json | python3 -m json.tool
+cat Logs/Audit/audit_20251025_111940_<guid>.json | python3 -m json.tool
 ```
 
 ### Find changes to a specific entity:
 
 ```bash
-grep -l '"PrimaryKey":{"Id":5}' AuditLogs/*.json
+grep -l '"PrimaryKey":{"Id":5}' Logs/Audit/*.json
 ```
 
 ## Configuration Files
@@ -114,6 +113,7 @@ grep -l '"PrimaryKey":{"Id":5}' AuditLogs/*.json
 - **AuditConfiguration.cs**: Contains the Audit.NET setup and configuration
 - **MiddlewareConfig.cs**: Initializes the audit system during application startup
 - **AppDbContext.cs**: DbContext configured for auditing
+- **AuditDbContextIncludeEntityObjectsAnalyzer.cs**: Roslyn analyzer (SRV008) that prevents accidentally enabling `IncludeEntityObjects`
 
 ## References
 
