@@ -1,6 +1,4 @@
-﻿using Nuke.Common;
-using Nuke.Common.IO;
-using Serilog;
+﻿using Nuke.Common.IO;
 
 public partial class Build
 {
@@ -53,24 +51,4 @@ public partial class Build
   AbsolutePath LogsDirectory => RootDirectory / "Logs";
   AbsolutePath LogsAuditDirectory => RootDirectory / "Logs" / "Audit";
   #endregion
-
-  Target CleanDirectories => _ => _
-    .Description("Pre-create directories that Docker containers need to prevent root permission issues")
-    .Executes(() =>
-    {
-      // Create or clean Reports directories
-      ReportsServerDirectory.CreateOrCleanDirectory();
-      ReportsClientDirectory.CreateOrCleanDirectory();
-      ReportsClientResultsDirectory.CreateOrCleanDirectory();
-      ReportsClientArtifactsDirectory.CreateOrCleanDirectory();
-      ReportsTestE2eDirectory.CreateOrCleanDirectory();
-      ReportsTestE2eResultsDirectory.CreateOrCleanDirectory();
-      ReportsTestE2eArtifactsDirectory.CreateOrCleanDirectory();
-      ReportsTestPostmanDirectory.CreateOrCleanDirectory();
-
-      // Create or clean Logs directories
-      LogsAuditDirectory.CreateOrCleanDirectory();
-
-      Log.Information("✓ Directories cleaned and pre-created");
-    });
 }

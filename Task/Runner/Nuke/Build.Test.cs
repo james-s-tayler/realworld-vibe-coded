@@ -20,7 +20,7 @@ public partial class Build
   Target TestServer => _ => _
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
-      .DependsOn(CleanDirectories)
+      .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
         // Get all test projects in the solution
@@ -79,7 +79,7 @@ public partial class Build
       .Description("Run client tests")
       .DependsOn(InstallClient)
       .DependsOn(InstallDotnetToolLiquidReports)
-      .DependsOn(CleanDirectories)
+      .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
         Log.Information("Running client tests in {ClientDirectory}", ClientDirectory);
@@ -123,7 +123,7 @@ public partial class Build
       .Description("Run postman tests using Docker Compose. Optionally specify a FOLDER parameter to run a specific Postman collection folder. E.g. FOLDER=Auth nuke TestServerPostman")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(CleanDirectories)
+      .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
         Log.Information("Running Postman tests with Docker Compose");
@@ -170,7 +170,7 @@ public partial class Build
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
       .DependsOn(InstallDotnetToolLiquidReports)
-      .DependsOn(CleanDirectories)
+      .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
         Log.Information("Running E2E tests with Docker Compose");

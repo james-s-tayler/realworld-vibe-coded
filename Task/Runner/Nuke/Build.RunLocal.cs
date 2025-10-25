@@ -12,10 +12,31 @@ public partial class Build
   AbsolutePath PidDirectory => RootDirectory / ".nuke" / "pids";
   AbsolutePath DocsMcpPidFile => PidDirectory / "docs-mcp-server.pid";
   AbsolutePath NgrokPidFile => PidDirectory / "ngrok.pid";
+
+  Target RunLocalCleanDirectories => _ => _
+    .Description("Pre-create directories that Docker containers need to prevent root permission issues")
+    .Executes(() =>
+    {
+      // Create or clean Reports directories
+      ReportsServerDirectory.CreateOrCleanDirectory();
+      ReportsClientDirectory.CreateOrCleanDirectory();
+      ReportsClientResultsDirectory.CreateOrCleanDirectory();
+      ReportsClientArtifactsDirectory.CreateOrCleanDirectory();
+      ReportsTestE2eDirectory.CreateOrCleanDirectory();
+      ReportsTestE2eResultsDirectory.CreateOrCleanDirectory();
+      ReportsTestE2eArtifactsDirectory.CreateOrCleanDirectory();
+      ReportsTestPostmanDirectory.CreateOrCleanDirectory();
+
+      // Create or clean Logs directories
+      LogsAuditDirectory.CreateOrCleanDirectory();
+
+      Log.Information("✓ Directories cleaned and pre-created");
+    });
+
   Target RunLocalServer => _ => _
     .Description("Run backend locally using Docker Compose with SQL Server and hot-reload")
     .DependsOn(DbResetForce)
-    .DependsOn(CleanDirectories)
+    .DependsOn(RunLocalCleanDirectories)
     .Executes(() =>
     {
       Log.Information("Starting local development environment with Docker Compose...");
