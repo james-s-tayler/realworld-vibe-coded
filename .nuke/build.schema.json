@@ -27,6 +27,7 @@
         "BuildClient",
         "BuildServer",
         "BuildServerPublish",
+        "CleanDirectories",
         "DbMigrationsTestApply",
         "DbReset",
         "DbResetForce",

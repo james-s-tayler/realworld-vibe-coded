@@ -20,10 +20,9 @@ public partial class Build
   Target TestServer => _ => _
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
+      .DependsOn(CleanDirectories)
       .Executes(() =>
       {
-        ReportsServerDirectory.CreateOrCleanDirectory();
-
         // Get all test projects in the solution
         var testsDirectory = RootDirectory / "App" / "Server" / "tests";
         var testProjects = testsDirectory.GlobDirectories("*")
@@ -80,13 +79,9 @@ public partial class Build
       .Description("Run client tests")
       .DependsOn(InstallClient)
       .DependsOn(InstallDotnetToolLiquidReports)
+      .DependsOn(CleanDirectories)
       .Executes(() =>
       {
-        ReportsClientDirectory.CreateOrCleanDirectory();
-        // explicitly create these so that docker doesn't create them with root permissions making them hard to delete later
-        ReportsClientResultsDirectory.CreateOrCleanDirectory();
-        ReportsClientArtifactsDirectory.CreateOrCleanDirectory();
-
         Log.Information("Running client tests in {ClientDirectory}", ClientDirectory);
 
         var testsFailed = false;
@@ -128,12 +123,9 @@ public partial class Build
       .Description("Run postman tests using Docker Compose. Optionally specify a FOLDER parameter to run a specific Postman collection folder. E.g. FOLDER=Auth nuke TestServerPostman")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
+      .DependsOn(CleanDirectories)
       .Executes(() =>
       {
-        ReportsTestPostmanDirectory.CreateOrCleanDirectory();
-        // Pre-create Logs/Audit directory so docker doesn't create it with root permissions
-        LogsAuditDirectory.CreateOrCleanDirectory();
-
         Log.Information("Running Postman tests with Docker Compose");
 
         var envVars = new Dictionary<string, string>
@@ -178,15 +170,9 @@ public partial class Build
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
       .DependsOn(InstallDotnetToolLiquidReports)
+      .DependsOn(CleanDirectories)
       .Executes(() =>
       {
-        ReportsTestE2eDirectory.CreateOrCleanDirectory();
-        // explicitly create these so that docker doesn't create them with root permissions making them hard to delete later
-        ReportsTestE2eResultsDirectory.CreateOrCleanDirectory();
-        ReportsTestE2eArtifactsDirectory.CreateOrCleanDirectory();
-        // Pre-create Logs/Audit directory so docker doesn't create it with root permissions
-        LogsAuditDirectory.CreateOrCleanDirectory();
-
         Log.Information("Running E2E tests with Docker Compose");
 
         int exitCode = 0;

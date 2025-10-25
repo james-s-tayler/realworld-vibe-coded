@@ -15,11 +15,9 @@ public partial class Build
   Target RunLocalServer => _ => _
     .Description("Run backend locally using Docker Compose with SQL Server and hot-reload")
     .DependsOn(DbResetForce)
+    .DependsOn(CleanDirectories)
     .Executes(() =>
     {
-      // Pre-create Logs directory structure so docker doesn't create it with root permissions
-      LogsAuditDirectory.CreateDirectory();
-
       Log.Information("Starting local development environment with Docker Compose...");
 
       var composeFile = RootDirectory / "Task" / "LocalDev" / "docker-compose.yml";
