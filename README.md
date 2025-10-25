@@ -19,7 +19,7 @@ An attempt at implementing gothinkster/realworld purely through vibe-coding
 
 Inside Github Copilot in the repo settings for copilot
 
-    { 
+    {
       "mcpServers": {
         "docs-mcp-server": {
           "type": "sse",

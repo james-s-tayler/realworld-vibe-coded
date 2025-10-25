@@ -33,6 +33,8 @@
         "InstallClient",
         "InstallDotnetToolLiquidReports",
         "InstallGitHooks",
+        "LintAllFix",
+        "LintAllVerify",
         "LintClientFix",
         "LintClientVerify",
         "LintNukeFix",
