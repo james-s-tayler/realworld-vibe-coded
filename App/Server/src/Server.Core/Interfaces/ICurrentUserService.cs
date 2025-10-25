@@ -29,4 +29,10 @@ public interface ICurrentUserService
   /// </summary>
   /// <returns>The JWT token if present, otherwise null</returns>
   string? GetCurrentToken();
+
+  /// <summary>
+  /// Gets the current authenticated user's username
+  /// </summary>
+  /// <returns>The username if authenticated, otherwise null</returns>
+  string? GetCurrentUsername();
 }

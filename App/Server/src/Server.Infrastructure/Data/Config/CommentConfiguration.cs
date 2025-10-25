@@ -9,12 +9,6 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
     builder.Property(x => x.Body)
       .IsRequired();
 
-    builder.Property(x => x.CreatedAt)
-      .IsRequired();
-
-    builder.Property(x => x.UpdatedAt)
-      .IsRequired();
-
     // One-to-many relationship with User (Author)
     builder.HasOne(x => x.Author)
       .WithMany()

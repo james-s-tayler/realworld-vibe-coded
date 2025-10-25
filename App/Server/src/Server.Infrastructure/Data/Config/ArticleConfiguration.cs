@@ -24,12 +24,6 @@ public class ArticleConfiguration : IEntityTypeConfiguration<Article>
     builder.HasIndex(x => x.Slug)
       .IsUnique();
 
-    builder.Property(x => x.CreatedAt)
-      .IsRequired();
-
-    builder.Property(x => x.UpdatedAt)
-      .IsRequired();
-
     // One-to-many relationship with User (Author)
     builder.HasOne(x => x.Author)
       .WithMany()

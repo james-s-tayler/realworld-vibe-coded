@@ -87,4 +87,20 @@ public class CurrentUserService : ICurrentUserService
 
     return null;
   }
+
+  /// <summary>
+  /// Gets the current authenticated user's username
+  /// </summary>
+  /// <returns>The username if authenticated, otherwise null</returns>
+  public string? GetCurrentUsername()
+  {
+    var httpContext = _httpContextAccessor.HttpContext;
+    if (!IsAuthenticated())
+    {
+      return null;
+    }
+
+    var usernameClaim = httpContext!.User.FindFirst(ClaimTypes.Name);
+    return usernameClaim?.Value;
+  }
 }

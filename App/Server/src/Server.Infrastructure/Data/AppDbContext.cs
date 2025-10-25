@@ -26,20 +26,57 @@ public class AppDbContext : AuditDbContext
     base.OnModelCreating(modelBuilder);
     modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-    // Configure ChangeCheck property for all entities inheriting from EntityBase
+    // Configure properties for all entities inheriting from EntityBase
     foreach (var entityType in modelBuilder.Model.GetEntityTypes())
     {
       // Check if the entity inherits from any of the EntityBase variants
       if (typeof(EntityBase).IsAssignableFrom(entityType.ClrType) ||
           (entityType.ClrType.BaseType?.IsGenericType == true &&
-           entityType.ClrType.BaseType.GetGenericTypeDefinition().Name.StartsWith("EntityBase")))
+           entityType.ClrType.BaseType.GetGenericTypeDefinition().Name.StartsWith(nameof(EntityBase))))
       {
-        var property = entityType.FindProperty("ChangeCheck");
-        if (property != null)
+        // Configure ChangeCheck for optimistic concurrency
+        var changeCheckProperty = entityType.FindProperty(nameof(EntityBase.ChangeCheck));
+        if (changeCheckProperty != null)
         {
           modelBuilder.Entity(entityType.ClrType)
-            .Property("ChangeCheck")
+            .Property(nameof(EntityBase.ChangeCheck))
             .IsRowVersion();
+        }
+
+        // Configure audit timestamps
+        var createdAtProperty = entityType.FindProperty(nameof(EntityBase.CreatedAt));
+        if (createdAtProperty != null)
+        {
+          modelBuilder.Entity(entityType.ClrType)
+            .Property(nameof(EntityBase.CreatedAt))
+            .IsRequired();
+        }
+
+        var updatedAtProperty = entityType.FindProperty(nameof(EntityBase.UpdatedAt));
+        if (updatedAtProperty != null)
+        {
+          modelBuilder.Entity(entityType.ClrType)
+            .Property(nameof(EntityBase.UpdatedAt))
+            .IsRequired();
+        }
+
+        // Configure audit user tracking
+        var createdByProperty = entityType.FindProperty(nameof(EntityBase.CreatedBy));
+        if (createdByProperty != null)
+        {
+          modelBuilder.Entity(entityType.ClrType)
+            .Property(nameof(EntityBase.CreatedBy))
+            .IsRequired()
+            .HasMaxLength(256);
+        }
+
+        var updatedByProperty = entityType.FindProperty(nameof(EntityBase.UpdatedBy));
+        if (updatedByProperty != null)
+        {
+          modelBuilder.Entity(entityType.ClrType)
+            .Property(nameof(EntityBase.UpdatedBy))
+            .IsRequired()
+            .HasMaxLength(256);
         }
       }
     }

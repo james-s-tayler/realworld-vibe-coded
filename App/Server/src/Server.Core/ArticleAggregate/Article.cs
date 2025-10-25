@@ -12,8 +12,6 @@ public class Article : EntityBase, IAggregateRoot
     Author = Guard.Against.Null(author);
     AuthorId = author.Id;
     Slug = GenerateSlug(title);
-    CreatedAt = DateTime.UtcNow;
-    UpdatedAt = DateTime.UtcNow;
     Tags = new List<Tag>();
     FavoritedBy = new List<User>();
     Comments = new List<Comment>();
@@ -25,8 +23,6 @@ public class Article : EntityBase, IAggregateRoot
   public string Description { get; private set; } = string.Empty;
   public string Body { get; private set; } = string.Empty;
   public string Slug { get; private set; } = string.Empty;
-  public DateTime CreatedAt { get; private set; }
-  public DateTime UpdatedAt { get; private set; }
 
   public int AuthorId { get; private set; }
   public User Author { get; private set; } = default!;
@@ -79,7 +75,6 @@ public class Article : EntityBase, IAggregateRoot
     Description = Guard.Against.NullOrEmpty(description);
     Body = Guard.Against.NullOrEmpty(body);
     Slug = GenerateSlug(title);
-    UpdatedAt = DateTime.UtcNow;
   }
 
   public void AddTag(Tag tag)
