@@ -83,37 +83,21 @@ public partial class Build
         throw new Exception("Services may already be running. Clean up PID files first.");
       }
 
-      // Install the latest version of docs-mcp-server
-      Log.Information("Installing latest version of @arabold/docs-mcp-server...");
-      try
-      {
-        NpmInstall(s => s
-          .SetProcessWorkingDirectory(RootDirectory)
-          .SetPackages("@arabold/docs-mcp-server@latest")
-          .EnableGlobal());
-        Log.Information("✓ @arabold/docs-mcp-server@latest installed");
-      }
-      catch (Exception ex)
-      {
-        Log.Warning("Failed to install @arabold/docs-mcp-server@latest: {Message}", ex.Message);
-        Log.Warning("Continuing with existing version...");
-      }
-
       // Start Docs MCP Server in the background
       Log.Information("Starting Docs MCP Server in the background...");
-      var mcpProcess = StartBackgroundProcess("npx", "@arabold/docs-mcp-server");
+      var mcpProcess = StartBackgroundProcess("npx", "@arabold/docs-mcp-server@latest");
       File.WriteAllText(DocsMcpPidFile, mcpProcess.Id.ToString());
       Log.Information("Docs MCP Server started with PID: {PID}", mcpProcess.Id);
 
       // Wait for the server to be available
       Log.Information("Waiting for Docs MCP Server to be available at http://127.0.0.1:6280...");
-      if (!WaitForHttpEndpoint("http://127.0.0.1:6280", timeoutSeconds: 60))
+      if (!WaitForHttpEndpoint("http://127.0.0.1:6280", timeoutSeconds: 15))
       {
         Log.Error("Docs MCP Server did not become available within the timeout period");
         // Clean up the started process
         KillProcess(mcpProcess.Id);
         File.Delete(DocsMcpPidFile);
-        throw new Exception("Docs MCP Server failed to start");
+        throw new Exception("Docs MCP Server failed to start - try run npx @arabold/docs-mcp-server@latest");
       }
       Log.Information("✓ Docs MCP Server is available at http://127.0.0.1:6280");
 
