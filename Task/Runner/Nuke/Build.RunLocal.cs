@@ -30,13 +30,19 @@ public partial class Build
       };
       Console.CancelKeyPress += handler;
 
+      var envVars = new Dictionary<string, string>
+      {
+        ["DOCKER_BUILDKIT"] = "1"
+      };
+
       try
       {
         // Run docker-compose to start SQL Server and API with hot-reload
         Log.Information("Running Docker Compose for local development...");
         var args = $"compose -f {composeFile} up --build";
         var process = ProcessTasks.StartProcess("docker", args,
-              workingDirectory: RootDirectory);
+              workingDirectory: RootDirectory,
+              environmentVariables: envVars);
         process.WaitForExit();
       }
       finally
@@ -85,7 +91,7 @@ public partial class Build
 
       // Start Docs MCP Server in the background
       Log.Information("Starting Docs MCP Server in the background...");
-      var mcpProcess = StartBackgroundProcess("npx", "@arabold/docs-mcp-server@latest");
+      var mcpProcess = StartBackgroundProcess("npx", "--yes @arabold/docs-mcp-server@latest");
       DocsMcpPidFile.WriteAllText(mcpProcess.Id.ToString());
       Log.Information("Docs MCP Server started with PID: {PID}", mcpProcess.Id);
 
