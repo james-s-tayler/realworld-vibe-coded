@@ -141,7 +141,6 @@ var lastWrite = fileInfo.LastWriteTime;
 - `Build.cs`
 - `Build.Build.cs`
 - `Build.Db.cs`
-- `Build.DbMigrations.cs`
 - `Build.Install.cs`
 - `Build.Lint.cs`
 - `Build.Paths.cs`
@@ -184,7 +183,7 @@ Add the target to one of the existing Build files, choosing the most appropriate
 - `Build.Lint.cs` - Linting and formatting targets
 - `Build.Install.cs` - Installation and setup targets
 - `Build.RunLocal.cs` - Local development targets
-- `Build.Db.cs` / `Build.DbMigrations.cs` - Database-related targets
+- `Build.Db.cs` - Database-related targets (including migrations)
 - `Build.Paths.cs` - Path definitions (not typically for targets)
 
 ---

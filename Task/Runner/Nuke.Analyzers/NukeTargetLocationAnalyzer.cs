@@ -23,7 +23,6 @@ public class NukeTargetLocationAnalyzer : DiagnosticAnalyzer
       "Build.cs",
       "Build.Build.cs",
       "Build.Db.cs",
-      "Build.DbMigrations.cs",
       "Build.Install.cs",
       "Build.Lint.cs",
       "Build.Paths.cs",
