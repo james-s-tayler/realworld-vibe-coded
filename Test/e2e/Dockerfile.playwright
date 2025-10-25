@@ -13,8 +13,9 @@ WORKDIR /tests
 # Copy project file first for better layer caching
 COPY E2eTests/E2eTests.csproj E2eTests/
 
-# Restore dependencies in a separate layer for better caching
-RUN dotnet restore E2eTests/E2eTests.csproj
+# Restore dependencies with BuildKit cache mount for better caching across builds
+RUN --mount=type=cache,target=/root/.nuget/packages \
+    dotnet restore E2eTests/E2eTests.csproj
 
 # Copy the rest of the test files
 COPY E2eTests/ E2eTests/
