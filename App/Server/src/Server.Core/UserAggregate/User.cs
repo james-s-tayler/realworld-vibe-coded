@@ -1,4 +1,6 @@
-﻿namespace Server.Core.UserAggregate;
+﻿using Audit.EntityFramework;
+
+namespace Server.Core.UserAggregate;
 
 public class User : EntityBase, IAggregateRoot
 {
@@ -15,6 +17,8 @@ public class User : EntityBase, IAggregateRoot
 
   public string Email { get; private set; } = default!;
   public string Username { get; private set; } = default!;
+
+  [AuditIgnore]
   public string HashedPassword { get; private set; } = default!;
   public string Bio { get; private set; } = default!;
   public string? Image { get; private set; }
