@@ -12,7 +12,7 @@ public class UserByUsernameWithFollowingSpec : Specification<User>
 
 public class UserWithFollowingSpec : Specification<User>
 {
-  public UserWithFollowingSpec(int userId)
+  public UserWithFollowingSpec(Guid userId)
   {
     Query.Where(u => u.Id == userId)
          .Include(u => u.Following)
@@ -22,7 +22,7 @@ public class UserWithFollowingSpec : Specification<User>
 
 public class IsFollowingSpec : Specification<UserFollowing>
 {
-  public IsFollowingSpec(int followerId, int followedId)
+  public IsFollowingSpec(Guid followerId, Guid followedId)
   {
     Query.Where(uf => uf.FollowerId == followerId && uf.FollowedId == followedId);
   }

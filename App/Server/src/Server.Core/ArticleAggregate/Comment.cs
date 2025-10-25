@@ -17,10 +17,10 @@ public class Comment : EntityBase
 
   public string Body { get; private set; } = string.Empty;
 
-  public int AuthorId { get; private set; }
+  public Guid AuthorId { get; private set; }
   public User Author { get; private set; } = default!;
 
-  public int ArticleId { get; private set; }
+  public Guid ArticleId { get; private set; }
   public Article Article { get; private set; } = default!;
 
   public void Update(string body)

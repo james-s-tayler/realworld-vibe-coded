@@ -2,5 +2,5 @@
 
 public record DeleteArticleCommand(
   string Slug,
-  int UserId
+  Guid UserId
 ) : ICommand<Unit>;

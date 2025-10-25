@@ -7,6 +7,6 @@ public record UpdateArticleCommand(
   string? Title,
   string? Description,
   string? Body,
-  int UserId,
-  int CurrentUserId
+  Guid UserId,
+  Guid CurrentUserId
 ) : ICommand<Article>;

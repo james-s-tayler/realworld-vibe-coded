@@ -7,6 +7,6 @@ public record CreateArticleCommand(
   string Description,
   string Body,
   List<string> TagList,
-  int AuthorId,
-  int? CurrentUserId = null
+  Guid AuthorId,
+  Guid? CurrentUserId = null
 ) : ICommand<Article>;

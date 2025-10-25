@@ -1,7 +1,7 @@
 ﻿namespace Server.Core.ArticleAggregate.Dtos;
 
 public record CommentDto(
-  int Id,
+  Guid Id,
   DateTime CreatedAt,
   DateTime UpdatedAt,
   string Body,

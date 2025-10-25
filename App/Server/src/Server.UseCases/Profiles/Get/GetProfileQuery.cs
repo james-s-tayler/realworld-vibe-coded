@@ -4,5 +4,5 @@ namespace Server.UseCases.Profiles.Get;
 
 public record GetProfileQuery(
   string Username,
-  int? CurrentUserId = null
+  Guid? CurrentUserId = null
 ) : IQuery<User>;

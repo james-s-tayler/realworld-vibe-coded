@@ -9,14 +9,14 @@ public interface ICurrentUserService
   /// Gets the current authenticated user's ID
   /// </summary>
   /// <returns>The user ID if authenticated and valid, otherwise null</returns>
-  int? GetCurrentUserId();
+  Guid? GetCurrentUserId();
 
   /// <summary>
   /// Gets the current authenticated user's ID, throwing an exception if not authenticated
   /// </summary>
   /// <returns>The authenticated user's ID</returns>
   /// <exception cref="UnauthorizedAccessException">Thrown when user is not authenticated</exception>
-  int GetRequiredCurrentUserId();
+  Guid GetRequiredCurrentUserId();
 
   /// <summary>
   /// Determines if the current user is authenticated

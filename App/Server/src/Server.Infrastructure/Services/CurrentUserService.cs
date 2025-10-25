@@ -20,7 +20,7 @@ public class CurrentUserService : ICurrentUserService
   /// Gets the current authenticated user's ID
   /// </summary>
   /// <returns>The user ID if authenticated and valid, otherwise null</returns>
-  public int? GetCurrentUserId()
+  public Guid? GetCurrentUserId()
   {
     var httpContext = _httpContextAccessor.HttpContext;
     if (httpContext?.User?.Identity?.IsAuthenticated != true)
@@ -29,7 +29,7 @@ public class CurrentUserService : ICurrentUserService
     }
 
     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+    if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
     {
       return userId;
     }
@@ -42,7 +42,7 @@ public class CurrentUserService : ICurrentUserService
   /// </summary>
   /// <returns>The authenticated user's ID</returns>
   /// <exception cref="UnauthorizedAccessException">Thrown when user is not authenticated</exception>
-  public int GetRequiredCurrentUserId()
+  public Guid GetRequiredCurrentUserId()
   {
     var userId = GetCurrentUserId();
     if (!userId.HasValue)

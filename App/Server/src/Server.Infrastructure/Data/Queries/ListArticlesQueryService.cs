@@ -11,7 +11,7 @@ public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQuer
     string? favorited = null,
     int limit = 20,
     int offset = 0,
-    int? currentUserId = null)
+    Guid? currentUserId = null)
   {
     var query = BuildQuery(tag, author, favorited);
 
