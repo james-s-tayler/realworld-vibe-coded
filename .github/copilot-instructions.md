@@ -31,11 +31,12 @@ General functionality:
 - You are not permitted to modify any Archunit rules unless explicitly instructed to do so.
 - Don't hardcode things or use magic strings.
 - Do not use python, perl, awk, sed, or regex to perform mass refactorings. Only do direct updates.
-- Make sure to run `./build.sh LintAllVerify` before committing to ensure code formatting and linting rules are satisfied.
+- Make sure to run `./build.sh LintAllVerify` before committing to ensure code formatting and linting rules are satisfied and run `./build.sh LintAllFix` if any errors found.
 - Make sure the postman tests are passing before finishing.
-- Do not add any extraneous documentation unless asked to do so.
+- DO NOT add or update any documentation unless asked to do so.
 - All the nuke targets that run tests produce reports under `Reports` folder. Make sure to check them if any test fails.
 - If you get stuck on an implementation detail related to a particular library use the docs-mcp-server to search for the relevant documentation.
+- If you modify the nuke build you MUST try and build it first before committing.
 
 ## Folder Structure
 
@@ -65,7 +66,7 @@ General functionality:
 - xUnit for testing
 
 ## Testing
-- There is a comprehensive Postman collection that can be run through `./build.sh test-server-postman`. The Postman collection is also split into folders which have their own Nuke targets and can independently test areas of the system. The quality of the Postman suite is excellent. If the Postman suite is green, then the backend api has been implemented correctly. 
+- There is a comprehensive Postman collection that can be run through `./build.sh test-server-postman`. The Postman collection is also split into folders which have their own Nuke targets and can independently test areas of the system. The quality of the Postman suite is excellent. If the Postman suite is green, then the backend api has been implemented correctly.
 
 ## Infrastructure as Code
 - Bicep for Azure infrastructure as code
