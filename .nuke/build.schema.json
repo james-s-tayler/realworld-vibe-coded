@@ -40,6 +40,8 @@
         "LintServerFix",
         "LintServerVerify",
         "RunLocalClient",
+        "RunLocalDocsMcpServerDown",
+        "RunLocalDocsMcpServerUp",
         "RunLocalServer",
         "TestClient",
         "TestE2e",

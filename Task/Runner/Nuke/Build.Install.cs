@@ -1,4 +1,5 @@
 ﻿using Nuke.Common;
+using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
@@ -15,8 +16,8 @@ public partial class Build
         var packageLock = ClientDirectory / "package-lock.json";
         var nodeModules = ClientDirectory / "node_modules";
 
-        if (!Directory.Exists(nodeModules) ||
-              (File.Exists(packageLock) && File.GetLastWriteTime(packageLock) > Directory.GetLastWriteTime(nodeModules)))
+        if (!nodeModules.DirectoryExists() ||
+              (packageLock.FileExists() && packageLock.ToFileInfo().LastWriteTime > nodeModules.ToDirectoryInfo().LastWriteTime))
         {
           Log.Information("Installing/updating client dependencies...");
           NpmCi(s => s
