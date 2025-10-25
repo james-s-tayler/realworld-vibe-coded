@@ -71,7 +71,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
     // Update password if provided
     if (!string.IsNullOrEmpty(request.Password))
     {
-      var hashedPassword = _passwordHasher.HashPassword(request.Password);
+      var hashedPassword = _passwordHasher.HashPassword(user, request.Password);
       user.UpdatePassword(hashedPassword);
     }
 

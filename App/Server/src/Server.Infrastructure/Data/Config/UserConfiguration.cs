@@ -6,18 +6,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
   public void Configure(EntityTypeBuilder<User> builder)
   {
-    builder.Property(p => p.Email)
-        .HasMaxLength(DataSchemaConstants.EMAIL_LENGTH)
-        .IsRequired();
-
-    builder.Property(p => p.Username)
-        .HasMaxLength(DataSchemaConstants.USERNAME_LENGTH)
-        .IsRequired();
-
-    builder.Property(p => p.HashedPassword)
-        .HasMaxLength(DataSchemaConstants.HASHED_PASSWORD_LENGTH)
-        .IsRequired();
-
+    // Bio and Image are custom fields
     builder.Property(p => p.Bio)
         .HasMaxLength(DataSchemaConstants.BIO_LENGTH)
         .IsRequired();
@@ -25,12 +14,31 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     builder.Property(p => p.Image)
         .HasMaxLength(DataSchemaConstants.IMAGE_URL_LENGTH);
 
-    // Create unique indexes
-    builder.HasIndex(p => p.Email)
+    // Configure audit fields
+    builder.Property(p => p.CreatedAt)
+        .IsRequired();
+
+    builder.Property(p => p.UpdatedAt)
+        .IsRequired();
+
+    builder.Property(p => p.CreatedBy)
+        .IsRequired()
+        .HasMaxLength(256);
+
+    builder.Property(p => p.UpdatedBy)
+        .IsRequired()
+        .HasMaxLength(256);
+
+    builder.Property(p => p.ChangeCheck)
+        .IsRowVersion();
+
+    // Note: Email, UserName, and other Identity fields are configured by IdentityDbContext
+    // We only ensure our custom unique indexes match the database schema expectations
+    builder.HasIndex(p => p.NormalizedEmail)
         .IsUnique()
         .HasDatabaseName("IX_Users_Email");
 
-    builder.HasIndex(p => p.Username)
+    builder.HasIndex(p => p.NormalizedUserName)
         .IsUnique()
         .HasDatabaseName("IX_Users_Username");
   }

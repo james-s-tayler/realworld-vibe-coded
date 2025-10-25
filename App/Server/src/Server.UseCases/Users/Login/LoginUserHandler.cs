@@ -34,8 +34,8 @@ public class LoginUserHandler : IQueryHandler<LoginUserQuery, User>
       return Result.Unauthorized();
     }
 
-    // Verify password
-    if (!_passwordHasher.VerifyPassword(request.Password, user.HashedPassword))
+    // Verify password using Identity's password hasher
+    if (!_passwordHasher.VerifyPassword(user, request.Password, user.HashedPassword))
     {
       _logger.LogWarning("Login failed: Invalid password for user {Email}", request.Email);
       return Result.Unauthorized();
