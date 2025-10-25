@@ -28,7 +28,7 @@ public class ProfilesFixture : AppFixture<Program>
 
     using var serviceProvider = serviceCollection.BuildServiceProvider();
     var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    using var db = new AppDbContext(dbContextOptions, null);
+    using var db = new AppDbContext(dbContextOptions, null, new TestTimeProvider());
     await db.Database.EnsureCreatedAsync();
   }
 
