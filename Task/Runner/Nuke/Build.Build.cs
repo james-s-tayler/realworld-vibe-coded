@@ -33,18 +33,16 @@ public partial class Build
       // Copy client dist to publish/wwwroot
       Log.Information($"Copying client dist from {ClientDistDirectory} to {PublishWwwRootDirectory}");
 
-      // I tried ClientDistDirectory.CopyToDirectory(PublishWwwRootDirectory)
-      // but that just seems to result in publish/wwwroot/dist/ which isn't what we want
-      foreach (var file in Directory.GetFiles(ClientDistDirectory, "*", SearchOption.AllDirectories))
+      // Use AbsolutePath GlobFiles to get all files recursively
+      var files = ClientDistDirectory.GlobFiles("**/*");
+      foreach (var file in files)
       {
-        var relativePath = Path.GetRelativePath(ClientDistDirectory, file);
-        var targetPath = Path.Combine(PublishWwwRootDirectory, relativePath);
-        var targetDir = Path.GetDirectoryName(targetPath);
-        if (targetDir != null && !Directory.Exists(targetDir))
-        {
-          Directory.CreateDirectory(targetDir);
-        }
-        File.Copy(file, targetPath, true);
+        var relativePath = ClientDistDirectory.GetRelativePathTo(file);
+        var targetPath = PublishWwwRootDirectory / relativePath;
+        var targetDir = targetPath.Parent;
+
+        targetDir.CreateDirectory();
+        file.Copy(targetPath, ExistsPolicy.FileOverwrite);
       }
     });
 
