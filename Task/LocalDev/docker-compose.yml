@@ -3,16 +3,18 @@ services:
     image: datalust/seq:latest
     environment:
       ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_ADMINPASSWORD: "Admin123!"
+      SEQ_CACHE_SYSTEMRAMMB: "512"
     ports:
       - "5341:80"
-    volumes:
-      - seq-data:/data
+    tmpfs:
+      - /data:size=2G
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/api/diagnostics/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
       interval: 5s
       timeout: 3s
       retries: 10
-      start_period: 10s
+      start_period: 15s
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -44,7 +46,7 @@ services:
       sqlserver:
         condition: service_healthy
       seq:
-        condition: service_healthy
+        condition: service_started
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:5000
@@ -79,4 +81,3 @@ services:
 
 volumes:
   sqlserver-data:
-  seq-data:
