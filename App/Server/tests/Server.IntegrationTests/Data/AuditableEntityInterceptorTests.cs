@@ -277,6 +277,92 @@ public class AuditableEntityInterceptorTests : IDisposable
     Assert.Equal("SYSTEM", user.UpdatedBy);
   }
 
+  [Fact]
+  public void Interceptor_SetsCreatedAtAndUpdatedAt_OnEntityCreation_Synchronous()
+  {
+    // Arrange
+    var fixedTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    _timeProvider.SetTime(fixedTime);
+
+    var user = new User("sync@example.com", "syncuser", "hashedpass");
+
+    // Act
+    _dbContext.Users.Add(user);
+    _dbContext.SaveChanges(); // Synchronous save
+
+    // Assert
+    Assert.Equal(fixedTime, user.CreatedAt);
+    Assert.Equal(fixedTime, user.UpdatedAt);
+    Assert.Equal("SYSTEM", user.CreatedBy);
+    Assert.Equal("SYSTEM", user.UpdatedBy);
+  }
+
+  [Fact]
+  public void Interceptor_UpdatesOnlyUpdatedAtAndUpdatedBy_OnEntityModification_Synchronous()
+  {
+    // Arrange
+    var creationTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    _timeProvider.SetTime(creationTime);
+
+    var user = new User("sync2@example.com", "syncuser2", "hashedpass");
+
+    _dbContext.Users.Add(user);
+    _dbContext.SaveChanges(); // Synchronous save
+
+    var originalCreatedAt = user.CreatedAt;
+    var originalCreatedBy = user.CreatedBy;
+
+    // Change time for the update
+    var updateTime = creationTime.AddHours(2);
+    _timeProvider.SetTime(updateTime);
+
+    // Act - Modify the entity
+    user.UpdateBio("Updated bio sync");
+    _dbContext.SaveChanges(); // Synchronous save
+
+    // Assert
+    Assert.Equal(originalCreatedAt, user.CreatedAt); // Should not change
+    Assert.Equal(originalCreatedBy, user.CreatedBy); // Should not change
+    Assert.Equal(updateTime, user.UpdatedAt); // Should be updated
+    Assert.Equal("SYSTEM", user.UpdatedBy); // Should be updated
+  }
+
+  [Fact]
+  public void Interceptor_DoesNotUpdateAuditFields_WhenOnlyNavigationPropertiesChange_Synchronous()
+  {
+    // Arrange
+    var creationTime = new DateTime(2025, 10, 25, 12, 0, 0, DateTimeKind.Utc);
+    _timeProvider.SetTime(creationTime);
+
+    var author = new User("author@example.com", "author", "hashedpass");
+
+    var article = new Article(
+      title: "Sync Test Article",
+      description: "Sync Test Description",
+      body: "Sync Test Body",
+      author);
+
+    _dbContext.Users.Add(author);
+    _dbContext.Articles.Add(article);
+    _dbContext.SaveChanges(); // Synchronous save
+
+    var originalUpdatedAt = article.UpdatedAt;
+
+    // Change time for the "update"
+    var updateTime = creationTime.AddHours(2);
+    _timeProvider.SetTime(updateTime);
+
+    // Act - Touch the article entity without changing any scalar properties
+    var entry = _dbContext.Entry(article);
+    entry.State = EntityState.Modified;
+
+    _dbContext.SaveChanges(); // Synchronous save
+
+    // Assert
+    // Since no actual property values changed, UpdatedAt should NOT be updated
+    Assert.Equal(originalUpdatedAt, article.UpdatedAt);
+  }
+
   public void Dispose()
   {
     _dbContext?.Dispose();
