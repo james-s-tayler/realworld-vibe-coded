@@ -12,7 +12,7 @@ The audit system is configured in **opt-out mode**, which means:
 
 ### Audit Log Storage
 
-Audit logs are stored as JSON files in the `Logs/Audit/` directory (excluded from version control via `.gitignore`).
+Audit logs are stored as JSON files in the `Logs/Audit/` directory at the repository root (excluded from version control via `.gitignore`).
 
 File naming pattern: `audit_yyyyMMdd_HHmmss_fff_<guid>.json`
 
