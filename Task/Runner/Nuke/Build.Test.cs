@@ -22,18 +22,13 @@ public partial class Build
       .DependsOn(InstallDotnetToolLiquidReports)
       .Executes(() =>
       {
-        if (Directory.Exists(ReportsServerDirectory))
-        {
-          Directory.Delete(ReportsServerDirectory, true);
-        }
-
-        Directory.CreateDirectory(ReportsServerDirectory);
+        ReportsServerDirectory.CreateOrCleanDirectory();
 
         // Get all test projects in the solution
         var testsDirectory = RootDirectory / "App" / "Server" / "tests";
-        var testProjects = Directory.GetDirectories(testsDirectory)
-              .Select(dir => (AbsolutePath)dir / $"{Path.GetFileName(dir)}.csproj")
-              .Where(project => File.Exists(project))
+        var testProjects = testsDirectory.GlobDirectories("*")
+              .Select(dir => dir / $"{dir.Name}.csproj")
+              .Where(project => project.FileExists())
               .ToArray();
 
         var failures = new List<string>();
@@ -41,7 +36,7 @@ public partial class Build
         // Run tests for each project with unique result files
         foreach (var testProject in testProjects)
         {
-          var projectName = Path.GetFileNameWithoutExtension(testProject);
+          var projectName = testProject.NameWithoutExtension;
           var logFileName = $"{projectName}-results.trx";
 
           Log.Information("Running tests for {ProjectName}", projectName);
@@ -139,7 +134,10 @@ public partial class Build
 
         Log.Information("Running Postman tests with Docker Compose");
 
-        var envVars = new Dictionary<string, string>();
+        var envVars = new Dictionary<string, string>
+        {
+          ["DOCKER_BUILDKIT"] = "1"
+        };
         if (!string.IsNullOrEmpty(Folder))
         {
           envVars["FOLDER"] = Folder;
@@ -191,8 +189,13 @@ public partial class Build
         try
         {
           var args = "compose -f Test/e2e/docker-compose.yml up --build --abort-on-container-exit";
+          var envVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1"
+          };
           var process = ProcessTasks.StartProcess("docker", args,
-                workingDirectory: RootDirectory);
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
           process.WaitForExit();
           exitCode = process.ExitCode;
         }
@@ -242,13 +245,13 @@ public partial class Build
   /// </summary>
   private void ExtractReportSummary(AbsolutePath reportFile, AbsolutePath summaryFile)
   {
-    if (!File.Exists(reportFile))
+    if (!reportFile.FileExists())
     {
       Log.Warning("Report file not found: {ReportFile}", reportFile);
       return;
     }
 
-    var lines = File.ReadAllLines(reportFile);
+    var lines = reportFile.ReadAllLines();
     var summaryLines = new List<string>();
 
     foreach (var line in lines)
@@ -260,7 +263,7 @@ public partial class Build
       summaryLines.Add(line);
     }
 
-    File.WriteAllLines(summaryFile, summaryLines);
+    summaryFile.WriteAllLines(summaryLines);
     Log.Information("Extracted report summary to: {SummaryFile}", summaryFile);
   }
 }
