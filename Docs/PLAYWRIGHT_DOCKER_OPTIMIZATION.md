@@ -113,13 +113,52 @@ The optimizations were validated using:
 
 1. **Direct Docker Compose**: `DOCKER_BUILDKIT=1 docker compose -f Test/e2e/docker-compose.yml up --build`
 2. **NUKE Build System**: `./build.sh TestE2e` (BuildKit automatically enabled)
+3. **GitHub Actions CI**: BuildKit and NuGet caching enabled in `.github/workflows/ci.yml`
 
-Both methods show consistent improvements:
+All methods show consistent improvements:
 - Tests pass successfully
 - Build artifacts are properly cached
 - BuildKit cache mounts persist NuGet packages across builds
 - Health checks complete faster
 - Reports are generated correctly
+
+## GitHub Actions Optimizations
+
+The following optimizations were added to the CI pipeline:
+
+### 1. NuGet Caching for E2E Tests
+
+Added NuGet package caching using `actions/setup-dotnet` cache feature:
+
+```yaml
+- name: Setup .NET (from global.json)
+  uses: actions/setup-dotnet@v4
+  with:
+    global-json-file: App/Server/global.json
+    cache: true
+    cache-dependency-path: Test/e2e/E2eTests/E2eTests.csproj
+```
+
+This caches NuGet packages between CI runs, avoiding repeated downloads.
+
+### 2. Docker Buildx for BuildKit Support
+
+Added Docker Buildx setup to enable BuildKit cache mounts:
+
+```yaml
+- name: Setup Docker Buildx
+  uses: docker/setup-buildx-action@v3
+```
+
+Combined with `DOCKER_BUILDKIT: 1` environment variable, this enables persistent caching of NuGet packages in Docker builds.
+
+### 3. Applied to Multiple Jobs
+
+These optimizations were applied to:
+- `test-e2e`: E2E Playwright tests
+- `test-server-postman`: Postman API tests
+
+Both jobs benefit from faster builds and reduced network usage in CI.
 
 ## Future Optimization Opportunities
 
