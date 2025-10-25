@@ -4,7 +4,7 @@ using Server.Core.UserAggregate;
 
 namespace Server.Infrastructure.Data;
 
-[AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = true)]
+[AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false)]
 public class AppDbContext : AuditDbContext
 {
   private readonly IDomainEventDispatcher? _dispatcher;

@@ -1,6 +1,7 @@
 ﻿using Audit.Core;
 using Microsoft.AspNetCore.Http;
 using Server.Core.Interfaces;
+using Server.Core.UserAggregate;
 
 namespace Server.Infrastructure.Data;
 
@@ -13,6 +14,12 @@ public static class AuditConfiguration
     {
       Directory.CreateDirectory(auditLogsPath);
     }
+
+    // Configure EntityFramework-specific audit settings to exclude password from Entity objects
+    Audit.EntityFramework.Configuration.Setup()
+      .ForContext<AppDbContext>(config => config
+        .ForEntity<User>(_ => _
+          .Override(user => user.HashedPassword, null)));
 
     Audit.Core.Configuration.Setup()
       .UseFileLogProvider(config => config
