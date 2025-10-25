@@ -51,6 +51,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options,
             .Property(nameof(EntityBase.UpdatedAt))
             .IsRequired();
         }
+
+        // Configure audit user tracking (nullable to handle system-generated entities)
+        var createdByProperty = entityType.FindProperty(nameof(EntityBase.CreatedBy));
+        if (createdByProperty != null)
+        {
+          modelBuilder.Entity(entityType.ClrType)
+            .Property(nameof(EntityBase.CreatedBy))
+            .HasMaxLength(256);
+        }
+
+        var updatedByProperty = entityType.FindProperty(nameof(EntityBase.UpdatedBy));
+        if (updatedByProperty != null)
+        {
+          modelBuilder.Entity(entityType.ClrType)
+            .Property(nameof(EntityBase.UpdatedBy))
+            .HasMaxLength(256);
+        }
       }
     }
   }
