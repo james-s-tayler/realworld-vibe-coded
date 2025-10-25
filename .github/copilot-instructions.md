@@ -37,7 +37,7 @@ General functionality:
 - All the nuke targets that run tests produce reports under `Reports` folder. Make sure to check them if any test fails.
 - If you get stuck on an implementation detail related to a particular library use the docs-mcp-server to search for the relevant documentation.
 - If you modify the nuke build you MUST try and build it first before committing.
-- Server logs (Serilog and Audit.NET) are available in the `Logs` directory at the repository root. All docker-compose.yml configurations are set up to output logs there for debugging. Serilog logs are in `Logs/Server.Web/serilog.txt` and Audit logs are in `Logs/Audit/`.
+- Server logs (Serilog and Audit.NET) are available in the `Logs` directory at the repository root. All docker-compose.yml configurations are set up to output logs there for debugging. Serilog logs are in `Logs/Server.Web/Serilog/` and Audit logs are in `Logs/Server.Web/Audit.NET/`.
 
 ## Folder Structure
 
