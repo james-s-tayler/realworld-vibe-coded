@@ -29,13 +29,9 @@ public class UnitOfWork : IUnitOfWork
       // Begin transaction
       await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-      // Set transaction ID for audit buffering
-      var transactionId = transaction.TransactionId.ToString();
-      DeferredAuditDataProvider.SetTransactionId(transactionId);
-
       try
       {
-        _logger.LogDebug("Transaction started with ID: {TransactionId}", transactionId);
+        _logger.LogDebug("Transaction started");
 
         // Execute the operation
         var result = await operation(cancellationToken);
@@ -59,16 +55,10 @@ public class UnitOfWork : IUnitOfWork
             {
               await transaction.CommitAsync(cancellationToken);
               _logger.LogDebug("Transaction committed - Result was successful");
-
-              // Flush buffered audit events on successful commit
-              DeferredAuditDataProvider.FlushTransaction();
             }
             else
             {
               await transaction.RollbackAsync(cancellationToken);
-
-              // Discard buffered audit events on rollback
-              DeferredAuditDataProvider.DiscardTransaction();
 
               var status = statusProperty?.GetValue(result)?.ToString() ?? "Unknown";
               var errors = errorsProperty?.GetValue(result) as IEnumerable<string> ?? Array.Empty<string>();
@@ -101,7 +91,6 @@ public class UnitOfWork : IUnitOfWork
           {
             // If we can't determine success, commit by default
             await transaction.CommitAsync(cancellationToken);
-            DeferredAuditDataProvider.FlushTransaction();
             _logger.LogDebug("Transaction committed (IsSuccess property not found)");
           }
         }
@@ -109,7 +98,6 @@ public class UnitOfWork : IUnitOfWork
         {
           // For non-Result types, always commit
           await transaction.CommitAsync(cancellationToken);
-          DeferredAuditDataProvider.FlushTransaction();
           _logger.LogDebug("Transaction committed");
         }
 
@@ -119,10 +107,6 @@ public class UnitOfWork : IUnitOfWork
       {
         _logger.LogError(ex, "Transaction failed with exception, rolling back");
         await transaction.RollbackAsync(cancellationToken);
-
-        // Discard buffered audit events on exception rollback
-        DeferredAuditDataProvider.DiscardTransaction();
-
         throw;
       }
     });

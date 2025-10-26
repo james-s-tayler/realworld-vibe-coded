@@ -15,8 +15,11 @@ public static class AuditConfiguration
     }
 
     Audit.Core.Configuration.Setup()
-      .UseCustomProvider(new DeferredAuditDataProvider())
-      .WithCreationPolicy(EventCreationPolicy.Manual)
+      .UseFileLogProvider(config => config
+        .Directory(auditLogsPath)
+        .FilenameBuilder(auditEvent =>
+          $"audit_{DateTime.UtcNow:yyyyMMdd_HHmmss_fff}_{Guid.NewGuid():N}.json"))
+      .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
       .WithAction(action => action
         .OnScopeCreated(scope =>
         {
@@ -49,8 +52,5 @@ public static class AuditConfiguration
             }
           }
         }));
-
-    // Set the file log provider for the deferred data provider
-    DeferredAuditDataProvider.SetFileLogProvider(auditLogsPath);
   }
 }
