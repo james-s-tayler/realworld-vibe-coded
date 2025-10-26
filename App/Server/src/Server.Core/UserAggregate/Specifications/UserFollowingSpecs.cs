@@ -7,7 +7,8 @@ public class UserByUsernameWithFollowingSpec : Specification<User>
     var normalizedUsername = username.ToUpperInvariant();
     Query.Where(u => u.NormalizedUserName == normalizedUsername)
          .Include(u => u.Following)
-         .Include(u => u.Followers);
+         .Include(u => u.Followers)
+         .AsSplitQuery(); // Use split queries to avoid cartesian explosion
   }
 }
 
@@ -17,7 +18,8 @@ public class UserWithFollowingSpec : Specification<User>
   {
     Query.Where(u => u.Id == userId)
          .Include(u => u.Following)
-         .Include(u => u.Followers);
+         .Include(u => u.Followers)
+         .AsSplitQuery(); // Use split queries to avoid cartesian explosion
   }
 }
 

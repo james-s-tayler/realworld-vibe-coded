@@ -81,10 +81,9 @@ public class User : IdentityUser<Guid>, IAggregateRoot, IAuditableEntity
   public byte[] ChangeCheck { get; set; } = default!;
 
   // Navigation properties for following relationships
-  // These are initialized in public constructors for new entities
-  // EF Core will populate them for loaded entities
-  public ICollection<UserFollowing> Following { get; set; } = default!;
-  public ICollection<UserFollowing> Followers { get; set; } = default!;
+  // Initialize to empty collections - EF Core will replace these with properly tracked collections when loading from DB
+  public ICollection<UserFollowing> Following { get; set; } = new List<UserFollowing>();
+  public ICollection<UserFollowing> Followers { get; set; } = new List<UserFollowing>();
 
   public User UpdateEmail(string newEmail)
   {

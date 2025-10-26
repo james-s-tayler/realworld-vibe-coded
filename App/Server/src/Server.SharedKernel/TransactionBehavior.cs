@@ -46,7 +46,12 @@ public class TransactionBehavior<TRequest, T> : IPipelineBehavior<TRequest, Resu
     }
     else
     {
-      _logger.LogWarning("Transaction rolled back for {RequestName}", typeof(TRequest).Name);
+      // Log detailed rollback information including why it was rolled back
+      _logger.LogWarning("Transaction rolled back for {RequestName} - Status: {Status}, Errors: {Errors}, ValidationErrors: {ValidationErrors}", 
+        typeof(TRequest).Name,
+        response.Status,
+        string.Join(", ", response.Errors),
+        response.ValidationErrors != null ? string.Join(", ", response.ValidationErrors.Select(e => $"{e.Identifier}: {e.ErrorMessage}")) : "none");
     }
 
     return response;
