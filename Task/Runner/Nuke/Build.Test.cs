@@ -177,9 +177,10 @@ public partial class Build
         // Explicitly fail the target if Docker Compose failed
         if (exitCode != 0)
         {
+          const string debugInstructions = "For a high-level summary of specific failures, see Reports/Test/Postman/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.";
           Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
-          Log.Error("Test failed. For a high-level summary of specific failures, see Reports/Test/Postman/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.");
-          throw new Exception($"Postman tests failed with exit code: {exitCode}. For a high-level summary of specific failures, see Reports/Test/Postman/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.");
+          Log.Error("Test failed. {DebugInstructions}", debugInstructions);
+          throw new Exception($"Postman tests failed with exit code: {exitCode}. {debugInstructions}");
         }
       });
 
