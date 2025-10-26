@@ -1,4 +1,4 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.Logging;
 using Server.FunctionalTests.Infrastructure;
 
 namespace Server.FunctionalTests.TestLogging;
@@ -6,20 +6,22 @@ namespace Server.FunctionalTests.TestLogging;
 public class LoggingVerificationTests
 {
   [Fact]
-  public void VerifyLoggingConfiguration_WritesToBothConsoleAndFile()
+  public void VerifyLoggingConfiguration_WritesToFile()
   {
-    // Arrange
-    var logger = TestLoggingConfiguration.CreateLogger("Server.FunctionalTests", "LoggingVerificationTests");
+    // Get test output helper from test context (xUnit v3 approach)
+    var output = TestContext.Current?.TestOutputHelper;
+
+    // Arrange - Create logger that writes to file (and console if output helper available)
+    var logger = output != null
+      ? TestLoggingConfiguration.CreateLogger(output, "Server.FunctionalTests", "LoggingVerificationTests")
+      : TestLoggingConfiguration.CreateFileOnlyLogger("Server.FunctionalTests", "LoggingVerificationTests");
 
     // Act
-    logger.Information("Test log message from LoggingVerificationTests");
-    logger.Debug("Debug message - logging is working correctly");
-    logger.Warning("Warning message - this should appear in both console and file");
+    logger.LogInformation("Test log message from LoggingVerificationTests");
+    logger.LogDebug("Debug message - logging is working correctly");
+    logger.LogWarning("Warning message - this should appear in log file and xUnit output (if available)");
 
     // Assert - if we get here without exceptions, logging is configured correctly
     true.ShouldBeTrue();
-
-    // Cleanup
-    Log.CloseAndFlush();
   }
 }
