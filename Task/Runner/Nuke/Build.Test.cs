@@ -1,4 +1,5 @@
-﻿using Nuke.Common;
+﻿using System.Text.Json;
+using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
@@ -157,11 +158,28 @@ public partial class Build
           downProcess.WaitForExit();
         }
 
+        // Generate markdown report summary from Newman JSON report
+        var newmanReportFile = ReportsTestPostmanDirectory / "newman-report.json";
+        var reportSummaryFile = ReportsTestPostmanDirectory / "Artifacts" / "ReportSummary.md";
+
+        if (newmanReportFile.FileExists())
+        {
+          try
+          {
+            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+          }
+          catch (Exception ex)
+          {
+            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+          }
+        }
+
         // Explicitly fail the target if Docker Compose failed
         if (exitCode != 0)
         {
           Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
-          throw new Exception($"Postman tests failed with exit code: {exitCode}");
+          Log.Error("Test failed. For a high-level summary of specific failures, see Reports/Test/Postman/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.");
+          throw new Exception($"Postman tests failed with exit code: {exitCode}. For a high-level summary of specific failures, see Reports/Test/Postman/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.");
         }
       });
 
@@ -255,5 +273,95 @@ public partial class Build
 
     summaryFile.WriteAllLines(summaryLines);
     Log.Information("Extracted report summary to: {SummaryFile}", summaryFile);
+  }
+
+  /// <summary>
+  /// Generates a markdown report summary from a Newman JSON report.
+  /// This provides a human-readable summary of test results including
+  /// test statistics and failure details.
+  /// </summary>
+  private void GenerateNewmanReportSummary(AbsolutePath newmanReportFile, AbsolutePath summaryFile)
+  {
+    if (!newmanReportFile.FileExists())
+    {
+      Log.Warning("Newman report file not found: {ReportFile}", newmanReportFile);
+      return;
+    }
+
+    // Ensure the Artifacts directory exists
+    summaryFile.Parent.CreateDirectory();
+
+    var jsonContent = newmanReportFile.ReadAllText();
+    using var jsonDoc = JsonDocument.Parse(jsonContent);
+    var root = jsonDoc.RootElement;
+
+    if (!root.TryGetProperty("run", out var run))
+    {
+      Log.Warning("Invalid Newman report format: missing 'run' property");
+      return;
+    }
+
+    var stats = run.GetProperty("stats");
+    var assertions = stats.GetProperty("assertions");
+    var requests = stats.GetProperty("requests");
+
+    var totalTests = assertions.GetProperty("total").GetInt32();
+    var failedTests = assertions.GetProperty("failed").GetInt32();
+    var passedTests = totalTests - failedTests;
+
+    var totalRequests = requests.GetProperty("total").GetInt32();
+    var failedRequests = requests.GetProperty("failed").GetInt32();
+    var passedRequests = totalRequests - failedRequests;
+
+    var timings = run.GetProperty("timings");
+    var started = timings.GetProperty("started").GetInt64();
+    var completed = timings.GetProperty("completed").GetInt64();
+    var executionTimeMs = completed - started;
+    var executionTimeSec = Math.Round(executionTimeMs / 1000.0, 1);
+
+    var testPassPercentage = totalTests > 0 ? Math.Round(passedTests * 100.0 / totalTests) : 0;
+    var statusIcon = failedTests == 0 ? "✅" : "❌";
+    var statusText = failedTests == 0 ? "PASSED" : "FAILED";
+
+    var summaryLines = new List<string>
+    {
+      $"## {statusIcon} Postman API Tests {statusText}",
+      "",
+      "**📊 Test Summary**",
+      $"- **Tests**: {passedTests}/{totalTests} passed ({testPassPercentage}%)",
+      $"- **Requests**: {passedRequests}/{totalRequests} passed",
+      $"- **Execution Time**: {executionTimeSec}s",
+      ""
+    };
+
+    // Add failure details if any
+    if (run.TryGetProperty("failures", out var failures) && failures.GetArrayLength() > 0)
+    {
+      summaryLines.Add("**🔍 All Failures**");
+      foreach (var failure in failures.EnumerateArray())
+      {
+        var source = failure.TryGetProperty("source", out var src) ? src : default;
+        var error = failure.TryGetProperty("error", out var err) ? err : default;
+
+        var sourceName = source.ValueKind != JsonValueKind.Undefined && source.TryGetProperty("name", out var name)
+          ? name.GetString()
+          : "Unknown";
+
+        var errorMessage = error.ValueKind != JsonValueKind.Undefined && error.TryGetProperty("message", out var msg)
+          ? msg.GetString()
+          : (error.ValueKind != JsonValueKind.Undefined && error.TryGetProperty("test", out var test)
+            ? test.GetString()
+            : "Unknown error");
+
+        summaryLines.Add($"• **{sourceName}**: {errorMessage}");
+      }
+    }
+    else
+    {
+      summaryLines.Add("**🎉 All tests passed!**");
+    }
+
+    summaryFile.WriteAllLines(summaryLines);
+    Log.Information("Generated Newman report summary to: {SummaryFile}", summaryFile);
   }
 }
