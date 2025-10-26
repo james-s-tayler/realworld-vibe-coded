@@ -163,7 +163,7 @@ public class UnitOfWorkTests
     // Assert
     result.IsSuccess.ShouldBeTrue();
     auditEvents.ShouldNotBeEmpty();
-    auditEvents.Any(e => e.EventType == "Transaction").ShouldBeTrue();
+    auditEvents.Any(e => e.EventType == "DatabaseTransactionEvent").ShouldBeTrue();
   }
 
   [Fact]
@@ -186,7 +186,7 @@ public class UnitOfWorkTests
 
     // Assert
     result.IsSuccess.ShouldBeTrue();
-    var transactionEvent = auditEvents.FirstOrDefault(e => e.EventType == "Transaction");
+    var transactionEvent = auditEvents.FirstOrDefault(e => e.EventType == "DatabaseTransactionEvent");
     transactionEvent.ShouldNotBeNull();
     transactionEvent.CustomFields.ShouldContainKey("TransactionStatus");
     transactionEvent.CustomFields["TransactionStatus"].ToString().ShouldBe("Committed");
@@ -237,7 +237,7 @@ public class UnitOfWorkTests
     return new TestUnitOfWork(context, logger);
   }
 
-  /// <summary>
+  /// <summary> -
   /// Test wrapper for UnitOfWork that implements IDisposable for cleanup.
   /// </summary>
   private class TestUnitOfWork : UnitOfWork, IDisposable
