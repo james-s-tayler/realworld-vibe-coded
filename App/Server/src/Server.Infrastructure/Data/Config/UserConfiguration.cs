@@ -32,6 +32,19 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     builder.Property(p => p.ChangeCheck)
         .IsRowVersion();
 
+    // Explicitly configure navigation properties
+    // These are configured in UserFollowingConfiguration, but we need to ensure
+    // they're properly linked from the User side as well
+    builder.HasMany(u => u.Following)
+        .WithOne(uf => uf.Follower)
+        .HasForeignKey(uf => uf.FollowerId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    builder.HasMany(u => u.Followers)
+        .WithOne(uf => uf.Followed)
+        .HasForeignKey(uf => uf.FollowedId)
+        .OnDelete(DeleteBehavior.Restrict);
+
     // Note: Email, UserName, and other Identity fields are configured by IdentityDbContext
     // We only ensure our custom unique indexes match the database schema expectations
     builder.HasIndex(p => p.NormalizedEmail)

@@ -6,13 +6,11 @@ namespace Server.Core.UserAggregate;
 public class User : IdentityUser<Guid>, IAggregateRoot, IAuditableEntity
 {
   // Required parameterless constructor for EF Core
+  // Do NOT initialize navigation properties here - EF Core will populate them when loading from database
   private User() : base()
   {
-    Bio = "I work at statefarm"; // Default bio as per Postman tests
-    Image = null; // Default image as per Postman tests
-    Following = new List<UserFollowing>();
-    Followers = new List<UserFollowing>();
-    SecurityStamp = Guid.NewGuid().ToString();
+    // Only set defaults for value types and simple properties
+    // Navigation properties (Following, Followers) will be initialized by EF Core
   }
 
   public User(string email, string username, string hashedPassword) : base()
@@ -83,8 +81,10 @@ public class User : IdentityUser<Guid>, IAggregateRoot, IAuditableEntity
   public byte[] ChangeCheck { get; set; } = default!;
 
   // Navigation properties for following relationships
-  public ICollection<UserFollowing> Following { get; private set; } = new List<UserFollowing>();
-  public ICollection<UserFollowing> Followers { get; private set; } = new List<UserFollowing>();
+  // These are initialized in public constructors for new entities
+  // EF Core will populate them for loaded entities
+  public ICollection<UserFollowing> Following { get; set; } = default!;
+  public ICollection<UserFollowing> Followers { get; set; } = default!;
 
   public User UpdateEmail(string newEmail)
   {
