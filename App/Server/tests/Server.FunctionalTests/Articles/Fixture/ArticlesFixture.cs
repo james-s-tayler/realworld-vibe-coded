@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Server.Core.UserAggregate;
 using Server.Infrastructure.Data;
 using Server.Web.Users.Register;
 using Testcontainers.MsSql;
@@ -67,11 +69,26 @@ public class ArticlesFixture : AppFixture<Program>
       services.Remove(desc);
     }
 
+    // Remove Identity stores that depend on the old DbContext
+    var identityStores = services.Where(d =>
+        d.ServiceType == typeof(IUserStore<User>) ||
+        d.ServiceType == typeof(IRoleStore<IdentityRole<Guid>>))
+        .ToList();
+
+    foreach (var desc in identityStores)
+    {
+      services.Remove(desc);
+    }
+
     services.AddDbContext<AppDbContext>(options =>
     {
       options.UseSqlServer(_connectionString);
       options.EnableSensitiveDataLogging();
     });
+
+    // Re-register Entity Framework stores to connect Identity to the new DbContext
+    services.AddScoped<IUserStore<User>, Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserStore<User, IdentityRole<Guid>, AppDbContext, Guid>>();
+    services.AddScoped<IRoleStore<IdentityRole<Guid>>, Microsoft.AspNetCore.Identity.EntityFrameworkCore.RoleStore<IdentityRole<Guid>, AppDbContext, Guid>>();
   }
 
   protected override async ValueTask SetupAsync()

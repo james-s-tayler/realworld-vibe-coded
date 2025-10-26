@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Server.Core.UserAggregate;
 using Server.Infrastructure.Data;
 using Testcontainers.MsSql;
 
@@ -61,6 +63,18 @@ public class UsersFixture : AppFixture<Program>
       services.Remove(desc);
     }
 
+    // Remove Identity stores that depend on the old DbContext
+    // Don't remove UserManager/SignInManager themselves - just the stores
+    var identityStores = services.Where(d =>
+        d.ServiceType == typeof(IUserStore<User>) ||
+        d.ServiceType == typeof(IRoleStore<IdentityRole<Guid>>))
+        .ToList();
+
+    foreach (var desc in identityStores)
+    {
+      services.Remove(desc);
+    }
+
     // Re-add DbContext with test connection string
     services.AddDbContext<AppDbContext>(options =>
     {
@@ -68,8 +82,10 @@ public class UsersFixture : AppFixture<Program>
       options.EnableSensitiveDataLogging();
     });
 
-    // Ensure Identity services are still registered (they should be from InfrastructureServiceExtensions)
-    // But we need to make sure they use the correct DbContext
+    // Re-register just the Entity Framework stores (not the full Identity stack)
+    // This connects the existing UserManager/SignInManager to the new DbContext
+    services.AddScoped<IUserStore<User>, Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserStore<User, IdentityRole<Guid>, AppDbContext, Guid>>();
+    services.AddScoped<IRoleStore<IdentityRole<Guid>>, Microsoft.AspNetCore.Identity.EntityFrameworkCore.RoleStore<IdentityRole<Guid>, AppDbContext, Guid>>();
   }
 
   protected override ValueTask SetupAsync()
