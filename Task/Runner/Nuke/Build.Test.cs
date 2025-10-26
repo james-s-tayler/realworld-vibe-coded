@@ -24,6 +24,9 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
+        // Ensure test log directory exists
+        LogsTestServerXUnitDirectory.CreateDirectory();
+
         // Get all test projects in the solution
         var testsDirectory = RootDirectory / "App" / "Server" / "tests";
         var testProjects = testsDirectory.GlobDirectories("*")
@@ -48,7 +51,8 @@ public partial class Build
                   .SetLoggers($"trx;LogFileName={logFileName}")
                   .SetResultsDirectory(ReportsServerResultsDirectory)
                   .SetSettingsFile(RootDirectory / "App" / "Server" / "coverlet.runsettings")
-                  .AddProcessAdditionalArguments("--collect:\"XPlat Code Coverage\""));
+                  .AddProcessAdditionalArguments("--collect:\"XPlat Code Coverage\"")
+                  .SetProcessEnvironmentVariable("TEST_LOG_PATH", LogsTestServerXUnitDirectory));
           }
           catch (ProcessException)
           {
