@@ -36,7 +36,7 @@ public static class InfrastructureServiceExtensions
            .AddScoped<IListTagsQueryService, ListTagsQueryService>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
            .AddScoped<IJwtTokenGenerator, JwtTokenGenerator>()
-           .AddScoped<ICurrentUserService, CurrentUserService>();
+           .AddScoped<IUserContext, UserContext>();
 
     // Configure JWT settings
     var jwtSettings = new JwtSettings();

@@ -28,9 +28,15 @@ public static class AuditConfiguration
           if (httpContextAccessor.HttpContext != null)
           {
             // Get ICurrentUserService from the scoped service provider (RequestServices) instead of root provider
-            var currentUserService = httpContextAccessor.HttpContext.RequestServices.GetService<ICurrentUserService>();
+            var currentUserService = httpContextAccessor.HttpContext.RequestServices.GetService<IUserContext>();
             var userId = currentUserService?.GetCurrentUserId();
             var username = httpContextAccessor.HttpContext.User?.Identity?.Name;
+            var correlationId = currentUserService?.GetCorrelationId();
+
+            if (!string.IsNullOrEmpty(correlationId))
+            {
+              scope.SetCustomField("CorrelationId", correlationId);
+            }
 
             if (userId.HasValue)
             {

@@ -3,8 +3,10 @@
 /// <summary>
 /// Service for accessing the current authenticated user's context
 /// </summary>
-public interface ICurrentUserService
+public interface IUserContext
 {
+  string GetCorrelationId();
+
   /// <summary>
   /// Gets the current authenticated user's ID
   /// </summary>
