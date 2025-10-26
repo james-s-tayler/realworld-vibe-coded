@@ -64,9 +64,9 @@ public class UnitOfWork : IUnitOfWork
         {
           // Rollback transaction on failure
           await transaction.RollbackAsync(cancellationToken);
-          scope.Discard();
           scope.SetCustomField("TransactionStatus", "RolledBack");
           scope.SetCustomField("ResultStatus", result.Status.ToString());
+          scope.Discard();
           _logger.LogWarning("Transaction rolled back due to operation failure. Result: {@Result}", result);
         }
 
@@ -76,9 +76,9 @@ public class UnitOfWork : IUnitOfWork
       {
         // Rollback transaction on exception
         await transaction.RollbackAsync(cancellationToken);
-        scope.Discard();
         scope.SetCustomField("TransactionStatus", "RolledBack");
         scope.SetCustomField("Exception", ex.Message);
+        scope.Discard();
         _logger.LogError(ex, "Transaction failed with exception, rolling back");
         throw;
       }
