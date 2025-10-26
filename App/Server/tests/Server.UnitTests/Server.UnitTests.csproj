@@ -24,6 +24,8 @@
     </PackageReference>
     <PackageReference Include="ReportGenerator" />
     <PackageReference Include="xunit.v3" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
   </ItemGroup>
 
   <ItemGroup>

@@ -39,7 +39,12 @@ public partial class Build
           var projectName = testProject.NameWithoutExtension;
           var logFileName = $"{projectName}-results.trx";
 
+          // Create log directory for this test project
+          var testLogDirectory = LogsServerTestsDirectory / projectName / "xUnit";
+          testLogDirectory.CreateDirectory();
+
           Log.Information("Running tests for {ProjectName}", projectName);
+          Log.Information("Test logs will be written to: {LogDirectory}", testLogDirectory);
 
           try
           {
@@ -48,7 +53,8 @@ public partial class Build
                   .SetLoggers($"trx;LogFileName={logFileName}")
                   .SetResultsDirectory(ReportsServerResultsDirectory)
                   .SetSettingsFile(RootDirectory / "App" / "Server" / "coverlet.runsettings")
-                  .AddProcessAdditionalArguments("--collect:\"XPlat Code Coverage\""));
+                  .AddProcessAdditionalArguments("--collect:\"XPlat Code Coverage\"")
+                  .SetProcessEnvironmentVariable("XUNIT_LOG_DIRECTORY", testLogDirectory));
           }
           catch (ProcessException)
           {
