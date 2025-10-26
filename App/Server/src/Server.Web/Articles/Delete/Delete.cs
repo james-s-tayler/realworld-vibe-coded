@@ -10,7 +10,7 @@ namespace Server.Web.Articles.Delete;
 /// <remarks>
 /// Deletes an existing article. Authentication required. User must be the author.
 /// </remarks>
-public class Delete(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<DeleteArticleRequest>
+public class Delete(IMediator _mediator, IUserContext userContext) : Endpoint<DeleteArticleRequest>
 {
   public override void Configure()
   {
@@ -25,7 +25,7 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
   public override async Task HandleAsync(DeleteArticleRequest request, CancellationToken cancellationToken)
   {
-    var userId = _currentUserService.GetRequiredCurrentUserId();
+    var userId = userContext.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new DeleteArticleCommand(request.Slug, userId), cancellationToken);
 

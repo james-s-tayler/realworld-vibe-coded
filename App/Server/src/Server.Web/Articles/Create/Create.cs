@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Create;
 /// <remarks>
 /// Creates a new article. Authentication required.
 /// </remarks>
-public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<CreateArticleRequest, ArticleResponse, ArticleMapper>
+public class Create(IMediator _mediator, IUserContext userContext) : Endpoint<CreateArticleRequest, ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -26,7 +26,7 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
 
   public override async Task HandleAsync(CreateArticleRequest request, CancellationToken cancellationToken)
   {
-    var userId = _currentUserService.GetRequiredCurrentUserId();
+    var userId = userContext.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new CreateArticleCommand(
       request.Article.Title,

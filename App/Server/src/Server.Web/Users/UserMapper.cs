@@ -13,7 +13,7 @@ public class UserMapper : ResponseMapper<UserResponse, User>
   public override UserResponse FromEntity(User user)
   {
     // Check if there's already a valid token in the current request
-    var currentUserService = Resolve<ICurrentUserService>();
+    var currentUserService = Resolve<IUserContext>();
     var existingToken = currentUserService.GetCurrentToken();
 
     // Use existing token if present and user is authenticated, otherwise generate new one

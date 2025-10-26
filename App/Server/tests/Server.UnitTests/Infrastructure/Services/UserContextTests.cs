@@ -4,17 +4,17 @@ using Server.Infrastructure.Services;
 
 namespace Server.UnitTests.Infrastructure.Services;
 
-public class CurrentUserServiceTests
+public class UserContextTests
 {
   private readonly IHttpContextAccessor _httpContextAccessor;
-  private readonly CurrentUserService _currentUserService;
+  private readonly UserContext _userContext;
   private readonly HttpContext _httpContext;
 
-  public CurrentUserServiceTests()
+  public UserContextTests()
   {
     _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
     _httpContext = Substitute.For<HttpContext>();
-    _currentUserService = new CurrentUserService(_httpContextAccessor);
+    _userContext = new UserContext(_httpContextAccessor);
   }
 
   [Fact]
@@ -26,7 +26,7 @@ public class CurrentUserServiceTests
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
     // Act
-    var result = _currentUserService.GetCurrentUserId();
+    var result = _userContext.GetCurrentUserId();
 
     // Assert
     result.ShouldBeNull();
@@ -39,7 +39,7 @@ public class CurrentUserServiceTests
     _httpContextAccessor.HttpContext.Returns((HttpContext?)null);
 
     // Act
-    var result = _currentUserService.GetCurrentUserId();
+    var result = _userContext.GetCurrentUserId();
 
     // Assert
     result.ShouldBeNull();
@@ -60,7 +60,7 @@ public class CurrentUserServiceTests
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
     // Act
-    var result = _currentUserService.GetCurrentUserId();
+    var result = _userContext.GetCurrentUserId();
 
     // Assert
     result.ShouldBe(expectedUserId);
@@ -80,7 +80,7 @@ public class CurrentUserServiceTests
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
     // Act
-    var result = _currentUserService.GetCurrentUserId();
+    var result = _userContext.GetCurrentUserId();
 
     // Assert
     result.ShouldBeNull();
@@ -100,7 +100,7 @@ public class CurrentUserServiceTests
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
     // Act
-    var result = _currentUserService.GetCurrentUserId();
+    var result = _userContext.GetCurrentUserId();
 
     // Assert
     result.ShouldBeNull();
@@ -121,7 +121,7 @@ public class CurrentUserServiceTests
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
     // Act
-    var result = _currentUserService.GetRequiredCurrentUserId();
+    var result = _userContext.GetRequiredCurrentUserId();
 
     // Assert
     result.ShouldBe(expectedUserId);
@@ -136,7 +136,7 @@ public class CurrentUserServiceTests
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
     // Act & Assert
-    var exception = Should.Throw<UnauthorizedAccessException>(() => _currentUserService.GetRequiredCurrentUserId());
+    var exception = Should.Throw<UnauthorizedAccessException>(() => _userContext.GetRequiredCurrentUserId());
     exception.Message.ShouldBe("User is not authenticated or user ID is invalid");
   }
 
@@ -154,7 +154,7 @@ public class CurrentUserServiceTests
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
     // Act
-    var result = _currentUserService.IsAuthenticated();
+    var result = _userContext.IsAuthenticated();
 
     // Assert
     result.ShouldBeTrue();
@@ -169,7 +169,7 @@ public class CurrentUserServiceTests
     _httpContextAccessor.HttpContext.Returns(_httpContext);
 
     // Act
-    var result = _currentUserService.IsAuthenticated();
+    var result = _userContext.IsAuthenticated();
 
     // Assert
     result.ShouldBeFalse();

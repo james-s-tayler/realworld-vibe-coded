@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Favorite;
 /// <remarks>
 /// Add article to favorites. Authentication required.
 /// </remarks>
-public class Favorite(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<FavoriteArticleRequest, ArticleResponse, ArticleMapper>
+public class Favorite(IMediator _mediator, IUserContext userContext) : Endpoint<FavoriteArticleRequest, ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -26,7 +26,7 @@ public class Favorite(IMediator _mediator, ICurrentUserService _currentUserServi
 
   public override async Task HandleAsync(FavoriteArticleRequest request, CancellationToken cancellationToken)
   {
-    var userId = _currentUserService.GetRequiredCurrentUserId();
+    var userId = userContext.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new FavoriteArticleCommand(request.Slug, userId, userId), cancellationToken);
 

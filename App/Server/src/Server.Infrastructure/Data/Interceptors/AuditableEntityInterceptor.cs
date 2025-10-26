@@ -45,13 +45,13 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
 
     // Get the current user service from the scoped service provider via the DbContext
     // This may be null if called outside of an HTTP request context (e.g., during migrations or tests)
-    ICurrentUserService? currentUserService = null;
+    IUserContext? currentUserService = null;
     try
     {
       // Try to get the scoped service provider from the context's service provider
       // The context's service provider is scoped to the current request
       var scopedProvider = context.GetInfrastructure();
-      currentUserService = scopedProvider.GetService<ICurrentUserService>();
+      currentUserService = scopedProvider.GetService<IUserContext>();
     }
     catch
     {

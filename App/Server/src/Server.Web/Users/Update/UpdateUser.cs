@@ -10,7 +10,7 @@ namespace Server.Web.Users.Update;
 /// <remarks>
 /// Update the currently authenticated user's details.
 /// </remarks>
-public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<UpdateUserRequest, UpdateUserResponse, UserMapper>
+public class UpdateUser(IMediator _mediator, IUserContext userContext) : Endpoint<UpdateUserRequest, UpdateUserResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -37,7 +37,7 @@ public class UpdateUser(IMediator _mediator, ICurrentUserService _currentUserSer
     UpdateUserRequest request,
     CancellationToken cancellationToken)
   {
-    var userId = _currentUserService.GetRequiredCurrentUserId();
+    var userId = userContext.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new UpdateUserCommand(
       userId,
