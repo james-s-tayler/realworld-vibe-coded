@@ -10,7 +10,7 @@ namespace Server.Web.Articles.Comments.Delete;
 /// <remarks>
 /// Delete a comment. Authentication required. Only comment author can delete.
 /// </remarks>
-public class Delete(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<DeleteCommentRequest>
+public class Delete(IMediator _mediator, IUserContext userContext) : Endpoint<DeleteCommentRequest>
 {
   public override void Configure()
   {
@@ -25,7 +25,7 @@ public class Delete(IMediator _mediator, ICurrentUserService _currentUserService
 
   public override async Task HandleAsync(DeleteCommentRequest request, CancellationToken cancellationToken)
   {
-    var userId = _currentUserService.GetRequiredCurrentUserId();
+    var userId = userContext.GetRequiredCurrentUserId();
 
     var result = await _mediator.Send(new DeleteCommentCommand(request.Slug, request.Id, userId), cancellationToken);
 

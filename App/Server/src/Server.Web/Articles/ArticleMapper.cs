@@ -15,7 +15,7 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
   public override ArticleResponse FromEntity(Article article)
   {
     // Resolve current user service to get authentication context
-    var currentUserService = Resolve<ICurrentUserService>();
+    var currentUserService = Resolve<IUserContext>();
     var currentUserId = currentUserService.GetCurrentUserId();
 
     // Use domain methods to compute user-specific values

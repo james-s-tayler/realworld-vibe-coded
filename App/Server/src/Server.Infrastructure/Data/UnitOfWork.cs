@@ -51,25 +51,13 @@ public class UnitOfWork : IUnitOfWork
        *
        *       Hence the simple solution is:
        *       Rather than trying to get Audit.NET to NOT write a log, make it write an additional correlated log.
-       *       The EntityFrameworkEvent includes the TransactionId as a custom field.
-       *       Hence, if we create a DatabaseTransactionEvent with the TrasactionId and record whether it was committed or rolled back,
-       *       that's enough information to know what actually happened to the entity in question.
+       *       By using a custom IAuditScopeFactory and IUserContext we can inject a stable correlation id into all logs and audit events.
+       *       This can be used to correlate the state of the entity to what happened in the database transaction.
        *
        *       Assuming no logs got dropped of course... muahahaha!
        *       Ahhhh distributed systems!
        */
-      await using var scope = await AuditScope.CreateAsync(new AuditScopeOptions
-      {
-        EventType = "DatabaseTransactionEvent",
-        AuditEvent = new AuditEvent
-        {
-          CustomFields = new Dictionary<string, object>
-          {
-            { "TransactionStartTime", DateTime.UtcNow },
-            { "TransactionId", transaction.TransactionId }
-          }
-        }
-      }, cancellationToken);
+      await using var scope = await AuditScope.CreateAsync(new AuditScopeOptions { EventType = "DatabaseTransactionEvent" }, cancellationToken);
 
       try
       {

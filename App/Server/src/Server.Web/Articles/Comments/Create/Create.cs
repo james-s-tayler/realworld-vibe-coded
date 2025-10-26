@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Comments.Create;
 /// <remarks>
 /// Create a new comment for an article. Authentication required.
 /// </remarks>
-public class Create(IMediator _mediator, ICurrentUserService _currentUserService) : Endpoint<CreateCommentRequest, CommentResponse>
+public class Create(IMediator _mediator, IUserContext userContext) : Endpoint<CreateCommentRequest, CommentResponse>
 {
   public override void Configure()
   {
@@ -26,7 +26,7 @@ public class Create(IMediator _mediator, ICurrentUserService _currentUserService
 
   public override async Task HandleAsync(CreateCommentRequest request, CancellationToken cancellationToken)
   {
-    var userId = _currentUserService.GetRequiredCurrentUserId();
+    var userId = userContext.GetRequiredCurrentUserId();
 
     // Get slug from route parameter
     var slug = Route<string>("slug") ?? string.Empty;

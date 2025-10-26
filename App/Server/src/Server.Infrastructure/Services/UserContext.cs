@@ -7,13 +7,28 @@ namespace Server.Infrastructure.Services;
 /// <summary>
 /// Service for accessing the current authenticated user's context
 /// </summary>
-public class CurrentUserService : ICurrentUserService
+public class UserContext : IUserContext
 {
   private readonly IHttpContextAccessor _httpContextAccessor;
 
-  public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+  public UserContext(IHttpContextAccessor httpContextAccessor)
   {
     _httpContextAccessor = httpContextAccessor;
+  }
+
+  public string GetCorrelationId()
+  {
+    if (_httpContextAccessor.HttpContext == null)
+    {
+      return Guid.Empty.ToString();
+    }
+
+    if (!_httpContextAccessor.HttpContext.Items.ContainsKey("CorrelationId"))
+    {
+      _httpContextAccessor.HttpContext.Items["CorrelationId"] = Guid.NewGuid().ToString();
+    }
+
+    return _httpContextAccessor.HttpContext.Items["CorrelationId"] as string ?? Guid.Empty.ToString();
   }
 
   /// <summary>

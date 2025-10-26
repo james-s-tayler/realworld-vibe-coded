@@ -13,7 +13,7 @@ public class ProfileMapper : ResponseMapper<ProfileResponse, User>
   public override ProfileResponse FromEntity(User user)
   {
     // Resolve current user service to get authentication context
-    var currentUserService = Resolve<ICurrentUserService>();
+    var currentUserService = Resolve<IUserContext>();
     var currentUserId = currentUserService.GetCurrentUserId();
 
     // Determine if the current user is following this profile
