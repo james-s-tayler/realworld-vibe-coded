@@ -38,6 +38,7 @@ General functionality:
 - If you get stuck on an implementation detail related to a particular library use the docs-mcp-server to search for the relevant documentation.
 - If you modify the nuke build you MUST try and build it first before committing.
 - Server logs (Serilog and Audit.NET) are available in the `Logs` directory at the repository root. All docker-compose.yml configurations are set up to output logs there for debugging. Serilog logs are in `Logs/Server.Web/Serilog/` and Audit logs are in `Logs/Server.Web/Audit.NET/`.
+- When checking Audit.NET logs you need to check both the EntityFrameworkEvent and the DatabaseTransactionEvent correlated by TransactionId and inspect the TransactionStatus to see whether it was Committed or RolledBack.
 - When Nuke build targets fail, carefully read and follow any instructions in the error messages, as they often contain specific guidance on how to access logs and reports for debugging.
 
 ## Folder Structure

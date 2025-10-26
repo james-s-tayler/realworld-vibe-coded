@@ -28,21 +28,48 @@ public class UnitOfWork : IUnitOfWork
 
     return await strategy.ExecuteAsync(async () =>
     {
-      // Create audit scope for the transaction
-      using var scope = await AuditScope.CreateAsync(new AuditScopeOptions
+      // Begin transaction
+      await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+      /*
+       * NOTE: The following AuditScope logic is designed to mitigate the following problem.
+       *       Essentially, when a rollback happens in EF Core, Audit.NET doesn't know about that and will write the audit trail anyway.
+       *       This leads to a situation where your audit trail says something happened when it didn't.
+       *
+       *       So, how do we solve it? Well, there are a few potential ways. The TL;DR is it boils down to:
+       *       - Find some way to buffer writes in memory until the transaction is committed or rolled back
+       *       - Find some way to wire the EF Core and Audit.NET lifecycle together nicely
+       *
+       *       Both of these are technically doable with enough effort, but neither is super easy.
+       *       Nor are they easy to reason about. So, why isn't this just simple?
+       *
+       *       AuditScope's in Audit.NET are independent by design with each scope managing its own lifecycle independently.
+       *       AuditScopes do not nest. Audit.EntityFramework.Core produces audit logs of EventType "EntityFrameworkEvent".
+       *       That library is in control of that AuditScope, not us.
+       *       Therefore we can't simply call scope.Discard() here to not write the EntityFrameworkEvent.
+       *       Believe me, I tried.
+       *
+       *       Hence the simple solution is:
+       *       Rather than trying to get Audit.NET to NOT write a log, make it write an additional correlated log.
+       *       The EntityFrameworkEvent includes the TransactionId as a custom field.
+       *       Hence, if we create a DatabaseTransactionEvent with the TrasactionId and record whether it was committed or rolled back,
+       *       that's enough information to know what actually happened to the entity in question.
+       *
+       *       Assuming no logs got dropped of course... muahahaha!
+       *       Ahhhh distributed systems!
+       */
+      await using var scope = await AuditScope.CreateAsync(new AuditScopeOptions
       {
-        EventType = "Transaction",
+        EventType = "DatabaseTransactionEvent",
         AuditEvent = new AuditEvent
         {
           CustomFields = new Dictionary<string, object>
           {
-            { "TransactionStartTime", DateTime.UtcNow }
+            { "TransactionStartTime", DateTime.UtcNow },
+            { "TransactionId", transaction.TransactionId }
           }
         }
-      });
-
-      // Begin transaction
-      await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+      }, cancellationToken);
 
       try
       {
@@ -66,7 +93,6 @@ public class UnitOfWork : IUnitOfWork
           await transaction.RollbackAsync(cancellationToken);
           scope.SetCustomField("TransactionStatus", "RolledBack");
           scope.SetCustomField("ResultStatus", result.Status.ToString());
-          scope.Discard();
           _logger.LogWarning("Transaction rolled back due to operation failure. Result: {@Result}", result);
         }
 
