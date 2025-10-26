@@ -1,13 +1,12 @@
 ﻿using Audit.EntityFramework;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Server.Core.ArticleAggregate;
 using Server.Core.UserAggregate;
 
 namespace Server.Infrastructure.Data;
 
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false)]
-public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+public class AppDbContext : AuditIdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
   private readonly IDomainEventDispatcher? _dispatcher;
 

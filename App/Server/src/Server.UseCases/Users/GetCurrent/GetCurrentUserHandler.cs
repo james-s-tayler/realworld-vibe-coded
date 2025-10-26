@@ -1,18 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Server.Core.UserAggregate;
 
 namespace Server.UseCases.Users.GetCurrent;
 
 public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
 {
-  private readonly IRepository<User> _repository;
+  private readonly UserManager<User> _userManager;
   private readonly ILogger<GetCurrentUserHandler> _logger;
 
   public GetCurrentUserHandler(
-    IRepository<User> repository,
+    UserManager<User> userManager,
     ILogger<GetCurrentUserHandler> logger)
   {
-    _repository = repository;
+    _userManager = userManager;
     _logger = logger;
   }
 
@@ -20,7 +21,7 @@ public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
   {
     _logger.LogInformation("Getting current user for ID {UserId}", request.UserId);
 
-    var user = await _repository.GetByIdAsync(request.UserId, cancellationToken);
+    var user = await _userManager.FindByIdAsync(request.UserId.ToString());
 
     if (user == null)
     {

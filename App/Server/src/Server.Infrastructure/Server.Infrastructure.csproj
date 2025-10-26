@@ -4,6 +4,7 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" />
     <PackageReference Include="Audit.EntityFramework.Core" />
+    <PackageReference Include="Audit.EntityFramework.Identity.Core" />
     <PackageReference Include="Azure.Identity" />
     <PackageReference Include="BCrypt.Net-Next" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />

@@ -1,22 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
-using Server.Core.Interfaces;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Server.Core.UserAggregate;
 
 namespace Server.UseCases.Users.Register;
 
 public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
 {
-  private readonly IRepository<User> _repository;
-  private readonly IPasswordHasher _passwordHasher;
+  private readonly UserManager<User> _userManager;
   private readonly ILogger<RegisterUserHandler> _logger;
 
   public RegisterUserHandler(
-    IRepository<User> repository,
-    IPasswordHasher passwordHasher,
+    UserManager<User> userManager,
     ILogger<RegisterUserHandler> logger)
   {
-    _repository = repository;
-    _passwordHasher = passwordHasher;
+    _userManager = userManager;
     _logger = logger;
   }
 
@@ -24,53 +21,34 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
   {
     _logger.LogInformation("Handling user registration for {Email}", request.Email);
 
-    // Check if user already exists by email or username
-    var existingUserByEmail = await _repository
-      .FirstOrDefaultAsync(new UserByEmailSpec(request.Email), cancellationToken);
-
-    if (existingUserByEmail != null)
-    {
-      _logger.LogWarning("Registration failed: Email {Email} already exists", request.Email);
-      return Result.Invalid(new ValidationError
-      {
-        Identifier = nameof(request.Email),
-        ErrorMessage = "Email already exists",
-      });
-    }
-
-    var existingUserByUsername = await _repository
-      .FirstOrDefaultAsync(new UserByUsernameSpec(request.Username), cancellationToken);
-
-    if (existingUserByUsername != null)
-    {
-      _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
-      return Result.Invalid(new ValidationError
-      {
-        Identifier = nameof(request.Username),
-        ErrorMessage = "Username already exists",
-      });
-    }
-
-    // Create user without password (will be set after hashing)
+    // Create user without password (UserManager will handle password hashing)
     var newUser = new User(request.Email, request.Username);
-    
-    // Hash password using Identity's password hasher
-    var hashedPassword = _passwordHasher.HashPassword(newUser, request.Password);
-    newUser.UpdatePassword(hashedPassword);
 
-    try
+    // Use UserManager to create user with password
+    var result = await _userManager.CreateAsync(newUser, request.Password);
+
+    if (!result.Succeeded)
     {
-      var createdUser = await _repository.AddAsync(newUser, cancellationToken);
+      _logger.LogWarning("Registration failed for {Email}: {Errors}",
+        request.Email,
+        string.Join(", ", result.Errors.Select(e => e.Description)));
 
-      _logger.LogInformation("User {Username} registered successfully with ID {UserId}",
-        createdUser.Username, createdUser.Id);
+      // Map Identity errors to validation errors
+      var errors = result.Errors.Select(e => new ValidationError
+      {
+        Identifier = e.Code.Contains("Email") ? nameof(request.Email) :
+                    e.Code.Contains("UserName") || e.Code.Contains("Username") ? nameof(request.Username) :
+                    e.Code.Contains("Password") ? nameof(request.Password) :
+                    "error",
+        ErrorMessage = e.Description
+      }).ToList();
 
-      return Result.Created(createdUser);
+      return Result.Invalid(errors);
     }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, "Error during user registration for {Email}", request.Email);
-      return Result.Error("An error occurred during registration");
-    }
+
+    _logger.LogInformation("User {Username} registered successfully with ID {UserId}",
+      newUser.Username, newUser.Id);
+
+    return Result.Created(newUser);
   }
 }

@@ -35,13 +35,14 @@ public class UsersFixture : AppFixture<Program>
     // so we can create it with a null DbContextOptions
     var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
     using var db = new AppDbContext(dbContextOptions, null);
-    
+
     // Use migrations instead of EnsureCreated for Identity compatibility
     await db.Database.MigrateAsync();
   }
 
   protected override void ConfigureServices(IServiceCollection services)
   {
+    // Remove existing DbContext registrations
     var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
     if (descriptor != null)
     {
@@ -60,11 +61,15 @@ public class UsersFixture : AppFixture<Program>
       services.Remove(desc);
     }
 
+    // Re-add DbContext with test connection string
     services.AddDbContext<AppDbContext>(options =>
     {
       options.UseSqlServer(_connectionString);
       options.EnableSensitiveDataLogging();
     });
+
+    // Ensure Identity services are still registered (they should be from InfrastructureServiceExtensions)
+    // But we need to make sure they use the correct DbContext
   }
 
   protected override ValueTask SetupAsync()

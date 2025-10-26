@@ -48,12 +48,14 @@ public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQuer
 
     if (!string.IsNullOrEmpty(author))
     {
-      query = query.Where(a => a.Author.Username == author);
+      var normalizedAuthor = author.ToUpperInvariant();
+      query = query.Where(a => a.Author.NormalizedUserName == normalizedAuthor);
     }
 
     if (!string.IsNullOrEmpty(favorited))
     {
-      query = query.Where(a => a.FavoritedBy.Any(u => u.Username == favorited));
+      var normalizedFavorited = favorited.ToUpperInvariant();
+      query = query.Where(a => a.FavoritedBy.Any(u => u.NormalizedUserName == normalizedFavorited));
     }
 
     return query.OrderByDescending(a => a.CreatedAt);

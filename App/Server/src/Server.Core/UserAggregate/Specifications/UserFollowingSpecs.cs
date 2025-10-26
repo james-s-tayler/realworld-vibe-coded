@@ -4,7 +4,8 @@ public class UserByUsernameWithFollowingSpec : Specification<User>
 {
   public UserByUsernameWithFollowingSpec(string username)
   {
-    Query.Where(u => u.Username == username)
+    var normalizedUsername = username.ToUpperInvariant();
+    Query.Where(u => u.NormalizedUserName == normalizedUsername)
          .Include(u => u.Following)
          .Include(u => u.Followers);
   }

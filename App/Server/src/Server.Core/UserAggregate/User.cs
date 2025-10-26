@@ -22,7 +22,7 @@ public class User : IdentityUser<Guid>, IAggregateRoot, IAuditableEntity
     Image = null;
     Following = new List<UserFollowing>();
     Followers = new List<UserFollowing>();
-    
+
     // Set Identity fields
     Id = Guid.NewGuid();
     Email = Guard.Against.NullOrEmpty(email, nameof(email));
@@ -46,7 +46,7 @@ public class User : IdentityUser<Guid>, IAggregateRoot, IAuditableEntity
     Image = null;
     Following = new List<UserFollowing>();
     Followers = new List<UserFollowing>();
-    
+
     // Set Identity fields
     Id = Guid.NewGuid();
     Email = Guard.Against.NullOrEmpty(email, nameof(email));

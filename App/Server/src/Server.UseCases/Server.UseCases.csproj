@@ -3,6 +3,7 @@
   <ItemGroup>
     <PackageReference Include="FastEndpoints" />
     <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
   </ItemGroup>
 
   <ItemGroup>

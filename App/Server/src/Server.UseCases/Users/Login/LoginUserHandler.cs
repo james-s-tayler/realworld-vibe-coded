@@ -1,22 +1,22 @@
-﻿using Microsoft.Extensions.Logging;
-using Server.Core.Interfaces;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Server.Core.UserAggregate;
 
 namespace Server.UseCases.Users.Login;
 
 public class LoginUserHandler : IQueryHandler<LoginUserQuery, User>
 {
-  private readonly IRepository<User> _repository;
-  private readonly IPasswordHasher _passwordHasher;
+  private readonly UserManager<User> _userManager;
+  private readonly SignInManager<User> _signInManager;
   private readonly ILogger<LoginUserHandler> _logger;
 
   public LoginUserHandler(
-    IRepository<User> repository,
-    IPasswordHasher passwordHasher,
+    UserManager<User> userManager,
+    SignInManager<User> signInManager,
     ILogger<LoginUserHandler> logger)
   {
-    _repository = repository;
-    _passwordHasher = passwordHasher;
+    _userManager = userManager;
+    _signInManager = signInManager;
     _logger = logger;
   }
 
@@ -25,8 +25,7 @@ public class LoginUserHandler : IQueryHandler<LoginUserQuery, User>
     _logger.LogInformation("Handling user login for {Email}", request.Email);
 
     // Find user by email
-    var user = await _repository
-      .FirstOrDefaultAsync(new UserByEmailSpec(request.Email), cancellationToken);
+    var user = await _userManager.FindByEmailAsync(request.Email);
 
     if (user == null)
     {
@@ -34,8 +33,10 @@ public class LoginUserHandler : IQueryHandler<LoginUserQuery, User>
       return Result.Unauthorized();
     }
 
-    // Verify password using Identity's password hasher
-    if (!_passwordHasher.VerifyPassword(user, request.Password, user.HashedPassword))
+    // Check password using SignInManager (this doesn't actually sign in, just checks password)
+    var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
+
+    if (!result.Succeeded)
     {
       _logger.LogWarning("Login failed: Invalid password for user {Email}", request.Email);
       return Result.Unauthorized();

@@ -1,22 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
-using Server.Core.Interfaces;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Server.Core.UserAggregate;
 
 namespace Server.UseCases.Users.Update;
 
 public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
 {
-  private readonly IRepository<User> _repository;
-  private readonly IPasswordHasher _passwordHasher;
+  private readonly UserManager<User> _userManager;
   private readonly ILogger<UpdateUserHandler> _logger;
 
   public UpdateUserHandler(
-    IRepository<User> repository,
-    IPasswordHasher passwordHasher,
+    UserManager<User> userManager,
     ILogger<UpdateUserHandler> logger)
   {
-    _repository = repository;
-    _passwordHasher = passwordHasher;
+    _userManager = userManager;
     _logger = logger;
   }
 
@@ -24,7 +21,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
   {
     _logger.LogInformation("Updating user {UserId}", request.UserId);
 
-    var user = await _repository.GetByIdAsync(request.UserId, cancellationToken);
+    var user = await _userManager.FindByIdAsync(request.UserId.ToString());
 
     if (user == null)
     {
@@ -32,12 +29,11 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       return Result.NotFound();
     }
 
-    // Check for duplicate email
+    // Update email if provided
     if (!string.IsNullOrEmpty(request.Email) && request.Email != user.Email)
     {
-      var existingUserByEmail = await _repository
-        .FirstOrDefaultAsync(new UserByEmailSpec(request.Email), cancellationToken);
-
+      // Check if email is already taken
+      var existingUserByEmail = await _userManager.FindByEmailAsync(request.Email);
       if (existingUserByEmail != null && existingUserByEmail.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Email {Email} already exists", request.Email);
@@ -47,15 +43,24 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
           ErrorMessage = "Email already exists",
         });
       }
-      user.UpdateEmail(request.Email);
+
+      var emailResult = await _userManager.SetEmailAsync(user, request.Email);
+      if (!emailResult.Succeeded)
+      {
+        _logger.LogWarning("Update failed: Could not update email {Email}", request.Email);
+        return Result.Invalid(emailResult.Errors.Select(e => new ValidationError
+        {
+          Identifier = "email",
+          ErrorMessage = e.Description
+        }).ToList());
+      }
     }
 
-    // Check for duplicate username
+    // Update username if provided
     if (!string.IsNullOrEmpty(request.Username) && request.Username != user.Username)
     {
-      var existingUserByUsername = await _repository
-        .FirstOrDefaultAsync(new UserByUsernameSpec(request.Username), cancellationToken);
-
+      // Check if username is already taken
+      var existingUserByUsername = await _userManager.FindByNameAsync(request.Username);
       if (existingUserByUsername != null && existingUserByUsername.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Username {Username} already exists", request.Username);
@@ -65,14 +70,35 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
           ErrorMessage = "Username already exists",
         });
       }
-      user.UpdateUsername(request.Username);
+
+      var usernameResult = await _userManager.SetUserNameAsync(user, request.Username);
+      if (!usernameResult.Succeeded)
+      {
+        _logger.LogWarning("Update failed: Could not update username {Username}", request.Username);
+        return Result.Invalid(usernameResult.Errors.Select(e => new ValidationError
+        {
+          Identifier = "username",
+          ErrorMessage = e.Description
+        }).ToList());
+      }
     }
 
     // Update password if provided
     if (!string.IsNullOrEmpty(request.Password))
     {
-      var hashedPassword = _passwordHasher.HashPassword(user, request.Password);
-      user.UpdatePassword(hashedPassword);
+      // Remove old password and add new one
+      var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+      var passwordResult = await _userManager.ResetPasswordAsync(user, token, request.Password);
+
+      if (!passwordResult.Succeeded)
+      {
+        _logger.LogWarning("Update failed: Could not update password");
+        return Result.Invalid(passwordResult.Errors.Select(e => new ValidationError
+        {
+          Identifier = "password",
+          ErrorMessage = e.Description
+        }).ToList());
+      }
     }
 
     // Update bio if provided
@@ -87,18 +113,18 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       user.UpdateImage(request.Image);
     }
 
-    try
+    // Save changes using UserManager
+    var updateResult = await _userManager.UpdateAsync(user);
+    if (!updateResult.Succeeded)
     {
-      await _repository.UpdateAsync(user, cancellationToken);
-
-      _logger.LogInformation("User {Username} updated successfully", user.Username);
-
-      return Result.Success(user);
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, "Error during user update for {UserId}", request.UserId);
+      _logger.LogError("Error during user update for {UserId}: {Errors}",
+        request.UserId,
+        string.Join(", ", updateResult.Errors.Select(e => e.Description)));
       return Result.Error("An error occurred during update");
     }
+
+    _logger.LogInformation("User {Username} updated successfully", user.Username);
+
+    return Result.Success(user);
   }
 }
