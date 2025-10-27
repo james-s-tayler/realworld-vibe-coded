@@ -1,5 +1,7 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications;
+using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Get;
 

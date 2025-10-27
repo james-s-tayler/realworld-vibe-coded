@@ -1,5 +1,6 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.Interfaces;
+using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Articles.Feed;
 

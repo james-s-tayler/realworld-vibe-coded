@@ -1,4 +1,4 @@
-﻿namespace Server.SharedKernel;
+﻿namespace Server.SharedKernel.MediatR;
 
 /// <summary>
 /// Represents a command that returns a Result{T}.

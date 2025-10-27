@@ -74,6 +74,8 @@ services:
       - /app/src/Server.UseCases/bin
       - /app/src/Server.Core/obj
       - /app/src/Server.Core/bin
+      - /app/src/Server.SharedKernel/obj
+      - /app/src/Server.SharedKernel/bin
       - /app/analyzers/Server.Analyzers/obj
       - /app/analyzers/Server.Analyzers/bin
     healthcheck:

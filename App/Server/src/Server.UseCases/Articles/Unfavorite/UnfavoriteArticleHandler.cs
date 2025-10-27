@@ -1,6 +1,8 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.UserAggregate;
+using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Unfavorite;
 

@@ -1,4 +1,5 @@
 ﻿using Server.Core.ArticleAggregate;
+using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Articles.Update;
 

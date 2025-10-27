@@ -5,6 +5,7 @@ using Server.Infrastructure.Data.Interceptors;
 using Server.Infrastructure.Data.Queries;
 using Server.Infrastructure.Services;
 using Server.SharedKernel.Interfaces;
+using Server.SharedKernel.Persistence;
 
 
 namespace Server.Infrastructure;

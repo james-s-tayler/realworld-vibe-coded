@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Server.Core.Interfaces;
 using Server.SharedKernel.Interfaces;
+using Server.SharedKernel.Persistence;
 
 namespace Server.Infrastructure.Data.Interceptors;
 

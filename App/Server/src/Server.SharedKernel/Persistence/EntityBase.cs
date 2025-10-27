@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Server.SharedKernel.DomainEvents;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.Persistence;
 
 /// <summary>
 /// A base class for DDD Entities. Includes support for domain events dispatched post-persistence.

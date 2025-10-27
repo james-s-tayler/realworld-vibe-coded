@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.Persistence;
 
 /// <summary>
 /// Interface for entities that track creation and modification timestamps,

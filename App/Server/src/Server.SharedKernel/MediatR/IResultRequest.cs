@@ -1,7 +1,7 @@
 ﻿using Ardalis.Result;
 using MediatR;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.MediatR;
 
 /// <summary>
 /// Non-generic marker interface for requests that return Result{T}.

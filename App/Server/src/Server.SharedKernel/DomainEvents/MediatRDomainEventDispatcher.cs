@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.DomainEvents;
 
 public class MediatRDomainEventDispatcher : IDomainEventDispatcher
 {

@@ -1,6 +1,6 @@
 ﻿using Ardalis.Result;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.Persistence;
 
 /// <summary>
 /// Defines a unit of work pattern for managing database transactions.

@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using Server.Core.UserAggregate;
+using Server.SharedKernel.DomainEvents;
+using Server.SharedKernel.MediatR;
 using Server.UseCases.Users.Register;
 
 namespace Server.Web.Configurations;
@@ -40,7 +42,7 @@ public static class MediatrConfigs
         Type = type,
         ResultRequestInterface = type.GetInterfaces()
           .FirstOrDefault(i => i.IsGenericType &&
-                              (i.GetGenericTypeDefinition() == typeof(Server.SharedKernel.ICommand<>) ||
+                              (i.GetGenericTypeDefinition() == typeof(SharedKernel.MediatR.ICommand<>) ||
                                i.GetGenericTypeDefinition() == typeof(IQuery<>)))
       })
       .Where(x => x.ResultRequestInterface != null)

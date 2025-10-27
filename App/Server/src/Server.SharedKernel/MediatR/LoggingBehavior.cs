@@ -5,7 +5,7 @@ using Ardalis.Result;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.MediatR;
 
 /// <summary>
 /// MediatR pipeline behavior that adds logging for all requests in the pipeline.

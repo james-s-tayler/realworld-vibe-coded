@@ -35,7 +35,7 @@ public static class MiddlewareConfig
       {
         ep.PostProcessor<GlobalExceptionHandler>(Order.After);
       };
-      if (!app.Environment.IsDevelopment())
+      if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
       {
         config.Endpoints.Filter = ep =>
         {

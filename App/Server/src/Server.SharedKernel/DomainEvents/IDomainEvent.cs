@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.DomainEvents;
 
 public interface IDomainEvent : INotification
 {

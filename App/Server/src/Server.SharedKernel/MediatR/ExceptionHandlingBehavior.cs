@@ -2,8 +2,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Server.SharedKernel.Ardalis.Result;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.MediatR;
 
 /// <summary>
 /// MediatR pipeline behavior that catches exceptions during request handling

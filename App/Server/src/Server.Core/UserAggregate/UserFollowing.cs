@@ -1,4 +1,6 @@
-﻿namespace Server.Core.UserAggregate;
+﻿using Server.SharedKernel.Persistence;
+
+namespace Server.Core.UserAggregate;
 
 public class UserFollowing : EntityBase
 {

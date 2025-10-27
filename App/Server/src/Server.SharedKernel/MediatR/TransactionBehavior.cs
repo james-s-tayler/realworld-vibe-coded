@@ -1,8 +1,9 @@
 ﻿using Ardalis.Result;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Server.SharedKernel.Persistence;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.MediatR;
 
 /// <summary>
 /// MediatR pipeline behavior that wraps Command handling in an EF Core transaction.

@@ -1,4 +1,4 @@
-﻿namespace Server.SharedKernel;
+﻿namespace Server.SharedKernel.Persistence;
 
 /// <summary>
 /// Apply this marker interface only to aggregate root entities in your domain model

@@ -1,6 +1,6 @@
 ﻿using Ardalis.Specification;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.Persistence;
 
 /// <summary>
 /// An abstraction for persistence, based on Ardalis.Specification

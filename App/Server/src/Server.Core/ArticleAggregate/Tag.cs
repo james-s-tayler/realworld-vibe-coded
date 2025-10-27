@@ -1,4 +1,6 @@
-﻿namespace Server.Core.ArticleAggregate;
+﻿using Server.SharedKernel.Persistence;
+
+namespace Server.Core.ArticleAggregate;
 
 public class Tag : EntityBase, IAggregateRoot
 {

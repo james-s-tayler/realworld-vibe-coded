@@ -1,7 +1,7 @@
 ﻿using Ardalis.Result;
 using MediatR;
 
-namespace Server.SharedKernel;
+namespace Server.SharedKernel.MediatR;
 
 /// <summary>
 /// Handler for queries that return Result{T}.

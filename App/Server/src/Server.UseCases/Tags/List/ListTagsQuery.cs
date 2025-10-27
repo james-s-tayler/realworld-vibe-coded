@@ -1,3 +1,5 @@
-﻿namespace Server.UseCases.Tags.List;
+﻿using Server.SharedKernel.MediatR;
+
+namespace Server.UseCases.Tags.List;
 
 public record ListTagsQuery() : IQuery<TagsResponse>;

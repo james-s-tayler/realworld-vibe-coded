@@ -2,7 +2,7 @@
 
 public sealed class DevOnly : Group
 {
-  public const string ROUTE = "api/dev-only";
+  public const string ROUTE = "dev-only";
   public DevOnly()
   {
     Configure(ROUTE, ep => { });

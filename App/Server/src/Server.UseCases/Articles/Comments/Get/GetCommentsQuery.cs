@@ -1,4 +1,5 @@
 ﻿using Server.Core.ArticleAggregate.Dtos;
+using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Articles.Comments.Get;
 

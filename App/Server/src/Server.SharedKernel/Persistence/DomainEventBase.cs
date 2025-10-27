@@ -1,4 +1,6 @@
-﻿namespace Server.SharedKernel;
+﻿using Server.SharedKernel.DomainEvents;
+
+namespace Server.SharedKernel.Persistence;
 
 /// <summary>
 /// A base type for domain events. Depends on MediatR INotification.
