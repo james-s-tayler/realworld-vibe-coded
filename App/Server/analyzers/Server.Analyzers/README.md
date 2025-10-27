@@ -116,8 +116,55 @@ var response = await client.PostAsJsonAsync(route, "{", cancellationToken);
 
 ---
 
-### SRV008-SRV009: Other Analyzers
-Reserved for internal analyzers.
+### SRV012-SRV013: DevOnlyGroupAnalyzer
+**Description:** Enforces FastEndpoints grouping rules for the Server.Web.DevOnly namespace.
+
+**Severity:** Error
+
+**Rationale:** Development-only endpoints in the Server.Web.DevOnly namespace must be explicitly grouped under `DevOnly` or a `SubGroup<DevOnly>` to ensure they are properly filtered and organized. Conversely, only endpoints in the Server.Web.DevOnly namespace should use these groups to maintain clear separation between dev-only and production code.
+
+**Two-way enforcement:**
+
+1. **SRV012:** All endpoints in the `Server.Web.DevOnly` namespace must call `Group<DevOnly>()` or `Group<T>()` where `T` inherits from `SubGroup<DevOnly>` in their `Configure()` method.
+
+2. **SRV013:** Any endpoint calling `Group<DevOnly>()` or `Group<T>()` where `T` inherits from `SubGroup<DevOnly>` must be located in the `Server.Web.DevOnly` namespace.
+
+**Example:**
+```csharp
+namespace Server.Web.DevOnly.Endpoints;
+
+// ✅ Good - DevOnly endpoint with DevOnly group
+public class TestEndpoint : Endpoint<EmptyRequest>
+{
+  public override void Configure()
+  {
+    Get("/api/dev-only/test");
+    Group<DevOnly>(); // or Group<TestError>() where TestError : SubGroup<DevOnly>
+  }
+}
+
+// ❌ Bad - DevOnly endpoint without DevOnly group
+public class TestEndpoint : Endpoint<EmptyRequest>
+{
+  public override void Configure()
+  {
+    Get("/api/dev-only/test");
+    // Missing Group<DevOnly>() call - SRV012 violation
+  }
+}
+
+namespace Server.Web.Articles;
+
+// ❌ Bad - Production endpoint using DevOnly group
+public class GetArticle : Endpoint<EmptyRequest>
+{
+  public override void Configure()
+  {
+    Get("/api/articles/{slug}");
+    Group<DevOnly>(); // SRV013 violation - wrong namespace
+  }
+}
+```
 
 ---
 
