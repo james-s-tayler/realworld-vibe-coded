@@ -230,6 +230,243 @@ var date = DateTime.Parse("2023-01-15");
 var dateTime = DateTime.Parse("2023-01-15 10:30:00");
 ```
 
+---
+
+## Persistence Analyzers (PV001-PV060)
+
+### PV001: EfCoreTypesOnlyInInfrastructureAnalyzer
+**Description:** Prevents EF Core types from being referenced outside Infrastructure layer.
+
+**Severity:** Error
+
+**Rationale:** EF Core types (DbContext, DbSet, IEntityTypeConfiguration, Migrations) should be isolated to Infrastructure to maintain clean architecture boundaries.
+
+**Fix:** Wrap with repository/abstraction, move code into Infrastructure, or inject an abstraction.
+
+---
+
+### PV002: DbContextNotInApplicationDomainAnalyzer
+**Description:** Prevents DbContext from appearing in the public surface of Application/Domain layers.
+
+**Severity:** Error
+
+**Rationale:** DbContext should be isolated to Infrastructure layer behind abstractions like repositories or unit-of-work.
+
+**Fix:** Use repository or unit-of-work abstractions instead of direct DbContext usage.
+
+---
+
+### PV003: RawSqlRestrictedToGatewaysAnalyzer
+**Description:** Restricts raw SQL API usage to designated gateway classes.
+
+**Severity:** Warning
+
+**Rationale:** Centralizes and audits FromSqlRaw/Interpolated and ExecuteSql* usage for security and maintainability.
+
+**Fix:** Move to a gateway class marked with [SqlGateway] or in .Data.Queries namespace.
+
+---
+
+### PV010: RepositoriesNoIQueryableAnalyzer
+**Description:** Detects repository interfaces or classes exposing IQueryable or EF types.
+
+**Severity:** Error
+
+**Rationale:** Avoid leaking query providers and EF-specific concerns across boundaries.
+
+**Fix:** Return IEnumerable, IAsyncEnumerable, or concrete domain types instead.
+
+---
+
+### PV011: RepositoryAsyncMethodsCancellationTokenAnalyzer
+**Description:** Ensures repository async methods support CancellationToken.
+
+**Severity:** Warning
+
+**Rationale:** Cooperative cancellation is critical for I/O-bound operations.
+
+**Fix:** Add CancellationToken parameter and pass to EF async methods.
+
+---
+
+### PV012: SaveChangesOnlyInUnitOfWorkAnalyzer
+**Description:** Ensures SaveChanges/SaveChangesAsync is only called in UnitOfWork implementations.
+
+**Severity:** Error
+
+**Rationale:** Centralizes transaction management and domain event dispatch.
+
+**Fix:** Use IUnitOfWork.CommitAsync() instead of direct SaveChanges calls.
+
+---
+
+### PV013: DomainEntitiesNoEfAttributesAnalyzer
+**Description:** Detects EF mapping attributes on domain entities.
+
+**Severity:** Error
+
+**Rationale:** Keep domain persistence-agnostic.
+
+**Fix:** Move mapping to Fluent API in IEntityTypeConfiguration<T>.
+
+**Example:**
+```csharp
+// ❌ Bad - Domain entity with EF attributes
+[Table("Users")]
+public class User
+{
+  [Key]
+  public int Id { get; set; }
+}
+
+// ✅ Good - Clean domain entity
+public class User
+{
+  public int Id { get; set; }
+}
+
+// Configuration in Infrastructure
+public class UserConfiguration : IEntityTypeConfiguration<User>
+{
+  public void Configure(EntityTypeBuilder<User> builder)
+  {
+    builder.ToTable("Users");
+    builder.HasKey(u => u.Id);
+  }
+}
+```
+
+---
+
+### PV020: PreferAsNoTrackingForReadOnlyQueriesAnalyzer
+**Description:** Suggests using AsNoTracking for read-only queries.
+
+**Severity:** Info
+
+**Rationale:** Reduce change-tracking overhead for reads.
+
+**Fix:** Insert .AsNoTracking() before materialization methods.
+
+---
+
+### PV021: AvoidMaterializationBeforeProjectionAnalyzer
+**Description:** Detects materialization (ToList/AsEnumerable) before projection or filtering.
+
+**Severity:** Warning
+
+**Rationale:** Push computation to the database for better performance.
+
+**Fix:** Reorder to perform Select/Where before ToList/ToArray.
+
+---
+
+### PV022: UseAsyncEfVariantsAnalyzer
+**Description:** Detects synchronous EF methods being used in async methods.
+
+**Severity:** Warning
+
+**Rationale:** Avoid sync blocking on I/O operations.
+
+**Fix:** Use ToListAsync, FirstAsync, etc. instead of synchronous variants.
+
+---
+
+### PV023: BlockOnAsyncEfCallsAnalyzer
+**Description:** Detects blocking on async Entity Framework calls using .Result or .Wait().
+
+**Severity:** Error
+
+**Rationale:** Prevent deadlocks and thread pool starvation.
+
+**Fix:** Use await with CancellationToken.
+
+---
+
+### PV030: ForbidDateTimeNowInQueriesAnalyzer
+**Description:** Forbids DateTime.Now and DateTimeOffset.Now in LINQ queries.
+
+**Severity:** Error
+
+**Rationale:** Timezone consistency and proper database translation.
+
+**Fix:** Use DateTime.UtcNow or DateTimeOffset.UtcNow.
+
+---
+
+### PV032: BanStringBasedIncludeAnalyzer
+**Description:** Bans string-based Include calls in Entity Framework queries.
+
+**Severity:** Error
+
+**Rationale:** Avoid brittle magic strings.
+
+**Fix:** Use strongly typed Include/ThenInclude with lambda expressions.
+
+**Example:**
+```csharp
+// ❌ Bad
+query.Include("Author").Include("Tags")
+
+// ✅ Good
+query.Include(a => a.Author).ThenInclude(a => a.Tags)
+```
+
+---
+
+### PV040: EntityConfigurationLocationAnalyzer
+**Description:** Ensures IEntityTypeConfiguration implementations are in the correct namespace.
+
+**Severity:** Warning
+
+**Rationale:** Keep EF mapping centralized and discoverable.
+
+**Fix:** Move to .Data.Config or .Infrastructure.Data.Config namespace.
+
+---
+
+### PV041: NoMigrationReferencesInApplicationDomainAnalyzer
+**Description:** Prevents migration classes from being referenced outside Infrastructure layer.
+
+**Severity:** Error
+
+**Rationale:** Migrations are implementation details.
+
+**Fix:** Remove references or move logic to Infrastructure.
+
+---
+
+### PV042: NoEnsureCreatedInProductionAnalyzer
+**Description:** Prevents usage of EnsureCreated/EnsureDeleted in production code.
+
+**Severity:** Error
+
+**Rationale:** Avoid destructive or schema-bypassing APIs at runtime.
+
+**Fix:** Use EF Core migrations or guard behind environment checks.
+
+---
+
+### PV050: PublicApisNoEfEntitiesAnalyzer
+**Description:** Prevents public APIs from exposing EF entities directly.
+
+**Severity:** Error
+
+**Rationale:** Prevent coupling of transport and persistence models.
+
+**Fix:** Map to DTOs or domain models.
+
+---
+
+### PV051: NoInfrastructureTypesInApplicationDomainAnalyzer
+**Description:** Prevents Infrastructure types from being injected into Application/Domain layers.
+
+**Severity:** Error
+
+**Rationale:** Depend on abstractions, not concrete implementations.
+
+**Fix:** Inject IUnitOfWork or repository interfaces instead.
+
+---
 
 ## Adding a New Analyzer
 
