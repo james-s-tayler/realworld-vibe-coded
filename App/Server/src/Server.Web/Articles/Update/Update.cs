@@ -1,7 +1,7 @@
 ﻿using Server.Core.Interfaces;
+using Server.Infrastructure;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Update;
-using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles.Update;
 

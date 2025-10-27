@@ -1,6 +1,6 @@
 ﻿using Server.Core.Interfaces;
+using Server.Infrastructure;
 using Server.UseCases.Profiles.Follow;
-using Server.Web.Infrastructure;
 
 namespace Server.Web.Profiles.Follow;
 

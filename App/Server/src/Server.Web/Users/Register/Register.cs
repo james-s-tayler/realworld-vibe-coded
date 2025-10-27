@@ -1,5 +1,5 @@
-﻿using Server.UseCases.Users.Register;
-using Server.Web.Infrastructure;
+﻿using Server.Infrastructure;
+using Server.UseCases.Users.Register;
 
 namespace Server.Web.Users.Register;
 

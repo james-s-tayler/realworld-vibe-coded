@@ -1,6 +1,9 @@
-﻿using FluentValidation.Results;
+﻿using Ardalis.Result;
+using FastEndpoints;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 
-namespace Server.Web.Infrastructure;
+namespace Server.Infrastructure;
 
 public static class ResultExtensions
 {
