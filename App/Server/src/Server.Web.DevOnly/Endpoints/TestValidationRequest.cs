@@ -1,4 +1,4 @@
-﻿namespace Server.Web.ErrorTestEndpoints.Endpoints;
+﻿namespace Server.Web.DevOnly.Endpoints;
 
 public class TestValidationRequest
 {

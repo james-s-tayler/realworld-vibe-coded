@@ -1,7 +1,7 @@
 ﻿using Server.Infrastructure;
-using Server.Web.ErrorTestEndpoints.UseCases;
+using Server.Web.DevOnly.UseCases;
 
-namespace Server.Web.ErrorTestEndpoints.Endpoints;
+namespace Server.Web.DevOnly.Endpoints;
 
 /// <summary>
 /// Test endpoint that throws an exception in the use case

@@ -22,7 +22,7 @@ builder.Services.AddServiceConfigs(appLogger, builder);
 
 builder.Services.AddFastEndpoints(o =>
                 {
-                  o.Assemblies = [typeof(Program).Assembly, typeof(Server.Web.ErrorTestEndpoints.Endpoints.ThrowInEndpoint).Assembly];
+                  o.Assemblies = [typeof(Program).Assembly, typeof(Server.Web.DevOnly.Endpoints.ThrowInEndpoint).Assembly];
                 })
                 .SwaggerDocument(o =>
                 {

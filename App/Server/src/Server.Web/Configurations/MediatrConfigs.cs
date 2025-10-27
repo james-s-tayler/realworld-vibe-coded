@@ -12,7 +12,7 @@ public static class MediatrConfigs
       {
         Assembly.GetAssembly(typeof(User)), // Core
         Assembly.GetAssembly(typeof(RegisterUserCommand)), // UseCases
-        Assembly.GetAssembly(typeof(Server.Web.ErrorTestEndpoints.UseCases.ThrowInUseCaseQuery)) // ErrorTestEndpoints
+        Assembly.GetAssembly(typeof(Server.Web.DevOnly.UseCases.ThrowInUseCaseQuery)) // DevOnly
       };
 
     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!))

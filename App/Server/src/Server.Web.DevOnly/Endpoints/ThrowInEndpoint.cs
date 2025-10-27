@@ -1,4 +1,4 @@
-﻿namespace Server.Web.ErrorTestEndpoints.Endpoints;
+﻿namespace Server.Web.DevOnly.Endpoints;
 
 /// <summary>
 /// Test endpoint that throws an exception directly in the endpoint handler

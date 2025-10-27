@@ -43,7 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Analyzers", "analyzers\Server.Analyzers\Server.Analyzers.csproj", "{1E9967A8-E023-47A7-916F-AEF4053BDE2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Web.ErrorTestEndpoints", "tests\Server.Web.ErrorTestEndpoints\Server.Web.ErrorTestEndpoints.csproj", "{D9E39DC7-8DBA-48B0-8DA5-77A3D84F77F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Web.DevOnly", "src\Server.Web.DevOnly\Server.Web.DevOnly.csproj", "{D9E39DC7-8DBA-48B0-8DA5-77A3D84F77F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

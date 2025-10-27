@@ -8,9 +8,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Server.Infrastructure\Server.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\src\Server.SharedKernel\Server.SharedKernel.csproj" />
-    <ProjectReference Include="..\..\src\Server.UseCases\Server.UseCases.csproj" />
+    <ProjectReference Include="..\Server.Infrastructure\Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\Server.SharedKernel\Server.SharedKernel.csproj" />
+    <ProjectReference Include="..\Server.UseCases\Server.UseCases.csproj" />
   </ItemGroup>
 
 </Project>

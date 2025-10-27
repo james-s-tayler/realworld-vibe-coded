@@ -1,4 +1,4 @@
-﻿namespace Server.Web.ErrorTestEndpoints.UseCases;
+﻿namespace Server.Web.DevOnly.UseCases;
 
 public class ThrowInUseCaseNonGenericHandler : IQueryHandler<ThrowInUseCaseNonGenericQuery, Unit>
 {
