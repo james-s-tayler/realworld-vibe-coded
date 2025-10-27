@@ -1,5 +1,5 @@
 ﻿using Ardalis.Result;
-using Server.SharedKernel;
+using Server.SharedKernel.Ardalis.Result;
 
 namespace Server.UnitTests;
 

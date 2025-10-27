@@ -120,7 +120,7 @@ namespace Server.Analyzers
     {
       // Check if it's IResultRequest (non-generic or generic)
       if (typeSymbol.Name == "IResultRequest" &&
-          typeSymbol.ContainingNamespace?.ToDisplayString() == "Server.SharedKernel")
+          typeSymbol.ContainingNamespace?.ToDisplayString() == "Server.SharedKernel.MediatR")
       {
         return true;
       }

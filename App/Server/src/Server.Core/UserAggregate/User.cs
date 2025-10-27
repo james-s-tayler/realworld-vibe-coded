@@ -1,4 +1,5 @@
 ﻿using Audit.EntityFramework;
+using Server.SharedKernel.Persistence;
 
 namespace Server.Core.UserAggregate;
 

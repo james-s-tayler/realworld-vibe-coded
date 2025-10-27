@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
+using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Users.Update;
 

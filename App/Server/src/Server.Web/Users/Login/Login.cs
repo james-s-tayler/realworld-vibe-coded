@@ -1,5 +1,5 @@
-﻿using Server.UseCases.Users.Login;
-using Server.Web.Infrastructure;
+﻿using Server.Infrastructure;
+using Server.UseCases.Users.Login;
 
 namespace Server.Web.Users.Login;
 

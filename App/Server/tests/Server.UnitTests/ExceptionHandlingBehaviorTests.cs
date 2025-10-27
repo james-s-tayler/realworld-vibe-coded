@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Server.SharedKernel;
+using Server.SharedKernel.MediatR;
 
 namespace Server.UnitTests;
 

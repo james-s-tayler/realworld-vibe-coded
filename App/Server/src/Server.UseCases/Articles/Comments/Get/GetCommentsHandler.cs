@@ -3,6 +3,8 @@ using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
+using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Comments.Get;
 

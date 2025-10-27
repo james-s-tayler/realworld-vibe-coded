@@ -1,6 +1,6 @@
-﻿using Server.UseCases.Tags;
+﻿using Server.Infrastructure;
+using Server.UseCases.Tags;
 using Server.UseCases.Tags.List;
-using Server.Web.Infrastructure;
 
 namespace Server.Web.Tags.List;
 

@@ -66,12 +66,16 @@ services:
       - ../../Logs:/app/Logs
       - /app/src/Server.Web/obj
       - /app/src/Server.Web/bin
+      - /app/src/Server.Web.DevOnly/obj
+      - /app/src/Server.Web.DevOnly/bin
       - /app/src/Server.Infrastructure/obj
       - /app/src/Server.Infrastructure/bin
       - /app/src/Server.UseCases/obj
       - /app/src/Server.UseCases/bin
       - /app/src/Server.Core/obj
       - /app/src/Server.Core/bin
+      - /app/src/Server.SharedKernel/obj
+      - /app/src/Server.SharedKernel/bin
       - /app/analyzers/Server.Analyzers/obj
       - /app/analyzers/Server.Analyzers/bin
     healthcheck:

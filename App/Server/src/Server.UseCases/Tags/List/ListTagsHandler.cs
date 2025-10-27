@@ -1,4 +1,5 @@
 ﻿using Server.Core.Interfaces;
+using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Tags.List;
 

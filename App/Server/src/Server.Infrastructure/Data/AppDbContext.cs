@@ -1,6 +1,8 @@
 ﻿using Audit.EntityFramework;
 using Server.Core.ArticleAggregate;
 using Server.Core.UserAggregate;
+using Server.SharedKernel.DomainEvents;
+using Server.SharedKernel.Persistence;
 
 namespace Server.Infrastructure.Data;
 

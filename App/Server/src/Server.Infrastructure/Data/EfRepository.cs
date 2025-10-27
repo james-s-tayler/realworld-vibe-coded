@@ -1,4 +1,6 @@
-﻿namespace Server.Infrastructure.Data;
+﻿using Server.SharedKernel.Persistence;
+
+namespace Server.Infrastructure.Data;
 
 // inherit from Ardalis.Specification type
 public class EfRepository<T>(AppDbContext dbContext) :

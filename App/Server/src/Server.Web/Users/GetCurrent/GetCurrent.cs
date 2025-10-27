@@ -1,6 +1,6 @@
 ﻿using Server.Core.Interfaces;
+using Server.Infrastructure;
 using Server.UseCases.Users.GetCurrent;
-using Server.Web.Infrastructure;
 using Server.Web.Users.Register;
 
 namespace Server.Web.Users.GetCurrent;

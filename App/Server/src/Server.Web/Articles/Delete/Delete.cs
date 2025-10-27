@@ -1,6 +1,6 @@
 ﻿using Server.Core.Interfaces;
+using Server.Infrastructure;
 using Server.UseCases.Articles.Delete;
-using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles.Delete;
 

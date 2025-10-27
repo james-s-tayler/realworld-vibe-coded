@@ -1,4 +1,5 @@
 ﻿using Server.Web.Configurations;
+using Server.Web.DevOnly.Configuration;
 using Server.Web.Infrastructure;
 
 // setup app
@@ -20,7 +21,10 @@ builder.Services.AddOptionConfigs(builder.Configuration, appLogger, builder);
 builder.Services.AddServiceConfigs(appLogger, builder);
 
 
-builder.Services.AddFastEndpoints()
+builder.Services.AddFastEndpoints(o =>
+                {
+                  o.Assemblies = [typeof(Program).Assembly, typeof(Server.Web.DevOnly.Endpoints.ThrowInEndpoint).Assembly];
+                })
                 .SwaggerDocument(o =>
                 {
                   o.ShortSchemaNames = true;
@@ -43,7 +47,7 @@ await app.UseAppMiddlewareAndSeedDatabase();
 
 // Only serve SPA fallback for non-API routes to prevent API 404s from returning index.html
 app.MapWhen(
-  context => !context.Request.Path.StartsWithSegments("/api"),
+  context => !context.Request.Path.StartsWithSegments("/api") && !context.Request.Path.StartsWithSegments($"/{DevOnly.ROUTE}"),
   builder => builder.Run(async context =>
   {
     context.Response.ContentType = "text/html";

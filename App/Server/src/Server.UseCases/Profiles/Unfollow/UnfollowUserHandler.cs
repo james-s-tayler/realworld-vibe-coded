@@ -1,5 +1,7 @@
 ﻿using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
+using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Profiles.Unfollow;
 

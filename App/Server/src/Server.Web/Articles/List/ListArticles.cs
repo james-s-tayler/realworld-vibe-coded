@@ -1,9 +1,9 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.Interfaces;
+using Server.Infrastructure;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.List;
-using Server.Web.Infrastructure;
 
 namespace Server.Web.Articles.List;
 

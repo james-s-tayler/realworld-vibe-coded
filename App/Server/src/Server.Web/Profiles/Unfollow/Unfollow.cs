@@ -1,6 +1,6 @@
 ﻿using Server.Core.Interfaces;
+using Server.Infrastructure;
 using Server.UseCases.Profiles.Unfollow;
-using Server.Web.Infrastructure;
 
 namespace Server.Web.Profiles.Unfollow;
 
