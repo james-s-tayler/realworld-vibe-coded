@@ -1,7 +1,6 @@
-﻿using Server.UseCases.ErrorTest;
-using Server.Web.Infrastructure;
+﻿using Server.Web.ErrorTestEndpoints.UseCases;
 
-namespace Server.Web.ErrorTest;
+namespace Server.Web.ErrorTestEndpoints.Endpoints;
 
 /// <summary>
 /// Test endpoint that throws a DbUpdateConcurrencyException
@@ -21,7 +20,17 @@ public class ThrowConcurrency(IMediator _mediator) : Endpoint<EmptyRequest>
 
   public override async Task HandleAsync(EmptyRequest req, CancellationToken cancellationToken)
   {
+    // The handler throws DbUpdateConcurrencyException, which is caught by ExceptionHandlingBehavior
+    // and converted to Result.Conflict. We need to send the conflict response with status code 409.
     var result = await _mediator.Send(new ThrowConcurrencyQuery(), cancellationToken);
-    await Send.ResultValueAsync(result, cancellationToken);
+
+    if (result.Status == ResultStatus.Conflict)
+    {
+      foreach (var error in result.ValidationErrors)
+      {
+        AddError(new FluentValidation.Results.ValidationFailure(error.Identifier, error.ErrorMessage));
+      }
+      ThrowIfAnyErrors(statusCode: 409);
+    }
   }
 }

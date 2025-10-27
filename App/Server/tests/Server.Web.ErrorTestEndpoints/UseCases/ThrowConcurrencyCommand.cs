@@ -1,4 +1,4 @@
-﻿namespace Server.UseCases.ErrorTest;
+﻿namespace Server.Web.ErrorTestEndpoints.UseCases;
 
 /// <summary>
 /// Command that throws a DbUpdateConcurrencyException to test conflict handling

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Server.Web.ErrorTest;
+namespace Server.Web.ErrorTestEndpoints.Endpoints;
 
 public class RequestValidator : Validator<TestValidationRequest>
 {

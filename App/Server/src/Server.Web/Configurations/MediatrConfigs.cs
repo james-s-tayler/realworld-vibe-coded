@@ -11,7 +11,8 @@ public static class MediatrConfigs
     var mediatRAssemblies = new[]
       {
         Assembly.GetAssembly(typeof(User)), // Core
-        Assembly.GetAssembly(typeof(RegisterUserCommand)) // UseCases
+        Assembly.GetAssembly(typeof(RegisterUserCommand)), // UseCases
+        Assembly.GetAssembly(typeof(Server.Web.ErrorTestEndpoints.UseCases.ThrowInUseCaseQuery)) // ErrorTestEndpoints
       };
 
     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!))

@@ -1,6 +1,6 @@
 ﻿using FluentValidation.Results;
 
-namespace Server.Web.ErrorTest;
+namespace Server.Web.ErrorTestEndpoints.Endpoints;
 
 /// <summary>
 /// Test endpoint that triggers validation errors

@@ -20,7 +20,10 @@ builder.Services.AddOptionConfigs(builder.Configuration, appLogger, builder);
 builder.Services.AddServiceConfigs(appLogger, builder);
 
 
-builder.Services.AddFastEndpoints()
+builder.Services.AddFastEndpoints(o =>
+                {
+                  o.Assemblies = [typeof(Program).Assembly, typeof(Server.Web.ErrorTestEndpoints.Endpoints.ThrowInEndpoint).Assembly];
+                })
                 .SwaggerDocument(o =>
                 {
                   o.ShortSchemaNames = true;

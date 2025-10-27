@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Server.UseCases.ErrorTest;
+namespace Server.Web.ErrorTestEndpoints.UseCases;
 
 public class ThrowConcurrencyHandler : IQueryHandler<ThrowConcurrencyQuery, string>
 {

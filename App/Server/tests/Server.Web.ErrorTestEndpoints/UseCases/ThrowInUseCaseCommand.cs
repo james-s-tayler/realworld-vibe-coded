@@ -1,3 +1,3 @@
-﻿namespace Server.UseCases.ErrorTest;
+﻿namespace Server.Web.ErrorTestEndpoints.UseCases;
 
 public record ThrowInUseCaseQuery() : IQuery<string>;

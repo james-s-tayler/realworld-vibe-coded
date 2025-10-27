@@ -41,7 +41,7 @@ public class ErrorHandlingTests(ErrorTestFixture App)
     endpointError.Errors.ElementAt(errorIndex).Reason.ShouldBe(reason);
   }
 
-  [InlineData("/api/error-test/validation-error-validator", 400, 0, "serializerErrors", "The JSON value could not be converted to Server.Web.ErrorTest.TestValidationRequest. Path: $ | LineNumber: 0 | BytePositionInLine: 3.")]
+  [InlineData("/api/error-test/validation-error-validator", 400, 0, "serializerErrors", "The JSON value could not be converted to Server.Web.ErrorTestEndpoints.Endpoints.TestValidationRequest. Path: $ | LineNumber: 0 | BytePositionInLine: 3.")]
   [Theory]
   public async Task TestDeserializationError(string route, int statusCode, int errorIndex, string name, string reason)
   {
