@@ -37,11 +37,12 @@ namespace Server.Analyzers
     {
       var namedType = (INamedTypeSymbol)context.Symbol;
 
-      // Check if this type is in a Domain/Core namespace (not Infrastructure)
+      // Check if this type is in a Domain/Core namespace (not Infrastructure or SharedKernel)
       var namespaceName = namedType.ContainingNamespace?.ToDisplayString() ?? string.Empty;
 
-      // Only check types in Domain/Core namespaces
-      if (!namespaceName.Contains(".Core") && !namespaceName.Contains(".Domain"))
+      // Only check types in Domain/Core namespaces, excluding SharedKernel (framework component)
+      if ((!namespaceName.Contains(".Core") && !namespaceName.Contains(".Domain")) ||
+          namespaceName.Contains(".SharedKernel"))
       {
         return;
       }

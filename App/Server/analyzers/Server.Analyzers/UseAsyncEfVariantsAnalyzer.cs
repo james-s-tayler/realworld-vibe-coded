@@ -84,12 +84,24 @@ namespace Server.Analyzers
       {
         if (current is MethodDeclarationSyntax method)
         {
-          return method.Modifiers.Any(m => m.IsKind(SyntaxKind.AsyncKeyword));
+          foreach (var modifier in method.Modifiers)
+          {
+            if (modifier.IsKind(SyntaxKind.AsyncKeyword))
+            {
+              return true;
+            }
+          }
         }
 
         if (current is LocalFunctionStatementSyntax localFunction)
         {
-          return localFunction.Modifiers.Any(m => m.IsKind(SyntaxKind.AsyncKeyword));
+          foreach (var modifier in localFunction.Modifiers)
+          {
+            if (modifier.IsKind(SyntaxKind.AsyncKeyword))
+            {
+              return true;
+            }
+          }
         }
 
         // Also check for lambda expressions with async

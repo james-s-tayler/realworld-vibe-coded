@@ -64,6 +64,14 @@ namespace Server.Analyzers
         return;
       }
 
+      // Allow in test projects
+      var compilation = context.Compilation;
+      var assemblyName = compilation.AssemblyName ?? string.Empty;
+      if (assemblyName.Contains("Test") || assemblyName.Contains("Tests"))
+      {
+        return;
+      }
+
       // Check if we're inside a class that implements IUnitOfWork
       var enclosingClass = GetEnclosingClass(invocation);
       if (enclosingClass == null)
@@ -74,7 +82,21 @@ namespace Server.Analyzers
       }
 
       var classSymbol = context.SemanticModel.GetDeclaredSymbol(enclosingClass) as INamedTypeSymbol;
-      if (classSymbol == null || !ImplementsIUnitOfWork(classSymbol))
+      if (classSymbol == null)
+      {
+        var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
+        context.ReportDiagnostic(diagnostic);
+        return;
+      }
+
+      // Allow if the class itself is a DbContext (overriding the method)
+      if (IsDbContextOrDerived(classSymbol))
+      {
+        return;
+      }
+
+      // Otherwise, must implement IUnitOfWork
+      if (!ImplementsIUnitOfWork(classSymbol))
       {
         var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
         context.ReportDiagnostic(diagnostic);
