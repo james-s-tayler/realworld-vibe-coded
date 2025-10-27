@@ -27,7 +27,7 @@ public class ExceptionHandlingBehavior<TRequest, T> : IPipelineBehavior<TRequest
   {
     try
     {
-      return await next();
+      return await next(cancellationToken);
     }
     catch (DbUpdateConcurrencyException ex)
     {

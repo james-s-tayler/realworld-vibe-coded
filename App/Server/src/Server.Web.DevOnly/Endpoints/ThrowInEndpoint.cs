@@ -11,8 +11,8 @@ public class ThrowInEndpoint : Endpoint<EmptyRequest>
 {
   public override void Configure()
   {
-    Get("/api/error-test/throw-in-endpoint");
-    AllowAnonymous();
+    Get("throw-in-endpoint");
+    Group<TestError>();
     Summary(s =>
     {
       s.Summary = "Test endpoint - throws exception in endpoint";

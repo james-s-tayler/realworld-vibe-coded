@@ -39,9 +39,12 @@ public static class MiddlewareConfig
       {
         config.Endpoints.Filter = ep =>
         {
-          if (ep.Routes.Contains("/api/error-test"))
+          foreach (var route in ep.Routes)
           {
-            return false; // don't register these endpoints in non-development environments
+            if (route.StartsWith(DevOnly.Configuration.DevOnly.ROUTE))
+            {
+              return false; // don't register these endpoints in non-development environments
+            }
           }
 
           return true;

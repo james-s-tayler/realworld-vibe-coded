@@ -11,7 +11,8 @@ public class ThrowUnauthorized : Endpoint<EmptyRequest>
 {
   public override void Configure()
   {
-    Get("/api/error-test/throw-unauthorized");
+    Get("throw-unauthorized");
+    Group<TestAuth>();
     Summary(s =>
     {
       s.Summary = "Test endpoint - throws exception in endpoint";

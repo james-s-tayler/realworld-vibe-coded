@@ -12,8 +12,8 @@ public class ValidationErrorValidator : Endpoint<TestValidationRequest>
   public override void Configure()
   {
     Verbs(Http.POST, Http.GET);
-    Routes("/api/error-test/validation-error-validator");
-    AllowAnonymous();
+    Routes("validation-error-validator");
+    Group<TestError>();
     Summary(s =>
     {
       s.Summary = "Test endpoint - validation error";

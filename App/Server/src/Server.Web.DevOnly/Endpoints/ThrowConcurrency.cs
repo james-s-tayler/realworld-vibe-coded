@@ -1,7 +1,4 @@
-﻿using Server.Infrastructure;
-using Server.Web.DevOnly.UseCases;
-
-namespace Server.Web.DevOnly.Endpoints;
+﻿namespace Server.Web.DevOnly.Endpoints;
 
 /// <summary>
 /// Test endpoint that throws a DbUpdateConcurrencyException
@@ -10,8 +7,8 @@ public class ThrowConcurrency(IMediator _mediator) : Endpoint<EmptyRequest>
 {
   public override void Configure()
   {
-    Get("/api/error-test/throw-concurrency");
-    AllowAnonymous();
+    Get("throw-concurrency");
+    Group<TestError>();
     Summary(s =>
     {
       s.Summary = "Test endpoint - throws DbUpdateConcurrencyException";

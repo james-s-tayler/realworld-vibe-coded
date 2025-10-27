@@ -1,6 +1,4 @@
-﻿using FluentValidation.Results;
-
-namespace Server.Web.DevOnly.Endpoints;
+﻿namespace Server.Web.DevOnly.Endpoints;
 
 /// <summary>
 /// Test endpoint that triggers validation errors
@@ -13,8 +11,8 @@ public class ValidationErrorEndpoint : Endpoint<EmptyRequest>
 {
   public override void Configure()
   {
-    Get("/api/error-test/validation-error-endpoint");
-    AllowAnonymous();
+    Get("validation-error-endpoint");
+    Group<TestError>();
     Summary(s =>
     {
       s.Summary = "Test endpoint - validation error";

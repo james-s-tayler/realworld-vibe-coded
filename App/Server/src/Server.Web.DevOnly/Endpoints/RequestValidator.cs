@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Server.Web.DevOnly.Endpoints;
+﻿namespace Server.Web.DevOnly.Endpoints;
 
 public class RequestValidator : Validator<TestValidationRequest>
 {

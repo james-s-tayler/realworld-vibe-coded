@@ -1,7 +1,4 @@
-﻿using Server.Infrastructure;
-using Server.Web.DevOnly.UseCases;
-
-namespace Server.Web.DevOnly.Endpoints;
+﻿namespace Server.Web.DevOnly.Endpoints;
 
 /// <summary>
 /// Test endpoint that throws an exception in the use case
@@ -14,8 +11,8 @@ public class ThrowInUseCase(IMediator _mediator) : Endpoint<EmptyRequest>
 {
   public override void Configure()
   {
-    Get("/api/error-test/throw-in-use-case");
-    AllowAnonymous();
+    Get("throw-in-use-case");
+    Group<TestError>();
     Summary(s =>
     {
       s.Summary = "Test endpoint - throws exception in use case";
