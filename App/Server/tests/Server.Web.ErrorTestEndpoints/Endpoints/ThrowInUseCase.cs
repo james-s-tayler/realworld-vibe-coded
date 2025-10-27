@@ -1,4 +1,5 @@
-﻿using Server.Web.ErrorTestEndpoints.UseCases;
+﻿using Server.Infrastructure;
+using Server.Web.ErrorTestEndpoints.UseCases;
 
 namespace Server.Web.ErrorTestEndpoints.Endpoints;
 
@@ -24,17 +25,7 @@ public class ThrowInUseCase(IMediator _mediator) : Endpoint<EmptyRequest>
 
   public override async Task HandleAsync(EmptyRequest req, CancellationToken cancellationToken)
   {
-    // The handler throws InvalidOperationException, which is caught by ExceptionHandlingBehavior
-    // and converted to Result.CriticalError. We need to send the error response.
     var result = await _mediator.Send(new ThrowInUseCaseQuery(), cancellationToken);
-
-    if (result.Status == ResultStatus.CriticalError)
-    {
-      foreach (var error in result.ValidationErrors)
-      {
-        AddError(new FluentValidation.Results.ValidationFailure(error.Identifier, error.ErrorMessage));
-      }
-      ThrowIfAnyErrors(statusCode: 500);
-    }
+    await Send.ResultValueAsync(result, cancellationToken);
   }
 }
