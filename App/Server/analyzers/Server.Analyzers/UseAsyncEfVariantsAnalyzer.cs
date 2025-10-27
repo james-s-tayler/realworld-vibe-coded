@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -84,24 +85,12 @@ namespace Server.Analyzers
       {
         if (current is MethodDeclarationSyntax method)
         {
-          foreach (var modifier in method.Modifiers)
-          {
-            if (modifier.IsKind(SyntaxKind.AsyncKeyword))
-            {
-              return true;
-            }
-          }
+          return method.Modifiers.Any(m => m.IsKind(SyntaxKind.AsyncKeyword));
         }
 
         if (current is LocalFunctionStatementSyntax localFunction)
         {
-          foreach (var modifier in localFunction.Modifiers)
-          {
-            if (modifier.IsKind(SyntaxKind.AsyncKeyword))
-            {
-              return true;
-            }
-          }
+          return localFunction.Modifiers.Any(m => m.IsKind(SyntaxKind.AsyncKeyword));
         }
 
         // Also check for lambda expressions with async
