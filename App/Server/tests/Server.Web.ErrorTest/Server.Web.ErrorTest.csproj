@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Microsoft.Build.CentralPackageVersions" Version="2.1.3" />
+
+  <ItemGroup>
+    <PackageReference Include="FastEndpoints" />
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Server.Infrastructure\Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\Server.UseCases.ErrorTest\Server.UseCases.ErrorTest.csproj" />
+  </ItemGroup>
+
+</Project>

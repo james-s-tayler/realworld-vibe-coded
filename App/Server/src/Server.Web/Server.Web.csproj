@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Server.Infrastructure\Server.Infrastructure.csproj" />
     <ProjectReference Include="..\Server.UseCases\Server.UseCases.csproj" />
+    <ProjectReference Include="..\..\tests\Server.Web.ErrorTest\Server.Web.ErrorTest.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Server.Core.UserAggregate;
+using Server.UseCases.ErrorTest;
 using Server.UseCases.Users.Register;
 
 namespace Server.Web.Configurations;
@@ -11,7 +12,8 @@ public static class MediatrConfigs
     var mediatRAssemblies = new[]
       {
         Assembly.GetAssembly(typeof(User)), // Core
-        Assembly.GetAssembly(typeof(RegisterUserCommand)) // UseCases
+        Assembly.GetAssembly(typeof(RegisterUserCommand)), // UseCases
+        Assembly.GetAssembly(typeof(ThrowInUseCaseQuery)) // UseCases.ErrorTest
       };
 
     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!))

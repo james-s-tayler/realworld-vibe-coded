@@ -1,4 +1,6 @@
-﻿namespace Server.UseCases.ErrorTest;
+﻿using MediatR;
+
+namespace Server.UseCases.ErrorTest;
 
 public class ThrowInUseCaseNonGenericHandler : IQueryHandler<ThrowInUseCaseNonGenericQuery, Unit>
 {

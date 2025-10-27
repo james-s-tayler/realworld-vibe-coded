@@ -1,5 +1,4 @@
 ﻿using Server.UseCases.ErrorTest;
-using Server.Web.Infrastructure;
 
 namespace Server.Web.ErrorTest;
 
