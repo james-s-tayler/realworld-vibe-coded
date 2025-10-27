@@ -15,7 +15,7 @@ namespace Server.IntegrationTests.Data;
 public class AuditableEntityInterceptorTests : IDisposable
 {
   private readonly ServiceProvider _serviceProvider;
-  private readonly AppDbContext _dbContext;
+  private readonly DomainDbContext _dbContext;
   private readonly TestTimeProvider _timeProvider;
 
   public AuditableEntityInterceptorTests()
@@ -27,7 +27,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     services.AddSingleton<ITimeProvider>(_timeProvider);
     services.AddSingleton<AuditableEntityInterceptor>();
 
-    services.AddDbContext<AppDbContext>((serviceProvider, options) =>
+    services.AddDbContext<DomainDbContext>((serviceProvider, options) =>
     {
       options.UseInMemoryDatabase($"AuditTest_{Guid.NewGuid()}");
       options.AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
@@ -36,8 +36,8 @@ public class AuditableEntityInterceptorTests : IDisposable
     _serviceProvider = services.BuildServiceProvider();
 
     // Create the context manually with null dispatcher
-    var dbContextOptions = _serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    _dbContext = new AppDbContext(dbContextOptions, null);
+    var dbContextOptions = _serviceProvider.GetRequiredService<DbContextOptions<DomainDbContext>>();
+    _dbContext = new DomainDbContext(dbContextOptions, null);
   }
 
   [Fact]

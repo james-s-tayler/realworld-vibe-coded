@@ -23,36 +23,39 @@ public class UsersFixture : AppFixture<Program>
 
     _connectionString = _container.GetConnectionString();
 
-    // Create database schema once per assembly
+    // Create database schema once per assembly for both contexts
     // Services is not available yet, so create a temporary service provider
     var serviceCollection = new ServiceCollection();
-    serviceCollection.AddDbContext<AppDbContext>(options =>
+    serviceCollection.AddDbContext<IdentityDbContext>(options =>
+    {
+      options.UseSqlServer(_connectionString);
+      options.EnableSensitiveDataLogging();
+    });
+    serviceCollection.AddDbContext<DomainDbContext>(options =>
     {
       options.UseSqlServer(_connectionString);
       options.EnableSensitiveDataLogging();
     });
 
     using var serviceProvider = serviceCollection.BuildServiceProvider();
-    // AppDbContext constructor requires IDomainEventDispatcher but it's nullable,
-    // so we can create it with a null DbContextOptions
-    var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    using var db = new AppDbContext(dbContextOptions, null);
+    
+    // Run migrations for IdentityDbContext
+    var identityDbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<IdentityDbContext>>();
+    using var identityDb = new IdentityDbContext(identityDbContextOptions);
+    await identityDb.Database.MigrateAsync();
 
-    // Use migrations instead of EnsureCreated for Identity compatibility
-    await db.Database.MigrateAsync();
+    // Run migrations for DomainDbContext
+    var domainDbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<DomainDbContext>>();
+    using var domainDb = new DomainDbContext(domainDbContextOptions, null);
+    await domainDb.Database.MigrateAsync();
   }
 
   protected override void ConfigureServices(IServiceCollection services)
   {
-    // Remove existing DbContext registrations
-    var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-    if (descriptor != null)
-    {
-      services.Remove(descriptor);
-    }
-
+    // Remove existing DbContext registrations for both contexts
     var toRemove = services.Where(d =>
-        d.ServiceType.ToString().Contains("AppDbContext") ||
+        d.ServiceType.ToString().Contains("IdentityDbContext") ||
+        d.ServiceType.ToString().Contains("DomainDbContext") ||
         d.ServiceType == typeof(DbContextOptions) ||
         (d.ServiceType.IsGenericType &&
          d.ServiceType.GetGenericTypeDefinition() == typeof(DbContextOptions<>)))
@@ -75,17 +78,23 @@ public class UsersFixture : AppFixture<Program>
       services.Remove(desc);
     }
 
-    // Re-add DbContext with test connection string
-    services.AddDbContext<AppDbContext>(options =>
+    // Re-add both DbContexts with test connection string
+    services.AddDbContext<IdentityDbContext>(options =>
+    {
+      options.UseSqlServer(_connectionString);
+      options.EnableSensitiveDataLogging();
+    });
+
+    services.AddDbContext<DomainDbContext>(options =>
     {
       options.UseSqlServer(_connectionString);
       options.EnableSensitiveDataLogging();
     });
 
     // Re-register just the Entity Framework stores (not the full Identity stack)
-    // This connects the existing UserManager/SignInManager to the new DbContext
-    services.AddScoped<IUserStore<User>, Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserStore<User, IdentityRole<Guid>, AppDbContext, Guid>>();
-    services.AddScoped<IRoleStore<IdentityRole<Guid>>, Microsoft.AspNetCore.Identity.EntityFrameworkCore.RoleStore<IdentityRole<Guid>, AppDbContext, Guid>>();
+    // This connects the existing UserManager/SignInManager to the new IdentityDbContext
+    services.AddScoped<IUserStore<User>, Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserStore<User, IdentityRole<Guid>, IdentityDbContext, Guid>>();
+    services.AddScoped<IRoleStore<IdentityRole<Guid>>, Microsoft.AspNetCore.Identity.EntityFrameworkCore.RoleStore<IdentityRole<Guid>, IdentityDbContext, Guid>>();
   }
 
   protected override ValueTask SetupAsync()
