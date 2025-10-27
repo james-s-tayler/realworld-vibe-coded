@@ -1,21 +1,27 @@
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using Audit.Core;
 
 namespace Server.Infrastructure.Data;
 
 /// <summary>
 /// Unit of Work implementation using EF Core DbContext.
+/// Coordinates transactions between IdentityDbContext and DomainDbContext.
 /// Leverages EF Core execution strategy for automatic retries on transient failures.
 /// Integrates AuditScope for transaction auditing.
 /// </summary>
 public class UnitOfWork : IUnitOfWork
 {
-  private readonly AppDbContext _dbContext;
+  private readonly IdentityDbContext _identityDbContext;
+  private readonly DomainDbContext _domainDbContext;
   private readonly ILogger<UnitOfWork> _logger;
 
-  public UnitOfWork(AppDbContext dbContext, ILogger<UnitOfWork> logger)
+  public UnitOfWork(
+    IdentityDbContext identityDbContext,
+    DomainDbContext domainDbContext,
+    ILogger<UnitOfWork> logger)
   {
-    _dbContext = dbContext;
+    _identityDbContext = identityDbContext;
+    _domainDbContext = domainDbContext;
     _logger = logger;
   }
 
@@ -24,12 +30,15 @@ public class UnitOfWork : IUnitOfWork
     CancellationToken cancellationToken = default)
   {
     // Use EF Core execution strategy for retry logic
-    var strategy = _dbContext.Database.CreateExecutionStrategy();
+    // Use the domain context's strategy (both should use the same connection)
+    var strategy = _domainDbContext.Database.CreateExecutionStrategy();
 
     return await strategy.ExecuteAsync(async () =>
     {
-      // Begin transaction
-      await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+      // Begin transactions on both contexts
+      // Note: These should share the same underlying database connection
+      await using var identityTransaction = await _identityDbContext.Database.BeginTransactionAsync(cancellationToken);
+      await using var domainTransaction = await _domainDbContext.Database.BeginTransactionAsync(cancellationToken);
 
       /*
        * NOTE: The following AuditScope logic is designed to mitigate the following problem.
@@ -69,31 +78,34 @@ public class UnitOfWork : IUnitOfWork
         // Check if the result is successful
         if (result.IsSuccess)
         {
-          // Commit transaction on success
-          await transaction.CommitAsync(cancellationToken);
+          // Commit both transactions on success
+          await identityTransaction.CommitAsync(cancellationToken);
+          await domainTransaction.CommitAsync(cancellationToken);
           scope.SetCustomField("TransactionStatus", "Committed");
           scope.SetCustomField("ResultStatus", result.Status.ToString());
-          _logger.LogInformation("Transaction committed successfully with status: {Status}", result.Status);
+          _logger.LogInformation("Transactions committed successfully with status: {Status}", result.Status);
         }
         else
         {
-          // Rollback transaction on failure
-          await transaction.RollbackAsync(cancellationToken);
+          // Rollback both transactions on failure
+          await identityTransaction.RollbackAsync(cancellationToken);
+          await domainTransaction.RollbackAsync(cancellationToken);
           scope.SetCustomField("TransactionStatus", "RolledBack");
           scope.SetCustomField("ResultStatus", result.Status.ToString());
-          _logger.LogWarning("Transaction rolled back due to operation failure. Result: {@Result}", result);
+          _logger.LogWarning("Transactions rolled back due to operation failure. Result: {@Result}", result);
         }
 
         return result;
       }
       catch (Exception ex)
       {
-        // Rollback transaction on exception
-        await transaction.RollbackAsync(cancellationToken);
+        // Rollback both transactions on exception
+        await identityTransaction.RollbackAsync(cancellationToken);
+        await domainTransaction.RollbackAsync(cancellationToken);
         scope.SetCustomField("TransactionStatus", "RolledBack");
         scope.SetCustomField("Exception", ex.Message);
         scope.Discard();
-        _logger.LogError(ex, "Transaction failed with exception, rolling back");
+        _logger.LogError(ex, "Transactions failed with exception, rolling back");
         throw;
       }
     });

@@ -3,7 +3,7 @@ using Server.Core.Interfaces;
 
 namespace Server.Infrastructure.Data.Queries;
 
-public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQueryService
+public class ListArticlesQueryService(DomainDbContext _context) : IListArticlesQueryService
 {
   public async Task<IEnumerable<Article>> ListAsync(
     string? tag = null,

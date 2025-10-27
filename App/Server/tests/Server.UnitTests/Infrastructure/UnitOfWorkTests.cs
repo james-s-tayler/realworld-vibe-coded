@@ -225,16 +225,25 @@ public class UnitOfWorkTests
   /// </summary>
   private static async Task<TestUnitOfWork> CreateTestUnitOfWorkAsync()
   {
-    var options = new DbContextOptionsBuilder<AppDbContext>()
+    var identityOptions = new DbContextOptionsBuilder<IdentityDbContext>()
       .UseSqlite("DataSource=:memory:")
       .Options;
 
-    var context = new AppDbContext(options, dispatcher: null);
-    await context.Database.OpenConnectionAsync();
-    await context.Database.EnsureCreatedAsync();
+    var domainOptions = new DbContextOptionsBuilder<DomainDbContext>()
+      .UseSqlite("DataSource=:memory:")
+      .Options;
+
+    var identityContext = new IdentityDbContext(identityOptions);
+    var domainContext = new DomainDbContext(domainOptions, dispatcher: null);
+
+    await identityContext.Database.OpenConnectionAsync();
+    await identityContext.Database.EnsureCreatedAsync();
+
+    await domainContext.Database.OpenConnectionAsync();
+    await domainContext.Database.EnsureCreatedAsync();
 
     var logger = NullLogger<UnitOfWork>.Instance;
-    return new TestUnitOfWork(context, logger);
+    return new TestUnitOfWork(identityContext, domainContext, logger);
   }
 
   /// <summary> -
@@ -242,18 +251,25 @@ public class UnitOfWorkTests
   /// </summary>
   private class TestUnitOfWork : UnitOfWork, IDisposable
   {
-    private readonly AppDbContext _context;
+    private readonly IdentityDbContext _identityContext;
+    private readonly DomainDbContext _domainContext;
 
-    public TestUnitOfWork(AppDbContext context, ILogger<UnitOfWork> logger)
-      : base(context, logger)
+    public TestUnitOfWork(
+      IdentityDbContext identityContext,
+      DomainDbContext domainContext,
+      ILogger<UnitOfWork> logger)
+      : base(identityContext, domainContext, logger)
     {
-      _context = context;
+      _identityContext = identityContext;
+      _domainContext = domainContext;
     }
 
     public void Dispose()
     {
-      _context.Database.CloseConnection();
-      _context.Dispose();
+      _identityContext.Database.CloseConnection();
+      _identityContext.Dispose();
+      _domainContext.Database.CloseConnection();
+      _domainContext.Dispose();
     }
   }
 }

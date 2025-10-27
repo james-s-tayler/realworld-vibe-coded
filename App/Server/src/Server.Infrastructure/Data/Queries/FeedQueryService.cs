@@ -3,7 +3,7 @@ using Server.Core.Interfaces;
 
 namespace Server.Infrastructure.Data.Queries;
 
-public class FeedQueryService(AppDbContext _context) : IFeedQueryService
+public class FeedQueryService(DomainDbContext _context) : IFeedQueryService
 {
   public async Task<IEnumerable<Article>> GetFeedAsync(
     Guid userId,

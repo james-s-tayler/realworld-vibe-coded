@@ -2,7 +2,7 @@
 
 namespace Server.Infrastructure.Data.Queries;
 
-public class ListTagsQueryService(AppDbContext _context) : IListTagsQueryService
+public class ListTagsQueryService(DomainDbContext _context) : IListTagsQueryService
 {
   public async Task<IEnumerable<string>> ListAsync()
   {

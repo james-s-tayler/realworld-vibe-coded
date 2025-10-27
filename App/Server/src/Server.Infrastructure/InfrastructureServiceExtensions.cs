@@ -24,7 +24,15 @@ public static class InfrastructureServiceExtensions
     services.AddSingleton<ITimeProvider, UtcNowTimeProvider>();
     services.AddSingleton<AuditableEntityInterceptor>();
 
-    services.AddDbContext<AppDbContext>((serviceProvider, options) =>
+    // Register IdentityDbContext for Identity entities (User, Roles, etc.)
+    services.AddDbContext<IdentityDbContext>((serviceProvider, options) =>
+    {
+      options.UseSqlServer(connectionString);
+      options.AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
+    });
+
+    // Register DomainDbContext for domain entities (Articles, Comments, etc.)
+    services.AddDbContext<DomainDbContext>((serviceProvider, options) =>
     {
       options.UseSqlServer(connectionString);
       options.AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
@@ -48,12 +56,15 @@ public static class InfrastructureServiceExtensions
       options.SignIn.RequireConfirmedEmail = false;
       options.SignIn.RequireConfirmedPhoneNumber = false;
     })
-    .AddEntityFrameworkStores<AppDbContext>()
+    .AddEntityFrameworkStores<IdentityDbContext>()
     .AddDefaultTokenProviders();
 
-    services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
-           .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
-           .AddScoped<IUnitOfWork, UnitOfWork>()
+    // Register repositories
+    services.AddScoped(typeof(ContextAwareRepository<>));
+    services.AddScoped(typeof(IRepository<>), typeof(ContextAwareRepository<>));
+    services.AddScoped(typeof(IReadRepository<>), typeof(ContextAwareRepository<>));
+
+    services.AddScoped<IUnitOfWork, UnitOfWork>()
            .AddScoped<IListArticlesQueryService, ListArticlesQueryService>()
            .AddScoped<IFeedQueryService, FeedQueryService>()
            .AddScoped<IListTagsQueryService, ListTagsQueryService>()

@@ -65,10 +65,14 @@ public static class MiddlewareConfig
 
     try
     {
-      var context = services.GetRequiredService<AppDbContext>();
-      //          await context.Database.MigrateAsync();
-      await context.Database.EnsureCreatedAsync();
-      await SeedData.InitializeAsync(context);
+      var identityContext = services.GetRequiredService<IdentityDbContext>();
+      var domainContext = services.GetRequiredService<DomainDbContext>();
+
+      //          await identityContext.Database.MigrateAsync();
+      //          await domainContext.Database.MigrateAsync();
+      await identityContext.Database.EnsureCreatedAsync();
+      await domainContext.Database.EnsureCreatedAsync();
+      await SeedData.InitializeAsync(identityContext, domainContext);
     }
     catch (Exception ex)
     {
