@@ -15,12 +15,12 @@ public class DeleteArticleHandler(IRepository<Article> _articleRepository)
 
     if (article == null)
     {
-      return Result<Unit>.NotFound("Article not found");
+      return Result<Unit>.NotFound(new ErrorDetail("NotFound", "Article not found"));
     }
 
     if (article.AuthorId != request.UserId)
     {
-      return Result<Unit>.Forbidden("You can only delete your own articles");
+      return Result<Unit>.Forbidden(new ErrorDetail("Forbidden", "You can only delete your own articles"));
     }
 
     await _articleRepository.DeleteAsync(article, cancellationToken);

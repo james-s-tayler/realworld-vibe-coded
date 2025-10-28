@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Server.SharedKernel.Ardalis.Result;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
 using Server.SharedKernel.Result;
@@ -100,7 +99,7 @@ public class TransactionBehaviorTests
   {
     // Arrange
     var command = new TestCommand();
-    var errorResult = Result<string>.Error("Something went wrong");
+    var errorResult = Result<string>.Error(new ErrorDetail("Error", "Something went wrong"));
     var executedInTransaction = false;
 
     _unitOfWork.ExecuteInTransactionAsync(
@@ -126,7 +125,7 @@ public class TransactionBehaviorTests
   {
     // Arrange
     var command = new TestCommand();
-    var criticalErrorResult = CustomArdalisResultFactory.CriticalError<string>(
+    var criticalErrorResult = Result<string>.CriticalError(
       new InvalidOperationException("Critical error occurred"));
     var executedInTransaction = false;
 
@@ -154,7 +153,7 @@ public class TransactionBehaviorTests
   {
     // Arrange
     var command = new TestCommand();
-    var invalidResult = Result<string>.Invalid(new ValidationError("Field", "is invalid"));
+    var invalidResult = Result<string>.Invalid(new ErrorDetail("Field", "is invalid"));
     var executedInTransaction = false;
 
     _unitOfWork.ExecuteInTransactionAsync(

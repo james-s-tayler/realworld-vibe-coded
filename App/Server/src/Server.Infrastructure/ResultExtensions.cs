@@ -75,16 +75,16 @@ public static class ResultExtensions
         await ep.HttpContext.Response.SendNoContentAsync(cancellation: cancellationToken);
         break;
       case ResultStatus.Invalid:
-        foreach (var error in result.ValidationErrors)
+        foreach (var error in result.ErrorDetails)
         {
           ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
         }
         await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
         break;
       case ResultStatus.NotFound:
-        if (result.ValidationErrors.Any())
+        if (result.ErrorDetails.Any())
         {
-          foreach (var error in result.ValidationErrors)
+          foreach (var error in result.ErrorDetails)
           {
             ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
           }
@@ -96,9 +96,9 @@ public static class ResultExtensions
         }
         break;
       case ResultStatus.Unauthorized:
-        if (result.ValidationErrors.Any())
+        if (result.ErrorDetails.Any())
         {
-          foreach (var error in result.ValidationErrors)
+          foreach (var error in result.ErrorDetails)
           {
             ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
           }
@@ -110,9 +110,9 @@ public static class ResultExtensions
         }
         break;
       case ResultStatus.Forbidden:
-        if (result.ValidationErrors.Any())
+        if (result.ErrorDetails.Any())
         {
-          foreach (var error in result.ValidationErrors)
+          foreach (var error in result.ErrorDetails)
           {
             ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
           }
@@ -124,28 +124,28 @@ public static class ResultExtensions
         }
         break;
       case ResultStatus.Conflict:
-        foreach (var error in result.ValidationErrors)
+        foreach (var error in result.ErrorDetails)
         {
           ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
         }
         await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status409Conflict, cancellation: cancellationToken);
         break;
       case ResultStatus.Error:
-        foreach (var error in result.ValidationErrors)
+        foreach (var error in result.ErrorDetails)
         {
           ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
         }
         await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
         break;
       case ResultStatus.CriticalError:
-        foreach (var error in result.ValidationErrors)
+        foreach (var error in result.ErrorDetails)
         {
           ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
         }
         await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status500InternalServerError, cancellation: cancellationToken);
         break;
       case ResultStatus.Unavailable:
-        foreach (var error in result.ValidationErrors)
+        foreach (var error in result.ErrorDetails)
         {
           ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
         }

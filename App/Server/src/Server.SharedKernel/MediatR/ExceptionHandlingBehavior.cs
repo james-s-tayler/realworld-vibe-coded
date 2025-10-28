@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Server.SharedKernel.Ardalis.Result;
 using Server.SharedKernel.Result;
 
 namespace Server.SharedKernel.MediatR;
@@ -10,7 +9,7 @@ namespace Server.SharedKernel.MediatR;
 /// MediatR pipeline behavior that catches exceptions during request handling
 /// and transforms them into Result.CriticalError with ProblemDetails format.
 /// This behavior uses the constrained generic parameter T from IResultRequest{T}
-/// to call factory methods directly without reflection.
+/// to call factory methods directly.
 /// </summary>
 /// <typeparam name="TRequest">The request type implementing IResultRequest{T}</typeparam>
 /// <typeparam name="T">The inner value type of Result{T}</typeparam>
@@ -34,13 +33,13 @@ public class ExceptionHandlingBehavior<TRequest, T> : IPipelineBehavior<TRequest
     {
       _logger.LogWarning(ex, "Concurrency conflict occurred while processing {RequestName}", typeof(TRequest).Name);
 
-      return CustomArdalisResultFactory.Conflict<T>(ex);
+      return Result<T>.Conflict(ex);
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "An unhandled exception occurred while processing {RequestName}", typeof(TRequest).Name);
 
-      return CustomArdalisResultFactory.CriticalError<T>(ex);
+      return Result<T>.CriticalError(ex);
     }
   }
 }

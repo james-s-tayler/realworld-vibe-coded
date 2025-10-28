@@ -15,12 +15,12 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
 
     if (article == null)
     {
-      return Result<Article>.NotFound("Article not found");
+      return Result<Article>.NotFound(new ErrorDetail("NotFound", "Article not found"));
     }
 
     if (article.AuthorId != request.UserId)
     {
-      return Result<Article>.Forbidden("You can only update your own articles");
+      return Result<Article>.Forbidden(new ErrorDetail("Forbidden", "You can only update your own articles"));
     }
 
     // Check for duplicate slug if title changed
@@ -34,7 +34,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
 
         if (existingArticle != null)
         {
-          return Result<Article>.Invalid(new ValidationError("slug", "duplicate slug"));
+          return Result<Article>.Invalid(new ErrorDetail("slug", "duplicate slug"));
         }
       }
     }

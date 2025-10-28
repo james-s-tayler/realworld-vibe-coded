@@ -86,7 +86,7 @@ public class ListTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task ListArticles_WithInvalidOffsetAndLimit_ReturnsValidationError()
+  public async Task ListArticles_WithInvalidOffsetAndLimit_ReturnsErrorDetail()
   {
     var request = new ListArticlesRequest();
     var (response, _) = await App.Client.GETAsync<ListArticlesRequest, object>("/api/articles?limit=0&offset=-1", request);
@@ -95,7 +95,7 @@ public class ListTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task ListArticles_WithInvalidAuthorParameter_ReturnsValidationError()
+  public async Task ListArticles_WithInvalidAuthorParameter_ReturnsErrorDetail()
   {
     var request = new ListArticlesRequest();
     var (response, _) = await App.Client.GETAsync<ListArticlesRequest, object>("/api/articles?author=", request);
@@ -117,7 +117,7 @@ public class ListTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task ListArticles_WithInvalidTagParameter_ReturnsValidationError()
+  public async Task ListArticles_WithInvalidTagParameter_ReturnsErrorDetail()
   {
     var request = new ListArticlesRequest();
     var (response, _) = await App.Client.GETAsync<ListArticlesRequest, object>("/api/articles?tag=", request);
@@ -126,7 +126,7 @@ public class ListTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task ListArticles_WithInvalidFavoritedParameter_ReturnsValidationError()
+  public async Task ListArticles_WithInvalidFavoritedParameter_ReturnsErrorDetail()
   {
     var request = new ListArticlesRequest();
     var (response, _) = await App.Client.GETAsync<ListArticlesRequest, object>("/api/articles?favorited=", request);

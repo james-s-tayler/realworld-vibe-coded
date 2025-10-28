@@ -59,7 +59,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task CreateArticle_WithMissingRequiredFields_ReturnsValidationError()
+  public async Task CreateArticle_WithMissingRequiredFields_ReturnsErrorDetail()
   {
     var request = new CreateArticleRequest
     {
@@ -72,7 +72,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task CreateArticle_WithEmptyRequiredFields_ReturnsValidationError()
+  public async Task CreateArticle_WithEmptyRequiredFields_ReturnsErrorDetail()
   {
     var request = new CreateArticleRequest
     {
@@ -90,7 +90,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task CreateArticle_WithInvalidTagContainingComma_ReturnsValidationError()
+  public async Task CreateArticle_WithInvalidTagContainingComma_ReturnsErrorDetail()
   {
     var request = new CreateArticleRequest
     {
@@ -109,7 +109,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task CreateArticle_WithEmptyTag_ReturnsValidationError()
+  public async Task CreateArticle_WithEmptyTag_ReturnsErrorDetail()
   {
     var request = new CreateArticleRequest
     {
@@ -128,7 +128,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task CreateArticle_WithDuplicateSlug_ReturnsValidationError()
+  public async Task CreateArticle_WithDuplicateSlug_ReturnsErrorDetail()
   {
     var request1 = new CreateArticleRequest
     {

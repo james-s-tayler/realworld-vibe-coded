@@ -1,20 +1,20 @@
 ﻿namespace Server.SharedKernel.Result;
 
-public class ValidationError
+public class ErrorDetail
 {
-  public ValidationError()
+  public ErrorDetail()
   {
   }
 
-  public ValidationError(string errorMessage) => ErrorMessage = errorMessage;
+  public ErrorDetail(string errorMessage) => ErrorMessage = errorMessage;
 
-  public ValidationError(string identifier, string errorMessage)
+  public ErrorDetail(string identifier, string errorMessage)
   {
     Identifier = identifier;
     ErrorMessage = errorMessage;
   }
 
-  public ValidationError(string identifier, string errorMessage, string errorCode, ValidationSeverity severity)
+  public ErrorDetail(string identifier, string errorMessage, string errorCode, ValidationSeverity severity)
   {
     Identifier = identifier;
     ErrorMessage = errorMessage;

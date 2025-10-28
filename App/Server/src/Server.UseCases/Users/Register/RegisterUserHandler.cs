@@ -33,7 +33,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
     if (existingUserByEmail != null)
     {
       _logger.LogWarning("Registration failed: Email {Email} already exists", request.Email);
-      return Result<User>.Invalid(new ValidationError
+      return Result<User>.Invalid(new ErrorDetail
       {
         Identifier = nameof(request.Email),
         ErrorMessage = "Email already exists",
@@ -46,7 +46,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
     if (existingUserByUsername != null)
     {
       _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
-      return Result<User>.Invalid(new ValidationError
+      return Result<User>.Invalid(new ErrorDetail
       {
         Identifier = nameof(request.Username),
         ErrorMessage = "Username already exists",
@@ -69,7 +69,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
     catch (Exception ex)
     {
       _logger.LogError(ex, "Error during user registration for {Email}", request.Email);
-      return Result<User>.Error("An error occurred during registration");
+      return Result<User>.Error(new ErrorDetail("Error", "An error occurred during registration"));
     }
   }
 }

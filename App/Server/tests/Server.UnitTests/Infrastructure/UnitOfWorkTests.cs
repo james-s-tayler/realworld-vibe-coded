@@ -38,7 +38,7 @@ public class UnitOfWorkTests
     // Arrange
     using var unitOfWork = await CreateTestUnitOfWorkAsync();
     var errorMessage = "Operation failed";
-    var errorResult = Result<string>.Error(errorMessage);
+    var errorResult = Result<string>.Error(new ErrorDetail("Error", errorMessage));
 
     // Act
     var result = await unitOfWork.ExecuteInTransactionAsync(
@@ -48,7 +48,7 @@ public class UnitOfWorkTests
     // Assert
     result.IsSuccess.ShouldBeFalse();
     result.Status.ShouldBe(ResultStatus.Error);
-    result.ValidationErrors.ShouldContain(e => e.ErrorMessage == errorMessage);
+    result.ErrorDetails.ShouldContain(e => e.ErrorMessage == errorMessage);
   }
 
   [Fact]
@@ -56,7 +56,7 @@ public class UnitOfWorkTests
   {
     // Arrange
     using var unitOfWork = await CreateTestUnitOfWorkAsync();
-    var invalidResult = Result<string>.Invalid(new ValidationError("Field", "is required"));
+    var invalidResult = Result<string>.Invalid(new ErrorDetail("Field", "is required"));
 
     // Act
     var result = await unitOfWork.ExecuteInTransactionAsync(
@@ -66,7 +66,7 @@ public class UnitOfWorkTests
     // Assert
     result.IsSuccess.ShouldBeFalse();
     result.Status.ShouldBe(ResultStatus.Invalid);
-    result.ValidationErrors.Count().ShouldBe(1);
+    result.ErrorDetails.Count().ShouldBe(1);
   }
 
   [Fact]
@@ -199,7 +199,7 @@ public class UnitOfWorkTests
   {
     // Arrange
     using var unitOfWork = await CreateTestUnitOfWorkAsync();
-    var errorResult = Result<string>.Error("Operation failed");
+    var errorResult = Result<string>.Error(new ErrorDetail("Error", "Operation failed"));
 
     // Configure audit to track events - discarded events should not be inserted
     var auditEvents = new List<AuditEvent>();

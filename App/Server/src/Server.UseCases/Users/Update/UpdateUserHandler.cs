@@ -43,7 +43,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       if (existingUserByEmail != null && existingUserByEmail.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Email {Email} already exists", request.Email);
-        return Result<User>.Invalid(new ValidationError
+        return Result<User>.Invalid(new ErrorDetail
         {
           Identifier = "email",
           ErrorMessage = "Email already exists",
@@ -61,7 +61,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       if (existingUserByUsername != null && existingUserByUsername.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Username {Username} already exists", request.Username);
-        return Result<User>.Invalid(new ValidationError
+        return Result<User>.Invalid(new ErrorDetail
         {
           Identifier = "username",
           ErrorMessage = "Username already exists",
@@ -100,7 +100,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
     catch (Exception ex)
     {
       _logger.LogError(ex, "Error during user update for {UserId}", request.UserId);
-      return Result<User>.Error("An error occurred during update");
+      return Result<User>.Error(new ErrorDetail("Error", "An error occurred during update"));
     }
   }
 }

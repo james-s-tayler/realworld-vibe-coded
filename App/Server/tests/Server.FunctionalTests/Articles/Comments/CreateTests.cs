@@ -91,7 +91,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task CreateComment_WithMissingRequiredFields_ReturnsValidationError()
+  public async Task CreateComment_WithMissingRequiredFields_ReturnsErrorDetail()
   {
     var createArticleRequest = new CreateArticleRequest
     {
@@ -117,7 +117,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task CreateComment_WithEmptyBody_ReturnsValidationError()
+  public async Task CreateComment_WithEmptyBody_ReturnsErrorDetail()
   {
     var createArticleRequest = new CreateArticleRequest
     {

@@ -25,20 +25,20 @@ public class DeleteCommentHandler : ICommandHandler<DeleteCommentCommand, Unit>
     var article = await _articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(request.Slug), cancellationToken);
     if (article == null)
     {
-      return Result<Unit>.NotFound("Article not found");
+      return Result<Unit>.NotFound(new ErrorDetail("NotFound", "Article not found"));
     }
 
     // Find the comment
     var comment = article.Comments.FirstOrDefault(c => c.Id == request.CommentId);
     if (comment == null)
     {
-      return Result<Unit>.NotFound("Comment not found");
+      return Result<Unit>.NotFound(new ErrorDetail("NotFound", "Comment not found"));
     }
 
     // Check if the user is the author of the comment
     if (comment.AuthorId != request.UserId)
     {
-      return Result<Unit>.Forbidden("You can only delete your own comments");
+      return Result<Unit>.Forbidden(new ErrorDetail("Forbidden", "You can only delete your own comments"));
     }
 
     // Remove the comment

@@ -16,7 +16,7 @@ public class UnfollowUserHandler(IRepository<User> _userRepository)
 
     if (userToUnfollow == null)
     {
-      return Result<User>.NotFound("User not found");
+      return Result<User>.NotFound(new ErrorDetail("NotFound", "User not found"));
     }
 
     // Get current user with following relationships
@@ -25,13 +25,13 @@ public class UnfollowUserHandler(IRepository<User> _userRepository)
 
     if (currentUser == null)
     {
-      return Result<User>.NotFound("Current user not found");
+      return Result<User>.NotFound(new ErrorDetail("NotFound", "Current user not found"));
     }
 
     // Check if the user is currently following the target user
     if (!currentUser.IsFollowing(userToUnfollow))
     {
-      return Result<User>.Invalid(new ValidationError("username", "is not being followed"));
+      return Result<User>.Invalid(new ErrorDetail("username", "is not being followed"));
     }
 
     // Unfollow the user

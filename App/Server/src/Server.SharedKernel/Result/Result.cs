@@ -36,7 +36,7 @@ public class Result<T> : IResult
   public string Location { get; protected set; } = string.Empty;
 
   [JsonInclude]
-  public IEnumerable<ValidationError> ValidationErrors { get; protected set; } = [];
+  public IEnumerable<ErrorDetail> ErrorDetails { get; protected set; } = [];
 
   /// <summary>
   /// Returns the current value.
@@ -82,25 +82,25 @@ public class Result<T> : IResult
   /// </summary>
   /// <param name="validationError">The validation error encountered</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Invalid(ValidationError validationError)
-      => new(ResultStatus.Invalid) { ValidationErrors = [validationError] };
+  public static Result<T> Invalid(ErrorDetail validationError)
+      => new(ResultStatus.Invalid) { ErrorDetails = [validationError] };
 
   /// <summary>
   /// Represents validation errors that prevent the underlying service from completing.
   /// </summary>
-  /// <param name="validationErrors">A list of validation errors encountered</param>
+  /// <param name="errorDetails">A list of validation errors encountered</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Invalid(params ValidationError[] validationErrors) =>
+  public static Result<T> Invalid(params ErrorDetail[] errorDetails) =>
       new(ResultStatus.Invalid)
-      { ValidationErrors = new List<ValidationError>(validationErrors) };
+      { ErrorDetails = new List<ErrorDetail>(errorDetails) };
 
   /// <summary>
   /// Represents validation errors that prevent the underlying service from completing.
   /// </summary>
-  /// <param name="validationErrors">A list of validation errors encountered</param>
+  /// <param name="errorDetails">A list of validation errors encountered</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Invalid(IEnumerable<ValidationError> validationErrors)
-      => new(ResultStatus.Invalid) { ValidationErrors = validationErrors };
+  public static Result<T> Invalid(IEnumerable<ErrorDetail> errorDetails)
+      => new(ResultStatus.Invalid) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// Represents the situation where a service was unable to find a requested resource.
@@ -110,20 +110,12 @@ public class Result<T> : IResult
 
   /// <summary>
   /// Represents the situation where a service was unable to find a requested resource.
+  /// Error details may be provided and will be exposed via the ErrorDetails property.
   /// </summary>
-  /// <param name="errorMessage">An error message that will be converted to a validation error.</param>
+  /// <param name="errorDetails">A list of error details.</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> NotFound(string errorMessage) =>
-    new(ResultStatus.NotFound) { ValidationErrors = [new ValidationError("NotFound", errorMessage)] };
-
-  /// <summary>
-  /// Represents the situation where a service was unable to find a requested resource.
-  /// Validation errors may be provided and will be exposed via the ValidationErrors property.
-  /// </summary>
-  /// <param name="validationErrors">A list of validation errors.</param>
-  /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> NotFound(params ValidationError[] validationErrors) =>
-    new(ResultStatus.NotFound) { ValidationErrors = validationErrors };
+  public static Result<T> NotFound(params ErrorDetail[] errorDetails) =>
+    new(ResultStatus.NotFound) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// The parameters to the call were correct, but the user does not have permission to perform some action.
@@ -136,19 +128,10 @@ public class Result<T> : IResult
   /// The parameters to the call were correct, but the user does not have permission to perform some action.
   /// See also HTTP 403 Forbidden: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
   /// </summary>
-  /// <param name="errorMessage">An error message that will be converted to a validation error.</param> 
+  /// <param name="errorDetails">A list of error details.</param> 
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Forbidden(string errorMessage) =>
-    new(ResultStatus.Forbidden) { ValidationErrors = [new ValidationError("Forbidden", errorMessage)] };
-
-  /// <summary>
-  /// The parameters to the call were correct, but the user does not have permission to perform some action.
-  /// See also HTTP 403 Forbidden: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
-  /// </summary>
-  /// <param name="validationErrors">A list of validation errors.</param> 
-  /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Forbidden(params ValidationError[] validationErrors) =>
-    new(ResultStatus.Forbidden) { ValidationErrors = validationErrors };
+  public static Result<T> Forbidden(params ErrorDetail[] errorDetails) =>
+    new(ResultStatus.Forbidden) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// This is similar to Forbidden, but should be used when the user has not authenticated or has attempted to authenticate but failed.
@@ -161,35 +144,18 @@ public class Result<T> : IResult
   /// This is similar to Forbidden, but should be used when the user has not authenticated or has attempted to authenticate but failed.
   /// See also HTTP 401 Unauthorized: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
   /// </summary>
-  /// <param name="errorMessage">An error message that will be converted to a validation error.</param>  
+  /// <param name="errorDetails">A list of error details.</param>  
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Unauthorized(string errorMessage) =>
-    new(ResultStatus.Unauthorized) { ValidationErrors = [new ValidationError("Unauthorized", errorMessage)] };
-
-  /// <summary>
-  /// This is similar to Forbidden, but should be used when the user has not authenticated or has attempted to authenticate but failed.
-  /// See also HTTP 401 Unauthorized: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
-  /// </summary>
-  /// <param name="validationErrors">A list of validation errors.</param>  
-  /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Unauthorized(params ValidationError[] validationErrors) =>
-    new(ResultStatus.Unauthorized) { ValidationErrors = validationErrors };
+  public static Result<T> Unauthorized(params ErrorDetail[] errorDetails) =>
+    new(ResultStatus.Unauthorized) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// Represents an error that occurred during the execution of the service.
   /// </summary>
-  /// <param name="errorMessage">An error message that will be converted to a validation error.</param>
+  /// <param name="errorDetails">A list of error details.</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Error(string errorMessage) =>
-    new(ResultStatus.Error) { ValidationErrors = [new ValidationError("Error", errorMessage)] };
-
-  /// <summary>
-  /// Represents an error that occurred during the execution of the service.
-  /// </summary>
-  /// <param name="validationErrors">A list of validation errors.</param>
-  /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Error(params ValidationError[] validationErrors) =>
-    new(ResultStatus.Error) { ValidationErrors = validationErrors };
+  public static Result<T> Error(params ErrorDetail[] errorDetails) =>
+    new(ResultStatus.Error) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// Represents a situation where a service is in conflict due to the current state of a resource,
@@ -202,24 +168,24 @@ public class Result<T> : IResult
   /// <summary>
   /// Represents a situation where a service is in conflict due to the current state of a resource,
   /// such as an edit conflict between multiple concurrent updates.
-  /// Validation errors may be provided and will be exposed via the ValidationErrors property.
+  /// Validation errors may be provided and will be exposed via the ErrorDetails property.
   /// See also HTTP 409 Conflict: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
   /// </summary>
-  /// <param name="validationErrors">A list of validation errors.</param>
+  /// <param name="errorDetails">A list of validation errors.</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Conflict(params ValidationError[] validationErrors) =>
-    new(ResultStatus.Conflict) { ValidationErrors = validationErrors };
+  public static Result<T> Conflict(params ErrorDetail[] errorDetails) =>
+    new(ResultStatus.Conflict) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// Represents a situation where a service is in conflict due to the current state of a resource,
   /// such as an edit conflict between multiple concurrent updates.
-  /// Validation errors may be provided and will be exposed via the ValidationErrors property.
+  /// Validation errors may be provided and will be exposed via the ErrorDetails property.
   /// See also HTTP 409 Conflict: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
   /// </summary>
-  /// <param name="validationErrors">A list of validation errors.</param>
+  /// <param name="errorDetails">A list of validation errors.</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> Conflict(IEnumerable<ValidationError> validationErrors) =>
-    new(ResultStatus.Conflict) { ValidationErrors = validationErrors };
+  public static Result<T> Conflict(IEnumerable<ErrorDetail> errorDetails) =>
+    new(ResultStatus.Conflict) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// Represents a situation where a service is in conflict due to the current state of a resource.
@@ -231,7 +197,7 @@ public class Result<T> : IResult
   public static Result<T> Conflict(Exception exception) =>
     new(ResultStatus.Conflict)
     {
-      ValidationErrors = [new ValidationError(exception.GetType().Name, exception.Message)]
+      ErrorDetails = [new ErrorDetail(exception.GetType().Name, exception.Message)]
     };
 
   /// <summary>
@@ -239,20 +205,20 @@ public class Result<T> : IResult
   /// Everything provided by the user was valid, but the service was unable to complete due to an exception.
   /// See also HTTP 500 Internal Server Error: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_server_errors
   /// </summary>
-  /// <param name="validationErrors">A list of validation errors.</param>
+  /// <param name="errorDetails">A list of validation errors.</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> CriticalError(params ValidationError[] validationErrors) =>
-    new(ResultStatus.CriticalError) { ValidationErrors = validationErrors };
+  public static Result<T> CriticalError(params ErrorDetail[] errorDetails) =>
+    new(ResultStatus.CriticalError) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// Represents a critical error that occurred during the execution of the service.
   /// Everything provided by the user was valid, but the service was unable to complete due to an exception.
   /// See also HTTP 500 Internal Server Error: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_server_errors
   /// </summary>
-  /// <param name="validationErrors">A list of validation errors.</param>
+  /// <param name="errorDetails">A list of validation errors.</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> CriticalError(IEnumerable<ValidationError> validationErrors) =>
-    new(ResultStatus.CriticalError) { ValidationErrors = validationErrors };
+  public static Result<T> CriticalError(IEnumerable<ErrorDetail> errorDetails) =>
+    new(ResultStatus.CriticalError) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// Represents a critical error that occurred during the execution of the service.
@@ -265,7 +231,7 @@ public class Result<T> : IResult
   public static Result<T> CriticalError(Exception exception) =>
     new(ResultStatus.CriticalError)
     {
-      ValidationErrors = [new ValidationError(exception.GetType().Name, exception.Message)]
+      ErrorDetails = [new ErrorDetail(exception.GetType().Name, exception.Message)]
     };
 
   /// <summary>
@@ -273,10 +239,10 @@ public class Result<T> : IResult
   /// Errors may be transient, so the caller may wish to retry the operation.
   /// See also HTTP 503 Service Unavailable: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_server_errors
   /// </summary>
-  /// <param name="validationErrors">A list of validation errors</param>
+  /// <param name="errorDetails">A list of validation errors</param>
   /// <returns></returns>
-  public static Result<T> Unavailable(params ValidationError[] validationErrors) =>
-    new(ResultStatus.Unavailable) { ValidationErrors = validationErrors };
+  public static Result<T> Unavailable(params ErrorDetail[] errorDetails) =>
+    new(ResultStatus.Unavailable) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// Represents a situation where the server has successfully fulfilled the request, but there is no content to send back in the response body.

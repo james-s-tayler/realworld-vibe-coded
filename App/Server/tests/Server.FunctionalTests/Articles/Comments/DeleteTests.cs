@@ -109,7 +109,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task DeleteComment_WithInvalidCommentId_ReturnsValidationError()
+  public async Task DeleteComment_WithInvalidCommentId_ReturnsErrorDetail()
   {
     var createArticleRequest = new CreateArticleRequest
     {

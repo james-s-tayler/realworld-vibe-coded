@@ -16,7 +16,7 @@ public class FollowUserHandler(IRepository<User> _userRepository)
 
     if (userToFollow == null)
     {
-      return Result<User>.NotFound("User not found");
+      return Result<User>.NotFound(new ErrorDetail("NotFound", "User not found"));
     }
 
     // Get current user with following relationships
@@ -25,7 +25,7 @@ public class FollowUserHandler(IRepository<User> _userRepository)
 
     if (currentUser == null)
     {
-      return Result<User>.NotFound("Current user not found");
+      return Result<User>.NotFound(new ErrorDetail("NotFound", "Current user not found"));
     }
 
     // Follow the user

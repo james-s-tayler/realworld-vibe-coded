@@ -49,7 +49,7 @@ public class ExceptionHandlingBehaviorTests
     // Assert
     result.IsSuccess.ShouldBeFalse();
     result.Status.ShouldBe(ResultStatus.Conflict);
-    result.ValidationErrors.ShouldContain(e => e.ErrorMessage.Contains("Concurrency conflict"));
+    result.ErrorDetails.ShouldContain(e => e.ErrorMessage.Contains("Concurrency conflict"));
   }
 
   [Fact]
@@ -65,7 +65,7 @@ public class ExceptionHandlingBehaviorTests
     // Assert
     result.IsSuccess.ShouldBeFalse();
     result.Status.ShouldBe(ResultStatus.CriticalError);
-    result.ValidationErrors.ShouldContain(e => e.ErrorMessage.Contains("Something went wrong"));
+    result.ErrorDetails.ShouldContain(e => e.ErrorMessage.Contains("Something went wrong"));
   }
 
   // Test command class

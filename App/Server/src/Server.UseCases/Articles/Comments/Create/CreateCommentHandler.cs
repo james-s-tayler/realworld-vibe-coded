@@ -31,14 +31,14 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
     var article = await _articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(request.Slug), cancellationToken);
     if (article == null)
     {
-      return Result<CommentResponse>.NotFound("Article not found");
+      return Result<CommentResponse>.NotFound(new ErrorDetail("NotFound", "Article not found"));
     }
 
     // Find the user
     var user = await _userRepository.GetByIdAsync(request.AuthorId, cancellationToken);
     if (user == null)
     {
-      return Result<CommentResponse>.NotFound("User not found");
+      return Result<CommentResponse>.NotFound(new ErrorDetail("NotFound", "User not found"));
     }
 
     // Create the comment

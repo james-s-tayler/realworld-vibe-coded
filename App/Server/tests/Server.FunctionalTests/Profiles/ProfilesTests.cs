@@ -337,7 +337,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
   }
 
   [Fact]
-  public async Task UnfollowProfile_NotFollowing_ReturnsValidationError()
+  public async Task UnfollowProfile_NotFollowing_ReturnsErrorDetail()
   {
     var user1Username = $"user1-{Guid.NewGuid()}";
     var user1Email = $"user1-{Guid.NewGuid()}@example.com";
