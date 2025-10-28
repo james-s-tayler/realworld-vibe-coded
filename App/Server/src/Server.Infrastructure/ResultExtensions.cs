@@ -75,22 +75,43 @@ public static class ResultExtensions
         await ep.HttpContext.Response.SendNoContentAsync(cancellation: cancellationToken);
         break;
       case ResultStatus.Invalid:
-        await SendErrorResponseAsync(ep, result, statusCode: null, cancellationToken);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status400BadRequest, cancellationToken);
         break;
       case ResultStatus.NotFound:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status404NotFound, cancellationToken, () => ep.HttpContext.Response.SendNotFoundAsync(cancellation: cancellationToken));
+        if (result.ErrorDetails.Any())
+        {
+          await SendErrorResponseAsync(ep, result, StatusCodes.Status404NotFound, cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendNotFoundAsync(cancellation: cancellationToken);
+        }
         break;
       case ResultStatus.Unauthorized:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status401Unauthorized, cancellationToken, () => ep.HttpContext.Response.SendUnauthorizedAsync(cancellation: cancellationToken));
+        if (result.ErrorDetails.Any())
+        {
+          await SendErrorResponseAsync(ep, result, StatusCodes.Status401Unauthorized, cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendUnauthorizedAsync(cancellation: cancellationToken);
+        }
         break;
       case ResultStatus.Forbidden:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status403Forbidden, cancellationToken, () => ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken));
+        if (result.ErrorDetails.Any())
+        {
+          await SendErrorResponseAsync(ep, result, StatusCodes.Status403Forbidden, cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
+        }
         break;
       case ResultStatus.Conflict:
         await SendErrorResponseAsync(ep, result, StatusCodes.Status409Conflict, cancellationToken);
         break;
       case ResultStatus.Error:
-        await SendErrorResponseAsync(ep, result, statusCode: null, cancellationToken);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status400BadRequest, cancellationToken);
         break;
       case ResultStatus.CriticalError:
         await SendErrorResponseAsync(ep, result, StatusCodes.Status500InternalServerError, cancellationToken);
@@ -102,47 +123,19 @@ public static class ResultExtensions
   }
 
   /// <summary>
-  /// Sends an error response with error details and status code.
-  /// If no error details are present and a fallback is provided, calls the fallback instead.
+  /// Sends an error response with error details and the specified status code.
   /// </summary>
   private static async Task SendErrorResponseAsync<TResult>(
     IResponseSender ep,
     Result<TResult> result,
-    int? statusCode = null,
-    CancellationToken cancellationToken = default,
-    Func<Task>? fallbackWhenNoErrors = null)
+    int statusCode,
+    CancellationToken cancellationToken)
   {
-    if (result.ErrorDetails.Any())
+    foreach (var error in result.ErrorDetails)
     {
-      foreach (var error in result.ErrorDetails)
-      {
-        ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-      }
+      ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
+    }
 
-      if (statusCode.HasValue)
-      {
-        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: statusCode.Value, cancellation: cancellationToken);
-      }
-      else
-      {
-        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
-      }
-    }
-    else if (fallbackWhenNoErrors != null)
-    {
-      await fallbackWhenNoErrors();
-    }
-    else
-    {
-      // If no errors and no fallback, still send error response with status code
-      if (statusCode.HasValue)
-      {
-        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: statusCode.Value, cancellation: cancellationToken);
-      }
-      else
-      {
-        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
-      }
-    }
+    await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: statusCode, cancellation: cancellationToken);
   }
 }
