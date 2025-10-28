@@ -90,7 +90,7 @@ public static class ResultExtensions
         await SendErrorResponseAsync(ep, result, StatusCodes.Status409Conflict);
         break;
       case ResultStatus.Error:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status400BadRequest);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status422UnprocessableEntity);
         break;
       case ResultStatus.CriticalError:
         await SendErrorResponseAsync(ep, result, StatusCodes.Status500InternalServerError);
