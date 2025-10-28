@@ -75,49 +75,28 @@ public static class ResultExtensions
         await ep.HttpContext.Response.SendNoContentAsync(cancellation: cancellationToken);
         break;
       case ResultStatus.Invalid:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status400BadRequest, cancellationToken);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status400BadRequest);
         break;
       case ResultStatus.NotFound:
-        if (result.ErrorDetails.Any())
-        {
-          await SendErrorResponseAsync(ep, result, StatusCodes.Status404NotFound, cancellationToken);
-        }
-        else
-        {
-          await ep.HttpContext.Response.SendNotFoundAsync(cancellation: cancellationToken);
-        }
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status404NotFound);
         break;
       case ResultStatus.Unauthorized:
-        if (result.ErrorDetails.Any())
-        {
-          await SendErrorResponseAsync(ep, result, StatusCodes.Status401Unauthorized, cancellationToken);
-        }
-        else
-        {
-          await ep.HttpContext.Response.SendUnauthorizedAsync(cancellation: cancellationToken);
-        }
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status401Unauthorized);
         break;
       case ResultStatus.Forbidden:
-        if (result.ErrorDetails.Any())
-        {
-          await SendErrorResponseAsync(ep, result, StatusCodes.Status403Forbidden, cancellationToken);
-        }
-        else
-        {
-          await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
-        }
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status403Forbidden);
         break;
       case ResultStatus.Conflict:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status409Conflict, cancellationToken);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status409Conflict);
         break;
       case ResultStatus.Error:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status400BadRequest, cancellationToken);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status400BadRequest);
         break;
       case ResultStatus.CriticalError:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status500InternalServerError, cancellationToken);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status500InternalServerError);
         break;
       case ResultStatus.Unavailable:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status503ServiceUnavailable, cancellationToken);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status503ServiceUnavailable);
         break;
     }
   }
@@ -128,14 +107,13 @@ public static class ResultExtensions
   private static async Task SendErrorResponseAsync<TResult>(
     IResponseSender ep,
     Result<TResult> result,
-    int statusCode,
-    CancellationToken cancellationToken)
+    int statusCode)
   {
     foreach (var error in result.ErrorDetails)
     {
       ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
     }
 
-    await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: statusCode, cancellation: cancellationToken);
+    await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: statusCode, cancellation: default);
   }
 }
