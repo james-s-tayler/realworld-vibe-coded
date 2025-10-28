@@ -1,4 +1,4 @@
-﻿using Ardalis.Result;
+﻿using Server.SharedKernel.Result;
 
 namespace Server.SharedKernel.Persistence;
 
@@ -10,7 +10,7 @@ public interface IUnitOfWork
 {
   /// <summary>
   /// Executes a function within a transaction context using EF Core execution strategy.
-  /// The operation must return an Ardalis.Result type for proper transaction handling.
+  /// The operation must return a Result type for proper transaction handling.
   /// Commits on Result.IsSuccess, rolls back on failure.
   /// </summary>
   /// <typeparam name="T">The inner value type of Result{T}</typeparam>

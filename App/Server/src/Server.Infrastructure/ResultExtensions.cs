@@ -1,7 +1,6 @@
-﻿using Ardalis.Result;
-using FastEndpoints;
-using FluentValidation.Results;
+﻿using FastEndpoints;
 using Microsoft.AspNetCore.Http;
+using Server.SharedKernel.Result;
 
 namespace Server.Infrastructure;
 
@@ -83,44 +82,74 @@ public static class ResultExtensions
         await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
         break;
       case ResultStatus.NotFound:
-        await ep.HttpContext.Response.SendNotFoundAsync(cancellation: cancellationToken);
+        if (result.ValidationErrors.Any())
+        {
+          foreach (var error in result.ValidationErrors)
+          {
+            ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
+          }
+          await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status404NotFound, cancellation: cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendNotFoundAsync(cancellation: cancellationToken);
+        }
         break;
       case ResultStatus.Unauthorized:
-        await ep.HttpContext.Response.SendUnauthorizedAsync(cancellation: cancellationToken);
+        if (result.ValidationErrors.Any())
+        {
+          foreach (var error in result.ValidationErrors)
+          {
+            ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
+          }
+          await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status401Unauthorized, cancellation: cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendUnauthorizedAsync(cancellation: cancellationToken);
+        }
         break;
       case ResultStatus.Forbidden:
-        await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
+        if (result.ValidationErrors.Any())
+        {
+          foreach (var error in result.ValidationErrors)
+          {
+            ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
+          }
+          await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status403Forbidden, cancellation: cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
+        }
         break;
       case ResultStatus.Conflict:
-        if (result.ValidationErrors.Any())
+        foreach (var error in result.ValidationErrors)
         {
-          foreach (var error in result.ValidationErrors)
-          {
-            ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-          }
-          await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status409Conflict, cancellation: cancellationToken);
+          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
         }
-        else
-        {
-          await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("error", string.Join(";", result.Errors)) }, statusCode: StatusCodes.Status409Conflict, cancellation: cancellationToken);
-        }
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status409Conflict, cancellation: cancellationToken);
         break;
       case ResultStatus.Error:
-        await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("error", string.Join(";", result.Errors)) }, cancellation: cancellationToken);
+        foreach (var error in result.ValidationErrors)
+        {
+          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
+        }
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
         break;
       case ResultStatus.CriticalError:
-        if (result.ValidationErrors.Any())
+        foreach (var error in result.ValidationErrors)
         {
-          foreach (var error in result.ValidationErrors)
-          {
-            ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-          }
-          await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status500InternalServerError, cancellation: cancellationToken);
+          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
         }
-        else
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status500InternalServerError, cancellation: cancellationToken);
+        break;
+      case ResultStatus.Unavailable:
+        foreach (var error in result.ValidationErrors)
         {
-          await ep.HttpContext.Response.SendErrorsAsync(new List<ValidationFailure> { new("error", string.Join(";", result.Errors)) }, statusCode: StatusCodes.Status500InternalServerError, cancellation: cancellationToken);
+          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
         }
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status503ServiceUnavailable, cancellation: cancellationToken);
         break;
     }
   }

@@ -1,9 +1,9 @@
-﻿using Ardalis.Result;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Server.SharedKernel.Ardalis.Result;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
+using Server.SharedKernel.Result;
 
 namespace Server.UnitTests;
 

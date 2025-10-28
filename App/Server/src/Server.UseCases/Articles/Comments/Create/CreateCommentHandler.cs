@@ -31,14 +31,14 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
     var article = await _articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(request.Slug), cancellationToken);
     if (article == null)
     {
-      return Result.NotFound("Article not found");
+      return Result<CommentResponse>.NotFound("Article not found");
     }
 
     // Find the user
     var user = await _userRepository.GetByIdAsync(request.AuthorId, cancellationToken);
     if (user == null)
     {
-      return Result.NotFound("User not found");
+      return Result<CommentResponse>.NotFound("User not found");
     }
 
     // Create the comment
@@ -57,6 +57,6 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
     // Return the comment response
     var response = new CommentResponse(CommentMappers.MapToDto(comment, currentUser));
 
-    return Result.Created(response);
+    return Result<CommentResponse>.Created(response);
   }
 }

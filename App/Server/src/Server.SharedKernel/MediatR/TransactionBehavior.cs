@@ -1,7 +1,7 @@
-﻿using Ardalis.Result;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using Server.SharedKernel.Persistence;
+using Server.SharedKernel.Result;
 
 namespace Server.SharedKernel.MediatR;
 

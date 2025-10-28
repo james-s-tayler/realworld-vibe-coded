@@ -1,8 +1,8 @@
 ﻿namespace Server.SharedKernel.Ardalis.Result;
 
 /// <summary>
-/// Extensions to Ardalis.Result.Result to support custom error result creation.
-/// These methods are used by ExceptionHandlingBehavior via reflection.
+/// Factory for creating Result instances with exceptions.
+/// These methods are used by ExceptionHandlingBehavior.
 /// </summary>
 public static class CustomArdalisResultFactory
 {
@@ -13,25 +13,9 @@ public static class CustomArdalisResultFactory
   /// </summary>
   /// <param name="exception">The exception that occurred</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static global::Ardalis.Result.Result<T> CriticalError<T>(Exception exception)
+  public static Server.SharedKernel.Result.Result<T> CriticalError<T>(Exception exception)
   {
-    // Create validation error from the exception
-    var validationError = new global::Ardalis.Result.ValidationError(exception.GetType().Name, exception.Message);
-
-    // Use reflection to create Result<T> with CriticalError status and set ValidationErrors
-    var result = (global::Ardalis.Result.Result<T>)Activator.CreateInstance(
-      typeof(global::Ardalis.Result.Result<T>),
-      System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
-      null,
-      new object[] { global::Ardalis.Result.ResultStatus.CriticalError },
-      null
-    )!;
-
-    // Set ValidationErrors via reflection since it has a protected setter
-    var validationErrorsProp = typeof(global::Ardalis.Result.Result<T>).GetProperty(nameof(global::Ardalis.Result.Result<T>.ValidationErrors))!;
-    validationErrorsProp.SetValue(result, new[] { validationError });
-
-    return result;
+    return Server.SharedKernel.Result.Result<T>.CriticalError(exception);
   }
 
   /// <summary>
@@ -41,24 +25,8 @@ public static class CustomArdalisResultFactory
   /// </summary>
   /// <param name="exception">The exception that occurred</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static global::Ardalis.Result.Result<T> Conflict<T>(Exception exception)
+  public static Server.SharedKernel.Result.Result<T> Conflict<T>(Exception exception)
   {
-    // Create validation error from the exception
-    var validationError = new global::Ardalis.Result.ValidationError(exception.GetType().Name, exception.Message);
-
-    // Use reflection to create Result<T> with Conflict status and set ValidationErrors
-    var result = (global::Ardalis.Result.Result<T>)Activator.CreateInstance(
-      typeof(global::Ardalis.Result.Result<T>),
-      System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
-      null,
-      new object[] { global::Ardalis.Result.ResultStatus.Conflict },
-      null
-    )!;
-
-    // Set ValidationErrors via reflection since it has a protected setter
-    var validationErrorsProp = typeof(global::Ardalis.Result.Result<T>).GetProperty(nameof(global::Ardalis.Result.Result<T>.ValidationErrors))!;
-    validationErrorsProp.SetValue(result, new[] { validationError });
-
-    return result;
+    return Server.SharedKernel.Result.Result<T>.Conflict(exception);
   }
 }

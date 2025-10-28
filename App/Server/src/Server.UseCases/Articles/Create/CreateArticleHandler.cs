@@ -18,7 +18,7 @@ public class CreateArticleHandler(
     var author = await _userRepository.GetByIdAsync(request.AuthorId, cancellationToken);
     if (author == null)
     {
-      return Result.Error("Author not found");
+      return Result<Article>.Error("Author not found");
     }
 
     // Check for duplicate slug
@@ -27,7 +27,7 @@ public class CreateArticleHandler(
 
     if (existingArticle != null)
     {
-      return Result.Invalid(new ValidationError("slug", "has already been taken"));
+      return Result<Article>.Invalid(new ValidationError("slug", "has already been taken"));
     }
 
     // Create the article
@@ -51,6 +51,6 @@ public class CreateArticleHandler(
     await _articleRepository.AddAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
-    return Result.Created(article);
+    return Result<Article>.Created(article);
   }
 }

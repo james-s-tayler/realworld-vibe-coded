@@ -1,8 +1,8 @@
-﻿using Ardalis.Result;
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Server.SharedKernel.Ardalis.Result;
+using Server.SharedKernel.Result;
 
 namespace Server.SharedKernel.MediatR;
 

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
-using Ardalis.Result;
 using Server.SharedKernel.Ardalis.Result;
+using Server.SharedKernel.Result;
 
 namespace Server.UnitTests;
 

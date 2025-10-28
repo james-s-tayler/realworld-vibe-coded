@@ -1,11 +1,10 @@
-﻿using Ardalis.Result;
-using Server.SharedKernel.Ardalis.Result;
+﻿using Server.SharedKernel.Ardalis.Result;
+using Server.SharedKernel.Result;
 
 namespace Server.UnitTests;
 
 /// <summary>
-/// Tests for CustomArdalisResultFactory to ensure reflection-based Result creation works correctly
-/// and would catch issues if the Ardalis.Result library changes in incompatible ways.
+/// Tests for CustomArdalisResultFactory to ensure Result creation works correctly.
 /// </summary>
 public class CustomArdalisResultFactoryTests
 {
@@ -95,7 +94,7 @@ public class CustomArdalisResultFactoryTests
   }
 
   [Fact]
-  public void CriticalError_ShouldBeCompatibleWithArdalisResultType()
+  public void CriticalError_ShouldBeCompatibleWithResultType()
   {
     // Arrange
     var exception = new Exception("Test message");
@@ -103,20 +102,10 @@ public class CustomArdalisResultFactoryTests
     // Act
     var result = CustomArdalisResultFactory.CriticalError<string>(exception);
 
-    // Assert - Should be assignable to Ardalis.Result.Result<T>
-    Result<string> ardalisResult = result;
-    ardalisResult.ShouldNotBeNull();
-    ardalisResult.Status.ShouldBe(ResultStatus.CriticalError);
-  }
-
-  [Fact]
-  public void CriticalError_ReflectionAccessToProtectedConstructor_ShouldSucceed()
-  {
-    // Arrange
-    var exception = new Exception("Testing reflection access");
-
-    // Act & Assert
-    Should.NotThrow(() => CustomArdalisResultFactory.CriticalError<string>(exception));
+    // Assert - Should be assignable to Result<T>
+    Result<string> resultType = result;
+    resultType.ShouldNotBeNull();
+    resultType.Status.ShouldBe(ResultStatus.CriticalError);
   }
 
   [Fact]
@@ -205,7 +194,7 @@ public class CustomArdalisResultFactoryTests
   }
 
   [Fact]
-  public void Conflict_ShouldBeCompatibleWithArdalisResultType()
+  public void Conflict_ShouldBeCompatibleWithResultType()
   {
     // Arrange
     var exception = new Exception("Conflict");
@@ -213,44 +202,10 @@ public class CustomArdalisResultFactoryTests
     // Act
     var result = CustomArdalisResultFactory.Conflict<string>(exception);
 
-    // Assert - Should be assignable to Ardalis.Result.Result<T>
-    Result<string> ardalisResult = result;
-    ardalisResult.ShouldNotBeNull();
-    ardalisResult.Status.ShouldBe(ResultStatus.Conflict);
-  }
-
-  /// <summary>
-  /// This test validates that all reflection-based invariants required by CustomArdalisResultFactory
-  /// continue to hold. If this test fails after a library upgrade, it indicates that Ardalis.Result
-  /// has changed in an incompatible way and CustomArdalisResultFactory needs to be updated.
-  /// 
-  /// Validates:
-  /// - Protected constructor Result(ResultStatus) exists and is accessible
-  /// - ValidationErrors property exists
-  /// - ValidationErrors property has a protected setter
-  /// </summary>
-  [Fact]
-  public void ReflectionInvariants_ShouldBeValid()
-  {
-    // Arrange
-    var resultType = typeof(Result<string>);
-
-    // Act & Assert - Verify protected constructor exists
-    var constructor = resultType.GetConstructor(
-      System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
-      null,
-      new[] { typeof(ResultStatus) },
-      null
-    );
-    constructor.ShouldNotBeNull("Ardalis.Result.Result<T> must have a protected constructor that accepts ResultStatus");
-
-    // Act & Assert - Verify ValidationErrors property exists
-    var validationErrorsProp = resultType.GetProperty(nameof(Result<string>.ValidationErrors));
-    validationErrorsProp.ShouldNotBeNull("Ardalis.Result.Result<T> must have a ValidationErrors property");
-
-    // Act & Assert - Verify ValidationErrors property has a protected setter
-    var setter = validationErrorsProp.GetSetMethod(nonPublic: true);
-    setter.ShouldNotBeNull("Ardalis.Result.Result<T>.ValidationErrors must have a protected setter");
+    // Assert - Should be assignable to Result<T>
+    Result<string> resultType = result;
+    resultType.ShouldNotBeNull();
+    resultType.Status.ShouldBe(ResultStatus.Conflict);
   }
 
   private class TestComplexType

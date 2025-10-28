@@ -1,6 +1,6 @@
-﻿using Ardalis.Result;
-using Audit.Core;
+﻿using Audit.Core;
 using Server.SharedKernel.Persistence;
+using Server.SharedKernel.Result;
 
 namespace Server.Infrastructure.Data;
 

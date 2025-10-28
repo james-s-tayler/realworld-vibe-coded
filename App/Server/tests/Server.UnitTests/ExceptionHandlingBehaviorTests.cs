@@ -1,8 +1,8 @@
-﻿using Ardalis.Result;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Result;
 
 namespace Server.UnitTests;
 

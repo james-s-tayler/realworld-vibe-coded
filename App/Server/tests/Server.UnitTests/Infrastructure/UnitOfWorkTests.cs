@@ -1,9 +1,9 @@
-﻿using Ardalis.Result;
-using Audit.Core;
+﻿using Audit.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Server.Infrastructure.Data;
+using Server.SharedKernel.Result;
 
 namespace Server.UnitTests.Infrastructure;
 
@@ -48,7 +48,7 @@ public class UnitOfWorkTests
     // Assert
     result.IsSuccess.ShouldBeFalse();
     result.Status.ShouldBe(ResultStatus.Error);
-    result.Errors.ShouldContain(errorMessage);
+    result.ValidationErrors.ShouldContain(e => e.ErrorMessage == errorMessage);
   }
 
   [Fact]

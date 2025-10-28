@@ -18,7 +18,7 @@ namespace Server.Analyzers
         "Usage",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "Non-generic Result is deprecated in Ardalis.Result v10+. Use Result<T> for type safety. For operations without a return value, use Result<Unit>.");
+        description: "Non-generic Result is not supported. Use Result<T> for type safety. For operations without a return value, use Result<Unit>.");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(Rule);
@@ -96,10 +96,10 @@ namespace Server.Analyzers
         return false;
       }
 
-      // Check if it's the non-generic Result type from Ardalis.Result
-      // The non-generic Result is actually Result (not Result<T>)
+      // Check if it's the non-generic Result type from Server.SharedKernel.Result
+      // We no longer support non-generic Result
       if (typeSymbol.Name == "Result" &&
-          typeSymbol.ContainingNamespace?.ToDisplayString() == "Ardalis.Result")
+          typeSymbol.ContainingNamespace?.ToDisplayString() == "Server.SharedKernel.Result")
       {
         // Check if it's NOT a generic type (i.e., it's the non-generic Result)
         if (!(typeSymbol is INamedTypeSymbol namedType) || !namedType.IsGenericType)

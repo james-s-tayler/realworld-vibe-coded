@@ -14,6 +14,6 @@ public class GetFeedHandler(IFeedQueryService _feedQuery)
       request.Limit,
       request.Offset);
 
-    return Result.Success(articles);
+    return Result<IEnumerable<Article>>.Success(articles);
   }
 }

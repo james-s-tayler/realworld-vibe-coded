@@ -9,6 +9,6 @@ public class ListTagsHandler(IListTagsQueryService _query)
   public async Task<Result<TagsResponse>> Handle(ListTagsQuery request, CancellationToken cancellationToken)
   {
     var tags = await _query.ListAsync();
-    return Result.Success(new TagsResponse(tags.ToList()));
+    return Result<TagsResponse>.Success(new TagsResponse(tags.ToList()));
   }
 }
