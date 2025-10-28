@@ -75,82 +75,74 @@ public static class ResultExtensions
         await ep.HttpContext.Response.SendNoContentAsync(cancellation: cancellationToken);
         break;
       case ResultStatus.Invalid:
-        foreach (var error in result.ErrorDetails)
-        {
-          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-        }
-        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
+        await SendErrorResponseAsync(ep, result, statusCode: null, cancellationToken);
         break;
       case ResultStatus.NotFound:
-        if (result.ErrorDetails.Any())
-        {
-          foreach (var error in result.ErrorDetails)
-          {
-            ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-          }
-          await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status404NotFound, cancellation: cancellationToken);
-        }
-        else
-        {
-          await ep.HttpContext.Response.SendNotFoundAsync(cancellation: cancellationToken);
-        }
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status404NotFound, cancellationToken, () => ep.HttpContext.Response.SendNotFoundAsync(cancellation: cancellationToken));
         break;
       case ResultStatus.Unauthorized:
-        if (result.ErrorDetails.Any())
-        {
-          foreach (var error in result.ErrorDetails)
-          {
-            ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-          }
-          await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status401Unauthorized, cancellation: cancellationToken);
-        }
-        else
-        {
-          await ep.HttpContext.Response.SendUnauthorizedAsync(cancellation: cancellationToken);
-        }
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status401Unauthorized, cancellationToken, () => ep.HttpContext.Response.SendUnauthorizedAsync(cancellation: cancellationToken));
         break;
       case ResultStatus.Forbidden:
-        if (result.ErrorDetails.Any())
-        {
-          foreach (var error in result.ErrorDetails)
-          {
-            ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-          }
-          await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status403Forbidden, cancellation: cancellationToken);
-        }
-        else
-        {
-          await ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken);
-        }
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status403Forbidden, cancellationToken, () => ep.HttpContext.Response.SendForbiddenAsync(cancellation: cancellationToken));
         break;
       case ResultStatus.Conflict:
-        foreach (var error in result.ErrorDetails)
-        {
-          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-        }
-        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status409Conflict, cancellation: cancellationToken);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status409Conflict, cancellationToken);
         break;
       case ResultStatus.Error:
-        foreach (var error in result.ErrorDetails)
-        {
-          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-        }
-        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
+        await SendErrorResponseAsync(ep, result, statusCode: null, cancellationToken);
         break;
       case ResultStatus.CriticalError:
-        foreach (var error in result.ErrorDetails)
-        {
-          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-        }
-        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status500InternalServerError, cancellation: cancellationToken);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status500InternalServerError, cancellationToken);
         break;
       case ResultStatus.Unavailable:
-        foreach (var error in result.ErrorDetails)
-        {
-          ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
-        }
-        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: StatusCodes.Status503ServiceUnavailable, cancellation: cancellationToken);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status503ServiceUnavailable, cancellationToken);
         break;
+    }
+  }
+
+  /// <summary>
+  /// Sends an error response with error details and status code.
+  /// If no error details are present and a fallback is provided, calls the fallback instead.
+  /// </summary>
+  private static async Task SendErrorResponseAsync<TResult>(
+    IResponseSender ep,
+    Result<TResult> result,
+    int? statusCode = null,
+    CancellationToken cancellationToken = default,
+    Func<Task>? fallbackWhenNoErrors = null)
+  {
+    if (result.ErrorDetails.Any())
+    {
+      foreach (var error in result.ErrorDetails)
+      {
+        ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
+      }
+
+      if (statusCode.HasValue)
+      {
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: statusCode.Value, cancellation: cancellationToken);
+      }
+      else
+      {
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
+      }
+    }
+    else if (fallbackWhenNoErrors != null)
+    {
+      await fallbackWhenNoErrors();
+    }
+    else
+    {
+      // If no errors and no fallback, still send error response with status code
+      if (statusCode.HasValue)
+      {
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: statusCode.Value, cancellation: cancellationToken);
+      }
+      else
+      {
+        await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: cancellationToken);
+      }
     }
   }
 }
