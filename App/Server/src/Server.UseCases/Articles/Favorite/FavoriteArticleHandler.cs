@@ -16,13 +16,13 @@ public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRe
 
     if (article == null)
     {
-      return Result<Article>.NotFound(new ErrorDetail("NotFound", "Article not found"));
+      return Result<Article>.NotFound(request.Slug);
     }
 
     var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
     if (user == null)
     {
-      return Result<Article>.Error(new ErrorDetail("Error", "User not found"));
+      return Result<Article>.NotFound(request.UserId);
     }
 
     article.AddToFavorites(user);

@@ -15,7 +15,7 @@ public class DeleteArticleHandler(IRepository<Article> _articleRepository)
 
     if (article == null)
     {
-      return Result<Unit>.NotFound(new ErrorDetail("NotFound", "Article not found"));
+      return Result<Unit>.NotFound(request.Slug);
     }
 
     if (article.AuthorId != request.UserId)

@@ -89,18 +89,10 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       user.UpdateImage(request.Image);
     }
 
-    try
-    {
-      await _repository.UpdateAsync(user, cancellationToken);
+    await _repository.UpdateAsync(user, cancellationToken);
 
-      _logger.LogInformation("User {Username} updated successfully", user.Username);
+    _logger.LogInformation("User {Username} updated successfully", user.Username);
 
-      return Result<User>.Success(user);
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, "Error during user update for {UserId}", request.UserId);
-      return Result<User>.Error(new ErrorDetail("Error", "An error occurred during update"));
-    }
+    return Result<User>.Success(user);
   }
 }

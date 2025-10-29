@@ -2,7 +2,7 @@
 
 namespace Server.SharedKernel.Result;
 
-public class Result<T> : IResult
+public class Result<T>
 {
   protected Result() { }
 
@@ -109,12 +109,28 @@ public class Result<T> : IResult
   public static Result<T> NotFound() => new(ResultStatus.NotFound);
 
   /// <summary>
+  /// Represents the situation where a service was unable to find a requested resource identified by a Guid.
+  /// </summary>
+  /// <param name="id">The Guid identifier of the resource that was not found.</param>
+  /// <returns>A Result<typeparamref name="T"/></returns>
+  public static Result<T> NotFound(Guid id) =>
+    NotFound(new ErrorDetail($"{typeof(T).Name}", $"{typeof(T).Name} identified by {id} was not found"));
+
+  /// <summary>
+  /// Represents the situation where a service was unable to find a requested resource identified by a string.
+  /// </summary>
+  /// <param name="identifier">The string identifier of the resource that was not found.</param>
+  /// <returns>A Result<typeparamref name="T"/></returns>
+  public static Result<T> NotFound(string identifier) =>
+    NotFound(new ErrorDetail($"{typeof(T).Name}", $"{typeof(T).Name} identified by {identifier} was not found"));
+
+  /// <summary>
   /// Represents the situation where a service was unable to find a requested resource.
   /// Error details may be provided and will be exposed via the ErrorDetails property.
   /// </summary>
   /// <param name="errorDetails">A list of error details.</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
-  public static Result<T> NotFound(params ErrorDetail[] errorDetails) =>
+  private static Result<T> NotFound(params ErrorDetail[] errorDetails) =>
     new(ResultStatus.NotFound) { ErrorDetails = errorDetails };
 
   /// <summary>

@@ -75,28 +75,28 @@ public static class ResultExtensions
         await ep.HttpContext.Response.SendNoContentAsync(cancellation: cancellationToken);
         break;
       case ResultStatus.Invalid:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status400BadRequest);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status400BadRequest, cancellationToken);
         break;
       case ResultStatus.NotFound:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status404NotFound);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status404NotFound, cancellationToken);
         break;
       case ResultStatus.Unauthorized:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status401Unauthorized);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status401Unauthorized, cancellationToken);
         break;
       case ResultStatus.Forbidden:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status403Forbidden);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status403Forbidden, cancellationToken);
         break;
       case ResultStatus.Conflict:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status409Conflict);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status409Conflict, cancellationToken);
         break;
       case ResultStatus.Error:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status422UnprocessableEntity);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status422UnprocessableEntity, cancellationToken);
         break;
       case ResultStatus.CriticalError:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status500InternalServerError);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status500InternalServerError, cancellationToken);
         break;
       case ResultStatus.Unavailable:
-        await SendErrorResponseAsync(ep, result, StatusCodes.Status503ServiceUnavailable);
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status503ServiceUnavailable, cancellationToken);
         break;
     }
   }
@@ -107,13 +107,14 @@ public static class ResultExtensions
   private static async Task SendErrorResponseAsync<TResult>(
     IResponseSender ep,
     Result<TResult> result,
-    int statusCode)
+    int statusCode,
+    CancellationToken cancellationToken)
   {
     foreach (var error in result.ErrorDetails)
     {
       ep.ValidationFailures.Add(new(error.Identifier, error.ErrorMessage));
     }
 
-    await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: statusCode, cancellation: default);
+    await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, statusCode: statusCode, cancellation: cancellationToken);
   }
 }

@@ -15,7 +15,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
 
     if (article == null)
     {
-      return Result<Article>.NotFound(new ErrorDetail("NotFound", "Article not found"));
+      return Result<Article>.NotFound(request.Slug);
     }
 
     if (article.AuthorId != request.UserId)

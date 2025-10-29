@@ -57,19 +57,11 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
     var hashedPassword = _passwordHasher.HashPassword(request.Password);
     var newUser = new User(request.Email, request.Username, hashedPassword);
 
-    try
-    {
-      var createdUser = await _repository.AddAsync(newUser, cancellationToken);
+    var createdUser = await _repository.AddAsync(newUser, cancellationToken);
 
-      _logger.LogInformation("User {Username} registered successfully with ID {UserId}",
-        createdUser.Username, createdUser.Id);
+    _logger.LogInformation("User {Username} registered successfully with ID {UserId}",
+      createdUser.Username, createdUser.Id);
 
-      return Result<User>.Created(createdUser);
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, "Error during user registration for {Email}", request.Email);
-      return Result<User>.Error(new ErrorDetail("Error", "An error occurred during registration"));
-    }
+    return Result<User>.Created(createdUser);
   }
 }

@@ -15,7 +15,7 @@ public class GetProfileHandler(IRepository<User> _userRepository)
 
     if (user == null)
     {
-      return Result<User>.NotFound(new ErrorDetail("NotFound", "User not found"));
+      return Result<User>.NotFound(request.Username);
     }
 
     return Result<User>.Success(user);

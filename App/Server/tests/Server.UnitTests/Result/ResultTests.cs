@@ -173,18 +173,37 @@ public class ResultTests
   }
 
   [Fact]
-  public void NotFound_WithErrorDetails_ShouldCreateNotFoundResultWithErrors()
+  public void NotFound_WithGuid_ShouldCreateNotFoundResultWithErrorDetail()
   {
     // Arrange
-    var errorDetails = new[] { new ErrorDetail("resource", "not found") };
+    var id = Guid.NewGuid();
 
     // Act
-    var result = Result<string>.NotFound(errorDetails);
+    var result = Result<string>.NotFound(id);
 
     // Assert
     result.IsSuccess.ShouldBeFalse();
     result.Status.ShouldBe(ResultStatus.NotFound);
     result.ErrorDetails.Count().ShouldBe(1);
+    result.ErrorDetails.First().Identifier.ShouldBe("String");
+    result.ErrorDetails.First().ErrorMessage.ShouldContain(id.ToString());
+  }
+
+  [Fact]
+  public void NotFound_WithString_ShouldCreateNotFoundResultWithErrorDetail()
+  {
+    // Arrange
+    var identifier = "test-slug";
+
+    // Act
+    var result = Result<string>.NotFound(identifier);
+
+    // Assert
+    result.IsSuccess.ShouldBeFalse();
+    result.Status.ShouldBe(ResultStatus.NotFound);
+    result.ErrorDetails.Count().ShouldBe(1);
+    result.ErrorDetails.First().Identifier.ShouldBe("String");
+    result.ErrorDetails.First().ErrorMessage.ShouldContain(identifier);
   }
 
   [Fact]
