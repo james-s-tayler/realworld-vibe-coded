@@ -16,7 +16,7 @@ public class UnfollowUserHandler(IRepository<User> _userRepository)
 
     if (userToUnfollow == null)
     {
-      return Result.NotFound("User not found");
+      return Result<User>.NotFound(request.Username);
     }
 
     // Get current user with following relationships
@@ -25,19 +25,19 @@ public class UnfollowUserHandler(IRepository<User> _userRepository)
 
     if (currentUser == null)
     {
-      return Result.NotFound("Current user not found");
+      return Result<User>.NotFound(request.CurrentUserId);
     }
 
     // Check if the user is currently following the target user
     if (!currentUser.IsFollowing(userToUnfollow))
     {
-      return Result.Invalid(new ValidationError("username", "is not being followed"));
+      return Result<User>.Invalid(new ErrorDetail("username", "is not being followed"));
     }
 
     // Unfollow the user
     currentUser.Unfollow(userToUnfollow);
     await _userRepository.SaveChangesAsync(cancellationToken);
 
-    return Result.Success(userToUnfollow);
+    return Result<User>.Success(userToUnfollow);
   }
 }

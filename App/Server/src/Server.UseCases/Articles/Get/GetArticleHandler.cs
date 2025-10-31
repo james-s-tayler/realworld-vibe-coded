@@ -15,9 +15,9 @@ public class GetArticleHandler(IRepository<Article> _articleRepository)
 
     if (article == null)
     {
-      return Result.NotFound("Article not found");
+      return Result<Article>.NotFound(request.Slug);
     }
 
-    return Result.Success(article);
+    return Result<Article>.Success(article);
   }
 }

@@ -32,7 +32,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
   }
 
   [Fact]
-  public async Task Register_WithDuplicateEmail_ReturnsValidationError()
+  public async Task Register_WithDuplicateEmail_ReturnsErrorDetail()
   {
     var email = $"duplicate-{Guid.NewGuid()}@example.com";
     var request1 = new RegisterRequest
@@ -159,7 +159,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
   }
 
   [Fact]
-  public async Task Register_WithMissingRequiredFields_ReturnsValidationError()
+  public async Task Register_WithMissingRequiredFields_ReturnsErrorDetail()
   {
     var request = new RegisterRequest
     {
@@ -177,7 +177,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
   }
 
   [Fact]
-  public async Task Register_WithBlankFields_ReturnsValidationError()
+  public async Task Register_WithBlankFields_ReturnsErrorDetail()
   {
     var request = new RegisterRequest
     {
@@ -195,7 +195,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
   }
 
   [Fact]
-  public async Task Register_WithInvalidEmail_ReturnsValidationError()
+  public async Task Register_WithInvalidEmail_ReturnsErrorDetail()
   {
     var request = new RegisterRequest
     {
@@ -213,7 +213,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
   }
 
   [Fact]
-  public async Task Register_WithDuplicateUsername_ReturnsValidationError()
+  public async Task Register_WithDuplicateUsername_ReturnsErrorDetail()
   {
     var username = $"duplicate-username-{Guid.NewGuid()}";
     var request1 = new RegisterRequest
@@ -367,7 +367,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
   }
 
   [Fact]
-  public async Task UpdateUser_WithDuplicateEmail_ReturnsValidationError()
+  public async Task UpdateUser_WithDuplicateEmail_ReturnsErrorDetail()
   {
     var existingEmail = $"existing-{Guid.NewGuid()}@example.com";
 
@@ -415,7 +415,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
   }
 
   [Fact]
-  public async Task UpdateUser_WithDuplicateUsername_ReturnsValidationError()
+  public async Task UpdateUser_WithDuplicateUsername_ReturnsErrorDetail()
   {
     var existingUsername = $"existing-{Guid.NewGuid()}";
 
@@ -463,7 +463,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
   }
 
   [Fact]
-  public async Task UpdateUser_WithBlankFields_ReturnsValidationError()
+  public async Task UpdateUser_WithBlankFields_ReturnsErrorDetail()
   {
     var email = $"test-{Guid.NewGuid()}@example.com";
     var username = $"testuser-{Guid.NewGuid()}";

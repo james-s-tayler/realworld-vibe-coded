@@ -1,5 +1,5 @@
-﻿using Ardalis.Result;
-using MediatR;
+﻿using MediatR;
+using Server.SharedKernel.Result;
 
 namespace Server.SharedKernel.MediatR;
 

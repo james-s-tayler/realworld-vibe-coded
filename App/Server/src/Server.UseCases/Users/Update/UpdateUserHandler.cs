@@ -31,7 +31,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
     if (user == null)
     {
       _logger.LogWarning("User with ID {UserId} not found", request.UserId);
-      return Result.NotFound();
+      return Result<User>.NotFound();
     }
 
     // Check for duplicate email
@@ -43,7 +43,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       if (existingUserByEmail != null && existingUserByEmail.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Email {Email} already exists", request.Email);
-        return Result.Invalid(new ValidationError
+        return Result<User>.Invalid(new ErrorDetail
         {
           Identifier = "email",
           ErrorMessage = "Email already exists",
@@ -61,7 +61,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       if (existingUserByUsername != null && existingUserByUsername.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Username {Username} already exists", request.Username);
-        return Result.Invalid(new ValidationError
+        return Result<User>.Invalid(new ErrorDetail
         {
           Identifier = "username",
           ErrorMessage = "Username already exists",
@@ -89,18 +89,10 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       user.UpdateImage(request.Image);
     }
 
-    try
-    {
-      await _repository.UpdateAsync(user, cancellationToken);
+    await _repository.UpdateAsync(user, cancellationToken);
 
-      _logger.LogInformation("User {Username} updated successfully", user.Username);
+    _logger.LogInformation("User {Username} updated successfully", user.Username);
 
-      return Result.Success(user);
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, "Error during user update for {UserId}", request.UserId);
-      return Result.Error("An error occurred during update");
-    }
+    return Result<User>.Success(user);
   }
 }

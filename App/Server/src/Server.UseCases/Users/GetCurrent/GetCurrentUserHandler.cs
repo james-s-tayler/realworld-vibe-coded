@@ -27,11 +27,11 @@ public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
     if (user == null)
     {
       _logger.LogWarning("User with ID {UserId} not found", request.UserId);
-      return Result.NotFound();
+      return Result<User>.NotFound();
     }
 
     _logger.LogInformation("Retrieved current user {Username}", user.Username);
 
-    return Result.Success(user);
+    return Result<User>.Success(user);
   }
 }

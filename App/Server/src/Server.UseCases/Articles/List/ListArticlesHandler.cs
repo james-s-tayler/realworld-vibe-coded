@@ -17,6 +17,6 @@ public class ListArticlesHandler(IListArticlesQueryService _query)
       request.Offset,
       request.CurrentUserId);
 
-    return Result.Success(articles);
+    return Result<IEnumerable<Article>>.Success(articles);
   }
 }

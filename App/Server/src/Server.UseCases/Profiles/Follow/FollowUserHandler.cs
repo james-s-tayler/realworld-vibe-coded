@@ -16,7 +16,7 @@ public class FollowUserHandler(IRepository<User> _userRepository)
 
     if (userToFollow == null)
     {
-      return Result.NotFound("User not found");
+      return Result<User>.NotFound(request.Username);
     }
 
     // Get current user with following relationships
@@ -25,13 +25,13 @@ public class FollowUserHandler(IRepository<User> _userRepository)
 
     if (currentUser == null)
     {
-      return Result.NotFound("Current user not found");
+      return Result<User>.NotFound(request.CurrentUserId);
     }
 
     // Follow the user
     currentUser.Follow(userToFollow);
     await _userRepository.SaveChangesAsync(cancellationToken);
 
-    return Result.Success(userToFollow);
+    return Result<User>.Success(userToFollow);
   }
 }

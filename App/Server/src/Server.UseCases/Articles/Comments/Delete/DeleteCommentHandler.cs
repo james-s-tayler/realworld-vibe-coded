@@ -6,7 +6,7 @@ using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Comments.Delete;
 
-public class DeleteCommentHandler : ICommandHandler<DeleteCommentCommand, Unit>
+public class DeleteCommentHandler : ICommandHandler<DeleteCommentCommand, Comment>
 {
   private readonly IRepository<Article> _articleRepository;
   private readonly ILogger<DeleteCommentHandler> _logger;
@@ -19,26 +19,26 @@ public class DeleteCommentHandler : ICommandHandler<DeleteCommentCommand, Unit>
     _logger = logger;
   }
 
-  public async Task<Result<Unit>> Handle(DeleteCommentCommand request, CancellationToken cancellationToken)
+  public async Task<Result<Comment>> Handle(DeleteCommentCommand request, CancellationToken cancellationToken)
   {
     // Find the article
     var article = await _articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(request.Slug), cancellationToken);
     if (article == null)
     {
-      return Result<Unit>.NotFound("Article not found");
+      return Result<Comment>.ErrorMissingRequiredEntity(typeof(Article), request.Slug);
     }
 
     // Find the comment
     var comment = article.Comments.FirstOrDefault(c => c.Id == request.CommentId);
     if (comment == null)
     {
-      return Result<Unit>.NotFound("Comment not found");
+      return Result<Comment>.NotFound(request.CommentId);
     }
 
     // Check if the user is the author of the comment
     if (comment.AuthorId != request.UserId)
     {
-      return Result<Unit>.Forbidden("You can only delete your own comments");
+      return Result<Comment>.Forbidden(new ErrorDetail("Forbidden", "You can only delete your own comments"));
     }
 
     // Remove the comment
@@ -47,6 +47,6 @@ public class DeleteCommentHandler : ICommandHandler<DeleteCommentCommand, Unit>
 
     _logger.LogInformation("Comment {CommentId} deleted successfully", request.CommentId);
 
-    return Result<Unit>.Success(Unit.Value);
+    return Result<Comment>.NoContent();
   }
 }

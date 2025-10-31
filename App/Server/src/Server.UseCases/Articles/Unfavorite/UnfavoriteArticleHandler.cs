@@ -16,19 +16,19 @@ public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, I
 
     if (article == null)
     {
-      return Result.NotFound("Article not found");
+      return Result<Article>.NotFound(request.Slug);
     }
 
     var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
     if (user == null)
     {
-      return Result.Error("User not found");
+      return Result<Article>.ErrorMissingRequiredEntity(typeof(User), request.UserId);
     }
 
     article.RemoveFromFavorites(user);
     await _articleRepository.UpdateAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
-    return Result.Success(article);
+    return Result<Article>.Success(article);
   }
 }

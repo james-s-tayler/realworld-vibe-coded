@@ -6,26 +6,26 @@ using Server.SharedKernel.Persistence;
 namespace Server.UseCases.Articles.Delete;
 
 public class DeleteArticleHandler(IRepository<Article> _articleRepository)
-  : ICommandHandler<DeleteArticleCommand, Unit>
+  : ICommandHandler<DeleteArticleCommand, Article>
 {
-  public async Task<Result<Unit>> Handle(DeleteArticleCommand request, CancellationToken cancellationToken)
+  public async Task<Result<Article>> Handle(DeleteArticleCommand request, CancellationToken cancellationToken)
   {
     var article = await _articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(request.Slug), cancellationToken);
 
     if (article == null)
     {
-      return Result<Unit>.NotFound("Article not found");
+      return Result<Article>.NotFound(request.Slug);
     }
 
     if (article.AuthorId != request.UserId)
     {
-      return Result<Unit>.Forbidden("You can only delete your own articles");
+      return Result<Article>.Forbidden(new ErrorDetail("Forbidden", "You can only delete your own articles"));
     }
 
     await _articleRepository.DeleteAsync(article, cancellationToken);
     await _articleRepository.SaveChangesAsync(cancellationToken);
 
-    return Result<Unit>.NoContent();
+    return Result<Article>.NoContent();
   }
 }

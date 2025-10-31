@@ -18,7 +18,7 @@ public class GetCommentsHandler(IRepository<Article> _articleRepository, IReposi
 
     if (article == null)
     {
-      return Result.NotFound("Article not found");
+      return Result<CommentsResponse>.ErrorMissingRequiredEntity(typeof(Article), request.Slug);
     }
 
     // Get current user with following relationships if authenticated
@@ -31,6 +31,6 @@ public class GetCommentsHandler(IRepository<Article> _articleRepository, IReposi
 
     var commentDtos = article.Comments.Select(c => CommentMappers.MapToDto(c, currentUser)).ToList();
 
-    return Result.Success(new CommentsResponse(commentDtos));
+    return Result<CommentsResponse>.Success(new CommentsResponse(commentDtos));
   }
 }

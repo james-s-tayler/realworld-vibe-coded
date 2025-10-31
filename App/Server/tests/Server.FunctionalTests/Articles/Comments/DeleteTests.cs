@@ -80,11 +80,11 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task DeleteComment_WithNonExistentArticle_ReturnsNotFound()
+  public async Task DeleteComment_WithNonExistentArticle_ReturnsUnprocessableEntity()
   {
     var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = "no-such-article", Id = Guid.NewGuid() });
 
-    response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
   }
 
   [Fact]
@@ -109,7 +109,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task DeleteComment_WithInvalidCommentId_ReturnsValidationError()
+  public async Task DeleteComment_WithInvalidCommentId_ReturnsErrorDetail()
   {
     var createArticleRequest = new CreateArticleRequest
     {

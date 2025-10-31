@@ -123,7 +123,7 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task UpdateArticle_WithAllFieldsEmpty_ReturnsValidationError()
+  public async Task UpdateArticle_WithAllFieldsEmpty_ReturnsErrorDetail()
   {
     var createRequest = new CreateArticleRequest
     {

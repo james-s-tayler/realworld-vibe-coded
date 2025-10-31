@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using Ardalis.GuardClauses;
-using Ardalis.Result;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Server.SharedKernel.Result;
 
 namespace Server.SharedKernel.MediatR;
 

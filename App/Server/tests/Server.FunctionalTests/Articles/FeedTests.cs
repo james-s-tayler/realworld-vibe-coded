@@ -82,7 +82,7 @@ public class FeedTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task GetFeed_WithInvalidPagination_ReturnsValidationError()
+  public async Task GetFeed_WithInvalidPagination_ReturnsErrorDetail()
   {
     var feedRequest = new FeedRequest { Limit = 0, Offset = -1 };
     var (response, _) = await App.ArticlesUser1Client.GETAsync<Feed, FeedRequest, object>(feedRequest);

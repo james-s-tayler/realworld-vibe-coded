@@ -33,7 +33,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
     if (existingUserByEmail != null)
     {
       _logger.LogWarning("Registration failed: Email {Email} already exists", request.Email);
-      return Result.Invalid(new ValidationError
+      return Result<User>.Invalid(new ErrorDetail
       {
         Identifier = nameof(request.Email),
         ErrorMessage = "Email already exists",
@@ -46,7 +46,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
     if (existingUserByUsername != null)
     {
       _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
-      return Result.Invalid(new ValidationError
+      return Result<User>.Invalid(new ErrorDetail
       {
         Identifier = nameof(request.Username),
         ErrorMessage = "Username already exists",
@@ -57,19 +57,11 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
     var hashedPassword = _passwordHasher.HashPassword(request.Password);
     var newUser = new User(request.Email, request.Username, hashedPassword);
 
-    try
-    {
-      var createdUser = await _repository.AddAsync(newUser, cancellationToken);
+    var createdUser = await _repository.AddAsync(newUser, cancellationToken);
 
-      _logger.LogInformation("User {Username} registered successfully with ID {UserId}",
-        createdUser.Username, createdUser.Id);
+    _logger.LogInformation("User {Username} registered successfully with ID {UserId}",
+      createdUser.Username, createdUser.Id);
 
-      return Result.Created(createdUser);
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, "Error during user registration for {Email}", request.Email);
-      return Result.Error("An error occurred during registration");
-    }
+    return Result<User>.Created(createdUser);
   }
 }

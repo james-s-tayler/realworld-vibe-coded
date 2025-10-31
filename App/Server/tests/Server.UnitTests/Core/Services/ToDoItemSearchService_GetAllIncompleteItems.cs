@@ -25,7 +25,7 @@ namespace Server.UnitTests.Core.Services
             var result = await _searchService.GetAllIncompleteItemsAsync(null);
 
             Assert.Equal(Server.SharedKernel.Result.ResultStatus.Invalid, result.Status);
-            Assert.Equal("searchString is required.", result.ValidationErrors.First().ErrorMessage);
+            Assert.Equal("searchString is required.", result.ErrorDetails.First().ErrorMessage);
         }
 
         [Fact]
