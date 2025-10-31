@@ -1,2 +1,1 @@
-﻿global using MediatR;
-global using Server.SharedKernel.Result;
+﻿global using Server.SharedKernel.Result;

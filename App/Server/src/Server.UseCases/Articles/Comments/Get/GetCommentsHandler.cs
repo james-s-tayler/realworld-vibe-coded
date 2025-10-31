@@ -18,7 +18,7 @@ public class GetCommentsHandler(IRepository<Article> _articleRepository, IReposi
 
     if (article == null)
     {
-      return Result<CommentsResponse>.NotFound(request.Slug);
+      return Result<CommentsResponse>.ErrorMissingRequiredEntity(typeof(Article), request.Slug);
     }
 
     // Get current user with following relationships if authenticated

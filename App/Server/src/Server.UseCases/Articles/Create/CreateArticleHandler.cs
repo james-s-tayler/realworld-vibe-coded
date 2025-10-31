@@ -18,7 +18,7 @@ public class CreateArticleHandler(
     var author = await _userRepository.GetByIdAsync(request.AuthorId, cancellationToken);
     if (author == null)
     {
-      return Result<Article>.Error(new ErrorDetail("Error", "Author not found"));
+      return Result<Article>.ErrorMissingRequiredEntity(typeof(User), request.AuthorId);
     }
 
     // Check for duplicate slug

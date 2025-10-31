@@ -103,11 +103,11 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task GetComments_WithNonExistentArticle_ReturnsNotFound()
+  public async Task GetComments_WithNonExistentArticle_ReturnsUnprocessableEntity()
   {
     var (response, _) = await App.Client.GETAsync<Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = "no-such-article" });
 
-    response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
   }
 
   [Fact]
@@ -141,6 +141,6 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = commentId });
 
-    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
   }
 }

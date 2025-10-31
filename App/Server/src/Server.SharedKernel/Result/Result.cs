@@ -174,6 +174,32 @@ public class Result<T>
     new(ResultStatus.Error) { ErrorDetails = errorDetails };
 
   /// <summary>
+  /// Represents an error where a required entity for processing is missing.
+  /// </summary>
+  /// <param name="entityType">The type of the required entity that is missing.</param>
+  /// <returns>A Result<typeparamref name="T"/></returns>
+  public static Result<T> ErrorMissingRequiredEntity(Type entityType) =>
+    Error(new ErrorDetail(entityType.Name, $"{entityType.Name} is required for processing, but is missing."));
+
+  /// <summary>
+  /// Represents an error where a required entity for processing is missing, identified by a Guid.
+  /// </summary>
+  /// <param name="entityType">The type of the required entity that is missing.</param>
+  /// <param name="id">The Guid identifier of the missing entity.</param>
+  /// <returns>A Result<typeparamref name="T"/></returns>
+  public static Result<T> ErrorMissingRequiredEntity(Type entityType, Guid id) =>
+    Error(new ErrorDetail(entityType.Name, $"{entityType.Name} identified by {id} is required for processing, but is missing."));
+
+  /// <summary>
+  /// Represents an error where a required entity for processing is missing, identified by a string.
+  /// </summary>
+  /// <param name="entityType">The type of the required entity that is missing.</param>
+  /// <param name="identifier">The string identifier of the missing entity.</param>
+  /// <returns>A Result<typeparamref name="T"/></returns>
+  public static Result<T> ErrorMissingRequiredEntity(Type entityType, string identifier) =>
+    Error(new ErrorDetail(entityType.Name, $"{entityType.Name} identified by {identifier} is required for processing, but is missing."));
+
+  /// <summary>
   /// Represents a situation where a service is in conflict due to the current state of a resource,
   /// such as an edit conflict between multiple concurrent updates.
   /// See also HTTP 409 Conflict: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors

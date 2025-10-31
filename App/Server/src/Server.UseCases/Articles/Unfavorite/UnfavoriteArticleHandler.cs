@@ -22,7 +22,7 @@ public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, I
     var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
     if (user == null)
     {
-      return Result<Article>.NotFound(request.UserId);
+      return Result<Article>.ErrorMissingRequiredEntity(typeof(User), request.UserId);
     }
 
     article.RemoveFromFavorites(user);

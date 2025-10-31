@@ -38,7 +38,7 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
     var user = await _userRepository.GetByIdAsync(request.AuthorId, cancellationToken);
     if (user == null)
     {
-      return Result<CommentResponse>.NotFound(request.AuthorId);
+      return Result<CommentResponse>.ErrorMissingRequiredEntity(typeof(User), request.AuthorId);
     }
 
     // Create the comment
