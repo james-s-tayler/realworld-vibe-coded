@@ -207,6 +207,40 @@ public class ResultTests
   }
 
   [Fact]
+  public void NotFound_WithTypeAndGuid_ShouldCreateNotFoundResultWithErrorDetail()
+  {
+    // Arrange
+    var id = Guid.NewGuid();
+
+    // Act
+    var result = Result<string>.NotFound(typeof(int), id);
+
+    // Assert
+    result.IsSuccess.ShouldBeFalse();
+    result.Status.ShouldBe(ResultStatus.NotFound);
+    result.ErrorDetails.Count().ShouldBe(1);
+    result.ErrorDetails.First().Identifier.ShouldBe("Int32");
+    result.ErrorDetails.First().ErrorMessage.ShouldBe($"Int32 identified by {id} was not found");
+  }
+
+  [Fact]
+  public void NotFound_WithTypeAndString_ShouldCreateNotFoundResultWithErrorDetail()
+  {
+    // Arrange
+    var identifier = "test-slug";
+
+    // Act
+    var result = Result<string>.NotFound(typeof(int), identifier);
+
+    // Assert
+    result.IsSuccess.ShouldBeFalse();
+    result.Status.ShouldBe(ResultStatus.NotFound);
+    result.ErrorDetails.Count().ShouldBe(1);
+    result.ErrorDetails.First().Identifier.ShouldBe("Int32");
+    result.ErrorDetails.First().ErrorMessage.ShouldBe($"Int32 identified by {identifier} was not found");
+  }
+
+  [Fact]
   public void Forbidden_WithoutParameters_ShouldCreateForbiddenResult()
   {
     // Act

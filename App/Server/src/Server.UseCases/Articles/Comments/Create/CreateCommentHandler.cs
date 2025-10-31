@@ -31,7 +31,7 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
     var article = await _articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(request.Slug), cancellationToken);
     if (article == null)
     {
-      return Result<CommentResponse>.NotFound(request.Slug);
+      return Result<CommentResponse>.NotFound(typeof(Article), request.Slug);
     }
 
     // Find the user

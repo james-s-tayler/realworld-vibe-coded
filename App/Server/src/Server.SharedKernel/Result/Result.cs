@@ -125,6 +125,24 @@ public class Result<T>
     NotFound(new ErrorDetail($"{typeof(T).Name}", $"{typeof(T).Name} identified by {identifier} was not found"));
 
   /// <summary>
+  /// Represents the situation where a service was unable to find a requested resource of a specific type identified by a Guid.
+  /// </summary>
+  /// <param name="entityType">The type of the resource that was not found.</param>
+  /// <param name="id">The Guid identifier of the resource that was not found.</param>
+  /// <returns>A Result<typeparamref name="T"/></returns>
+  public static Result<T> NotFound(Type entityType, Guid id) =>
+    NotFound(new ErrorDetail(entityType.Name, $"{entityType.Name} identified by {id} was not found"));
+
+  /// <summary>
+  /// Represents the situation where a service was unable to find a requested resource of a specific type identified by a string.
+  /// </summary>
+  /// <param name="entityType">The type of the resource that was not found.</param>
+  /// <param name="identifier">The string identifier of the resource that was not found.</param>
+  /// <returns>A Result<typeparamref name="T"/></returns>
+  public static Result<T> NotFound(Type entityType, string identifier) =>
+    NotFound(new ErrorDetail(entityType.Name, $"{entityType.Name} identified by {identifier} was not found"));
+
+  /// <summary>
   /// Represents the situation where a service was unable to find a requested resource.
   /// Error details may be provided and will be exposed via the ErrorDetails property.
   /// </summary>
