@@ -36,7 +36,7 @@ public class UnfollowUserHandler(IRepository<User> _userRepository)
 
     // Unfollow the user
     currentUser.Unfollow(userToUnfollow);
-    await _userRepository.SaveChangesAsync(cancellationToken);
+    await _userRepository.UpdateAsync(currentUser, cancellationToken);
 
     return Result<User>.Success(userToUnfollow);
   }

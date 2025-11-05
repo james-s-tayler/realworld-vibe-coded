@@ -24,7 +24,6 @@ public class DeleteArticleHandler(IRepository<Article> _articleRepository)
     }
 
     await _articleRepository.DeleteAsync(article, cancellationToken);
-    await _articleRepository.SaveChangesAsync(cancellationToken);
 
     return Result<Article>.NoContent();
   }

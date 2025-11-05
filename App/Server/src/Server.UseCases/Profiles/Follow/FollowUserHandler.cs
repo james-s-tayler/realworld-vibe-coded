@@ -30,7 +30,7 @@ public class FollowUserHandler(IRepository<User> _userRepository)
 
     // Follow the user
     currentUser.Follow(userToFollow);
-    await _userRepository.SaveChangesAsync(cancellationToken);
+    await _userRepository.UpdateAsync(currentUser, cancellationToken);
 
     return Result<User>.Success(userToFollow);
   }

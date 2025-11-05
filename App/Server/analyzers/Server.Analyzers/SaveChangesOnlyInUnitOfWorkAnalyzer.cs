@@ -18,11 +18,11 @@ namespace Server.Analyzers
     private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
         DiagnosticId,
         "No SaveChanges/SaveChangesAsync outside UnitOfWork",
-        "Call SaveChanges/SaveChangesAsync only in IUnitOfWork implementations. Use IUnitOfWork.CommitAsync() to centralize transactions and domain event dispatch.",
+        "Call SaveChanges/SaveChangesAsync only in IUnitOfWork implementations. Use IUnitOfWork.ExecuteInTransactionAsync() to centralize transactions and domain event dispatch.",
         "Persistence",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "DbContext.SaveChanges/SaveChangesAsync should only be called within classes implementing IUnitOfWork to centralize transaction management and domain event dispatch.");
+        description: "SaveChanges/SaveChangesAsync on DbContext or IRepository should only be called within classes implementing IUnitOfWork to centralize transaction management and domain event dispatch.");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(Rule);
@@ -51,15 +51,18 @@ namespace Server.Analyzers
         return;
       }
 
-      // Check if it's from DbContext
+      // Check if it's from DbContext or IRepository
       var containingType = methodSymbol.ContainingType;
       if (containingType == null)
       {
         return;
       }
 
-      // Check if the containing type is or derives from DbContext
-      if (!IsDbContextOrDerived(containingType))
+      // Check if the containing type is or derives from DbContext OR implements IRepository
+      var isDbContext = IsDbContextOrDerived(containingType);
+      var isRepository = IsRepositoryOrDerived(containingType);
+
+      if (!isDbContext && !isRepository)
       {
         return;
       }
@@ -95,6 +98,12 @@ namespace Server.Analyzers
         return;
       }
 
+      // Allow if the class itself is a Repository implementation (defining the method)
+      if (IsRepositoryOrDerived(classSymbol))
+      {
+        return;
+      }
+
       // Otherwise, must implement IUnitOfWork
       if (!ImplementsIUnitOfWork(classSymbol))
       {
@@ -115,6 +124,46 @@ namespace Server.Analyzers
         }
         current = current.BaseType;
       }
+      return false;
+    }
+
+    private static bool IsRepositoryOrDerived(INamedTypeSymbol type)
+    {
+      // Check if the type itself implements IRepository or IRepositoryBase interfaces
+      foreach (var @interface in type.AllInterfaces)
+      {
+        var interfaceName = @interface.Name;
+        var namespaceName = @interface.ContainingNamespace?.ToDisplayString() ?? string.Empty;
+
+        // Check for IRepository from Server.SharedKernel.Persistence
+        if (interfaceName == "IRepository" && namespaceName.Contains("Server.SharedKernel"))
+        {
+          return true;
+        }
+
+        // Check for IRepositoryBase from Ardalis.Specification
+        if (interfaceName == "IRepositoryBase" && namespaceName.Contains("Ardalis.Specification"))
+        {
+          return true;
+        }
+      }
+
+      // Check if the type is or derives from RepositoryBase (Ardalis.Specification)
+      var current = type;
+      while (current != null)
+      {
+        var typeName = current.Name;
+        var namespaceName = current.ContainingNamespace?.ToDisplayString() ?? string.Empty;
+
+        // Check for RepositoryBase from Ardalis.Specification
+        if (typeName.Contains("RepositoryBase") && namespaceName.Contains("Ardalis.Specification"))
+        {
+          return true;
+        }
+
+        current = current.BaseType;
+      }
+
       return false;
     }
 

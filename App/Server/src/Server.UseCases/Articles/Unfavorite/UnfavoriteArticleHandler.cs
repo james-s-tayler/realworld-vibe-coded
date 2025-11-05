@@ -27,7 +27,6 @@ public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, I
 
     article.RemoveFromFavorites(user);
     await _articleRepository.UpdateAsync(article, cancellationToken);
-    await _articleRepository.SaveChangesAsync(cancellationToken);
 
     return Result<Article>.Success(article);
   }

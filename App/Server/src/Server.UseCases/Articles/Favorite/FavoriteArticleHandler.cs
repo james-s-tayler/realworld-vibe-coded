@@ -27,7 +27,6 @@ public class FavoriteArticleHandler(IRepository<Article> _articleRepository, IRe
 
     article.AddToFavorites(user);
     await _articleRepository.UpdateAsync(article, cancellationToken);
-    await _articleRepository.SaveChangesAsync(cancellationToken);
 
     return Result<Article>.Success(article);
   }

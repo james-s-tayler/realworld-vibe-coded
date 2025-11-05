@@ -46,7 +46,9 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
 
     // Add it to the article
     article.Comments.Add(comment);
-    await _articleRepository.SaveChangesAsync(cancellationToken);
+
+    // Update the article to let EF Core track the change
+    await _articleRepository.UpdateAsync(article, cancellationToken);
 
     _logger.LogInformation("Comment created successfully with ID {CommentId}", comment.Id);
 
