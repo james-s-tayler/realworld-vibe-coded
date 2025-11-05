@@ -70,6 +70,9 @@ public class UnitOfWork : IUnitOfWork
         // Check if the result is successful
         if (result.IsSuccess)
         {
+          // Save changes to the database before committing the transaction
+          await _dbContext.SaveChangesAsync(cancellationToken);
+
           // Commit transaction on success
           await transaction.CommitAsync(cancellationToken);
           scope.SetCustomField("TransactionStatus", "Committed");

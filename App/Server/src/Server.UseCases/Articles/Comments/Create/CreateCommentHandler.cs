@@ -47,6 +47,16 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
     // Add it to the article
     article.Comments.Add(comment);
 
+    // Update the article to let EF Core track the change
+    await _articleRepository.UpdateAsync(article, cancellationToken);
+
+    // PV012: We need to call SaveChangesAsync here to populate database-generated values (Id, CreatedAt, UpdatedAt)
+    // before returning the response. The UnitOfWork transaction is still open and will commit after this handler completes.
+    // This is an exception to the rule because we need to return the comment with its timestamps in the response.
+#pragma warning disable PV012
+    await _articleRepository.SaveChangesAsync(cancellationToken);
+#pragma warning restore PV012
+
     _logger.LogInformation("Comment created successfully with ID {CommentId}", comment.Id);
 
     // Check if current user is following the comment author
