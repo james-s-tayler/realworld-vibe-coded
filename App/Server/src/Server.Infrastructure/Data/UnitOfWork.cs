@@ -71,6 +71,9 @@ public class UnitOfWork : IUnitOfWork
         if (result.IsSuccess)
         {
           // Save changes to the database before committing the transaction
+          // Repository methods like AddAsync, UpdateAsync, DeleteAsync from Ardalis.Specification do NOT
+          // automatically call SaveChangesAsync. They only track changes in EF Core's ChangeTracker.
+          // We must call SaveChangesAsync here to persist all tracked changes before committing the transaction.
           await _dbContext.SaveChangesAsync(cancellationToken);
 
           // Commit transaction on success
