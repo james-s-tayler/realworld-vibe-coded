@@ -84,6 +84,20 @@ end_of_line = crlf
 dotnet_diagnostic.IDE0005.severity = error
 # Enforce formatting rules (whitespace, indentation, etc.)
 dotnet_diagnostic.IDE0055.severity = error
+# StyleCop: Suppress file header requirements
+dotnet_diagnostic.SA1633.severity = none
+dotnet_diagnostic.SA0001.severity = none
+# StyleCop: Make all StyleCop rules warnings by default
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.SpacingRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.ReadabilityRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.OrderingRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.NamingRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.LayoutRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = suggestion
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.MaintainabilityRules.severity = suggestion
+# StyleCop: Enforce specific rules as errors
+dotnet_diagnostic.SA1402.severity = error
+dotnet_diagnostic.SA1503.severity = error
 # var preferences
 csharp_style_var_for_built_in_types = true:silent
 csharp_style_var_when_type_is_apparent = true:silent

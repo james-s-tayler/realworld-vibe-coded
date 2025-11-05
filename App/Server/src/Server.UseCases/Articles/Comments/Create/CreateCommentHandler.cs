@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
-using Server.Core.ArticleAggregate.Specifications;
+using Server.Core.ArticleAggregate.Specifications.Articles;
 using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
 using Server.SharedKernel.MediatR;

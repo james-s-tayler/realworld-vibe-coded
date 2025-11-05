@@ -34,8 +34,3 @@ public class Get(IMediator _mediator, IUserContext userContext) : Endpoint<GetCo
     await Send.ResultValueAsync(result, cancellationToken);
   }
 }
-
-public class GetCommentsRequest
-{
-  public string Slug { get; set; } = string.Empty;
-}

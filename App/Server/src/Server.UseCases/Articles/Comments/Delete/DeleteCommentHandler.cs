@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Server.Core.ArticleAggregate;
-using Server.Core.ArticleAggregate.Specifications;
+using Server.Core.ArticleAggregate.Specifications.Articles;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
 

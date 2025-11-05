@@ -35,7 +35,9 @@ public class BanSystemIOAnalyzer : DiagnosticAnalyzer
     // Check if this is a member access on System.IO types
     var symbolInfo = context.SemanticModel.GetSymbolInfo(memberAccess.Expression);
     if (symbolInfo.Symbol == null)
+    {
       return;
+    }
 
     INamedTypeSymbol typeSymbol = null;
     if (symbolInfo.Symbol is INamedTypeSymbol type)
@@ -52,7 +54,9 @@ public class BanSystemIOAnalyzer : DiagnosticAnalyzer
     }
 
     if (typeSymbol == null)
+    {
       return;
+    }
 
     // Check if the type is File, Directory, or Path from System.IO
     if (IsBannedSystemIOType(typeSymbol))
@@ -73,7 +77,9 @@ public class BanSystemIOAnalyzer : DiagnosticAnalyzer
     // Get the method being invoked
     var symbolInfo = context.SemanticModel.GetSymbolInfo(invocation);
     if (!(symbolInfo.Symbol is IMethodSymbol methodSymbol))
+    {
       return;
+    }
 
     // Check if the method belongs to a banned System.IO type
     if (IsBannedSystemIOType(methodSymbol.ContainingType))
@@ -90,7 +96,9 @@ public class BanSystemIOAnalyzer : DiagnosticAnalyzer
   private static bool IsBannedSystemIOType(INamedTypeSymbol typeSymbol)
   {
     if (typeSymbol == null)
+    {
       return false;
+    }
 
     // Check if it's System.IO.File, System.IO.Directory, or System.IO.Path
     var bannedTypes = new[] { "File", "Directory", "Path" };

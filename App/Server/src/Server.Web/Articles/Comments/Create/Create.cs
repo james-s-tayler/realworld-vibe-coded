@@ -36,13 +36,3 @@ public class Create(IMediator _mediator, IUserContext userContext) : Endpoint<Cr
     await Send.ResultValueAsync(result, cancellationToken);
   }
 }
-
-public class CreateCommentRequest
-{
-  public CreateCommentDto Comment { get; set; } = default!;
-}
-
-public class CreateCommentDto
-{
-  public string Body { get; set; } = string.Empty;
-}

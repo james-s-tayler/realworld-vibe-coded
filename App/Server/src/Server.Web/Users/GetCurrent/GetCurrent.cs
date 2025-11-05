@@ -1,7 +1,6 @@
 ﻿using Server.Core.Interfaces;
 using Server.Infrastructure;
 using Server.UseCases.Users.GetCurrent;
-using Server.Web.Users.Register;
 
 namespace Server.Web.Users.GetCurrent;
 
@@ -35,9 +34,4 @@ public class GetCurrent(IMediator _mediator, IUserContext userContext) : Endpoin
       User = Map.FromEntity(userDto)
     }, cancellationToken);
   }
-}
-
-public class UserCurrentResponse
-{
-  public UserResponse User { get; set; } = default!;
 }

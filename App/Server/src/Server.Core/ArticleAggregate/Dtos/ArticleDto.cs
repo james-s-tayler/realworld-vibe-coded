@@ -12,10 +12,3 @@ public record ArticleDto(
   int FavoritesCount,
   AuthorDto Author
 );
-
-public record AuthorDto(
-  string Username,
-  string Bio,
-  string? Image,
-  bool Following
-);

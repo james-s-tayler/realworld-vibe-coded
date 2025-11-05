@@ -34,14 +34,18 @@ public class NukeTargetDescriptionAnalyzer : DiagnosticAnalyzer
 
     // Check if this is a Target property (has type "Target")
     if (!IsTargetProperty(propertyDeclaration))
+    {
       return;
+    }
 
     // Get the property name
     var propertyName = propertyDeclaration.Identifier.ValueText;
 
     // Skip if this is an overridden property or has certain attributes that indicate it's not a user target
     if (ShouldSkipTarget(propertyName))
+    {
       return;
+    }
 
     // Check if the property expression contains a .Description() call
     if (!HasDescriptionCall(propertyDeclaration))
