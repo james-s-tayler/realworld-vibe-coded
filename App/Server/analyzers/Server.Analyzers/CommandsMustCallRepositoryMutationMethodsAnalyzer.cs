@@ -24,7 +24,7 @@ namespace Server.Analyzers
         "Architecture",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: "Command handlers should call at least one repository mutation method to ensure changes are tracked by EF Core. Without these calls, the UnitOfWork's SaveChangesAsync won't persist any changes.");
+        description: "Command handlers should call at least one repository mutation method to ensure changes are tracked by EF Core. Without these calls, the UnitOfWork's CommitTransaction won't persist any changes.");
 
     private static readonly string[] MutationMethods = new[]
     {
