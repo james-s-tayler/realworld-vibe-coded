@@ -37,11 +37,3 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     return tokenHandler.WriteToken(token);
   }
 }
-
-public class JwtSettings
-{
-  public string Secret { get; set; } = default!;
-  public string Issuer { get; set; } = default!;
-  public string Audience { get; set; } = default!;
-  public int ExpirationInDays { get; set; } = 7;
-}

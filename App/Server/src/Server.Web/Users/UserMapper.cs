@@ -1,6 +1,5 @@
 ﻿using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
-using Server.Web.Users.Register;
 
 namespace Server.Web.Users;
 

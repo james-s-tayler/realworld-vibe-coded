@@ -39,16 +39,3 @@ public class Update(IMediator _mediator, IUserContext userContext) : Endpoint<Up
     await Send.ResultMapperAsync(result, article => Map.FromEntity(article), cancellationToken);
   }
 }
-
-public class UpdateArticleRequest
-{
-  public string Slug { get; set; } = string.Empty;
-  public UpdateArticleData Article { get; set; } = new();
-}
-
-public class UpdateArticleData
-{
-  public string? Title { get; set; } = null;
-  public string? Description { get; set; } = null;
-  public string? Body { get; set; } = null;
-}

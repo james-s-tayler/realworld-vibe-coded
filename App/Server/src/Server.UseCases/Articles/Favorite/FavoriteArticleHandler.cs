@@ -1,5 +1,5 @@
 ﻿using Server.Core.ArticleAggregate;
-using Server.Core.ArticleAggregate.Specifications;
+using Server.Core.ArticleAggregate.Specifications.Articles;
 using Server.Core.UserAggregate;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
