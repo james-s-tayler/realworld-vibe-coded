@@ -46,7 +46,6 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
 
     // Add it to the article
     article.Comments.Add(comment);
-    await _articleRepository.SaveChangesAsync(cancellationToken);
 
     _logger.LogInformation("Comment created successfully with ID {CommentId}", comment.Id);
 

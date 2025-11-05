@@ -46,7 +46,6 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
 
     article.Update(newTitle, newDescription, newBody);
     await _articleRepository.UpdateAsync(article, cancellationToken);
-    await _articleRepository.SaveChangesAsync(cancellationToken);
 
     return Result<Article>.Success(article);
   }

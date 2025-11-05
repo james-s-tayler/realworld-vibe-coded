@@ -43,7 +43,6 @@ public class DeleteCommentHandler : ICommandHandler<DeleteCommentCommand, Commen
 
     // Remove the comment
     article.Comments.Remove(comment);
-    await _articleRepository.SaveChangesAsync(cancellationToken);
 
     _logger.LogInformation("Comment {CommentId} deleted successfully", request.CommentId);
 
