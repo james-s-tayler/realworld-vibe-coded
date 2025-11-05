@@ -46,7 +46,9 @@ public class NukeTargetLocationAnalyzer : DiagnosticAnalyzer
 
     // Check if this is a Target property (has type "Target")
     if (!IsTargetProperty(propertyDeclaration))
+    {
       return;
+    }
 
     // Get the file name
     var filePath = propertyDeclaration.SyntaxTree.FilePath;
