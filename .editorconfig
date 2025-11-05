@@ -96,9 +96,7 @@ dotnet_analyzer_diagnostic.category-StyleCop.CSharp.LayoutRules.severity = sugge
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = suggestion
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.MaintainabilityRules.severity = suggestion
 # StyleCop: Enforce specific rules as errors
-# TODO: Re-enable SA1402 after fixing all violations
-# dotnet_diagnostic.SA1402.severity = error
-dotnet_diagnostic.SA1402.severity = none
+dotnet_diagnostic.SA1402.severity = error
 dotnet_diagnostic.SA1503.severity = error
 # var preferences
 csharp_style_var_for_built_in_types = true:silent
