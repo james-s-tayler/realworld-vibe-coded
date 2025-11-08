@@ -104,9 +104,9 @@ dotnet_diagnostic.SA1516.severity = error
 # StyleCop: change to error
 dotnet_diagnostic.SA1502.severity = error
 dotnet_diagnostic.SA1413.severity = error
-dotnet_diagnostic.SA1649.severity = none
+dotnet_diagnostic.SA1649.severity = error
 dotnet_diagnostic.SA1116.severity = error
-dotnet_diagnostic.SA1202.severity = none
+dotnet_diagnostic.SA1202.severity = error
 dotnet_diagnostic.SA1313.severity = error
 dotnet_diagnostic.SA1117.severity = error
 dotnet_diagnostic.SA1515.severity = error
@@ -117,7 +117,7 @@ dotnet_diagnostic.SA1121.severity = error
 dotnet_diagnostic.SA1505.severity = error
 dotnet_diagnostic.SA1508.severity = error
 dotnet_diagnostic.SA1005.severity = error
-dotnet_diagnostic.SA1204.severity = none
+dotnet_diagnostic.SA1204.severity = error
 dotnet_diagnostic.SA1028.severity = error
 dotnet_diagnostic.SA1129.severity = error
 

@@ -42,6 +42,18 @@ public class Article : EntityBase, IAggregateRoot
 
   public int FavoritesCount => FavoritedBy.Count;
 
+  public static string GenerateSlug(string title)
+  {
+    return title.ToLowerInvariant()
+      .Replace(" ", "-")
+      .Replace(".", string.Empty)
+      .Replace(",", string.Empty)
+      .Replace("!", string.Empty)
+      .Replace("?", string.Empty)
+      .Replace("'", string.Empty)
+      .Replace("\"", string.Empty);
+  }
+
   /// <summary>
   /// Checks if the article is favorited by a specific user
   /// </summary>
@@ -66,18 +78,6 @@ public class Article : EntityBase, IAggregateRoot
     }
 
     return user.IsFollowing(AuthorId);
-  }
-
-  public static string GenerateSlug(string title)
-  {
-    return title.ToLowerInvariant()
-      .Replace(" ", "-")
-      .Replace(".", string.Empty)
-      .Replace(",", string.Empty)
-      .Replace("!", string.Empty)
-      .Replace("?", string.Empty)
-      .Replace("'", string.Empty)
-      .Replace("\"", string.Empty);
   }
 
   public void Update(string title, string description, string body)

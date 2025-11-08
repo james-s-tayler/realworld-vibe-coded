@@ -4,9 +4,9 @@ namespace Server.SharedKernel.Result;
 
 public class Result<T>
 {
-  protected Result()
-  {
-  }
+  public static implicit operator T(Result<T> result) => result.Value;
+
+  public static implicit operator Result<T>(T value) => new Result<T>(value);
 
   public Result(T value) => Value = value;
 
@@ -14,9 +14,9 @@ public class Result<T>
 
   protected internal Result(ResultStatus status) => Status = status;
 
-  public static implicit operator T(Result<T> result) => result.Value;
-
-  public static implicit operator Result<T>(T value) => new Result<T>(value);
+  protected Result()
+  {
+  }
 
   [JsonInclude]
   public T Value { get; init; } = default!;
@@ -40,12 +40,6 @@ public class Result<T>
 
   [JsonInclude]
   public IEnumerable<ErrorDetail> ErrorDetails { get; protected set; } = [];
-
-  /// <summary>
-  /// Returns the current value.
-  /// </summary>
-  /// <returns></returns>
-  public object? GetValue() => this.Value;
 
   /// <summary>
   /// Represents a successful operation and accepts a values as the result of the operation
@@ -144,15 +138,6 @@ public class Result<T>
   /// <returns>A Result<typeparamref name="T"/></returns>
   public static Result<T> NotFound(Type entityType, string identifier) =>
     NotFound(new ErrorDetail(entityType.Name, $"{entityType.Name} identified by {identifier} was not found"));
-
-  /// <summary>
-  /// Represents the situation where a service was unable to find a requested resource.
-  /// Error details may be provided and will be exposed via the ErrorDetails property.
-  /// </summary>
-  /// <param name="errorDetails">A list of error details.</param>
-  /// <returns>A Result<typeparamref name="T"/></returns>
-  private static Result<T> NotFound(params ErrorDetail[] errorDetails) =>
-    new(ResultStatus.NotFound) { ErrorDetails = errorDetails };
 
   /// <summary>
   /// The parameters to the call were correct, but the user does not have permission to perform some action.
@@ -313,4 +298,19 @@ public class Result<T>
   /// <typeparam name="T">The type parameter representing the expected response data.</typeparam>
   /// <returns>A Result object</returns>
   public static Result<T> NoContent() => new(ResultStatus.NoContent);
+
+  /// <summary>
+  /// Returns the current value.
+  /// </summary>
+  /// <returns></returns>
+  public object? GetValue() => this.Value;
+
+  /// <summary>
+  /// Represents the situation where a service was unable to find a requested resource.
+  /// Error details may be provided and will be exposed via the ErrorDetails property.
+  /// </summary>
+  /// <param name="errorDetails">A list of error details.</param>
+  /// <returns>A Result<typeparamref name="T"/></returns>
+  private static Result<T> NotFound(params ErrorDetail[] errorDetails) =>
+    new(ResultStatus.NotFound) { ErrorDetails = errorDetails };
 }
