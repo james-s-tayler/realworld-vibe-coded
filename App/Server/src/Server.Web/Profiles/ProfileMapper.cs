@@ -11,7 +11,7 @@ namespace Server.Web.Profiles;
 /// </summary>
 public class ProfileMapper : ResponseMapper<ProfileResponse, User>
 {
-  public override ProfileResponse FromEntity(User user)
+  public override async Task<ProfileResponse> FromEntityAsync(User user, CancellationToken ct)
   {
     // Resolve current user service to get authentication context
     var currentUserService = Resolve<IUserContext>();
@@ -23,8 +23,8 @@ public class ProfileMapper : ResponseMapper<ProfileResponse, User>
     {
       // Get the current user to check if they are following
       var userRepository = Resolve<IRepository<User>>();
-      var currentUser = userRepository.FirstOrDefaultAsync(
-        new UserWithFollowingSpec(currentUserId.Value)).GetAwaiter().GetResult();
+      var currentUser = await userRepository.FirstOrDefaultAsync(
+        new UserWithFollowingSpec(currentUserId.Value), ct);
 
       if (currentUser != null)
       {

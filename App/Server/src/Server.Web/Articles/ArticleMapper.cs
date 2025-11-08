@@ -13,7 +13,7 @@ namespace Server.Web.Articles;
 /// </summary>
 public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
 {
-  public override ArticleResponse FromEntity(Article article)
+  public override async Task<ArticleResponse> FromEntityAsync(Article article, CancellationToken ct)
   {
     // Resolve current user service to get authentication context
     var currentUserService = Resolve<IUserContext>();
@@ -28,7 +28,7 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
     {
       var userRepository = Resolve<IRepository<User>>();
       var userSpec = new Server.Core.UserAggregate.Specifications.UserWithFollowingSpec(currentUserId.Value);
-      currentUser = userRepository.FirstOrDefaultAsync(userSpec).GetAwaiter().GetResult();
+      currentUser = await userRepository.FirstOrDefaultAsync(userSpec, ct);
     }
 
     // Use domain method to check if current user follows the article author
