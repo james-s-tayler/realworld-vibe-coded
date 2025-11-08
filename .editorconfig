@@ -100,6 +100,8 @@ dotnet_diagnostic.SA1402.severity = error
 dotnet_diagnostic.SA1503.severity = error
 dotnet_diagnostic.SA1122.severity = error
 dotnet_diagnostic.SA1516.severity = error
+
+# StyleCop: change to error
 dotnet_diagnostic.SA1502.severity = none
 dotnet_diagnostic.SA1413.severity = none
 dotnet_diagnostic.SA1649.severity = none
@@ -119,7 +121,7 @@ dotnet_diagnostic.SA1204.severity = none
 dotnet_diagnostic.SA1028.severity = none
 dotnet_diagnostic.SA1129.severity = none
 
-# intentionally ignored Stylecop rules
+# StylceCop: intentionally ignored Stylecop rules
 dotnet_diagnostic.SA1600.severity = none
 dotnet_diagnostic.SA1101.severity = none
 dotnet_diagnostic.SA1309.severity = none
