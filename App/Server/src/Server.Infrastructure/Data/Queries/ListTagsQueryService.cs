@@ -1,4 +1,4 @@
-﻿using Server.Core.Interfaces;
+﻿using Server.Core.TagAggregate;
 
 namespace Server.Infrastructure.Data.Queries;
 

@@ -1,5 +1,4 @@
 ﻿using Server.Core.ArticleAggregate;
-using Server.Core.Interfaces;
 
 namespace Server.Infrastructure.Data.Queries;
 

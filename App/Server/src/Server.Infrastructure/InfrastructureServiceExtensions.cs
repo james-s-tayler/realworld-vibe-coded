@@ -1,4 +1,5 @@
-﻿using Server.Core.Interfaces;
+﻿using Server.Core.ArticleAggregate;
+using Server.Core.TagAggregate;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;

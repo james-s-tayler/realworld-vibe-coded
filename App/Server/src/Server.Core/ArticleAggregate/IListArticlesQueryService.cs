@@ -1,6 +1,4 @@
-﻿using Server.Core.ArticleAggregate;
-
-namespace Server.Core.Interfaces;
+﻿namespace Server.Core.ArticleAggregate;
 
 public interface IListArticlesQueryService
 {

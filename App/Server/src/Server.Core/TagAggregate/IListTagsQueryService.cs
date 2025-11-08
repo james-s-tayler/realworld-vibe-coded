@@ -1,4 +1,4 @@
-﻿namespace Server.Core.Interfaces;
+﻿namespace Server.Core.TagAggregate;
 
 public interface IListTagsQueryService
 {
