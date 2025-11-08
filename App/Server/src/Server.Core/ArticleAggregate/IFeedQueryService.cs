@@ -6,6 +6,4 @@ public interface IFeedQueryService
     Guid userId,
     int limit = 20,
     int offset = 0);
-
-  Task<int> GetFeedCountAsync(Guid userId);
 }
