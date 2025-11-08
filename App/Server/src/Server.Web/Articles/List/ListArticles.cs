@@ -1,6 +1,4 @@
-﻿using Server.Core.ArticleAggregate;
-using Server.Core.ArticleAggregate.Dtos;
-using Server.Core.Interfaces;
+﻿using Server.Core.Interfaces;
 using Server.Infrastructure;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.List;
@@ -43,9 +41,15 @@ public class ListArticles(IMediator mediator, IUserContext userContext) : Endpoi
 
     await Send.ResultMapperAsync(
       result,
-      articles =>
+      async (articles, ct) =>
       {
-        var articleDtos = Enumerable.Select<Article, ArticleDto>(articles, article => Map.FromEntity(article).Article).ToList();
+        var articleDtos = new List<Server.Core.ArticleAggregate.Dtos.ArticleDto>();
+        foreach (var article in articles)
+        {
+          var response = await Map.FromEntityAsync(article, ct);
+          articleDtos.Add(response.Article);
+        }
+
         return new ArticlesResponse(articleDtos, articleDtos.Count);
       },
       cancellationToken);

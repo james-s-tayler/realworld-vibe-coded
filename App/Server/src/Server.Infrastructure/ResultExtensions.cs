@@ -35,6 +35,21 @@ public static class ResultExtensions
     await ResultAsync(ep, result, mapper, cancellationToken);
   }
 
+  /// <summary>
+  /// Sends a standardized response based on Result pattern with async mapping support.
+  /// Handles success, error, and validation scenarios consistently.
+  /// Maps the result value using the provided async mapper function before sending.
+  /// Automatically uses the correct status code based on Result.Status.
+  /// </summary>
+  public static async Task ResultMapperAsync<TResult, TResponse>(
+    this IResponseSender ep,
+    Result<TResult> result,
+    Func<TResult, CancellationToken, Task<TResponse>> mapper,
+    CancellationToken cancellationToken = default)
+  {
+    await ResultAsyncMapper(ep, result, mapper, cancellationToken);
+  }
+
   private static async Task ResultAsync<TResult, TResponse>(
     this IResponseSender ep,
     Result<TResult> result,
@@ -62,6 +77,76 @@ public static class ResultExtensions
         if (mapper != null)
         {
           await ep.HttpContext.Response.SendAsync(mapper(result.Value), statusCode: StatusCodes.Status201Created, cancellation: cancellationToken);
+        }
+        else if (result.Value != null)
+        {
+          await ep.HttpContext.Response.SendAsync(result.Value, statusCode: StatusCodes.Status201Created, cancellation: cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendResultAsync(TypedResults.Created());
+        }
+
+        break;
+      case ResultStatus.NoContent:
+        await ep.HttpContext.Response.SendNoContentAsync(cancellation: cancellationToken);
+        break;
+      case ResultStatus.Invalid:
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status400BadRequest, cancellationToken);
+        break;
+      case ResultStatus.NotFound:
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status404NotFound, cancellationToken);
+        break;
+      case ResultStatus.Unauthorized:
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status401Unauthorized, cancellationToken);
+        break;
+      case ResultStatus.Forbidden:
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status403Forbidden, cancellationToken);
+        break;
+      case ResultStatus.Conflict:
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status409Conflict, cancellationToken);
+        break;
+      case ResultStatus.Error:
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status422UnprocessableEntity, cancellationToken);
+        break;
+      case ResultStatus.CriticalError:
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status500InternalServerError, cancellationToken);
+        break;
+      case ResultStatus.Unavailable:
+        await SendErrorResponseAsync(ep, result, StatusCodes.Status503ServiceUnavailable, cancellationToken);
+        break;
+    }
+  }
+
+  private static async Task ResultAsyncMapper<TResult, TResponse>(
+    this IResponseSender ep,
+    Result<TResult> result,
+    Func<TResult, CancellationToken, Task<TResponse>>? mapper,
+    CancellationToken cancellationToken)
+  {
+    switch (result.Status)
+    {
+      case ResultStatus.Ok:
+        if (mapper != null)
+        {
+          var response = await mapper(result.Value, cancellationToken);
+          await ep.HttpContext.Response.SendOkAsync(response, cancellation: cancellationToken);
+        }
+        else if (result.Value != null)
+        {
+          await ep.HttpContext.Response.SendOkAsync(result.Value, cancellation: cancellationToken);
+        }
+        else
+        {
+          await ep.HttpContext.Response.SendOkAsync(cancellation: cancellationToken);
+        }
+
+        break;
+      case ResultStatus.Created:
+        if (mapper != null)
+        {
+          var response = await mapper(result.Value, cancellationToken);
+          await ep.HttpContext.Response.SendAsync(response, statusCode: StatusCodes.Status201Created, cancellation: cancellationToken);
         }
         else if (result.Value != null)
         {

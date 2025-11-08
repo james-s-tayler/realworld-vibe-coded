@@ -63,6 +63,42 @@ Reserved for internal analyzers.
 
 ---
 
+### SRV009: ResponseMapperGetAwaiterAnalyzer
+**Description:** Bans usage of `GetAwaiter().GetResult()` in FastEndpoints.ResponseMapper classes.
+
+**Severity:** Error
+
+**Rationale:** Using `GetAwaiter().GetResult()` within FastEndpoints.ResponseMapper classes can cause deadlocks and poor asynchronous behavior. ResponseMapper classes should use asynchronous patterns properly.
+
+**Fix:** Override `FromEntityAsync` instead of `FromEntity` and use `await` for asynchronous calls.
+
+**Example:**
+```csharp
+// ❌ Bad - Using GetAwaiter().GetResult() in FromEntity
+public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
+{
+  public override ArticleResponse FromEntity(Article article)
+  {
+    var userRepository = Resolve<IRepository<User>>();
+    var currentUser = userRepository.FirstOrDefaultAsync(spec).GetAwaiter().GetResult();
+    // ... rest of mapping
+  }
+}
+
+// ✅ Good - Using await in FromEntityAsync
+public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
+{
+  public override async Task<ArticleResponse> FromEntityAsync(Article article, CancellationToken ct)
+  {
+    var userRepository = Resolve<IRepository<User>>();
+    var currentUser = await userRepository.FirstOrDefaultAsync(spec, ct);
+    // ... rest of mapping
+  }
+}
+```
+
+---
+
 ### SRV007: BanRawHttpClientAnalyzer
 **Description:** Bans raw usage of `HttpClient` methods in functional tests, encouraging the use of FastEndpoints testing extension methods.
 

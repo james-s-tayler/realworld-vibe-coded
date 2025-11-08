@@ -29,6 +29,6 @@ public class Follow(IMediator mediator, IUserContext userContext) : Endpoint<Fol
 
     var result = await mediator.Send(new FollowUserCommand(request.Username, userId), cancellationToken);
 
-    await Send.ResultMapperAsync(result, user => Map.FromEntity(user), cancellationToken);
+    await Send.ResultMapperAsync(result, async (user, ct) => await Map.FromEntityAsync(user, ct), cancellationToken);
   }
 }
