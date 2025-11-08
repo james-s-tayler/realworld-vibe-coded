@@ -2,14 +2,14 @@
 
 public static class DataSchemaConstants
 {
-  public const int DEFAULT_NAME_LENGTH = 100;
-  public const int EMAIL_LENGTH = 255;
-  public const int USERNAME_LENGTH = 100;
-  public const int HASHED_PASSWORD_LENGTH = 255;
-  public const int BIO_LENGTH = 1000;
-  public const int IMAGE_URL_LENGTH = 500;
-  public const int ARTICLE_TITLE_LENGTH = 200;
-  public const int ARTICLE_DESCRIPTION_LENGTH = 500;
-  public const int ARTICLE_SLUG_LENGTH = 250;
-  public const int TAG_NAME_LENGTH = 50;
+  public const int DefaultNameLength = 100;
+  public const int EmailLength = 255;
+  public const int UsernameLength = 100;
+  public const int HashedPasswordLength = 255;
+  public const int BioLength = 1000;
+  public const int ImageUrlLength = 500;
+  public const int ArticleTitleLength = 200;
+  public const int ArticleDescriptionLength = 500;
+  public const int ArticleSlugLength = 250;
+  public const int TagNameLength = 50;
 }
