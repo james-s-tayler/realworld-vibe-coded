@@ -13,7 +13,7 @@ namespace Server.Web.Articles.List;
 /// <remarks>
 /// List articles globally. Optional filters for tag, author, favorited user. Authentication optional.
 /// </remarks>
-public class ListArticles(IMediator _mediator, IUserContext userContext) : Endpoint<ListArticlesRequest, ArticlesResponse, ArticleMapper>
+public class ListArticles(IMediator mediator, IUserContext userContext) : Endpoint<ListArticlesRequest, ArticlesResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -31,7 +31,8 @@ public class ListArticles(IMediator _mediator, IUserContext userContext) : Endpo
     // Get current user ID if authenticated
     var currentUserId = userContext.GetCurrentUserId();
 
-    var result = await _mediator.Send(new ListArticlesQuery(
+    var result = await mediator.Send(
+      new ListArticlesQuery(
       request.Tag,
       request.Author,
       request.Favorited,

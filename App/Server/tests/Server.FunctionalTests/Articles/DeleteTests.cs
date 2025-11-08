@@ -18,7 +18,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Delete Article Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -47,7 +47,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Delete Unauth Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -68,7 +68,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Delete Wrong User Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);

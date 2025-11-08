@@ -19,7 +19,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = $"test-{Guid.NewGuid()}@example.com",
         Username = $"testuser-{Guid.NewGuid()}",
         Password = "password123"
-      }
+      },
     };
 
     var (response, result) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request);
@@ -42,7 +42,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = email,
         Username = $"user1-{Guid.NewGuid()}",
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
@@ -54,7 +54,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = email,
         Username = $"user2-{Guid.NewGuid()}",
         Password = "password123"
-      }
+      },
     };
 
     var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request2);
@@ -76,7 +76,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = email,
         Username = username,
         Password = password
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
@@ -87,7 +87,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Password = password
-      }
+      },
     };
 
     var (response, result) = await App.Client.POSTAsync<Login, LoginRequest, LoginResponse>(loginRequest);
@@ -108,7 +108,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = "nonexistent@example.com",
         Password = "wrongpassword"
-      }
+      },
     };
 
     var (response, _) = await App.Client.POSTAsync<Login, LoginRequest, object>(loginRequest);
@@ -130,7 +130,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = email,
         Username = username,
         Password = password
-      }
+      },
     };
 
     var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
@@ -168,7 +168,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = null!,
         Username = null!,
         Password = null!
-      }
+      },
     };
 
     var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request);
@@ -186,7 +186,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = string.Empty,
         Username = string.Empty,
         Password = string.Empty
-      }
+      },
     };
 
     var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request);
@@ -204,7 +204,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = "not-an-email",
         Username = $"user-{Guid.NewGuid()}",
         Password = "password123"
-      }
+      },
     };
 
     var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request);
@@ -223,7 +223,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = $"user1-{Guid.NewGuid()}@example.com",
         Username = username,
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
@@ -235,7 +235,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = $"user2-{Guid.NewGuid()}@example.com",
         Username = username,
         Password = "password123"
-      }
+      },
     };
 
     var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request2);
@@ -257,7 +257,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = email,
         Username = username,
         Password = password
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
@@ -268,7 +268,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Password = "wrongpassword"
-      }
+      },
     };
 
     var (response, _) = await App.Client.POSTAsync<Login, LoginRequest, object>(loginRequest);
@@ -285,7 +285,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = "nonexistent@example.com",
         Password = "password123"
-      }
+      },
     };
 
     var (response, _) = await App.Client.POSTAsync<Login, LoginRequest, object>(loginRequest);
@@ -320,7 +320,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = email,
         Username = username,
         Password = password
-      }
+      },
     };
 
     var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
@@ -338,7 +338,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = $"updated-{Guid.NewGuid()}@example.com",
         Bio = "Updated bio",
         Image = "https://example.com/image.jpg"
-      }
+      },
     };
 
     var (response, result) = await client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
@@ -358,7 +358,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       User = new UpdateUserData
       {
         Email = "test@example.com"
-      }
+      },
     };
 
     var (response, _) = await App.Client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
@@ -378,7 +378,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = existingEmail,
         Username = $"user1-{Guid.NewGuid()}",
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
@@ -390,7 +390,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = $"user2-{Guid.NewGuid()}@example.com",
         Username = $"user2-{Guid.NewGuid()}",
         Password = "password123"
-      }
+      },
     };
 
     var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request2);
@@ -406,7 +406,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       User = new UpdateUserData
       {
         Email = existingEmail
-      }
+      },
     };
 
     var (response, _) = await client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
@@ -426,7 +426,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = $"user1-{Guid.NewGuid()}@example.com",
         Username = existingUsername,
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
@@ -438,7 +438,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = $"user2-{Guid.NewGuid()}@example.com",
         Username = $"user2-{Guid.NewGuid()}",
         Password = "password123"
-      }
+      },
     };
 
     var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request2);
@@ -454,7 +454,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       User = new UpdateUserData
       {
         Username = existingUsername
-      }
+      },
     };
 
     var (response, _) = await client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
@@ -476,7 +476,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = email,
         Username = username,
         Password = password
-      }
+      },
     };
 
     var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
@@ -492,7 +492,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       User = new UpdateUserData
       {
         Email = string.Empty
-      }
+      },
     };
 
     var (response, _) = await client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
@@ -515,7 +515,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = email,
         Username = username,
         Password = oldPassword
-      }
+      },
     };
 
     var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
@@ -532,7 +532,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       User = new UpdateUserData
       {
         Password = newPassword
-      }
+      },
     };
 
     var (response, result) = await client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
@@ -545,7 +545,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Password = newPassword
-      }
+      },
     };
 
     var (loginResponse, loginResult) = await App.Client.POSTAsync<Login, LoginRequest, LoginResponse>(loginRequest);
@@ -569,7 +569,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
         Email = email,
         Username = oldUsername,
         Password = password
-      }
+      },
     };
 
     var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
@@ -586,7 +586,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       User = new UpdateUserData
       {
         Username = newUsername
-      }
+      },
     };
 
     var (response, result) = await client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);

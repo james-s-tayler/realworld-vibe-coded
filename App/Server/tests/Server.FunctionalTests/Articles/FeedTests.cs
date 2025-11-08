@@ -36,7 +36,7 @@ public class FeedTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Description = "Test Description",
         Body = "Test Body",
         TagList = new List<string> { "feedtest" }
-      }
+      },
     };
 
     await App.ArticlesUser2Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -115,7 +115,7 @@ public class FeedTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Email = email,
         Username = username,
         Password = password
-      }
+      },
     };
 
     var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);

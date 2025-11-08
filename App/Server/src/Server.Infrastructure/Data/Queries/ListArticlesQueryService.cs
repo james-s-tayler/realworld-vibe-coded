@@ -3,7 +3,7 @@ using Server.Core.Interfaces;
 
 namespace Server.Infrastructure.Data.Queries;
 
-public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQueryService
+public class ListArticlesQueryService(AppDbContext context) : IListArticlesQueryService
 {
   public async Task<IEnumerable<Article>> ListAsync(
     string? tag = null,
@@ -35,7 +35,7 @@ public class ListArticlesQueryService(AppDbContext _context) : IListArticlesQuer
 
   private IQueryable<Article> BuildQuery(string? tag, string? author, string? favorited)
   {
-    var query = _context.Articles
+    var query = context.Articles
       .Include(a => a.Author)
       .Include(a => a.Tags)
       .Include(a => a.FavoritedBy)

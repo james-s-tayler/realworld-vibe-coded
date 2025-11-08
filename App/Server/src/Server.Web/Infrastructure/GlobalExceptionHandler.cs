@@ -28,10 +28,11 @@ public class GlobalExceptionHandler : IGlobalPostProcessor
     // This uses FastEndpoints' SendErrorsAsync which formats as problem details
     var validationFailures = new List<ValidationFailure>
     {
-      new(exception.GetType().Name, exception.Message)
+      new(exception.GetType().Name, exception.Message),
     };
 
-    await ctx.HttpContext.Response.SendErrorsAsync(validationFailures,
+    await ctx.HttpContext.Response.SendErrorsAsync(
+      validationFailures,
       statusCode: StatusCodes.Status500InternalServerError,
       cancellation: ct);
   }

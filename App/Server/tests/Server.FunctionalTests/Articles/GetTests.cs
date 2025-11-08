@@ -18,7 +18,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Get Article Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -42,7 +42,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Get Article Unauthenticated",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);

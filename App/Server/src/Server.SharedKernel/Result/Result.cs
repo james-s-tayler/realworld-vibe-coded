@@ -4,7 +4,9 @@ namespace Server.SharedKernel.Result;
 
 public class Result<T>
 {
-  protected Result() { }
+  protected Result()
+  {
+  }
 
   public Result(T value) => Value = value;
 
@@ -163,7 +165,7 @@ public class Result<T>
   /// The parameters to the call were correct, but the user does not have permission to perform some action.
   /// See also HTTP 403 Forbidden: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
   /// </summary>
-  /// <param name="errorDetails">A list of error details.</param> 
+  /// <param name="errorDetails">A list of error details.</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
   public static Result<T> Forbidden(params ErrorDetail[] errorDetails) =>
     new(ResultStatus.Forbidden) { ErrorDetails = errorDetails };
@@ -179,7 +181,7 @@ public class Result<T>
   /// This is similar to Forbidden, but should be used when the user has not authenticated or has attempted to authenticate but failed.
   /// See also HTTP 401 Unauthorized: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
   /// </summary>
-  /// <param name="errorDetails">A list of error details.</param>  
+  /// <param name="errorDetails">A list of error details.</param>
   /// <returns>A Result<typeparamref name="T"/></returns>
   public static Result<T> Unauthorized(params ErrorDetail[] errorDetails) =>
     new(ResultStatus.Unauthorized) { ErrorDetails = errorDetails };
@@ -258,7 +260,7 @@ public class Result<T>
   public static Result<T> Conflict(Exception exception) =>
     new(ResultStatus.Conflict)
     {
-      ErrorDetails = [new ErrorDetail(exception.GetType().Name, exception.Message)]
+      ErrorDetails = [new ErrorDetail(exception.GetType().Name, exception.Message)],
     };
 
   /// <summary>
@@ -292,7 +294,7 @@ public class Result<T>
   public static Result<T> CriticalError(Exception exception) =>
     new(ResultStatus.CriticalError)
     {
-      ErrorDetails = [new ErrorDetail(exception.GetType().Name, exception.Message)]
+      ErrorDetails = [new ErrorDetail(exception.GetType().Name, exception.Message)],
     };
 
   /// <summary>

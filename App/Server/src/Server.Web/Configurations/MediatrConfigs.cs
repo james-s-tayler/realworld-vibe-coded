@@ -14,7 +14,7 @@ public static class MediatrConfigs
       {
         Assembly.GetAssembly(typeof(User)), // Core
         Assembly.GetAssembly(typeof(RegisterUserCommand)), // UseCases
-        Assembly.GetAssembly(typeof(Server.Web.DevOnly.UseCases.ThrowInUseCaseQuery)) // DevOnly
+        Assembly.GetAssembly(typeof(Server.Web.DevOnly.UseCases.ThrowInUseCaseQuery)), // DevOnly
       };
 
     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!))
@@ -43,7 +43,7 @@ public static class MediatrConfigs
         ResultRequestInterface = type.GetInterfaces()
           .FirstOrDefault(i => i.IsGenericType &&
                               (i.GetGenericTypeDefinition() == typeof(SharedKernel.MediatR.ICommand<>) ||
-                               i.GetGenericTypeDefinition() == typeof(IQuery<>)))
+                               i.GetGenericTypeDefinition() == typeof(IQuery<>))),
       })
       .Where(x => x.ResultRequestInterface != null)
       .ToList();

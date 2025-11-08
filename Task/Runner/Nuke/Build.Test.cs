@@ -13,12 +13,9 @@ using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 public partial class Build
 {
   [Parameter("Postman folder to test")]
-  readonly string? Folder;
+  internal readonly string? Folder;
 
-  // LiquidTestReports.Cli dotnet global tool isn't available as a built-in Nuke tool under Nuke.Common.Tools, so we resolve it manually
-  private Tool Liquid => ToolResolver.GetPathTool("liquid");
-
-  Target TestServer => _ => _
+  internal Target TestServer => _ => _
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
       .DependsOn(RunLocalCleanDirectories)
@@ -76,7 +73,7 @@ public partial class Build
         }
       });
 
-  Target TestClient => _ => _
+  internal Target TestClient => _ => _
       .Description("Run client tests")
       .DependsOn(InstallClient)
       .DependsOn(InstallDotnetToolLiquidReports)
@@ -120,7 +117,7 @@ public partial class Build
         }
       });
 
-  Target TestServerPostman => _ => _
+  internal Target TestServerPostman => _ => _
       .Description("Run postman tests using Docker Compose. Optionally specify a FOLDER parameter to run a specific Postman collection folder. E.g. FOLDER=Auth nuke TestServerPostman")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
@@ -131,7 +128,7 @@ public partial class Build
 
         var envVars = new Dictionary<string, string>
         {
-          ["DOCKER_BUILDKIT"] = "1"
+          ["DOCKER_BUILDKIT"] = "1",
         };
         if (!string.IsNullOrEmpty(Folder))
         {
@@ -143,7 +140,9 @@ public partial class Build
         try
         {
           var args = "compose -f Test/Postman/docker-compose.yml up --build --abort-on-container-exit";
-          var process = ProcessTasks.StartProcess("docker", args,
+          var process = ProcessTasks.StartProcess(
+                "docker",
+                args,
                 workingDirectory: RootDirectory,
                 environmentVariables: envVars);
           process.WaitForExit();
@@ -152,7 +151,9 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.yml down";
-          var downProcess = ProcessTasks.StartProcess("docker", downArgs,
+          var downProcess = ProcessTasks.StartProcess(
+                "docker",
+                downArgs,
                 workingDirectory: RootDirectory,
                 environmentVariables: envVars);
           downProcess.WaitForExit();
@@ -184,7 +185,7 @@ public partial class Build
         }
       });
 
-  Target TestE2e => _ => _
+  internal Target TestE2e => _ => _
       .Description("Run E2E Playwright tests using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
@@ -200,9 +201,11 @@ public partial class Build
           var args = "compose -f Test/e2e/docker-compose.yml up --build --abort-on-container-exit";
           var envVars = new Dictionary<string, string>
           {
-            ["DOCKER_BUILDKIT"] = "1"
+            ["DOCKER_BUILDKIT"] = "1",
           };
-          var process = ProcessTasks.StartProcess("docker", args,
+          var process = ProcessTasks.StartProcess(
+                "docker",
+                args,
                 workingDirectory: RootDirectory,
                 environmentVariables: envVars);
           process.WaitForExit();
@@ -211,7 +214,9 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/e2e/docker-compose.yml down";
-          var downProcess = ProcessTasks.StartProcess("docker", downArgs,
+          var downProcess = ProcessTasks.StartProcess(
+                "docker",
+                downArgs,
                 workingDirectory: RootDirectory);
           downProcess.WaitForExit();
         }
@@ -240,10 +245,13 @@ public partial class Build
         }
       });
 
+  // LiquidTestReports.Cli dotnet global tool isn't available as a built-in Nuke tool under Nuke.Common.Tools, so we resolve it manually
+  private Tool Liquid => ToolResolver.GetPathTool("liquid");
+
   /// <summary>
   /// Extracts the summary section from a LiquidTestReport Report.md file.
   /// The summary is everything before the first "---" separator.
-  /// 
+  ///
   /// In the CI pipeline we output the full report to the job summary,
   /// and we append the link to the full report to this ReportSummary.md.
   /// That way the PR comment shows the high level pass/fail stats,
@@ -269,6 +277,7 @@ public partial class Build
       {
         break;
       }
+
       summaryLines.Add(line);
     }
 
@@ -332,7 +341,7 @@ public partial class Build
       $"- **Tests**: {passedTests}/{totalTests} passed ({testPassPercentage}%)",
       $"- **Requests**: {passedRequests}/{totalRequests} passed",
       $"- **Execution Time**: {executionTimeSec}s",
-      string.Empty
+      string.Empty,
     };
 
     // Add failure details if any

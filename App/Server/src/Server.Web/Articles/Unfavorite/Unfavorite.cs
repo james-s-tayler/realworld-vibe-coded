@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Unfavorite;
 /// <remarks>
 /// Remove article from favorites. Authentication required.
 /// </remarks>
-public class Unfavorite(IMediator _mediator, IUserContext userContext) : Endpoint<UnfavoriteArticleRequest, ArticleResponse, ArticleMapper>
+public class Unfavorite(IMediator mediator, IUserContext userContext) : Endpoint<UnfavoriteArticleRequest, ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -28,7 +28,7 @@ public class Unfavorite(IMediator _mediator, IUserContext userContext) : Endpoin
   {
     var userId = userContext.GetRequiredCurrentUserId();
 
-    var result = await _mediator.Send(new UnfavoriteArticleCommand(request.Slug, userId, userId), cancellationToken);
+    var result = await mediator.Send(new UnfavoriteArticleCommand(request.Slug, userId, userId), cancellationToken);
 
     await Send.ResultMapperAsync(result, article => Map.FromEntity(article), cancellationToken);
   }

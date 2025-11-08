@@ -26,12 +26,12 @@ public class JwtTokenGenerator : IJwtTokenGenerator
       {
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Name, user.Username)
+        new Claim(ClaimTypes.Name, user.Username),
       }),
       Expires = DateTime.UtcNow.AddDays(_jwtSettings.ExpirationInDays),
       SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
       Issuer = _jwtSettings.Issuer,
-      Audience = _jwtSettings.Audience
+      Audience = _jwtSettings.Audience,
     };
     var token = tokenHandler.CreateToken(tokenDescriptor);
     return tokenHandler.WriteToken(token);

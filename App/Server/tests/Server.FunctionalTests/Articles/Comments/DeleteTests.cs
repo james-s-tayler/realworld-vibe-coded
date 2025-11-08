@@ -21,7 +21,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Delete Comment Unauth Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -32,7 +32,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Comment = new CreateCommentDto
       {
         Body = "Comment"
-      }
+      },
     };
 
     var createCommentResponse = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -55,7 +55,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Delete Comment Wrong User",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -66,7 +66,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Comment = new CreateCommentDto
       {
         Body = "Comment"
-      }
+      },
     };
 
     var createCommentResponse = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -97,7 +97,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Delete Nonexistent Comment",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -118,7 +118,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Invalid Comment Id Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);

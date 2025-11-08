@@ -44,7 +44,7 @@ public static class ServiceConfigs
           ValidateAudience = true,
           ValidAudience = jwtSettings.Audience,
           ValidateLifetime = true,
-          ClockSkew = TimeSpan.Zero
+          ClockSkew = TimeSpan.Zero,
         };
 
         // Configure events to return JSON error responses for authentication failures
@@ -73,7 +73,7 @@ public static class ServiceConfigs
             await context.HttpContext.Response.SendErrorsAsync(
               new List<ValidationFailure>([new ValidationFailure("authorization", context.Result?.Failure?.Message ?? "Forbidden")
               ]), StatusCodes.Status403Forbidden);
-          }
+          },
         };
       });
 
@@ -90,8 +90,7 @@ public static class ServiceConfigs
       services.AddScoped<IEmailSender, MimeKitEmailSender>();
 
       // Otherwise use this:
-      //builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
-
+      // builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
     }
     else
     {
@@ -102,6 +101,4 @@ public static class ServiceConfigs
 
     return services;
   }
-
-
 }

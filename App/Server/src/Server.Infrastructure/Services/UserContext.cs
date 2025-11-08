@@ -64,6 +64,7 @@ public class UserContext : IUserContext
     {
       throw new UnauthorizedAccessException("User is not authenticated or user ID is invalid");
     }
+
     return userId.Value;
   }
 

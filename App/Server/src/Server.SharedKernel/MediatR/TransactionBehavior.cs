@@ -36,7 +36,8 @@ public class TransactionBehavior<TRequest, T> : IPipelineBehavior<TRequest, Resu
 
     _logger.LogInformation("Starting transaction for {RequestName}", typeof(TRequest).Name);
 
-    var response = await _unitOfWork.ExecuteInTransactionAsync(async (ct) =>
+    var response = await _unitOfWork.ExecuteInTransactionAsync(
+      async (ct) =>
     {
       return await next();
     }, cancellationToken);

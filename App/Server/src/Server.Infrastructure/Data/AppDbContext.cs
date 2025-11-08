@@ -11,7 +11,8 @@ public class AppDbContext : AuditDbContext
 {
   private readonly IDomainEventDispatcher? _dispatcher;
 
-  public AppDbContext(DbContextOptions<AppDbContext> options,
+  public AppDbContext(
+    DbContextOptions<AppDbContext> options,
     IDomainEventDispatcher? dispatcher) : base(options)
   {
     _dispatcher = dispatcher;
@@ -88,7 +89,7 @@ public class AppDbContext : AuditDbContext
     }
   }
 
-  public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+  public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
   {
     int result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 

@@ -23,7 +23,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = email,
         Username = username,
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
@@ -52,7 +52,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user1Email,
         Username = user1Username,
         Password = "password123"
-      }
+      },
     };
 
     var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
@@ -65,7 +65,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user2Email,
         Username = user2Username,
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
@@ -99,7 +99,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user1Email,
         Username = user1Username,
         Password = "password123"
-      }
+      },
     };
 
     var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
@@ -112,7 +112,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user2Email,
         Username = user2Username,
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
@@ -167,7 +167,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user1Email,
         Username = user1Username,
         Password = "password123"
-      }
+      },
     };
 
     var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
@@ -180,7 +180,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user2Email,
         Username = user2Username,
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
@@ -214,7 +214,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user1Email,
         Username = user1Username,
         Password = "password123"
-      }
+      },
     };
 
     var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
@@ -227,7 +227,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user2Email,
         Username = user2Username,
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
@@ -269,7 +269,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = userEmail,
         Username = username,
         Password = "password123"
-      }
+      },
     };
 
     var (_, result) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
@@ -301,7 +301,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user1Email,
         Username = user1Username,
         Password = "password123"
-      }
+      },
     };
 
     var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
@@ -314,7 +314,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user2Email,
         Username = user2Username,
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
@@ -351,7 +351,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user1Email,
         Username = user1Username,
         Password = "password123"
-      }
+      },
     };
 
     var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
@@ -364,7 +364,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
         Email = user2Email,
         Username = user2Username,
         Password = "password123"
-      }
+      },
     };
 
     await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);

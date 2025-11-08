@@ -19,7 +19,7 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Unfavorite Article Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -45,7 +45,7 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Not Favorited Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -68,7 +68,7 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Unfavorite Unauthenticated Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);

@@ -40,7 +40,7 @@ public class ProfileMapper : ResponseMapper<ProfileResponse, User>
         Bio = user.Bio,
         Image = user.Image,
         Following = isFollowing
-      }
+      },
     };
   }
 }

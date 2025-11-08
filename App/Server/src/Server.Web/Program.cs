@@ -36,6 +36,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
   options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
   options.SerializerOptions.Converters.Add(new UtcDateTimeConverter());
   options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+
   // Don't ignore null values - we need them in the API response
   // options.SerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 });
@@ -57,4 +58,6 @@ app.MapWhen(
 app.Run();
 
 // Make the implicit Program.cs class public, so integration tests can reference the correct assembly for host building
-public partial class Program { }
+public partial class Program
+{
+}

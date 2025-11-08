@@ -112,6 +112,7 @@ public class ListTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
+
     // All returned articles should match both filters (if any exist)
     result.Articles.Where(a => a.Author.Username == App.ArticlesUser1Username).ShouldBe(result.Articles);
   }

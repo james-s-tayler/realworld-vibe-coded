@@ -18,7 +18,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Description = "Test Description",
         Body = "Test Body",
         TagList = new List<string> { "test", "article" }
-      }
+      },
     };
 
     var (response, result) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
@@ -47,7 +47,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Article Without Tags",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (response, result) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
@@ -63,7 +63,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   {
     var request = new CreateArticleRequest
     {
-      Article = new ArticleData()
+      Article = new ArticleData(),
     };
 
     var (response, _) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
@@ -81,7 +81,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = string.Empty,
         Description = string.Empty,
         Body = string.Empty
-      }
+      },
     };
 
     var (response, _) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
@@ -100,7 +100,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Description = "Test",
         Body = "Test",
         TagList = new List<string> { "tag,with,comma" }
-      }
+      },
     };
 
     var (response, _) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
@@ -119,7 +119,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Description = "Test",
         Body = "Test",
         TagList = new List<string> { string.Empty }
-      }
+      },
     };
 
     var (response, _) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
@@ -137,7 +137,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Duplicate Title",
         Description = "Description 1",
         Body = "Body 1"
-      }
+      },
     };
 
     await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request1);
@@ -149,7 +149,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Duplicate Title",
         Description = "Description 2",
         Body = "Body 2"
-      }
+      },
     };
 
     var (response, _) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request2);
@@ -167,7 +167,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Test",
         Description = "Test",
         Body = "Test"
-      }
+      },
     };
 
     var (response, _) = await App.Client.POSTAsync<Create, CreateArticleRequest, object>(request);

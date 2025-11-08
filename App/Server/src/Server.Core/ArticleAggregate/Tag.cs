@@ -9,7 +9,9 @@ public class Tag : EntityBase, IAggregateRoot
     Name = Guard.Against.NullOrEmpty(name);
   }
 
-  private Tag() { } // For EF Core
+  private Tag()
+  {
+  } // For EF Core
 
   public string Name { get; private set; } = string.Empty;
 

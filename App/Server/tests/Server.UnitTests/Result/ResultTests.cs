@@ -129,7 +129,7 @@ public class ResultTests
     var errorDetails = new[]
     {
       new ErrorDetail("field1", "error1"),
-      new ErrorDetail("field2", "error2")
+      new ErrorDetail("field2", "error2"),
     };
 
     // Act
@@ -148,7 +148,7 @@ public class ResultTests
     var errorDetails = new List<ErrorDetail>
     {
       new ErrorDetail("field1", "error1"),
-      new ErrorDetail("field2", "error2")
+      new ErrorDetail("field2", "error2"),
     };
 
     // Act

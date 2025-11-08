@@ -18,7 +18,9 @@ public class Article : EntityBase, IAggregateRoot
     Comments = new List<Comment>();
   }
 
-  private Article() { } // For EF Core
+  private Article()
+  {
+  } // For EF Core
 
   public string Title { get; private set; } = string.Empty;
 
@@ -49,6 +51,7 @@ public class Article : EntityBase, IAggregateRoot
     {
       return false;
     }
+
     return FavoritedBy.Any(u => u.Id == userId.Value);
   }
 
@@ -61,6 +64,7 @@ public class Article : EntityBase, IAggregateRoot
     {
       return false;
     }
+
     return user.IsFollowing(AuthorId);
   }
 

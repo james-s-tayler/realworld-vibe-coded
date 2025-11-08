@@ -5,12 +5,12 @@ using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Delete;
 
-public class DeleteArticleHandler(IRepository<Article> _articleRepository)
+public class DeleteArticleHandler(IRepository<Article> articleRepository)
   : ICommandHandler<DeleteArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(DeleteArticleCommand request, CancellationToken cancellationToken)
   {
-    var article = await _articleRepository.FirstOrDefaultAsync(
+    var article = await articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(request.Slug), cancellationToken);
 
     if (article == null)
@@ -23,7 +23,7 @@ public class DeleteArticleHandler(IRepository<Article> _articleRepository)
       return Result<Article>.Forbidden(new ErrorDetail("Forbidden", "You can only delete your own articles"));
     }
 
-    await _articleRepository.DeleteAsync(article, cancellationToken);
+    await articleRepository.DeleteAsync(article, cancellationToken);
 
     return Result<Article>.NoContent();
   }

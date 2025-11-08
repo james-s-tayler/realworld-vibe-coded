@@ -45,6 +45,7 @@ public class ArticlesFixture : AppFixture<Program>
     });
 
     await using var serviceProvider = serviceCollection.BuildServiceProvider();
+
     // AppDbContext constructor requires IDomainEventDispatcher but it's nullable,
     // so we can create it with a null DbContextOptions
     var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
@@ -99,7 +100,7 @@ public class ArticlesFixture : AppFixture<Program>
         Email = ArticlesUser1Email,
         Username = ArticlesUser1Username,
         Password = articlesUser1Password
-      }
+      },
     };
 
     var (_, registerResult1) = await Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest1);
@@ -117,7 +118,7 @@ public class ArticlesFixture : AppFixture<Program>
         Email = ArticlesUser2Email,
         Username = ArticlesUser2Username,
         Password = articlesUser2Password
-      }
+      },
     };
 
     var (_, registerResult2) = await Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest2);

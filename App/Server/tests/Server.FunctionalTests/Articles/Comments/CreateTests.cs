@@ -20,7 +20,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Comment Test Article",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -31,7 +31,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Comment = new CreateCommentDto
       {
         Body = "This is a test comment"
-      }
+      },
     };
 
     var response = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -55,7 +55,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Comment Unauthenticated Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -66,7 +66,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Comment = new CreateCommentDto
       {
         Body = "Test comment"
-      }
+      },
     };
 
     var response = await App.Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -82,7 +82,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Comment = new CreateCommentDto
       {
         Body = "Test comment"
-      }
+      },
     };
 
     var response = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/no-such-article/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -100,7 +100,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Comment Validation Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -108,7 +108,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
 
     var createCommentRequest = new CreateCommentRequest
     {
-      Comment = new CreateCommentDto()
+      Comment = new CreateCommentDto(),
     };
 
     var response = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -126,7 +126,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Comment Empty Body Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -137,7 +137,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Comment = new CreateCommentDto
       {
         Body = string.Empty
-      }
+      },
     };
 
     var response = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);

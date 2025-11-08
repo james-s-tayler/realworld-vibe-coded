@@ -18,7 +18,7 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Favorite Article Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -43,7 +43,7 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Already Favorited Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -68,7 +68,7 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Multiple Favorites Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -93,7 +93,7 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Favorite Unauthenticated Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);

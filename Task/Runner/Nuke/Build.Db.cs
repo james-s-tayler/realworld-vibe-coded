@@ -6,9 +6,9 @@ using Serilog;
 public partial class Build
 {
   [Parameter("Force operation without confirmation")]
-  readonly bool Force;
+  internal readonly bool Force;
 
-  Target DbReset => _ => _
+  internal Target DbReset => _ => _
     .Description("Reset local SQL Server database by removing docker volume (confirm or --force to skip)")
     .Executes(() =>
     {
@@ -26,11 +26,11 @@ public partial class Build
       ResetDatabase();
     });
 
-  Target DbResetForce => _ => _
+  internal Target DbResetForce => _ => _
     .Description("Reset local dev database without confirmation by removing the docker volume")
     .Executes(ResetDatabase);
 
-  void ResetDatabase()
+  internal void ResetDatabase()
   {
     var composeFile = TaskLocalDevDirectory / "docker-compose.yml";
 
@@ -45,7 +45,7 @@ public partial class Build
     }
   }
 
-  bool DoesDockerVolumeExist(string volumeName)
+  internal bool DoesDockerVolumeExist(string volumeName)
   {
     try
     {
@@ -59,7 +59,7 @@ public partial class Build
     }
   }
 
-  void RemoveSqlServerVolume(string composeFile)
+  internal void RemoveSqlServerVolume(string composeFile)
   {
     try
     {
@@ -81,7 +81,7 @@ public partial class Build
     }
   }
 
-  Target DbMigrationsTestApply => _ => _
+  internal Target DbMigrationsTestApply => _ => _
     .Description("Test EF Core migrations by applying them to a throwaway SQL Server database in Docker")
     .Executes(() =>
     {
@@ -95,7 +95,9 @@ public partial class Build
         // Run docker-compose to start SQL Server and apply migrations
         Log.Information("Running Docker Compose to test migrations...");
         var args = $"compose -f {composeFile} up --build --abort-on-container-exit";
-        var process = ProcessTasks.StartProcess("docker", args,
+        var process = ProcessTasks.StartProcess(
+              "docker",
+              args,
               workingDirectory: RootDirectory);
         process.WaitForExit();
         exitCode = process.ExitCode;
@@ -105,7 +107,9 @@ public partial class Build
         // Clean up containers
         Log.Information("Cleaning up Docker Compose resources...");
         var downArgs = $"compose -f {composeFile} down";
-        var downProcess = ProcessTasks.StartProcess("docker", downArgs,
+        var downProcess = ProcessTasks.StartProcess(
+              "docker",
+              downArgs,
               workingDirectory: RootDirectory,
               logOutput: false,
               logInvocation: false);

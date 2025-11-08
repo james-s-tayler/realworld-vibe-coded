@@ -22,7 +22,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Get Comments Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -33,7 +33,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Comment = new CreateCommentDto
       {
         Body = "First comment"
-      }
+      },
     };
 
     await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -56,7 +56,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Get Comments Unauthenticated",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -67,7 +67,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Comment = new CreateCommentDto
       {
         Body = "Comment"
-      }
+      },
     };
 
     await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -89,7 +89,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "No Comments Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -120,7 +120,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Delete Comment Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
@@ -131,7 +131,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Comment = new CreateCommentDto
       {
         Body = "Comment to delete"
-      }
+      },
     };
 
     var createCommentResponse = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);

@@ -6,12 +6,12 @@ using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Unfavorite;
 
-public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
+public class UnfavoriteArticleHandler(IRepository<Article> articleRepository, IRepository<User> userRepository)
   : ICommandHandler<UnfavoriteArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(UnfavoriteArticleCommand request, CancellationToken cancellationToken)
   {
-    var article = await _articleRepository.FirstOrDefaultAsync(
+    var article = await articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(request.Slug), cancellationToken);
 
     if (article == null)
@@ -19,14 +19,14 @@ public class UnfavoriteArticleHandler(IRepository<Article> _articleRepository, I
       return Result<Article>.NotFound(request.Slug);
     }
 
-    var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
+    var user = await userRepository.GetByIdAsync(request.UserId, cancellationToken);
     if (user == null)
     {
       return Result<Article>.ErrorMissingRequiredEntity(typeof(User), request.UserId);
     }
 
     article.RemoveFromFavorites(user);
-    await _articleRepository.UpdateAsync(article, cancellationToken);
+    await articleRepository.UpdateAsync(article, cancellationToken);
 
     return Result<Article>.Success(article);
   }

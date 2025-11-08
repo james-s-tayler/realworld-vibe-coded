@@ -56,6 +56,7 @@ public static class ResultExtensions
         {
           await ep.HttpContext.Response.SendOkAsync(cancellation: cancellationToken);
         }
+
         break;
       case ResultStatus.Created:
         if (mapper != null)
@@ -70,6 +71,7 @@ public static class ResultExtensions
         {
           await ep.HttpContext.Response.SendResultAsync(TypedResults.Created());
         }
+
         break;
       case ResultStatus.NoContent:
         await ep.HttpContext.Response.SendNoContentAsync(cancellation: cancellationToken);

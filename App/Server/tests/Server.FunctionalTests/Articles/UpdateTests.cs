@@ -18,7 +18,7 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Original Title",
         Description = "Original Description",
         Body = "Original Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -32,7 +32,7 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Updated Title",
         Description = "Updated Description",
         Body = "Updated Body"
-      }
+      },
     };
 
     var (response, result) = await App.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, ArticleResponse>(updateRequest);
@@ -55,7 +55,7 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Update Unauth Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -67,7 +67,7 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Article = new UpdateArticleData
       {
         Title = "Updated"
-      }
+      },
     };
 
     var (response, _) = await App.Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
@@ -84,7 +84,7 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Article = new UpdateArticleData
       {
         Title = "Updated"
-      }
+      },
     };
 
     var (response, _) = await App.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
@@ -102,7 +102,7 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Update Wrong User Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -114,7 +114,7 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Article = new UpdateArticleData
       {
         Title = "Updated by wrong user"
-      }
+      },
     };
 
     var (response, _) = await App.ArticlesUser2Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
@@ -132,7 +132,7 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Update Empty Fields Test",
         Description = "Description",
         Body = "Body"
-      }
+      },
     };
 
     var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
@@ -146,7 +146,7 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = string.Empty,
         Description = string.Empty,
         Body = string.Empty
-      }
+      },
     };
 
     var (response, _) = await App.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);

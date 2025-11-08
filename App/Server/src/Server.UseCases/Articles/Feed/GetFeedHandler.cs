@@ -4,12 +4,12 @@ using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Articles.Feed;
 
-public class GetFeedHandler(IFeedQueryService _feedQuery)
+public class GetFeedHandler(IFeedQueryService feedQuery)
   : IQueryHandler<GetFeedQuery, IEnumerable<Article>>
 {
   public async Task<Result<IEnumerable<Article>>> Handle(GetFeedQuery request, CancellationToken cancellationToken)
   {
-    var articles = await _feedQuery.GetFeedAsync(
+    var articles = await feedQuery.GetFeedAsync(
       request.UserId,
       request.Limit,
       request.Offset);

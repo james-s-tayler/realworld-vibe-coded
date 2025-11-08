@@ -14,7 +14,9 @@ public class Comment : EntityBase
     ArticleId = article.Id;
   }
 
-  private Comment() { } // For EF Core
+  private Comment()
+  {
+  } // For EF Core
 
   public string Body { get; private set; } = string.Empty;
 

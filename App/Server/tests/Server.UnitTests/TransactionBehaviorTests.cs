@@ -55,7 +55,8 @@ public class TransactionBehaviorTests
     // Arrange
     var query = new TestQuery();
     var expectedResult = Result<string>.Success("test");
-    var queryBehavior = new TransactionBehavior<TestQuery, string>(_unitOfWork,
+    var queryBehavior = new TransactionBehavior<TestQuery, string>(
+      _unitOfWork,
       NullLogger<TransactionBehavior<TestQuery, string>>.Instance);
 
     // Act
@@ -207,4 +208,3 @@ public class TransactionBehaviorTests
 
   private record TestQuery : IQuery<string>;
 }
-

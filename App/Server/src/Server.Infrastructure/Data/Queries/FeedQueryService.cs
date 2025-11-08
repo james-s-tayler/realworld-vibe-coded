@@ -3,7 +3,7 @@ using Server.Core.Interfaces;
 
 namespace Server.Infrastructure.Data.Queries;
 
-public class FeedQueryService(AppDbContext _context) : IFeedQueryService
+public class FeedQueryService(AppDbContext context) : IFeedQueryService
 {
   public async Task<IEnumerable<Article>> GetFeedAsync(
     Guid userId,
@@ -11,7 +11,7 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
     int offset = 0)
   {
     // Get IDs of users that the current user follows
-    var followedUserIds = await _context.UserFollowings
+    var followedUserIds = await context.UserFollowings
       .AsNoTracking()
       .Where(uf => uf.FollowerId == userId)
       .Select(uf => uf.FollowedId)
@@ -24,7 +24,7 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
     }
 
     // Get articles from followed users
-    var articles = await _context.Articles
+    var articles = await context.Articles
       .Include(a => a.Author)
       .Include(a => a.Tags)
       .Include(a => a.FavoritedBy)
@@ -41,7 +41,7 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
   public async Task<int> GetFeedCountAsync(Guid userId)
   {
     // Get IDs of users that the current user follows
-    var followedUserIds = await _context.UserFollowings
+    var followedUserIds = await context.UserFollowings
       .AsNoTracking()
       .Where(uf => uf.FollowerId == userId)
       .Select(uf => uf.FollowedId)
@@ -54,10 +54,8 @@ public class FeedQueryService(AppDbContext _context) : IFeedQueryService
     }
 
     // Count articles from followed users
-    return await _context.Articles
+    return await context.Articles
       .Where(a => followedUserIds.Contains(a.AuthorId))
       .CountAsync();
   }
-
-
 }

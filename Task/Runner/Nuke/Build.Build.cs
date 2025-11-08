@@ -9,14 +9,14 @@ using static Nuke.Common.Tools.Npm.NpmTasks;
 
 public partial class Build
 {
-  Target BuildServer => _ => _
+  internal Target BuildServer => _ => _
     .Description("dotnet build (backend)")
     .Executes(() =>
     {
       DotNetBuild(s => s.SetProjectFile(ServerSolution));
     });
 
-  Target BuildServerPublish => _ => _
+  internal Target BuildServerPublish => _ => _
     .Description("Publish App/Server for linux-x64 in Release configuration with App/Client/dist in wwwroot")
     .DependsOn(BuildClient)
     .Executes(() =>
@@ -46,7 +46,7 @@ public partial class Build
       }
     });
 
-  Target BuildClient => _ => _
+  internal Target BuildClient => _ => _
     .Description("Build client (frontend)")
     .DependsOn(InstallClient)
     .Executes(() =>
