@@ -50,6 +50,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
           ErrorMessage = "Email already exists",
         });
       }
+
       user.UpdateEmail(request.Email);
     }
 
@@ -68,6 +69,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
           ErrorMessage = "Username already exists",
         });
       }
+
       user.UpdateUsername(request.Username);
     }
 

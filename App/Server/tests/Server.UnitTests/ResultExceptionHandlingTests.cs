@@ -210,6 +210,7 @@ public class ResultExceptionHandlingTests
   private class TestComplexType
   {
     public string Property1 { get; set; } = string.Empty;
+
     public int Property2 { get; set; }
   }
 }

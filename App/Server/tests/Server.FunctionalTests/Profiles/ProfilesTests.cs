@@ -8,7 +8,7 @@ using Server.Web.Users.Register;
 namespace Server.FunctionalTests.Profiles;
 
 [Collection("Profiles Integration Tests")]
-public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
+public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
 {
   [Fact]
   public async Task GetProfile_Unauthenticated_ReturnsProfile()
@@ -22,14 +22,14 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = email,
         Username = username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
 
     var request = new GetProfileRequest { Username = username };
-    var (response, result) = await App.Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
+    var (response, result) = await app.Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
@@ -51,11 +51,11 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user1Email,
         Username = user1Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
+    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
     var user1Token = result1.User.Token;
 
     var register2 = new RegisterRequest
@@ -64,13 +64,13 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user2Email,
         Username = user2Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
     });
@@ -98,11 +98,11 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user1Email,
         Username = user1Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
+    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
     var user1Token = result1.User.Token;
 
     var register2 = new RegisterRequest
@@ -111,13 +111,13 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user2Email,
         Username = user2Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
     });
@@ -138,7 +138,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
   public async Task GetProfile_NonExistentUser_ReturnsNotFound()
   {
     var request = new GetProfileRequest { Username = "nonexistentuser999" };
-    var (response, _) = await App.Client.GETAsync<Get, GetProfileRequest, object>(request);
+    var (response, _) = await app.Client.GETAsync<Get, GetProfileRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -147,7 +147,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
   public async Task GetProfile_InvalidUsername_ReturnsNotFound()
   {
     var request = new GetProfileRequest { Username = "invalid user!" };
-    var (response, _) = await App.Client.GETAsync<Get, GetProfileRequest, object>(request);
+    var (response, _) = await app.Client.GETAsync<Get, GetProfileRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -166,11 +166,11 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user1Email,
         Username = user1Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
+    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
     var user1Token = result1.User.Token;
 
     var register2 = new RegisterRequest
@@ -179,13 +179,13 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user2Email,
         Username = user2Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
     });
@@ -213,11 +213,11 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user1Email,
         Username = user1Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
+    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
     var user1Token = result1.User.Token;
 
     var register2 = new RegisterRequest
@@ -226,13 +226,13 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user2Email,
         Username = user2Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
     });
@@ -251,7 +251,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
   public async Task FollowProfile_WithoutAuthentication_ReturnsUnauthorized()
   {
     var followRequest = new FollowProfileRequest { Username = "someuser" };
-    var (response, _) = await App.Client.POSTAsync<Follow, FollowProfileRequest, object>(followRequest);
+    var (response, _) = await app.Client.POSTAsync<Follow, FollowProfileRequest, object>(followRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -268,14 +268,14 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = userEmail,
         Username = username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    var (_, result) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    var (_, result) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
     var token = result.User.Token;
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
     });
@@ -300,11 +300,11 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user1Email,
         Username = user1Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
+    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
     var user1Token = result1.User.Token;
 
     var register2 = new RegisterRequest
@@ -313,13 +313,13 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user2Email,
         Username = user2Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
     });
@@ -350,11 +350,11 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user1Email,
         Username = user1Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    var (_, result1) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
+    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
     var user1Token = result1.User.Token;
 
     var register2 = new RegisterRequest
@@ -363,13 +363,13 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
       {
         Email = user2Email,
         Username = user2Username,
-        Password = "password123"
-      }
+        Password = "password123",
+      },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
     });
@@ -384,7 +384,7 @@ public class ProfilesTests(ProfilesFixture App) : TestBase<ProfilesFixture>
   public async Task UnfollowProfile_WithoutAuthentication_ReturnsUnauthorized()
   {
     var unfollowRequest = new UnfollowProfileRequest { Username = "someuser" };
-    var (response, _) = await App.Client.DELETEAsync<Unfollow, UnfollowProfileRequest, object>(unfollowRequest);
+    var (response, _) = await app.Client.DELETEAsync<Unfollow, UnfollowProfileRequest, object>(unfollowRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }

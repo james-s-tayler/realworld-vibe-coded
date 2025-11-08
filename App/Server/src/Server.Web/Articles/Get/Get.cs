@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Get;
 /// <remarks>
 /// Gets a single article by its slug. Authentication optional.
 /// </remarks>
-public class Get(IMediator _mediator, IUserContext userContext) : Endpoint<GetArticleRequest, ArticleResponse, ArticleMapper>
+public class Get(IMediator mediator, IUserContext userContext) : Endpoint<GetArticleRequest, ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -29,10 +29,8 @@ public class Get(IMediator _mediator, IUserContext userContext) : Endpoint<GetAr
     // Get current user ID if authenticated
     var currentUserId = userContext.GetCurrentUserId();
 
-    var result = await _mediator.Send(new GetArticleQuery(request.Slug, currentUserId), cancellationToken);
+    var result = await mediator.Send(new GetArticleQuery(request.Slug, currentUserId), cancellationToken);
 
     await Send.ResultMapperAsync(result, article => Map.FromEntity(article), cancellationToken);
   }
 }
-
-

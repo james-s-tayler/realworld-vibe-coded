@@ -10,7 +10,7 @@ namespace Server.Web.Profiles.Unfollow;
 /// <remarks>
 /// Unfollow a user by username. Authentication required.
 /// </remarks>
-public class Unfollow(IMediator _mediator, IUserContext userContext) : Endpoint<UnfollowProfileRequest, ProfileResponse, ProfileMapper>
+public class Unfollow(IMediator mediator, IUserContext userContext) : Endpoint<UnfollowProfileRequest, ProfileResponse, ProfileMapper>
 {
   public override void Configure()
   {
@@ -27,7 +27,7 @@ public class Unfollow(IMediator _mediator, IUserContext userContext) : Endpoint<
   {
     var userId = userContext.GetRequiredCurrentUserId();
 
-    var result = await _mediator.Send(new UnfollowUserCommand(request.Username, userId), cancellationToken);
+    var result = await mediator.Send(new UnfollowUserCommand(request.Username, userId), cancellationToken);
 
     await Send.ResultMapperAsync(result, user => Map.FromEntity(user), cancellationToken);
   }

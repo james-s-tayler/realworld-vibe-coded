@@ -8,12 +8,12 @@ using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Comments.Get;
 
-public class GetCommentsHandler(IRepository<Article> _articleRepository, IRepository<User> _userRepository)
+public class GetCommentsHandler(IRepository<Article> articleRepository, IRepository<User> userRepository)
   : IQueryHandler<GetCommentsQuery, CommentsResponse>
 {
   public async Task<Result<CommentsResponse>> Handle(GetCommentsQuery request, CancellationToken cancellationToken)
   {
-    var article = await _articleRepository.FirstOrDefaultAsync(
+    var article = await articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(request.Slug), cancellationToken);
 
     if (article == null)
@@ -25,7 +25,7 @@ public class GetCommentsHandler(IRepository<Article> _articleRepository, IReposi
     User? currentUser = null;
     if (request.CurrentUserId.HasValue)
     {
-      currentUser = await _userRepository.FirstOrDefaultAsync(
+      currentUser = await userRepository.FirstOrDefaultAsync(
         new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken);
     }
 

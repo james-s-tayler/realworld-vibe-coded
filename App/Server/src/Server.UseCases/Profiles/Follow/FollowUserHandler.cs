@@ -5,13 +5,13 @@ using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Profiles.Follow;
 
-public class FollowUserHandler(IRepository<User> _userRepository)
+public class FollowUserHandler(IRepository<User> userRepository)
   : ICommandHandler<FollowUserCommand, User>
 {
   public async Task<Result<User>> Handle(FollowUserCommand request, CancellationToken cancellationToken)
   {
     // Find the user to follow
-    var userToFollow = await _userRepository.FirstOrDefaultAsync(
+    var userToFollow = await userRepository.FirstOrDefaultAsync(
       new UserByUsernameSpec(request.Username), cancellationToken);
 
     if (userToFollow == null)
@@ -20,7 +20,7 @@ public class FollowUserHandler(IRepository<User> _userRepository)
     }
 
     // Get current user with following relationships
-    var currentUser = await _userRepository.FirstOrDefaultAsync(
+    var currentUser = await userRepository.FirstOrDefaultAsync(
       new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
 
     if (currentUser == null)
@@ -30,7 +30,7 @@ public class FollowUserHandler(IRepository<User> _userRepository)
 
     // Follow the user
     currentUser.Follow(userToFollow);
-    await _userRepository.UpdateAsync(currentUser, cancellationToken);
+    await userRepository.UpdateAsync(currentUser, cancellationToken);
 
     return Result<User>.Success(userToFollow);
   }

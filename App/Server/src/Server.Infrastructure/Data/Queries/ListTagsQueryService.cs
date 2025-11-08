@@ -2,11 +2,11 @@
 
 namespace Server.Infrastructure.Data.Queries;
 
-public class ListTagsQueryService(AppDbContext _context) : IListTagsQueryService
+public class ListTagsQueryService(AppDbContext context) : IListTagsQueryService
 {
   public async Task<IEnumerable<string>> ListAsync()
   {
-    return await _context.Tags
+    return await context.Tags
       .AsNoTracking()
       .Select(t => t.Name)
       .ToListAsync();

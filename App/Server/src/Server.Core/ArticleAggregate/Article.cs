@@ -18,21 +18,41 @@ public class Article : EntityBase, IAggregateRoot
     Comments = new List<Comment>();
   }
 
-  private Article() { } // For EF Core
+  private Article()
+  {
+  } // For EF Core
 
   public string Title { get; private set; } = string.Empty;
+
   public string Description { get; private set; } = string.Empty;
+
   public string Body { get; private set; } = string.Empty;
+
   public string Slug { get; private set; } = string.Empty;
 
   public Guid AuthorId { get; private set; }
+
   public User Author { get; private set; } = default!;
 
   public List<Tag> Tags { get; private set; } = new();
+
   public List<User> FavoritedBy { get; private set; } = new();
+
   public List<Comment> Comments { get; private set; } = new();
 
   public int FavoritesCount => FavoritedBy.Count;
+
+  public static string GenerateSlug(string title)
+  {
+    return title.ToLowerInvariant()
+      .Replace(" ", "-")
+      .Replace(".", string.Empty)
+      .Replace(",", string.Empty)
+      .Replace("!", string.Empty)
+      .Replace("?", string.Empty)
+      .Replace("'", string.Empty)
+      .Replace("\"", string.Empty);
+  }
 
   /// <summary>
   /// Checks if the article is favorited by a specific user
@@ -43,6 +63,7 @@ public class Article : EntityBase, IAggregateRoot
     {
       return false;
     }
+
     return FavoritedBy.Any(u => u.Id == userId.Value);
   }
 
@@ -55,19 +76,8 @@ public class Article : EntityBase, IAggregateRoot
     {
       return false;
     }
-    return user.IsFollowing(AuthorId);
-  }
 
-  public static string GenerateSlug(string title)
-  {
-    return title.ToLowerInvariant()
-      .Replace(" ", "-")
-      .Replace(".", "")
-      .Replace(",", "")
-      .Replace("!", "")
-      .Replace("?", "")
-      .Replace("'", "")
-      .Replace("\"", "");
+    return user.IsFollowing(AuthorId);
   }
 
   public void Update(string title, string description, string body)

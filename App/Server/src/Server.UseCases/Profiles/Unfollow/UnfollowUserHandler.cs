@@ -5,13 +5,13 @@ using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Profiles.Unfollow;
 
-public class UnfollowUserHandler(IRepository<User> _userRepository)
+public class UnfollowUserHandler(IRepository<User> userRepository)
   : ICommandHandler<UnfollowUserCommand, User>
 {
   public async Task<Result<User>> Handle(UnfollowUserCommand request, CancellationToken cancellationToken)
   {
     // Find the user to unfollow
-    var userToUnfollow = await _userRepository.FirstOrDefaultAsync(
+    var userToUnfollow = await userRepository.FirstOrDefaultAsync(
       new UserByUsernameSpec(request.Username), cancellationToken);
 
     if (userToUnfollow == null)
@@ -20,7 +20,7 @@ public class UnfollowUserHandler(IRepository<User> _userRepository)
     }
 
     // Get current user with following relationships
-    var currentUser = await _userRepository.FirstOrDefaultAsync(
+    var currentUser = await userRepository.FirstOrDefaultAsync(
       new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
 
     if (currentUser == null)
@@ -36,7 +36,7 @@ public class UnfollowUserHandler(IRepository<User> _userRepository)
 
     // Unfollow the user
     currentUser.Unfollow(userToUnfollow);
-    await _userRepository.UpdateAsync(currentUser, cancellationToken);
+    await userRepository.UpdateAsync(currentUser, cancellationToken);
 
     return Result<User>.Success(userToUnfollow);
   }

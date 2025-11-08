@@ -214,6 +214,7 @@ public class UnitOfWorkTests
 
     // Assert
     result.IsSuccess.ShouldBeFalse();
+
     // Discarded audit events should not be inserted
     // The audit scope is discarded, so no Transaction event should be in the list
     var transactionEvents = auditEvents.Where(e => e.EventType == "Transaction").ToList();

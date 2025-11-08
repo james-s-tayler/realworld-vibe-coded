@@ -31,6 +31,7 @@ public class EmptyArticlesFixture : AppFixture<Program>
     });
 
     using var serviceProvider = serviceCollection.BuildServiceProvider();
+
     // AppDbContext constructor requires IDomainEventDispatcher but it's nullable,
     // so we can create it with a null DbContextOptions
     var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();

@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Comments.Create;
 /// <remarks>
 /// Create a new comment for an article. Authentication required.
 /// </remarks>
-public class Create(IMediator _mediator, IUserContext userContext) : Endpoint<CreateCommentRequest, CommentResponse>
+public class Create(IMediator mediator, IUserContext userContext) : Endpoint<CreateCommentRequest, CommentResponse>
 {
   public override void Configure()
   {
@@ -31,7 +31,7 @@ public class Create(IMediator _mediator, IUserContext userContext) : Endpoint<Cr
     // Get slug from route parameter
     var slug = Route<string>("slug") ?? string.Empty;
 
-    var result = await _mediator.Send(new CreateCommentCommand(slug, request.Comment.Body, userId, userId), cancellationToken);
+    var result = await mediator.Send(new CreateCommentCommand(slug, request.Comment.Body, userId, userId), cancellationToken);
 
     await Send.ResultValueAsync(result, cancellationToken);
   }

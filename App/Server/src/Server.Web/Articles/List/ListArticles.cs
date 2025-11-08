@@ -13,7 +13,7 @@ namespace Server.Web.Articles.List;
 /// <remarks>
 /// List articles globally. Optional filters for tag, author, favorited user. Authentication optional.
 /// </remarks>
-public class ListArticles(IMediator _mediator, IUserContext userContext) : Endpoint<ListArticlesRequest, ArticlesResponse, ArticleMapper>
+public class ListArticles(IMediator mediator, IUserContext userContext) : Endpoint<ListArticlesRequest, ArticlesResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -31,18 +31,23 @@ public class ListArticles(IMediator _mediator, IUserContext userContext) : Endpo
     // Get current user ID if authenticated
     var currentUserId = userContext.GetCurrentUserId();
 
-    var result = await _mediator.Send(new ListArticlesQuery(
-      request.Tag,
-      request.Author,
-      request.Favorited,
-      request.Limit,
-      request.Offset,
-      currentUserId), cancellationToken);
+    var result = await mediator.Send(
+      new ListArticlesQuery(
+        request.Tag,
+        request.Author,
+        request.Favorited,
+        request.Limit,
+        request.Offset,
+        currentUserId),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, articles =>
-    {
-      var articleDtos = Enumerable.Select<Article, ArticleDto>(articles, article => Map.FromEntity(article).Article).ToList();
-      return new ArticlesResponse(articleDtos, articleDtos.Count);
-    }, cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      articles =>
+      {
+        var articleDtos = Enumerable.Select<Article, ArticleDto>(articles, article => Map.FromEntity(article).Article).ToList();
+        return new ArticlesResponse(articleDtos, articleDtos.Count);
+      },
+      cancellationToken);
   }
 }

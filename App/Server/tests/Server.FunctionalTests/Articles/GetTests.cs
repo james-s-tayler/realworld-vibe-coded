@@ -6,7 +6,7 @@ using Server.Web.Articles.Get;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
+public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
 {
   [Fact]
   public async Task GetArticle_WithAuthentication_ReturnsArticle()
@@ -17,14 +17,14 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Get Article Test",
         Description = "Description",
-        Body = "Body"
-      }
+        Body = "Body",
+      },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await App.ArticlesUser1Client.GETAsync<Get, GetArticleRequest, ArticleResponse>(new GetArticleRequest { Slug = slug });
+    var (response, result) = await app.ArticlesUser1Client.GETAsync<Get, GetArticleRequest, ArticleResponse>(new GetArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -41,14 +41,14 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Get Article Unauthenticated",
         Description = "Description",
-        Body = "Body"
-      }
+        Body = "Body",
+      },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await App.Client.GETAsync<Get, GetArticleRequest, ArticleResponse>(new GetArticleRequest { Slug = slug });
+    var (response, result) = await app.Client.GETAsync<Get, GetArticleRequest, ArticleResponse>(new GetArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -58,7 +58,7 @@ public class GetTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task GetArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var (response, _) = await App.Client.GETAsync<Get, GetArticleRequest, object>(new GetArticleRequest { Slug = "no-such-article" });
+    var (response, _) = await app.Client.GETAsync<Get, GetArticleRequest, object>(new GetArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }

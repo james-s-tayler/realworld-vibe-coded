@@ -27,7 +27,7 @@ public partial class RemoveContributorsTable : Migration
           Status = table.Column<int>(type: "int", nullable: false),
           PhoneNumber_CountryCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
           PhoneNumber_Extension = table.Column<string>(type: "nvarchar(max)", nullable: true),
-          PhoneNumber_Number = table.Column<string>(type: "nvarchar(max)", nullable: true)
+          PhoneNumber_Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
         },
         constraints: table =>
         {

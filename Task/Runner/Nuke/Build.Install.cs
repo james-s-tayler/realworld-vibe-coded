@@ -9,7 +9,7 @@ using static Nuke.Common.Tools.Npm.NpmTasks;
 
 public partial class Build
 {
-  Target InstallClient => _ => _
+  internal Target InstallClient => _ => _
       .Description("Run npm ci if node_modules is missing or package-lock.json is newer")
       .Executes(() =>
       {
@@ -29,7 +29,7 @@ public partial class Build
         }
       });
 
-  Target InstallGitHooks => _ => _
+  internal Target InstallGitHooks => _ => _
     .Description("Install git hooks from .husky")
     .Executes(() =>
     {
@@ -39,7 +39,7 @@ public partial class Build
         .SetCommand("prepare"));
     });
 
-  Target InstallDotnetToolLiquidReports => _ => _
+  internal Target InstallDotnetToolLiquidReports => _ => _
       .Description("Install LiquidTestReports.Cli as a global dotnet tool")
       .Executes(() =>
       {

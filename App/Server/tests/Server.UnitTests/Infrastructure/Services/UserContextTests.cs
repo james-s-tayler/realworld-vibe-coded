@@ -50,10 +50,12 @@ public class UserContextTests
   {
     // Arrange
     var expectedUserId = Guid.NewGuid();
-    var identity = new ClaimsIdentity(new[]
-    {
-      new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString())
-    }, "test");
+    var identity = new ClaimsIdentity(
+      new[]
+      {
+        new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString()),
+      },
+      "test");
     var user = new ClaimsPrincipal(identity);
 
     _httpContext.User.Returns(user);
@@ -70,10 +72,12 @@ public class UserContextTests
   public void GetCurrentUserId_WhenUserIdClaimIsInvalid_ReturnsNull()
   {
     // Arrange
-    var identity = new ClaimsIdentity(new[]
-    {
-      new Claim(ClaimTypes.NameIdentifier, "invalid")
-    }, "test");
+    var identity = new ClaimsIdentity(
+      new[]
+      {
+        new Claim(ClaimTypes.NameIdentifier, "invalid"),
+      },
+      "test");
     var user = new ClaimsPrincipal(identity);
 
     _httpContext.User.Returns(user);
@@ -90,10 +94,12 @@ public class UserContextTests
   public void GetCurrentUserId_WhenUserIdClaimIsMissing_ReturnsNull()
   {
     // Arrange
-    var identity = new ClaimsIdentity(new[]
-    {
-      new Claim(ClaimTypes.Name, "testuser")
-    }, "test");
+    var identity = new ClaimsIdentity(
+      new[]
+      {
+        new Claim(ClaimTypes.Name, "testuser"),
+      },
+      "test");
     var user = new ClaimsPrincipal(identity);
 
     _httpContext.User.Returns(user);
@@ -111,10 +117,12 @@ public class UserContextTests
   {
     // Arrange
     var expectedUserId = Guid.NewGuid();
-    var identity = new ClaimsIdentity(new[]
-    {
-      new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString())
-    }, "test");
+    var identity = new ClaimsIdentity(
+      new[]
+      {
+        new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString()),
+      },
+      "test");
     var user = new ClaimsPrincipal(identity);
 
     _httpContext.User.Returns(user);
@@ -144,10 +152,12 @@ public class UserContextTests
   public void IsAuthenticated_WhenUserAuthenticated_ReturnsTrue()
   {
     // Arrange
-    var identity = new ClaimsIdentity(new[]
-    {
-      new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
-    }, "test");
+    var identity = new ClaimsIdentity(
+      new[]
+      {
+        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+      },
+      "test");
     var user = new ClaimsPrincipal(identity);
 
     _httpContext.User.Returns(user);

@@ -12,5 +12,5 @@ public enum ResultStatus
   NoContent,
   Conflict,
   CriticalError,
-  Unavailable
+  Unavailable,
 }

@@ -7,7 +7,7 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
   public void Configure(EntityTypeBuilder<Tag> builder)
   {
     builder.Property(x => x.Name)
-      .HasMaxLength(DataSchemaConstants.TAG_NAME_LENGTH)
+      .HasMaxLength(DataSchemaConstants.TagNameLength)
       .IsRequired();
 
     builder.HasIndex(x => x.Name)

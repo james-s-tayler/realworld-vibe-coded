@@ -8,7 +8,7 @@ using static Nuke.Common.Tools.Npm.NpmTasks;
 
 public partial class Build
 {
-  Target LintServerVerify => _ => _
+  internal Target LintServerVerify => _ => _
       .Description("Verify backend formatting & analyzers (no changes). Fails if issues found")
       .Executes(() =>
       {
@@ -18,7 +18,7 @@ public partial class Build
               .SetVerifyNoChanges(true));
       });
 
-  Target LintServerFix => _ => _
+  internal Target LintServerFix => _ => _
       .Description("Fix backend formatting & analyzer issues automatically")
       .Executes(() =>
       {
@@ -27,7 +27,7 @@ public partial class Build
               .SetProject(ServerSolution));
       });
 
-  Target LintClientVerify => _ => _
+  internal Target LintClientVerify => _ => _
       .Description("Verify client code formatting and style")
       .DependsOn(InstallClient)
       .Executes(() =>
@@ -38,7 +38,7 @@ public partial class Build
               .SetCommand("lint"));
       });
 
-  Target LintClientFix => _ => _
+  internal Target LintClientFix => _ => _
       .Description("Fix client code formatting and style issues automatically")
       .DependsOn(InstallClient)
       .Executes(() =>
@@ -49,7 +49,7 @@ public partial class Build
               .SetCommand("lint:fix"));
       });
 
-  Target LintNukeVerify => _ => _
+  internal Target LintNukeVerify => _ => _
       .Description("Verify Nuke build targets for documentation and naming conventions")
       .Executes(() =>
       {
@@ -68,7 +68,7 @@ public partial class Build
               .SetProjectFile(testProject));
       });
 
-  Target LintNukeFix => _ => _
+  internal Target LintNukeFix => _ => _
       .Description("Fix Nuke build formatting and style issues automatically")
       .Executes(() =>
       {
@@ -81,7 +81,7 @@ public partial class Build
               .SetSeverity("error"));
       });
 
-  Target LintAllVerify => _ => _
+  internal Target LintAllVerify => _ => _
       .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
       .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify)
       .Executes(() =>
@@ -94,7 +94,7 @@ public partial class Build
               .SetVerifyNoChanges(true));
       });
 
-  Target LintAllFix => _ => _
+  internal Target LintAllFix => _ => _
       .Description("Fix all C# formatting & analyzer issues automatically")
       .DependsOn(LintClientFix, LintServerFix, LintNukeFix)
       .Executes(() =>

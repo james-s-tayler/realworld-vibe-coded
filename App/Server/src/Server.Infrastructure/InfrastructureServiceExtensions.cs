@@ -9,6 +9,7 @@ using Server.SharedKernel.Persistence;
 
 
 namespace Server.Infrastructure;
+
 public static class InfrastructureServiceExtensions
 {
   public static IServiceCollection AddInfrastructureServices(

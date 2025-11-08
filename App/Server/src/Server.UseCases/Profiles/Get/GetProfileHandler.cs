@@ -5,12 +5,12 @@ using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Profiles.Get;
 
-public class GetProfileHandler(IRepository<User> _userRepository)
+public class GetProfileHandler(IRepository<User> userRepository)
   : IQueryHandler<GetProfileQuery, User>
 {
   public async Task<Result<User>> Handle(GetProfileQuery request, CancellationToken cancellationToken)
   {
-    var user = await _userRepository.FirstOrDefaultAsync(
+    var user = await userRepository.FirstOrDefaultAsync(
       new UserByUsernameWithFollowingSpec(request.Username), cancellationToken);
 
     if (user == null)

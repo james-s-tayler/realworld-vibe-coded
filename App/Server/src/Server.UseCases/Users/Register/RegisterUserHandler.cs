@@ -60,8 +60,10 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
 
     var createdUser = await _repository.AddAsync(newUser, cancellationToken);
 
-    _logger.LogInformation("User {Username} registered successfully with ID {UserId}",
-      createdUser.Username, createdUser.Id);
+    _logger.LogInformation(
+      "User {Username} registered successfully with ID {UserId}",
+      createdUser.Username,
+      createdUser.Id);
 
     return Result<User>.Created(createdUser);
   }

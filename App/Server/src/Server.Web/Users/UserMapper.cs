@@ -34,7 +34,7 @@ public class UserMapper : ResponseMapper<UserResponse, User>
       Username = user.Username,
       Bio = user.Bio,
       Image = user.Image,
-      Token = token
+      Token = token,
     };
   }
 }

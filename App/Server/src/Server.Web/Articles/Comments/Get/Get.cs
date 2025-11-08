@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Comments.Get;
 /// <remarks>
 /// Get all comments for an article. Authentication optional.
 /// </remarks>
-public class Get(IMediator _mediator, IUserContext userContext) : Endpoint<GetCommentsRequest, CommentsResponse>
+public class Get(IMediator mediator, IUserContext userContext) : Endpoint<GetCommentsRequest, CommentsResponse>
 {
   public override void Configure()
   {
@@ -29,7 +29,7 @@ public class Get(IMediator _mediator, IUserContext userContext) : Endpoint<GetCo
     // Get current user ID if authenticated
     var currentUserId = userContext.GetCurrentUserId();
 
-    var result = await _mediator.Send(new GetCommentsQuery(request.Slug, currentUserId), cancellationToken);
+    var result = await mediator.Send(new GetCommentsQuery(request.Slug, currentUserId), cancellationToken);
 
     await Send.ResultValueAsync(result, cancellationToken);
   }

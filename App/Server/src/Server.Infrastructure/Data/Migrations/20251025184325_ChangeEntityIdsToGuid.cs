@@ -46,7 +46,7 @@ public partial class ChangeEntityIdsToGuid : Migration
           CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
         },
         constraints: table =>
         {
@@ -76,7 +76,7 @@ public partial class ChangeEntityIdsToGuid : Migration
           CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
         },
         constraints: table =>
         {
@@ -104,7 +104,7 @@ public partial class ChangeEntityIdsToGuid : Migration
           CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
         },
         constraints: table =>
         {
@@ -141,7 +141,7 @@ public partial class ChangeEntityIdsToGuid : Migration
           CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
         },
         constraints: table =>
         {
@@ -181,7 +181,7 @@ public partial class ChangeEntityIdsToGuid : Migration
           CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
         },
         constraints: table =>
         {
@@ -211,7 +211,7 @@ public partial class ChangeEntityIdsToGuid : Migration
         columns: table => new
         {
           ArticleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-          FavoritedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+          FavoritedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
         },
         constraints: table =>
         {
@@ -241,7 +241,7 @@ public partial class ChangeEntityIdsToGuid : Migration
         columns: table => new
         {
           ArticlesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-          TagsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+          TagsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
         },
         constraints: table =>
         {

@@ -9,7 +9,7 @@ namespace Server.Web.Users.Register;
 /// <remarks>
 /// Creates a new user account given email, username, and password.
 /// </remarks>
-public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterResponse, UserMapper>
+public class Register(IMediator mediator) : Endpoint<RegisterRequest, RegisterResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -25,8 +25,8 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
         {
           Email = "user@example.com",
           Username = "username",
-          Password = "password123"
-        }
+          Password = "password123",
+        },
       };
     });
   }
@@ -35,14 +35,19 @@ public class Register(IMediator _mediator) : Endpoint<RegisterRequest, RegisterR
     RegisterRequest request,
     CancellationToken cancellationToken)
   {
-    var result = await _mediator.Send(new RegisterUserCommand(
-      request.User.Email,
-      request.User.Username,
-      request.User.Password), cancellationToken);
+    var result = await mediator.Send(
+      new RegisterUserCommand(
+        request.User.Email,
+        request.User.Username,
+        request.User.Password),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, userDto => new RegisterResponse
-    {
-      User = Map.FromEntity(userDto)
-    }, cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      userDto => new RegisterResponse
+      {
+        User = Map.FromEntity(userDto),
+      },
+      cancellationToken);
   }
 }
