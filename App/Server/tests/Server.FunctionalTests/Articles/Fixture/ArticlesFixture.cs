@@ -99,7 +99,7 @@ public class ArticlesFixture : AppFixture<Program>
       {
         Email = ArticlesUser1Email,
         Username = ArticlesUser1Username,
-        Password = articlesUser1Password
+        Password = articlesUser1Password,
       },
     };
 
@@ -117,7 +117,7 @@ public class ArticlesFixture : AppFixture<Program>
       {
         Email = ArticlesUser2Email,
         Username = ArticlesUser2Username,
-        Password = articlesUser2Password
+        Password = articlesUser2Password,
       },
     };
 

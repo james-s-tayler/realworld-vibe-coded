@@ -6,7 +6,7 @@ using Server.Web.Articles.Delete;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
+public class DeleteTests(ArticlesFixture app) : TestBase<ArticlesFixture>
 {
   [Fact]
   public async Task DeleteArticle_WithAuthentication_ReturnsNoContent()
@@ -17,14 +17,14 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Delete Article Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
+    var (response, _) = await app.ArticlesUser1Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
   }
@@ -32,7 +32,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task DeleteArticle_WithNonExistentArticle_ReturnsNotFound()
   {
-    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = "no-such-article" });
+    var (response, _) = await app.ArticlesUser1Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -46,14 +46,14 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Delete Unauth Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, _) = await App.Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
+    var (response, _) = await app.Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -67,14 +67,14 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Delete Wrong User Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, _) = await App.ArticlesUser2Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
+    var (response, _) = await app.ArticlesUser2Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }

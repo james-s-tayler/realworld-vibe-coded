@@ -18,8 +18,11 @@ public class GlobalExceptionHandler : IGlobalPostProcessor
     var exception = ctx.ExceptionDispatchInfo.SourceException;
 
     var logger = ctx.HttpContext.Resolve<ILogger<GlobalExceptionHandler>>();
-    logger.LogError(exception, "An unhandled exception occurred: {ExceptionType} - {Message}",
-      exception.GetType().Name, exception.Message);
+    logger.LogError(
+      exception,
+      "An unhandled exception occurred: {ExceptionType} - {Message}",
+      exception.GetType().Name,
+      exception.Message);
 
     // Mark the exception as handled to prevent automatic re-throwing
     ctx.MarkExceptionAsHandled();

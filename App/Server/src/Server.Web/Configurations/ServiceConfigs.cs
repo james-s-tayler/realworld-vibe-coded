@@ -65,14 +65,22 @@ public static class ServiceConfigs
           {
             context.HandleResponse();
             await context.HttpContext.Response.SendErrorsAsync(
-              new List<ValidationFailure>([new ValidationFailure(context.Error ?? "authorization", context.ErrorDescription ?? "Unauthorized")
-            ]), StatusCodes.Status401Unauthorized);
+              new List<ValidationFailure>([
+                new ValidationFailure(
+                  context.Error ?? "authorization",
+                  context.ErrorDescription ?? "Unauthorized"),
+              ]),
+              StatusCodes.Status401Unauthorized);
           },
           OnForbidden = async context =>
           {
             await context.HttpContext.Response.SendErrorsAsync(
-              new List<ValidationFailure>([new ValidationFailure("authorization", context.Result?.Failure?.Message ?? "Forbidden")
-              ]), StatusCodes.Status403Forbidden);
+              new List<ValidationFailure>([
+                new ValidationFailure(
+                  "authorization",
+                  context.Result?.Failure?.Message ?? "Forbidden"),
+              ]),
+              StatusCodes.Status403Forbidden);
           },
         };
       });

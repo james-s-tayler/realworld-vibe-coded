@@ -52,9 +52,10 @@ public class UserContextTests
     var expectedUserId = Guid.NewGuid();
     var identity = new ClaimsIdentity(
       new[]
-    {
-      new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString()),
-    }, "test");
+      {
+        new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString()),
+      },
+      "test");
     var user = new ClaimsPrincipal(identity);
 
     _httpContext.User.Returns(user);
@@ -73,9 +74,10 @@ public class UserContextTests
     // Arrange
     var identity = new ClaimsIdentity(
       new[]
-    {
-      new Claim(ClaimTypes.NameIdentifier, "invalid"),
-    }, "test");
+      {
+        new Claim(ClaimTypes.NameIdentifier, "invalid"),
+      },
+      "test");
     var user = new ClaimsPrincipal(identity);
 
     _httpContext.User.Returns(user);
@@ -94,9 +96,10 @@ public class UserContextTests
     // Arrange
     var identity = new ClaimsIdentity(
       new[]
-    {
-      new Claim(ClaimTypes.Name, "testuser"),
-    }, "test");
+      {
+        new Claim(ClaimTypes.Name, "testuser"),
+      },
+      "test");
     var user = new ClaimsPrincipal(identity);
 
     _httpContext.User.Returns(user);
@@ -116,9 +119,10 @@ public class UserContextTests
     var expectedUserId = Guid.NewGuid();
     var identity = new ClaimsIdentity(
       new[]
-    {
-      new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString()),
-    }, "test");
+      {
+        new Claim(ClaimTypes.NameIdentifier, expectedUserId.ToString()),
+      },
+      "test");
     var user = new ClaimsPrincipal(identity);
 
     _httpContext.User.Returns(user);
@@ -150,9 +154,10 @@ public class UserContextTests
     // Arrange
     var identity = new ClaimsIdentity(
       new[]
-    {
-      new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-    }, "test");
+      {
+        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+      },
+      "test");
     var user = new ClaimsPrincipal(identity);
 
     _httpContext.User.Returns(user);

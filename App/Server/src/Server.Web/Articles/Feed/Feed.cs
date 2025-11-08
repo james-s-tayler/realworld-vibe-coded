@@ -29,12 +29,20 @@ public class Feed(IMediator mediator, IUserContext userContext) : Endpoint<FeedR
     // Get current user ID from service
     var userId = userContext.GetRequiredCurrentUserId();
 
-    var result = await mediator.Send(new GetFeedQuery(userId, request.Limit, request.Offset), cancellationToken);
+    var result = await mediator.Send(
+      new GetFeedQuery(
+        userId,
+        request.Limit,
+        request.Offset),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, articles =>
-    {
-      var articleDtos = articles.Select(article => Map.FromEntity(article).Article).ToList();
-      return new ArticlesResponse(articleDtos, articleDtos.Count);
-    }, cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      articles =>
+      {
+        var articleDtos = articles.Select(article => Map.FromEntity(article).Article).ToList();
+        return new ArticlesResponse(articleDtos, articleDtos.Count);
+      },
+      cancellationToken);
   }
 }

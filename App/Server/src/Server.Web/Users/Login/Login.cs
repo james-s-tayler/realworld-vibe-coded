@@ -24,7 +24,7 @@ public class Login(IMediator mediator) : Endpoint<LoginRequest, LoginResponse, U
         User = new LoginUserData
         {
           Email = "user@example.com",
-          Password = "password123"
+          Password = "password123",
         },
       };
     });
@@ -36,12 +36,16 @@ public class Login(IMediator mediator) : Endpoint<LoginRequest, LoginResponse, U
   {
     var result = await mediator.Send(
       new LoginUserQuery(
-      request.User.Email,
-      request.User.Password), cancellationToken);
+        request.User.Email,
+        request.User.Password),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, userDto => new LoginResponse
-    {
-      User = Map.FromEntity(userDto),
-    }, cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      userDto => new LoginResponse
+      {
+        User = Map.FromEntity(userDto),
+      },
+      cancellationToken);
   }
 }

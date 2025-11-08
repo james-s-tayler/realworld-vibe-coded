@@ -25,7 +25,7 @@ public class Register(IMediator mediator) : Endpoint<RegisterRequest, RegisterRe
         {
           Email = "user@example.com",
           Username = "username",
-          Password = "password123"
+          Password = "password123",
         },
       };
     });
@@ -37,13 +37,17 @@ public class Register(IMediator mediator) : Endpoint<RegisterRequest, RegisterRe
   {
     var result = await mediator.Send(
       new RegisterUserCommand(
-      request.User.Email,
-      request.User.Username,
-      request.User.Password), cancellationToken);
+        request.User.Email,
+        request.User.Username,
+        request.User.Password),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, userDto => new RegisterResponse
-    {
-      User = Map.FromEntity(userDto),
-    }, cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      userDto => new RegisterResponse
+      {
+        User = Map.FromEntity(userDto),
+      },
+      cancellationToken);
   }
 }

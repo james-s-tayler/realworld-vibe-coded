@@ -38,9 +38,10 @@ public class TransactionBehavior<TRequest, T> : IPipelineBehavior<TRequest, Resu
 
     var response = await _unitOfWork.ExecuteInTransactionAsync(
       async (ct) =>
-    {
-      return await next();
-    }, cancellationToken);
+      {
+        return await next();
+      },
+      cancellationToken);
 
     if (response.IsSuccess)
     {

@@ -62,7 +62,8 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
 
     _logger.LogInformation(
       "User {Username} registered successfully with ID {UserId}",
-      createdUser.Username, createdUser.Id);
+      createdUser.Username,
+      createdUser.Id);
 
     return Result<User>.Created(createdUser);
   }

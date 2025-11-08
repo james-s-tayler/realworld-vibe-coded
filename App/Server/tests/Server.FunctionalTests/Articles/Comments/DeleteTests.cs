@@ -9,7 +9,7 @@ using Create = Server.Web.Articles.Create.Create;
 namespace Server.FunctionalTests.Articles.Comments;
 
 [Collection("Articles Integration Tests")]
-public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
+public class DeleteTests(ArticlesFixture app) : TestBase<ArticlesFixture>
 {
   [Fact]
   public async Task DeleteComment_WithoutAuthentication_ReturnsUnauthorized()
@@ -20,27 +20,27 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Delete Comment Unauth Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
     {
       Comment = new CreateCommentDto
       {
-        Body = "Comment"
+        Body = "Comment",
       },
     };
 
-    var createCommentResponse = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    var createCommentResponse = await app.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
     var createCommentResult = await createCommentResponse.Content.ReadFromJsonAsync<CommentResponse>(cancellationToken: TestContext.Current.CancellationToken);
     createCommentResult.ShouldNotBeNull();
     var commentId = createCommentResult.Comment.Id;
 
-    var (response, _) = await App.Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = commentId });
+    var (response, _) = await app.Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = commentId });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -54,27 +54,27 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Delete Comment Wrong User",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
     {
       Comment = new CreateCommentDto
       {
-        Body = "Comment"
+        Body = "Comment",
       },
     };
 
-    var createCommentResponse = await App.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    var createCommentResponse = await app.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
     var createCommentResult = await createCommentResponse.Content.ReadFromJsonAsync<CommentResponse>(cancellationToken: TestContext.Current.CancellationToken);
     createCommentResult.ShouldNotBeNull();
     var commentId = createCommentResult.Comment.Id;
 
-    var (response, _) = await App.ArticlesUser2Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = commentId });
+    var (response, _) = await app.ArticlesUser2Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = commentId });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }
@@ -82,7 +82,7 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task DeleteComment_WithNonExistentArticle_ReturnsUnprocessableEntity()
   {
-    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = "no-such-article", Id = Guid.NewGuid() });
+    var (response, _) = await app.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = "no-such-article", Id = Guid.NewGuid() });
 
     response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
   }
@@ -96,14 +96,14 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Delete Nonexistent Comment",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
-    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = Guid.NewGuid() });
+    var (response, _) = await app.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = Guid.NewGuid() });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -117,18 +117,18 @@ public class DeleteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Invalid Comment Id Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createArticleResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     // SRV007: Using raw HttpClient.DeleteAsync is necessary here to test invalid comment ID format
     // (non-numeric "abc"). FastEndpoints DELETEAsync would require a valid DeleteCommentRequest with int Id,
     // which would not allow testing this edge case.
 #pragma warning disable SRV007
-    var response = await App.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/abc", TestContext.Current.CancellationToken);
+    var response = await app.ArticlesUser1Client.DeleteAsync($"/api/articles/{slug}/comments/abc", TestContext.Current.CancellationToken);
 #pragma warning restore SRV007
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);

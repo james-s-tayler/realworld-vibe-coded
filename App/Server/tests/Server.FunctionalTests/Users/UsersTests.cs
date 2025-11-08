@@ -7,7 +7,7 @@ using Server.Web.Users.Update;
 namespace Server.FunctionalTests.Users;
 
 [Collection("Users Integration Tests")]
-public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
+public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
 {
   [Fact]
   public async Task Register_WithValidCredentials_ReturnsJwtAndUser()
@@ -18,11 +18,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = $"test-{Guid.NewGuid()}@example.com",
         Username = $"testuser-{Guid.NewGuid()}",
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    var (response, result) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request);
+    var (response, result) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Created);
     result.User.ShouldNotBeNull();
@@ -41,11 +41,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Username = $"user1-{Guid.NewGuid()}",
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
 
     var request2 = new RegisterRequest
     {
@@ -53,11 +53,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Username = $"user2-{Guid.NewGuid()}",
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request2);
+    var (response, _) = await app.Client.POSTAsync<Register, RegisterRequest, object>(request2);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -75,22 +75,22 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Username = username,
-        Password = password
+        Password = password,
       },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
 
     var loginRequest = new LoginRequest
     {
       User = new LoginUserData
       {
         Email = email,
-        Password = password
+        Password = password,
       },
     };
 
-    var (response, result) = await App.Client.POSTAsync<Login, LoginRequest, LoginResponse>(loginRequest);
+    var (response, result) = await app.Client.POSTAsync<Login, LoginRequest, LoginResponse>(loginRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.User.ShouldNotBeNull();
@@ -107,11 +107,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       User = new LoginUserData
       {
         Email = "nonexistent@example.com",
-        Password = "wrongpassword"
+        Password = "wrongpassword",
       },
     };
 
-    var (response, _) = await App.Client.POSTAsync<Login, LoginRequest, object>(loginRequest);
+    var (response, _) = await app.Client.POSTAsync<Login, LoginRequest, object>(loginRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -129,15 +129,15 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Username = username,
-        Password = password
+        Password = password,
       },
     };
 
-    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    var (_, registerResult) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
 
     var token = registerResult.User.Token;
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
     });
@@ -153,7 +153,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
   [Fact]
   public async Task GetCurrentUser_WithoutToken_ReturnsUnauthorized()
   {
-    var (response, _) = await App.Client.GETAsync<GetCurrent, object>();
+    var (response, _) = await app.Client.GETAsync<GetCurrent, object>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -167,11 +167,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = null!,
         Username = null!,
-        Password = null!
+        Password = null!,
       },
     };
 
-    var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request);
+    var (response, _) = await app.Client.POSTAsync<Register, RegisterRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -185,11 +185,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = string.Empty,
         Username = string.Empty,
-        Password = string.Empty
+        Password = string.Empty,
       },
     };
 
-    var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request);
+    var (response, _) = await app.Client.POSTAsync<Register, RegisterRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -203,11 +203,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = "not-an-email",
         Username = $"user-{Guid.NewGuid()}",
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request);
+    var (response, _) = await app.Client.POSTAsync<Register, RegisterRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -222,11 +222,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = $"user1-{Guid.NewGuid()}@example.com",
         Username = username,
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
 
     var request2 = new RegisterRequest
     {
@@ -234,11 +234,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = $"user2-{Guid.NewGuid()}@example.com",
         Username = username,
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    var (response, _) = await App.Client.POSTAsync<Register, RegisterRequest, object>(request2);
+    var (response, _) = await app.Client.POSTAsync<Register, RegisterRequest, object>(request2);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -256,22 +256,22 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Username = username,
-        Password = password
+        Password = password,
       },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
 
     var loginRequest = new LoginRequest
     {
       User = new LoginUserData
       {
         Email = email,
-        Password = "wrongpassword"
+        Password = "wrongpassword",
       },
     };
 
-    var (response, _) = await App.Client.POSTAsync<Login, LoginRequest, object>(loginRequest);
+    var (response, _) = await app.Client.POSTAsync<Login, LoginRequest, object>(loginRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -284,11 +284,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       User = new LoginUserData
       {
         Email = "nonexistent@example.com",
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    var (response, _) = await App.Client.POSTAsync<Login, LoginRequest, object>(loginRequest);
+    var (response, _) = await app.Client.POSTAsync<Login, LoginRequest, object>(loginRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -296,7 +296,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
   [Fact]
   public async Task GetCurrentUser_WithInvalidToken_ReturnsUnauthorized()
   {
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", "invalid-token");
     });
@@ -319,14 +319,14 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Username = username,
-        Password = password
+        Password = password,
       },
     };
 
-    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    var (_, registerResult) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
     var token = registerResult.User.Token;
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
     });
@@ -337,7 +337,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = $"updated-{Guid.NewGuid()}@example.com",
         Bio = "Updated bio",
-        Image = "https://example.com/image.jpg"
+        Image = "https://example.com/image.jpg",
       },
     };
 
@@ -357,11 +357,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
     {
       User = new UpdateUserData
       {
-        Email = "test@example.com"
+        Email = "test@example.com",
       },
     };
 
-    var (response, _) = await App.Client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
+    var (response, _) = await app.Client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -377,11 +377,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = existingEmail,
         Username = $"user1-{Guid.NewGuid()}",
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
 
     var request2 = new RegisterRequest
     {
@@ -389,14 +389,14 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = $"user2-{Guid.NewGuid()}@example.com",
         Username = $"user2-{Guid.NewGuid()}",
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request2);
+    var (_, registerResult) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request2);
     var token = registerResult.User.Token;
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
     });
@@ -405,7 +405,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
     {
       User = new UpdateUserData
       {
-        Email = existingEmail
+        Email = existingEmail,
       },
     };
 
@@ -425,11 +425,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = $"user1-{Guid.NewGuid()}@example.com",
         Username = existingUsername,
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
+    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request1);
 
     var request2 = new RegisterRequest
     {
@@ -437,14 +437,14 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = $"user2-{Guid.NewGuid()}@example.com",
         Username = $"user2-{Guid.NewGuid()}",
-        Password = "password123"
+        Password = "password123",
       },
     };
 
-    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request2);
+    var (_, registerResult) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request2);
     var token = registerResult.User.Token;
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
     });
@@ -453,7 +453,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
     {
       User = new UpdateUserData
       {
-        Username = existingUsername
+        Username = existingUsername,
       },
     };
 
@@ -475,14 +475,14 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Username = username,
-        Password = password
+        Password = password,
       },
     };
 
-    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    var (_, registerResult) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
     var token = registerResult.User.Token;
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
     });
@@ -491,7 +491,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
     {
       User = new UpdateUserData
       {
-        Email = string.Empty
+        Email = string.Empty,
       },
     };
 
@@ -514,14 +514,14 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Username = username,
-        Password = oldPassword
+        Password = oldPassword,
       },
     };
 
-    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    var (_, registerResult) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
     var token = registerResult.User.Token;
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
     });
@@ -531,7 +531,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
     {
       User = new UpdateUserData
       {
-        Password = newPassword
+        Password = newPassword,
       },
     };
 
@@ -544,11 +544,11 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       User = new LoginUserData
       {
         Email = email,
-        Password = newPassword
+        Password = newPassword,
       },
     };
 
-    var (loginResponse, loginResult) = await App.Client.POSTAsync<Login, LoginRequest, LoginResponse>(loginRequest);
+    var (loginResponse, loginResult) = await app.Client.POSTAsync<Login, LoginRequest, LoginResponse>(loginRequest);
     loginResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
     loginResult.User.ShouldNotBeNull();
     loginResult.User.Email.ShouldBe(email);
@@ -568,14 +568,14 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
       {
         Email = email,
         Username = oldUsername,
-        Password = password
+        Password = password,
       },
     };
 
-    var (_, registerResult) = await App.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+    var (_, registerResult) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
     var token = registerResult.User.Token;
 
-    var client = App.CreateClient(c =>
+    var client = app.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
     });
@@ -585,7 +585,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
     {
       User = new UpdateUserData
       {
-        Username = newUsername
+        Username = newUsername,
       },
     };
 

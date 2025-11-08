@@ -30,13 +30,17 @@ public class Create(IMediator mediator, IUserContext userContext) : Endpoint<Cre
 
     var result = await mediator.Send(
       new CreateArticleCommand(
-      request.Article.Title,
-      request.Article.Description,
-      request.Article.Body,
-      request.Article.TagList ?? new List<string>(),
-      userId,
-      userId), cancellationToken);
+        request.Article.Title,
+        request.Article.Description,
+        request.Article.Body,
+        request.Article.TagList ?? new List<string>(),
+        userId,
+        userId),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, article => Map.FromEntity(article), cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      article => Map.FromEntity(article),
+      cancellationToken);
   }
 }

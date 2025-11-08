@@ -10,7 +10,7 @@ public class SwaggerE2eTests : PageTest
   {
     return new BrowserNewContextOptions()
     {
-      IgnoreHTTPSErrors = true
+      IgnoreHTTPSErrors = true,
     };
   }
 
@@ -20,7 +20,7 @@ public class SwaggerE2eTests : PageTest
     // Configure additional browser options to ignore HTTPS errors
     await Context.SetExtraHTTPHeadersAsync(new Dictionary<string, string>
     {
-      ["User-Agent"] = "E2E-Test-Suite"
+      ["User-Agent"] = "E2E-Test-Suite",
     });
 
     // Start tracing
@@ -29,7 +29,7 @@ public class SwaggerE2eTests : PageTest
       Title = "Swagger API Docs Test",
       Screenshots = true,
       Snapshots = true,
-      Sources = true
+      Sources = true,
     });
 
     try
@@ -42,7 +42,7 @@ public class SwaggerE2eTests : PageTest
       await Page.GotoAsync(swaggerUrl, new()
       {
         WaitUntil = WaitUntilState.NetworkIdle,
-        Timeout = 30000
+        Timeout = 30000,
       });
 
       // Wait for Swagger UI to load and verify it's visible (use first occurrence)
@@ -52,7 +52,7 @@ public class SwaggerE2eTests : PageTest
       var isVisible = await swaggerContainer.IsVisibleAsync();
       Assert.True(isVisible, "Swagger UI container should be visible");
 
-      // Verify that the API title is displayed 
+      // Verify that the API title is displayed
       var apiInfo = Page.Locator(".info .title");
       await apiInfo.WaitForAsync(new() { Timeout = 10000 });
       var title = await apiInfo.TextContentAsync();
@@ -61,6 +61,7 @@ public class SwaggerE2eTests : PageTest
 
       // Verify basic functionality - just that Swagger loaded successfully
       var hasSchemaSection = await Page.Locator(".scheme-container").IsVisibleAsync();
+
       // Don't assert on this as it may not always be present, just verify we got past the basic loading
     }
     finally
@@ -74,7 +75,7 @@ public class SwaggerE2eTests : PageTest
       // Stop tracing and save to file
       await Context.Tracing.StopAsync(new()
       {
-        Path = Path.Combine(Constants.TracesDirectory, $"swagger_test_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip")
+        Path = Path.Combine(Constants.TracesDirectory, $"swagger_test_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip"),
       });
     }
   }

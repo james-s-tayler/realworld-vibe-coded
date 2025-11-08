@@ -30,13 +30,17 @@ public class Update(IMediator mediator, IUserContext userContext) : Endpoint<Upd
 
     var result = await mediator.Send(
       new UpdateArticleCommand(
-      request.Slug,
-      request.Article.Title,
-      request.Article.Description,
-      request.Article.Body,
-      userId,
-      userId), cancellationToken);
+        request.Slug,
+        request.Article.Title,
+        request.Article.Description,
+        request.Article.Body,
+        userId,
+        userId),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, article => Map.FromEntity(article), cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      article => Map.FromEntity(article),
+      cancellationToken);
   }
 }

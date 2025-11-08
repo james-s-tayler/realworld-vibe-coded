@@ -29,9 +29,12 @@ public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint
 
     var result = await mediator.Send(new GetCurrentUserQuery(userId), cancellationToken);
 
-    await Send.ResultMapperAsync(result, userDto => new UserCurrentResponse
-    {
-      User = Map.FromEntity(userDto),
-    }, cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      userDto => new UserCurrentResponse
+      {
+        User = Map.FromEntity(userDto),
+      },
+      cancellationToken);
   }
 }

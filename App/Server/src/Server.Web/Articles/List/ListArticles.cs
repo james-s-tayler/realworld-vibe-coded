@@ -33,17 +33,21 @@ public class ListArticles(IMediator mediator, IUserContext userContext) : Endpoi
 
     var result = await mediator.Send(
       new ListArticlesQuery(
-      request.Tag,
-      request.Author,
-      request.Favorited,
-      request.Limit,
-      request.Offset,
-      currentUserId), cancellationToken);
+        request.Tag,
+        request.Author,
+        request.Favorited,
+        request.Limit,
+        request.Offset,
+        currentUserId),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, articles =>
-    {
-      var articleDtos = Enumerable.Select<Article, ArticleDto>(articles, article => Map.FromEntity(article).Article).ToList();
-      return new ArticlesResponse(articleDtos, articleDtos.Count);
-    }, cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      articles =>
+      {
+        var articleDtos = Enumerable.Select<Article, ArticleDto>(articles, article => Map.FromEntity(article).Article).ToList();
+        return new ArticlesResponse(articleDtos, articleDtos.Count);
+      },
+      cancellationToken);
   }
 }

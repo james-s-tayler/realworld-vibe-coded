@@ -27,7 +27,7 @@ public class UpdateUser(IMediator mediator, IUserContext userContext) : Endpoint
           Email = "updated@example.com",
           Username = "newusername",
           Bio = "Updated bio",
-          Image = "https://example.com/avatar.jpg"
+          Image = "https://example.com/avatar.jpg",
         },
       };
     });
@@ -41,16 +41,20 @@ public class UpdateUser(IMediator mediator, IUserContext userContext) : Endpoint
 
     var result = await mediator.Send(
       new UpdateUserCommand(
-      userId,
-      request.User.Email,
-      request.User.Username,
-      request.User.Password,
-      request.User.Bio,
-      request.User.Image), cancellationToken);
+        userId,
+        request.User.Email,
+        request.User.Username,
+        request.User.Password,
+        request.User.Bio,
+        request.User.Image),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, userDto => new UpdateUserResponse
-    {
-      User = Map.FromEntity(userDto),
-    }, cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      userDto => new UpdateUserResponse
+      {
+        User = Map.FromEntity(userDto),
+      },
+      cancellationToken);
   }
 }

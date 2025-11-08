@@ -6,7 +6,7 @@ using Server.Web.Articles.Favorite;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
+public class FavoriteTests(ArticlesFixture app) : TestBase<ArticlesFixture>
 {
   [Fact]
   public async Task FavoriteArticle_WithAuthentication_ReturnsArticleWithFavorite()
@@ -17,14 +17,14 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Favorite Article Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    var (response, result) = await app.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -42,16 +42,16 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Already Favorited Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    await app.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
-    var (response, result) = await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    var (response, result) = await app.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(true);
@@ -67,16 +67,16 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Multiple Favorites Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    await app.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
-    var (response, result) = await App.ArticlesUser2Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    var (response, result) = await app.ArticlesUser2Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(true);
@@ -92,14 +92,14 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Favorite Unauthenticated Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, _) = await App.Client.POSTAsync<Favorite, FavoriteArticleRequest, object>(new FavoriteArticleRequest { Slug = slug });
+    var (response, _) = await app.Client.POSTAsync<Favorite, FavoriteArticleRequest, object>(new FavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -107,7 +107,7 @@ public class FavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task FavoriteArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var (response, _) = await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, object>(new FavoriteArticleRequest { Slug = "no-such-article" });
+    var (response, _) = await app.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, object>(new FavoriteArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }

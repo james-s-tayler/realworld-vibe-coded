@@ -6,7 +6,7 @@ using Server.Web.Articles.Update;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
+public class UpdateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
 {
   [Fact]
   public async Task UpdateArticle_WithValidData_ReturnsUpdatedArticle()
@@ -17,11 +17,11 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Original Title",
         Description = "Original Description",
-        Body = "Original Body"
+        Body = "Original Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -31,11 +31,11 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Updated Title",
         Description = "Updated Description",
-        Body = "Updated Body"
+        Body = "Updated Body",
       },
     };
 
-    var (response, result) = await App.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, ArticleResponse>(updateRequest);
+    var (response, result) = await app.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, ArticleResponse>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -54,11 +54,11 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Update Unauth Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -66,11 +66,11 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Slug = slug,
       Article = new UpdateArticleData
       {
-        Title = "Updated"
+        Title = "Updated",
       },
     };
 
-    var (response, _) = await App.Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
+    var (response, _) = await app.Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -83,11 +83,11 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Slug = "no-such-article",
       Article = new UpdateArticleData
       {
-        Title = "Updated"
+        Title = "Updated",
       },
     };
 
-    var (response, _) = await App.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
+    var (response, _) = await app.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -101,11 +101,11 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Update Wrong User Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -113,11 +113,11 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Slug = slug,
       Article = new UpdateArticleData
       {
-        Title = "Updated by wrong user"
+        Title = "Updated by wrong user",
       },
     };
 
-    var (response, _) = await App.ArticlesUser2Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
+    var (response, _) = await app.ArticlesUser2Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }
@@ -131,11 +131,11 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Update Empty Fields Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -145,11 +145,11 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = string.Empty,
         Description = string.Empty,
-        Body = string.Empty
+        Body = string.Empty,
       },
     };
 
-    var (response, _) = await App.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
+    var (response, _) = await app.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }

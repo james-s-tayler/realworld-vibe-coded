@@ -7,7 +7,7 @@ using Server.Web.Articles.Unfavorite;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
+public class UnfavoriteTests(ArticlesFixture app) : TestBase<ArticlesFixture>
 {
   [Fact]
   public async Task UnfavoriteArticle_WithAuthentication_ReturnsArticleWithoutFavorite()
@@ -18,16 +18,16 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Unfavorite Article Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await App.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    await app.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
-    var (response, result) = await App.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, ArticleResponse>(new UnfavoriteArticleRequest { Slug = slug });
+    var (response, result) = await app.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, ArticleResponse>(new UnfavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -44,14 +44,14 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Not Favorited Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await App.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, ArticleResponse>(new UnfavoriteArticleRequest { Slug = slug });
+    var (response, result) = await app.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, ArticleResponse>(new UnfavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(false);
@@ -67,14 +67,14 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       {
         Title = "Unfavorite Unauthenticated Test",
         Description = "Description",
-        Body = "Body"
+        Body = "Body",
       },
     };
 
-    var (_, createResult) = await App.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, _) = await App.Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, object>(new UnfavoriteArticleRequest { Slug = slug });
+    var (response, _) = await app.Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, object>(new UnfavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -82,7 +82,7 @@ public class UnfavoriteTests(ArticlesFixture App) : TestBase<ArticlesFixture>
   [Fact]
   public async Task UnfavoriteArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var (response, _) = await App.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, object>(new UnfavoriteArticleRequest { Slug = "no-such-article" });
+    var (response, _) = await app.ArticlesUser1Client.DELETEAsync<Unfavorite, UnfavoriteArticleRequest, object>(new UnfavoriteArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }

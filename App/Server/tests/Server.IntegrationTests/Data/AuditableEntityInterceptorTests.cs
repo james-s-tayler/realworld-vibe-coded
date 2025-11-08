@@ -29,10 +29,11 @@ public class AuditableEntityInterceptorTests : IDisposable
 
     services.AddDbContext<AppDbContext>(
       (serviceProvider, options) =>
-    {
-      options.UseInMemoryDatabase($"AuditTest_{Guid.NewGuid()}");
-      options.AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
-    }, ServiceLifetime.Transient);
+      {
+        options.UseInMemoryDatabase($"AuditTest_{Guid.NewGuid()}");
+        options.AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
+      },
+      ServiceLifetime.Transient);
 
     _serviceProvider = services.BuildServiceProvider();
 
