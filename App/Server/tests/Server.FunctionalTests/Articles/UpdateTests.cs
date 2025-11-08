@@ -143,9 +143,9 @@ public class UpdateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
       Slug = slug,
       Article = new UpdateArticleData
       {
-        Title = "",
-        Description = "",
-        Body = ""
+        Title = string.Empty,
+        Description = string.Empty,
+        Body = string.Empty
       }
     };
 

@@ -99,6 +99,7 @@ dotnet_analyzer_diagnostic.category-StyleCop.CSharp.MaintainabilityRules.severit
 dotnet_diagnostic.SA1402.severity = error
 dotnet_diagnostic.SA1503.severity = error
 dotnet_diagnostic.SA1516.severity = error
+dotnet_diagnostic.SA1122.severity = error
 # var preferences
 csharp_style_var_for_built_in_types = true:silent
 csharp_style_var_when_type_is_apparent = true:silent

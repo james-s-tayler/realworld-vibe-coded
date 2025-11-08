@@ -136,7 +136,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     {
       Comment = new CreateCommentDto
       {
-        Body = ""
+        Body = string.Empty
       }
     };
 

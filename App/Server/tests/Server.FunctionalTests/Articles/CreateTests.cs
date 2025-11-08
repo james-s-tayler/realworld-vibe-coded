@@ -78,9 +78,9 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
     {
       Article = new ArticleData
       {
-        Title = "",
-        Description = "",
-        Body = ""
+        Title = string.Empty,
+        Description = string.Empty,
+        Body = string.Empty
       }
     };
 
@@ -118,7 +118,7 @@ public class CreateTests(ArticlesFixture App) : TestBase<ArticlesFixture>
         Title = "Test",
         Description = "Test",
         Body = "Test",
-        TagList = new List<string> { "" }
+        TagList = new List<string> { string.Empty }
       }
     };
 
