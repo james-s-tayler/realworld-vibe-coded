@@ -1,4 +1,4 @@
-﻿namespace Server.Core.Interfaces;
+﻿namespace Server.UseCases.Interfaces;
 
 /// <summary>
 /// Service for accessing the current authenticated user's context

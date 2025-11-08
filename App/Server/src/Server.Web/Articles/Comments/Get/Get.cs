@@ -1,7 +1,7 @@
 ﻿using Server.Core.ArticleAggregate.Dtos;
-using Server.Core.Interfaces;
 using Server.Infrastructure;
 using Server.UseCases.Articles.Comments.Get;
+using Server.UseCases.Interfaces;
 
 namespace Server.Web.Articles.Comments.Get;
 

@@ -1,7 +1,7 @@
-﻿using Server.Core.Interfaces;
-using Server.Core.UserAggregate;
+﻿using Server.Core.UserAggregate;
 using Server.Core.UserAggregate.Specifications;
 using Server.SharedKernel.Persistence;
+using Server.UseCases.Interfaces;
 
 namespace Server.Web.Profiles;
 

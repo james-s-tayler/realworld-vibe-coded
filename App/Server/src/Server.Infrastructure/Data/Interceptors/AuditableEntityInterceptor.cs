@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Server.Core.Interfaces;
 using Server.SharedKernel.Interfaces;
 using Server.SharedKernel.Persistence;
+using Server.UseCases.Interfaces;
 
 namespace Server.Infrastructure.Data.Interceptors;
 

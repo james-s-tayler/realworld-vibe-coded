@@ -1,4 +1,4 @@
-﻿namespace Server.Core.Interfaces;
+﻿namespace Server.UseCases.Interfaces;
 
 public interface IPasswordHasher
 {

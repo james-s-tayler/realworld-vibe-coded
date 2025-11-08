@@ -1,10 +1,10 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Server.Core.Interfaces;
 using Server.Infrastructure;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Email;
+using Server.UseCases.Interfaces;
 using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace Server.Web.Configurations;

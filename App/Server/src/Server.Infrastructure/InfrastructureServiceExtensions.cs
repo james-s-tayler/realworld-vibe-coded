@@ -6,6 +6,7 @@ using Server.Infrastructure.Data.Queries;
 using Server.Infrastructure.Services;
 using Server.SharedKernel.Interfaces;
 using Server.SharedKernel.Persistence;
+using Server.UseCases.Interfaces;
 
 
 namespace Server.Infrastructure;

@@ -1,6 +1,6 @@
 ﻿using Audit.Core;
 using Microsoft.AspNetCore.Http;
-using Server.Core.Interfaces;
+using Server.UseCases.Interfaces;
 
 namespace Server.Infrastructure.Data;
 
