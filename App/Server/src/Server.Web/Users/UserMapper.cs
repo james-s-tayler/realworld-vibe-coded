@@ -1,5 +1,5 @@
-﻿using Server.Core.Interfaces;
-using Server.Core.UserAggregate;
+﻿using Server.Core.UserAggregate;
+using Server.UseCases.Interfaces;
 
 namespace Server.Web.Users;
 

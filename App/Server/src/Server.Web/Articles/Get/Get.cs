@@ -1,7 +1,7 @@
-﻿using Server.Core.Interfaces;
-using Server.Infrastructure;
+﻿using Server.Infrastructure;
 using Server.UseCases.Articles;
 using Server.UseCases.Articles.Get;
+using Server.UseCases.Interfaces;
 
 namespace Server.Web.Articles.Get;
 

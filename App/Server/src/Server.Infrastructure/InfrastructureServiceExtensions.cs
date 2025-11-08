@@ -1,4 +1,5 @@
-﻿using Server.Core.Interfaces;
+﻿using Server.Core.ArticleAggregate;
+using Server.Core.TagAggregate;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
@@ -6,6 +7,7 @@ using Server.Infrastructure.Data.Queries;
 using Server.Infrastructure.Services;
 using Server.SharedKernel.Interfaces;
 using Server.SharedKernel.Persistence;
+using Server.UseCases.Interfaces;
 
 
 namespace Server.Infrastructure;

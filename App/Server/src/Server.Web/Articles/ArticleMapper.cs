@@ -1,9 +1,9 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
-using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
 using Server.SharedKernel.Persistence;
 using Server.UseCases.Articles;
+using Server.UseCases.Interfaces;
 
 namespace Server.Web.Articles;
 

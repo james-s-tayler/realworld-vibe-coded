@@ -1,4 +1,4 @@
-﻿using Server.Core.Interfaces;
+﻿using Server.Core.TagAggregate;
 using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Tags.List;

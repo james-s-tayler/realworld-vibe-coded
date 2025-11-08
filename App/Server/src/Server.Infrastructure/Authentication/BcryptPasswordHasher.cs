@@ -1,4 +1,4 @@
-﻿using Server.Core.Interfaces;
+﻿using Server.UseCases.Interfaces;
 
 namespace Server.Infrastructure.Authentication;
 

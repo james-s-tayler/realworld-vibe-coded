@@ -1,5 +1,5 @@
-﻿using Server.Core.Interfaces;
-using Server.Infrastructure;
+﻿using Server.Infrastructure;
+using Server.UseCases.Interfaces;
 using Server.UseCases.Profiles.Get;
 
 namespace Server.Web.Profiles.Get;

@@ -2,8 +2,8 @@
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using Server.Core.Interfaces;
 using Server.Core.UserAggregate;
+using Server.UseCases.Interfaces;
 
 namespace Server.Infrastructure.Authentication;
 
