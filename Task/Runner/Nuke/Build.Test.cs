@@ -327,12 +327,12 @@ public partial class Build
     var summaryLines = new List<string>
     {
       $"## {statusIcon} Postman API Tests {statusText}",
-      "",
+      string.Empty,
       "**📊 Test Summary**",
       $"- **Tests**: {passedTests}/{totalTests} passed ({testPassPercentage}%)",
       $"- **Requests**: {passedRequests}/{totalRequests} passed",
       $"- **Execution Time**: {executionTimeSec}s",
-      ""
+      string.Empty
     };
 
     // Add failure details if any
