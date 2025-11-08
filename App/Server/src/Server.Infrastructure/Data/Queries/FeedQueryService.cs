@@ -36,25 +36,4 @@ public class FeedQueryService(AppDbContext context) : IFeedQueryService
 
     return articles;
   }
-
-  public async Task<int> GetFeedCountAsync(Guid userId)
-  {
-    // Get IDs of users that the current user follows
-    var followedUserIds = await context.UserFollowings
-      .AsNoTracking()
-      .Where(uf => uf.FollowerId == userId)
-      .Select(uf => uf.FollowedId)
-      .ToListAsync();
-
-    // If not following anyone, count is 0
-    if (!followedUserIds.Any())
-    {
-      return 0;
-    }
-
-    // Count articles from followed users
-    return await context.Articles
-      .Where(a => followedUserIds.Contains(a.AuthorId))
-      .CountAsync();
-  }
 }

@@ -23,15 +23,6 @@ public class ListArticlesQueryService(AppDbContext context) : IListArticlesQuery
     return articles;
   }
 
-  public async Task<int> CountAsync(
-    string? tag = null,
-    string? author = null,
-    string? favorited = null)
-  {
-    var query = BuildQuery(tag, author, favorited);
-    return await query.CountAsync();
-  }
-
   private IQueryable<Article> BuildQuery(string? tag, string? author, string? favorited)
   {
     var query = context.Articles
