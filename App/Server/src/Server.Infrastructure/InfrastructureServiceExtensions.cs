@@ -1,9 +1,6 @@
-﻿using Server.Core.ArticleAggregate;
-using Server.Core.TagAggregate;
-using Server.Infrastructure.Authentication;
+﻿using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
-using Server.Infrastructure.Data.Queries;
 using Server.Infrastructure.Services;
 using Server.SharedKernel.Interfaces;
 using Server.SharedKernel.Persistence;
@@ -35,8 +32,6 @@ public static class InfrastructureServiceExtensions
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
            .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
            .AddScoped<IUnitOfWork, UnitOfWork>()
-           .AddScoped<IFeedQueryService, FeedQueryService>()
-           .AddScoped<IListTagsQueryService, ListTagsQueryService>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
            .AddScoped<IJwtTokenGenerator, JwtTokenGenerator>()
            .AddScoped<IUserContext, UserContext>();
