@@ -21,15 +21,21 @@ public class Article : EntityBase, IAggregateRoot
   private Article() { } // For EF Core
 
   public string Title { get; private set; } = string.Empty;
+
   public string Description { get; private set; } = string.Empty;
+
   public string Body { get; private set; } = string.Empty;
+
   public string Slug { get; private set; } = string.Empty;
 
   public Guid AuthorId { get; private set; }
+
   public User Author { get; private set; } = default!;
 
   public List<Tag> Tags { get; private set; } = new();
+
   public List<User> FavoritedBy { get; private set; } = new();
+
   public List<Comment> Comments { get; private set; } = new();
 
   public int FavoritesCount => FavoritedBy.Count;

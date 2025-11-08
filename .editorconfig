@@ -99,7 +99,7 @@ dotnet_analyzer_diagnostic.category-StyleCop.CSharp.MaintainabilityRules.severit
 dotnet_diagnostic.SA1402.severity = error
 dotnet_diagnostic.SA1503.severity = error
 dotnet_diagnostic.SA1122.severity = error
-dotnet_diagnostic.SA1516.severity = none
+dotnet_diagnostic.SA1516.severity = error
 dotnet_diagnostic.SA1600.severity = none
 dotnet_diagnostic.SA1101.severity = none
 dotnet_diagnostic.SA1309.severity = none
