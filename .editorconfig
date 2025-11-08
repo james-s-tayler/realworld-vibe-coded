@@ -98,7 +98,7 @@ dotnet_analyzer_diagnostic.category-StyleCop.CSharp.MaintainabilityRules.severit
 # StyleCop: Enforce specific rules as errors
 dotnet_diagnostic.SA1402.severity = error
 dotnet_diagnostic.SA1503.severity = error
-dotnet_diagnostic.SA1122.severity = none
+dotnet_diagnostic.SA1122.severity = error
 dotnet_diagnostic.SA1516.severity = none
 dotnet_diagnostic.SA1600.severity = none
 dotnet_diagnostic.SA1101.severity = none

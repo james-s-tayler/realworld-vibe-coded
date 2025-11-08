@@ -62,12 +62,12 @@ public class Article : EntityBase, IAggregateRoot
   {
     return title.ToLowerInvariant()
       .Replace(" ", "-")
-      .Replace(".", "")
-      .Replace(",", "")
-      .Replace("!", "")
-      .Replace("?", "")
-      .Replace("'", "")
-      .Replace("\"", "");
+      .Replace(".", string.Empty)
+      .Replace(",", string.Empty)
+      .Replace("!", string.Empty)
+      .Replace("?", string.Empty)
+      .Replace("'", string.Empty)
+      .Replace("\"", string.Empty);
   }
 
   public void Update(string title, string description, string body)

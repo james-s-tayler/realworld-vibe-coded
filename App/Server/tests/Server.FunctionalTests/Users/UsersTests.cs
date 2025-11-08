@@ -183,9 +183,9 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
     {
       User = new UserData
       {
-        Email = "",
-        Username = "",
-        Password = ""
+        Email = string.Empty,
+        Username = string.Empty,
+        Password = string.Empty
       }
     };
 
@@ -491,7 +491,7 @@ public class UsersTests(UsersFixture App) : TestBase<UsersFixture>
     {
       User = new UpdateUserData
       {
-        Email = ""
+        Email = string.Empty
       }
     };
 
