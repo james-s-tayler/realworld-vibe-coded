@@ -504,6 +504,62 @@ query.Include(a => a.Author).ThenInclude(a => a.Tags)
 
 ---
 
+## Domain Design Analyzers (SRV016-SRV020)
+
+### SRV016: AggregateRootLocationAnalyzer - Wrong Location
+**Description:** Enforces that entities implementing `IAggregateRoot` must be located in a matching `*Aggregate` namespace.
+
+**Severity:** Error
+
+**Rationale:** Maintains clear Domain-Driven Design aggregate boundaries by ensuring each aggregate root resides in its own dedicated namespace/directory.
+
+**Rule:** An entity implementing `IAggregateRoot` must be in namespace `Server.Core.<EntityName>Aggregate` where `EntityName` matches the entity class name.
+
+**Fix:** Move the aggregate root to the correct `*Aggregate` directory and update the namespace.
+
+**Example:**
+```csharp
+// ❌ Bad - Tag aggregate root in ArticleAggregate namespace
+namespace Server.Core.ArticleAggregate;
+public class Tag : EntityBase, IAggregateRoot { }
+
+// ✅ Good - Tag aggregate root in its own TagAggregate namespace
+namespace Server.Core.TagAggregate;
+public class Tag : EntityBase, IAggregateRoot { }
+```
+
+---
+
+### SRV017: AggregateRootLocationAnalyzer - Multiple Roots
+**Description:** Enforces that each `*Aggregate` namespace contains only one entity implementing `IAggregateRoot`.
+
+**Severity:** Error
+
+**Rationale:** Maintains clear aggregate boundaries in Domain-Driven Design. Each aggregate should have exactly one root entity that controls access to the aggregate's internals.
+
+**Rule:** Only one entity per `*Aggregate` namespace can implement `IAggregateRoot`.
+
+**Fix:** If multiple entities in the same aggregate namespace implement `IAggregateRoot`, either:
+- Move one of them to its own `*Aggregate` directory (if it should be a separate aggregate)
+- Remove the `IAggregateRoot` interface from child entities (if they should be part of the existing aggregate)
+
+**Example:**
+```csharp
+// ❌ Bad - Both Article and Tag implement IAggregateRoot in ArticleAggregate
+namespace Server.Core.ArticleAggregate;
+public class Article : EntityBase, IAggregateRoot { }
+public class Tag : EntityBase, IAggregateRoot { }  // Violation!
+
+// ✅ Good - Each aggregate root in its own namespace
+namespace Server.Core.ArticleAggregate;
+public class Article : EntityBase, IAggregateRoot { }
+
+namespace Server.Core.TagAggregate;
+public class Tag : EntityBase, IAggregateRoot { }
+```
+
+---
+
 ## Adding a New Analyzer
 
 To add a new analyzer to this project:
