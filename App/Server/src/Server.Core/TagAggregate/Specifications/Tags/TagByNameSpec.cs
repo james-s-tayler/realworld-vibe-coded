@@ -1,4 +1,4 @@
-﻿namespace Server.Core.ArticleAggregate.Specifications.Tags;
+﻿namespace Server.Core.TagAggregate.Specifications;
 
 public class TagByNameSpec : Specification<Tag>
 {

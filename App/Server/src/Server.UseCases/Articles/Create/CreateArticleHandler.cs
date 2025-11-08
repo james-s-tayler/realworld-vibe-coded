@@ -1,6 +1,7 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications.Articles;
-using Server.Core.ArticleAggregate.Specifications.Tags;
+using Server.Core.TagAggregate;
+using Server.Core.TagAggregate.Specifications;
 using Server.Core.UserAggregate;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;

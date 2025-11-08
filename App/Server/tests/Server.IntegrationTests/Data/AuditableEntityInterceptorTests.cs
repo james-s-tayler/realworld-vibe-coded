@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Core.ArticleAggregate;
+using Server.Core.TagAggregate;
 using Server.Core.UserAggregate;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;

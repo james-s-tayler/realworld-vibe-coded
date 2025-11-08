@@ -1,4 +1,5 @@
-﻿using Server.Core.UserAggregate;
+﻿using Server.Core.TagAggregate;
+using Server.Core.UserAggregate;
 using Server.SharedKernel.Persistence;
 
 namespace Server.Core.ArticleAggregate;

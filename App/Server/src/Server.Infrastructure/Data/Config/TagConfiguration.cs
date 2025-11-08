@@ -1,4 +1,4 @@
-﻿using Server.Core.ArticleAggregate;
+﻿using Server.Core.TagAggregate;
 
 namespace Server.Infrastructure.Data.Config;
 
