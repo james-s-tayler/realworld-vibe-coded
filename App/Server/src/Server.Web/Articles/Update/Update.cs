@@ -40,7 +40,7 @@ public class Update(IMediator mediator, IUserContext userContext) : Endpoint<Upd
 
     await Send.ResultMapperAsync(
       result,
-      article => Map.FromEntity(article),
+      async (article, ct) => await Map.FromEntityAsync(article, ct),
       cancellationToken);
   }
 }

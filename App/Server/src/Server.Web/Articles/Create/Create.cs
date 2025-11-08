@@ -40,7 +40,7 @@ public class Create(IMediator mediator, IUserContext userContext) : Endpoint<Cre
 
     await Send.ResultMapperAsync(
       result,
-      article => Map.FromEntity(article),
+      async (article, ct) => await Map.FromEntityAsync(article, ct),
       cancellationToken);
   }
 }
