@@ -11,7 +11,9 @@ public class UserFollowing : EntityBase
   }
 
   // Required by EF Core
-  private UserFollowing() { }
+  private UserFollowing()
+  {
+  }
 
   public Guid FollowerId { get; private set; }
 

@@ -18,7 +18,7 @@ public class UserContextTests
     var userId = Guid.NewGuid();
     var claims = new List<Claim>
     {
-      new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+      new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
     };
     httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth"));
     httpContextAccessor.HttpContext.Returns(httpContext);
@@ -57,7 +57,7 @@ public class UserContextTests
     var claims = new List<Claim>
     {
       new Claim(ClaimTypes.Name, "testuser"),
-      new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+      new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
     };
     httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth"));
     httpContextAccessor.HttpContext.Returns(httpContext);

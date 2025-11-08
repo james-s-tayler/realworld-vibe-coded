@@ -20,7 +20,7 @@ public partial class InitialCreate : Migration
           Status = table.Column<int>(type: "int", nullable: false),
           PhoneNumber_CountryCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
           PhoneNumber_Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
-          PhoneNumber_Extension = table.Column<string>(type: "nvarchar(max)", nullable: true)
+          PhoneNumber_Extension = table.Column<string>(type: "nvarchar(max)", nullable: true),
         },
         constraints: table =>
         {
@@ -33,7 +33,7 @@ public partial class InitialCreate : Migration
         {
           Id = table.Column<int>(type: "int", nullable: false)
                 .Annotation("SqlServer:Identity", "1, 1"),
-          Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+          Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
         },
         constraints: table =>
         {
@@ -50,7 +50,7 @@ public partial class InitialCreate : Migration
           Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
           HashedPassword = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
           Bio = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-          Image = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+          Image = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
         },
         constraints: table =>
         {
@@ -69,7 +69,7 @@ public partial class InitialCreate : Migration
           Slug = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
           CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-          AuthorId = table.Column<int>(type: "int", nullable: false)
+          AuthorId = table.Column<int>(type: "int", nullable: false),
         },
         constraints: table =>
         {
@@ -88,7 +88,7 @@ public partial class InitialCreate : Migration
         {
           FollowerId = table.Column<int>(type: "int", nullable: false),
           FollowedId = table.Column<int>(type: "int", nullable: false),
-          Id = table.Column<int>(type: "int", nullable: false)
+          Id = table.Column<int>(type: "int", nullable: false),
         },
         constraints: table =>
         {
@@ -112,7 +112,7 @@ public partial class InitialCreate : Migration
         columns: table => new
         {
           ArticleId = table.Column<int>(type: "int", nullable: false),
-          FavoritedById = table.Column<int>(type: "int", nullable: false)
+          FavoritedById = table.Column<int>(type: "int", nullable: false),
         },
         constraints: table =>
         {
@@ -136,7 +136,7 @@ public partial class InitialCreate : Migration
         columns: table => new
         {
           ArticlesId = table.Column<int>(type: "int", nullable: false),
-          TagsId = table.Column<int>(type: "int", nullable: false)
+          TagsId = table.Column<int>(type: "int", nullable: false),
         },
         constraints: table =>
         {
@@ -165,7 +165,7 @@ public partial class InitialCreate : Migration
           CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
           AuthorId = table.Column<int>(type: "int", nullable: false),
-          ArticleId = table.Column<int>(type: "int", nullable: false)
+          ArticleId = table.Column<int>(type: "int", nullable: false),
         },
         constraints: table =>
         {

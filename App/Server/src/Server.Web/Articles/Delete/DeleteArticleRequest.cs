@@ -2,5 +2,5 @@
 
 public class DeleteArticleRequest
 {
-  public string Slug { get; set; } = String.Empty;
+  public string Slug { get; set; } = string.Empty;
 }

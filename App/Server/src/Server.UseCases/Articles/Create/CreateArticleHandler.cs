@@ -8,15 +8,15 @@ using Server.SharedKernel.Persistence;
 namespace Server.UseCases.Articles.Create;
 
 public class CreateArticleHandler(
-  IRepository<User> _userRepository,
-  IRepository<Article> _articleRepository,
-  IRepository<Tag> _tagRepository)
+  IRepository<User> userRepository,
+  IRepository<Article> articleRepository,
+  IRepository<Tag> tagRepository)
   : ICommandHandler<CreateArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
   {
     // Get the author
-    var author = await _userRepository.GetByIdAsync(request.AuthorId, cancellationToken);
+    var author = await userRepository.GetByIdAsync(request.AuthorId, cancellationToken);
     if (author == null)
     {
       return Result<Article>.ErrorMissingRequiredEntity(typeof(User), request.AuthorId);
@@ -24,7 +24,7 @@ public class CreateArticleHandler(
 
     // Check for duplicate slug
     var slug = Article.GenerateSlug(request.Title);
-    var existingArticle = await _articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(slug), cancellationToken);
+    var existingArticle = await articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(slug), cancellationToken);
 
     if (existingArticle != null)
     {
@@ -37,19 +37,19 @@ public class CreateArticleHandler(
     // Handle tags - validation is now done at the endpoint level
     foreach (var tagName in request.TagList ?? new List<string>())
     {
-      var existingTag = await _tagRepository.FirstOrDefaultAsync(
+      var existingTag = await tagRepository.FirstOrDefaultAsync(
         new TagByNameSpec(tagName), cancellationToken);
 
       if (existingTag == null)
       {
         existingTag = new Tag(tagName);
-        await _tagRepository.AddAsync(existingTag, cancellationToken);
+        await tagRepository.AddAsync(existingTag, cancellationToken);
       }
 
       article.AddTag(existingTag);
     }
 
-    await _articleRepository.AddAsync(article, cancellationToken);
+    await articleRepository.AddAsync(article, cancellationToken);
 
     return Result<Article>.Created(article);
   }

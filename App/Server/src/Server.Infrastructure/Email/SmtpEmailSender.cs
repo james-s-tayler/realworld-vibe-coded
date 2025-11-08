@@ -20,7 +20,7 @@ public class SmtpEmailSender(ILogger<SmtpEmailSender> logger,
     {
       From = new MailAddress(from),
       Subject = subject,
-      Body = body
+      Body = body,
     };
     message.To.Add(new MailAddress(to));
     await emailClient.SendMailAsync(message);

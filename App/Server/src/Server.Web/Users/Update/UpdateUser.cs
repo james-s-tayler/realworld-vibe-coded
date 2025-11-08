@@ -10,7 +10,7 @@ namespace Server.Web.Users.Update;
 /// <remarks>
 /// Update the currently authenticated user's details.
 /// </remarks>
-public class UpdateUser(IMediator _mediator, IUserContext userContext) : Endpoint<UpdateUserRequest, UpdateUserResponse, UserMapper>
+public class UpdateUser(IMediator mediator, IUserContext userContext) : Endpoint<UpdateUserRequest, UpdateUserResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -27,8 +27,8 @@ public class UpdateUser(IMediator _mediator, IUserContext userContext) : Endpoin
           Email = "updated@example.com",
           Username = "newusername",
           Bio = "Updated bio",
-          Image = "https://example.com/avatar.jpg"
-        }
+          Image = "https://example.com/avatar.jpg",
+        },
       };
     });
   }
@@ -39,17 +39,22 @@ public class UpdateUser(IMediator _mediator, IUserContext userContext) : Endpoin
   {
     var userId = userContext.GetRequiredCurrentUserId();
 
-    var result = await _mediator.Send(new UpdateUserCommand(
-      userId,
-      request.User.Email,
-      request.User.Username,
-      request.User.Password,
-      request.User.Bio,
-      request.User.Image), cancellationToken);
+    var result = await mediator.Send(
+      new UpdateUserCommand(
+        userId,
+        request.User.Email,
+        request.User.Username,
+        request.User.Password,
+        request.User.Bio,
+        request.User.Image),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, userDto => new UpdateUserResponse
-    {
-      User = Map.FromEntity(userDto)
-    }, cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      userDto => new UpdateUserResponse
+      {
+        User = Map.FromEntity(userDto),
+      },
+      cancellationToken);
   }
 }

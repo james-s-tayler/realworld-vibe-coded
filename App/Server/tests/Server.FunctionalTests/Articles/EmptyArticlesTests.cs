@@ -9,12 +9,12 @@ using Server.Web.Tags.List;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Empty Articles Integration Tests")]
-public class EmptyArticlesTests(EmptyArticlesFixture App) : TestBase<EmptyArticlesFixture>
+public class EmptyArticlesTests(EmptyArticlesFixture app) : TestBase<EmptyArticlesFixture>
 {
   [Fact]
   public async Task AllArticles_WhenEmpty_ReturnsEmptyList()
   {
-    var (response, result) = await App.Client.GETAsync<ListArticles, ArticlesResponse>();
+    var (response, result) = await app.Client.GETAsync<ListArticles, ArticlesResponse>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -26,7 +26,7 @@ public class EmptyArticlesTests(EmptyArticlesFixture App) : TestBase<EmptyArticl
   public async Task ArticlesByAuthor_WhenEmpty_ReturnsEmptyList()
   {
     var request = new ListArticlesRequest();
-    var (response, result) = await App.Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?author=johnjacob", request);
+    var (response, result) = await app.Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?author=johnjacob", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -38,7 +38,7 @@ public class EmptyArticlesTests(EmptyArticlesFixture App) : TestBase<EmptyArticl
   public async Task ArticlesFavoritedByUsername_WhenEmpty_ReturnsEmptyList()
   {
     var request = new ListArticlesRequest();
-    var (response, result) = await App.Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?favorited=testuser", request);
+    var (response, result) = await app.Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?favorited=testuser", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -50,7 +50,7 @@ public class EmptyArticlesTests(EmptyArticlesFixture App) : TestBase<EmptyArticl
   public async Task ArticlesByTag_WhenEmpty_ReturnsEmptyList()
   {
     var request = new ListArticlesRequest();
-    var (response, result) = await App.Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?tag=dragons", request);
+    var (response, result) = await app.Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?tag=dragons", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -61,7 +61,7 @@ public class EmptyArticlesTests(EmptyArticlesFixture App) : TestBase<EmptyArticl
   [Fact]
   public async Task GetTags_WhenEmpty_ReturnsEmptyList()
   {
-    var (response, result) = await App.Client.GETAsync<List, TagsResponse>();
+    var (response, result) = await app.Client.GETAsync<List, TagsResponse>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Tags.ShouldNotBeNull();

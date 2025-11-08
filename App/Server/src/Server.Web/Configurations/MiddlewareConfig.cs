@@ -10,11 +10,13 @@ public static class MiddlewareConfig
   {
     // Configure Audit.NET - use path from configuration
     var auditLogsPath = app.Configuration["Audit:LogsPath"] ?? "Logs/Audit";
+
     // Make path absolute if it's relative
     if (!Path.IsPathRooted(auditLogsPath))
     {
       auditLogsPath = Path.Combine(Directory.GetCurrentDirectory(), auditLogsPath);
     }
+
     AuditConfiguration.ConfigureAudit(app.Services, auditLogsPath);
 
     if (app.Environment.IsDevelopment())
@@ -61,7 +63,7 @@ public static class MiddlewareConfig
     return app;
   }
 
-  static async Task SeedDatabase(WebApplication app)
+  private static async Task SeedDatabase(WebApplication app)
   {
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
@@ -69,7 +71,8 @@ public static class MiddlewareConfig
     try
     {
       var context = services.GetRequiredService<AppDbContext>();
-      //          await context.Database.MigrateAsync();
+
+      // await context.Database.MigrateAsync();
       // PV042: EnsureCreatedAsync is acceptable here as this is development-time database seeding.
       // In production, migrations should be used instead. This code should be guarded by environment checks.
 #pragma warning disable PV042

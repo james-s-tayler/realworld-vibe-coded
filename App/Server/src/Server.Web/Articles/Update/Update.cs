@@ -11,7 +11,7 @@ namespace Server.Web.Articles.Update;
 /// <remarks>
 /// Updates an existing article. Authentication required. User must be the author.
 /// </remarks>
-public class Update(IMediator _mediator, IUserContext userContext) : Endpoint<UpdateArticleRequest, ArticleResponse, ArticleMapper>
+public class Update(IMediator mediator, IUserContext userContext) : Endpoint<UpdateArticleRequest, ArticleResponse, ArticleMapper>
 {
   public override void Configure()
   {
@@ -28,14 +28,19 @@ public class Update(IMediator _mediator, IUserContext userContext) : Endpoint<Up
   {
     var userId = userContext.GetRequiredCurrentUserId();
 
-    var result = await _mediator.Send(new UpdateArticleCommand(
-      request.Slug,
-      request.Article.Title,
-      request.Article.Description,
-      request.Article.Body,
-      userId,
-      userId), cancellationToken);
+    var result = await mediator.Send(
+      new UpdateArticleCommand(
+        request.Slug,
+        request.Article.Title,
+        request.Article.Description,
+        request.Article.Body,
+        userId,
+        userId),
+      cancellationToken);
 
-    await Send.ResultMapperAsync(result, article => Map.FromEntity(article), cancellationToken);
+    await Send.ResultMapperAsync(
+      result,
+      article => Map.FromEntity(article),
+      cancellationToken);
   }
 }

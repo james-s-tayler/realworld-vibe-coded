@@ -7,7 +7,7 @@
 /// This endpoint is used to test the exception handling pipeline behavior.
 /// It throws an InvalidOperationException inside the MediatR handler.
 /// </remarks>
-public class ThrowInUseCase(IMediator _mediator) : Endpoint<EmptyRequest>
+public class ThrowInUseCase(IMediator mediator) : Endpoint<EmptyRequest>
 {
   public override void Configure()
   {
@@ -22,7 +22,7 @@ public class ThrowInUseCase(IMediator _mediator) : Endpoint<EmptyRequest>
 
   public override async Task HandleAsync(EmptyRequest req, CancellationToken cancellationToken)
   {
-    var result = await _mediator.Send(new ThrowInUseCaseQuery(), cancellationToken);
+    var result = await mediator.Send(new ThrowInUseCaseQuery(), cancellationToken);
     await Send.ResultValueAsync(result, cancellationToken);
   }
 }

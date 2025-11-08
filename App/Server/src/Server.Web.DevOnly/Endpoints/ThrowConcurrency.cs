@@ -3,7 +3,7 @@
 /// <summary>
 /// Test endpoint that throws a DbUpdateConcurrencyException
 /// </summary>
-public class ThrowConcurrency(IMediator _mediator) : Endpoint<EmptyRequest>
+public class ThrowConcurrency(IMediator mediator) : Endpoint<EmptyRequest>
 {
   public override void Configure()
   {
@@ -18,7 +18,7 @@ public class ThrowConcurrency(IMediator _mediator) : Endpoint<EmptyRequest>
 
   public override async Task HandleAsync(EmptyRequest req, CancellationToken cancellationToken)
   {
-    var result = await _mediator.Send(new ThrowConcurrencyQuery(), cancellationToken);
+    var result = await mediator.Send(new ThrowConcurrencyQuery(), cancellationToken);
     await Send.ResultValueAsync(result, cancellationToken);
   }
 }

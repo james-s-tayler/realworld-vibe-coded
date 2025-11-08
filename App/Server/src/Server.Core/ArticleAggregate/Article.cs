@@ -18,7 +18,9 @@ public class Article : EntityBase, IAggregateRoot
     Comments = new List<Comment>();
   }
 
-  private Article() { } // For EF Core
+  private Article()
+  {
+  } // For EF Core
 
   public string Title { get; private set; } = string.Empty;
 
@@ -40,6 +42,18 @@ public class Article : EntityBase, IAggregateRoot
 
   public int FavoritesCount => FavoritedBy.Count;
 
+  public static string GenerateSlug(string title)
+  {
+    return title.ToLowerInvariant()
+      .Replace(" ", "-")
+      .Replace(".", string.Empty)
+      .Replace(",", string.Empty)
+      .Replace("!", string.Empty)
+      .Replace("?", string.Empty)
+      .Replace("'", string.Empty)
+      .Replace("\"", string.Empty);
+  }
+
   /// <summary>
   /// Checks if the article is favorited by a specific user
   /// </summary>
@@ -49,6 +63,7 @@ public class Article : EntityBase, IAggregateRoot
     {
       return false;
     }
+
     return FavoritedBy.Any(u => u.Id == userId.Value);
   }
 
@@ -61,19 +76,8 @@ public class Article : EntityBase, IAggregateRoot
     {
       return false;
     }
-    return user.IsFollowing(AuthorId);
-  }
 
-  public static string GenerateSlug(string title)
-  {
-    return title.ToLowerInvariant()
-      .Replace(" ", "-")
-      .Replace(".", string.Empty)
-      .Replace(",", string.Empty)
-      .Replace("!", string.Empty)
-      .Replace("?", string.Empty)
-      .Replace("'", string.Empty)
-      .Replace("\"", string.Empty);
+    return user.IsFollowing(AuthorId);
   }
 
   public void Update(string title, string description, string body)

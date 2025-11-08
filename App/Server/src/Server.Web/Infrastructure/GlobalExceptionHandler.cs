@@ -18,8 +18,11 @@ public class GlobalExceptionHandler : IGlobalPostProcessor
     var exception = ctx.ExceptionDispatchInfo.SourceException;
 
     var logger = ctx.HttpContext.Resolve<ILogger<GlobalExceptionHandler>>();
-    logger.LogError(exception, "An unhandled exception occurred: {ExceptionType} - {Message}",
-      exception.GetType().Name, exception.Message);
+    logger.LogError(
+      exception,
+      "An unhandled exception occurred: {ExceptionType} - {Message}",
+      exception.GetType().Name,
+      exception.Message);
 
     // Mark the exception as handled to prevent automatic re-throwing
     ctx.MarkExceptionAsHandled();
@@ -28,10 +31,11 @@ public class GlobalExceptionHandler : IGlobalPostProcessor
     // This uses FastEndpoints' SendErrorsAsync which formats as problem details
     var validationFailures = new List<ValidationFailure>
     {
-      new(exception.GetType().Name, exception.Message)
+      new(exception.GetType().Name, exception.Message),
     };
 
-    await ctx.HttpContext.Response.SendErrorsAsync(validationFailures,
+    await ctx.HttpContext.Response.SendErrorsAsync(
+      validationFailures,
       statusCode: StatusCodes.Status500InternalServerError,
       cancellation: ct);
   }

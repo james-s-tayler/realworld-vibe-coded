@@ -4,12 +4,12 @@ using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Articles.List;
 
-public class ListArticlesHandler(IListArticlesQueryService _query)
+public class ListArticlesHandler(IListArticlesQueryService query)
   : IQueryHandler<ListArticlesQuery, IEnumerable<Article>>
 {
   public async Task<Result<IEnumerable<Article>>> Handle(ListArticlesQuery request, CancellationToken cancellationToken)
   {
-    var articles = await _query.ListAsync(
+    var articles = await query.ListAsync(
       request.Tag,
       request.Author,
       request.Favorited,

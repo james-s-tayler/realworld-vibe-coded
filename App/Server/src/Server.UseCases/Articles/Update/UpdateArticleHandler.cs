@@ -5,12 +5,12 @@ using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Update;
 
-public class UpdateArticleHandler(IRepository<Article> _articleRepository)
+public class UpdateArticleHandler(IRepository<Article> articleRepository)
   : ICommandHandler<UpdateArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(UpdateArticleCommand request, CancellationToken cancellationToken)
   {
-    var article = await _articleRepository.FirstOrDefaultAsync(
+    var article = await articleRepository.FirstOrDefaultAsync(
       new ArticleBySlugSpec(request.Slug), cancellationToken);
 
     if (article == null)
@@ -29,7 +29,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
       var newSlug = Article.GenerateSlug(request.Title);
       if (newSlug != article.Slug)
       {
-        var existingArticle = await _articleRepository.FirstOrDefaultAsync(
+        var existingArticle = await articleRepository.FirstOrDefaultAsync(
           new ArticleBySlugSpec(newSlug), cancellationToken);
 
         if (existingArticle != null)
@@ -45,7 +45,7 @@ public class UpdateArticleHandler(IRepository<Article> _articleRepository)
     var newBody = request.Body ?? article.Body;
 
     article.Update(newTitle, newDescription, newBody);
-    await _articleRepository.UpdateAsync(article, cancellationToken);
+    await articleRepository.UpdateAsync(article, cancellationToken);
 
     return Result<Article>.Success(article);
   }

@@ -22,14 +22,16 @@ public class NoOpMediator : IMediator
     return Task.FromResult<object?>(default);
   }
 
-  public async IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request,
+  public async IAsyncEnumerable<TResponse> CreateStream<TResponse>(
+    IStreamRequest<TResponse> request,
     [EnumeratorCancellation] CancellationToken cancellationToken = default)
   {
     await Task.CompletedTask;
     yield break;
   }
 
-  public async IAsyncEnumerable<object?> CreateStream(object request,
+  public async IAsyncEnumerable<object?> CreateStream(
+    object request,
     [EnumeratorCancellation] CancellationToken cancellationToken = default)
   {
     await Task.CompletedTask;

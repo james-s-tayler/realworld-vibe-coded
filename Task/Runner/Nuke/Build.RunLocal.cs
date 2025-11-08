@@ -9,13 +9,13 @@ using static Nuke.Common.Tools.Npm.NpmTasks;
 
 public partial class Build
 {
-  AbsolutePath PidDirectory => RootDirectory / ".nuke" / "pids";
+  internal AbsolutePath PidDirectory => RootDirectory / ".nuke" / "pids";
 
-  AbsolutePath DocsMcpPidFile => PidDirectory / "docs-mcp-server.pid";
+  internal AbsolutePath DocsMcpPidFile => PidDirectory / "docs-mcp-server.pid";
 
-  AbsolutePath NgrokPidFile => PidDirectory / "ngrok.pid";
+  internal AbsolutePath NgrokPidFile => PidDirectory / "ngrok.pid";
 
-  Target RunLocalCleanDirectories => _ => _
+  internal Target RunLocalCleanDirectories => _ => _
     .Description("Pre-create directories that Docker containers need to prevent root permission issues")
     .Executes(() =>
     {
@@ -37,7 +37,7 @@ public partial class Build
       Log.Information("✓ Directories cleaned and pre-created");
     });
 
-  Target RunLocalServer => _ => _
+  internal Target RunLocalServer => _ => _
     .Description("Run backend locally using Docker Compose with SQL Server and hot-reload")
     .DependsOn(DbResetForce)
     .DependsOn(RunLocalCleanDirectories)
@@ -58,7 +58,7 @@ public partial class Build
 
       var envVars = new Dictionary<string, string>
       {
-        ["DOCKER_BUILDKIT"] = "1"
+        ["DOCKER_BUILDKIT"] = "1",
       };
 
       try
@@ -66,7 +66,9 @@ public partial class Build
         // Run docker-compose to start SQL Server and API with hot-reload
         Log.Information("Running Docker Compose for local development...");
         var args = $"compose -f {composeFile} up --build";
-        var process = ProcessTasks.StartProcess("docker", args,
+        var process = ProcessTasks.StartProcess(
+              "docker",
+              args,
               workingDirectory: RootDirectory,
               environmentVariables: envVars);
         process.WaitForExit();
@@ -74,10 +76,13 @@ public partial class Build
       finally
       {
         Console.CancelKeyPress -= handler;
+
         // Clean up containers when user stops the process
         Log.Information("Cleaning up Docker Compose resources...");
         var downArgs = $"compose -f {composeFile} down";
-        var downProcess = ProcessTasks.StartProcess("docker", downArgs,
+        var downProcess = ProcessTasks.StartProcess(
+              "docker",
+              downArgs,
               workingDirectory: RootDirectory,
               logOutput: false,
               logInvocation: false);
@@ -86,7 +91,7 @@ public partial class Build
       }
     });
 
-  Target RunLocalClient => _ => _
+  internal Target RunLocalClient => _ => _
     .Description("Run client locally")
     .DependsOn(InstallClient)
     .Executes(() =>
@@ -97,7 +102,7 @@ public partial class Build
         .SetCommand("dev"));
     });
 
-  Target RunLocalDocsMcpServerUp => _ => _
+  internal Target RunLocalDocsMcpServerUp => _ => _
     .Description("Start Docs MCP Server and ngrok in the background")
     .Executes(() =>
     {
@@ -126,11 +131,13 @@ public partial class Build
       if (!WaitForHttpEndpoint("http://127.0.0.1:6280", timeoutSeconds: 15))
       {
         Log.Error("Docs MCP Server did not become available within the timeout period");
+
         // Clean up the started process
         KillProcess(mcpProcess.Id);
         DocsMcpPidFile.DeleteFile();
         throw new Exception("Docs MCP Server failed to start - try run npx @arabold/docs-mcp-server@latest");
       }
+
       Log.Information("✓ Docs MCP Server is available at http://127.0.0.1:6280");
 
       // Check if ngrok is available
@@ -161,7 +168,7 @@ public partial class Build
       Log.Information("  PID files stored in: {PidDirectory}", PidDirectory);
     });
 
-  Target RunLocalDocsMcpServerDown => _ => _
+  internal Target RunLocalDocsMcpServerDown => _ => _
     .Description("Stop Docs MCP Server and ngrok background processes")
     .Executes(() =>
     {
@@ -247,7 +254,7 @@ public partial class Build
       RedirectStandardOutput = true,
       RedirectStandardError = true,
       RedirectStandardInput = false,
-      WorkingDirectory = RootDirectory
+      WorkingDirectory = RootDirectory,
     };
 
     var process = new Process { StartInfo = startInfo };
@@ -356,7 +363,7 @@ public partial class Build
         Arguments = command,
         UseShellExecute = false,
         CreateNoWindow = true,
-        RedirectStandardOutput = true
+        RedirectStandardOutput = true,
       };
       var process = Process.Start(startInfo);
       process?.WaitForExit();
