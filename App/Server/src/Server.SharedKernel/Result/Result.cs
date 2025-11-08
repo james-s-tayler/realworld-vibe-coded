@@ -13,6 +13,7 @@ public class Result<T>
   protected internal Result(ResultStatus status) => Status = status;
 
   public static implicit operator T(Result<T> result) => result.Value;
+
   public static implicit operator Result<T>(T value) => new Result<T>(value);
 
   [JsonInclude]

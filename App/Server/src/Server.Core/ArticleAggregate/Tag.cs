@@ -12,5 +12,6 @@ public class Tag : EntityBase, IAggregateRoot
   private Tag() { } // For EF Core
 
   public string Name { get; private set; } = string.Empty;
+
   public List<Article> Articles { get; private set; } = new();
 }

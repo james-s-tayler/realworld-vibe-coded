@@ -204,6 +204,7 @@ public class TransactionBehaviorTests
 
   // Test command and query classes
   private record TestCommand : ICommand<string>;
+
   private record TestQuery : IQuery<string>;
 }
 

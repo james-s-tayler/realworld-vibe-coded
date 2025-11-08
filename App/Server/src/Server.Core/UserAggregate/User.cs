@@ -17,15 +17,19 @@ public class User : EntityBase, IAggregateRoot
   }
 
   public string Email { get; private set; } = default!;
+
   public string Username { get; private set; } = default!;
 
   [AuditIgnore]
   public string HashedPassword { get; private set; } = default!;
+
   public string Bio { get; private set; } = default!;
+
   public string? Image { get; private set; }
 
   // Navigation properties for following relationships
   public ICollection<UserFollowing> Following { get; private set; } = new List<UserFollowing>();
+
   public ICollection<UserFollowing> Followers { get; private set; } = new List<UserFollowing>();
 
   public User UpdateEmail(string newEmail)

@@ -12,10 +12,15 @@ public class ArticlesFixture : AppFixture<Program>
   private string _connectionString = null!;
 
   public HttpClient ArticlesUser1Client { get; private set; } = null!;
+
   public HttpClient ArticlesUser2Client { get; private set; } = null!;
+
   public string ArticlesUser1Username { get; private set; } = null!;
+
   public string ArticlesUser2Username { get; private set; } = null!;
+
   public string ArticlesUser1Email { get; private set; } = null!;
+
   public string ArticlesUser2Email { get; private set; } = null!;
 
   protected override async ValueTask PreSetupAsync()
