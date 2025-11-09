@@ -5,9 +5,14 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    // Watch for changes when running in Docker
+    watch: {
+      usePolling: true,
+    },
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        // Use VITE_API_URL if set (for Docker), otherwise default to localhost
+        target: process.env.VITE_API_URL || 'http://localhost:5000',
         changeOrigin: true,
       },
     },

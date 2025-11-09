@@ -37,8 +37,8 @@ public partial class Build
       Log.Information("✓ Directories cleaned and pre-created");
     });
 
-  internal Target RunLocalServer => _ => _
-    .Description("Run backend locally using Docker Compose with SQL Server and hot-reload")
+  internal Target RunLocal => _ => _
+    .Description("Run backend and frontend locally using Docker Compose with SQL Server and hot-reload")
     .DependsOn(DbResetForce)
     .DependsOn(RunLocalCleanDirectories)
     .Executes(() =>
@@ -63,7 +63,7 @@ public partial class Build
 
       try
       {
-        // Run docker-compose to start SQL Server and API with hot-reload
+        // Run docker-compose to start SQL Server, API, and Client with hot-reload
         Log.Information("Running Docker Compose for local development...");
         var args = $"compose -f {composeFile} up --build";
         var process = ProcessTasks.StartProcess(
