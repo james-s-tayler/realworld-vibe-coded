@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Use relative API path so Vite proxy can handle it in development
+// In production, the API is expected to be served from the same origin
+const API_BASE_URL = '';
 
 export class ApiError extends Error {
   status: number;
