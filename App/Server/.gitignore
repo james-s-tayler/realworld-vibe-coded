@@ -1,0 +1,4 @@
+# These files are mounted from the repository root by Docker Compose
+# and should not be committed in this directory
+.editorconfig
+stylecop.json
