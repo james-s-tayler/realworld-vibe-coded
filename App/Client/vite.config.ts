@@ -1,21 +1,25 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    // Watch for changes when running in Docker
-    watch: {
-      usePolling: true,
-    },
-    proxy: {
-      '/api': {
-        // Use VITE_API_URL if set (for Docker), otherwise default to localhost
-        target: process.env.VITE_API_URL || 'http://localhost:5000',
-        changeOrigin: true,
+export default defineConfig(({ mode }) => {
+  // Load env file based on `mode` in the current working directory.
+  const env = loadEnv(mode, process.cwd(), '')
+  
+  return {
+    plugins: [react()],
+    server: {
+      // Watch for changes when running in Docker
+      watch: {
+        usePolling: true,
+      },
+      proxy: {
+        '/api': {
+          // Use VITE_API_URL if set (for Docker), otherwise default to localhost
+          target: env.VITE_API_URL || 'http://localhost:5000',
+          changeOrigin: true,
+        },
       },
     },
-  },
-
+  }
 })

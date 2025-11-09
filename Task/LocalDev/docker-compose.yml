@@ -96,6 +96,8 @@ services:
       api:
         condition: service_healthy
     environment:
+      # NOTE: VITE_API_URL is only used by the Vite dev server proxy configuration (see vite.config.ts).
+      # It is NOT used by the client code at runtime; client code uses relative URLs.
       VITE_API_URL: http://api:5000
     ports:
       - "5173:5173"
