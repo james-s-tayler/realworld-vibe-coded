@@ -47,6 +47,7 @@ services:
     build:
       context: ../../App/Server
       dockerfile: ../../Task/LocalDev/Dockerfile.dev
+    user: "${UID:-1000}:${GID:-1000}"
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -92,6 +93,7 @@ services:
     build:
       context: ../../App/Client
       dockerfile: ../../Task/LocalDev/Dockerfile.dev.client
+    user: "${UID:-1000}:${GID:-1000}"
     depends_on:
       api:
         condition: service_healthy

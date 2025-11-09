@@ -59,6 +59,8 @@ public partial class Build
       var envVars = new Dictionary<string, string>
       {
         ["DOCKER_BUILDKIT"] = "1",
+        ["UID"] = GetUserId(),
+        ["GID"] = GetGroupId(),
       };
 
       try
@@ -372,6 +374,60 @@ public partial class Build
     catch
     {
       return false;
+    }
+  }
+
+  private string GetUserId()
+  {
+    if (EnvironmentInfo.IsWin)
+    {
+      return "1000"; // Default for Windows
+    }
+
+    try
+    {
+      var startInfo = new ProcessStartInfo
+      {
+        FileName = "id",
+        Arguments = "-u",
+        UseShellExecute = false,
+        CreateNoWindow = true,
+        RedirectStandardOutput = true,
+      };
+      var process = Process.Start(startInfo);
+      process?.WaitForExit();
+      return process?.StandardOutput.ReadToEnd().Trim() ?? "1000";
+    }
+    catch
+    {
+      return "1000";
+    }
+  }
+
+  private string GetGroupId()
+  {
+    if (EnvironmentInfo.IsWin)
+    {
+      return "1000"; // Default for Windows
+    }
+
+    try
+    {
+      var startInfo = new ProcessStartInfo
+      {
+        FileName = "id",
+        Arguments = "-g",
+        UseShellExecute = false,
+        CreateNoWindow = true,
+        RedirectStandardOutput = true,
+      };
+      var process = Process.Start(startInfo);
+      process?.WaitForExit();
+      return process?.StandardOutput.ReadToEnd().Trim() ?? "1000";
+    }
+    catch
+    {
+      return "1000";
     }
   }
 }
