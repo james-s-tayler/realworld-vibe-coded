@@ -37,20 +37,22 @@ public partial class Build
       Log.Information("✓ Directories cleaned and pre-created");
     });
 
-  internal Target RunLocalServer => _ => _
+
+  internal Target RunLocalHotReload => _ => _
     .Description("Run backend locally using Docker Compose with SQL Server and hot-reload")
     .DependsOn(DbResetForce)
     .DependsOn(RunLocalCleanDirectories)
     .Executes(() =>
     {
-      Log.Information("Starting local development environment with Docker Compose...");
+      Log.Information("Starting local development environment with Docker Compose (hot-reload)...");
 
-      var composeFile = RootDirectory / "Task" / "LocalDev" / "docker-compose.yml";
+      var devDepsComposeFile = TaskLocalDevDirectory / "docker-compose.dev-deps.yml";
+      var hotReloadComposeFile = TaskLocalDevDirectory / "docker-compose.hot-reload.yml";
 
       ConsoleCancelEventHandler? handler = null;
       handler = (_, e) =>
       {
-        // Don’t let NUKE abort the build on Ctrl+C; let docker handle it.
+        // Don't let NUKE abort the build on Ctrl+C; let docker handle it.
         e.Cancel = true;
         Log.Warning("Ctrl+C received; waiting for Docker to stop containers...");
       };
@@ -63,9 +65,9 @@ public partial class Build
 
       try
       {
-        // Run docker-compose to start SQL Server and API with hot-reload
-        Log.Information("Running Docker Compose for local development...");
-        var args = $"compose -f {composeFile} up --build";
+        // Run docker-compose to start dev dependencies and API with hot-reload
+        Log.Information("Running Docker Compose for local development with hot-reload...");
+        var args = $"compose -f {devDepsComposeFile} -f {hotReloadComposeFile} up --build";
         var process = ProcessTasks.StartProcess(
               "docker",
               args,
@@ -79,7 +81,63 @@ public partial class Build
 
         // Clean up containers when user stops the process
         Log.Information("Cleaning up Docker Compose resources...");
-        var downArgs = $"compose -f {composeFile} down";
+        var downArgs = $"compose -f {devDepsComposeFile} -f {hotReloadComposeFile} down";
+        var downProcess = ProcessTasks.StartProcess(
+              "docker",
+              downArgs,
+              workingDirectory: RootDirectory,
+              logOutput: false,
+              logInvocation: false);
+        downProcess.WaitForExit();
+        Log.Information("✓ Docker Compose resources cleaned up");
+      }
+    });
+
+  internal Target RunLocalPublish => _ => _
+    .Description("Run backend locally using Docker Compose with published artifact")
+    .DependsOn(BuildServerPublish)
+    .DependsOn(DbResetForce)
+    .DependsOn(RunLocalCleanDirectories)
+    .Executes(() =>
+    {
+      Log.Information("Starting local development environment with Docker Compose (published artifact)...");
+
+      var devDepsComposeFile = TaskLocalDevDirectory / "docker-compose.dev-deps.yml";
+      var publishComposeFile = TaskLocalDevDirectory / "docker-compose.publish.yml";
+
+      ConsoleCancelEventHandler? handler = null;
+      handler = (_, e) =>
+      {
+        // Don't let NUKE abort the build on Ctrl+C; let docker handle it.
+        e.Cancel = true;
+        Log.Warning("Ctrl+C received; waiting for Docker to stop containers...");
+      };
+      Console.CancelKeyPress += handler;
+
+      var envVars = new Dictionary<string, string>
+      {
+        ["DOCKER_BUILDKIT"] = "1",
+      };
+
+      try
+      {
+        // Run docker-compose to start dev dependencies and API with published artifact
+        Log.Information("Running Docker Compose for local development with published artifact...");
+        var args = $"compose -f {devDepsComposeFile} -f {publishComposeFile} up --build";
+        var process = ProcessTasks.StartProcess(
+              "docker",
+              args,
+              workingDirectory: RootDirectory,
+              environmentVariables: envVars);
+        process.WaitForExit();
+      }
+      finally
+      {
+        Console.CancelKeyPress -= handler;
+
+        // Clean up containers when user stops the process
+        Log.Information("Cleaning up Docker Compose resources...");
+        var downArgs = $"compose -f {devDepsComposeFile} -f {publishComposeFile} down";
         var downProcess = ProcessTasks.StartProcess(
               "docker",
               downArgs,
