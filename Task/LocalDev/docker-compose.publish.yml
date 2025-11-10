@@ -1,0 +1,27 @@
+services:
+  api:
+    build:
+      context: ../../
+      dockerfile: Task/LocalDev/Dockerfile.publish
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      seq:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true"
+      Audit__LogsPath: /app/Logs/Server.Web/Audit.NET
+      Serilog__WriteTo__1__Args__Path: /app/Logs/Server.Web/Serilog/logs.json
+      Serilog__WriteTo__2__Args__ServerUrl: http://seq:80
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../../Logs:/app/Logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/swagger/index.html"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
