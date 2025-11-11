@@ -43,51 +43,6 @@ services:
         gelf-address: "udp://127.0.0.1:12201"
         tag: "{{.Name}}"
 
-  api:
-    build:
-      context: ../../App/Server
-      dockerfile: ../../Task/LocalDev/Dockerfile.dev
-    depends_on:
-      sqlserver:
-        condition: service_healthy
-      seq:
-        condition: service_started
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:5000
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true"
-      Audit__LogsPath: /app/Logs/Server.Web/Audit.NET
-      Serilog__WriteTo__1__Args__Path: /app/Logs/Server.Web/Serilog/logs.json
-      Serilog__WriteTo__2__Args__ServerUrl: http://seq:80
-    ports:
-      - "5000:5000"
-    volumes:
-      - ../../App/Server:/app
-      - ../../Logs:/app/Logs
-      # Mount root configuration files for StyleCop and EditorConfig
-      - ../../.editorconfig:/app/.editorconfig:ro
-      - ../../stylecop.json:/app/stylecop.json:ro
-      - /app/src/Server.Web/obj
-      - /app/src/Server.Web/bin
-      - /app/src/Server.Web.DevOnly/obj
-      - /app/src/Server.Web.DevOnly/bin
-      - /app/src/Server.Infrastructure/obj
-      - /app/src/Server.Infrastructure/bin
-      - /app/src/Server.UseCases/obj
-      - /app/src/Server.UseCases/bin
-      - /app/src/Server.Core/obj
-      - /app/src/Server.Core/bin
-      - /app/src/Server.SharedKernel/obj
-      - /app/src/Server.SharedKernel/bin
-      - /app/analyzers/Server.Analyzers/obj
-      - /app/analyzers/Server.Analyzers/bin
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/swagger/index.html"]
-      interval: 3s
-      timeout: 5s
-      retries: 20
-      start_period: 10s
-
 volumes:
   seq-data:
   sqlserver-data:
