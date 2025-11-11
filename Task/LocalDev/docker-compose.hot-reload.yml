@@ -21,8 +21,8 @@ services:
       - ../../App/Server:/app
       - ../../Logs:/app/Logs
       # Mount root configuration files for StyleCop and EditorConfig
-      - ../../.editorconfig:/app/.editorconfig:ro
-      - ../../stylecop.json:/app/stylecop.json:ro
+      - ../../.editorconfig:/.editorconfig:ro
+      - ../../stylecop.json:/stylecop.json:ro
       - /app/src/Server.Web/obj
       - /app/src/Server.Web/bin
       - /app/src/Server.Web.DevOnly/obj
