@@ -67,14 +67,17 @@ public class RealWorldE2eTests : PageTest
       await Page.GetByPlaceholder("Password").FillAsync(_testPassword);
 
       // Submit registration
+      var responseTask = Page.WaitForResponseAsync(response => 
+        response.Url.Contains("/api/users") && response.Request.Method == "POST",
+        new() { Timeout = DefaultTimeout });
+      
       await Page.GetByRole(AriaRole.Button, new() { Name = "Sign up" }).ClickAsync();
+      
+      await responseTask;
 
-      // Wait for redirect to home page
-      await Page.WaitForURLAsync(_baseUrl, new() { Timeout = DefaultTimeout });
-
-      // Verify user is logged in - check for user link in header
+      // Wait for the user link to appear in the header (indicates successful registration and navigation)
       var userLink = Page.GetByRole(AriaRole.Link, new() { Name = _testUsername }).First;
-      await userLink.WaitForAsync(new() { Timeout = DefaultTimeout });
+      await userLink.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = DefaultTimeout });
       Assert.True(await userLink.IsVisibleAsync(), "User link should be visible in header after sign up");
 
       // Click on user profile link
@@ -233,9 +236,18 @@ public class RealWorldE2eTests : PageTest
     await Page.GetByPlaceholder("Username").FillAsync(_testUsername);
     await Page.GetByPlaceholder("Email").FillAsync(_testEmail);
     await Page.GetByPlaceholder("Password").FillAsync(_testPassword);
+    
+    // Click submit and wait for API response and navigation
+    var responseTask = Page.WaitForResponseAsync(response => 
+      response.Url.Contains("/api/users") && response.Request.Method == "POST",
+      new() { Timeout = DefaultTimeout });
+    
     await Page.GetByRole(AriaRole.Button, new() { Name = "Sign up" }).ClickAsync();
-
-    await Page.WaitForURLAsync(_baseUrl, new() { Timeout = DefaultTimeout });
+    
+    await responseTask;
+    
+    // Wait for the user link to appear in the header to confirm login and navigation completed
+    await Page.GetByRole(AriaRole.Link, new() { Name = _testUsername }).First.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = DefaultTimeout });
   }
 
   private async Task<string> CreateArticle()

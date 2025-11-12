@@ -268,9 +268,18 @@ public class RealWorldArticleInteractionsE2eTests : PageTest
     await Page.GetByPlaceholder("Username").FillAsync(_testUsername);
     await Page.GetByPlaceholder("Email").FillAsync(_testEmail);
     await Page.GetByPlaceholder("Password").FillAsync(_testPassword);
+    
+    // Click submit and wait for API response and navigation
+    var responseTask = Page.WaitForResponseAsync(response => 
+      response.Url.Contains("/api/users") && response.Request.Method == "POST",
+      new() { Timeout = DefaultTimeout });
+    
     await Page.GetByRole(AriaRole.Button, new() { Name = "Sign up" }).ClickAsync();
-
-    await Page.WaitForURLAsync(_baseUrl, new() { Timeout = DefaultTimeout });
+    
+    await responseTask;
+    
+    // Wait for the user link to appear in the header to confirm login and navigation completed
+    await Page.GetByRole(AriaRole.Link, new() { Name = _testUsername }).First.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = DefaultTimeout });
   }
 
   private async Task<string> CreateArticle()
