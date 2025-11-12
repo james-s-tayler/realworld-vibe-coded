@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
-import { Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading } from '@carbon/react';
+import { Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, InlineNotification } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
 import { useAuth } from '../hooks/useAuth';
 import { profilesApi } from '../api/profiles';
 import { articlesApi } from '../api/articles';
 import { ArticleList } from '../components/ArticleList';
+import { ApiError } from '../api/client';
 import type { Profile } from '../types/article';
 import type { Article } from '../types/article';
 import './ProfilePage.css';
@@ -18,15 +19,22 @@ export const ProfilePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [articlesLoading, setArticlesLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const loadProfile = useCallback(async () => {
     if (!username) return;
     setLoading(true);
+    setError(null);
     try {
       const response = await profilesApi.getProfile(username);
       setProfile(response.profile);
     } catch (error) {
       console.error('Failed to load profile:', error);
+      if (error instanceof ApiError) {
+        setError(error.errors.join(', '));
+      } else {
+        setError('Failed to load profile');
+      }
     } finally {
       setLoading(false);
     }
@@ -90,6 +98,21 @@ export const ProfilePage: React.FC = () => {
     return (
       <div className="profile-page loading">
         <Loading description="Loading profile..." withOverlay={false} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-page">
+        <div className="container">
+          <InlineNotification
+            kind="error"
+            title="Error"
+            subtitle={error}
+            lowContrast
+          />
+        </div>
       </div>
     );
   }

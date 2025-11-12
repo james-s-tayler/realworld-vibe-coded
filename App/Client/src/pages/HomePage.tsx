@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile } from '@carbon/react';
+import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, InlineNotification } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
 import { articlesApi } from '../api/articles';
 import { tagsApi } from '../api/tags';
 import { ArticleList } from '../components/ArticleList';
 import { TagList } from '../components/TagList';
+import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
 import './HomePage.css';
 
@@ -16,6 +17,7 @@ export const HomePage: React.FC = () => {
   const [tagsLoading, setTagsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const loadTags = useCallback(async () => {
     setTagsLoading(true);
@@ -31,6 +33,7 @@ export const HomePage: React.FC = () => {
 
   const loadArticles = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let response;
       if (activeTab === 0 && user) {
@@ -46,6 +49,11 @@ export const HomePage: React.FC = () => {
       setArticles(response.articles);
     } catch (error) {
       console.error('Failed to load articles:', error);
+      if (error instanceof ApiError) {
+        setError(error.errors.join(', '));
+      } else {
+        setError('Failed to load articles');
+      }
     } finally {
       setLoading(false);
     }
@@ -99,6 +107,15 @@ export const HomePage: React.FC = () => {
       <div className="container page">
         <div className="row">
           <div className="col-md-9">
+            {error && (
+              <InlineNotification
+                kind="error"
+                title="Error"
+                subtitle={error}
+                lowContrast
+                onCloseButtonClick={() => setError(null)}
+              />
+            )}
             <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
               <TabList aria-label="Article feeds">
                 {user && <Tab>Your Feed</Tab>}

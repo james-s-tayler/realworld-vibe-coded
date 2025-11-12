@@ -18,6 +18,8 @@ describe('apiRequest', () => {
     const mockData = { user: { username: 'test' } }
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      text: async () => JSON.stringify(mockData),
       json: async () => mockData,
     } as Response)
 
@@ -40,6 +42,8 @@ describe('apiRequest', () => {
     const mockData = { user: { username: 'test' } }
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      text: async () => JSON.stringify(mockData),
       json: async () => mockData,
     } as Response)
 
@@ -72,6 +76,8 @@ describe('apiRequest', () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: false,
       status: 401,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      text: async () => JSON.stringify(errorResponse),
       json: async () => errorResponse,
     } as Response)
 
@@ -83,7 +89,7 @@ describe('apiRequest', () => {
       expect(error).toBeInstanceOf(ApiError)
       if (error instanceof ApiError) {
         expect(error.status).toBe(401)
-        expect(error.errors).toEqual(['body email or password is invalid'])
+        expect(error.errors).toEqual(['body: email or password is invalid'])
       }
     }
   })
@@ -92,6 +98,8 @@ describe('apiRequest', () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: false,
       status: 500,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      text: async () => JSON.stringify({}),
       json: async () => ({}),
     } as Response)
 
@@ -99,7 +107,7 @@ describe('apiRequest', () => {
       await apiRequest('/api/test')
     } catch (error) {
       if (error instanceof ApiError) {
-        expect(error.errors).toEqual(['An error occurred'])
+        expect(error.errors).toEqual(['Request failed with status 500'])
       }
     }
   })
@@ -108,6 +116,8 @@ describe('apiRequest', () => {
     const mockData = { success: true }
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      text: async () => JSON.stringify(mockData),
       json: async () => mockData,
     } as Response)
 

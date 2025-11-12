@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { articlesApi } from '../api/articles';
 import { commentsApi } from '../api/comments';
 import { profilesApi } from '../api/profiles';
+import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
 import type { Comment } from '../types/comment';
 import './ArticlePage.css';
@@ -24,12 +25,17 @@ export const ArticlePage: React.FC = () => {
   const loadArticle = useCallback(async () => {
     if (!slug) return;
     setLoading(true);
+    setError(null);
     try {
       const response = await articlesApi.getArticle(slug);
       setArticle(response.article);
     } catch (error) {
       console.error('Failed to load article:', error);
-      setError('Failed to load article');
+      if (error instanceof ApiError) {
+        setError(error.errors.join(', '));
+      } else {
+        setError('Failed to load article');
+      }
     } finally {
       setLoading(false);
     }

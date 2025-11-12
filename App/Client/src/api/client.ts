@@ -35,22 +35,61 @@ export async function apiRequest<T>(
     headers,
   });
 
-  const data = await response.json();
+  // Check if response has content before trying to parse JSON
+  const contentType = response.headers.get('content-type');
+  const hasJsonContent = contentType && contentType.includes('application/json');
+  
+  // Handle empty responses (204 No Content or empty body)
+  const text = await response.text();
+  let data: unknown = null;
+  
+  if (text && hasJsonContent) {
+    try {
+      data = JSON.parse(text);
+    } catch (error) {
+      console.error('Failed to parse JSON response:', text);
+      if (!response.ok) {
+        throw new ApiError(response.status, ['Failed to parse response']);
+      }
+      throw error;
+    }
+  }
 
   if (!response.ok) {
-    // Handle ProblemDetails format: errors is an array of {name, reason}
+    // Handle ProblemDetails format
     let errors: string[];
-    if (data?.errors && Array.isArray(data.errors)) {
-      // ProblemDetails format
-      errors = data.errors.map((err: { name: string; reason: string }) => 
-        `${err.name} ${err.reason}`
-      );
+    
+    const errorData = data as Record<string, unknown>;
+    
+    if (errorData?.errors) {
+      // ProblemDetails format: errors can be an array or object
+      if (Array.isArray(errorData.errors)) {
+        errors = errorData.errors.map((err: { name: string; reason: string }) => 
+          `${err.name}: ${err.reason}`
+        );
+      } else if (typeof errorData.errors === 'object' && errorData.errors !== null) {
+        // Object format: {0: {name, reason}, 1: {name, reason}}
+        errors = Object.values(errorData.errors).map((err: unknown) => {
+          const error = err as { name: string; reason: string };
+          return `${error.name}: ${error.reason}`;
+        });
+      } else {
+        errors = [String(errorData.errors)];
+      }
+    } else if (errorData?.title) {
+      // ProblemDetails with title
+      errors = [String(errorData.title)];
+      if (errorData.detail) {
+        errors.push(String(errorData.detail));
+      }
+    } else if (errorData?.message) {
+      errors = [String(errorData.message)];
     } else {
-      // Fallback for other error formats
-      errors = ['An error occurred'];
+      errors = [`Request failed with status ${response.status}`];
     }
+    
     throw new ApiError(response.status, errors);
   }
 
-  return data;
+  return data as T;
 }
