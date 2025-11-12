@@ -52,8 +52,8 @@ describe('RegisterPage', () => {
   it('shows link to login page', () => {
     renderRegisterPage()
     
-    expect(screen.getByText(/already have an account/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /sign in/i })).toHaveAttribute('href', '/login')
+    expect(screen.getByText(/have an account/i)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /have an account/i })).toHaveAttribute('href', '/login')
   })
 
   it('submits registration form with valid data', async () => {
