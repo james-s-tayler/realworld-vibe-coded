@@ -18,9 +18,12 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const token = localStorage.getItem('token');
   
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
+  const headers: Record<string, string> = {};
+
+  // Only add Content-Type header for requests with a body
+  if (options.body && options.method !== 'GET' && options.method !== 'HEAD') {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (options.headers) {
     Object.assign(headers, options.headers);

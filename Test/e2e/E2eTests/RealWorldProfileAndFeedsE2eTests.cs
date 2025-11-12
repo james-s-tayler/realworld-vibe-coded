@@ -85,8 +85,8 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       Assert.True(await profileHeading.IsVisibleAsync(), "Other user's profile should be visible");
 
       // Verify tabs are present
-      var myPostsTab = Page.GetByRole(AriaRole.Tab, new() { Name = /my (posts|articles)/i });
-      Assert.True(await myPostsTab.IsVisibleAsync(), "My Posts tab should be visible on other user's profile");
+      var myPostsTab = Page.Locator("button[role='tab']").Filter(new() { HasText = "My Articles" }).Or(Page.Locator("button[role='tab']").Filter(new() { HasText = "My Posts" }));
+      Assert.True(await myPostsTab.First.IsVisibleAsync(), "My Posts tab should be visible on other user's profile");
     }
     finally
     {
@@ -121,7 +121,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await Page.GotoAsync($"{_baseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
 
       // Find and click follow button
-      var followButton = Page.GetByRole(AriaRole.Button, new() { Name = /follow/i });
+      var followButton = Page.Locator("button").Filter(new() { HasText = "Follow" });
       await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await followButton.ClickAsync();
 
@@ -129,7 +129,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await Page.WaitForTimeoutAsync(1000);
 
       // Verify button text changed to unfollow
-      var unfollowButton = Page.GetByRole(AriaRole.Button, new() { Name = /unfollow/i });
+      var unfollowButton = Page.Locator("button").Filter(new() { HasText = "Unfollow" });
       Assert.True(await unfollowButton.IsVisibleAsync(), "Unfollow button should appear after following");
 
       // Click to unfollow
@@ -139,7 +139,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await Page.WaitForTimeoutAsync(1000);
 
       // Verify button text changed back to follow
-      followButton = Page.GetByRole(AriaRole.Button, new() { Name = /follow/i });
+      followButton = Page.Locator("button").Filter(new() { HasText = "Follow" });
       Assert.True(await followButton.IsVisibleAsync(), "Follow button should appear after unfollowing");
     }
     finally
@@ -173,7 +173,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
 
       // Follow first user
       await Page.GotoAsync($"{_baseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
-      var followButton = Page.GetByRole(AriaRole.Button, new() { Name = /follow/i });
+      var followButton = Page.Locator("button").Filter(new() { HasText = "Follow" });
       await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await followButton.ClickAsync();
       await Page.WaitForTimeoutAsync(1000);
@@ -233,11 +233,11 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await Page.WaitForTimeoutAsync(2000);
 
       // Verify we're on a tag filter view (tab should show the tag name)
-      var tagTab = Page.GetByRole(AriaRole.Tab, new() { Name = new Regex(testTag, RegexOptions.IgnoreCase) });
+      var tagTab = Page.Locator($"button[role='tab']:has-text('{testTag}')").First;
       Assert.True(await tagTab.IsVisibleAsync(), "Tag tab should be visible when filtering by tag");
 
       // Verify the article with that tag is displayed
-      var article = Page.Locator($"text=/{articleTitle}/i").First;
+      var article = Page.GetByText(articleTitle).First;
       Assert.True(await article.IsVisibleAsync(), "Article with the selected tag should be visible");
     }
     finally
@@ -264,7 +264,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       var articleTitle = await CreateArticle(_testUsername1);
 
       // Favorite the article
-      var favoriteButton = Page.Locator("button").Filter(new() { HasText = new Regex("favorite", RegexOptions.IgnoreCase) }).First;
+      var favoriteButton = Page.Locator("button:has-text('Favorite')").First;
       await favoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await favoriteButton.ClickAsync();
       await Page.WaitForTimeoutAsync(1000);
@@ -274,7 +274,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await Page.WaitForURLAsync($"{_baseUrl}/profile/{_testUsername1}", new() { Timeout = DefaultTimeout });
 
       // Click on Favorited Posts tab
-      var favoritedTab = Page.GetByRole(AriaRole.Tab, new() { Name = /favorited/i });
+      var favoritedTab = Page.Locator("button[role='tab']").Filter(new() { HasText = "Favorited" });
       await favoritedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await favoritedTab.ClickAsync();
 

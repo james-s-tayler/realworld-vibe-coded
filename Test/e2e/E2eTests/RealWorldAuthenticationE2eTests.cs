@@ -139,14 +139,14 @@ public class RealWorldAuthenticationE2eTests : PageTest
 
       // Should redirect to login
       await Page.WaitForURLAsync($"{_baseUrl}/login", new() { Timeout = DefaultTimeout });
-      Assert.Contains("/login", Page.Url, "Should redirect to login page for protected route");
+      Assert.Contains("/login", Page.Url);
 
       // Try to access settings page without authentication
       await Page.GotoAsync($"{_baseUrl}/settings", new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
 
       // Should redirect to login
       await Page.WaitForURLAsync($"{_baseUrl}/login", new() { Timeout = DefaultTimeout });
-      Assert.Contains("/login", Page.Url, "Should redirect to login page for settings");
+      Assert.Contains("/login", Page.Url);
     }
     finally
     {

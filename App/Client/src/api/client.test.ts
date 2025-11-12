@@ -28,9 +28,7 @@ describe('apiRequest', () => {
     expect(fetch).toHaveBeenCalledWith(
       'http://localhost:5000/api/test',
       expect.objectContaining({
-        headers: expect.objectContaining({
-          'Content-Type': 'application/json',
-        }),
+        headers: {},
       })
     )
     expect(result).toEqual(mockData)
@@ -53,7 +51,6 @@ describe('apiRequest', () => {
       'http://localhost:5000/api/user',
       expect.objectContaining({
         headers: expect.objectContaining({
-          'Content-Type': 'application/json',
           'Authorization': 'Token test-token',
         }),
       })
@@ -131,7 +128,6 @@ describe('apiRequest', () => {
       'http://localhost:5000/api/test',
       expect.objectContaining({
         headers: expect.objectContaining({
-          'Content-Type': 'application/json',
           'X-Custom-Header': 'value',
         }),
       })

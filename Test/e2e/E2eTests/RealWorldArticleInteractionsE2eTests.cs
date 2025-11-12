@@ -56,7 +56,7 @@ public class RealWorldArticleInteractionsE2eTests : PageTest
       var articleTitle = await CreateArticle();
 
       // Click edit button on article page
-      var editButton = Page.GetByRole(AriaRole.Button, new() { Name = /edit article/i });
+      var editButton = Page.Locator("button").Filter(new() { HasText = "Edit Article" });
       await editButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await editButton.ClickAsync();
 
@@ -104,7 +104,7 @@ public class RealWorldArticleInteractionsE2eTests : PageTest
       var articleTitle = await CreateArticle();
 
       // Click delete button on article page
-      var deleteButton = Page.GetByRole(AriaRole.Button, new() { Name = /delete article/i });
+      var deleteButton = Page.Locator("button").Filter(new() { HasText = "Delete Article" });
       await deleteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await deleteButton.ClickAsync();
 
@@ -115,7 +115,7 @@ public class RealWorldArticleInteractionsE2eTests : PageTest
       await Page.WaitForTimeoutAsync(2000);
 
       // Check that the deleted article is not in the feed
-      var deletedArticle = Page.Locator($"text=/{articleTitle}/i").First;
+      var deletedArticle = Page.GetByText(articleTitle).First;
       var isVisible = await deletedArticle.IsVisibleAsync();
       Assert.False(isVisible, "Deleted article should not appear in feed");
     }
@@ -143,18 +143,18 @@ public class RealWorldArticleInteractionsE2eTests : PageTest
       await CreateArticle();
 
       // Find favorite button (may have different text/icon)
-      var favoriteButton = Page.Locator("button").Filter(new() { HasText = new Regex("favorite", RegexOptions.IgnoreCase) }).First;
+      var favoriteButton = Page.Locator("button:has-text('Favorite')").First;
       await favoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
 
       // Get initial favorite count
-      var initialText = await favoriteButton.TextContentAsync() ?? "";
+      var initialText = await favoriteButton.TextContentAsync() ?? string.Empty;
 
       // Click to favorite
       await favoriteButton.ClickAsync();
       await Page.WaitForTimeoutAsync(1000); // Wait for update
 
       // Verify favorite count increased
-      var updatedText = await favoriteButton.TextContentAsync() ?? "";
+      var updatedText = await favoriteButton.TextContentAsync() ?? string.Empty;
       Assert.NotEqual(initialText, updatedText);
 
       // Click to unfavorite
@@ -162,7 +162,7 @@ public class RealWorldArticleInteractionsE2eTests : PageTest
       await Page.WaitForTimeoutAsync(1000); // Wait for update
 
       // Verify favorite count decreased back
-      var finalText = await favoriteButton.TextContentAsync() ?? "";
+      var finalText = await favoriteButton.TextContentAsync() ?? string.Empty;
       Assert.Equal(initialText, finalText);
     }
     finally
@@ -190,18 +190,18 @@ public class RealWorldArticleInteractionsE2eTests : PageTest
 
       // Add a comment
       var commentText = "This is a test comment from E2E tests!";
-      var commentTextarea = Page.GetByPlaceholder(/write a comment/i);
+      var commentTextarea = Page.GetByPlaceholder("Write a comment...");
       await commentTextarea.WaitForAsync(new() { Timeout = DefaultTimeout });
       await commentTextarea.FillAsync(commentText);
 
-      var postButton = Page.GetByRole(AriaRole.Button, new() { Name = /post comment/i });
+      var postButton = Page.Locator("button").Filter(new() { HasText = "Post Comment" });
       await postButton.ClickAsync();
 
       // Wait for comment to appear
       await Page.WaitForTimeoutAsync(2000);
 
       // Verify comment is displayed
-      var comment = Page.Locator($"text=/{commentText}/i");
+      var comment = Page.Locator($"text={commentText}").First;
       await comment.WaitForAsync(new() { Timeout = DefaultTimeout });
       Assert.True(await comment.IsVisibleAsync(), "Posted comment should be visible");
     }
@@ -230,18 +230,18 @@ public class RealWorldArticleInteractionsE2eTests : PageTest
 
       // Add a comment
       var commentText = "This comment will be deleted!";
-      var commentTextarea = Page.GetByPlaceholder(/write a comment/i);
+      var commentTextarea = Page.GetByPlaceholder("Write a comment...");
       await commentTextarea.WaitForAsync(new() { Timeout = DefaultTimeout });
       await commentTextarea.FillAsync(commentText);
 
-      var postButton = Page.GetByRole(AriaRole.Button, new() { Name = /post comment/i });
+      var postButton = Page.Locator("button").Filter(new() { HasText = "Post Comment" });
       await postButton.ClickAsync();
 
       // Wait for comment to appear
       await Page.WaitForTimeoutAsync(2000);
 
       // Find and click delete button on the comment
-      var deleteButton = Page.GetByRole(AriaRole.Button, new() { Name = /delete/i }).First;
+      var deleteButton = Page.Locator("button").Filter(new() { HasText = "Delete" }).First;
       await deleteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await deleteButton.ClickAsync();
 
@@ -249,7 +249,7 @@ public class RealWorldArticleInteractionsE2eTests : PageTest
       await Page.WaitForTimeoutAsync(2000);
 
       // Verify comment is no longer visible
-      var deletedComment = Page.Locator($"text=/{commentText}/i");
+      var deletedComment = Page.GetByText(commentText);
       Assert.False(await deletedComment.IsVisibleAsync(), "Deleted comment should not be visible");
     }
     finally
