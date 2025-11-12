@@ -1,0 +1,26 @@
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-pill {
+  cursor: pointer;
+  background-color: #818181;
+  color: white;
+  border: none;
+  border-radius: 10rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.tag-pill:hover {
+  background-color: #687077;
+}
+
+.tag-list-loading,
+.tag-list-empty {
+  padding: 1rem;
+  text-align: center;
+  color: #999;
+}

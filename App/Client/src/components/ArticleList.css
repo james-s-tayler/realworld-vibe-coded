@@ -1,0 +1,16 @@
+.article-list {
+  margin: 0;
+  padding: 0;
+}
+
+.article-list-loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.article-list-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #999;
+}
