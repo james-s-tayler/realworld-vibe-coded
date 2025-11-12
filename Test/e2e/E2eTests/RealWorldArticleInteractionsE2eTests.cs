@@ -261,7 +261,7 @@ public class RealWorldArticleInteractionsE2eTests : PageTest
   // Helper methods
   private async Task RegisterUser()
   {
-    await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+    await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
     await Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" }).ClickAsync();
     await Page.WaitForURLAsync($"{_baseUrl}/register", new() { Timeout = DefaultTimeout });
 

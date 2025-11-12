@@ -69,7 +69,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await RegisterUser(_testUsername2, _testEmail2, _testPassword2);
 
       // Navigate to home and find first user's article
-      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Click on first user's name/profile link from an article
       var authorLink = Page.GetByRole(AriaRole.Link, new() { Name = _testUsername1 }).First;
@@ -118,7 +118,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await RegisterUser(_testUsername2, _testEmail2, _testPassword2);
 
       // Navigate to first user's profile
-      await Page.GotoAsync($"{_baseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+      await Page.GotoAsync($"{_baseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Find and click follow button
       var followButton = Page.Locator("button").Filter(new() { HasText = "Follow" });
@@ -172,14 +172,14 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await RegisterUser(_testUsername2, _testEmail2, _testPassword2);
 
       // Follow first user
-      await Page.GotoAsync($"{_baseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+      await Page.GotoAsync($"{_baseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
       var followButton = Page.Locator("button").Filter(new() { HasText = "Follow" });
       await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await followButton.ClickAsync();
       await Page.WaitForTimeoutAsync(1000);
 
       // Navigate to home page
-      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Click on Your Feed tab
       var yourFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Your Feed" });
@@ -219,7 +219,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       var articleTitle = await CreateArticleWithTag(testTag);
 
       // Navigate to home page
-      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Wait for tags to load
       await Page.WaitForTimeoutAsync(2000);
@@ -294,7 +294,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
   // Helper methods
   private async Task RegisterUser(string username, string email, string password)
   {
-    await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+    await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
     await Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" }).ClickAsync();
     await Page.WaitForURLAsync($"{_baseUrl}/register", new() { Timeout = DefaultTimeout });
 

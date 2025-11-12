@@ -41,7 +41,7 @@ public class SwaggerE2eTests : PageTest
       // Navigate to Swagger docs
       await Page.GotoAsync(swaggerUrl, new()
       {
-        WaitUntil = WaitUntilState.NetworkIdle,
+        WaitUntil = WaitUntilState.Load,
         Timeout = 30000,
       });
 

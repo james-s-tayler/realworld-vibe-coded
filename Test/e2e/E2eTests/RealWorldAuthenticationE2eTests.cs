@@ -135,14 +135,14 @@ public class RealWorldAuthenticationE2eTests : PageTest
     try
     {
       // Try to access editor page without authentication
-      await Page.GotoAsync($"{_baseUrl}/editor", new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+      await Page.GotoAsync($"{_baseUrl}/editor", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Should redirect to login
       await Page.WaitForURLAsync($"{_baseUrl}/login", new() { Timeout = DefaultTimeout });
       Assert.Contains("/login", Page.Url);
 
       // Try to access settings page without authentication
-      await Page.GotoAsync($"{_baseUrl}/settings", new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+      await Page.GotoAsync($"{_baseUrl}/settings", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Should redirect to login
       await Page.WaitForURLAsync($"{_baseUrl}/login", new() { Timeout = DefaultTimeout });
@@ -157,7 +157,7 @@ public class RealWorldAuthenticationE2eTests : PageTest
   // Helper methods
   private async Task RegisterUser()
   {
-    await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+    await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
     await Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" }).ClickAsync();
     await Page.WaitForURLAsync($"{_baseUrl}/register", new() { Timeout = DefaultTimeout });
 

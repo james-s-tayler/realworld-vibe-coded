@@ -55,7 +55,7 @@ public class RealWorldE2eTests : PageTest
     try
     {
       // Navigate to home page
-      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Click on Sign up link
       await Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" }).ClickAsync();
@@ -194,7 +194,7 @@ public class RealWorldE2eTests : PageTest
       var articleTitle = await CreateArticle();
 
       // Navigate to home page
-      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
@@ -226,7 +226,7 @@ public class RealWorldE2eTests : PageTest
   // Helper methods
   private async Task SignUpUser()
   {
-    await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.NetworkIdle, Timeout = DefaultTimeout });
+    await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
     await Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" }).ClickAsync();
     await Page.WaitForURLAsync($"{_baseUrl}/register", new() { Timeout = DefaultTimeout });
 
