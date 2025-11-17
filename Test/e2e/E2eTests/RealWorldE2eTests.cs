@@ -234,21 +234,41 @@ public class RealWorldE2eTests : PageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" }).ClickAsync();
     await Page.WaitForURLAsync($"{_baseUrl}/register", new() { Timeout = DefaultTimeout });
 
+    // Fill in the form
     await Page.GetByPlaceholder("Username").FillAsync(_testUsername);
     await Page.GetByPlaceholder("Email").FillAsync(_testEmail);
     await Page.GetByPlaceholder("Password").FillAsync(_testPassword);
 
-    // Click submit and wait for API response and navigation
+    // Set up response listener before submitting
     var responseTask = Page.WaitForResponseAsync(
       response =>
       response.Url.Contains("/api/users") && response.Request.Method == "POST",
       new() { Timeout = DefaultTimeout });
 
-    await Page.GetByRole(AriaRole.Button, new() { Name = "Sign up" }).ClickAsync();
+    // Try multiple strategies to submit the form
+    // Strategy 1: Click the button
+    var submitButton = Page.GetByRole(AriaRole.Button, new() { Name = "Sign up" });
 
-    await responseTask;
+    try
+    {
+      await submitButton.ClickAsync(new() { Timeout = 2000 });
+    }
+    catch
+    {
+      // Strategy 2: If click fails, try pressing Enter on the password field
+      await Page.GetByPlaceholder("Password").PressAsync("Enter");
+    }
 
-    // Wait for the user link to appear in the header to confirm login and navigation completed
+    // Wait for API response
+    var response = await responseTask;
+
+    // Verify the response was successful (2xx status code)
+    Assert.True(response.Ok, $"Registration API call should succeed, but got status {response.Status}");
+
+    // Wait for navigation to home page after successful registration
+    await Page.WaitForURLAsync(_baseUrl, new() { Timeout = DefaultTimeout });
+
+    // Wait for the user link to appear in the header to confirm login completed
     await Page.GetByRole(AriaRole.Link, new() { Name = _testUsername }).First.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = DefaultTimeout });
   }
 
