@@ -1,5 +1,5 @@
-# Use the official Playwright Docker image that matches our package version
-FROM mcr.microsoft.com/playwright:v1.55.0-noble
+# Stage 1: Base image with .NET SDK
+FROM mcr.microsoft.com/playwright:v1.55.0-noble AS base
 
 # Install .NET SDK using the official installer script
 RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --install-dir /usr/share/dotnet --channel 9.0
@@ -10,19 +10,33 @@ ENV DOTNET_ROOT="/usr/share/dotnet"
 
 WORKDIR /tests
 
-# Copy project file first for better layer caching
-COPY E2eTests/E2eTests.csproj E2eTests/
+# Stage 2: Restore and Build
+FROM base AS build
 
-# Restore dependencies with BuildKit cache mount for better caching across builds
-RUN --mount=type=cache,target=/root/.nuget/packages \
-    dotnet restore E2eTests/E2eTests.csproj
+# Copy Directory.Build.props, stylecop.json, and .editorconfig for analyzer configuration
+COPY Directory.Build.props ./
+COPY stylecop.json ./
+COPY .editorconfig ./
 
-# Copy the rest of the test files
-COPY E2eTests/ E2eTests/
+# Copy project file for dependency resolution
+COPY Test/e2e/E2eTests/E2eTests.csproj Test/e2e/E2eTests/
+
+# Restore NuGet packages including analyzers
+RUN dotnet restore Test/e2e/E2eTests/E2eTests.csproj
+
+# Copy all test source files
+COPY Test/e2e/E2eTests/ Test/e2e/E2eTests/
+
+# Build the project (no --no-restore to ensure analyzers are properly resolved)
+RUN dotnet build Test/e2e/E2eTests/E2eTests.csproj -c Release
+
+# Stage 3: Test
+FROM build AS test
 
 # Set environment variables for headless operation
 ENV CI=true
 ENV PLAYWRIGHT_HEADLESS=true
 
-# Set the entry point to run the tests
-ENTRYPOINT ["dotnet", "test", "./E2eTests/E2eTests.csproj", "-c", "Release", "--logger", "trx;LogFileName=e2e-results.trx", "--results-directory", "/Reports/Test/e2e/Results", "--verbosity", "normal"]
+# Set the entry point to run tests without building or restoring
+# Using --no-build ensures we use the already-built binaries from the previous stage
+ENTRYPOINT ["dotnet", "test", "./Test/e2e/E2eTests/E2eTests.csproj", "-c", "Release", "--no-build", "--logger", "trx;LogFileName=e2e-results.trx", "--results-directory", "/Reports/Test/e2e/Results", "--verbosity", "normal"]

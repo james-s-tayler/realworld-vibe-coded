@@ -40,8 +40,8 @@ services:
     
   playwright:
     build:
-      context: ./
-      dockerfile: Dockerfile.playwright
+      context: ../../
+      dockerfile: Test/e2e/Dockerfile.playwright
     depends_on:
       api:
         condition: service_healthy
