@@ -7,7 +7,7 @@ namespace E2eTests;
 [Collection("E2E Tests")]
 public class RealWorldProfileAndFeedsE2eTests : PageTest
 {
-  private const int DefaultTimeout = 30000;
+  private const int DefaultTimeout = 10000;
   private string _baseUrl = null!;
   private string _testUsername1 = null!;
   private string _testEmail1 = null!;

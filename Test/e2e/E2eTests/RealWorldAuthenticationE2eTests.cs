@@ -6,7 +6,7 @@ namespace E2eTests;
 [Collection("E2E Tests")]
 public class RealWorldAuthenticationE2eTests : PageTest
 {
-  private const int DefaultTimeout = 30000;
+  private const int DefaultTimeout = 10000;
   private string _baseUrl = null!;
   private string _testUsername = null!;
   private string _testEmail = null!;
