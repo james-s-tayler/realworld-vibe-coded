@@ -27,6 +27,8 @@ public class User : EntityBase, IAggregateRoot
 
   public string? Image { get; private set; }
 
+  public string Test { get; set; } = default!;
+
   // Navigation properties for following relationships
   public ICollection<UserFollowing> Following { get; private set; } = new List<UserFollowing>();
 
