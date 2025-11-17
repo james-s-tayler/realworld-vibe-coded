@@ -1,5 +1,5 @@
 {
   "methodDisplay": "method",
   "methodTimeout": 15000,
-  "stopOnFail": 2
+  "stopOnFail": true
 }
