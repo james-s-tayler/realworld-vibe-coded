@@ -233,8 +233,8 @@ jobs:
       - name: Lint (server)
         run: ./build.sh lint-server-verify
 
-  db-migrations-test-apply:
-    name: db-migrations-test-apply
+  db-migrations-verify-all:
+    name: db-migrations-verify-all
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.server == 'true' }}
@@ -253,8 +253,8 @@ jobs:
       - name: Verify .NET version
         run: dotnet --info
 
-      - name: Test migrations can be applied
-        run: ./build.sh db-migrations-test-apply
+      - name: Verify all database migrations
+        run: ./build.sh db-migrations-verify-all
 
   lint-nuke-verify:
     name: lint-nuke-verify

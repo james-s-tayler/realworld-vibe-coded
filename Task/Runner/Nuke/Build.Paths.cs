@@ -14,6 +14,8 @@ public partial class Build
 
   internal AbsolutePath MigrationsDirectory => RootDirectory / "App" / "Server" / "src" / "Server.Infrastructure" / "Data" / "Migrations";
 
+  internal AbsolutePath IdempotentScriptPath => MigrationsDirectory / "idempotent.sql";
+
   #endregion
 
   #region App/Client
