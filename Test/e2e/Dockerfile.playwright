@@ -13,34 +13,28 @@ WORKDIR /tests
 # Stage 2: Restore dependencies
 FROM base AS restore
 
-# Copy only files needed for restore to maximize cache hits
-# Directory.Build.props is needed for StyleCop.Analyzers package reference
-COPY Directory.Build.props ./
-COPY Test/e2e/E2eTests/E2eTests.csproj Test/e2e/E2eTests/
+# Copy project file for dependency resolution
+COPY E2eTests/E2eTests.csproj E2eTests/
 
-# Restore NuGet packages including analyzers
-RUN dotnet restore Test/e2e/E2eTests/E2eTests.csproj
+# Restore NuGet packages
+RUN dotnet restore E2eTests/E2eTests.csproj
 
 # Stage 3: Build
 FROM restore AS build
 
-# Copy analyzer configuration files
-COPY stylecop.json ./
-COPY .editorconfig ./
-
 # Copy all test source files
-COPY Test/e2e/E2eTests/ Test/e2e/E2eTests/
+COPY E2eTests/ E2eTests/
 
 # Build the project using already-restored packages
-RUN dotnet build Test/e2e/E2eTests/E2eTests.csproj -c Release --no-restore
+RUN dotnet build E2eTests/E2eTests.csproj -c Release --no-restore
 
-# Stage 3: Test
+# Stage 4: Test
 FROM build AS test
 
 # Set environment variables for headless operation
 ENV CI=true
 ENV PLAYWRIGHT_HEADLESS=true
 
-# Set the entry point to run tests without building or restoring
+# Set the entry point to run tests without building
 # Using --no-build ensures we use the already-built binaries from the previous stage
-ENTRYPOINT ["dotnet", "test", "./Test/e2e/E2eTests/E2eTests.csproj", "-c", "Release", "--no-build", "--logger", "trx;LogFileName=e2e-results.trx", "--results-directory", "/Reports/Test/e2e/Results", "--verbosity", "normal"]
+ENTRYPOINT ["dotnet", "test", "./E2eTests/E2eTests.csproj", "-c", "Release", "--no-build", "--logger", "trx;LogFileName=e2e-results.trx", "--results-directory", "/Reports/Test/e2e/Results", "--verbosity", "normal"]
