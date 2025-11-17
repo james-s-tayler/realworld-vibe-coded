@@ -10,25 +10,29 @@ ENV DOTNET_ROOT="/usr/share/dotnet"
 
 WORKDIR /tests
 
-# Stage 2: Restore and Build
-FROM base AS build
+# Stage 2: Restore dependencies
+FROM base AS restore
 
-# Copy Directory.Build.props, stylecop.json, and .editorconfig for analyzer configuration
+# Copy only files needed for restore to maximize cache hits
+# Directory.Build.props is needed for StyleCop.Analyzers package reference
 COPY Directory.Build.props ./
-COPY stylecop.json ./
-COPY .editorconfig ./
-
-# Copy project file for dependency resolution
 COPY Test/e2e/E2eTests/E2eTests.csproj Test/e2e/E2eTests/
 
 # Restore NuGet packages including analyzers
 RUN dotnet restore Test/e2e/E2eTests/E2eTests.csproj
 
+# Stage 3: Build
+FROM restore AS build
+
+# Copy analyzer configuration files
+COPY stylecop.json ./
+COPY .editorconfig ./
+
 # Copy all test source files
 COPY Test/e2e/E2eTests/ Test/e2e/E2eTests/
 
-# Build the project (no --no-restore to ensure analyzers are properly resolved)
-RUN dotnet build Test/e2e/E2eTests/E2eTests.csproj -c Release
+# Build the project using already-restored packages
+RUN dotnet build Test/e2e/E2eTests/E2eTests.csproj -c Release --no-restore
 
 # Stage 3: Test
 FROM build AS test
