@@ -918,6 +918,23 @@ BEGIN
     VALUES (N'20251025184325_ChangeEntityIdsToGuid', N'9.0.6');
 END;
 
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251117155657_AddTestPropertyToUser'
+)
+BEGIN
+    ALTER TABLE [Users] ADD [Test] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251117155657_AddTestPropertyToUser'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20251117155657_AddTestPropertyToUser', N'9.0.6');
+END;
+
 COMMIT;
 GO
 
