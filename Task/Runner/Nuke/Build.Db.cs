@@ -82,11 +82,11 @@ public partial class Build
     }
   }
 
-  internal Target DbMigrationsTestApply => _ => _
-    .Description("Test EF Core migrations by applying them to a throwaway SQL Server database in Docker")
+  internal Target DbMigrationsVerifyApply => _ => _
+    .Description("Verify EF Core migrations by applying them to a throwaway SQL Server database in Docker")
     .Executes(() =>
     {
-      Log.Information("Testing migrations against a throwaway SQL Server database using Docker Compose");
+      Log.Information("Verifying migrations against a throwaway SQL Server database using Docker Compose");
 
       var composeFile = RootDirectory / "Test" / "Migrations" / "docker-compose.yml";
 
@@ -94,7 +94,7 @@ public partial class Build
       try
       {
         // Run docker-compose to start SQL Server and apply migrations
-        Log.Information("Running Docker Compose to test migrations...");
+        Log.Information("Running Docker Compose to verify migrations...");
         var args = $"compose -f {composeFile} up --build --abort-on-container-exit";
         var process = ProcessTasks.StartProcess(
               "docker",
@@ -122,7 +122,7 @@ public partial class Build
       if (exitCode != 0)
       {
         Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
-        throw new Exception($"Migration test failed with exit code: {exitCode}");
+        throw new Exception($"Migration verification failed with exit code: {exitCode}");
       }
 
       Log.Information("✓ Migrations applied successfully to test database");
@@ -220,5 +220,13 @@ public partial class Build
         Log.Error("Failed to verify idempotent SQL script: {Message}", ex.Message);
         throw;
       }
+    });
+
+  internal Target DbMigrationsVerifyAll => _ => _
+    .Description("Verify all database migrations: apply to test database and verify idempotent SQL script")
+    .DependsOn(DbMigrationsVerifyApply, DbMigrationsVerifyIdempotentScript)
+    .Executes(() =>
+    {
+      Log.Information("✓ All database migration verifications completed successfully");
     });
 }
