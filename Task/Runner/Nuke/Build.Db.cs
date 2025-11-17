@@ -1,4 +1,5 @@
 ﻿using Nuke.Common;
+using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.Docker;
 using Serilog;
@@ -125,5 +126,99 @@ public partial class Build
       }
 
       Log.Information("✓ Migrations applied successfully to test database");
+    });
+
+  internal Target DbMigrationsGenerateIdempotentScript => _ => _
+    .Description("Generate idempotent SQL script from EF Core migrations")
+    .DependsOn(InstallDotnetToolEf)
+    .Executes(() =>
+    {
+      Log.Information("Generating idempotent SQL script from migrations...");
+
+      // Generate the idempotent script using dotnet ef
+      var args = $"ef migrations script --idempotent --project {ServerInfrastructureProject} --startup-project {ServerProject} --output {IdempotentScriptPath}";
+
+      try
+      {
+        ProcessTasks.StartProcess(
+          "dotnet",
+          args,
+          workingDirectory: RootDirectory,
+          logOutput: true)
+          .AssertZeroExitCode();
+
+        Log.Information("✓ Idempotent SQL script generated successfully at {ScriptPath}", IdempotentScriptPath);
+      }
+      catch (Exception ex)
+      {
+        Log.Error("Failed to generate idempotent SQL script: {Message}", ex.Message);
+        throw;
+      }
+    });
+
+  internal Target DbMigrationsVerifyIdempotentScript => _ => _
+    .Description("Verify that the idempotent SQL script matches the current migrations")
+    .DependsOn(InstallDotnetToolEf)
+    .Executes(() =>
+    {
+      Log.Information("Verifying idempotent SQL script is up to date...");
+
+      // Check if the committed script exists
+      if (!IdempotentScriptPath.FileExists())
+      {
+        Log.Error("Idempotent SQL script not found at {ScriptPath}", IdempotentScriptPath);
+        Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript' to generate the script and commit it to source control.");
+        throw new Exception("Idempotent SQL script not found in source control");
+      }
+
+      // Read the committed script
+      var committedScript = IdempotentScriptPath.ReadAllText();
+
+      // Generate a new script to compare
+      var tempScriptPath = RootDirectory / "temp-idempotent.sql";
+      var args = $"ef migrations script --idempotent --project {ServerInfrastructureProject} --startup-project {ServerProject} --output {tempScriptPath}";
+
+      try
+      {
+        ProcessTasks.StartProcess(
+          "dotnet",
+          args,
+          workingDirectory: RootDirectory,
+          logOutput: false,
+          logInvocation: false)
+          .AssertZeroExitCode();
+
+        var generatedScript = tempScriptPath.ReadAllText();
+
+        // Clean up temp file
+        tempScriptPath.DeleteFile();
+
+        // Compare the scripts
+        if (committedScript != generatedScript)
+        {
+          Log.Error("Idempotent SQL script is out of sync with current migrations!");
+          Log.Error("The committed script at {ScriptPath} does not match the script generated from current migrations.", IdempotentScriptPath);
+          Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript' to regenerate the script and commit the changes to source control.");
+          throw new Exception("Idempotent SQL script is out of sync with migrations");
+        }
+
+        Log.Information("✓ Idempotent SQL script is up to date with current migrations");
+      }
+      catch (Exception ex)
+      {
+        // Clean up temp file if it exists
+        if (tempScriptPath.FileExists())
+        {
+          tempScriptPath.DeleteFile();
+        }
+
+        if (ex.Message.Contains("out of sync"))
+        {
+          throw;
+        }
+
+        Log.Error("Failed to verify idempotent SQL script: {Message}", ex.Message);
+        throw;
+      }
     });
 }

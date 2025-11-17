@@ -60,4 +60,26 @@ public partial class Build
                 .SetProcessAdditionalArguments("--prerelease"));
         }
       });
+
+  internal Target InstallDotnetToolEf => _ => _
+      .Description("Install dotnet-ef as a global dotnet tool")
+      .Executes(() =>
+      {
+        try
+        {
+          Log.Information("Updating dotnet-ef global tool...");
+          DotNetToolUpdate(s => s
+                .SetPackageName("dotnet-ef")
+                .SetGlobal(true)
+                .SetVersion("9.*"));
+        }
+        catch
+        {
+          Log.Information("Tool not found. Installing dotnet-ef globally...");
+          DotNetToolInstall(s => s
+                .SetPackageName("dotnet-ef")
+                .SetGlobal(true)
+                .SetVersion("9.*"));
+        }
+      });
 }
