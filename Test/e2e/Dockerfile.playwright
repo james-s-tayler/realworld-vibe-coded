@@ -17,8 +17,7 @@ FROM base AS restore
 COPY E2eTests/E2eTests.csproj E2eTests/
 
 # Restore NuGet packages
-RUN --mount=type=cache,id=nuget-packages,sharing=locked,target=/root/.nuget/packages \
-    dotnet restore E2eTests/E2eTests.csproj
+RUN dotnet restore E2eTests/E2eTests.csproj
 
 # Stage 3: Build
 FROM restore AS build
@@ -27,8 +26,7 @@ FROM restore AS build
 COPY E2eTests/ E2eTests/
 
 # Build the project using already-restored packages
-RUN --mount=type=cache,id=nuget-packages,sharing=locked,target=/root/.nuget/packages \
-    dotnet build E2eTests/E2eTests.csproj -c Release --no-restore
+RUN dotnet build E2eTests/E2eTests.csproj -c Release --no-restore
 
 # Stage 4: Test
 FROM build AS test
