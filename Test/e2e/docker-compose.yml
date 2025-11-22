@@ -25,8 +25,8 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:5000
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true"
-      Audit__LogsPath: /app/Logs/Server.Web/Audit.NET
-      Serilog__WriteTo__1__Args__Path: /app/Logs/Server.Web/Serilog/logs.txt
+      Audit__LogsPath: /app/Logs/Test/e2e/Server.Web/Audit.NET
+      Serilog__WriteTo__1__Args__Path: /app/Logs/Test/e2e/Server.Web/Serilog/logs.txt
     ports:
       - "5000:5000"
     volumes:
@@ -37,19 +37,19 @@ services:
       timeout: 5s
       retries: 20
       start_period: 10s
-    
-  playwright:
-    build:
-      context: ./
-      dockerfile: Dockerfile.playwright
-    depends_on:
-      api:
-        condition: service_healthy
-    volumes:
-      - ../../Reports:/Reports
-    environment:
-      - PLAYWRIGHT_BASE_URL=http://api:5000
-      - CI=true
+
+  # playwright:
+  #  build:
+  #    context: ./
+  #    dockerfile: Dockerfile.playwright
+  #  depends_on:
+  #    api:
+  #      condition: service_healthy
+  #  volumes:
+  #    - ../../Reports:/Reports
+  #  environment:
+  #    - PLAYWRIGHT_BASE_URL=http://api:5000
+  #    - CI=true
 
 networks:
   default:

@@ -33,7 +33,7 @@ public partial class Build
 
   internal void ResetDatabase()
   {
-    var composeFile = TaskLocalDevDirectory / "docker-compose.yml";
+    var composeFile = TaskLocalDevDirectory / "docker-compose.dev-deps.yml";
 
     if (DoesDockerVolumeExist("localdev_sqlserver-data"))
     {
