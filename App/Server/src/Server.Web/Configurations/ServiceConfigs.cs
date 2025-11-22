@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Server.Infrastructure;
 using Server.Infrastructure.Authentication;
+using Server.Infrastructure.Data;
 using Server.Infrastructure.Email;
 using Server.UseCases.Interfaces;
 using ValidationFailure = FluentValidation.Results.ValidationFailure;
@@ -90,6 +91,10 @@ public static class ServiceConfigs
 
     // Register IHttpContextAccessor for CurrentUserService
     services.AddHttpContextAccessor();
+
+    // Add health checks with database connectivity check
+    services.AddHealthChecks()
+      .AddDbContextCheck<AppDbContext>("database", tags: new[] { "db", "ready" });
 
     if (builder.Environment.IsDevelopment())
     {

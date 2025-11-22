@@ -58,6 +58,19 @@ public static class MiddlewareConfig
     app.UseAuthentication();
     app.UseAuthorization();
 
+    // Map health check endpoints
+    // /health/live - Liveness probe (always returns healthy if app is running)
+    // /health/ready - Readiness probe (checks database connection and schema)
+    app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+    {
+      Predicate = _ => false, // No checks, just confirm app is alive
+    });
+
+    app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+    {
+      Predicate = check => check.Tags.Contains("ready"), // Only run readiness checks (database)
+    });
+
     await SeedDatabase(app);
 
     return app;
