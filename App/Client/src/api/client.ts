@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Use empty string to make API calls relative to the current origin
+// This works in all scenarios: local dev, docker, and E2E tests
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export class ApiError extends Error {
   status: number;
