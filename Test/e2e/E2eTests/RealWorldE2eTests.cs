@@ -1,46 +1,11 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.Playwright;
-using Microsoft.Playwright.Xunit.v3;
 
 namespace E2eTests;
 
 [Collection("E2E Tests")]
-public class RealWorldE2eTests : PageTest
+public class RealWorldE2eTests : ConduitPageTest
 {
-  private const int DefaultTimeout = 10000;
-  private string _baseUrl = null!;
-  private string _testUsername = null!;
-  private string _testEmail = null!;
-  private string _testPassword = null!;
-
-  public override BrowserNewContextOptions ContextOptions()
-  {
-    return new BrowserNewContextOptions()
-    {
-      IgnoreHTTPSErrors = true,
-    };
-  }
-
-  public override async ValueTask InitializeAsync()
-  {
-    await base.InitializeAsync();
-
-    // Use environment variable for URL if available (for Docker), otherwise use localhost
-    _baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
-
-    // Generate unique credentials for this test run
-    var timestamp = DateTime.Now.Ticks;
-    _testUsername = $"testuser{timestamp}";
-    _testEmail = $"testuser{timestamp}@test.com";
-    _testPassword = "TestPassword123!";
-
-    // Configure context
-    await Context.SetExtraHTTPHeadersAsync(new Dictionary<string, string>
-    {
-      ["User-Agent"] = "E2E-Test-Suite",
-    });
-  }
-
   [Fact]
   public async Task UserCanSignUp_ViewProfile_AndEditProfile()
   {
@@ -55,16 +20,16 @@ public class RealWorldE2eTests : PageTest
     try
     {
       // Navigate to home page
-      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+      await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Click on Sign up link
       await Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" }).ClickAsync();
-      await Page.WaitForURLAsync($"{_baseUrl}/register", new() { Timeout = DefaultTimeout });
+      await Page.WaitForURLAsync($"{BaseUrl}/register", new() { Timeout = DefaultTimeout });
 
       // Fill in registration form
-      await Page.GetByPlaceholder("Username").FillAsync(_testUsername);
-      await Page.GetByPlaceholder("Email").FillAsync(_testEmail);
-      await Page.GetByPlaceholder("Password").FillAsync(_testPassword);
+      await Page.GetByPlaceholder("Username").FillAsync(TestUsername);
+      await Page.GetByPlaceholder("Email").FillAsync(TestEmail);
+      await Page.GetByPlaceholder("Password").FillAsync(TestPassword);
 
       // Submit registration
       var responseTask = Page.WaitForResponseAsync(
@@ -77,22 +42,22 @@ public class RealWorldE2eTests : PageTest
       await responseTask;
 
       // Wait for the user link to appear in the header (indicates successful registration and navigation)
-      var userLink = Page.GetByRole(AriaRole.Link, new() { Name = _testUsername }).First;
+      var userLink = Page.GetByRole(AriaRole.Link, new() { Name = TestUsername }).First;
       await userLink.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = DefaultTimeout });
       Assert.True(await userLink.IsVisibleAsync(), "User link should be visible in header after sign up");
 
       // Click on user profile link
       await userLink.ClickAsync();
-      await Page.WaitForURLAsync($"{_baseUrl}/profile/{_testUsername}", new() { Timeout = DefaultTimeout });
+      await Page.WaitForURLAsync($"{BaseUrl}/profile/{TestUsername}", new() { Timeout = DefaultTimeout });
 
       // Verify profile page elements
-      var profileUsername = Page.GetByRole(AriaRole.Heading, new() { Name = _testUsername });
+      var profileUsername = Page.GetByRole(AriaRole.Heading, new() { Name = TestUsername });
       await profileUsername.WaitForAsync(new() { Timeout = DefaultTimeout });
       Assert.True(await profileUsername.IsVisibleAsync(), "Username should be displayed on profile page");
 
       // Navigate to settings to edit profile
       await Page.GetByRole(AriaRole.Link, new() { Name = "Settings" }).ClickAsync();
-      await Page.WaitForURLAsync($"{_baseUrl}/settings", new() { Timeout = DefaultTimeout });
+      await Page.WaitForURLAsync($"{BaseUrl}/settings", new() { Timeout = DefaultTimeout });
 
       // Update bio
       var bioInput = Page.GetByPlaceholder("Short bio about you");
@@ -108,8 +73,8 @@ public class RealWorldE2eTests : PageTest
       Assert.True(await successMessage.IsVisibleAsync(), "Success message should appear after updating profile");
 
       // Go back to profile to verify bio was updated
-      await Page.GetByRole(AriaRole.Link, new() { Name = _testUsername }).First.ClickAsync();
-      await Page.WaitForURLAsync($"{_baseUrl}/profile/{_testUsername}", new() { Timeout = DefaultTimeout });
+      await Page.GetByRole(AriaRole.Link, new() { Name = TestUsername }).First.ClickAsync();
+      await Page.WaitForURLAsync($"{BaseUrl}/profile/{TestUsername}", new() { Timeout = DefaultTimeout });
 
       // Verify bio is displayed on profile
       var bioText = Page.Locator("text=/This is my updated bio/i");
@@ -136,11 +101,11 @@ public class RealWorldE2eTests : PageTest
     try
     {
       // First, sign up a user
-      await SignUpUser();
+      await RegisterUser();
 
       // Navigate to new article page
       await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
-      await Page.WaitForURLAsync($"{_baseUrl}/editor", new() { Timeout = DefaultTimeout });
+      await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
       // Fill in article form
       var timestamp = DateTime.Now.Ticks;
@@ -171,7 +136,7 @@ public class RealWorldE2eTests : PageTest
       Assert.True(await bodyContent.IsVisibleAsync(), "Article body should be displayed");
 
       // Verify author
-      var authorLink = Page.GetByRole(AriaRole.Link, new() { Name = _testUsername }).First;
+      var authorLink = Page.GetByRole(AriaRole.Link, new() { Name = TestUsername }).First;
       Assert.True(await authorLink.IsVisibleAsync(), "Author name should be displayed");
     }
     finally
@@ -194,11 +159,11 @@ public class RealWorldE2eTests : PageTest
     try
     {
       // First, sign up and create an article
-      await SignUpUser();
+      await RegisterUser();
       var articleTitle = await CreateArticle();
 
       // Navigate to home page
-      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+      await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
@@ -227,31 +192,10 @@ public class RealWorldE2eTests : PageTest
     }
   }
 
-  // Helper methods
-  private async Task SignUpUser()
-  {
-    await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
-    await Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" }).ClickAsync();
-    await Page.WaitForURLAsync($"{_baseUrl}/register", new() { Timeout = DefaultTimeout });
-
-    // Fill in the form
-    await Page.GetByPlaceholder("Username").FillAsync(_testUsername);
-    await Page.GetByPlaceholder("Email").FillAsync(_testEmail);
-    await Page.GetByPlaceholder("Password").FillAsync(_testPassword);
-
-    // Submit the form directly using JavaScript and wait for navigation
-    await Page.RunAndWaitForNavigationAsync(
-      async () => await Page.EvaluateAsync("document.querySelector('form').requestSubmit()"),
-      new() { UrlString = _baseUrl, Timeout = DefaultTimeout });
-
-    // Wait for the user link to appear in the header to confirm login completed
-    await Page.GetByRole(AriaRole.Link, new() { Name = _testUsername }).First.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = DefaultTimeout });
-  }
-
   private async Task<string> CreateArticle()
   {
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
-    await Page.WaitForURLAsync($"{_baseUrl}/editor", new() { Timeout = DefaultTimeout });
+    await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
     var timestamp = DateTime.Now.Ticks;
     var articleTitle = $"E2E Test Article {timestamp}";
@@ -265,18 +209,5 @@ public class RealWorldE2eTests : PageTest
 
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
     return articleTitle;
-  }
-
-  private async Task SaveTrace(string testName)
-  {
-    if (!Directory.Exists(Constants.TracesDirectory))
-    {
-      Directory.CreateDirectory(Constants.TracesDirectory);
-    }
-
-    await Context.Tracing.StopAsync(new()
-    {
-      Path = Path.Combine(Constants.TracesDirectory, $"{testName}_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip"),
-    });
   }
 }

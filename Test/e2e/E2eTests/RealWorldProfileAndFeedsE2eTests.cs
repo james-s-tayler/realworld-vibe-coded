@@ -5,10 +5,8 @@ using Microsoft.Playwright.Xunit.v3;
 namespace E2eTests;
 
 [Collection("E2E Tests")]
-public class RealWorldProfileAndFeedsE2eTests : PageTest
+public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
 {
-  private const int DefaultTimeout = 10000;
-  private string _baseUrl = null!;
   private string _testUsername1 = null!;
   private string _testEmail1 = null!;
   private string _testPassword1 = null!;
@@ -16,19 +14,9 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
   private string _testEmail2 = null!;
   private string _testPassword2 = null!;
 
-  public override BrowserNewContextOptions ContextOptions()
-  {
-    return new BrowserNewContextOptions()
-    {
-      IgnoreHTTPSErrors = true,
-    };
-  }
-
   public override async ValueTask InitializeAsync()
   {
     await base.InitializeAsync();
-
-    _baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
 
     var timestamp = DateTime.Now.Ticks;
     _testUsername1 = $"profileuser1_{timestamp}";
@@ -38,11 +26,6 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
     _testUsername2 = $"profileuser2_{timestamp}";
     _testEmail2 = $"profileuser2_{timestamp}@test.com";
     _testPassword2 = "TestPassword123!";
-
-    await Context.SetExtraHTTPHeadersAsync(new Dictionary<string, string>
-    {
-      ["User-Agent"] = "E2E-Test-Suite",
-    });
   }
 
   [Fact]
@@ -69,7 +52,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await RegisterUser(_testUsername2, _testEmail2, _testPassword2);
 
       // Navigate to home and find first user's article
-      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+      await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Click on first user's name/profile link from an article
       var authorLink = Page.GetByRole(AriaRole.Link, new() { Name = _testUsername1 }).First;
@@ -77,7 +60,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await authorLink.ClickAsync();
 
       // Verify on profile page
-      await Page.WaitForURLAsync($"{_baseUrl}/profile/{_testUsername1}", new() { Timeout = DefaultTimeout });
+      await Page.WaitForURLAsync($"{BaseUrl}/profile/{_testUsername1}", new() { Timeout = DefaultTimeout });
 
       // Verify profile information is displayed
       var profileHeading = Page.GetByRole(AriaRole.Heading, new() { Name = _testUsername1 });
@@ -118,7 +101,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await RegisterUser(_testUsername2, _testEmail2, _testPassword2);
 
       // Navigate to first user's profile
-      await Page.GotoAsync($"{_baseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+      await Page.GotoAsync($"{BaseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Find and click follow button
       var followButton = Page.Locator("button").Filter(new() { HasText = "Follow" });
@@ -172,14 +155,14 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       await RegisterUser(_testUsername2, _testEmail2, _testPassword2);
 
       // Follow first user
-      await Page.GotoAsync($"{_baseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+      await Page.GotoAsync($"{BaseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
       var followButton = Page.Locator("button").Filter(new() { HasText = "Follow" });
       await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await followButton.ClickAsync();
       await Page.WaitForTimeoutAsync(1000);
 
       // Navigate to home page
-      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+      await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Click on Your Feed tab
       var yourFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Your Feed" });
@@ -219,7 +202,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
       var articleTitle = await CreateArticleWithTag(testTag);
 
       // Navigate to home page
-      await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+      await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Wait for tags to load
       await Page.WaitForTimeoutAsync(2000);
@@ -271,7 +254,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
 
       // Navigate to own profile
       await Page.GetByRole(AriaRole.Link, new() { Name = _testUsername1 }).First.ClickAsync();
-      await Page.WaitForURLAsync($"{_baseUrl}/profile/{_testUsername1}", new() { Timeout = DefaultTimeout });
+      await Page.WaitForURLAsync($"{BaseUrl}/profile/{_testUsername1}", new() { Timeout = DefaultTimeout });
 
       // Click on Favorited Posts tab
       var favoritedTab = Page.Locator("button[role='tab']").Filter(new() { HasText = "Favorited" });
@@ -291,39 +274,10 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
     }
   }
 
-  // Helper methods
-  private async Task RegisterUser(string username, string email, string password)
-  {
-    await Page.GotoAsync(_baseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
-    await Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" }).ClickAsync();
-    await Page.WaitForURLAsync($"{_baseUrl}/register", new() { Timeout = DefaultTimeout });
-
-    // Fill in the form
-    await Page.GetByPlaceholder("Username").FillAsync(username);
-    await Page.GetByPlaceholder("Email").FillAsync(email);
-    await Page.GetByPlaceholder("Password").FillAsync(password);
-
-    // Submit the form directly using JavaScript and wait for navigation
-    await Page.RunAndWaitForNavigationAsync(
-      async () => await Page.EvaluateAsync("document.querySelector('form').requestSubmit()"),
-      new() { UrlString = _baseUrl, Timeout = DefaultTimeout });
-
-    // Wait for the user link to appear in the header to confirm login completed
-    await Page.GetByRole(AriaRole.Link, new() { Name = username }).First.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = DefaultTimeout });
-  }
-
-  private async Task SignOut()
-  {
-    await Page.GetByRole(AriaRole.Link, new() { Name = "Settings" }).ClickAsync();
-    await Page.WaitForURLAsync($"{_baseUrl}/settings", new() { Timeout = DefaultTimeout });
-    await Page.GetByRole(AriaRole.Button, new() { Name = "Logout" }).ClickAsync();
-    await Page.WaitForURLAsync(_baseUrl, new() { Timeout = DefaultTimeout });
-  }
-
   private async Task<string> CreateArticle(string username)
   {
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
-    await Page.WaitForURLAsync($"{_baseUrl}/editor", new() { Timeout = DefaultTimeout });
+    await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
     var timestamp = DateTime.Now.Ticks;
     var articleTitle = $"{username} Article {timestamp}";
@@ -342,7 +296,7 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
   private async Task<string> CreateArticleWithTag(string tag)
   {
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
-    await Page.WaitForURLAsync($"{_baseUrl}/editor", new() { Timeout = DefaultTimeout });
+    await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
     var timestamp = DateTime.Now.Ticks;
     var articleTitle = $"Tagged Article {timestamp}";
@@ -357,18 +311,5 @@ public class RealWorldProfileAndFeedsE2eTests : PageTest
 
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
     return articleTitle;
-  }
-
-  private async Task SaveTrace(string testName)
-  {
-    if (!Directory.Exists(Constants.TracesDirectory))
-    {
-      Directory.CreateDirectory(Constants.TracesDirectory);
-    }
-
-    await Context.Tracing.StopAsync(new()
-    {
-      Path = Path.Combine(Constants.TracesDirectory, $"{testName}_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip"),
-    });
   }
 }
