@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Server.Infrastructure.Data;
 
@@ -6,11 +7,14 @@ namespace Server.Web.Infrastructure;
 
 public class DatabaseMigrationHealthCheck : IHealthCheck
 {
+  private static readonly string _migrationCompleteCacheKey = $"{nameof(DatabaseMigrationHealthCheck)}-isMigrationComplete";
   private readonly AppDbContext _db;
+  private readonly IMemoryCache _cache;
 
-  public DatabaseMigrationHealthCheck(AppDbContext db)
+  public DatabaseMigrationHealthCheck(AppDbContext db, IMemoryCache cache)
   {
     _db = db;
+    _cache = cache;
   }
 
   public async Task<HealthCheckResult> CheckHealthAsync(
@@ -23,14 +27,21 @@ public class DatabaseMigrationHealthCheck : IHealthCheck
       return HealthCheckResult.Unhealthy("Cannot connect to database.");
     }
 
-    // 2) Are there any pending migrations?
-    var pending = await _db.Database.GetPendingMigrationsAsync(cancellationToken);
-    var pendingList = pending.ToList();
+    var isMigrationComplete = _cache.GetOrCreate(_migrationCompleteCacheKey, _ => false);
 
-    if (pendingList.Any())
+    // 2) Are there any pending migrations?
+    if (!isMigrationComplete)
     {
-      return HealthCheckResult.Unhealthy(
-        $"Database has pending migrations: {string.Join(", ", pendingList)}");
+      var pending = await _db.Database.GetPendingMigrationsAsync(cancellationToken);
+      var pendingList = pending.ToList();
+
+      if (pendingList.Any())
+      {
+        return HealthCheckResult.Unhealthy(
+          $"Database has pending migrations: {string.Join(", ", pendingList)}");
+      }
+
+      _cache.Set(_migrationCompleteCacheKey, true);
     }
 
     return HealthCheckResult.Healthy("Database schema is up to date.");

@@ -88,8 +88,7 @@ public static class ServiceConfigs
 
     services.AddAuthorization();
     services.AddProblemDetails();
-
-    // Register IHttpContextAccessor for CurrentUserService
+    services.AddMemoryCache();
     services.AddHttpContextAccessor();
 
     // Add custom health check that verifies database migrations are applied

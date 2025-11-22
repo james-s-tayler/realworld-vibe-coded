@@ -207,19 +207,17 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
       await postButton.ClickAsync();
 
       // Wait for comment to appear
-      await Page.WaitForTimeoutAsync(2000);
+      var comment = Page.GetByText(commentText);
 
       // Find and click delete button on the comment
       var deleteButton = Page.Locator("button").Filter(new() { HasText = "Delete" }).First;
-      await deleteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await deleteButton.ClickAsync();
 
-      // Wait for deletion
+      // This should be changed to wait for the network event signifiying the deletion has occured.
       await Page.WaitForTimeoutAsync(2000);
 
       // Verify comment is no longer visible
-      var deletedComment = Page.GetByText(commentText);
-      Assert.False(await deletedComment.IsVisibleAsync(), "Deleted comment should not be visible");
+      Assert.False(await comment.IsVisibleAsync(), "Deleted comment should not be visible");
     }
     finally
     {

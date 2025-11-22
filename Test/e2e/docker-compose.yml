@@ -49,6 +49,7 @@ services:
       - ../../Reports:/Reports
     environment:
       - PLAYWRIGHT_BASE_URL=http://api:5000
+      - DEBUG=pw:api
       - CI=true
 
 networks:
