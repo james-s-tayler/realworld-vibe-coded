@@ -1,4 +1,5 @@
 ﻿using Ardalis.ListStartupServices;
+using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
 
@@ -85,12 +86,7 @@ public static class MiddlewareConfig
     {
       var context = services.GetRequiredService<AppDbContext>();
 
-      // await context.Database.MigrateAsync();
-      // PV042: EnsureCreatedAsync is acceptable here as this is development-time database seeding.
-      // In production, migrations should be used instead. This code should be guarded by environment checks.
-#pragma warning disable PV042
-      await context.Database.EnsureCreatedAsync();
-#pragma warning restore PV042
+      await context.Database.MigrateAsync();
       await SeedData.InitializeAsync(context);
     }
     catch (Exception ex)

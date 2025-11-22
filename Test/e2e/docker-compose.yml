@@ -38,18 +38,18 @@ services:
       retries: 20
       start_period: 10s
 
-  # playwright:
-  #  build:
-  #    context: ./
-  #    dockerfile: Dockerfile.playwright
-  #  depends_on:
-  #    api:
-  #      condition: service_healthy
-  #  volumes:
-  #    - ../../Reports:/Reports
-  #  environment:
-  #    - PLAYWRIGHT_BASE_URL=http://api:5000
-  #    - CI=true
+  playwright:
+    build:
+      context: ./
+      dockerfile: Dockerfile.playwright
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ../../Reports:/Reports
+    environment:
+      - PLAYWRIGHT_BASE_URL=http://api:5000
+      - CI=true
 
 networks:
   default:
