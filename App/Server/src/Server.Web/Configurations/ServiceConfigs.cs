@@ -17,15 +17,14 @@ public static class ServiceConfigs
     services.AddInfrastructureServices(builder.Configuration, logger)
             .AddMediatrConfigs();
 
-    // Configure CORS for local development
+    // Configure CORS to allow any origin
     services.AddCors(options =>
     {
       options.AddPolicy("AllowLocalhost", policy =>
       {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://api:5000")
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowAnyMethod();
       });
     });
 
