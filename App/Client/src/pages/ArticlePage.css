@@ -1,0 +1,181 @@
+.article-page {
+  min-height: 100vh;
+}
+
+.article-page.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
+.article-page .banner {
+  background: #333;
+  color: white;
+  padding: 2rem 0;
+}
+
+.article-page .banner h1 {
+  font-size: 2.8rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.article-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.article-meta .author-info {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.article-meta img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.article-meta .info {
+  display: flex;
+  flex-direction: column;
+}
+
+.article-meta .author {
+  color: white;
+  font-weight: 500;
+}
+
+.article-meta .date {
+  color: #bbb;
+  font-size: 0.8rem;
+}
+
+.article-meta .actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.article-content {
+  padding: 2rem 0;
+}
+
+.article-body {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+.article-body p {
+  margin-bottom: 1rem;
+}
+
+.article-tags {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.tag-pill {
+  background-color: #818181;
+  color: white;
+  border: none;
+  border-radius: 10rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+.tag-pill:hover {
+  background-color: #687077;
+}
+
+.card {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+  background: white;
+}
+
+.card-block {
+  padding: 1.25rem;
+}
+
+.card-text {
+  margin: 0;
+}
+
+.card-footer {
+  padding: 0.75rem 1.25rem;
+  background-color: #f7f7f7;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.comment-form .card-footer {
+  justify-content: space-between;
+}
+
+.comment-author {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  gap: 0.5rem;
+}
+
+.comment-author-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.comment-author-name {
+  color: #5cb85c;
+  font-weight: 500;
+}
+
+.date-posted {
+  color: #bbb;
+  font-size: 0.8rem;
+  margin-left: auto;
+}
+
+.mod-options {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  padding: 0.25rem;
+}
+
+.mod-options:hover {
+  color: #333;
+}
+
+.col-md-8 {
+  flex: 0 0 66.666667%;
+  max-width: 66.666667%;
+}
+
+.offset-md-2 {
+  margin-left: 16.666667%;
+}
+
+@media (max-width: 768px) {
+  .col-md-8 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  
+  .offset-md-2 {
+    margin-left: 0;
+  }
+}

@@ -9,6 +9,7 @@ import {
 } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
 import { ApiError } from '../api/client';
+import './AuthPages.css';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -39,59 +40,64 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '0 1rem' }}>
-      <h1 style={{ marginBottom: '2rem' }}>Sign Up</h1>
-      
-      {error && (
-        <InlineNotification
-          kind="error"
-          title="Registration Failed"
-          subtitle={error}
-          onCloseButtonClick={() => setError(null)}
-          style={{ marginBottom: '1rem' }}
-        />
-      )}
+    <div className="auth-page">
+      <div className="container page">
+        <div className="row">
+          <div className="col-md-6 offset-md-3 col-xs-12">
+            <h1 className="text-xs-center">Sign up</h1>
+            <p className="text-xs-center">
+              <Link to="/login">Have an account?</Link>
+            </p>
 
-      <Form onSubmit={handleSubmit}>
-        <Stack gap={6}>
-          <TextInput
-            id="username"
-            labelText="Username"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          
-          <TextInput
-            id="email"
-            labelText="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            type="email"
-          />
-          
-          <TextInput
-            id="password"
-            labelText="Password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            type="password"
-          />
+            {error && (
+              <InlineNotification
+                kind="error"
+                title="Registration Failed"
+                subtitle={error}
+                onCloseButtonClick={() => setError(null)}
+                style={{ marginBottom: '1rem' }}
+              />
+            )}
 
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Creating account...' : 'Sign up'}
-          </Button>
+            <Form onSubmit={handleSubmit}>
+              <Stack gap={6}>
+                <TextInput
+                  id="username"
+                  labelText="Username"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
 
-          <p style={{ marginTop: '1rem' }}>
-            Already have an account? <Link to="/login">Sign in</Link>
-          </p>
-        </Stack>
-      </Form>
+                <TextInput
+                  id="email"
+                  labelText="Email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  type="email"
+                />
+
+                <TextInput
+                  id="password"
+                  labelText="Password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  type="password"
+                />
+
+                <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">
+                  {loading ? 'Creating account...' : 'Sign up'}
+                </Button>
+              </Stack>
+            </Form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

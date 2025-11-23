@@ -9,6 +9,7 @@ import {
 } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
 import { ApiError } from '../api/client';
+import './AuthPages.css';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -38,50 +39,55 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '0 1rem' }}>
-      <h1 style={{ marginBottom: '2rem' }}>Sign In</h1>
-      
-      {error && (
-        <InlineNotification
-          kind="error"
-          title="Login Failed"
-          subtitle={error}
-          onCloseButtonClick={() => setError(null)}
-          style={{ marginBottom: '1rem' }}
-        />
-      )}
+    <div className="auth-page">
+      <div className="container page">
+        <div className="row">
+          <div className="col-md-6 offset-md-3 col-xs-12">
+            <h1 className="text-xs-center">Sign in</h1>
+            <p className="text-xs-center">
+              <Link to="/register">Need an account?</Link>
+            </p>
 
-      <Form onSubmit={handleSubmit}>
-        <Stack gap={6}>
-          <TextInput
-            id="email"
-            labelText="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            type="email"
-          />
-          
-          <TextInput
-            id="password"
-            labelText="Password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            type="password"
-          />
+            {error && (
+              <InlineNotification
+                kind="error"
+                title="Login Failed"
+                subtitle={error}
+                onCloseButtonClick={() => setError(null)}
+                style={{ marginBottom: '1rem' }}
+              />
+            )}
 
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in'}
-          </Button>
+            <Form onSubmit={handleSubmit}>
+              <Stack gap={6}>
+                <TextInput
+                  id="email"
+                  labelText="Email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  type="email"
+                />
 
-          <p style={{ marginTop: '1rem' }}>
-            Don't have an account? <Link to="/register">Sign up</Link>
-          </p>
-        </Stack>
-      </Form>
+                <TextInput
+                  id="password"
+                  labelText="Password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  type="password"
+                />
+
+                <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">
+                  {loading ? 'Signing in...' : 'Sign in'}
+                </Button>
+              </Stack>
+            </Form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

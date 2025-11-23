@@ -1,0 +1,19 @@
+.settings-page {
+  min-height: calc(100vh - 56px);
+  padding: 1.5rem 0;
+}
+
+.settings-page .text-xs-center {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.settings-page .pull-xs-right {
+  float: right;
+}
+
+.settings-page hr {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px solid #e5e5e5;
+}

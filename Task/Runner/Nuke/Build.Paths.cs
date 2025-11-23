@@ -67,10 +67,16 @@ public partial class Build
   #region Logs
   internal AbsolutePath LogsDirectory => RootDirectory / "Logs";
 
-  internal AbsolutePath LogsServerWebDirectory => RootDirectory / "Logs" / "Server.Web";
+  internal AbsolutePath LogsRunLocalPublishSerilogDirectory => RootDirectory / "Logs" / "RunLocalPublish" / "Server.Web" / "Serilog";
 
-  internal AbsolutePath LogsSerilogDirectory => RootDirectory / "Logs" / "Server.Web" / "Serilog";
+  internal AbsolutePath LogsRunLocalPublishAuditDotNetDirectory => RootDirectory / "Logs" / "RunLocalPublish" / "Server.Web" / "Audit.NET";
 
-  internal AbsolutePath LogsAuditDotNetDirectory => RootDirectory / "Logs" / "Server.Web" / "Audit.NET";
+  internal AbsolutePath LogsRunLocalHotReloadSerilogDirectory => RootDirectory / "Logs" / "RunLocalHotReload" / "Server.Web" / "Serilog";
+
+  internal AbsolutePath LogsRunLocalHotReloadAuditDotNetDirectory => RootDirectory / "Logs" / "RunLocalHotReload" / "Server.Web" / "Audit.NET";
+
+  internal AbsolutePath LogsTestE2eSerilogDirectory => RootDirectory / "Logs" / "Test" / "e2e" / "Server.Web" / "Serilog";
+
+  internal AbsolutePath LogsTestE2eAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "e2e" / "Server.Web" / "Audit.NET";
   #endregion
 }
