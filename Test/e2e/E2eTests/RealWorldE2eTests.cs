@@ -167,17 +167,18 @@ public class RealWorldE2eTests : ConduitPageTest
       // Wait for articles to load
       await Page.WaitForTimeoutAsync(2000);
 
-      // Verify article appears in feed - look for the article title link
-      var articleLink = Page.GetByRole(AriaRole.Link, new() { Name = articleTitle });
-      await Expect(articleLink).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+      // Verify article appears in feed - look for the article preview within the Global Feed panel
+      var globalFeedPanel = Page.GetByRole(AriaRole.Tabpanel).First;
+      var articlePreview = globalFeedPanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
-      // Click on article to view it
-      await articleLink.ClickAsync();
+      // Click on article link to view it
+      await articlePreview.Locator(".article-link").ClickAsync();
 
       // Verify we're on the article page
       await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
       var articleHeading = Page.GetByRole(AriaRole.Heading, new() { Name = articleTitle });
-      Assert.True(await articleHeading.IsVisibleAsync(), "Article should be viewable from Global Feed");
+      await Expect(articleHeading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
     finally
     {

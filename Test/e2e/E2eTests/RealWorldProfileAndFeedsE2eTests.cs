@@ -202,13 +202,13 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
 
-      // Wait for articles to load
-      await Page.WaitForTimeoutAsync(2000);
+      // Wait for articles and tags to load
+      await Page.WaitForTimeoutAsync(3000);
 
-      // Find and click on the tag in the article preview - it's a Tag component
-      var tagElement = Page.Locator($".cds--tag:has-text('{testTag}')").First;
-      await tagElement.ScrollIntoViewIfNeededAsync();
-      await tagElement.ClickAsync();
+      // Click on the tag in the sidebar (Popular Tags section)
+      var sidebarTag = Page.Locator(".sidebar .tag-list .cds--tag").Filter(new() { HasText = testTag });
+      await sidebarTag.WaitForAsync(new() { Timeout = DefaultTimeout });
+      await sidebarTag.ClickAsync();
 
       // Wait for filtered results
       await Page.WaitForTimeoutAsync(2000);
@@ -217,9 +217,10 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       var tagTab = Page.GetByRole(AriaRole.Tab, new() { Name = $"#{testTag}" });
       await Expect(tagTab).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
-      // Verify the article with that tag is displayed
-      var article = Page.GetByText(articleTitle).First;
-      Assert.True(await article.IsVisibleAsync(), "Article with the selected tag should be visible");
+      // Verify the article with that tag is displayed in the visible panel
+      var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
+      var articlePreview = visiblePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
     finally
     {
@@ -258,8 +259,11 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await globalFeedTab.ClickAsync();
       await Page.WaitForTimeoutAsync(2000);
 
-      // Click on the article
-      await Page.GetByText(articleTitle).First.ClickAsync();
+      // Click on the article link - use visible panel and click the article-link specifically
+      var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
+      var articlePreview = visiblePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      var articleLink = articlePreview.Locator(".article-link");
+      await articleLink.ClickAsync();
       await Page.WaitForURLAsync(new System.Text.RegularExpressions.Regex(@"/article/"), new() { Timeout = DefaultTimeout });
 
       // Favorite the article - button text contains "Favorite Article"
@@ -283,9 +287,10 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       // Wait for articles to load
       await Page.WaitForTimeoutAsync(2000);
 
-      // Verify favorited article appears
-      var article = Page.GetByText(articleTitle).First;
-      await Expect(article).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+      // Verify favorited article appears - check for article in the visible tab panel
+      var profilePanel = Page.GetByRole(AriaRole.Tabpanel).First;
+      var articleInFavorites = profilePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      await Expect(articleInFavorites).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
     finally
     {

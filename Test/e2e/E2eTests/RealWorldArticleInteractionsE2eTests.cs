@@ -156,8 +156,10 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
       await globalFeedTab.ClickAsync();
       await Page.WaitForTimeoutAsync(2000);
 
-      // Click on the article link that contains the title
-      var articleLink = Page.Locator(".article-preview").Filter(new() { HasText = articleTitle }).GetByRole(AriaRole.Link).First;
+      // Click on the article link - use visible panel and click the article-link specifically
+      var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
+      var articlePreview = visiblePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      var articleLink = articlePreview.Locator(".article-link");
       await articleLink.ClickAsync();
       await Page.WaitForURLAsync(new System.Text.RegularExpressions.Regex(@"/article/"), new() { Timeout = DefaultTimeout });
 
