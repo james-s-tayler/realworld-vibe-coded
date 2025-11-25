@@ -26,7 +26,7 @@ describe('apiRequest', () => {
     const result = await apiRequest('/api/test')
 
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/test',
+      '/api/test',
       expect.objectContaining({
         headers: {},
       })
@@ -48,7 +48,7 @@ describe('apiRequest', () => {
     await apiRequest('/api/user')
 
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/user',
+      '/api/user',
       expect.objectContaining({
         headers: expect.objectContaining({
           'Authorization': 'Token test-token',
@@ -125,7 +125,7 @@ describe('apiRequest', () => {
     })
 
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/test',
+      '/api/test',
       expect.objectContaining({
         headers: expect.objectContaining({
           'X-Custom-Header': 'value',
