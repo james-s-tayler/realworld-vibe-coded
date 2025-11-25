@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import EditorPage from './EditorPage';
+import { EditorPage } from './EditorPage';
 import { AuthContext } from '../context/AuthContext';
 
 // Mock the articles API
@@ -23,10 +23,11 @@ const renderWithAuth = (user = mockUser, initialRoute = '/editor') => {
   return render(
     <AuthContext.Provider value={{ 
       user, 
-      token: user?.token || null, 
+      loading: false,
       login: vi.fn(), 
+      register: vi.fn(),
       logout: vi.fn(), 
-      isLoading: false 
+      updateUser: vi.fn()
     }}>
       <MemoryRouter initialEntries={[initialRoute]}>
         <Routes>

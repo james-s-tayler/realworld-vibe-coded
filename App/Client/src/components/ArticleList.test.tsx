@@ -43,7 +43,7 @@ const mockArticles = [
 
 const renderWithRouter = (ui: React.ReactElement) => {
   return render(
-    <AuthContext.Provider value={{ user: null, token: null, login: vi.fn(), logout: vi.fn(), isLoading: false }}>
+    <AuthContext.Provider value={{ user: null, loading: false, login: vi.fn(), register: vi.fn(), logout: vi.fn(), updateUser: vi.fn() }}>
       <MemoryRouter>{ui}</MemoryRouter>
     </AuthContext.Provider>
   );
