@@ -57,4 +57,23 @@ describe('ArticlePreview', () => {
     renderWithRouter(<ArticlePreview article={mockArticle} />);
     expect(screen.getByText('Read more...')).toBeInTheDocument();
   });
+
+  it('renders author profile image when provided', () => {
+    renderWithRouter(<ArticlePreview article={mockArticle} />);
+    const img = screen.getByAltText('testuser');
+    expect(img).toHaveAttribute('src', 'https://example.com/image.jpg');
+  });
+
+  it('renders placeholder image when no profile image is provided', () => {
+    const articleWithNoImage = {
+      ...mockArticle,
+      author: {
+        ...mockArticle.author,
+        image: null,
+      },
+    };
+    renderWithRouter(<ArticlePreview article={articleWithNoImage} />);
+    const img = screen.getByAltText('testuser');
+    expect(img).toHaveAttribute('src', 'https://placehold.co/200');
+  });
 });
