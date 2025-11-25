@@ -7,10 +7,7 @@ public class ListArticlesCountSpec : Specification<Article>
     string? author = null,
     string? favorited = null)
   {
-    Query.Include(x => x.Author)
-         .Include(x => x.Tags)
-         .Include(x => x.FavoritedBy)
-         .AsNoTracking();
+    Query.AsNoTracking();
 
     if (!string.IsNullOrEmpty(tag))
     {
