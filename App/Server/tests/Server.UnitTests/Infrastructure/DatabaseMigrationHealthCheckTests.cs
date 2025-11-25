@@ -26,8 +26,8 @@ public class DatabaseMigrationHealthCheckTests
     var result = await healthCheck.CheckHealthAsync(null!, CancellationToken.None);
 
     // Assert
-    Assert.Equal(HealthStatus.Unhealthy, result.Status);
-    Assert.Equal("Cannot connect to database.", result.Description);
+    result.Status.ShouldBe(HealthStatus.Unhealthy);
+    result.Description.ShouldBe("Cannot connect to database.");
   }
 
   [Fact]
@@ -43,9 +43,10 @@ public class DatabaseMigrationHealthCheckTests
     var result = await healthCheck.CheckHealthAsync(null!, CancellationToken.None);
 
     // Assert
-    Assert.Equal(HealthStatus.Unhealthy, result.Status);
-    Assert.Contains("Migration1", result.Description);
-    Assert.Contains("Migration2", result.Description);
+    result.Status.ShouldBe(HealthStatus.Unhealthy);
+    result.Description.ShouldNotBeNull();
+    result.Description.ShouldContain("Migration1");
+    result.Description.ShouldContain("Migration2");
   }
 
   [Fact]
@@ -61,8 +62,8 @@ public class DatabaseMigrationHealthCheckTests
     var result = await healthCheck.CheckHealthAsync(null!, CancellationToken.None);
 
     // Assert
-    Assert.Equal(HealthStatus.Healthy, result.Status);
-    Assert.Equal("Database schema is up to date.", result.Description);
+    result.Status.ShouldBe(HealthStatus.Healthy);
+    result.Description.ShouldBe("Database schema is up to date.");
   }
 
   [Fact]
