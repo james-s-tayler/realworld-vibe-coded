@@ -8,10 +8,11 @@ const renderWithAuth = (user: { username: string; email: string; token: string; 
   return render(
     <AuthContext.Provider value={{ 
       user, 
-      token: user?.token || null, 
+      loading: false,
       login: vi.fn(), 
+      register: vi.fn(),
       logout: vi.fn(), 
-      isLoading: false 
+      updateUser: vi.fn()
     }}>
       <MemoryRouter>
         <AppHeader />

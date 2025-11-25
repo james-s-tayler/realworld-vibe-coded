@@ -1,40 +1,44 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import ProfilePage from './ProfilePage';
+import { ProfilePage } from './ProfilePage';
 import { AuthContext } from '../context/AuthContext';
+import { profilesApi } from '../api/profiles';
+import { articlesApi } from '../api/articles';
 
 // Mock the API modules
 vi.mock('../api/profiles', () => ({
-  getProfile: vi.fn().mockResolvedValue({
-    profile: {
-      username: 'testuser',
-      bio: 'Test bio',
-      image: 'https://example.com/image.jpg',
-      following: false,
-    }
-  }),
-  followUser: vi.fn(),
-  unfollowUser: vi.fn(),
+  profilesApi: {
+    getProfile: vi.fn(),
+    followUser: vi.fn(),
+    unfollowUser: vi.fn(),
+  },
 }));
 
 vi.mock('../api/articles', () => ({
-  listArticles: vi.fn().mockResolvedValue({
-    articles: [],
-    articlesCount: 0,
-  }),
-  favoriteArticle: vi.fn(),
-  unfavoriteArticle: vi.fn(),
+  articlesApi: {
+    listArticles: vi.fn(),
+    favoriteArticle: vi.fn(),
+    unfavoriteArticle: vi.fn(),
+  },
 }));
+
+const mockProfile = {
+  username: 'testuser',
+  bio: 'Test bio',
+  image: 'https://example.com/image.jpg',
+  following: false,
+};
 
 const renderWithAuth = (user = null, username = 'testuser') => {
   return render(
     <AuthContext.Provider value={{ 
       user, 
-      token: user?.token || null, 
+      loading: false,
       login: vi.fn(), 
+      register: vi.fn(),
       logout: vi.fn(), 
-      isLoading: false 
+      updateUser: vi.fn()
     }}>
       <MemoryRouter initialEntries={[`/profile/${username}`]}>
         <Routes>
@@ -48,6 +52,8 @@ const renderWithAuth = (user = null, username = 'testuser') => {
 describe('ProfilePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(profilesApi.getProfile).mockResolvedValue({ profile: mockProfile });
+    vi.mocked(articlesApi.listArticles).mockResolvedValue({ articles: [], articlesCount: 0 });
   });
 
   it('renders loading state initially', () => {
@@ -55,17 +61,17 @@ describe('ProfilePage', () => {
     expect(screen.getByText(/Loading/i)).toBeInTheDocument();
   });
 
-  it('renders My Posts tab', async () => {
+  it('renders My Articles tab', async () => {
     renderWithAuth();
     await waitFor(() => {
-      expect(screen.getByText('My Posts')).toBeInTheDocument();
+      expect(screen.getByText('My Articles')).toBeInTheDocument();
     });
   });
 
-  it('renders Favorited Posts tab', async () => {
+  it('renders Favorited Articles tab', async () => {
     renderWithAuth();
     await waitFor(() => {
-      expect(screen.getByText('Favorited Posts')).toBeInTheDocument();
+      expect(screen.getByText('Favorited Articles')).toBeInTheDocument();
     });
   });
 });

@@ -3,6 +3,8 @@ import { authApi } from '../api/auth';
 import type { User } from '../types/user';
 import { AuthContext } from './AuthContextType';
 
+export { AuthContext };
+
 interface AuthProviderProps {
   children: ReactNode;
 }
