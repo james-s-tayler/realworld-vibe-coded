@@ -41,16 +41,16 @@ public class ListArticles(IMediator mediator, IUserContext userContext) : Endpoi
 
     await Send.ResultMapperAsync(
       result,
-      async (articles, ct) =>
+      async (data, ct) =>
       {
         var articleDtos = new List<Server.Core.ArticleAggregate.Dtos.ArticleDto>();
-        foreach (var article in articles)
+        foreach (var article in data.Articles)
         {
           var response = await Map.FromEntityAsync(article, ct);
           articleDtos.Add(response.Article);
         }
 
-        return new ArticlesResponse(articleDtos, articleDtos.Count);
+        return new ArticlesResponse(articleDtos, data.TotalCount);
       },
       cancellationToken);
   }

@@ -7,4 +7,4 @@ public record GetFeedQuery(
   Guid UserId,
   int Limit = 20,
   int Offset = 0
-) : IQuery<IEnumerable<Article>>;
+) : IQuery<(IEnumerable<Article> Articles, int TotalCount)>;
