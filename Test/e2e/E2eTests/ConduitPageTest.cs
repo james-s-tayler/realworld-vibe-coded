@@ -60,10 +60,14 @@ public abstract class ConduitPageTest : PageTest
 
   protected async Task SignOut()
   {
-    await Page.GetByRole(AriaRole.Link, new() { Name = "Settings" }).ClickAsync();
+    await Page.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/settings", new() { Timeout = DefaultTimeout });
-    await Page.GetByRole(AriaRole.Button, new() { Name = "Logout" }).ClickAsync();
-    await Page.WaitForURLAsync(BaseUrl, new() { Timeout = DefaultTimeout });
+
+    // The logout button contains "Or click here to logout."
+    await Page.GetByRole(AriaRole.Button, new() { Name = "Or click here to logout." }).ClickAsync();
+
+    // After logout, the app navigates to login page
+    await Expect(Page.GetByRole(AriaRole.Link, new() { Name = "Sign in" })).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
   protected async Task SaveTrace(string testName)

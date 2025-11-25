@@ -21,11 +21,13 @@ public class RealWorldAuthenticationE2eTests : ConduitPageTest
       // First, register a user
       await RegisterUser();
 
-      // Sign out
-      await Page.GetByRole(AriaRole.Link, new() { Name = "Settings" }).ClickAsync();
+      // Sign out - navigate to settings
+      await Page.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true }).ClickAsync();
       await Page.WaitForURLAsync($"{BaseUrl}/settings", new() { Timeout = DefaultTimeout });
-      await Page.GetByRole(AriaRole.Button, new() { Name = "Logout" }).ClickAsync();
-      await Page.WaitForURLAsync(BaseUrl, new() { Timeout = DefaultTimeout });
+      await Page.GetByRole(AriaRole.Button, new() { Name = "Or click here to logout." }).ClickAsync();
+
+      // Wait for sign in link to appear (indicates logged out state)
+      await Expect(Page.GetByRole(AriaRole.Link, new() { Name = "Sign in" })).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
       // Now sign in with the credentials
       await Page.GetByRole(AriaRole.Link, new() { Name = "Sign in" }).ClickAsync();
@@ -66,18 +68,15 @@ public class RealWorldAuthenticationE2eTests : ConduitPageTest
       await RegisterUser();
 
       // Navigate to settings
-      await Page.GetByRole(AriaRole.Link, new() { Name = "Settings" }).ClickAsync();
+      await Page.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true }).ClickAsync();
       await Page.WaitForURLAsync($"{BaseUrl}/settings", new() { Timeout = DefaultTimeout });
 
       // Click logout button
-      await Page.GetByRole(AriaRole.Button, new() { Name = "Logout" }).ClickAsync();
-
-      // Verify redirect to home page
-      await Page.WaitForURLAsync(BaseUrl, new() { Timeout = DefaultTimeout });
+      await Page.GetByRole(AriaRole.Button, new() { Name = "Or click here to logout." }).ClickAsync();
 
       // Verify user is logged out - Sign in and Sign up links should be visible
       var signInLink = Page.GetByRole(AriaRole.Link, new() { Name = "Sign in" });
-      await signInLink.WaitForAsync(new() { Timeout = DefaultTimeout });
+      await Expect(signInLink).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
       Assert.True(await signInLink.IsVisibleAsync(), "Sign in link should be visible after logout");
 
       var signUpLink = Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" });

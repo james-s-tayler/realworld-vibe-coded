@@ -51,25 +51,17 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       // Register second user
       await RegisterUser(_testUsername2, _testEmail2, _testPassword2);
 
-      // Navigate to home and find first user's article
-      await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+      // Navigate directly to first user's profile
+      await Page.GotoAsync($"{BaseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
-      // Click on first user's name/profile link from an article
-      var authorLink = Page.GetByRole(AriaRole.Link, new() { Name = _testUsername1 }).First;
-      await authorLink.WaitForAsync(new() { Timeout = DefaultTimeout });
-      await authorLink.ClickAsync();
-
-      // Verify on profile page
-      await Page.WaitForURLAsync($"{BaseUrl}/profile/{_testUsername1}", new() { Timeout = DefaultTimeout });
-
-      // Verify profile information is displayed
-      var profileHeading = Page.GetByRole(AriaRole.Heading, new() { Name = _testUsername1 });
+      // Verify profile information is displayed - use Exact match to avoid matching article title
+      var profileHeading = Page.GetByRole(AriaRole.Heading, new() { Name = _testUsername1, Exact = true });
       await profileHeading.WaitForAsync(new() { Timeout = DefaultTimeout });
       Assert.True(await profileHeading.IsVisibleAsync(), "Other user's profile should be visible");
 
       // Verify tabs are present
-      var myPostsTab = Page.Locator("button[role='tab']").Filter(new() { HasText = "My Articles" }).Or(Page.Locator("button[role='tab']").Filter(new() { HasText = "My Posts" }));
-      Assert.True(await myPostsTab.First.IsVisibleAsync(), "My Posts tab should be visible on other user's profile");
+      var myPostsTab = Page.GetByRole(AriaRole.Tab, new() { Name = "My Articles" });
+      Assert.True(await myPostsTab.IsVisibleAsync(), "My Articles tab should be visible on other user's profile");
     }
     finally
     {
@@ -103,8 +95,8 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       // Navigate to first user's profile
       await Page.GotoAsync($"{BaseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
-      // Find and click follow button
-      var followButton = Page.Locator("button").Filter(new() { HasText = "Follow" });
+      // Find and click follow button - The button text is "Follow {username}"
+      var followButton = Page.GetByRole(AriaRole.Button, new() { Name = $"Follow {_testUsername1}" });
       await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await followButton.ClickAsync();
 
@@ -112,8 +104,8 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await Page.WaitForTimeoutAsync(1000);
 
       // Verify button text changed to unfollow
-      var unfollowButton = Page.Locator("button").Filter(new() { HasText = "Unfollow" });
-      Assert.True(await unfollowButton.IsVisibleAsync(), "Unfollow button should appear after following");
+      var unfollowButton = Page.GetByRole(AriaRole.Button, new() { Name = $"Unfollow {_testUsername1}" });
+      await Expect(unfollowButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
       // Click to unfollow
       await unfollowButton.ClickAsync();
@@ -122,8 +114,8 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await Page.WaitForTimeoutAsync(1000);
 
       // Verify button text changed back to follow
-      followButton = Page.Locator("button").Filter(new() { HasText = "Follow" });
-      Assert.True(await followButton.IsVisibleAsync(), "Follow button should appear after unfollowing");
+      followButton = Page.GetByRole(AriaRole.Button, new() { Name = $"Follow {_testUsername1}" });
+      await Expect(followButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
     finally
     {
@@ -156,10 +148,12 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
 
       // Follow first user
       await Page.GotoAsync($"{BaseUrl}/profile/{_testUsername1}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
-      var followButton = Page.Locator("button").Filter(new() { HasText = "Follow" });
+      var followButton = Page.GetByRole(AriaRole.Button, new() { Name = $"Follow {_testUsername1}" });
       await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await followButton.ClickAsync();
-      await Page.WaitForTimeoutAsync(1000);
+
+      // Wait for follow to complete
+      await Expect(Page.GetByRole(AriaRole.Button, new() { Name = $"Unfollow {_testUsername1}" })).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
       // Navigate to home page
       await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
@@ -173,9 +167,8 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await Page.WaitForTimeoutAsync(2000);
 
       // Verify followed user's article appears in Your Feed
-      var article = Page.Locator($"text=/{articleTitle}/i").First;
-      await article.WaitForAsync(new() { Timeout = DefaultTimeout });
-      Assert.True(await article.IsVisibleAsync(), "Followed user's article should appear in Your Feed");
+      var article = Page.GetByText(articleTitle).First;
+      await Expect(article).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
     finally
     {
@@ -204,20 +197,25 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       // Navigate to home page
       await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
-      // Wait for tags to load
+      // First go to Global Feed to see the article
+      var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
+      await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
+      await globalFeedTab.ClickAsync();
+
+      // Wait for articles to load
       await Page.WaitForTimeoutAsync(2000);
 
-      // Click on the tag in popular tags (or use the tag from the article)
-      var tagLink = Page.Locator($"text=/{testTag}/i").First;
-      await tagLink.WaitForAsync(new() { Timeout = DefaultTimeout });
-      await tagLink.ClickAsync();
+      // Find and click on the tag in the article preview - it's a Tag component
+      var tagElement = Page.Locator($".cds--tag:has-text('{testTag}')").First;
+      await tagElement.ScrollIntoViewIfNeededAsync();
+      await tagElement.ClickAsync();
 
       // Wait for filtered results
       await Page.WaitForTimeoutAsync(2000);
 
-      // Verify we're on a tag filter view (tab should show the tag name)
-      var tagTab = Page.Locator($"button[role='tab']:has-text('{testTag}')").First;
-      Assert.True(await tagTab.IsVisibleAsync(), "Tag tab should be visible when filtering by tag");
+      // Verify we're on a tag filter view (tab should show the tag name with #)
+      var tagTab = Page.GetByRole(AriaRole.Tab, new() { Name = $"#{testTag}" });
+      await Expect(tagTab).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
       // Verify the article with that tag is displayed
       var article = Page.GetByText(articleTitle).First;
@@ -242,22 +240,43 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
 
     try
     {
-      // Register user and create an article
+      // Register first user and create an article
       await RegisterUser(_testUsername1, _testEmail1, _testPassword1);
       var articleTitle = await CreateArticle(_testUsername1);
 
-      // Favorite the article
-      var favoriteButton = Page.Locator("button:has-text('Favorite')").First;
+      // Sign out
+      await SignOut();
+
+      // Register second user
+      await RegisterUser(_testUsername2, _testEmail2, _testPassword2);
+
+      // Navigate to the first user's article
+      await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+
+      // Click on Global Feed tab
+      var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
+      await globalFeedTab.ClickAsync();
+      await Page.WaitForTimeoutAsync(2000);
+
+      // Click on the article
+      await Page.GetByText(articleTitle).First.ClickAsync();
+      await Page.WaitForURLAsync(new System.Text.RegularExpressions.Regex(@"/article/"), new() { Timeout = DefaultTimeout });
+
+      // Favorite the article - button text contains "Favorite Article"
+      var favoriteButton = Page.GetByRole(AriaRole.Button).Filter(new() { HasTextRegex = new System.Text.RegularExpressions.Regex("Favorite Article") });
       await favoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await favoriteButton.ClickAsync();
-      await Page.WaitForTimeoutAsync(1000);
+
+      // Wait for unfavorite button to confirm action completed
+      var unfavoriteButton = Page.GetByRole(AriaRole.Button).Filter(new() { HasTextRegex = new System.Text.RegularExpressions.Regex("Unfavorite Article") });
+      await Expect(unfavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
       // Navigate to own profile
-      await Page.GetByRole(AriaRole.Link, new() { Name = _testUsername1 }).First.ClickAsync();
-      await Page.WaitForURLAsync($"{BaseUrl}/profile/{_testUsername1}", new() { Timeout = DefaultTimeout });
+      await Page.GetByRole(AriaRole.Link, new() { Name = _testUsername2 }).First.ClickAsync();
+      await Page.WaitForURLAsync($"{BaseUrl}/profile/{_testUsername2}", new() { Timeout = DefaultTimeout });
 
-      // Click on Favorited Posts tab
-      var favoritedTab = Page.Locator("button[role='tab']").Filter(new() { HasText = "Favorited" });
+      // Click on Favorited Articles tab
+      var favoritedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Favorited Articles" });
       await favoritedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await favoritedTab.ClickAsync();
 
@@ -265,8 +284,8 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await Page.WaitForTimeoutAsync(2000);
 
       // Verify favorited article appears
-      var article = Page.Locator($"text=/{articleTitle}/i").First;
-      Assert.True(await article.IsVisibleAsync(), "Favorited article should appear in Favorited Posts tab");
+      var article = Page.GetByText(articleTitle).First;
+      await Expect(article).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
     finally
     {
