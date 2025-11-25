@@ -1,169 +1,197 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import {
-  Form,
-  TextInput,
-  TextArea,
-  Button,
-  InlineNotification,
-  Stack,
-  Tile,
-} from '@carbon/react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, Link } from 'react-router';
+import { Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, InlineNotification } from '@carbon/react';
+import { Settings } from '@carbon/icons-react';
 import { useAuth } from '../hooks/useAuth';
+import { profilesApi } from '../api/profiles';
+import { articlesApi } from '../api/articles';
+import { ArticleList } from '../components/ArticleList';
 import { ApiError } from '../api/client';
+import type { Profile } from '../types/article';
+import type { Article } from '../types/article';
+import './ProfilePage.css';
 
 export const ProfilePage: React.FC = () => {
-  const navigate = useNavigate();
-  const { user, updateUser, logout } = useAuth();
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [bio, setBio] = useState('');
-  const [image, setImage] = useState('');
-  const [password, setPassword] = useState('');
+  const { username } = useParams<{ username: string }>();
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [articlesLoading, setArticlesLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      setEmail(user.email);
-      setUsername(user.username);
-      setBio(user.bio || '');
-      setImage(user.image || '');
-    }
-  }, [user]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(false);
+  const loadProfile = useCallback(async () => {
+    if (!username) return;
     setLoading(true);
-
+    setError(null);
     try {
-      const updates: {
-        email?: string;
-        username?: string;
-        bio?: string;
-        image?: string;
-        password?: string;
-      } = {};
-
-      if (email !== user?.email) updates.email = email;
-      if (username !== user?.username) updates.username = username;
-      if (bio !== (user?.bio || '')) updates.bio = bio;
-      if (image !== (user?.image || '')) updates.image = image;
-      if (password) updates.password = password;
-
-      await updateUser(updates);
-      setSuccess(true);
-      setPassword('');
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
+      const response = await profilesApi.getProfile(username);
+      setProfile(response.profile);
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+      if (error instanceof ApiError) {
+        setError(error.errors.join(', '));
       } else {
-        setError('An unexpected error occurred');
+        setError('Failed to load profile');
       }
     } finally {
       setLoading(false);
     }
+  }, [username]);
+
+  const loadArticles = useCallback(async () => {
+    if (!username) return;
+    setArticlesLoading(true);
+    try {
+      const params = activeTab === 0
+        ? { author: username }
+        : { favorited: username };
+      const response = await articlesApi.listArticles(params);
+      setArticles(response.articles);
+    } catch (error) {
+      console.error('Failed to load articles:', error);
+    } finally {
+      setArticlesLoading(false);
+    }
+  }, [username, activeTab]);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+  useEffect(() => {
+    loadArticles();
+  }, [loadArticles]);
+
+  const handleFollow = async () => {
+    if (!profile) return;
+    try {
+      const response = profile.following
+        ? await profilesApi.unfollowUser(profile.username)
+        : await profilesApi.followUser(profile.username);
+      setProfile(response.profile);
+    } catch (error) {
+      console.error('Failed to follow/unfollow:', error);
+    }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleFavorite = async (slug: string) => {
+    try {
+      const response = await articlesApi.favoriteArticle(slug);
+      setArticles(articles.map(a => a.slug === slug ? response.article : a));
+    } catch (error) {
+      console.error('Failed to favorite article:', error);
+    }
   };
 
-  if (!user) {
-    return null;
+  const handleUnfavorite = async (slug: string) => {
+    try {
+      const response = await articlesApi.unfavoriteArticle(slug);
+      setArticles(articles.map(a => a.slug === slug ? response.article : a));
+    } catch (error) {
+      console.error('Failed to unfavorite article:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="profile-page loading">
+        <Loading description="Loading profile..." withOverlay={false} />
+      </div>
+    );
   }
 
+  if (error) {
+    return (
+      <div className="profile-page">
+        <div className="container">
+          <InlineNotification
+            kind="error"
+            title="Error"
+            subtitle={error}
+            lowContrast
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="profile-page">
+        <div className="container">
+          <p>Profile not found</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isOwnProfile = user && user.username === profile.username;
+
   return (
-    <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '0 1rem' }}>
-      <h1 style={{ marginBottom: '2rem' }}>Your Profile</h1>
-      
-      {error && (
-        <InlineNotification
-          kind="error"
-          title="Update Failed"
-          subtitle={error}
-          onCloseButtonClick={() => setError(null)}
-          style={{ marginBottom: '1rem' }}
-        />
-      )}
-
-      {success && (
-        <InlineNotification
-          kind="success"
-          title="Success"
-          subtitle="Profile updated successfully"
-          onCloseButtonClick={() => setSuccess(false)}
-          style={{ marginBottom: '1rem' }}
-        />
-      )}
-
-      <Tile style={{ marginBottom: '2rem', padding: '1rem' }}>
-        <p><strong>Current User:</strong> {user.username}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-      </Tile>
-
-      <Form onSubmit={handleSubmit}>
-        <Stack gap={6}>
-          <TextInput
-            id="image"
-            labelText="Profile Image URL"
-            placeholder="Enter URL of profile picture"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-          />
-
-          <TextInput
-            id="username"
-            labelText="Username"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          
-          <TextArea
-            id="bio"
-            labelText="Bio"
-            placeholder="Tell us about yourself"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            rows={4}
-          />
-          
-          <TextInput
-            id="email"
-            labelText="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            type="email"
-          />
-          
-          <TextInput
-            id="password"
-            labelText="New Password"
-            placeholder="Leave blank to keep current password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-          />
-
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Updating...' : 'Update Profile'}
-            </Button>
-            
-            <Button kind="danger" onClick={handleLogout}>
-              Logout
-            </Button>
+    <div className="profile-page">
+      <div className="user-info">
+        <div className="container">
+          <div className="row">
+            <div className="col-xs-12 col-md-10 offset-md-1">
+              <img
+                src={profile.image || '/default-avatar.png'}
+                alt={profile.username}
+                className="user-img"
+              />
+              <h4>{profile.username}</h4>
+              <p>{profile.bio}</p>
+              {isOwnProfile ? (
+                <Link to="/settings">
+                  <Button kind="ghost" size="sm" renderIcon={Settings}>
+                    Edit Profile Settings
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={handleFollow}
+                >
+                  {profile.following ? 'Unfollow' : 'Follow'} {profile.username}
+                </Button>
+              )}
+            </div>
           </div>
-        </Stack>
-      </Form>
+        </div>
+      </div>
+
+      <div className="container">
+        <div className="row">
+          <div className="col-xs-12 col-md-10 offset-md-1">
+            <Tabs selectedIndex={activeTab} onChange={(evt) => setActiveTab(evt.selectedIndex)}>
+              <TabList aria-label="Profile tabs">
+                <Tab>My Articles</Tab>
+                <Tab>Favorited Articles</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <ArticleList
+                    articles={articles}
+                    loading={articlesLoading}
+                    onFavorite={handleFavorite}
+                    onUnfavorite={handleUnfavorite}
+                  />
+                </TabPanel>
+                <TabPanel>
+                  <ArticleList
+                    articles={articles}
+                    loading={articlesLoading}
+                    onFavorite={handleFavorite}
+                    onUnfavorite={handleUnfavorite}
+                  />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

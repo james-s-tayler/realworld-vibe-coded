@@ -5,6 +5,7 @@ using Server.Infrastructure;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Email;
 using Server.UseCases.Interfaces;
+using Server.Web.Infrastructure;
 using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace Server.Web.Configurations;
@@ -16,15 +17,14 @@ public static class ServiceConfigs
     services.AddInfrastructureServices(builder.Configuration, logger)
             .AddMediatrConfigs();
 
-    // Configure CORS for local development
+    // Configure CORS to allow any origin
     services.AddCors(options =>
     {
       options.AddPolicy("AllowLocalhost", policy =>
       {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000")
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowAnyMethod();
       });
     });
 
@@ -87,9 +87,12 @@ public static class ServiceConfigs
 
     services.AddAuthorization();
     services.AddProblemDetails();
-
-    // Register IHttpContextAccessor for CurrentUserService
+    services.AddMemoryCache();
     services.AddHttpContextAccessor();
+
+    // Add custom health check that verifies database migrations are applied
+    services.AddHealthChecks()
+      .AddCheck<DatabaseMigrationHealthCheck>("database", tags: new[] { "db", "ready" });
 
     if (builder.Environment.IsDevelopment())
     {

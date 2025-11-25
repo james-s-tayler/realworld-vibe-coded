@@ -41,8 +41,8 @@ public class SwaggerE2eTests : PageTest
       // Navigate to Swagger docs
       await Page.GotoAsync(swaggerUrl, new()
       {
-        WaitUntil = WaitUntilState.NetworkIdle,
-        Timeout = 30000,
+        WaitUntil = WaitUntilState.Load,
+        Timeout = 10000,
       });
 
       // Wait for Swagger UI to load and verify it's visible (use first occurrence)

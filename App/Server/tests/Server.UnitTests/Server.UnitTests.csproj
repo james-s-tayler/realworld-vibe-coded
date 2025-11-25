@@ -41,6 +41,7 @@
     <ProjectReference Include="..\..\src\Server.Core\Server.Core.csproj" />
     <ProjectReference Include="..\..\src\Server.UseCases\Server.UseCases.csproj" />
     <ProjectReference Include="..\..\src\Server.Infrastructure\Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Server.Web\Server.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

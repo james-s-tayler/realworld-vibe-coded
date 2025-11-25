@@ -48,7 +48,10 @@ await app.UseAppMiddlewareAndSeedDatabase();
 
 // Only serve SPA fallback for non-API routes to prevent API 404s from returning index.html
 app.MapWhen(
-  context => !context.Request.Path.StartsWithSegments("/api") && !context.Request.Path.StartsWithSegments($"/{DevOnly.ROUTE}"),
+  context =>
+    !context.Request.Path.StartsWithSegments("/api") &&
+    !context.Request.Path.StartsWithSegments("/health") &&
+    !context.Request.Path.StartsWithSegments($"/{DevOnly.ROUTE}"),
   builder => builder.Run(async context =>
   {
     context.Response.ContentType = "text/html";

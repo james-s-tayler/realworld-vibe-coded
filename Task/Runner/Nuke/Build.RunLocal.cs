@@ -31,8 +31,12 @@ public partial class Build
 
       // Create or clean Logs directories
       LogsDirectory.CreateOrCleanDirectory();
-      LogsAuditDotNetDirectory.CreateOrCleanDirectory();
-      LogsSerilogDirectory.CreateOrCleanDirectory();
+      LogsRunLocalHotReloadAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsRunLocalHotReloadSerilogDirectory.CreateOrCleanDirectory();
+      LogsRunLocalPublishAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsRunLocalPublishSerilogDirectory.CreateOrCleanDirectory();
+      LogsTestE2eAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsTestE2eSerilogDirectory.CreateOrCleanDirectory();
 
       Log.Information("✓ Directories cleaned and pre-created");
     });

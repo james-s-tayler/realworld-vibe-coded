@@ -1,0 +1,15 @@
+.cds--header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.cds--header__name {
+  color: #5cb85c;
+  font-family: 'Titillium Web', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.cds--header__name:hover {
+  color: #5cb85c;
+}

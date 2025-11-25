@@ -1,0 +1,87 @@
+.article-preview {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.article-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.author-image {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.author-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  color: #5cb85c;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.article-date {
+  color: #bbb;
+  font-size: 0.8rem;
+}
+
+.favorite-button {
+  color: #5cb85c;
+  border: 1px solid #5cb85c;
+}
+
+.favorite-button.favorited {
+  background-color: #5cb85c;
+  color: white;
+}
+
+.article-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.article-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #373a3c;
+  margin-bottom: 0.5rem;
+}
+
+.article-description {
+  font-size: 1rem;
+  color: #999;
+  margin-bottom: 1rem;
+}
+
+.article-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.read-more {
+  color: #bbb;
+  font-size: 0.8rem;
+}
+
+.article-tags {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
