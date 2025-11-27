@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { Tag, Button } from '@carbon/react';
 import { FavoriteFilled, Favorite } from '@carbon/icons-react';
 import type { Article } from '../types/article';
+import { DEFAULT_PROFILE_IMAGE } from '../constants';
 import './ArticlePreview.css';
 
 interface ArticlePreviewProps {
@@ -38,7 +39,7 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({
       <div className="article-meta">
         <Link to={`/profile/${article.author.username}`} className="author-info">
           <img
-            src={article.author.image || '/default-avatar.png'}
+            src={article.author.image || DEFAULT_PROFILE_IMAGE}
             alt={article.author.username}
             className="author-image"
           />

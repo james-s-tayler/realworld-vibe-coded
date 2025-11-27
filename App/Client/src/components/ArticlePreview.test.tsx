@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { ArticlePreview } from './ArticlePreview';
 import { AuthContext } from '../context/AuthContext';
+import { DEFAULT_PROFILE_IMAGE } from '../constants';
 
 const mockArticle = {
   slug: 'test-article',
@@ -56,5 +57,24 @@ describe('ArticlePreview', () => {
   it('renders Read more link', () => {
     renderWithRouter(<ArticlePreview article={mockArticle} />);
     expect(screen.getByText('Read more...')).toBeInTheDocument();
+  });
+
+  it('renders author profile image when provided', () => {
+    renderWithRouter(<ArticlePreview article={mockArticle} />);
+    const img = screen.getByAltText('testuser');
+    expect(img).toHaveAttribute('src', 'https://example.com/image.jpg');
+  });
+
+  it('renders placeholder image when no profile image is provided', () => {
+    const articleWithNoImage = {
+      ...mockArticle,
+      author: {
+        ...mockArticle.author,
+        image: null,
+      },
+    };
+    renderWithRouter(<ArticlePreview article={articleWithNoImage} />);
+    const img = screen.getByAltText('testuser');
+    expect(img).toHaveAttribute('src', DEFAULT_PROFILE_IMAGE);
   });
 });

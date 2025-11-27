@@ -9,6 +9,7 @@ import { ArticleList } from '../components/ArticleList';
 import { ApiError } from '../api/client';
 import type { Profile } from '../types/article';
 import type { Article } from '../types/article';
+import { DEFAULT_PROFILE_IMAGE } from '../constants';
 import './ProfilePage.css';
 
 export const ProfilePage: React.FC = () => {
@@ -136,7 +137,7 @@ export const ProfilePage: React.FC = () => {
           <div className="row">
             <div className="col-xs-12 col-md-10 offset-md-1">
               <img
-                src={profile.image || '/default-avatar.png'}
+                src={profile.image || DEFAULT_PROFILE_IMAGE}
                 alt={profile.username}
                 className="user-img"
               />
