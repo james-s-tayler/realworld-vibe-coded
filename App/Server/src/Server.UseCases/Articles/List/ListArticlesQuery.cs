@@ -10,4 +10,4 @@ public record ListArticlesQuery(
   int Limit = 20,
   int Offset = 0,
   Guid? CurrentUserId = null
-) : IQuery<(IEnumerable<Article> Articles, int TotalCount)>;
+) : IQuery<IEnumerable<Article>>;

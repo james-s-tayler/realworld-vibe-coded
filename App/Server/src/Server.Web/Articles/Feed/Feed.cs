@@ -38,16 +38,16 @@ public class Feed(IMediator mediator, IUserContext userContext) : Endpoint<FeedR
 
     await Send.ResultMapperAsync(
       result,
-      async (data, ct) =>
+      async (articles, ct) =>
       {
         var articleDtos = new List<Server.Core.ArticleAggregate.Dtos.ArticleDto>();
-        foreach (var article in data.Articles)
+        foreach (var article in articles)
         {
           var response = await Map.FromEntityAsync(article, ct);
           articleDtos.Add(response.Article);
         }
 
-        return new ArticlesResponse(articleDtos, data.TotalCount);
+        return new ArticlesResponse(articleDtos, articleDtos.Count);
       },
       cancellationToken);
   }
