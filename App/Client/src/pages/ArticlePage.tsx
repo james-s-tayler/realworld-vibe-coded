@@ -9,6 +9,7 @@ import { profilesApi } from '../api/profiles';
 import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
 import type { Comment } from '../types/comment';
+import { DEFAULT_PROFILE_IMAGE } from '../constants';
 import './ArticlePage.css';
 
 export const ArticlePage: React.FC = () => {
@@ -146,7 +147,7 @@ export const ArticlePage: React.FC = () => {
           <h1>{article.title}</h1>
           <div className="article-meta">
             <Link to={`/profile/${article.author.username}`} className="author-info">
-              <img src={article.author.image || '/default-avatar.png'} alt={article.author.username} />
+              <img src={article.author.image || DEFAULT_PROFILE_IMAGE} alt={article.author.username} />
               <div className="info">
                 <span className="author">{article.author.username}</span>
                 <span className="date">{new Date(article.createdAt).toLocaleDateString()}</span>
@@ -230,7 +231,7 @@ export const ArticlePage: React.FC = () => {
                 </div>
                 <div className="card-footer">
                   <img
-                    src={user.image || '/default-avatar.png'}
+                    src={user.image || DEFAULT_PROFILE_IMAGE}
                     alt={user.username}
                     className="comment-author-img"
                   />
@@ -258,7 +259,7 @@ export const ArticlePage: React.FC = () => {
                 <div className="card-footer">
                   <Link to={`/profile/${comment.author.username}`} className="comment-author">
                     <img
-                      src={comment.author.image || '/default-avatar.png'}
+                      src={comment.author.image || DEFAULT_PROFILE_IMAGE}
                       alt={comment.author.username}
                       className="comment-author-img"
                     />

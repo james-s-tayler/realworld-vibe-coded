@@ -3,9 +3,8 @@ import { Link } from 'react-router';
 import { Tag, Button } from '@carbon/react';
 import { FavoriteFilled, Favorite } from '@carbon/icons-react';
 import type { Article } from '../types/article';
+import { DEFAULT_PROFILE_IMAGE } from '../constants';
 import './ArticlePreview.css';
-
-const DEFAULT_PROFILE_IMAGE = 'https://placehold.co/200';
 
 interface ArticlePreviewProps {
   article: Article;

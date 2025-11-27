@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { ArticlePreview } from './ArticlePreview';
 import { AuthContext } from '../context/AuthContext';
+import { DEFAULT_PROFILE_IMAGE } from '../constants';
 
 const mockArticle = {
   slug: 'test-article',
@@ -74,6 +75,6 @@ describe('ArticlePreview', () => {
     };
     renderWithRouter(<ArticlePreview article={articleWithNoImage} />);
     const img = screen.getByAltText('testuser');
-    expect(img).toHaveAttribute('src', 'https://placehold.co/200');
+    expect(img).toHaveAttribute('src', DEFAULT_PROFILE_IMAGE);
   });
 });
