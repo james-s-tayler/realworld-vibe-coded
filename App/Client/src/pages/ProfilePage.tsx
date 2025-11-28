@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
-import { Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, InlineNotification } from '@carbon/react';
+import { Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, InlineNotification, Pagination } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
 import { useAuth } from '../hooks/useAuth';
 import { profilesApi } from '../api/profiles';
@@ -12,11 +12,17 @@ import type { Article } from '../types/article';
 import { DEFAULT_PROFILE_IMAGE } from '../constants';
 import './ProfilePage.css';
 
+const DEFAULT_PAGE_SIZE = 20;
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
+
 export const ProfilePage: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
+  const [articlesCount, setArticlesCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [articlesLoading, setArticlesLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -45,17 +51,19 @@ export const ProfilePage: React.FC = () => {
     if (!username) return;
     setArticlesLoading(true);
     try {
+      const offset = (currentPage - 1) * pageSize;
       const params = activeTab === 0
-        ? { author: username }
-        : { favorited: username };
+        ? { author: username, limit: pageSize, offset }
+        : { favorited: username, limit: pageSize, offset };
       const response = await articlesApi.listArticles(params);
       setArticles(response.articles);
+      setArticlesCount(response.articlesCount);
     } catch (error) {
       console.error('Failed to load articles:', error);
     } finally {
       setArticlesLoading(false);
     }
-  }, [username, activeTab]);
+  }, [username, activeTab, currentPage, pageSize]);
 
   useEffect(() => {
     loadProfile();
@@ -64,6 +72,20 @@ export const ProfilePage: React.FC = () => {
   useEffect(() => {
     loadArticles();
   }, [loadArticles]);
+
+  const handleTabChange = (evt: { selectedIndex: number }) => {
+    setActiveTab(evt.selectedIndex);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (evt: { page: number; pageSize: number }) => {
+    if (evt.pageSize !== pageSize) {
+      setPageSize(evt.pageSize);
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(evt.page);
+    }
+  };
 
   const handleFollow = async () => {
     if (!profile) return;
@@ -166,7 +188,7 @@ export const ProfilePage: React.FC = () => {
       <div className="container">
         <div className="row">
           <div className="col-xs-12 col-md-10 offset-md-1">
-            <Tabs selectedIndex={activeTab} onChange={(evt) => setActiveTab(evt.selectedIndex)}>
+            <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
               <TabList aria-label="Profile tabs">
                 <Tab>My Articles</Tab>
                 <Tab>Favorited Articles</Tab>
@@ -179,6 +201,15 @@ export const ProfilePage: React.FC = () => {
                     onFavorite={handleFavorite}
                     onUnfavorite={handleUnfavorite}
                   />
+                  {articlesCount > pageSize && (
+                    <Pagination
+                      page={currentPage}
+                      pageSize={pageSize}
+                      pageSizes={PAGE_SIZE_OPTIONS}
+                      totalItems={articlesCount}
+                      onChange={handlePageChange}
+                    />
+                  )}
                 </TabPanel>
                 <TabPanel>
                   <ArticleList
@@ -187,6 +218,15 @@ export const ProfilePage: React.FC = () => {
                     onFavorite={handleFavorite}
                     onUnfavorite={handleUnfavorite}
                   />
+                  {articlesCount > pageSize && (
+                    <Pagination
+                      page={currentPage}
+                      pageSize={pageSize}
+                      pageSizes={PAGE_SIZE_OPTIONS}
+                      totalItems={articlesCount}
+                      onChange={handlePageChange}
+                    />
+                  )}
                 </TabPanel>
               </TabPanels>
             </Tabs>

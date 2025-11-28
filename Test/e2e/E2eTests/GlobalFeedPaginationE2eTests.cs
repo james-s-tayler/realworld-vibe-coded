@@ -44,16 +44,12 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
       var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var articlePreviews = visiblePanel.Locator(".article-preview");
 
-      // Wait for at least 20 articles to be loaded (first page should show 20)
+      // Wait for articles to be loaded (first page should show 20 by default)
       await Expect(articlePreviews).ToHaveCountAsync(20, new() { Timeout = DefaultTimeout });
 
       // Verify pagination control is visible (should appear when there are > 20 articles)
       var pagination = Page.Locator(".cds--pagination");
       await Expect(pagination).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
-
-      // Get the initial page number display
-      var pageStatus = Page.Locator(".cds--pagination__text").First;
-      var initialPageText = await pageStatus.TextContentAsync();
 
       // Click forward button to go to page 2
       var forwardButton = Page.Locator(".cds--pagination__button--forward");
@@ -63,24 +59,22 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
       // Wait for page content to change by waiting for articles to reload
       await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
-      // Verify we moved to a different page (page status text should change)
-      await Expect(pageStatus).Not.ToHaveTextAsync(initialPageText ?? string.Empty, new() { Timeout = DefaultTimeout });
-
-      // Click forward again to page 3
+      // Click forward again to page 3 (should show remaining 10 articles)
       await forwardButton.ClickAsync();
       await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+      await Expect(articlePreviews).ToHaveCountAsync(10, new() { Timeout = DefaultTimeout });
 
       // Now navigate backward
       var backwardButton = Page.Locator(".cds--pagination__button--backward");
       await Expect(backwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
       await backwardButton.ClickAsync();
 
-      // Wait for page content to change
-      await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+      // Wait for page content to change - should be back to 20 articles
+      await Expect(articlePreviews).ToHaveCountAsync(20, new() { Timeout = DefaultTimeout });
 
       // Navigate back to first page
       await backwardButton.ClickAsync();
-      await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+      await Expect(articlePreviews).ToHaveCountAsync(20, new() { Timeout = DefaultTimeout });
 
       // Verify backward button is disabled on first page
       await Expect(backwardButton).ToBeDisabledAsync(new() { Timeout = DefaultTimeout });

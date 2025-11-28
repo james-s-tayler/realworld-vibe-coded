@@ -9,7 +9,8 @@ import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
 import './HomePage.css';
 
-const PAGE_SIZE = 20;
+const DEFAULT_PAGE_SIZE = 20;
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 export const HomePage: React.FC = () => {
   const { user } = useAuth();
@@ -22,6 +23,7 @@ export const HomePage: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   const loadTags = useCallback(async () => {
     setTagsLoading(true);
@@ -40,16 +42,16 @@ export const HomePage: React.FC = () => {
     setError(null);
     try {
       let response;
-      const offset = (currentPage - 1) * PAGE_SIZE;
+      const offset = (currentPage - 1) * pageSize;
       if (activeTab === 0 && user) {
         // Your Feed
-        response = await articlesApi.getFeed(PAGE_SIZE, offset);
+        response = await articlesApi.getFeed(pageSize, offset);
       } else if (selectedTag) {
         // Articles by Tag
-        response = await articlesApi.listArticles({ tag: selectedTag, limit: PAGE_SIZE, offset });
+        response = await articlesApi.listArticles({ tag: selectedTag, limit: pageSize, offset });
       } else {
         // Global Feed
-        response = await articlesApi.listArticles({ limit: PAGE_SIZE, offset });
+        response = await articlesApi.listArticles({ limit: pageSize, offset });
       }
       setArticles(response.articles);
       setArticlesCount(response.articlesCount);
@@ -63,7 +65,7 @@ export const HomePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [activeTab, selectedTag, user, currentPage]);
+  }, [activeTab, selectedTag, user, currentPage, pageSize]);
 
   useEffect(() => {
     loadTags();
@@ -103,8 +105,13 @@ export const HomePage: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const handlePageChange = ({ page }: { page: number }) => {
-    setCurrentPage(page);
+  const handlePageChange = ({ page, pageSize: newPageSize }: { page: number; pageSize: number }) => {
+    if (newPageSize !== pageSize) {
+      setPageSize(newPageSize);
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(page);
+    }
   };
 
   return (
@@ -143,11 +150,11 @@ export const HomePage: React.FC = () => {
                       onFavorite={handleFavorite}
                       onUnfavorite={handleUnfavorite}
                     />
-                    {articlesCount > PAGE_SIZE && (
+                    {articlesCount > pageSize && (
                       <Pagination
                         page={currentPage}
-                        pageSize={PAGE_SIZE}
-                        pageSizes={[PAGE_SIZE]}
+                        pageSize={pageSize}
+                        pageSizes={PAGE_SIZE_OPTIONS}
                         totalItems={articlesCount}
                         onChange={handlePageChange}
                       />
@@ -161,11 +168,11 @@ export const HomePage: React.FC = () => {
                     onFavorite={handleFavorite}
                     onUnfavorite={handleUnfavorite}
                   />
-                  {articlesCount > PAGE_SIZE && (
+                  {articlesCount > pageSize && (
                     <Pagination
                       page={currentPage}
-                      pageSize={PAGE_SIZE}
-                      pageSizes={[PAGE_SIZE]}
+                      pageSize={pageSize}
+                      pageSizes={PAGE_SIZE_OPTIONS}
                       totalItems={articlesCount}
                       onChange={handlePageChange}
                     />
@@ -179,11 +186,11 @@ export const HomePage: React.FC = () => {
                       onFavorite={handleFavorite}
                       onUnfavorite={handleUnfavorite}
                     />
-                    {articlesCount > PAGE_SIZE && (
+                    {articlesCount > pageSize && (
                       <Pagination
                         page={currentPage}
-                        pageSize={PAGE_SIZE}
-                        pageSizes={[PAGE_SIZE]}
+                        pageSize={pageSize}
+                        pageSizes={PAGE_SIZE_OPTIONS}
                         totalItems={articlesCount}
                         onChange={handlePageChange}
                       />
