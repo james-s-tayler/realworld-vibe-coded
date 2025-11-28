@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, InlineNotification } from '@carbon/react';
+import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, InlineNotification, Pagination } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
 import { articlesApi } from '../api/articles';
 import { tagsApi } from '../api/tags';
@@ -9,15 +9,19 @@ import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
 import './HomePage.css';
 
+const PAGE_SIZE = 20;
+
 export const HomePage: React.FC = () => {
   const { user } = useAuth();
   const [articles, setArticles] = useState<Article[]>([]);
+  const [articlesCount, setArticlesCount] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [tagsLoading, setTagsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const loadTags = useCallback(async () => {
     setTagsLoading(true);
@@ -36,17 +40,19 @@ export const HomePage: React.FC = () => {
     setError(null);
     try {
       let response;
+      const offset = (currentPage - 1) * PAGE_SIZE;
       if (activeTab === 0 && user) {
         // Your Feed
-        response = await articlesApi.getFeed();
+        response = await articlesApi.getFeed(PAGE_SIZE, offset);
       } else if (selectedTag) {
         // Articles by Tag
-        response = await articlesApi.listArticles({ tag: selectedTag });
+        response = await articlesApi.listArticles({ tag: selectedTag, limit: PAGE_SIZE, offset });
       } else {
         // Global Feed
-        response = await articlesApi.listArticles();
+        response = await articlesApi.listArticles({ limit: PAGE_SIZE, offset });
       }
       setArticles(response.articles);
+      setArticlesCount(response.articlesCount);
     } catch (error) {
       console.error('Failed to load articles:', error);
       if (error instanceof ApiError) {
@@ -57,7 +63,7 @@ export const HomePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [activeTab, selectedTag, user]);
+  }, [activeTab, selectedTag, user, currentPage]);
 
   useEffect(() => {
     loadTags();
@@ -88,11 +94,17 @@ export const HomePage: React.FC = () => {
   const handleTagClick = (tag: string) => {
     setSelectedTag(tag);
     setActiveTab(user ? 2 : 1);
+    setCurrentPage(1);
   };
 
   const handleTabChange = (evt: { selectedIndex: number }) => {
     setActiveTab(evt.selectedIndex);
     setSelectedTag(null);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = ({ page }: { page: number }) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -131,6 +143,15 @@ export const HomePage: React.FC = () => {
                       onFavorite={handleFavorite}
                       onUnfavorite={handleUnfavorite}
                     />
+                    {articlesCount > PAGE_SIZE && (
+                      <Pagination
+                        page={currentPage}
+                        pageSize={PAGE_SIZE}
+                        pageSizes={[PAGE_SIZE]}
+                        totalItems={articlesCount}
+                        onChange={handlePageChange}
+                      />
+                    )}
                   </TabPanel>
                 )}
                 <TabPanel>
@@ -140,6 +161,15 @@ export const HomePage: React.FC = () => {
                     onFavorite={handleFavorite}
                     onUnfavorite={handleUnfavorite}
                   />
+                  {articlesCount > PAGE_SIZE && (
+                    <Pagination
+                      page={currentPage}
+                      pageSize={PAGE_SIZE}
+                      pageSizes={[PAGE_SIZE]}
+                      totalItems={articlesCount}
+                      onChange={handlePageChange}
+                    />
+                  )}
                 </TabPanel>
                 {selectedTag && (
                   <TabPanel>
@@ -149,6 +179,15 @@ export const HomePage: React.FC = () => {
                       onFavorite={handleFavorite}
                       onUnfavorite={handleUnfavorite}
                     />
+                    {articlesCount > PAGE_SIZE && (
+                      <Pagination
+                        page={currentPage}
+                        pageSize={PAGE_SIZE}
+                        pageSizes={[PAGE_SIZE]}
+                        totalItems={articlesCount}
+                        onChange={handlePageChange}
+                      />
+                    )}
                   </TabPanel>
                 )}
               </TabPanels>
