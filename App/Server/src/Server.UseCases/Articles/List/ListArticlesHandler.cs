@@ -6,9 +6,9 @@ using Server.SharedKernel.Persistence;
 namespace Server.UseCases.Articles.List;
 
 public class ListArticlesHandler(IReadRepository<Article> articleRepository)
-  : IQueryHandler<ListArticlesQuery, IEnumerable<Article>>
+  : IQueryHandler<ListArticlesQuery, ListArticlesResult>
 {
-  public async Task<Result<IEnumerable<Article>>> Handle(ListArticlesQuery request, CancellationToken cancellationToken)
+  public async Task<Result<ListArticlesResult>> Handle(ListArticlesQuery request, CancellationToken cancellationToken)
   {
     var spec = new ListArticlesSpec(
       request.Tag,
@@ -19,6 +19,14 @@ public class ListArticlesHandler(IReadRepository<Article> articleRepository)
 
     var articles = await articleRepository.ListAsync(spec, cancellationToken);
 
-    return Result<IEnumerable<Article>>.Success(articles);
+    // Get total count without pagination
+    var countSpec = new CountArticlesSpec(
+      request.Tag,
+      request.Author,
+      request.Favorited);
+
+    var totalCount = await articleRepository.CountAsync(countSpec, cancellationToken);
+
+    return Result<ListArticlesResult>.Success(new ListArticlesResult(articles, totalCount));
   }
 }

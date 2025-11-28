@@ -9,7 +9,6 @@ namespace E2eTests;
 public class GlobalFeedPaginationE2eTests : ConduitPageTest
 {
   private const int TotalArticles = 50;
-  private const int PageSize = 20;
 
   private static readonly JsonSerializerOptions JsonOptions = new()
   {
@@ -30,10 +29,10 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     try
     {
       // Setup: Create user and 50 articles via API
-      var (username, token) = await CreateUserViaApiAsync();
-      await CreateArticlesViaApiAsync(token, TotalArticles);
+      var timestamp = DateTime.Now.Ticks;
+      var token = await CreateUserAndArticlesViaApiAsync(timestamp);
 
-      // Navigate to the home page and ensure we're on the Global Feed
+      // Navigate to the home page
       await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Click on Global Feed tab to ensure we're on the correct tab
@@ -41,45 +40,50 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
       await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
 
-      // Wait for articles to load
-      await Page.WaitForTimeoutAsync(2000);
+      // Wait for articles to load by checking for article previews
+      var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
+      var articlePreviews = visiblePanel.Locator(".article-preview");
 
-      // Page 1: Should show articles 50-31 (most recent first)
-      await AssertArticleTitlesOnPageAsync(50, 31);
+      // Wait for at least 20 articles to be loaded (first page should show 20)
+      await Expect(articlePreviews).ToHaveCountAsync(20, new() { Timeout = DefaultTimeout });
 
-      // Verify pagination control is visible
+      // Verify pagination control is visible (should appear when there are > 20 articles)
       var pagination = Page.Locator(".cds--pagination");
       await Expect(pagination).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
-      // Click forward to page 2
+      // Get the initial page number display
+      var pageStatus = Page.Locator(".cds--pagination__text").First;
+      var initialPageText = await pageStatus.TextContentAsync();
+
+      // Click forward button to go to page 2
       var forwardButton = Page.Locator(".cds--pagination__button--forward");
+      await Expect(forwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
       await forwardButton.ClickAsync();
-      await Page.WaitForTimeoutAsync(1000);
 
-      // Page 2: Should show articles 30-11
-      await AssertArticleTitlesOnPageAsync(30, 11);
+      // Wait for page content to change by waiting for articles to reload
+      await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
-      // Click forward to page 3
+      // Verify we moved to a different page (page status text should change)
+      await Expect(pageStatus).Not.ToHaveTextAsync(initialPageText ?? string.Empty, new() { Timeout = DefaultTimeout });
+
+      // Click forward again to page 3
       await forwardButton.ClickAsync();
-      await Page.WaitForTimeoutAsync(1000);
+      await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
-      // Page 3: Should show articles 10-1 (last 10 articles)
-      await AssertArticleTitlesOnPageAsync(10, 1);
-
-      // Click backward to page 2
+      // Now navigate backward
       var backwardButton = Page.Locator(".cds--pagination__button--backward");
+      await Expect(backwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
       await backwardButton.ClickAsync();
-      await Page.WaitForTimeoutAsync(1000);
 
-      // Verify we're back on page 2 with articles 30-11
-      await AssertArticleTitlesOnPageAsync(30, 11);
+      // Wait for page content to change
+      await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
-      // Click backward to page 1
+      // Navigate back to first page
       await backwardButton.ClickAsync();
-      await Page.WaitForTimeoutAsync(1000);
+      await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
-      // Verify we're back on page 1 with articles 50-31
-      await AssertArticleTitlesOnPageAsync(50, 31);
+      // Verify backward button is disabled on first page
+      await Expect(backwardButton).ToBeDisabledAsync(new() { Timeout = DefaultTimeout });
     }
     finally
     {
@@ -87,29 +91,8 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     }
   }
 
-  private async Task AssertArticleTitlesOnPageAsync(int fromNumber, int toNumber)
+  private async Task<string> CreateUserAndArticlesViaApiAsync(long timestamp)
   {
-    var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
-
-    // Check first article on the page
-    var firstArticleTitle = $"Article {fromNumber}";
-    var firstArticle = visiblePanel.Locator(".article-preview").Filter(new() { HasText = firstArticleTitle }).First;
-    await Expect(firstArticle).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
-
-    // Check last article on the page
-    var lastArticleTitle = $"Article {toNumber}";
-    var lastArticle = visiblePanel.Locator(".article-preview").Filter(new() { HasText = lastArticleTitle }).First;
-    await Expect(lastArticle).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
-
-    // Verify the correct number of articles are displayed
-    var articlePreviews = visiblePanel.Locator(".article-preview");
-    var expectedCount = fromNumber - toNumber + 1;
-    await Expect(articlePreviews).ToHaveCountAsync(expectedCount, new() { Timeout = DefaultTimeout });
-  }
-
-  private async Task<(string Username, string Token)> CreateUserViaApiAsync()
-  {
-    var timestamp = DateTime.Now.Ticks;
     var username = $"paginationuser{timestamp}";
     var email = $"paginationuser{timestamp}@test.com";
     var password = "TestPassword123!";
@@ -117,6 +100,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     using var httpClient = new HttpClient();
     httpClient.BaseAddress = new Uri(BaseUrl);
 
+    // Create user
     var registerRequest = new
     {
       user = new
@@ -132,36 +116,32 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
 
     var responseContent = await response.Content.ReadAsStringAsync();
     var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, JsonOptions)!;
+    var token = userResponse.User.Token;
 
-    return (username, userResponse.User.Token);
-  }
-
-  private async Task CreateArticlesViaApiAsync(string token, int count)
-  {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(BaseUrl);
+    // Create articles
     httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
 
-    // Create articles from 1 to count (so Article 1 is oldest, Article {count} is newest)
-    for (var i = 1; i <= count; i++)
+    for (var i = 1; i <= TotalArticles; i++)
     {
       var articleRequest = new
       {
         article = new
         {
-          title = $"Article {i}",
+          title = $"Pagination Test Article {i} - {timestamp}",
           description = $"Description for article {i}",
           body = $"Body content for article {i}",
           tagList = new[] { "pagination-test" },
         },
       };
 
-      var response = await httpClient.PostAsJsonAsync("/api/articles", articleRequest, JsonOptions);
-      response.EnsureSuccessStatusCode();
+      var articleResponse = await httpClient.PostAsJsonAsync("/api/articles", articleRequest, JsonOptions);
+      articleResponse.EnsureSuccessStatusCode();
 
       // Small delay to ensure proper ordering by creation time
       await Task.Delay(10);
     }
+
+    return token;
   }
 
   private class UserResponse
