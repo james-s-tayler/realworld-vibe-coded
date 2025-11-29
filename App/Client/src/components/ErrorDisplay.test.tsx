@@ -20,6 +20,16 @@ describe('ErrorDisplay', () => {
       expect(container.firstChild).toBeNull();
     });
 
+    it('renders nothing when error is an empty string', () => {
+      const { container } = render(<ErrorDisplay error="" />);
+      expect(container.firstChild).toBeNull();
+    });
+
+    it('renders nothing when error is an empty array', () => {
+      const { container } = render(<ErrorDisplay error={[]} />);
+      expect(container.firstChild).toBeNull();
+    });
+
     it('renders error notification when error is provided', () => {
       render(<ErrorDisplay error="Something went wrong" />);
       expect(screen.getByTestId('error-display')).toBeInTheDocument();

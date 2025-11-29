@@ -106,8 +106,12 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   style,
   errorType,
 }) => {
-  // Don't render if there's no error or show is false
-  if (!error || !show) {
+  // Don't render if there's no meaningful error content or show is false
+  const hasError = error && 
+    !(typeof error === 'string' && !error) && 
+    !(Array.isArray(error) && error.length === 0);
+  
+  if (!hasError || !show) {
     return null;
   }
 

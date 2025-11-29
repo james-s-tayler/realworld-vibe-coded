@@ -22,7 +22,7 @@ public class ValidationErrorE2eTests : ConduitPageTest
       await RegisterUser();
 
       // Create the first article
-      var timestamp = DateTime.Now.Ticks;
+      var timestamp = DateTime.UtcNow.Ticks;
       var articleTitle = $"Duplicate Test Article {timestamp}";
 
       await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
@@ -73,7 +73,7 @@ public class ValidationErrorE2eTests : ConduitPageTest
     try
     {
       // Register the first user
-      var timestamp = DateTime.Now.Ticks;
+      var timestamp = DateTime.UtcNow.Ticks;
       var email = $"duplicate{timestamp}@test.com";
       var username1 = $"user1_{timestamp}";
       var username2 = $"user2_{timestamp}";
