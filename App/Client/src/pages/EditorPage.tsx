@@ -5,12 +5,12 @@ import {
   TextInput,
   TextArea,
   Button,
-  InlineNotification,
   Stack,
   Tag,
 } from '@carbon/react';
 import { articlesApi } from '../api/articles';
 import { ApiError } from '../api/client';
+import { ErrorDisplay } from '../components/ErrorDisplay';
 import './EditorPage.css';
 
 export const EditorPage: React.FC = () => {
@@ -21,7 +21,7 @@ export const EditorPage: React.FC = () => {
   const [body, setBody] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingArticle, setLoadingArticle] = useState(false);
 
@@ -35,9 +35,15 @@ export const EditorPage: React.FC = () => {
       setDescription(article.description);
       setBody(article.body);
       setTags(article.tagList);
-    } catch (error) {
-      console.error('Failed to load article:', error);
-      setError('Failed to load article for editing');
+    } catch (err) {
+      console.error('Failed to load article:', err);
+      if (err instanceof ApiError) {
+        setError(err);
+      } else if (err instanceof Error) {
+        setError(err);
+      } else {
+        setError(new Error('Failed to load article for editing'));
+      }
     } finally {
       setLoadingArticle(false);
     }
@@ -88,9 +94,11 @@ export const EditorPage: React.FC = () => {
       navigate(`/article/${response.article.slug}`);
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
+        setError(err);
+      } else if (err instanceof Error) {
+        setError(err);
       } else {
-        setError('An unexpected error occurred');
+        setError(new Error('An unexpected error occurred'));
       }
     } finally {
       setLoading(false);
@@ -104,15 +112,10 @@ export const EditorPage: React.FC = () => {
           <div className="col-md-10 offset-md-1 col-xs-12">
             <h1 className="text-xs-center">{slug ? 'Edit Article' : 'New Article'}</h1>
 
-            {error && (
-              <InlineNotification
-                kind="error"
-                title="Error"
-                subtitle={error}
-                onCloseButtonClick={() => setError(null)}
-                style={{ marginBottom: '1rem' }}
-              />
-            )}
+            <ErrorDisplay
+              error={error}
+              onClose={() => setError(null)}
+            />
 
             {loadingArticle ? (
               <p>Loading article...</p>

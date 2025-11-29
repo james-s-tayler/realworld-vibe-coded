@@ -4,11 +4,11 @@ import {
   Form,
   TextInput,
   Button,
-  InlineNotification,
   Stack,
 } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
 import { ApiError } from '../api/client';
+import { ErrorDisplay } from '../components/ErrorDisplay';
 import './AuthPages.css';
 
 export const LoginPage: React.FC = () => {
@@ -16,7 +16,7 @@ export const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | Error | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,9 +29,11 @@ export const LoginPage: React.FC = () => {
       navigate('/');
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
+        setError(err);
+      } else if (err instanceof Error) {
+        setError(err);
       } else {
-        setError('An unexpected error occurred');
+        setError(new Error('An unexpected error occurred'));
       }
     } finally {
       setLoading(false);
@@ -48,15 +50,11 @@ export const LoginPage: React.FC = () => {
               <Link to="/register">Need an account?</Link>
             </p>
 
-            {error && (
-              <InlineNotification
-                kind="error"
-                title="Login Failed"
-                subtitle={error}
-                onCloseButtonClick={() => setError(null)}
-                style={{ marginBottom: '1rem' }}
-              />
-            )}
+            <ErrorDisplay
+              error={error}
+              title="Login Failed"
+              onClose={() => setError(null)}
+            />
 
             <Form onSubmit={handleSubmit}>
               <Stack gap={6}>

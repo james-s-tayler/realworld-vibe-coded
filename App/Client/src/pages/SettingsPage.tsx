@@ -10,6 +10,7 @@ import {
 } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
 import { ApiError } from '../api/client';
+import { ErrorDisplay } from '../components/ErrorDisplay';
 import './SettingsPage.css';
 
 export const SettingsPage: React.FC = () => {
@@ -20,7 +21,7 @@ export const SettingsPage: React.FC = () => {
   const [bio, setBio] = useState('');
   const [image, setImage] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | Error | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -59,9 +60,11 @@ export const SettingsPage: React.FC = () => {
       setPassword('');
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
+        setError(err);
+      } else if (err instanceof Error) {
+        setError(err);
       } else {
-        setError('An unexpected error occurred');
+        setError(new Error('An unexpected error occurred'));
       }
     } finally {
       setLoading(false);
@@ -84,15 +87,11 @@ export const SettingsPage: React.FC = () => {
           <div className="col-md-6 offset-md-3 col-xs-12">
             <h1 className="text-xs-center">Your Settings</h1>
 
-            {error && (
-              <InlineNotification
-                kind="error"
-                title="Update Failed"
-                subtitle={error}
-                onCloseButtonClick={() => setError(null)}
-                style={{ marginBottom: '1rem' }}
-              />
-            )}
+            <ErrorDisplay
+              error={error}
+              title="Update Failed"
+              onClose={() => setError(null)}
+            />
 
             {success && (
               <InlineNotification
