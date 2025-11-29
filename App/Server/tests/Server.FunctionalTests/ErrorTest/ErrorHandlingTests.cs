@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Server.Web.DevOnly.Configuration;
 using Server.Web.DevOnly.Endpoints;
+using Server.Web.DevOnly.UseCases;
 
 namespace Server.FunctionalTests.ErrorTest;
 
@@ -42,10 +43,10 @@ public class ErrorHandlingTests(ErrorTestFixture app)
   }
 
   [Fact]
-  public async Task NestedException_IncludesAllInnerExceptionMessages()
+  public async Task NestedExceptionFromEndpoint_IncludesAllInnerExceptionMessages()
   {
     // Arrange & Act
-    var route = $"/{DevOnly.ROUTE}/{TestError.ROUTE}/throw-nested-exception";
+    var route = $"/{DevOnly.ROUTE}/{TestError.ROUTE}/throw-nested-exception-from-endpoint";
 
     // SRV007: Using raw HttpClient.GetAsync is necessary here to test nested exception endpoint
     // that is specifically designed for error handling tests and doesn't have typed request/response DTOs.
@@ -68,15 +69,53 @@ public class ErrorHandlingTests(ErrorTestFixture app)
     // Verify outermost exception (first in the list)
     // Note: exception type names are converted to camelCase in the response
     endpointError.Errors.ElementAt(0).Name.ShouldBe("exception");
-    endpointError.Errors.ElementAt(0).Reason.ShouldBe(ThrowNestedException.OuterExceptionMessage);
+    endpointError.Errors.ElementAt(0).Reason.ShouldBe(ThrowNestedExceptionFromEndpoint.OuterExceptionMessage);
 
     // Verify middle exception (second in the list)
     endpointError.Errors.ElementAt(1).Name.ShouldBe("applicationException");
-    endpointError.Errors.ElementAt(1).Reason.ShouldBe(ThrowNestedException.MiddleExceptionMessage);
+    endpointError.Errors.ElementAt(1).Reason.ShouldBe(ThrowNestedExceptionFromEndpoint.MiddleExceptionMessage);
 
     // Verify innermost exception (third in the list)
     endpointError.Errors.ElementAt(2).Name.ShouldBe("invalidOperationException");
-    endpointError.Errors.ElementAt(2).Reason.ShouldBe(ThrowNestedException.InnerMostExceptionMessage);
+    endpointError.Errors.ElementAt(2).Reason.ShouldBe(ThrowNestedExceptionFromEndpoint.InnerMostExceptionMessage);
+  }
+
+  [Fact]
+  public async Task NestedExceptionFromUseCase_IncludesAllInnerExceptionMessages()
+  {
+    // Arrange & Act
+    var route = $"/{DevOnly.ROUTE}/{TestError.ROUTE}/throw-nested-exception-from-usecase";
+
+    // SRV007: Using raw HttpClient.GetAsync is necessary here to test nested exception endpoint
+    // that is specifically designed for error handling tests and doesn't have typed request/response DTOs.
+#pragma warning disable SRV007
+    var endpointResponse = await app.Client.GetAsync(route, TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
+
+    // Assert - Should return 500 with all nested exception messages
+    var endpointContent = await endpointResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+    var endpointError = JsonSerializer.Deserialize<ProblemDetails>(endpointContent, options);
+
+    endpointError.ShouldNotBeNull();
+    endpointError.Status.ShouldBe(500);
+
+    // Should have exactly 3 errors - one for each level of the nested exception
+    endpointError.Errors.Count().ShouldBe(3);
+
+    // Verify outermost exception (first in the list)
+    // Note: exception type names are converted to camelCase in the response
+    endpointError.Errors.ElementAt(0).Name.ShouldBe("exception");
+    endpointError.Errors.ElementAt(0).Reason.ShouldBe(ThrowNestedExceptionFromUseCaseHandler.OuterExceptionMessage);
+
+    // Verify middle exception (second in the list)
+    endpointError.Errors.ElementAt(1).Name.ShouldBe("applicationException");
+    endpointError.Errors.ElementAt(1).Reason.ShouldBe(ThrowNestedExceptionFromUseCaseHandler.MiddleExceptionMessage);
+
+    // Verify innermost exception (third in the list)
+    endpointError.Errors.ElementAt(2).Name.ShouldBe("invalidOperationException");
+    endpointError.Errors.ElementAt(2).Reason.ShouldBe(ThrowNestedExceptionFromUseCaseHandler.InnerMostExceptionMessage);
   }
 
   [InlineData($"/{DevOnly.ROUTE}/{TestError.ROUTE}/validation-error-validator", 400, 0, "serializerErrors", "The JSON value could not be converted to Server.Web.DevOnly.Endpoints.TestValidationRequest. Path: $ | LineNumber: 0 | BytePositionInLine: 3.")]

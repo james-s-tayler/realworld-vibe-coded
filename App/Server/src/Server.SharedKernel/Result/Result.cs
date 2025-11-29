@@ -237,7 +237,7 @@ public class Result<T>
 
   /// <summary>
   /// Represents a situation where a service is in conflict due to the current state of a resource.
-  /// Creates a conflict result from an exception.
+  /// Creates a conflict result from an exception, including all inner exceptions in the chain.
   /// See also HTTP 409 Conflict: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
   /// </summary>
   /// <param name="exception">The exception that occurred</param>
@@ -245,7 +245,7 @@ public class Result<T>
   public static Result<T> Conflict(Exception exception) =>
     new(ResultStatus.Conflict)
     {
-      ErrorDetails = [new ErrorDetail(exception.GetType().Name, exception.Message)],
+      ErrorDetails = UnwrapExceptions(exception),
     };
 
   /// <summary>
@@ -271,7 +271,7 @@ public class Result<T>
   /// <summary>
   /// Represents a critical error that occurred during the execution of the service.
   /// Everything provided by the user was valid, but the service was unable to complete due to an exception.
-  /// Creates a critical error result from an exception.
+  /// Creates a critical error result from an exception, including all inner exceptions in the chain.
   /// See also HTTP 500 Internal Server Error: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_server_errors
   /// </summary>
   /// <param name="exception">The exception that occurred</param>
@@ -279,7 +279,7 @@ public class Result<T>
   public static Result<T> CriticalError(Exception exception) =>
     new(ResultStatus.CriticalError)
     {
-      ErrorDetails = [new ErrorDetail(exception.GetType().Name, exception.Message)],
+      ErrorDetails = UnwrapExceptions(exception),
     };
 
   /// <summary>
@@ -313,4 +313,24 @@ public class Result<T>
   /// <returns>A Result<typeparamref name="T"/></returns>
   private static Result<T> NotFound(params ErrorDetail[] errorDetails) =>
     new(ResultStatus.NotFound) { ErrorDetails = errorDetails };
+
+  /// <summary>
+  /// Recursively unwraps exceptions and inner exceptions to create a list of error details
+  /// containing the full exception chain.
+  /// </summary>
+  /// <param name="exception">The root exception to unwrap.</param>
+  /// <returns>A list of error details representing the entire exception chain.</returns>
+  private static List<ErrorDetail> UnwrapExceptions(Exception exception)
+  {
+    var errors = new List<ErrorDetail>();
+    var currentException = exception;
+
+    while (currentException != null)
+    {
+      errors.Add(new ErrorDetail(currentException.GetType().Name, currentException.Message));
+      currentException = currentException.InnerException;
+    }
+
+    return errors;
+  }
 }
