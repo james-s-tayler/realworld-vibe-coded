@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router';
 import { Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, InlineNotification, Pagination } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
 import { useAuth } from '../hooks/useAuth';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 import { profilesApi } from '../api/profiles';
 import { articlesApi } from '../api/articles';
 import { ArticleList } from '../components/ArticleList';
@@ -18,6 +19,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 export const ProfilePage: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
+  const { requireAuth } = useRequireAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesCount, setArticlesCount] = useState(0);
@@ -90,10 +92,13 @@ export const ProfilePage: React.FC = () => {
   const handleFollow = async () => {
     if (!profile) return;
     try {
-      const response = profile.following
-        ? await profilesApi.unfollowUser(profile.username)
-        : await profilesApi.followUser(profile.username);
-      setProfile(response.profile);
+      await requireAuth(async () => {
+        const response = profile.following
+          ? await profilesApi.unfollowUser(profile.username)
+          : await profilesApi.followUser(profile.username);
+        setProfile(response.profile);
+        return response;
+      });
     } catch (error) {
       console.error('Failed to follow/unfollow:', error);
     }
@@ -101,8 +106,11 @@ export const ProfilePage: React.FC = () => {
 
   const handleFavorite = async (slug: string) => {
     try {
-      const response = await articlesApi.favoriteArticle(slug);
-      setArticles(articles.map(a => a.slug === slug ? response.article : a));
+      await requireAuth(async () => {
+        const response = await articlesApi.favoriteArticle(slug);
+        setArticles(articles.map(a => a.slug === slug ? response.article : a));
+        return response;
+      });
     } catch (error) {
       console.error('Failed to favorite article:', error);
     }
@@ -110,8 +118,11 @@ export const ProfilePage: React.FC = () => {
 
   const handleUnfavorite = async (slug: string) => {
     try {
-      const response = await articlesApi.unfavoriteArticle(slug);
-      setArticles(articles.map(a => a.slug === slug ? response.article : a));
+      await requireAuth(async () => {
+        const response = await articlesApi.unfavoriteArticle(slug);
+        setArticles(articles.map(a => a.slug === slug ? response.article : a));
+        return response;
+      });
     } catch (error) {
       console.error('Failed to unfavorite article:', error);
     }
