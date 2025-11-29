@@ -85,16 +85,166 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     }
   }
 
+  [Fact]
+  public async Task YourFeed_DisplaysPaginationAndNavigatesCorrectly()
+  {
+    await Context.Tracing.StartAsync(new()
+    {
+      Title = "Your Feed Pagination Test",
+      Screenshots = true,
+      Snapshots = true,
+      Sources = true,
+    });
+
+    try
+    {
+      // Setup: Create two users and have user2 follow user1
+      var timestamp = DateTime.Now.Ticks;
+      var (user1Token, user1Username) = await CreateUserViaApiAsync(timestamp, "feeduser1");
+      var (user2Token, user2Username) = await CreateUserViaApiAsync(timestamp, "feeduser2");
+
+      // User1 creates 50 articles
+      await CreateArticlesForUserAsync(user1Token, TotalArticles, timestamp);
+
+      // User2 follows user1
+      await FollowUserAsync(user2Token, user1Username);
+
+      // Navigate to home page and login as user2
+      await Page.GotoAsync($"{BaseUrl}/login", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+
+      // Login as user2
+      await Page.GetByLabel("Email").FillAsync($"feeduser2{timestamp}@test.com");
+      await Page.GetByLabel("Password").FillAsync("TestPassword123!");
+      await Page.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
+
+      // Wait for redirect to home page
+      await Expect(Page).ToHaveURLAsync(BaseUrl + "/", new() { Timeout = DefaultTimeout });
+
+      // Your Feed should be the first tab for authenticated users
+      var yourFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Your Feed" });
+      await yourFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
+      await yourFeedTab.ClickAsync();
+
+      // Wait for articles to load - scope to the active tabpanel
+      var yourFeedPanel = Page.Locator("[role='tabpanel']").First;
+      var articlePreviews = yourFeedPanel.Locator(".article-preview");
+
+      // Wait for articles to be loaded (first page should show 20 by default)
+      await Expect(articlePreviews).ToHaveCountAsync(20, new() { Timeout = DefaultTimeout });
+
+      // Verify pagination control is visible within the Your Feed panel
+      var pagination = yourFeedPanel.Locator(".cds--pagination");
+      await Expect(pagination).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
+      // Click forward button to go to page 2
+      var forwardButton = yourFeedPanel.Locator(".cds--pagination__button--forward");
+      await Expect(forwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
+      await forwardButton.ClickAsync();
+
+      // Wait for page content to change
+      await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
+      // Click forward again to page 3 (should show remaining 10 articles)
+      await forwardButton.ClickAsync();
+      await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+      await Expect(articlePreviews).ToHaveCountAsync(10, new() { Timeout = DefaultTimeout });
+
+      // Navigate backward
+      var backwardButton = yourFeedPanel.Locator(".cds--pagination__button--backward");
+      await Expect(backwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
+      await backwardButton.ClickAsync();
+
+      // Wait for page content to change - should be back to 20 articles
+      await Expect(articlePreviews).ToHaveCountAsync(20, new() { Timeout = DefaultTimeout });
+
+      // Verify backward button is enabled on page 2
+      await Expect(backwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
+    }
+    finally
+    {
+      await SaveTrace("your_feed_pagination_test");
+    }
+  }
+
+  [Fact]
+  public async Task ProfilePage_MyArticles_DisplaysPaginationAndNavigatesCorrectly()
+  {
+    await Context.Tracing.StartAsync(new()
+    {
+      Title = "Profile Page My Articles Pagination Test",
+      Screenshots = true,
+      Snapshots = true,
+      Sources = true,
+    });
+
+    try
+    {
+      // Setup: Create user and 50 articles
+      var timestamp = DateTime.Now.Ticks;
+      var (token, username) = await CreateUserViaApiAsync(timestamp, "profileuser");
+      await CreateArticlesForUserAsync(token, TotalArticles, timestamp);
+
+      // Navigate to profile page
+      await Page.GotoAsync($"{BaseUrl}/profile/{username}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+
+      // Wait for My Articles tab to be visible
+      var myArticlesTab = Page.GetByRole(AriaRole.Tab, new() { Name = "My Articles" });
+      await myArticlesTab.WaitForAsync(new() { Timeout = DefaultTimeout });
+
+      // Scope to the active tabpanel for My Articles
+      var myArticlesPanel = Page.Locator("[role='tabpanel']").First;
+      var articlePreviews = myArticlesPanel.Locator(".article-preview");
+
+      // Wait for articles to load
+      await Expect(articlePreviews).ToHaveCountAsync(20, new() { Timeout = DefaultTimeout });
+
+      // Verify pagination control is visible
+      var pagination = myArticlesPanel.Locator(".cds--pagination");
+      await Expect(pagination).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
+      // Click forward button to go to page 2
+      var forwardButton = myArticlesPanel.Locator(".cds--pagination__button--forward");
+      await Expect(forwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
+      await forwardButton.ClickAsync();
+
+      // Wait for page content to change
+      await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
+      // Click forward again to page 3 (should show remaining 10 articles)
+      await forwardButton.ClickAsync();
+      await Expect(articlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+      await Expect(articlePreviews).ToHaveCountAsync(10, new() { Timeout = DefaultTimeout });
+
+      // Navigate backward
+      var backwardButton = myArticlesPanel.Locator(".cds--pagination__button--backward");
+      await Expect(backwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
+      await backwardButton.ClickAsync();
+
+      // Wait for page content to change - should be back to 20 articles
+      await Expect(articlePreviews).ToHaveCountAsync(20, new() { Timeout = DefaultTimeout });
+    }
+    finally
+    {
+      await SaveTrace("profile_my_articles_pagination_test");
+    }
+  }
+
   private async Task<string> CreateUserAndArticlesViaApiAsync(long timestamp)
   {
-    var username = $"paginationuser{timestamp}";
-    var email = $"paginationuser{timestamp}@test.com";
+    var (token, _) = await CreateUserViaApiAsync(timestamp, "paginationuser");
+    await CreateArticlesForUserAsync(token, TotalArticles, timestamp);
+    return token;
+  }
+
+  private async Task<(string Token, string Username)> CreateUserViaApiAsync(long timestamp, string usernamePrefix)
+  {
+    var username = $"{usernamePrefix}{timestamp}";
+    var email = $"{usernamePrefix}{timestamp}@test.com";
     var password = "TestPassword123!";
 
     using var httpClient = new HttpClient();
     httpClient.BaseAddress = new Uri(BaseUrl);
 
-    // Create user
     var registerRequest = new
     {
       user = new
@@ -110,12 +260,16 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
 
     var responseContent = await response.Content.ReadAsStringAsync();
     var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, JsonOptions)!;
-    var token = userResponse.User.Token;
+    return (userResponse.User.Token, username);
+  }
 
-    // Create articles
+  private async Task CreateArticlesForUserAsync(string token, int count, long timestamp)
+  {
+    using var httpClient = new HttpClient();
+    httpClient.BaseAddress = new Uri(BaseUrl);
     httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
 
-    for (var i = 1; i <= TotalArticles; i++)
+    for (var i = 1; i <= count; i++)
     {
       var articleRequest = new
       {
@@ -134,8 +288,16 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
       // Small delay to ensure proper ordering by creation time
       await Task.Delay(10);
     }
+  }
 
-    return token;
+  private async Task FollowUserAsync(string followerToken, string usernameToFollow)
+  {
+    using var httpClient = new HttpClient();
+    httpClient.BaseAddress = new Uri(BaseUrl);
+    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {followerToken}");
+
+    var response = await httpClient.PostAsync($"/api/profiles/{usernameToFollow}/follow", null);
+    response.EnsureSuccessStatusCode();
   }
 
   private class UserResponse
