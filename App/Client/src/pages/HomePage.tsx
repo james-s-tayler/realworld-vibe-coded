@@ -137,14 +137,14 @@ export const HomePage: React.FC = () => {
                 onCloseButtonClick={() => setError(null)}
               />
             )}
-            <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
-              <TabList aria-label="Article feeds">
-                {user && <Tab>Your Feed</Tab>}
-                <Tab>Global Feed</Tab>
-                {selectedTag && <Tab>#{selectedTag}</Tab>}
-              </TabList>
-              <TabPanels>
-                {user && (
+            {user ? (
+              <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
+                <TabList aria-label="Article feeds">
+                  <Tab>Your Feed</Tab>
+                  <Tab>Global Feed</Tab>
+                  {selectedTag && <Tab>#{selectedTag}</Tab>}
+                </TabList>
+                <TabPanels>
                   <TabPanel>
                     <ArticleList
                       articles={articles}
@@ -162,25 +162,51 @@ export const HomePage: React.FC = () => {
                       />
                     )}
                   </TabPanel>
-                )}
-                <TabPanel>
-                  <ArticleList
-                    articles={articles}
-                    loading={loading}
-                    onFavorite={handleFavorite}
-                    onUnfavorite={handleUnfavorite}
-                  />
-                  {articlesCount > 0 && (
-                    <Pagination
-                      page={currentPage}
-                      pageSize={pageSize}
-                      pageSizes={PAGE_SIZE_OPTIONS}
-                      totalItems={articlesCount}
-                      onChange={handlePageChange}
+                  <TabPanel>
+                    <ArticleList
+                      articles={articles}
+                      loading={loading}
+                      onFavorite={handleFavorite}
+                      onUnfavorite={handleUnfavorite}
                     />
+                    {articlesCount > 0 && (
+                      <Pagination
+                        page={currentPage}
+                        pageSize={pageSize}
+                        pageSizes={PAGE_SIZE_OPTIONS}
+                        totalItems={articlesCount}
+                        onChange={handlePageChange}
+                      />
+                    )}
+                  </TabPanel>
+                  {selectedTag && (
+                    <TabPanel>
+                      <ArticleList
+                        articles={articles}
+                        loading={loading}
+                        onFavorite={handleFavorite}
+                        onUnfavorite={handleUnfavorite}
+                      />
+                      {articlesCount > 0 && (
+                        <Pagination
+                          page={currentPage}
+                          pageSize={pageSize}
+                          pageSizes={PAGE_SIZE_OPTIONS}
+                          totalItems={articlesCount}
+                          onChange={handlePageChange}
+                        />
+                      )}
+                    </TabPanel>
                   )}
-                </TabPanel>
-                {selectedTag && (
+                </TabPanels>
+              </Tabs>
+            ) : (
+              <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
+                <TabList aria-label="Article feeds">
+                  <Tab>Global Feed</Tab>
+                  {selectedTag && <Tab>#{selectedTag}</Tab>}
+                </TabList>
+                <TabPanels>
                   <TabPanel>
                     <ArticleList
                       articles={articles}
@@ -198,9 +224,28 @@ export const HomePage: React.FC = () => {
                       />
                     )}
                   </TabPanel>
-                )}
-              </TabPanels>
-            </Tabs>
+                  {selectedTag && (
+                    <TabPanel>
+                      <ArticleList
+                        articles={articles}
+                        loading={loading}
+                        onFavorite={handleFavorite}
+                        onUnfavorite={handleUnfavorite}
+                      />
+                      {articlesCount > 0 && (
+                        <Pagination
+                          page={currentPage}
+                          pageSize={pageSize}
+                          pageSizes={PAGE_SIZE_OPTIONS}
+                          totalItems={articlesCount}
+                          onChange={handlePageChange}
+                        />
+                      )}
+                    </TabPanel>
+                  )}
+                </TabPanels>
+              </Tabs>
+            )}
           </div>
 
           <div className="col-md-3">
