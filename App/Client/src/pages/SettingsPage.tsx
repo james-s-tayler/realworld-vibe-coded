@@ -9,8 +9,8 @@ import {
   Stack,
 } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
-import { ApiError } from '../api/client';
 import { ErrorDisplay } from '../components/ErrorDisplay';
+import { type AppError, normalizeError } from '../utils/errors';
 import './SettingsPage.css';
 
 export const SettingsPage: React.FC = () => {
@@ -21,7 +21,7 @@ export const SettingsPage: React.FC = () => {
   const [bio, setBio] = useState('');
   const [image, setImage] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<ApiError | Error | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -59,13 +59,7 @@ export const SettingsPage: React.FC = () => {
       setSuccess(true);
       setPassword('');
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err);
-      } else if (err instanceof Error) {
-        setError(err);
-      } else {
-        setError(new Error('An unexpected error occurred'));
-      }
+      setError(normalizeError(err));
     } finally {
       setLoading(false);
     }
@@ -89,7 +83,6 @@ export const SettingsPage: React.FC = () => {
 
             <ErrorDisplay
               error={error}
-              title="Update Failed"
               onClose={() => setError(null)}
             />
 

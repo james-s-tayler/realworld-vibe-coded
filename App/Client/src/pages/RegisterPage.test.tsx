@@ -84,10 +84,8 @@ describe('RegisterPage', () => {
   it('displays error message on registration failure', async () => {
     const user = userEvent.setup()
     
-    vi.mocked(authApi.register).mockRejectedValue({
-      status: 422,
-      errors: ['username has already been taken'],
-    })
+    // Throw an error that normalizeError can handle
+    vi.mocked(authApi.register).mockRejectedValue(new Error('username has already been taken'))
 
     renderRegisterPage()
 
@@ -97,7 +95,7 @@ describe('RegisterPage', () => {
     await user.click(screen.getByRole('button', { name: /sign up/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/registration failed/i)).toBeInTheDocument()
+      expect(screen.getByText(/username has already been taken/i)).toBeInTheDocument()
     })
   })
 })

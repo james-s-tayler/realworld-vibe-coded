@@ -9,8 +9,8 @@ import {
   Tag,
 } from '@carbon/react';
 import { articlesApi } from '../api/articles';
-import { ApiError } from '../api/client';
 import { ErrorDisplay } from '../components/ErrorDisplay';
+import { type AppError, normalizeError } from '../utils/errors';
 import './EditorPage.css';
 
 export const EditorPage: React.FC = () => {
@@ -21,7 +21,7 @@ export const EditorPage: React.FC = () => {
   const [body, setBody] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [error, setError] = useState<ApiError | Error | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingArticle, setLoadingArticle] = useState(false);
 
@@ -37,13 +37,7 @@ export const EditorPage: React.FC = () => {
       setTags(article.tagList);
     } catch (err) {
       console.error('Failed to load article:', err);
-      if (err instanceof ApiError) {
-        setError(err);
-      } else if (err instanceof Error) {
-        setError(err);
-      } else {
-        setError(new Error('Failed to load article for editing'));
-      }
+      setError(normalizeError(err));
     } finally {
       setLoadingArticle(false);
     }
@@ -93,13 +87,7 @@ export const EditorPage: React.FC = () => {
 
       navigate(`/article/${response.article.slug}`);
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err);
-      } else if (err instanceof Error) {
-        setError(err);
-      } else {
-        setError(new Error('An unexpected error occurred'));
-      }
+      setError(normalizeError(err));
     } finally {
       setLoading(false);
     }

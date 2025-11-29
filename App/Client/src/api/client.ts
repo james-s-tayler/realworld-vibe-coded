@@ -5,12 +5,14 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 export class ApiError extends Error {
   status: number;
   errors: string[];
+  title: string;
   
-  constructor(status: number, errors: string[]) {
+  constructor(status: number, errors: string[], title?: string) {
     super(errors.join(', '));
     this.name = 'ApiError';
     this.status = status;
     this.errors = errors;
+    this.title = title ?? 'Error';
   }
 }
 
@@ -63,8 +65,14 @@ export async function apiRequest<T>(
   if (!response.ok) {
     // Handle ProblemDetails format
     let errors: string[];
+    let title: string | undefined;
     
     const errorData = data as Record<string, unknown>;
+    
+    // Extract title from ProblemDetails if available
+    if (errorData?.title) {
+      title = String(errorData.title);
+    }
     
     if (errorData?.errors) {
       // ProblemDetails format: errors can be an array or object
@@ -81,9 +89,9 @@ export async function apiRequest<T>(
       } else {
         errors = [String(errorData.errors)];
       }
-    } else if (errorData?.title) {
-      // ProblemDetails with title
-      errors = [String(errorData.title)];
+    } else if (title) {
+      // ProblemDetails with title but no errors array
+      errors = [title];
       if (errorData.detail) {
         errors.push(String(errorData.detail));
       }
@@ -93,7 +101,7 @@ export async function apiRequest<T>(
       errors = [`Request failed with status ${response.status}`];
     }
     
-    throw new ApiError(response.status, errors);
+    throw new ApiError(response.status, errors, title);
   }
 
   return data as T;

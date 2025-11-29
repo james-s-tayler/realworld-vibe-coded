@@ -87,6 +87,7 @@ describe('apiRequest', () => {
       if (error instanceof ApiError) {
         expect(error.status).toBe(401)
         expect(error.errors).toEqual(['body: email or password is invalid'])
+        expect(error.title).toBe('Unauthorized')
       }
     }
   })

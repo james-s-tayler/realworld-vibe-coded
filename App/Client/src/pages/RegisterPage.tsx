@@ -7,8 +7,8 @@ import {
   Stack,
 } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
-import { ApiError } from '../api/client';
 import { ErrorDisplay } from '../components/ErrorDisplay';
+import { type AppError, normalizeError } from '../utils/errors';
 import './AuthPages.css';
 
 export const RegisterPage: React.FC = () => {
@@ -17,7 +17,7 @@ export const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<ApiError | Error | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,13 +29,7 @@ export const RegisterPage: React.FC = () => {
       await register(email, username, password);
       navigate('/');
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err);
-      } else if (err instanceof Error) {
-        setError(err);
-      } else {
-        setError(new Error('An unexpected error occurred'));
-      }
+      setError(normalizeError(err));
     } finally {
       setLoading(false);
     }
@@ -53,7 +47,6 @@ export const RegisterPage: React.FC = () => {
 
             <ErrorDisplay
               error={error}
-              title="Registration Failed"
               onClose={() => setError(null)}
             />
 

@@ -82,10 +82,8 @@ describe('LoginPage', () => {
   it('displays error message on login failure', async () => {
     const user = userEvent.setup()
     
-    vi.mocked(authApi.login).mockRejectedValue({
-      status: 401,
-      errors: ['email or password is invalid'],
-    })
+    // Throw an error that normalizeError can handle
+    vi.mocked(authApi.login).mockRejectedValue(new Error('email or password is invalid'))
 
     renderLoginPage()
 
@@ -94,7 +92,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/login failed/i)).toBeInTheDocument()
+      expect(screen.getByText(/email or password is invalid/i)).toBeInTheDocument()
     })
   })
 })

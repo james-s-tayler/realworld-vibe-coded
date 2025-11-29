@@ -90,10 +90,8 @@ describe('SettingsPage', () => {
     const user = userEvent.setup()
     
     vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
-    vi.mocked(authApi.updateUser).mockRejectedValue({
-      status: 422,
-      errors: ['username has already been taken'],
-    })
+    // Throw an error that normalizeError can handle
+    vi.mocked(authApi.updateUser).mockRejectedValue(new Error('username has already been taken'))
 
     renderSettingsPage()
 
@@ -107,7 +105,7 @@ describe('SettingsPage', () => {
     await user.click(screen.getByRole('button', { name: /update settings/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/update failed/i)).toBeInTheDocument()
+      expect(screen.getByText(/username has already been taken/i)).toBeInTheDocument()
     })
   })
 
