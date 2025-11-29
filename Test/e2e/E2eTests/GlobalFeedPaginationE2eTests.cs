@@ -160,7 +160,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
         },
       };
 
-      var articleResponse = await httpClient.PostAsJsonAsync("/api/articles", articleRequest, JsonOptions);
+      var articleResponse = await httpClient.PostAsJsonAsync("/api/articles", articleRequest, JsonOptions, TestContext.Current.CancellationToken);
       articleResponse.EnsureSuccessStatusCode();
 
       // Navigate to home page as unauthenticated user (no login)
