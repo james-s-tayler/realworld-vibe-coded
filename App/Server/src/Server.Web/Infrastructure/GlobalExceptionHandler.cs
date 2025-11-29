@@ -29,14 +29,32 @@ public class GlobalExceptionHandler : IGlobalPostProcessor
 
     // Return error in same format as Result.CriticalError
     // This uses FastEndpoints' SendErrorsAsync which formats as problem details
-    var validationFailures = new List<ValidationFailure>
-    {
-      new(exception.GetType().Name, exception.Message),
-    };
+    // Unwrap all inner exceptions to provide full error chain
+    var validationFailures = UnwrapExceptions(exception);
 
     await ctx.HttpContext.Response.SendErrorsAsync(
       validationFailures,
       statusCode: StatusCodes.Status500InternalServerError,
       cancellation: ct);
+  }
+
+  /// <summary>
+  /// Recursively unwraps exceptions and inner exceptions to create a list of validation failures
+  /// containing the full exception chain.
+  /// </summary>
+  /// <param name="exception">The root exception to unwrap.</param>
+  /// <returns>A list of validation failures representing the entire exception chain.</returns>
+  private static List<ValidationFailure> UnwrapExceptions(Exception exception)
+  {
+    var failures = new List<ValidationFailure>();
+    var currentException = exception;
+
+    while (currentException != null)
+    {
+      failures.Add(new ValidationFailure(currentException.GetType().Name, currentException.Message));
+      currentException = currentException.InnerException;
+    }
+
+    return failures;
   }
 }
