@@ -42,7 +42,7 @@ export async function apiRequest<T>(
 
   // Check if response has content before trying to parse JSON
   const contentType = response.headers.get('content-type');
-  const hasJsonContent = contentType && contentType.includes('application/json');
+  const hasJsonContent = contentType && (contentType.includes('application/json') || contentType.includes('application/problem+json'));
   
   // Handle empty responses (204 No Content or empty body)
   const text = await response.text();
