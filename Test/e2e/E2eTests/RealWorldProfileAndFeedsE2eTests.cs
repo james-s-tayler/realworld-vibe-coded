@@ -253,14 +253,21 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       // Navigate to the first user's article
       await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
-      // Click on Global Feed tab
+      // Click on Global Feed tab and wait for it to be selected
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
       await globalFeedTab.ClickAsync();
-      await Page.WaitForTimeoutAsync(2000);
+      await Expect(globalFeedTab).ToHaveAttributeAsync("aria-selected", "true", new() { Timeout = DefaultTimeout });
 
-      // Click on the article link - use visible panel and click the article-link specifically
+      // Wait for the feed to load (loading indicator to disappear)
       var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
+      var loadingIndicator = visiblePanel.GetByText("Loading articles...");
+      await Expect(loadingIndicator).ToBeHiddenAsync(new() { Timeout = 30000 });
+
+      // Wait for the article to be visible in the feed panel before clicking
       var articlePreview = visiblePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
+      // Click on the article link
       var articleLink = articlePreview.Locator(".article-link");
       await articleLink.ClickAsync();
       await Page.WaitForURLAsync(new System.Text.RegularExpressions.Regex(@"/article/"), new() { Timeout = DefaultTimeout });
@@ -283,10 +290,7 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await favoritedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await favoritedTab.ClickAsync();
 
-      // Wait for articles to load
-      await Page.WaitForTimeoutAsync(2000);
-
-      // Verify favorited article appears - check for article in the visible tab panel
+      // Verify favorited article appears - wait for article in the visible tab panel
       var profilePanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var articleInFavorites = profilePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
       await Expect(articleInFavorites).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
