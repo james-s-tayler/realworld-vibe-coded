@@ -10,7 +10,8 @@ import {
 } from '@carbon/react';
 import { articlesApi } from '../api/articles';
 import { useApiCall } from '../hooks/useApiCall';
-import { ErrorDisplay } from '../components/ErrorDisplay';
+import { PageShell } from '../components/PageShell';
+import { RequestBoundary } from '../components/RequestBoundary';
 import './EditorPage.css';
 
 export const EditorPage: React.FC = () => {
@@ -107,87 +108,81 @@ export const EditorPage: React.FC = () => {
   };
 
   return (
-    <div className="editor-page">
-      <div className="container page">
-        <div className="row">
-          <div className="col-md-10 offset-md-1 col-xs-12">
-            <h1 className="text-xs-center">{slug ? 'Edit Article' : 'New Article'}</h1>
-
-            <ErrorDisplay
-              error={error}
-              onClose={clearError}
+    <PageShell
+      className="editor-page"
+      title={slug ? 'Edit Article' : 'New Article'}
+      columnLayout="wide"
+    >
+      <RequestBoundary
+        error={error}
+        clearError={clearError}
+        loading={loadingArticle}
+        loadingMessage="Loading article..."
+      >
+        <Form onSubmit={handleSubmit}>
+          <Stack gap={6}>
+            <TextInput
+              id="title"
+              labelText=""
+              placeholder="Article Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
             />
 
-            {loadingArticle ? (
-              <p>Loading article...</p>
-            ) : (
-              <Form onSubmit={handleSubmit}>
-                <Stack gap={6}>
-                  <TextInput
-                    id="title"
-                    labelText=""
-                    placeholder="Article Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                  />
+            <TextInput
+              id="description"
+              labelText=""
+              placeholder="What's this article about?"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
 
-                  <TextInput
-                    id="description"
-                    labelText=""
-                    placeholder="What's this article about?"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                  />
+            <TextArea
+              id="body"
+              labelText=""
+              placeholder="Write your article (in markdown)"
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              required
+              rows={8}
+            />
 
-                  <TextArea
-                    id="body"
-                    labelText=""
-                    placeholder="Write your article (in markdown)"
-                    value={body}
-                    onChange={(e) => setBody(e.target.value)}
-                    required
-                    rows={8}
-                  />
-
-                  <div>
-                    <TextInput
-                      id="tags"
-                      labelText=""
-                      placeholder="Enter tags"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyPress={handleTagKeyPress}
-                      onBlur={handleAddTag}
-                    />
-                    <div className="tag-list">
-                      {tags.map(tag => (
-                        <Tag
-                          key={tag}
-                          filter
-                          onClose={() => handleRemoveTag(tag)}
-                        >
-                          {tag}
-                        </Tag>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    disabled={submitting || !title || !description || !body}
-                    size="lg"
-                    className="pull-xs-right"
+            <div>
+              <TextInput
+                id="tags"
+                labelText=""
+                placeholder="Enter tags"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyPress={handleTagKeyPress}
+                onBlur={handleAddTag}
+              />
+              <div className="tag-list">
+                {tags.map(tag => (
+                  <Tag
+                    key={tag}
+                    filter
+                    onClose={() => handleRemoveTag(tag)}
                   >
-                    {submitting ? 'Publishing...' : 'Publish Article'}
-                  </Button>
-                </Stack>
-              </Form>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+                    {tag}
+                  </Tag>
+                ))}
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={submitting || !title || !description || !body}
+              size="lg"
+              className="pull-xs-right"
+            >
+              {submitting ? 'Publishing...' : 'Publish Article'}
+            </Button>
+          </Stack>
+        </Form>
+      </RequestBoundary>
+    </PageShell>
   );
 };

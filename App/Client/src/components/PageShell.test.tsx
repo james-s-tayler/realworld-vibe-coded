@@ -84,6 +84,38 @@ describe('PageShell', () => {
     });
   });
 
+  describe('columnLayout prop', () => {
+    it('defaults to narrow column layout', () => {
+      const { container } = render(
+        <PageShell>
+          <p>Content</p>
+        </PageShell>
+      );
+      const columnDiv = container.querySelector('.col-md-6.offset-md-3');
+      expect(columnDiv).toBeInTheDocument();
+    });
+
+    it('applies narrow column classes when columnLayout is narrow', () => {
+      const { container } = render(
+        <PageShell columnLayout="narrow">
+          <p>Content</p>
+        </PageShell>
+      );
+      const columnDiv = container.querySelector('.col-md-6.offset-md-3.col-xs-12');
+      expect(columnDiv).toBeInTheDocument();
+    });
+
+    it('applies wide column classes when columnLayout is wide', () => {
+      const { container } = render(
+        <PageShell columnLayout="wide">
+          <p>Content</p>
+        </PageShell>
+      );
+      const columnDiv = container.querySelector('.col-md-10.offset-md-1.col-xs-12');
+      expect(columnDiv).toBeInTheDocument();
+    });
+  });
+
   describe('title ReactNode support', () => {
     it('renders title as ReactNode (JSX)', () => {
       render(
