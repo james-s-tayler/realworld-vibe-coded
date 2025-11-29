@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router';
 import {
   Form,
   TextInput,
   Button,
-  InlineNotification,
   Stack,
 } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
-import { ApiError } from '../api/client';
+import { useApiCall } from '../hooks/useApiCall';
+import { ErrorDisplay } from '../components/ErrorDisplay';
 import './AuthPages.css';
 
 export const RegisterPage: React.FC = () => {
@@ -17,26 +17,19 @@ export const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+
+  const registerApi = useCallback(
+    () => register(email, username, password),
+    [register, email, username, password]
+  );
+
+  const { error, loading, execute, clearError } = useApiCall(registerApi, {
+    onSuccess: () => navigate('/'),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      await register(email, username, password);
-      navigate('/');
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError('An unexpected error occurred');
-      }
-    } finally {
-      setLoading(false);
-    }
+    await execute();
   };
 
   return (
@@ -49,15 +42,10 @@ export const RegisterPage: React.FC = () => {
               <Link to="/login">Have an account?</Link>
             </p>
 
-            {error && (
-              <InlineNotification
-                kind="error"
-                title="Registration Failed"
-                subtitle={error}
-                onCloseButtonClick={() => setError(null)}
-                style={{ marginBottom: '1rem' }}
-              />
-            )}
+            <ErrorDisplay
+              error={error}
+              onClose={clearError}
+            />
 
             <Form onSubmit={handleSubmit}>
               <Stack gap={6}>

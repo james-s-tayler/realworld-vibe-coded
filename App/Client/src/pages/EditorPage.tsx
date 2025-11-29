@@ -5,12 +5,12 @@ import {
   TextInput,
   TextArea,
   Button,
-  InlineNotification,
   Stack,
   Tag,
 } from '@carbon/react';
 import { articlesApi } from '../api/articles';
-import { ApiError } from '../api/client';
+import { useApiCall } from '../hooks/useApiCall';
+import { ErrorDisplay } from '../components/ErrorDisplay';
 import './EditorPage.css';
 
 export const EditorPage: React.FC = () => {
@@ -21,33 +21,66 @@ export const EditorPage: React.FC = () => {
   const [body, setBody] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [loadingArticle, setLoadingArticle] = useState(false);
 
-  const loadArticle = useCallback(async () => {
-    if (!slug) return;
-    setLoadingArticle(true);
-    try {
-      const response = await articlesApi.getArticle(slug);
-      const { article } = response;
-      setTitle(article.title);
-      setDescription(article.description);
-      setBody(article.body);
-      setTags(article.tagList);
-    } catch (error) {
-      console.error('Failed to load article:', error);
-      setError('Failed to load article for editing');
-    } finally {
-      setLoadingArticle(false);
-    }
+  // API call for loading an existing article
+  const loadArticleApi = useCallback(async () => {
+    if (!slug) return null;
+    return articlesApi.getArticle(slug);
   }, [slug]);
+
+  const { 
+    data: articleData, 
+    error: loadError, 
+    loading: loadingArticle, 
+    execute: loadArticle,
+    clearError: clearLoadError 
+  } = useApiCall(loadArticleApi);
+
+  // Populate form when article data is loaded
+  useEffect(() => {
+    if (articleData?.article) {
+      setTitle(articleData.article.title);
+      setDescription(articleData.article.description);
+      setBody(articleData.article.body);
+      setTags(articleData.article.tagList);
+    }
+  }, [articleData]);
 
   useEffect(() => {
     if (slug) {
       loadArticle();
     }
   }, [slug, loadArticle]);
+
+  // API call for submitting the article
+  const submitArticleApi = useCallback(async () => {
+    const articleData = {
+      title,
+      description,
+      body,
+      tagList: tags,
+    };
+
+    return slug
+      ? articlesApi.updateArticle(slug, articleData)
+      : articlesApi.createArticle(articleData);
+  }, [slug, title, description, body, tags]);
+
+  const { 
+    error: submitError, 
+    loading: submitting, 
+    execute: submitArticle,
+    clearError: clearSubmitError 
+  } = useApiCall(submitArticleApi, {
+    onSuccess: (response) => navigate(`/article/${response.article.slug}`),
+  });
+
+  // Combine errors for display
+  const error = submitError || loadError;
+  const clearError = () => {
+    clearSubmitError();
+    clearLoadError();
+  };
 
   const handleAddTag = () => {
     const tag = tagInput.trim();
@@ -70,31 +103,7 @@ export const EditorPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      const articleData = {
-        title,
-        description,
-        body,
-        tagList: tags,
-      };
-
-      const response = slug
-        ? await articlesApi.updateArticle(slug, articleData)
-        : await articlesApi.createArticle(articleData);
-
-      navigate(`/article/${response.article.slug}`);
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError('An unexpected error occurred');
-      }
-    } finally {
-      setLoading(false);
-    }
+    await submitArticle();
   };
 
   return (
@@ -104,15 +113,10 @@ export const EditorPage: React.FC = () => {
           <div className="col-md-10 offset-md-1 col-xs-12">
             <h1 className="text-xs-center">{slug ? 'Edit Article' : 'New Article'}</h1>
 
-            {error && (
-              <InlineNotification
-                kind="error"
-                title="Error"
-                subtitle={error}
-                onCloseButtonClick={() => setError(null)}
-                style={{ marginBottom: '1rem' }}
-              />
-            )}
+            <ErrorDisplay
+              error={error}
+              onClose={clearError}
+            />
 
             {loadingArticle ? (
               <p>Loading article...</p>
@@ -172,11 +176,11 @@ export const EditorPage: React.FC = () => {
 
                   <Button
                     type="submit"
-                    disabled={loading || !title || !description || !body}
+                    disabled={submitting || !title || !description || !body}
                     size="lg"
                     className="pull-xs-right"
                   >
-                    {loading ? 'Publishing...' : 'Publish Article'}
+                    {submitting ? 'Publishing...' : 'Publish Article'}
                   </Button>
                 </Stack>
               </Form>
