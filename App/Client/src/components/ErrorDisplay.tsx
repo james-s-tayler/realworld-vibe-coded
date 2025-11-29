@@ -66,12 +66,15 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
 /** Type guard to check if an error is already a normalized AppError */
 function isAppError(error: unknown): error is AppError {
+  if (typeof error !== 'object' || error === null) {
+    return false;
+  }
+  
+  const candidate = error as Record<string, unknown>;
   return (
-    typeof error === 'object' &&
-    error !== null &&
-    'type' in error &&
-    'title' in error &&
-    'messages' in error &&
-    Array.isArray((error as AppError).messages)
+    'type' in candidate &&
+    'title' in candidate &&
+    'messages' in candidate &&
+    Array.isArray(candidate.messages)
   );
 }

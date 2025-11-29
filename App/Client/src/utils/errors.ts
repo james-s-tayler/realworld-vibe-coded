@@ -34,12 +34,14 @@ function getDefaultTitle(errorType: ErrorType): string {
   }
 }
 
+const DEFAULT_ERROR_TITLE = 'Error';
+
 export function normalizeError(error: unknown): AppError {
   // ApiError from the API client
   if (error instanceof ApiError) {
     const type = getErrorTypeFromStatus(error.status);
-    // Use API-provided title if it's not the default 'Error', otherwise use type-based default
-    const title = (error.title && error.title !== 'Error') ? error.title : getDefaultTitle(type);
+    // Use API-provided title if it's not the default, otherwise use type-based default
+    const title = (error.title && error.title !== DEFAULT_ERROR_TITLE) ? error.title : getDefaultTitle(type);
     return {
       type,
       title,
