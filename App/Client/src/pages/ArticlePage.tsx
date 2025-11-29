@@ -61,24 +61,32 @@ export const ArticlePage: React.FC = () => {
 
   const handleFavorite = async () => {
     if (!article) return;
-    await requireAuth(async () => {
-      const response = article.favorited
-        ? await articlesApi.unfavoriteArticle(article.slug)
-        : await articlesApi.favoriteArticle(article.slug);
-      setArticle(response.article);
-      return response;
-    });
+    try {
+      await requireAuth(async () => {
+        const response = article.favorited
+          ? await articlesApi.unfavoriteArticle(article.slug)
+          : await articlesApi.favoriteArticle(article.slug);
+        setArticle(response.article);
+        return response;
+      });
+    } catch (error) {
+      console.error('Failed to favorite/unfavorite article:', error);
+    }
   };
 
   const handleFollow = async () => {
     if (!article) return;
-    await requireAuth(async () => {
-      const response = article.author.following
-        ? await profilesApi.unfollowUser(article.author.username)
-        : await profilesApi.followUser(article.author.username);
-      setArticle({ ...article, author: response.profile });
-      return response;
-    });
+    try {
+      await requireAuth(async () => {
+        const response = article.author.following
+          ? await profilesApi.unfollowUser(article.author.username)
+          : await profilesApi.followUser(article.author.username);
+        setArticle({ ...article, author: response.profile });
+        return response;
+      });
+    } catch (error) {
+      console.error('Failed to follow/unfollow user:', error);
+    }
   };
 
   const handleDelete = async () => {

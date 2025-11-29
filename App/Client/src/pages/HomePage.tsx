@@ -80,19 +80,27 @@ export const HomePage: React.FC = () => {
   }, [loadArticles]);
 
   const handleFavorite = async (slug: string) => {
-    await requireAuth(async () => {
-      const response = await articlesApi.favoriteArticle(slug);
-      setArticles(articles.map(a => a.slug === slug ? response.article : a));
-      return response;
-    });
+    try {
+      await requireAuth(async () => {
+        const response = await articlesApi.favoriteArticle(slug);
+        setArticles(articles.map(a => a.slug === slug ? response.article : a));
+        return response;
+      });
+    } catch (error) {
+      console.error('Failed to favorite article:', error);
+    }
   };
 
   const handleUnfavorite = async (slug: string) => {
-    await requireAuth(async () => {
-      const response = await articlesApi.unfavoriteArticle(slug);
-      setArticles(articles.map(a => a.slug === slug ? response.article : a));
-      return response;
-    });
+    try {
+      await requireAuth(async () => {
+        const response = await articlesApi.unfavoriteArticle(slug);
+        setArticles(articles.map(a => a.slug === slug ? response.article : a));
+        return response;
+      });
+    } catch (error) {
+      console.error('Failed to unfavorite article:', error);
+    }
   };
 
   const handleTagClick = (tag: string) => {

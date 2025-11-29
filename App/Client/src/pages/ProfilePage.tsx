@@ -91,29 +91,41 @@ export const ProfilePage: React.FC = () => {
 
   const handleFollow = async () => {
     if (!profile) return;
-    await requireAuth(async () => {
-      const response = profile.following
-        ? await profilesApi.unfollowUser(profile.username)
-        : await profilesApi.followUser(profile.username);
-      setProfile(response.profile);
-      return response;
-    });
+    try {
+      await requireAuth(async () => {
+        const response = profile.following
+          ? await profilesApi.unfollowUser(profile.username)
+          : await profilesApi.followUser(profile.username);
+        setProfile(response.profile);
+        return response;
+      });
+    } catch (error) {
+      console.error('Failed to follow/unfollow:', error);
+    }
   };
 
   const handleFavorite = async (slug: string) => {
-    await requireAuth(async () => {
-      const response = await articlesApi.favoriteArticle(slug);
-      setArticles(articles.map(a => a.slug === slug ? response.article : a));
-      return response;
-    });
+    try {
+      await requireAuth(async () => {
+        const response = await articlesApi.favoriteArticle(slug);
+        setArticles(articles.map(a => a.slug === slug ? response.article : a));
+        return response;
+      });
+    } catch (error) {
+      console.error('Failed to favorite article:', error);
+    }
   };
 
   const handleUnfavorite = async (slug: string) => {
-    await requireAuth(async () => {
-      const response = await articlesApi.unfavoriteArticle(slug);
-      setArticles(articles.map(a => a.slug === slug ? response.article : a));
-      return response;
-    });
+    try {
+      await requireAuth(async () => {
+        const response = await articlesApi.unfavoriteArticle(slug);
+        setArticles(articles.map(a => a.slug === slug ? response.article : a));
+        return response;
+      });
+    } catch (error) {
+      console.error('Failed to unfavorite article:', error);
+    }
   };
 
   if (loading) {
