@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, InlineNotification, Pagination } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 import { articlesApi } from '../api/articles';
 import { tagsApi } from '../api/tags';
 import { ArticleList } from '../components/ArticleList';
@@ -14,6 +15,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 export const HomePage: React.FC = () => {
   const { user } = useAuth();
+  const { requireAuth } = useRequireAuth();
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesCount, setArticlesCount] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
@@ -78,21 +80,19 @@ export const HomePage: React.FC = () => {
   }, [loadArticles]);
 
   const handleFavorite = async (slug: string) => {
-    try {
+    await requireAuth(async () => {
       const response = await articlesApi.favoriteArticle(slug);
       setArticles(articles.map(a => a.slug === slug ? response.article : a));
-    } catch (error) {
-      console.error('Failed to favorite article:', error);
-    }
+      return response;
+    });
   };
 
   const handleUnfavorite = async (slug: string) => {
-    try {
+    await requireAuth(async () => {
       const response = await articlesApi.unfavoriteArticle(slug);
       setArticles(articles.map(a => a.slug === slug ? response.article : a));
-    } catch (error) {
-      console.error('Failed to unfavorite article:', error);
-    }
+      return response;
+    });
   };
 
   const handleTagClick = (tag: string) => {

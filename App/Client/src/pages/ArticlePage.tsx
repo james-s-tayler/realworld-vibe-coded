@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router';
 import { Button, TextArea, Loading, InlineNotification } from '@carbon/react';
 import { FavoriteFilled, Favorite, Edit, TrashCan } from '@carbon/icons-react';
 import { useAuth } from '../hooks/useAuth';
+import { useRequireAuth } from '../hooks/useRequireAuth';
 import { articlesApi } from '../api/articles';
 import { commentsApi } from '../api/comments';
 import { profilesApi } from '../api/profiles';
@@ -16,6 +17,7 @@ export const ArticlePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { requireAuth } = useRequireAuth();
   const [article, setArticle] = useState<Article | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,26 +61,24 @@ export const ArticlePage: React.FC = () => {
 
   const handleFavorite = async () => {
     if (!article) return;
-    try {
+    await requireAuth(async () => {
       const response = article.favorited
         ? await articlesApi.unfavoriteArticle(article.slug)
         : await articlesApi.favoriteArticle(article.slug);
       setArticle(response.article);
-    } catch (error) {
-      console.error('Failed to favorite/unfavorite article:', error);
-    }
+      return response;
+    });
   };
 
   const handleFollow = async () => {
     if (!article) return;
-    try {
+    await requireAuth(async () => {
       const response = article.author.following
         ? await profilesApi.unfollowUser(article.author.username)
         : await profilesApi.followUser(article.author.username);
       setArticle({ ...article, author: response.profile });
-    } catch (error) {
-      console.error('Failed to follow/unfollow user:', error);
-    }
+      return response;
+    });
   };
 
   const handleDelete = async () => {
