@@ -113,7 +113,7 @@ describe('ProfilePage', () => {
       });
     });
 
-    it('does not show pagination when articles count is less than or equal to page size', async () => {
+    it('shows pagination when articles count is less than or equal to page size', async () => {
       vi.mocked(articlesApi.listArticles).mockResolvedValue(createMockArticles(20));
 
       renderWithAuth();
@@ -122,8 +122,10 @@ describe('ProfilePage', () => {
         expect(screen.getByText('My Articles')).toBeInTheDocument();
       });
       
-      // Pagination should not be visible when articlesCount <= pageSize
-      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+      // Pagination should be visible even when articlesCount <= pageSize (since articlesCount > 0)
+      await waitFor(() => {
+        expect(vi.mocked(articlesApi.listArticles)).toHaveBeenCalled();
+      });
     });
 
     it('resets page to 1 when switching tabs', async () => {

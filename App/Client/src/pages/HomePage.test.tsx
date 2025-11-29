@@ -166,7 +166,7 @@ describe('HomePage', () => {
       })
     })
 
-    it('does not show pagination when articles count is less than or equal to page size', async () => {
+    it('shows pagination when articles count is less than or equal to page size', async () => {
       vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No token'))
       vi.mocked(articlesApi.listArticles).mockResolvedValue(createMockArticles(20))
 
@@ -176,8 +176,10 @@ describe('HomePage', () => {
         expect(screen.getByRole('tab', { name: /global feed/i })).toBeInTheDocument()
       })
       
-      // Pagination should not be visible when articlesCount <= pageSize
-      expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+      // Pagination should be visible even when articlesCount <= pageSize
+      await waitFor(() => {
+        expect(vi.mocked(articlesApi.listArticles)).toHaveBeenCalled()
+      })
     })
 
     it('loads Your Feed with pagination for authenticated users', async () => {

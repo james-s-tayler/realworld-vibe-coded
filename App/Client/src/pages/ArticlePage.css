@@ -13,6 +13,8 @@
   background: #333;
   color: white;
   padding: 2rem 0;
+  padding-top: calc(2rem + var(--header-height)); /* Extra padding for content below header */
+  margin-top: calc(-1 * var(--header-height)); /* Pull banner up behind header */
 }
 
 .article-page .banner h1 {

@@ -201,7 +201,7 @@ export const ProfilePage: React.FC = () => {
                     onFavorite={handleFavorite}
                     onUnfavorite={handleUnfavorite}
                   />
-                  {articlesCount > pageSize && (
+                  {articlesCount > 0 && (
                     <Pagination
                       page={currentPage}
                       pageSize={pageSize}
@@ -218,7 +218,7 @@ export const ProfilePage: React.FC = () => {
                     onFavorite={handleFavorite}
                     onUnfavorite={handleUnfavorite}
                   />
-                  {articlesCount > pageSize && (
+                  {articlesCount > 0 && (
                     <Pagination
                       page={currentPage}
                       pageSize={pageSize}

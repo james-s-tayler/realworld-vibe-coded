@@ -19,6 +19,8 @@ export const HomePage: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [tagsLoading, setTagsLoading] = useState(false);
+  // Default to "Your Feed" (index 0) for authenticated users, "Global Feed" (index 0) for unauthenticated
+  // Since unauthenticated users don't have "Your Feed" tab, index 0 is always correct initially
   const [activeTab, setActiveTab] = useState(0);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -150,7 +152,7 @@ export const HomePage: React.FC = () => {
                       onFavorite={handleFavorite}
                       onUnfavorite={handleUnfavorite}
                     />
-                    {articlesCount > pageSize && (
+                    {articlesCount > 0 && (
                       <Pagination
                         page={currentPage}
                         pageSize={pageSize}
@@ -168,7 +170,7 @@ export const HomePage: React.FC = () => {
                     onFavorite={handleFavorite}
                     onUnfavorite={handleUnfavorite}
                   />
-                  {articlesCount > pageSize && (
+                  {articlesCount > 0 && (
                     <Pagination
                       page={currentPage}
                       pageSize={pageSize}
@@ -186,7 +188,7 @@ export const HomePage: React.FC = () => {
                       onFavorite={handleFavorite}
                       onUnfavorite={handleUnfavorite}
                     />
-                    {articlesCount > pageSize && (
+                    {articlesCount > 0 && (
                       <Pagination
                         page={currentPage}
                         pageSize={pageSize}
