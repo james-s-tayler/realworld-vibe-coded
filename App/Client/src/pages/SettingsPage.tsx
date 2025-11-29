@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Form,
@@ -9,8 +9,8 @@ import {
   Stack,
 } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
+import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
-import { type AppError, normalizeError } from '../utils/errors';
 import './SettingsPage.css';
 
 export const SettingsPage: React.FC = () => {
@@ -21,9 +21,7 @@ export const SettingsPage: React.FC = () => {
   const [bio, setBio] = useState('');
   const [image, setImage] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<AppError | null>(null);
   const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -34,35 +32,35 @@ export const SettingsPage: React.FC = () => {
     }
   }, [user]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(false);
-    setLoading(true);
+  const updateApi = useCallback(() => {
+    const updates: {
+      email?: string;
+      username?: string;
+      bio?: string;
+      image?: string;
+      password?: string;
+    } = {};
 
-    try {
-      const updates: {
-        email?: string;
-        username?: string;
-        bio?: string;
-        image?: string;
-        password?: string;
-      } = {};
+    if (email !== user?.email) updates.email = email;
+    if (username !== user?.username) updates.username = username;
+    if (bio !== (user?.bio || '')) updates.bio = bio;
+    if (image !== (user?.image || '')) updates.image = image;
+    if (password) updates.password = password;
 
-      if (email !== user?.email) updates.email = email;
-      if (username !== user?.username) updates.username = username;
-      if (bio !== (user?.bio || '')) updates.bio = bio;
-      if (image !== (user?.image || '')) updates.image = image;
-      if (password) updates.password = password;
+    return updateUser(updates);
+  }, [email, username, bio, image, password, user, updateUser]);
 
-      await updateUser(updates);
+  const { error, loading, execute, clearError } = useApiCall(updateApi, {
+    onSuccess: () => {
       setSuccess(true);
       setPassword('');
-    } catch (err) {
-      setError(normalizeError(err));
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuccess(false);
+    await execute();
   };
 
   const handleLogout = () => {
@@ -83,7 +81,7 @@ export const SettingsPage: React.FC = () => {
 
             <ErrorDisplay
               error={error}
-              onClose={() => setError(null)}
+              onClose={clearError}
             />
 
             {success && (

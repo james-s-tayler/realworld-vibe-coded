@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router';
 import {
   Form,
@@ -7,8 +7,8 @@ import {
   Stack,
 } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
+import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
-import { type AppError, normalizeError } from '../utils/errors';
 import './AuthPages.css';
 
 export const RegisterPage: React.FC = () => {
@@ -17,22 +17,19 @@ export const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<AppError | null>(null);
-  const [loading, setLoading] = useState(false);
+
+  const registerApi = useCallback(
+    () => register(email, username, password),
+    [register, email, username, password]
+  );
+
+  const { error, loading, execute, clearError } = useApiCall(registerApi, {
+    onSuccess: () => navigate('/'),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      await register(email, username, password);
-      navigate('/');
-    } catch (err) {
-      setError(normalizeError(err));
-    } finally {
-      setLoading(false);
-    }
+    await execute();
   };
 
   return (
@@ -47,7 +44,7 @@ export const RegisterPage: React.FC = () => {
 
             <ErrorDisplay
               error={error}
-              onClose={() => setError(null)}
+              onClose={clearError}
             />
 
             <Form onSubmit={handleSubmit}>
