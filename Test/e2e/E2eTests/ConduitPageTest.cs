@@ -127,15 +127,6 @@ public abstract class ConduitPageTest : PageTest
   private async Task ResetDatabaseAsync()
   {
     var resetUrl = $"{BaseUrl}/api/dev-only/test-data/reset";
-    try
-    {
-      var response = await HttpClientInstance.DeleteAsync(resetUrl);
-
-      // We don't throw on failure - the endpoint might not exist in production
-    }
-    catch
-    {
-      // Silently ignore - endpoint may not exist
-    }
+    await HttpClientInstance.DeleteAsync(resetUrl);
   }
 }
