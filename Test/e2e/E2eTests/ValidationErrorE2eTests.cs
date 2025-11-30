@@ -22,8 +22,8 @@ public class ValidationErrorE2eTests : ConduitPageTest
       await RegisterUser();
 
       // Create the first article
-      var timestamp = DateTime.UtcNow.Ticks;
-      var articleTitle = $"Duplicate Test Article {timestamp}";
+      var uniqueId = GenerateUniqueId();
+      var articleTitle = $"Duplicate Test Article {uniqueId}";
 
       await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
       await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
@@ -72,11 +72,11 @@ public class ValidationErrorE2eTests : ConduitPageTest
 
     try
     {
-      // Register the first user
-      var timestamp = DateTime.UtcNow.Ticks;
-      var email = $"duplicate{timestamp}@test.com";
-      var username1 = $"user1_{timestamp}";
-      var username2 = $"user2_{timestamp}";
+      // Register the first user with a unique email for this test
+      var uniqueId = GenerateUniqueId();
+      var email = $"duptest{uniqueId}@test.com";
+      var username1 = $"dupusr1{uniqueId}";
+      var username2 = $"dupusr2{GenerateUniqueId()}";
       var password = "TestPassword123!";
 
       // Register first user

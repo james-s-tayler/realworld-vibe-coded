@@ -29,8 +29,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     try
     {
       // Setup: Create user and 50 articles via API
-      var timestamp = DateTime.Now.Ticks;
-      var token = await CreateUserAndArticlesViaApiAsync(timestamp);
+      var token = await CreateUserAndArticlesViaApiAsync();
 
       // Navigate to the home page
       await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
@@ -98,9 +97,8 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     try
     {
       // Setup: Create user and only 5 articles (less than page size of 20)
-      var timestamp = DateTime.Now.Ticks;
-      var (token, _) = await CreateUserViaApiAsync(timestamp, "fewartuser");
-      await CreateArticlesForUserAsync(token, 5, timestamp);
+      var (token, _) = await CreateUserViaApiAsync("fewart");
+      await CreateArticlesForUserAsync(token, 5);
 
       // Navigate to the home page
       await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
@@ -141,8 +139,8 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     try
     {
       // Setup: Create user and one article via API so global feed has content
-      var timestamp = DateTime.Now.Ticks;
-      var (token, username) = await CreateUserViaApiAsync(timestamp, "defaulttestuser");
+      var uniqueId = GenerateUniqueId();
+      var (token, username) = await CreateUserViaApiAsync("deftest");
 
       // Create a single article
       using var httpClient = new HttpClient();
@@ -153,7 +151,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
       {
         article = new
         {
-          title = $"Default Tab Test Article - {timestamp}",
+          title = $"Default Tab Test Article - {uniqueId}",
           description = "Test article for default tab selection",
           body = "This article verifies the global feed is selected by default",
           tagList = new[] { "default-test" },
@@ -178,7 +176,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
       await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
       // Verify our test article title is visible somewhere on the page
-      var articleTitle = Page.GetByText($"Default Tab Test Article - {timestamp}");
+      var articleTitle = Page.GetByText($"Default Tab Test Article - {uniqueId}");
       await Expect(articleTitle).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
     finally
@@ -201,12 +199,14 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     try
     {
       // Setup: Create two users and have user2 follow user1
-      var timestamp = DateTime.Now.Ticks;
-      var (user1Token, user1Username) = await CreateUserViaApiAsync(timestamp, "feeduser1");
-      var (user2Token, user2Username) = await CreateUserViaApiAsync(timestamp, "feeduser2");
+      var (user1Token, user1Username) = await CreateUserViaApiAsync("feedu1");
+      var user2UniqueId = GenerateUniqueId();
+      var user2Username = $"feedu2{user2UniqueId}";
+      var user2Email = $"feedu2{user2UniqueId}@test.com";
+      var (user2Token, _) = await CreateUserViaApiAsyncWithCredentials(user2Username, user2Email, "TestPassword123!");
 
       // User1 creates 50 articles
-      await CreateArticlesForUserAsync(user1Token, TotalArticles, timestamp);
+      await CreateArticlesForUserAsync(user1Token, TotalArticles);
 
       // User2 follows user1
       await FollowUserAsync(user2Token, user1Username);
@@ -215,7 +215,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
       await Page.GotoAsync($"{BaseUrl}/login", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
       // Login as user2
-      await Page.GetByLabel("Email").FillAsync($"feeduser2{timestamp}@test.com");
+      await Page.GetByLabel("Email").FillAsync(user2Email);
       await Page.GetByLabel("Password").FillAsync("TestPassword123!");
       await Page.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
 
@@ -282,9 +282,8 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     try
     {
       // Setup: Create user and 50 articles
-      var timestamp = DateTime.Now.Ticks;
-      var (token, username) = await CreateUserViaApiAsync(timestamp, "profileuser");
-      await CreateArticlesForUserAsync(token, TotalArticles, timestamp);
+      var (token, username) = await CreateUserViaApiAsync("profpag");
+      await CreateArticlesForUserAsync(token, TotalArticles);
 
       // Navigate to profile page
       await Page.GotoAsync($"{BaseUrl}/profile/{username}", new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
@@ -331,17 +330,18 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     }
   }
 
-  private async Task<string> CreateUserAndArticlesViaApiAsync(long timestamp)
+  private async Task<string> CreateUserAndArticlesViaApiAsync()
   {
-    var (token, _) = await CreateUserViaApiAsync(timestamp, "paginationuser");
-    await CreateArticlesForUserAsync(token, TotalArticles, timestamp);
+    var (token, _) = await CreateUserViaApiAsync("paguser");
+    await CreateArticlesForUserAsync(token, TotalArticles);
     return token;
   }
 
-  private async Task<(string Token, string Username)> CreateUserViaApiAsync(long timestamp, string usernamePrefix)
+  private async Task<(string Token, string Username)> CreateUserViaApiAsync(string usernamePrefix)
   {
-    var username = $"{usernamePrefix}{timestamp}";
-    var email = $"{usernamePrefix}{timestamp}@test.com";
+    var uniqueId = GenerateUniqueId();
+    var username = $"{usernamePrefix}{uniqueId}";
+    var email = $"{usernamePrefix}{uniqueId}@test.com";
     var password = "TestPassword123!";
 
     using var httpClient = new HttpClient();
@@ -365,8 +365,32 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     return (userResponse.User.Token, username);
   }
 
-  private async Task CreateArticlesForUserAsync(string token, int count, long timestamp)
+  private async Task<(string Token, string Username)> CreateUserViaApiAsyncWithCredentials(string username, string email, string password)
   {
+    using var httpClient = new HttpClient();
+    httpClient.BaseAddress = new Uri(BaseUrl);
+
+    var registerRequest = new
+    {
+      user = new
+      {
+        username,
+        email,
+        password,
+      },
+    };
+
+    var response = await httpClient.PostAsJsonAsync("/api/users", registerRequest, JsonOptions);
+    response.EnsureSuccessStatusCode();
+
+    var responseContent = await response.Content.ReadAsStringAsync();
+    var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, JsonOptions)!;
+    return (userResponse.User.Token, username);
+  }
+
+  private async Task CreateArticlesForUserAsync(string token, int count)
+  {
+    var uniqueId = GenerateUniqueId();
     using var httpClient = new HttpClient();
     httpClient.BaseAddress = new Uri(BaseUrl);
     httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
@@ -377,7 +401,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
       {
         article = new
         {
-          title = $"Pagination Test Article {i} - {timestamp}",
+          title = $"Pagination Test Article {i} - {uniqueId}",
           description = $"Description for article {i}",
           body = $"Body content for article {i}",
           tagList = new[] { "pagination-test" },
