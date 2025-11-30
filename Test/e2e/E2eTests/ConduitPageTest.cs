@@ -37,6 +37,14 @@ public abstract class ConduitPageTest : PageTest
     });
   }
 
+  public override async ValueTask DisposeAsync()
+  {
+    // Reset database after each test to clean up test data
+    await ResetDatabaseAsync();
+
+    await base.DisposeAsync();
+  }
+
   /// <summary>
   /// Generates a unique identifier for test data by combining timestamp and a short GUID.
   /// This ensures uniqueness even when tests run in parallel.
@@ -109,5 +117,25 @@ public abstract class ConduitPageTest : PageTest
     {
       Path = Path.Combine(Constants.TracesDirectory, $"{testName}_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip"),
     });
+  }
+
+  private static readonly HttpClient HttpClientInstance = new();
+
+  /// <summary>
+  /// Calls the dev-only endpoint to reset the database, clearing all test data.
+  /// </summary>
+  private async Task ResetDatabaseAsync()
+  {
+    var resetUrl = $"{BaseUrl}/api/dev-only/test-data/reset";
+    try
+    {
+      var response = await HttpClientInstance.DeleteAsync(resetUrl);
+
+      // We don't throw on failure - the endpoint might not exist in production
+    }
+    catch
+    {
+      // Silently ignore - endpoint may not exist
+    }
   }
 }

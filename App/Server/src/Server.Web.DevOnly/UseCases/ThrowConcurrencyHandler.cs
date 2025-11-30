@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Server.SharedKernel.MediatR;
+﻿using Server.SharedKernel.MediatR;
 
 namespace Server.Web.DevOnly.UseCases;
 
