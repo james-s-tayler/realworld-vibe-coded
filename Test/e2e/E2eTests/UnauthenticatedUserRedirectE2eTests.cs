@@ -14,9 +14,10 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
   {
     await base.InitializeAsync();
 
-    var timestamp = DateTime.Now.Ticks;
-    _testUsername1 = $"unauthuser1_{timestamp}";
-    _testEmail1 = $"unauthuser1_{timestamp}@test.com";
+    // Use centralized unique ID generation to avoid collisions in parallel tests
+    var uniqueId = GenerateUniqueId();
+    _testUsername1 = $"unauth{uniqueId}";
+    _testEmail1 = $"unauth{uniqueId}@test.com";
     _testPassword1 = "TestPassword123!";
   }
 

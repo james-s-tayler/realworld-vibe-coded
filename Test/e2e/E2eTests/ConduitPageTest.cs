@@ -25,15 +25,51 @@ public abstract class ConduitPageTest : PageTest
 
     BaseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
 
-    var timestamp = DateTime.Now.Ticks;
-    TestUsername = $"articleuser{timestamp}";
-    TestEmail = $"articleuser{timestamp}@test.com";
+    // Use unique identifiers with GUID to avoid collisions in parallel tests
+    var uniqueId = GenerateUniqueId();
+    TestUsername = $"testuser{uniqueId}";
+    TestEmail = $"testuser{uniqueId}@test.com";
     TestPassword = "TestPassword123!";
 
     await Context.SetExtraHTTPHeadersAsync(new Dictionary<string, string>
     {
       ["User-Agent"] = "E2E-Test-Suite",
     });
+  }
+
+  public override async ValueTask DisposeAsync()
+  {
+    // Reset database after each test to clean up test data
+    await ResetDatabaseAsync();
+
+    await base.DisposeAsync();
+  }
+
+  /// <summary>
+  /// Generates a unique identifier for test data by combining timestamp and a short GUID.
+  /// This ensures uniqueness even when tests run in parallel.
+  /// </summary>
+  protected static string GenerateUniqueId(string prefix = "")
+  {
+    var timestamp = DateTime.UtcNow.Ticks;
+    var shortGuid = Guid.NewGuid().ToString("N")[..8];
+    return string.IsNullOrEmpty(prefix) ? $"{timestamp}{shortGuid}" : $"{prefix}{timestamp}{shortGuid}";
+  }
+
+  /// <summary>
+  /// Generates a unique username for test purposes.
+  /// </summary>
+  protected static string GenerateUniqueUsername(string prefix = "user")
+  {
+    return GenerateUniqueId(prefix);
+  }
+
+  /// <summary>
+  /// Generates a unique email for test purposes.
+  /// </summary>
+  protected static string GenerateUniqueEmail(string prefix = "user")
+  {
+    return $"{GenerateUniqueId(prefix)}@test.com";
   }
 
   protected async Task RegisterUser()
@@ -81,5 +117,25 @@ public abstract class ConduitPageTest : PageTest
     {
       Path = Path.Combine(Constants.TracesDirectory, $"{testName}_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip"),
     });
+  }
+
+  private static readonly HttpClient HttpClientInstance = new();
+
+  /// <summary>
+  /// Calls the dev-only endpoint to reset the database, clearing all test data.
+  /// </summary>
+  private async Task ResetDatabaseAsync()
+  {
+    var resetUrl = $"{BaseUrl}/api/dev-only/test-data/reset";
+    try
+    {
+      var response = await HttpClientInstance.DeleteAsync(resetUrl);
+
+      // We don't throw on failure - the endpoint might not exist in production
+    }
+    catch
+    {
+      // Silently ignore - endpoint may not exist
+    }
   }
 }

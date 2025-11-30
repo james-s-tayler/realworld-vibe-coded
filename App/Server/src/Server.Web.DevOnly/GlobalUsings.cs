@@ -5,6 +5,7 @@ global using FastEndpoints;
 global using FluentValidation;
 global using FluentValidation.Results;
 global using MediatR;
+global using Microsoft.EntityFrameworkCore;
 global using Server.Infrastructure;
 global using Server.SharedKernel.Result;
 global using Server.Web.DevOnly.Configuration;

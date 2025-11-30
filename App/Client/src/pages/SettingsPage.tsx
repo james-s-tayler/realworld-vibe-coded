@@ -10,7 +10,8 @@ import {
 } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
 import { useApiCall } from '../hooks/useApiCall';
-import { ErrorDisplay } from '../components/ErrorDisplay';
+import { PageShell } from '../components/PageShell';
+import { RequestBoundary } from '../components/RequestBoundary';
 import './SettingsPage.css';
 
 export const SettingsPage: React.FC = () => {
@@ -73,88 +74,77 @@ export const SettingsPage: React.FC = () => {
   }
 
   return (
-    <div className="settings-page">
-      <div className="container page">
-        <div className="row">
-          <div className="col-md-6 offset-md-3 col-xs-12">
-            <h1 className="text-xs-center">Your Settings</h1>
+    <PageShell className="settings-page" title="Your Settings">
+      <RequestBoundary error={error} clearError={clearError}>
+        {success && (
+          <InlineNotification
+            kind="success"
+            title="Success"
+            subtitle="Settings updated successfully"
+            onCloseButtonClick={() => setSuccess(false)}
+            style={{ marginBottom: '1rem' }}
+          />
+        )}
 
-            <ErrorDisplay
-              error={error}
-              onClose={clearError}
+        <Form onSubmit={handleSubmit}>
+          <Stack gap={6}>
+            <TextInput
+              id="image"
+              labelText=""
+              placeholder="URL of profile picture"
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
             />
 
-            {success && (
-              <InlineNotification
-                kind="success"
-                title="Success"
-                subtitle="Settings updated successfully"
-                onCloseButtonClick={() => setSuccess(false)}
-                style={{ marginBottom: '1rem' }}
-              />
-            )}
+            <TextInput
+              id="username"
+              labelText=""
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
 
-            <Form onSubmit={handleSubmit}>
-              <Stack gap={6}>
-                <TextInput
-                  id="image"
-                  labelText=""
-                  placeholder="URL of profile picture"
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                />
+            <TextArea
+              id="bio"
+              labelText=""
+              placeholder="Short bio about you"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows={8}
+            />
 
-                <TextInput
-                  id="username"
-                  labelText=""
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
+            <TextInput
+              id="email"
+              labelText=""
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              type="email"
+            />
 
-                <TextArea
-                  id="bio"
-                  labelText=""
-                  placeholder="Short bio about you"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  rows={8}
-                />
+            <TextInput
+              id="password"
+              labelText=""
+              placeholder="New Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+            />
 
-                <TextInput
-                  id="email"
-                  labelText=""
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  type="email"
-                />
-
-                <TextInput
-                  id="password"
-                  labelText=""
-                  placeholder="New Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  type="password"
-                />
-
-                <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">
-                  {loading ? 'Updating...' : 'Update Settings'}
-                </Button>
-              </Stack>
-            </Form>
-
-            <hr />
-
-            <Button kind="danger--ghost" onClick={handleLogout}>
-              Or click here to logout.
+            <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">
+              {loading ? 'Updating...' : 'Update Settings'}
             </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+          </Stack>
+        </Form>
+
+        <hr />
+
+        <Button kind="danger--ghost" onClick={handleLogout}>
+          Or click here to logout.
+        </Button>
+      </RequestBoundary>
+    </PageShell>
   );
 };

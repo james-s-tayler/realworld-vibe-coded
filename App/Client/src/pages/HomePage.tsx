@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, InlineNotification, Pagination } from '@carbon/react';
+import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, Pagination } from '@carbon/react';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
+import { useToast } from '../hooks/useToast';
 import { articlesApi } from '../api/articles';
 import { tagsApi } from '../api/tags';
 import { ArticleList } from '../components/ArticleList';
 import { TagList } from '../components/TagList';
-import { ApiError } from '../api/client';
+import { PageShell } from '../components/PageShell';
+import { normalizeError } from '../utils/errors';
 import type { Article } from '../types/article';
 import './HomePage.css';
 
@@ -16,6 +18,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 export const HomePage: React.FC = () => {
   const { user } = useAuth();
   const { requireAuth } = useRequireAuth();
+  const { showError } = useToast();
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesCount, setArticlesCount] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
@@ -25,7 +28,6 @@ export const HomePage: React.FC = () => {
   // Since unauthenticated users don't have "Your Feed" tab, index 0 is always correct initially
   const [activeTab, setActiveTab] = useState(0);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
@@ -43,7 +45,6 @@ export const HomePage: React.FC = () => {
 
   const loadArticles = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       let response;
       const offset = (currentPage - 1) * pageSize;
@@ -61,15 +62,11 @@ export const HomePage: React.FC = () => {
       setArticlesCount(response.articlesCount);
     } catch (error) {
       console.error('Failed to load articles:', error);
-      if (error instanceof ApiError) {
-        setError(error.errors.join(', '));
-      } else {
-        setError('Failed to load articles');
-      }
+      showError(normalizeError(error));
     } finally {
       setLoading(false);
     }
-  }, [activeTab, selectedTag, user, currentPage, pageSize]);
+  }, [activeTab, selectedTag, user, currentPage, pageSize, showError]);
 
   useEffect(() => {
     loadTags();
@@ -124,146 +121,133 @@ export const HomePage: React.FC = () => {
     }
   };
 
-  return (
-    <div className="home-page">
-      <div className="banner">
-        <div className="container">
-          <h1 className="banner-title">conduit</h1>
-          <p className="banner-subtitle">A place to share your <i>Angular</i> knowledge.</p>
-        </div>
-      </div>
-
-      <div className="container page">
-        <div className="row">
-          <div className="col-md-9">
-            {error && (
-              <InlineNotification
-                kind="error"
-                title="Error"
-                subtitle={error}
-                lowContrast
-                onCloseButtonClick={() => setError(null)}
-              />
-            )}
-            {user ? (
-              <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
-                <TabList aria-label="Article feeds">
-                  <Tab>Your Feed</Tab>
-                  <Tab>Global Feed</Tab>
-                  {selectedTag && <Tab>#{selectedTag}</Tab>}
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <ArticleList
-                      articles={articles}
-                      loading={loading}
-                      onFavorite={handleFavorite}
-                      onUnfavorite={handleUnfavorite}
-                    />
-                    {articlesCount > 0 && (
-                      <Pagination
-                        page={currentPage}
-                        pageSize={pageSize}
-                        pageSizes={PAGE_SIZE_OPTIONS}
-                        totalItems={articlesCount}
-                        onChange={handlePageChange}
-                      />
-                    )}
-                  </TabPanel>
-                  <TabPanel>
-                    <ArticleList
-                      articles={articles}
-                      loading={loading}
-                      onFavorite={handleFavorite}
-                      onUnfavorite={handleUnfavorite}
-                    />
-                    {articlesCount > 0 && (
-                      <Pagination
-                        page={currentPage}
-                        pageSize={pageSize}
-                        pageSizes={PAGE_SIZE_OPTIONS}
-                        totalItems={articlesCount}
-                        onChange={handlePageChange}
-                      />
-                    )}
-                  </TabPanel>
-                  {selectedTag && (
-                    <TabPanel>
-                      <ArticleList
-                        articles={articles}
-                        loading={loading}
-                        onFavorite={handleFavorite}
-                        onUnfavorite={handleUnfavorite}
-                      />
-                      {articlesCount > 0 && (
-                        <Pagination
-                          page={currentPage}
-                          pageSize={pageSize}
-                          pageSizes={PAGE_SIZE_OPTIONS}
-                          totalItems={articlesCount}
-                          onChange={handlePageChange}
-                        />
-                      )}
-                    </TabPanel>
-                  )}
-                </TabPanels>
-              </Tabs>
-            ) : (
-              <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
-                <TabList aria-label="Article feeds">
-                  <Tab>Global Feed</Tab>
-                  {selectedTag && <Tab>#{selectedTag}</Tab>}
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <ArticleList
-                      articles={articles}
-                      loading={loading}
-                      onFavorite={handleFavorite}
-                      onUnfavorite={handleUnfavorite}
-                    />
-                    {articlesCount > 0 && (
-                      <Pagination
-                        page={currentPage}
-                        pageSize={pageSize}
-                        pageSizes={PAGE_SIZE_OPTIONS}
-                        totalItems={articlesCount}
-                        onChange={handlePageChange}
-                      />
-                    )}
-                  </TabPanel>
-                  {selectedTag && (
-                    <TabPanel>
-                      <ArticleList
-                        articles={articles}
-                        loading={loading}
-                        onFavorite={handleFavorite}
-                        onUnfavorite={handleUnfavorite}
-                      />
-                      {articlesCount > 0 && (
-                        <Pagination
-                          page={currentPage}
-                          pageSize={pageSize}
-                          pageSizes={PAGE_SIZE_OPTIONS}
-                          totalItems={articlesCount}
-                          onChange={handlePageChange}
-                        />
-                      )}
-                    </TabPanel>
-                  )}
-                </TabPanels>
-              </Tabs>
-            )}
-          </div>
-
-          <div className="col-md-3">
-            <Tile className="sidebar">
-              <p className="sidebar-title">Popular Tags</p>
-              <TagList tags={tags} loading={tagsLoading} onTagClick={handleTagClick} />
-            </Tile>
-          </div>
-        </div>
+  const banner = (
+    <div className="banner">
+      <div className="container">
+        <h1 className="banner-title">conduit</h1>
+        <p className="banner-subtitle">A place to share your <i>Angular</i> knowledge.</p>
       </div>
     </div>
+  );
+
+  const sidebar = (
+    <Tile className="sidebar">
+      <p className="sidebar-title">Popular Tags</p>
+      <TagList tags={tags} loading={tagsLoading} onTagClick={handleTagClick} />
+    </Tile>
+  );
+
+  return (
+    <PageShell className="home-page" banner={banner} sidebar={sidebar} columnLayout="two-column">
+      {user ? (
+        <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
+          <TabList aria-label="Article feeds">
+            <Tab>Your Feed</Tab>
+            <Tab>Global Feed</Tab>
+            {selectedTag && <Tab>#{selectedTag}</Tab>}
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <ArticleList
+                articles={articles}
+                loading={loading}
+                onFavorite={handleFavorite}
+                onUnfavorite={handleUnfavorite}
+              />
+              {articlesCount > 0 && (
+                <Pagination
+                  page={currentPage}
+                  pageSize={pageSize}
+                  pageSizes={PAGE_SIZE_OPTIONS}
+                  totalItems={articlesCount}
+                  onChange={handlePageChange}
+                />
+              )}
+            </TabPanel>
+            <TabPanel>
+              <ArticleList
+                articles={articles}
+                loading={loading}
+                onFavorite={handleFavorite}
+                onUnfavorite={handleUnfavorite}
+              />
+              {articlesCount > 0 && (
+                <Pagination
+                  page={currentPage}
+                  pageSize={pageSize}
+                  pageSizes={PAGE_SIZE_OPTIONS}
+                  totalItems={articlesCount}
+                  onChange={handlePageChange}
+                />
+              )}
+            </TabPanel>
+            {selectedTag && (
+              <TabPanel>
+                <ArticleList
+                  articles={articles}
+                  loading={loading}
+                  onFavorite={handleFavorite}
+                  onUnfavorite={handleUnfavorite}
+                />
+                {articlesCount > 0 && (
+                  <Pagination
+                    page={currentPage}
+                    pageSize={pageSize}
+                    pageSizes={PAGE_SIZE_OPTIONS}
+                    totalItems={articlesCount}
+                    onChange={handlePageChange}
+                  />
+                )}
+              </TabPanel>
+            )}
+          </TabPanels>
+        </Tabs>
+      ) : (
+        <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
+          <TabList aria-label="Article feeds">
+            <Tab>Global Feed</Tab>
+            {selectedTag && <Tab>#{selectedTag}</Tab>}
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <ArticleList
+                articles={articles}
+                loading={loading}
+                onFavorite={handleFavorite}
+                onUnfavorite={handleUnfavorite}
+              />
+              {articlesCount > 0 && (
+                <Pagination
+                  page={currentPage}
+                  pageSize={pageSize}
+                  pageSizes={PAGE_SIZE_OPTIONS}
+                  totalItems={articlesCount}
+                  onChange={handlePageChange}
+                />
+              )}
+            </TabPanel>
+            {selectedTag && (
+              <TabPanel>
+                <ArticleList
+                  articles={articles}
+                  loading={loading}
+                  onFavorite={handleFavorite}
+                  onUnfavorite={handleUnfavorite}
+                />
+                {articlesCount > 0 && (
+                  <Pagination
+                    page={currentPage}
+                    pageSize={pageSize}
+                    pageSizes={PAGE_SIZE_OPTIONS}
+                    totalItems={articlesCount}
+                    onChange={handlePageChange}
+                  />
+                )}
+              </TabPanel>
+            )}
+          </TabPanels>
+        </Tabs>
+      )}
+    </PageShell>
   );
 };

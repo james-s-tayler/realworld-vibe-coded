@@ -17,13 +17,15 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
   {
     await base.InitializeAsync();
 
-    var timestamp = DateTime.Now.Ticks;
-    _testUsername1 = $"profileuser1_{timestamp}";
-    _testEmail1 = $"profileuser1_{timestamp}@test.com";
+    // Use centralized unique ID generation to avoid collisions in parallel tests
+    var uniqueId1 = GenerateUniqueId();
+    _testUsername1 = $"prof1{uniqueId1}";
+    _testEmail1 = $"prof1{uniqueId1}@test.com";
     _testPassword1 = "TestPassword123!";
 
-    _testUsername2 = $"profileuser2_{timestamp}";
-    _testEmail2 = $"profileuser2_{timestamp}@test.com";
+    var uniqueId2 = GenerateUniqueId();
+    _testUsername2 = $"prof2{uniqueId2}";
+    _testEmail2 = $"prof2{uniqueId2}@test.com";
     _testPassword2 = "TestPassword123!";
   }
 
