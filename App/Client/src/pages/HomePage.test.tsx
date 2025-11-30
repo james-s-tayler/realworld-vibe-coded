@@ -3,6 +3,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { BrowserRouter } from 'react-router'
 import { HomePage } from './HomePage'
 import { AuthProvider } from '../context/AuthContext'
+import { ToastProvider } from '../context/ToastContext'
 import { authApi } from '../api/auth'
 import { articlesApi } from '../api/articles'
 import { tagsApi } from '../api/tags'
@@ -32,7 +33,9 @@ function renderHomePage() {
   return render(
     <BrowserRouter>
       <AuthProvider>
-        <HomePage />
+        <ToastProvider>
+          <HomePage />
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   )

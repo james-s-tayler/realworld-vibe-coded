@@ -114,6 +114,62 @@ describe('PageShell', () => {
       const columnDiv = container.querySelector('.col-md-10.offset-md-1.col-xs-12');
       expect(columnDiv).toBeInTheDocument();
     });
+
+    it('applies full column classes when columnLayout is full', () => {
+      const { container } = render(
+        <PageShell columnLayout="full">
+          <p>Content</p>
+        </PageShell>
+      );
+      const columnDiv = container.querySelector('.col-md-12.col-xs-12');
+      expect(columnDiv).toBeInTheDocument();
+    });
+
+    it('renders two-column layout with main content and sidebar', () => {
+      const { container } = render(
+        <PageShell
+          columnLayout="two-column"
+          sidebar={<div data-testid="sidebar">Sidebar Content</div>}
+        >
+          <p>Main Content</p>
+        </PageShell>
+      );
+      const mainCol = container.querySelector('.col-md-9');
+      const sidebarCol = container.querySelector('.col-md-3');
+      expect(mainCol).toBeInTheDocument();
+      expect(sidebarCol).toBeInTheDocument();
+      expect(screen.getByText('Main Content')).toBeInTheDocument();
+      expect(screen.getByTestId('sidebar')).toBeInTheDocument();
+    });
+  });
+
+  describe('banner slot', () => {
+    it('renders banner above the container when provided', () => {
+      const { container } = render(
+        <PageShell
+          banner={<div data-testid="banner" className="my-banner">Banner Content</div>}
+        >
+          <p>Content</p>
+        </PageShell>
+      );
+      expect(screen.getByTestId('banner')).toBeInTheDocument();
+      expect(screen.getByText('Banner Content')).toBeInTheDocument();
+      // Banner should be a sibling of container, not inside it
+      const shell = screen.getByTestId('page-shell');
+      const banner = container.querySelector('.my-banner');
+      const containerPage = container.querySelector('.container.page');
+      expect(shell.firstChild).toBe(banner);
+      expect(shell.lastChild).toBe(containerPage);
+    });
+
+    it('does not render banner element when banner is not provided', () => {
+      render(
+        <PageShell>
+          <p>Content</p>
+        </PageShell>
+      );
+      expect(screen.queryByTestId('banner')).not.toBeInTheDocument();
+    });
   });
 
   describe('title ReactNode support', () => {

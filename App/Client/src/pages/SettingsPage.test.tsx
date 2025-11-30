@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router'
 import { SettingsPage } from './SettingsPage'
 import { AuthProvider } from '../context/AuthContext'
+import { ToastProvider } from '../context/ToastContext'
 import { authApi } from '../api/auth'
 
 vi.mock('../api/auth', () => ({
@@ -34,7 +35,9 @@ function renderSettingsPage() {
   return render(
     <BrowserRouter>
       <AuthProvider>
-        <SettingsPage />
+        <ToastProvider>
+          <SettingsPage />
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   )

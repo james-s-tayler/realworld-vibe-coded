@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppHeader } from './components/AppHeader';
 import { HomePage } from './pages/HomePage';
@@ -14,6 +15,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ToastProvider>
         <AppHeader />
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -46,6 +48,7 @@ function App() {
             }
           />
         </Routes>
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   );

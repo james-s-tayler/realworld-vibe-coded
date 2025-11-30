@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { EditorPage } from './EditorPage';
 import { AuthContext } from '../context/AuthContext';
+import { ToastProvider } from '../context/ToastContext';
 
 // Mock the articles API
 vi.mock('../api/articles', () => ({
@@ -29,12 +30,14 @@ const renderWithAuth = (user = mockUser, initialRoute = '/editor') => {
       logout: vi.fn(), 
       updateUser: vi.fn()
     }}>
-      <MemoryRouter initialEntries={[initialRoute]}>
-        <Routes>
-          <Route path="/editor" element={<EditorPage />} />
-          <Route path="/editor/:slug" element={<EditorPage />} />
-        </Routes>
-      </MemoryRouter>
+      <ToastProvider>
+        <MemoryRouter initialEntries={[initialRoute]}>
+          <Routes>
+            <Route path="/editor" element={<EditorPage />} />
+            <Route path="/editor/:slug" element={<EditorPage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>
     </AuthContext.Provider>
   );
 };
