@@ -1,0 +1,88 @@
+.page-shell {
+  min-height: calc(100vh - 56px);
+}
+
+.page-shell .container.page {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 1.5rem 15px;
+}
+
+.page-shell .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+/* Column widths */
+.page-shell .col-md-6 {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+.page-shell .col-md-9 {
+  flex: 0 0 70%;
+  max-width: 70%;
+}
+
+.page-shell .col-md-10 {
+  flex: 0 0 83.333333%;
+  max-width: 83.333333%;
+}
+
+.page-shell .col-md-12 {
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+.page-shell .col-md-3 {
+  flex: 0 0 calc(30% - 1.5rem);
+  max-width: calc(30% - 1.5rem);
+}
+
+/* Column offsets */
+.page-shell .offset-md-1 {
+  margin-left: 8.333333%;
+}
+
+.page-shell .offset-md-3 {
+  margin-left: 25%;
+}
+
+.page-shell .col-xs-12 {
+  width: 100%;
+}
+
+.page-shell .text-xs-center {
+  text-align: center;
+}
+
+.page-shell h1 {
+  margin-bottom: 0.5rem;
+}
+
+.page-shell p.text-xs-center {
+  margin-bottom: 1rem;
+}
+
+/* Banner styles */
+.page-shell-banner {
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .page-shell .col-md-6,
+  .page-shell .col-md-9,
+  .page-shell .col-md-10,
+  .page-shell .col-md-12,
+  .page-shell .col-md-3 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .page-shell .offset-md-1,
+  .page-shell .offset-md-3 {
+    margin-left: 0;
+  }
+}
