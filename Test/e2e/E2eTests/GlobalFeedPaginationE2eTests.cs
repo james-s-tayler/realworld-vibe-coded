@@ -97,7 +97,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     try
     {
       // Setup: Create user and only 5 articles (less than page size of 20)
-      var (token, _) = await CreateUserViaApiAsync("fewart");
+      var (token, _, _) = await CreateUserViaApiAsync("fewart");
       await CreateArticlesForUserAsync(token, 5);
 
       // Navigate to the home page
@@ -140,7 +140,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     {
       // Setup: Create user and one article via API so global feed has content
       var uniqueId = GenerateUniqueId();
-      var (token, username) = await CreateUserViaApiAsync("deftest");
+      var (token, username, _) = await CreateUserViaApiAsync("deftest");
 
       // Create a single article
       using var httpClient = new HttpClient();
@@ -199,11 +199,8 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     try
     {
       // Setup: Create two users and have user2 follow user1
-      var (user1Token, user1Username) = await CreateUserViaApiAsync("feedu1");
-      var user2UniqueId = GenerateUniqueId();
-      var user2Username = $"feedu2{user2UniqueId}";
-      var user2Email = $"feedu2{user2UniqueId}@test.com";
-      var (user2Token, _) = await CreateUserViaApiAsyncWithCredentials(user2Username, user2Email, "TestPassword123!");
+      var (user1Token, user1Username, _) = await CreateUserViaApiAsync("feedu1");
+      var (user2Token, user2Username, user2Email) = await CreateUserViaApiAsync("feedu2");
 
       // User1 creates 50 articles
       await CreateArticlesForUserAsync(user1Token, TotalArticles);
@@ -282,7 +279,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
     try
     {
       // Setup: Create user and 50 articles
-      var (token, username) = await CreateUserViaApiAsync("profpag");
+      var (token, username, _) = await CreateUserViaApiAsync("profpag");
       await CreateArticlesForUserAsync(token, TotalArticles);
 
       // Navigate to profile page
@@ -332,12 +329,12 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
 
   private async Task<string> CreateUserAndArticlesViaApiAsync()
   {
-    var (token, _) = await CreateUserViaApiAsync("paguser");
+    var (token, _, _) = await CreateUserViaApiAsync("paguser");
     await CreateArticlesForUserAsync(token, TotalArticles);
     return token;
   }
 
-  private async Task<(string Token, string Username)> CreateUserViaApiAsync(string usernamePrefix)
+  private async Task<(string Token, string Username, string Email)> CreateUserViaApiAsync(string usernamePrefix)
   {
     var uniqueId = GenerateUniqueId();
     var username = $"{usernamePrefix}{uniqueId}";
@@ -362,30 +359,7 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
 
     var responseContent = await response.Content.ReadAsStringAsync();
     var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, JsonOptions)!;
-    return (userResponse.User.Token, username);
-  }
-
-  private async Task<(string Token, string Username)> CreateUserViaApiAsyncWithCredentials(string username, string email, string password)
-  {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(BaseUrl);
-
-    var registerRequest = new
-    {
-      user = new
-      {
-        username,
-        email,
-        password,
-      },
-    };
-
-    var response = await httpClient.PostAsJsonAsync("/api/users", registerRequest, JsonOptions);
-    response.EnsureSuccessStatusCode();
-
-    var responseContent = await response.Content.ReadAsStringAsync();
-    var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, JsonOptions)!;
-    return (userResponse.User.Token, username);
+    return (userResponse.User.Token, username, email);
   }
 
   private async Task CreateArticlesForUserAsync(string token, int count)

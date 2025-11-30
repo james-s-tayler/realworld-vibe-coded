@@ -76,7 +76,8 @@ public class ValidationErrorE2eTests : ConduitPageTest
       var uniqueId = GenerateUniqueId();
       var email = $"duptest{uniqueId}@test.com";
       var username1 = $"dupusr1{uniqueId}";
-      var username2 = $"dupusr2{GenerateUniqueId()}";
+      var uniqueId2 = GenerateUniqueId();
+      var username2 = $"dupusr2{uniqueId2}";
       var password = "TestPassword123!";
 
       // Register first user
