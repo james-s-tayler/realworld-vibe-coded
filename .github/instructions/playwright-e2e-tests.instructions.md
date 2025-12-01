@@ -139,9 +139,6 @@ Test Data
 ❌ Async void: public async void TestMethod()
 ✅ Use: public async Task TestMethod()
 
-❌ Short timeouts in CI: const int Timeout = 5000;
-✅ Use: const int DefaultTimeout = 30000; // 30s for CI stability
-
 ❌ Assuming immediate state after navigation:
 ```csharp
 await publishButton.ClickAsync();
