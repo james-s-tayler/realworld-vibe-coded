@@ -47,7 +47,30 @@ Use Appropriate Waiting Strategies
     Expect(page).ToHaveURLAsync(...)
     Expect(locator).ToHaveTextAsync(...)
     Expect(locator).ToHaveCountAsync(...)
-    Use WaitForLoadStateAsync() or WaitForResponseAsync() for specific scenarios only
+
+    **Critical for CI Stability:**
+    After navigation that triggers data changes (e.g., creating articles, following users):
+    1. Use WaitForLoadStateAsync(LoadState.NetworkIdle) to ensure all API calls complete
+    2. Wait for loading indicators to disappear before asserting content
+    3. Verify expected content is visible before proceeding to next action
+
+    Example - After creating an article:
+    ```csharp
+    await Page.GetByRole(AriaRole.Button, new() { Name = "Publish Article" }).ClickAsync();
+    await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
+    var articleHeading = Page.GetByRole(AriaRole.Heading, new() { Name = articleTitle });
+    await Expect(articleHeading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    ```
+
+    Example - Before checking tab content:
+    ```csharp
+    await favoritedTab.ClickAsync();
+    var panel = Page.GetByRole(AriaRole.Tabpanel).First;
+    var loadingIndicator = panel.GetByText("Loading articles...");
+    await Expect(loadingIndicator).ToBeHiddenAsync(new() { Timeout = DefaultTimeout });
+    // Now safe to check for articles
+    ```
 
 Use Async/Await Everywhere
 
@@ -79,6 +102,13 @@ Ensure Parallel Safety
 
 **Best Practices**
 
+CI Environment Considerations
+
+    CI environments are slower than local development machines
+    Use generous timeouts (30s default) to account for CI variability
+    Always use WaitForLoadStateAsync(NetworkIdle) after form submissions or navigation
+    Never assume immediate state changes - always wait for UI confirmation
+
 Test Structure
 
     Follow AAA pattern: Arrange, Act, Assert
@@ -93,9 +123,11 @@ Error Handling
 
 Test Data
 
-    Use unique identifiers (timestamps, GUIDs) to avoid conflicts
+    Use GUIDs for unique identifiers to ensure uniqueness across parallel CI runs
+    Example: var email = $"{username}{Guid.NewGuid():N[..8]}@test.com";
     Clean up test data when possible (or use isolated test databases)
     Make test data realistic but minimal
+    Wipe database before each test to ensure isolation
 
 **Anti-Patterns to Avoid**
 
@@ -106,10 +138,42 @@ Test Data
 ✅ Use: await Page.GetByRole(AriaRole.Button, new() { Name = "Submit" }).ClickAsync();
 
 ❌ Shared state: private static string sharedUsername;
-✅ Use: var username = $"user_{DateTime.UtcNow.Ticks}";
+✅ Use: var username = $"user_{Guid.NewGuid():N[..8]}";
 
 ❌ Cross-test dependencies: Test B assumes Test A ran first
 ✅ Each test sets up its own preconditions
 
 ❌ Async void: public async void TestMethod()
 ✅ Use: public async Task TestMethod()
+
+❌ Short timeouts in CI: const int Timeout = 5000;
+✅ Use: const int DefaultTimeout = 30000; // 30s for CI stability
+
+❌ Assuming immediate state after navigation:
+```csharp
+await publishButton.ClickAsync();
+await Page.WaitForURLAsync("/article/...");
+// Immediately checking content - FLAKY!
+var title = Page.GetByRole(AriaRole.Heading);
+```
+✅ Wait for network idle and verify content:
+```csharp
+await publishButton.ClickAsync();
+await Page.WaitForURLAsync("/article/...");
+await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+var title = Page.GetByRole(AriaRole.Heading, new() { Name = expectedTitle });
+await Expect(title).ToBeVisibleAsync();
+```
+
+❌ Checking tab content without waiting for load:
+```csharp
+await tab.ClickAsync();
+var article = panel.Locator(".article-preview"); // May still be loading!
+```
+✅ Wait for loading indicator to disappear:
+```csharp
+await tab.ClickAsync();
+await Expect(panel.GetByText("Loading...")).ToBeHiddenAsync();
+var article = panel.Locator(".article-preview");
+await Expect(article).ToBeVisibleAsync();
+```
