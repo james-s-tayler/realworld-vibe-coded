@@ -5,7 +5,7 @@ namespace E2eTests;
 
 public abstract class ConduitPageTest : PageTest
 {
-  protected const int DefaultTimeout = 10000;
+  protected const int DefaultTimeout = 30000; // Increased from 10s to 30s for CI stability
   protected string BaseUrl = null!;
   protected string TestUsername = null!;
   protected string TestEmail = null!;

@@ -287,7 +287,14 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
     await Page.GetByPlaceholder("Write your article (in markdown)").FillAsync(articleBody);
     await Page.GetByRole(AriaRole.Button, new() { Name = "Publish Article" }).ClickAsync();
 
+    // Wait for navigation to article page and ensure it's fully loaded
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
+
+    // Ensure the article heading is visible before returning
+    var articleHeading = Page.GetByRole(AriaRole.Heading, new() { Name = articleTitle });
+    await Expect(articleHeading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
     return articleTitle;
   }
 
@@ -305,7 +312,14 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
     await Page.GetByPlaceholder("Write your article (in markdown)").FillAsync(articleBody);
     await Page.GetByRole(AriaRole.Button, new() { Name = "Publish Article" }).ClickAsync();
 
+    // Wait for navigation to article page and ensure it's fully loaded
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
+
+    // Ensure the article heading is visible before returning
+    var articleHeading = Page.GetByRole(AriaRole.Heading, new() { Name = articleTitle });
+    await Expect(articleHeading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
     return articleTitle;
   }
 }
