@@ -25,6 +25,9 @@ public abstract class ConduitPageTest : PageTest
 
     BaseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
 
+    // Wipe all test data BEFORE each test to ensure a clean slate
+    await WipeTestData();
+
     // Generate unique test user credentials
     TestUsername = GenerateUniqueUsername("articleuser");
     TestEmail = GenerateUniqueEmail(TestUsername);
@@ -38,7 +41,7 @@ public abstract class ConduitPageTest : PageTest
 
   public override async ValueTask DisposeAsync()
   {
-    // Wipe all test data after each test to ensure isolation
+    // Also wipe after each test for cleanup (optional but helps with debugging)
     await WipeTestData();
     await base.DisposeAsync();
   }
