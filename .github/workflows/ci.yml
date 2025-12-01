@@ -503,6 +503,18 @@ jobs:
           echo "Postman tests failed with exit code ${{ steps.postman_tests.outputs.exit_code }}"
           exit ${{ steps.postman_tests.outputs.exit_code }}
 
+  # ============================================================================
+  # TODO: TEMPORARY PARALLEL E2E TESTS FOR FLAKINESS DETECTION
+  # ============================================================================
+  # These 5 parallel E2E test jobs are a TEMPORARY measure to detect flaky tests.
+  # Once flakiness is confirmed/fixed, revert to a single test-e2e job.
+  #
+  # To revert: Delete test-e2e-2 through test-e2e-5 jobs and remove this comment
+  # block, keeping only the original test-e2e job.
+  #
+  # Issue: https://github.com/james-s-tayler/realworld-vibe-coded/issues/XXX
+  # ============================================================================
+
   test-e2e:
     name: test-e2e
     runs-on: ubuntu-latest
@@ -562,6 +574,226 @@ jobs:
         if: always()  # This should actually be failure(), but I will optimize later
         with:
           name: test-e2e-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  # TODO: TEMPORARY - Parallel E2E test run 2 of 5 for flakiness detection
+  test-e2e-2:
+    name: test-e2e-2
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.client == 'true' || needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: Test/e2e/E2eTests/E2eTests.csproj
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts and comment
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-2-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  # TODO: TEMPORARY - Parallel E2E test run 3 of 5 for flakiness detection
+  test-e2e-3:
+    name: test-e2e-3
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.client == 'true' || needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: Test/e2e/E2eTests/E2eTests.csproj
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts and comment
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-3-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  # TODO: TEMPORARY - Parallel E2E test run 4 of 5 for flakiness detection
+  test-e2e-4:
+    name: test-e2e-4
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.client == 'true' || needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: Test/e2e/E2eTests/E2eTests.csproj
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts and comment
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-4-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  # TODO: TEMPORARY - Parallel E2E test run 5 of 5 for flakiness detection
+  test-e2e-5:
+    name: test-e2e-5
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.client == 'true' || needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+          cache: true
+          cache-dependency-path: Test/e2e/E2eTests/E2eTests.csproj
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts and comment
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-5-reports
           path: |
             Reports/Test/e2e
           retention-days: 7
