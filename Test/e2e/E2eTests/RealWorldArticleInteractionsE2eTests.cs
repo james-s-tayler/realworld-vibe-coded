@@ -17,13 +17,12 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
   {
     await base.InitializeAsync();
 
-    var timestamp = DateTime.Now.Ticks;
-    _testUsername1 = $"articleuser1_{timestamp}";
-    _testEmail1 = $"articleuser1_{timestamp}@test.com";
+    _testUsername1 = GenerateUniqueUsername("articleuser1");
+    _testEmail1 = GenerateUniqueEmail(_testUsername1);
     _testPassword1 = "TestPassword123!";
 
-    _testUsername2 = $"articleuser2_{timestamp}";
-    _testEmail2 = $"articleuser2_{timestamp}@test.com";
+    _testUsername2 = GenerateUniqueUsername("articleuser2");
+    _testEmail2 = GenerateUniqueEmail(_testUsername2);
     _testPassword2 = "TestPassword123!";
   }
 
@@ -111,12 +110,10 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
       await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
-      await Page.WaitForTimeoutAsync(2000);
 
       // Check that the deleted article is not in the feed
       var deletedArticle = Page.GetByText(articleTitle).First;
-      var isVisible = await deletedArticle.IsVisibleAsync();
-      Assert.False(isVisible, "Deleted article should not appear in feed");
+      await Expect(deletedArticle).Not.ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
     finally
     {
@@ -152,12 +149,15 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
 
       // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
+      await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
-      await Page.WaitForTimeoutAsync(2000);
 
-      // Click on the article link - use visible panel and click the article-link specifically
+      // Wait for article preview to be visible before clicking
       var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var articlePreview = visiblePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
+      // Click on the article link
       var articleLink = articlePreview.Locator(".article-link");
       await articleLink.ClickAsync();
       await Page.WaitForURLAsync(new System.Text.RegularExpressions.Regex(@"/article/"), new() { Timeout = DefaultTimeout });
@@ -168,17 +168,15 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
 
       // Click to favorite
       await favoriteButton.ClickAsync();
-      await Page.WaitForTimeoutAsync(1000);
 
-      // Verify button changed to unfavorite
+      // Verify button changed to unfavorite (implicitly waits)
       var unfavoriteButton = Page.GetByRole(AriaRole.Button).Filter(new() { HasTextRegex = new System.Text.RegularExpressions.Regex("Unfavorite Article") });
       await Expect(unfavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
       // Click to unfavorite
       await unfavoriteButton.ClickAsync();
-      await Page.WaitForTimeoutAsync(1000);
 
-      // Verify button changed back to favorite
+      // Verify button changed back to favorite (implicitly waits)
       favoriteButton = Page.GetByRole(AriaRole.Button).Filter(new() { HasTextRegex = new System.Text.RegularExpressions.Regex("Favorite Article") });
       await Expect(favoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
@@ -214,13 +212,9 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
       var postButton = Page.Locator("button").Filter(new() { HasText = "Post Comment" });
       await postButton.ClickAsync();
 
-      // Wait for comment to appear
-      await Page.WaitForTimeoutAsync(2000);
-
-      // Verify comment is displayed
-      var comment = Page.Locator($"text={commentText}").First;
-      await comment.WaitForAsync(new() { Timeout = DefaultTimeout });
-      Assert.True(await comment.IsVisibleAsync(), "Posted comment should be visible");
+      // Verify comment is displayed (implicitly waits for it to appear)
+      var comment = Page.GetByText(commentText).First;
+      await Expect(comment).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
     finally
     {
@@ -270,10 +264,7 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
       // Wait for the delete API response
       await responseTask;
 
-      // Give UI time to update
-      await Page.WaitForTimeoutAsync(1000);
-
-      // Verify comment is no longer visible
+      // Verify comment is no longer visible (implicitly waits for the UI to update)
       await Expect(comment).Not.ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
     finally
@@ -287,8 +278,7 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"E2E Test Article {timestamp}";
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
     var articleDescription = "Test article for E2E testing";
     var articleBody = "This is a test article body.";
 
@@ -306,8 +296,7 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"{username} Article {timestamp}";
+    var articleTitle = $"{username} Article {GenerateUniqueUsername("art")}";
     var articleDescription = "Test article for E2E testing";
     var articleBody = "This is a test article body.";
 

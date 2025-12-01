@@ -14,9 +14,8 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
   {
     await base.InitializeAsync();
 
-    var timestamp = DateTime.Now.Ticks;
-    _testUsername1 = $"unauthuser1_{timestamp}";
-    _testEmail1 = $"unauthuser1_{timestamp}@test.com";
+    _testUsername1 = GenerateUniqueUsername("unauthuser1");
+    _testEmail1 = GenerateUniqueEmail(_testUsername1);
     _testPassword1 = "TestPassword123!";
   }
 
@@ -46,18 +45,19 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
       // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
       await globalFeedTab.ClickAsync();
-      await Page.WaitForTimeoutAsync(2000);
 
-      // Click on the article link
+      // Wait for article preview to be visible
       var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var articlePreview = visiblePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
+      // Click on the article link
       var articleLink = articlePreview.Locator(".article-link");
       await articleLink.ClickAsync();
       await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
 
       // Try to click the favorite button - button text contains "Favorite Article"
       var favoriteButton = Page.GetByRole(AriaRole.Button).Filter(new() { HasTextRegex = new Regex("Favorite Article") });
-      await favoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await favoriteButton.ClickAsync();
 
       // Verify redirect to login page
@@ -96,12 +96,11 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
       // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
       await globalFeedTab.ClickAsync();
-      await Page.WaitForTimeoutAsync(2000);
 
-      // Find and click the favorite button on the article preview
+      // Wait for and click the favorite button on the article preview
       var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var favoriteButton = visiblePanel.Locator(".article-preview .favorite-button").First;
-      await favoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+      await Expect(favoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
       await favoriteButton.ClickAsync();
 
       // Verify redirect to login page
@@ -182,18 +181,19 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
       // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
       await globalFeedTab.ClickAsync();
-      await Page.WaitForTimeoutAsync(2000);
 
-      // Click on the article link
+      // Wait for article preview to be visible
       var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var articlePreview = visiblePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
+      // Click on the article link
       var articleLink = articlePreview.Locator(".article-link");
       await articleLink.ClickAsync();
       await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
 
       // Find and click the follow button
       var followButton = Page.GetByRole(AriaRole.Button, new() { Name = $"Follow {_testUsername1}" });
-      await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await followButton.ClickAsync();
 
       // Verify redirect to login page
@@ -211,8 +211,7 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"E2E Test Article {timestamp}";
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("article")}";
     var articleDescription = "Test article for E2E testing";
     var articleBody = "This is a test article body.";
 
