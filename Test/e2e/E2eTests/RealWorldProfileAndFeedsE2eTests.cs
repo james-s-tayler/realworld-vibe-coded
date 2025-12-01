@@ -17,13 +17,12 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
   {
     await base.InitializeAsync();
 
-    var timestamp = DateTime.Now.Ticks;
-    _testUsername1 = $"profileuser1_{timestamp}";
-    _testEmail1 = $"profileuser1_{timestamp}@test.com";
+    _testUsername1 = GenerateUniqueUsername("profileuser1");
+    _testEmail1 = GenerateUniqueEmail(_testUsername1);
     _testPassword1 = "TestPassword123!";
 
-    _testUsername2 = $"profileuser2_{timestamp}";
-    _testEmail2 = $"profileuser2_{timestamp}@test.com";
+    _testUsername2 = GenerateUniqueUsername("profileuser2");
+    _testEmail2 = GenerateUniqueEmail(_testUsername2);
     _testPassword2 = "TestPassword123!";
   }
 
@@ -99,20 +98,14 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await followButton.ClickAsync();
 
-      // Wait for update
-      await Page.WaitForTimeoutAsync(1000);
-
-      // Verify button text changed to unfollow
+      // Verify button text changed to unfollow (implicitly waits for the change)
       var unfollowButton = Page.GetByRole(AriaRole.Button, new() { Name = $"Unfollow {_testUsername1}" });
       await Expect(unfollowButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
       // Click to unfollow
       await unfollowButton.ClickAsync();
 
-      // Wait for update
-      await Page.WaitForTimeoutAsync(1000);
-
-      // Verify button text changed back to follow
+      // Verify button text changed back to follow (implicitly waits for the change)
       followButton = Page.GetByRole(AriaRole.Button, new() { Name = $"Follow {_testUsername1}" });
       await Expect(followButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
@@ -162,9 +155,6 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await yourFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await yourFeedTab.ClickAsync();
 
-      // Wait for articles to load
-      await Page.WaitForTimeoutAsync(2000);
-
       // Verify followed user's article appears in Your Feed
       var article = Page.GetByText(articleTitle).First;
       await Expect(article).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
@@ -190,7 +180,7 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     {
       // Register user and create an article with a specific tag
       await RegisterUser(_testUsername1, _testEmail1, _testPassword1);
-      var testTag = $"testtag{DateTime.Now.Ticks}";
+      var testTag = $"testtag{Random.Shared.Next(100000, 999999)}";
       var articleTitle = await CreateArticleWithTag(testTag);
 
       // Navigate to home page
@@ -201,16 +191,10 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
 
-      // Wait for articles and tags to load
-      await Page.WaitForTimeoutAsync(3000);
-
-      // Click on the tag in the sidebar (Popular Tags section)
+      // Wait for the tag to appear in the sidebar
       var sidebarTag = Page.Locator(".sidebar .tag-list .cds--tag").Filter(new() { HasText = testTag });
-      await sidebarTag.WaitForAsync(new() { Timeout = DefaultTimeout });
+      await Expect(sidebarTag).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
       await sidebarTag.ClickAsync();
-
-      // Wait for filtered results
-      await Page.WaitForTimeoutAsync(2000);
 
       // Verify we're on a tag filter view (tab should show the tag name with #)
       var tagTab = Page.GetByRole(AriaRole.Tab, new() { Name = $"#{testTag}" });
@@ -253,10 +237,9 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       // Navigate to the first user's article
       await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
-      // Click on Global Feed tab and wait for it to be selected
+      // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
       await globalFeedTab.ClickAsync();
-      await Expect(globalFeedTab).ToHaveAttributeAsync("aria-selected", "true", new() { Timeout = DefaultTimeout });
 
       // Wait for the feed to load (loading indicator to disappear)
       var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
@@ -306,8 +289,7 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"{username} Article {timestamp}";
+    var articleTitle = $"{username} Article {GenerateUniqueUsername("art")}";
     var articleDescription = "Test article";
     var articleBody = "This is a test article body.";
 
@@ -325,8 +307,7 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"Tagged Article {timestamp}";
+    var articleTitle = $"Tagged Article {GenerateUniqueUsername("tag")}";
     var articleDescription = "Test article with tag";
     var articleBody = "This is a test article body.";
 

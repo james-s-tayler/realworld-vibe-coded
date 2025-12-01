@@ -9,3 +9,4 @@ global using Server.Infrastructure;
 global using Server.SharedKernel.Result;
 global using Server.Web.DevOnly.Configuration;
 global using Server.Web.DevOnly.UseCases;
+global using Server.Web.DevOnly.UseCases.WipeData;
