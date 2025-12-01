@@ -76,7 +76,6 @@ public class RealWorldE2eTests : ConduitPageTest
       await Page.WaitForURLAsync($"{BaseUrl}/profile/{TestUsername}", new() { Timeout = DefaultTimeout });
 
       // Wait for profile to load and verify bio is displayed
-      await Page.WaitForTimeoutAsync(1000);
       var bioText = Page.GetByText("This is my updated bio for E2E test");
       await Expect(bioText).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
@@ -164,10 +163,7 @@ public class RealWorldE2eTests : ConduitPageTest
       await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
 
-      // Wait for articles to load
-      await Page.WaitForTimeoutAsync(2000);
-
-      // Verify article appears in feed - look for the article preview within the Global Feed panel
+      // Wait for articles to load by checking for the specific article preview
       var globalFeedPanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var articlePreview = globalFeedPanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
       await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });

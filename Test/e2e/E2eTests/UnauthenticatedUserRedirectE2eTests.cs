@@ -45,12 +45,15 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
 
       // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
+      await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
-      await Page.WaitForTimeoutAsync(2000);
 
-      // Click on the article link
+      // Wait for article preview to be visible
       var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var articlePreview = visiblePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
+      // Click on the article link
       var articleLink = articlePreview.Locator(".article-link");
       await articleLink.ClickAsync();
       await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
@@ -93,15 +96,15 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
       // Navigate to the home page
       await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
-      // Click on Global Feed tab
+      // Click on Global Feed tab and wait for it to be visible
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
+      await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
-      await Page.WaitForTimeoutAsync(2000);
 
-      // Find and click the favorite button on the article preview
+      // Wait for and click the favorite button on the article preview
       var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var favoriteButton = visiblePanel.Locator(".article-preview .favorite-button").First;
-      await favoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+      await Expect(favoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
       await favoriteButton.ClickAsync();
 
       // Verify redirect to login page
@@ -181,12 +184,15 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
 
       // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
+      await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
-      await Page.WaitForTimeoutAsync(2000);
 
-      // Click on the article link
+      // Wait for article preview to be visible
       var visiblePanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var articlePreview = visiblePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
+      await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
+      // Click on the article link
       var articleLink = articlePreview.Locator(".article-link");
       await articleLink.ClickAsync();
       await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
