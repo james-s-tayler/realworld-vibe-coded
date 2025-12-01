@@ -512,7 +512,7 @@ jobs:
   # To revert: Delete test-e2e-2 through test-e2e-5 jobs and remove this comment
   # block, keeping only the original test-e2e job.
   #
-  # Issue: https://github.com/james-s-tayler/realworld-vibe-coded/issues/XXX
+  # Issue: https://github.com/james-s-tayler/realworld-vibe-coded/issues/352
   # ============================================================================
 
   test-e2e:
