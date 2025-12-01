@@ -238,9 +238,8 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       // Navigate to the first user's article
       await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
-      // Click on Global Feed tab and wait for it to be selected
+      // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
-      await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
 
       // Wait for the feed to load (loading indicator to disappear)

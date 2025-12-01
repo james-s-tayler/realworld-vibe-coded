@@ -45,7 +45,6 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
 
       // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
-      await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
 
       // Wait for article preview to be visible
@@ -60,7 +59,6 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
 
       // Try to click the favorite button - button text contains "Favorite Article"
       var favoriteButton = Page.GetByRole(AriaRole.Button).Filter(new() { HasTextRegex = new Regex("Favorite Article") });
-      await favoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await favoriteButton.ClickAsync();
 
       // Verify redirect to login page
@@ -96,9 +94,8 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
       // Navigate to the home page
       await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
 
-      // Click on Global Feed tab and wait for it to be visible
+      // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
-      await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
 
       // Wait for and click the favorite button on the article preview
@@ -184,7 +181,6 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
 
       // Click on Global Feed tab
       var globalFeedTab = Page.GetByRole(AriaRole.Tab, new() { Name = "Global Feed" });
-      await globalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await globalFeedTab.ClickAsync();
 
       // Wait for article preview to be visible
@@ -199,7 +195,6 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
 
       // Find and click the follow button
       var followButton = Page.GetByRole(AriaRole.Button, new() { Name = $"Follow {_testUsername1}" });
-      await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
       await followButton.ClickAsync();
 
       // Verify redirect to login page
