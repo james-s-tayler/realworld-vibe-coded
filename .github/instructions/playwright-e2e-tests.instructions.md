@@ -102,13 +102,6 @@ Ensure Parallel Safety
 
 **Best Practices**
 
-CI Environment Considerations
-
-    CI environments are slower than local development machines
-    Use generous timeouts (30s default) to account for CI variability
-    Always use WaitForLoadStateAsync(NetworkIdle) after form submissions or navigation
-    Never assume immediate state changes - always wait for UI confirmation
-
 Test Structure
 
     Follow AAA pattern: Arrange, Act, Assert
