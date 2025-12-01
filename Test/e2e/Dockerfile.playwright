@@ -13,10 +13,12 @@ WORKDIR /tests
 # Stage 2: Restore dependencies
 FROM base AS restore
 
-# Copy project file for dependency resolution
+# Copy project files for dependency resolution
 COPY E2eTests/E2eTests.csproj E2eTests/
+COPY E2eTests.Analyzers/E2eTests.Analyzers.csproj E2eTests.Analyzers/
 
-# Restore NuGet packages
+# Restore NuGet packages for both projects
+RUN dotnet restore E2eTests.Analyzers/E2eTests.Analyzers.csproj
 RUN dotnet restore E2eTests/E2eTests.csproj
 
 # Stage 3: Build
@@ -24,9 +26,10 @@ FROM restore AS build
 
 # Copy all test source files
 COPY E2eTests/ E2eTests/
+COPY E2eTests.Analyzers/ E2eTests.Analyzers/
 
-# Build the project using already-restored packages
-RUN dotnet build E2eTests/E2eTests.csproj -c Release --no-restore
+# Build the project (restore will use cached packages)
+RUN dotnet build E2eTests/E2eTests.csproj -c Release
 
 # Stage 4: Test
 FROM build AS test

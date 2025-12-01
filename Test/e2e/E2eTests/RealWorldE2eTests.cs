@@ -106,8 +106,7 @@ public class RealWorldE2eTests : ConduitPageTest
       await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
       // Fill in article form
-      var timestamp = DateTime.Now.Ticks;
-      var articleTitle = $"E2E Test Article {timestamp}";
+      var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
       var articleDescription = "This is a test article created by E2E tests";
       var articleBody = "# Test Article\n\nThis is the body of the test article created for E2E testing purposes.";
       var articleTag = "e2etest";
@@ -187,8 +186,7 @@ public class RealWorldE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"E2E Test Article {timestamp}";
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
     var articleDescription = "Test article for E2E testing";
     var articleBody = "This is a test article body.";
 

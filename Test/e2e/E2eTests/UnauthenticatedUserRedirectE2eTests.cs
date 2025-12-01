@@ -14,9 +14,8 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
   {
     await base.InitializeAsync();
 
-    var timestamp = DateTime.Now.Ticks;
-    _testUsername1 = $"unauthuser1_{timestamp}";
-    _testEmail1 = $"unauthuser1_{timestamp}@test.com";
+    _testUsername1 = GenerateUniqueUsername("unauthuser1");
+    _testEmail1 = GenerateUniqueEmail(_testUsername1);
     _testPassword1 = "TestPassword123!";
   }
 
@@ -212,8 +211,7 @@ public class UnauthenticatedUserRedirectE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"E2E Test Article {timestamp}";
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("article")}";
     var articleDescription = "Test article for E2E testing";
     var articleBody = "This is a test article body.";
 

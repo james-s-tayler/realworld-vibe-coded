@@ -17,13 +17,12 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
   {
     await base.InitializeAsync();
 
-    var timestamp = DateTime.Now.Ticks;
-    _testUsername1 = $"articleuser1_{timestamp}";
-    _testEmail1 = $"articleuser1_{timestamp}@test.com";
+    _testUsername1 = GenerateUniqueUsername("articleuser1");
+    _testEmail1 = GenerateUniqueEmail(_testUsername1);
     _testPassword1 = "TestPassword123!";
 
-    _testUsername2 = $"articleuser2_{timestamp}";
-    _testEmail2 = $"articleuser2_{timestamp}@test.com";
+    _testUsername2 = GenerateUniqueUsername("articleuser2");
+    _testEmail2 = GenerateUniqueEmail(_testUsername2);
     _testPassword2 = "TestPassword123!";
   }
 
@@ -279,8 +278,7 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"E2E Test Article {timestamp}";
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
     var articleDescription = "Test article for E2E testing";
     var articleBody = "This is a test article body.";
 
@@ -298,8 +296,7 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"{username} Article {timestamp}";
+    var articleTitle = $"{username} Article {GenerateUniqueUsername("art")}";
     var articleDescription = "Test article for E2E testing";
     var articleBody = "This is a test article body.";
 

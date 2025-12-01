@@ -25,15 +25,64 @@ public abstract class ConduitPageTest : PageTest
 
     BaseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
 
-    var timestamp = DateTime.Now.Ticks;
-    TestUsername = $"articleuser{timestamp}";
-    TestEmail = $"articleuser{timestamp}@test.com";
+    // Generate unique test user credentials
+    TestUsername = GenerateUniqueUsername("articleuser");
+    TestEmail = GenerateUniqueEmail(TestUsername);
     TestPassword = "TestPassword123!";
 
     await Context.SetExtraHTTPHeadersAsync(new Dictionary<string, string>
     {
       ["User-Agent"] = "E2E-Test-Suite",
     });
+  }
+
+  public override async ValueTask DisposeAsync()
+  {
+    // Wipe all test data after each test to ensure isolation
+    await WipeTestData();
+    await base.DisposeAsync();
+  }
+
+  /// <summary>
+  /// Generates a unique username with an optional prefix.
+  /// Uses a short random suffix to ensure uniqueness while keeping username short.
+  /// </summary>
+  protected static string GenerateUniqueUsername(string prefix = "user")
+  {
+    var random = Random.Shared.Next(10000, 99999);
+    return $"{prefix}{random}";
+  }
+
+  /// <summary>
+  /// Generates a unique email based on a username.
+  /// </summary>
+  protected static string GenerateUniqueEmail(string username)
+  {
+    return $"{username}@test.com";
+  }
+
+  /// <summary>
+  /// Wipes all users and user-generated content from the database.
+  /// Called after each test to ensure test isolation.
+  /// </summary>
+  protected async Task WipeTestData()
+  {
+    try
+    {
+      var apiContext = await Playwright.APIRequest.NewContextAsync(new()
+      {
+        BaseURL = BaseUrl,
+        IgnoreHTTPSErrors = true,
+      });
+
+      await apiContext.DeleteAsync("/dev-only/test-data/wipe");
+      await apiContext.DisposeAsync();
+    }
+    catch (Exception ex)
+    {
+      // Log but don't fail the test if wipe fails
+      Console.WriteLine($"Warning: Failed to wipe test data: {ex.Message}");
+    }
   }
 
   protected async Task RegisterUser()

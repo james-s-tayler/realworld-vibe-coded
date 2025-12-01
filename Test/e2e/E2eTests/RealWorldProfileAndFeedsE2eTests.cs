@@ -17,13 +17,12 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
   {
     await base.InitializeAsync();
 
-    var timestamp = DateTime.Now.Ticks;
-    _testUsername1 = $"profileuser1_{timestamp}";
-    _testEmail1 = $"profileuser1_{timestamp}@test.com";
+    _testUsername1 = GenerateUniqueUsername("profileuser1");
+    _testEmail1 = GenerateUniqueEmail(_testUsername1);
     _testPassword1 = "TestPassword123!";
 
-    _testUsername2 = $"profileuser2_{timestamp}";
-    _testEmail2 = $"profileuser2_{timestamp}@test.com";
+    _testUsername2 = GenerateUniqueUsername("profileuser2");
+    _testEmail2 = GenerateUniqueEmail(_testUsername2);
     _testPassword2 = "TestPassword123!";
   }
 
@@ -181,7 +180,7 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     {
       // Register user and create an article with a specific tag
       await RegisterUser(_testUsername1, _testEmail1, _testPassword1);
-      var testTag = $"testtag{DateTime.Now.Ticks}";
+      var testTag = $"testtag{Random.Shared.Next(100000, 999999)}";
       var articleTitle = await CreateArticleWithTag(testTag);
 
       // Navigate to home page
@@ -290,8 +289,7 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"{username} Article {timestamp}";
+    var articleTitle = $"{username} Article {GenerateUniqueUsername("art")}";
     var articleDescription = "Test article";
     var articleBody = "This is a test article body.";
 
@@ -309,8 +307,7 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Link, new() { Name = "New Article" }).ClickAsync();
     await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
 
-    var timestamp = DateTime.Now.Ticks;
-    var articleTitle = $"Tagged Article {timestamp}";
+    var articleTitle = $"Tagged Article {GenerateUniqueUsername("tag")}";
     var articleDescription = "Test article with tag";
     var articleBody = "This is a test article body.";
 
