@@ -273,12 +273,9 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await favoritedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await favoritedTab.ClickAsync();
 
-      // Wait for the favorited articles tab panel to load
       var profilePanel = Page.GetByRole(AriaRole.Tabpanel).First;
       var profileLoadingIndicator = profilePanel.GetByText("Loading articles...");
       await Expect(profileLoadingIndicator).ToBeHiddenAsync(new() { Timeout = DefaultTimeout });
-
-      // Verify favorited article appears - wait for article in the visible tab panel
       var articleInFavorites = profilePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
       await Expect(articleInFavorites).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
@@ -302,11 +299,8 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     await Page.GetByPlaceholder("Write your article (in markdown)").FillAsync(articleBody);
     await Page.GetByRole(AriaRole.Button, new() { Name = "Publish Article" }).ClickAsync();
 
-    // Wait for navigation to article page and ensure it's fully loaded
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
     await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
-
-    // Ensure the article heading is visible before returning
     var articleHeading = Page.GetByRole(AriaRole.Heading, new() { Name = articleTitle });
     await Expect(articleHeading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
@@ -328,11 +322,8 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     await Page.GetByPlaceholder("Enter tags").FillAsync(tag);
     await Page.GetByRole(AriaRole.Button, new() { Name = "Publish Article" }).ClickAsync();
 
-    // Wait for navigation to article page and ensure it's fully loaded
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
     await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
-
-    // Ensure the article heading is visible before returning
     var articleHeading = Page.GetByRole(AriaRole.Heading, new() { Name = articleTitle });
     await Expect(articleHeading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 

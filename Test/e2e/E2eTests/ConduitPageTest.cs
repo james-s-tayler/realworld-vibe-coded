@@ -5,7 +5,7 @@ namespace E2eTests;
 
 public abstract class ConduitPageTest : PageTest
 {
-  protected const int DefaultTimeout = 30000; // Increased from 10s to 30s for CI stability
+  protected const int DefaultTimeout = 10000;
   protected string BaseUrl = null!;
   protected string TestUsername = null!;
   protected string TestEmail = null!;
@@ -46,20 +46,12 @@ public abstract class ConduitPageTest : PageTest
     await base.DisposeAsync();
   }
 
-  /// <summary>
-  /// Generates a unique username with an optional prefix.
-  /// Uses a GUID suffix to ensure uniqueness across parallel CI runs.
-  /// </summary>
   protected static string GenerateUniqueUsername(string prefix = "user")
   {
     var guid = Guid.NewGuid().ToString("N")[..8]; // First 8 chars of GUID for shorter usernames
     return $"{prefix}{guid}";
   }
 
-  /// <summary>
-  /// Generates a unique email based on a username.
-  /// Uses a GUID to ensure uniqueness across parallel CI runs.
-  /// </summary>
   protected static string GenerateUniqueEmail(string username)
   {
     var guid = Guid.NewGuid().ToString("N")[..8];

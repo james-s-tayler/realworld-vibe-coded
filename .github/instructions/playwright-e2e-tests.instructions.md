@@ -117,7 +117,7 @@ Error Handling
 Test Data
 
     Use GUIDs for unique identifiers to ensure uniqueness across parallel CI runs
-    Example: var email = $"{username}{Guid.NewGuid():N[..8]}@test.com";
+    Example: var email = $"{username}{Guid.NewGuid().ToString("N")[..8]}@test.com";
     Clean up test data when possible (or use isolated test databases)
     Make test data realistic but minimal
     Wipe database before each test to ensure isolation
@@ -131,7 +131,7 @@ Test Data
 ✅ Use: await Page.GetByRole(AriaRole.Button, new() { Name = "Submit" }).ClickAsync();
 
 ❌ Shared state: private static string sharedUsername;
-✅ Use: var username = $"user_{Guid.NewGuid():N[..8]}";
+✅ Use: var username = $"user_{Guid.NewGuid().ToString("N")[..8]}";
 
 ❌ Cross-test dependencies: Test B assumes Test A ran first
 ✅ Each test sets up its own preconditions
