@@ -1,0 +1,153 @@
+﻿using Microsoft.Playwright;
+
+namespace E2eTests.PageModels;
+
+/// <summary>
+/// Base class for all page models providing common functionality.
+/// </summary>
+public abstract class BasePage
+{
+  protected const int DefaultTimeout = 10000;
+  protected readonly IPage Page;
+  protected readonly string BaseUrl;
+
+  protected BasePage(IPage page, string baseUrl)
+  {
+    Page = page;
+    BaseUrl = baseUrl;
+  }
+
+  /// <summary>
+  /// Gets an assertion helper for this page.
+  /// </summary>
+  protected IPageAssertions Expect() => Assertions.Expect(Page);
+
+  /// <summary>
+  /// Gets an assertion helper for a locator.
+  /// </summary>
+  protected ILocatorAssertions Expect(ILocator locator) => Assertions.Expect(locator);
+
+  /// <summary>
+  /// Navigation header link - Conduit logo/home.
+  /// </summary>
+  public ILocator HomeLink => Page.GetByRole(AriaRole.Link, new() { Name = "conduit" });
+
+  /// <summary>
+  /// Navigation header link - Sign in.
+  /// </summary>
+  public ILocator SignInLink => Page.GetByRole(AriaRole.Link, new() { Name = "Sign in" });
+
+  /// <summary>
+  /// Navigation header link - Sign up.
+  /// </summary>
+  public ILocator SignUpLink => Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" });
+
+  /// <summary>
+  /// Navigation header link - New Article.
+  /// </summary>
+  public ILocator NewArticleLink => Page.GetByRole(AriaRole.Link, new() { Name = "New Article" });
+
+  /// <summary>
+  /// Navigation header link - Settings.
+  /// </summary>
+  public ILocator SettingsLink => Page.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true });
+
+  /// <summary>
+  /// Gets the user profile link in the navigation header.
+  /// </summary>
+  public ILocator GetUserProfileLink(string username) =>
+    Page.GetByRole(AriaRole.Link, new() { Name = username }).First;
+
+  /// <summary>
+  /// Navigates to the home page.
+  /// </summary>
+  public async Task GoToHomePageAsync()
+  {
+    await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+  }
+
+  /// <summary>
+  /// Clicks the Sign in link in the header.
+  /// </summary>
+  public async Task ClickSignInAsync()
+  {
+    await SignInLink.ClickAsync();
+    await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
+  }
+
+  /// <summary>
+  /// Clicks the Sign up link in the header.
+  /// </summary>
+  public async Task ClickSignUpAsync()
+  {
+    await SignUpLink.ClickAsync();
+    await Page.WaitForURLAsync($"{BaseUrl}/register", new() { Timeout = DefaultTimeout });
+  }
+
+  /// <summary>
+  /// Clicks the New Article link in the header.
+  /// </summary>
+  public async Task ClickNewArticleAsync()
+  {
+    await NewArticleLink.ClickAsync();
+    await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
+  }
+
+  /// <summary>
+  /// Clicks the Settings link in the header.
+  /// </summary>
+  public async Task ClickSettingsAsync()
+  {
+    await SettingsLink.ClickAsync();
+    await Page.WaitForURLAsync($"{BaseUrl}/settings", new() { Timeout = DefaultTimeout });
+  }
+
+  /// <summary>
+  /// Clicks on the user's profile link in the header.
+  /// </summary>
+  public async Task ClickUserProfileAsync(string username)
+  {
+    await GetUserProfileLink(username).ClickAsync();
+    await Page.WaitForURLAsync($"{BaseUrl}/profile/{username}", new() { Timeout = DefaultTimeout });
+  }
+
+  /// <summary>
+  /// Verifies that the user is logged in by checking for their username link.
+  /// </summary>
+  public async Task<bool> IsUserLoggedInAsync(string username)
+  {
+    try
+    {
+      await GetUserProfileLink(username).WaitForAsync(new()
+      {
+        State = WaitForSelectorState.Visible,
+        Timeout = DefaultTimeout,
+      });
+      return true;
+    }
+    catch
+    {
+      return false;
+    }
+  }
+
+  /// <summary>
+  /// Verifies that the Sign in link is visible (user is logged out).
+  /// </summary>
+  public async Task<bool> IsUserLoggedOutAsync()
+  {
+    try
+    {
+      await SignInLink.WaitForAsync(new()
+      {
+        State = WaitForSelectorState.Visible,
+        Timeout = DefaultTimeout,
+      });
+      return true;
+    }
+    catch
+    {
+      return false;
+    }
+  }
+}
