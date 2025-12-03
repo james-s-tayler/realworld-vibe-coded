@@ -186,8 +186,8 @@ public class ArticlePageTests : ConduitPageTest
 
       var articlePage = await homePage.ClickArticleAsync(articleTitle);
 
-      // Try to click the favorite button
-      await articlePage.FavoriteButton.ClickAsync();
+      // Try to click the favorite button (unauthenticated)
+      await articlePage.ClickFavoriteButtonWithoutWaitAsync();
 
       // Verify redirect to login page
       await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
@@ -226,9 +226,8 @@ public class ArticlePageTests : ConduitPageTest
 
       var articlePage = await homePage.ClickArticleAsync(articleTitle);
 
-      // Find and click the follow button
-      var followButton = articlePage.GetFollowButton(_testUsername1);
-      await followButton.ClickAsync();
+      // Click the follow button (unauthenticated)
+      await articlePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
 
       // Verify redirect to login page
       await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });

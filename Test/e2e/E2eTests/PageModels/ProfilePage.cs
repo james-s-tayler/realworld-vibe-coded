@@ -118,6 +118,16 @@ public class ProfilePage : BasePage
   }
 
   /// <summary>
+  /// Clicks the follow button without waiting for success (for unauthenticated tests).
+  /// </summary>
+  public async Task ClickFollowButtonWithoutWaitAsync(string username)
+  {
+    var followButton = GetFollowButton(username);
+    await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await followButton.ClickAsync();
+  }
+
+  /// <summary>
   /// Clicks on the My Articles tab.
   /// </summary>
   public async Task ClickMyArticlesTabAsync()

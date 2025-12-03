@@ -266,10 +266,8 @@ public class ProfilePageTests : ConduitPageTest
       await profilePage.GoToAsync(_testUsername1);
       await profilePage.WaitForProfileToLoadAsync(_testUsername1);
 
-      // Find and click the follow button
-      var followButton = profilePage.GetFollowButton(_testUsername1);
-      await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
-      await followButton.ClickAsync();
+      // Click the follow button (unauthenticated)
+      await profilePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
 
       // Verify redirect to login page
       await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });

@@ -217,4 +217,21 @@ public class HomePage : BasePage
   {
     await Expect(PaginationBackwardButton).ToBeDisabledAsync(new() { Timeout = DefaultTimeout });
   }
+
+  /// <summary>
+  /// Verifies that the tag filter tab is visible.
+  /// </summary>
+  public async Task VerifyTagFilterTabVisibleAsync(string tagName)
+  {
+    var tagTab = GetTagFilterTab(tagName);
+    await Expect(tagTab).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+  }
+
+  /// <summary>
+  /// Verifies that at least one article preview is visible.
+  /// </summary>
+  public async Task VerifyArticlesLoadedAsync()
+  {
+    await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+  }
 }

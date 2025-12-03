@@ -241,7 +241,7 @@ public class HomePageTests : ConduitPageTest
       await homePage.ClickSidebarTagAsync(testTag);
 
       // Verify the tag filter tab is visible
-      await Expect(homePage.GetTagFilterTab(testTag)).ToBeVisibleAsync(new() { Timeout = 10000 });
+      await homePage.VerifyTagFilterTabVisibleAsync(testTag);
 
       // Verify the article with that tag is displayed
       await homePage.VerifyArticleVisibleAsync(articleTitle);
@@ -278,7 +278,7 @@ public class HomePageTests : ConduitPageTest
       await homePage.ClickGlobalFeedTabAsync();
 
       // Wait for at least one article to be loaded
-      await Expect(homePage.ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = 10000 });
+      await homePage.VerifyArticlesLoadedAsync();
 
       // Verify pagination control is visible
       await homePage.VerifyPaginationVisibleAsync();

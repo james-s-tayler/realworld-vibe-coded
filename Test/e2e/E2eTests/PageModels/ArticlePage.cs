@@ -156,6 +156,25 @@ public class ArticlePage : BasePage
   }
 
   /// <summary>
+  /// Clicks the favorite button without waiting for success (for unauthenticated tests).
+  /// </summary>
+  public async Task ClickFavoriteButtonWithoutWaitAsync()
+  {
+    await FavoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await FavoriteButton.ClickAsync();
+  }
+
+  /// <summary>
+  /// Clicks the follow button without waiting for success (for unauthenticated tests).
+  /// </summary>
+  public async Task ClickFollowButtonWithoutWaitAsync(string username)
+  {
+    var followButton = GetFollowButton(username);
+    await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await followButton.ClickAsync();
+  }
+
+  /// <summary>
   /// Adds a comment to the article.
   /// </summary>
   public async Task AddCommentAsync(string commentText)
