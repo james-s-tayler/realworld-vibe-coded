@@ -273,8 +273,9 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
       await favoritedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
       await favoritedTab.ClickAsync();
 
-      // Verify favorited article appears - wait for article in the visible tab panel
       var profilePanel = Page.GetByRole(AriaRole.Tabpanel).First;
+      var profileLoadingIndicator = profilePanel.GetByText("Loading articles...");
+      await Expect(profileLoadingIndicator).ToBeHiddenAsync(new() { Timeout = DefaultTimeout });
       var articleInFavorites = profilePanel.Locator(".article-preview").Filter(new() { HasText = articleTitle }).First;
       await Expect(articleInFavorites).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     }
@@ -299,6 +300,10 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Button, new() { Name = "Publish Article" }).ClickAsync();
 
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
+    var articleHeading = Page.GetByRole(AriaRole.Heading, new() { Name = articleTitle });
+    await Expect(articleHeading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
     return articleTitle;
   }
 
@@ -318,6 +323,10 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Button, new() { Name = "Publish Article" }).ClickAsync();
 
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
+    var articleHeading = Page.GetByRole(AriaRole.Heading, new() { Name = articleTitle });
+    await Expect(articleHeading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
     return articleTitle;
   }
 }

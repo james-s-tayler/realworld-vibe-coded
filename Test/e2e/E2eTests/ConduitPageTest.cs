@@ -46,22 +46,16 @@ public abstract class ConduitPageTest : PageTest
     await base.DisposeAsync();
   }
 
-  /// <summary>
-  /// Generates a unique username with an optional prefix.
-  /// Uses a short random suffix to ensure uniqueness while keeping username short.
-  /// </summary>
   protected static string GenerateUniqueUsername(string prefix = "user")
   {
-    var random = Random.Shared.Next(10000, 99999);
-    return $"{prefix}{random}";
+    var guid = Guid.NewGuid().ToString("N")[..8]; // First 8 chars of GUID for shorter usernames
+    return $"{prefix}{guid}";
   }
 
-  /// <summary>
-  /// Generates a unique email based on a username.
-  /// </summary>
   protected static string GenerateUniqueEmail(string username)
   {
-    return $"{username}@test.com";
+    var guid = Guid.NewGuid().ToString("N")[..8];
+    return $"{username}{guid}@test.com";
   }
 
   /// <summary>
