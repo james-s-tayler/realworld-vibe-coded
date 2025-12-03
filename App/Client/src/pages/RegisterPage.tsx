@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
+import { PageShell } from '../components/PageShell';
 import './AuthPages.css';
 
 export const RegisterPage: React.FC = () => {
@@ -33,59 +34,53 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="container page">
-        <div className="row">
-          <div className="col-md-6 offset-md-3 col-xs-12">
-            <h1 className="text-xs-center">Sign up</h1>
-            <p className="text-xs-center">
-              <Link to="/login">Have an account?</Link>
-            </p>
+    <PageShell
+      className="auth-page"
+      columnLayout="narrow"
+      title="Sign up"
+      subtitle={<Link to="/login">Have an account?</Link>}
+    >
+      <ErrorDisplay
+        error={error}
+        onClose={clearError}
+      />
 
-            <ErrorDisplay
-              error={error}
-              onClose={clearError}
-            />
+      <Form onSubmit={handleSubmit}>
+        <Stack gap={6}>
+          <TextInput
+            id="username"
+            labelText="Username"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
 
-            <Form onSubmit={handleSubmit}>
-              <Stack gap={6}>
-                <TextInput
-                  id="username"
-                  labelText="Username"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
+          <TextInput
+            id="email"
+            labelText="Email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            type="email"
+          />
 
-                <TextInput
-                  id="email"
-                  labelText="Email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  type="email"
-                />
+          <TextInput
+            id="password"
+            labelText="Password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            type="password"
+          />
 
-                <TextInput
-                  id="password"
-                  labelText="Password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  type="password"
-                />
-
-                <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">
-                  {loading ? 'Creating account...' : 'Sign up'}
-                </Button>
-              </Stack>
-            </Form>
-          </div>
-        </div>
-      </div>
-    </div>
+          <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">
+            {loading ? 'Creating account...' : 'Sign up'}
+          </Button>
+        </Stack>
+      </Form>
+    </PageShell>
   );
 };

@@ -7,11 +7,83 @@ import { useRequireAuth } from '../hooks/useRequireAuth';
 import { articlesApi } from '../api/articles';
 import { commentsApi } from '../api/comments';
 import { profilesApi } from '../api/profiles';
+import { PageShell } from '../components/PageShell';
 import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
 import type { Comment } from '../types/comment';
 import { DEFAULT_PROFILE_IMAGE } from '../constants';
 import './ArticlePage.css';
+
+interface ArticleBannerProps {
+  article: Article;
+  isAuthor: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+  onFollow: () => void;
+  onFavorite: () => void;
+}
+
+const ArticleBanner: React.FC<ArticleBannerProps> = ({
+  article,
+  isAuthor,
+  onEdit,
+  onDelete,
+  onFollow,
+  onFavorite,
+}) => (
+  <div className="banner">
+    <div className="container">
+      <h1>{article.title}</h1>
+      <div className="article-meta">
+        <Link to={`/profile/${article.author.username}`} className="author-info">
+          <img src={article.author.image || DEFAULT_PROFILE_IMAGE} alt={article.author.username} />
+          <div className="info">
+            <span className="author">{article.author.username}</span>
+            <span className="date">{new Date(article.createdAt).toLocaleDateString()}</span>
+          </div>
+        </Link>
+        {isAuthor ? (
+          <div className="actions">
+            <Button
+              kind="ghost"
+              size="sm"
+              renderIcon={Edit}
+              onClick={onEdit}
+            >
+              Edit Article
+            </Button>
+            <Button
+              kind="danger--ghost"
+              size="sm"
+              renderIcon={TrashCan}
+              onClick={onDelete}
+            >
+              Delete Article
+            </Button>
+          </div>
+        ) : (
+          <div className="actions">
+            <Button
+              kind="ghost"
+              size="sm"
+              onClick={onFollow}
+            >
+              {article.author.following ? 'Unfollow' : 'Follow'} {article.author.username}
+            </Button>
+            <Button
+              kind="ghost"
+              size="sm"
+              renderIcon={article.favorited ? FavoriteFilled : Favorite}
+              onClick={onFavorite}
+            >
+              {article.favorited ? 'Unfavorite' : 'Favorite'} Article ({article.favoritesCount})
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+);
 
 export const ArticlePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -126,170 +198,124 @@ export const ArticlePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="article-page loading">
+      <PageShell className="article-page loading">
         <Loading description="Loading article..." withOverlay={false} />
-      </div>
+      </PageShell>
     );
   }
 
   if (!article) {
     return (
-      <div className="article-page">
-        <div className="container">
-          <InlineNotification
-            kind="error"
-            title="Article not found"
-            subtitle={error || 'The requested article could not be found'}
-          />
-        </div>
-      </div>
+      <PageShell className="article-page" columnLayout="full">
+        <InlineNotification
+          kind="error"
+          title="Article not found"
+          subtitle={error || 'The requested article could not be found'}
+        />
+      </PageShell>
     );
   }
 
   const isAuthor = user && article.author.username === user.username;
 
   return (
-    <div className="article-page">
-      <div className="banner">
-        <div className="container">
-          <h1>{article.title}</h1>
-          <div className="article-meta">
-            <Link to={`/profile/${article.author.username}`} className="author-info">
-              <img src={article.author.image || DEFAULT_PROFILE_IMAGE} alt={article.author.username} />
-              <div className="info">
-                <span className="author">{article.author.username}</span>
-                <span className="date">{new Date(article.createdAt).toLocaleDateString()}</span>
-              </div>
+    <PageShell
+      className="article-page"
+      columnLayout="full"
+      banner={
+        <ArticleBanner
+          article={article}
+          isAuthor={!!isAuthor}
+          onEdit={() => navigate(`/editor/${article.slug}`)}
+          onDelete={handleDelete}
+          onFollow={handleFollow}
+          onFavorite={handleFavorite}
+        />
+      }
+    >
+      <div className="article-content">
+        <div className="article-body">
+          {article.body.split('\n').map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+        </div>
+        <div className="article-tags">
+          {article.tagList.map(tag => (
+            <Link key={tag} to={`/?tag=${tag}`} className="tag-pill">
+              {tag}
             </Link>
-            {isAuthor ? (
-              <div className="actions">
-                <Button
-                  kind="ghost"
-                  size="sm"
-                  renderIcon={Edit}
-                  onClick={() => navigate(`/editor/${article.slug}`)}
-                >
-                  Edit Article
-                </Button>
-                <Button
-                  kind="danger--ghost"
-                  size="sm"
-                  renderIcon={TrashCan}
-                  onClick={handleDelete}
-                >
-                  Delete Article
-                </Button>
-              </div>
-            ) : (
-              <div className="actions">
-                <Button
-                  kind="ghost"
-                  size="sm"
-                  onClick={handleFollow}
-                >
-                  {article.author.following ? 'Unfollow' : 'Follow'} {article.author.username}
-                </Button>
-                <Button
-                  kind="ghost"
-                  size="sm"
-                  renderIcon={article.favorited ? FavoriteFilled : Favorite}
-                  onClick={handleFavorite}
-                >
-                  {article.favorited ? 'Unfavorite' : 'Favorite'} Article ({article.favoritesCount})
-                </Button>
-              </div>
-            )}
-          </div>
+          ))}
         </div>
       </div>
 
-      <div className="container page">
-        <div className="row article-content">
-          <div className="col-md-12">
-            <div className="article-body">
-              {article.body.split('\n').map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
-            </div>
-            <div className="article-tags">
-              {article.tagList.map(tag => (
-                <Link key={tag} to={`/?tag=${tag}`} className="tag-pill">
-                  {tag}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
+      <hr />
 
-        <hr />
+      <div className="row">
+        <div className="col-xs-12 col-md-8 offset-md-2">
+          {user ? (
+            <form className="card comment-form" onSubmit={handleCommentSubmit}>
+              <div className="card-block">
+                <TextArea
+                  id="comment"
+                  labelText=""
+                  placeholder="Write a comment..."
+                  value={commentBody}
+                  onChange={(e) => setCommentBody(e.target.value)}
+                  rows={3}
+                />
+              </div>
+              <div className="card-footer">
+                <img
+                  src={user.image || DEFAULT_PROFILE_IMAGE}
+                  alt={user.username}
+                  className="comment-author-img"
+                />
+                <Button type="submit" size="sm" disabled={submitting || !commentBody.trim()}>
+                  Post Comment
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div className="row">
+              <div className="col-xs-12 col-md-8 offset-md-2">
+                <p>
+                  <Link to="/login">Sign in</Link> or <Link to="/register">sign up</Link> to add
+                  comments on this article.
+                </p>
+              </div>
+            </div>
+          )}
 
-        <div className="row">
-          <div className="col-xs-12 col-md-8 offset-md-2">
-            {user ? (
-              <form className="card comment-form" onSubmit={handleCommentSubmit}>
-                <div className="card-block">
-                  <TextArea
-                    id="comment"
-                    labelText=""
-                    placeholder="Write a comment..."
-                    value={commentBody}
-                    onChange={(e) => setCommentBody(e.target.value)}
-                    rows={3}
-                  />
-                </div>
-                <div className="card-footer">
+          {comments.map(comment => (
+            <div key={comment.id} className="card">
+              <div className="card-block">
+                <p className="card-text">{comment.body}</p>
+              </div>
+              <div className="card-footer">
+                <Link to={`/profile/${comment.author.username}`} className="comment-author">
                   <img
-                    src={user.image || DEFAULT_PROFILE_IMAGE}
-                    alt={user.username}
+                    src={comment.author.image || DEFAULT_PROFILE_IMAGE}
+                    alt={comment.author.username}
                     className="comment-author-img"
                   />
-                  <Button type="submit" size="sm" disabled={submitting || !commentBody.trim()}>
-                    Post Comment
-                  </Button>
-                </div>
-              </form>
-            ) : (
-              <div className="row">
-                <div className="col-xs-12 col-md-8 offset-md-2">
-                  <p>
-                    <Link to="/login">Sign in</Link> or <Link to="/register">sign up</Link> to add
-                    comments on this article.
-                  </p>
-                </div>
+                  <span className="comment-author-name">{comment.author.username}</span>
+                </Link>
+                <span className="date-posted">
+                  {new Date(comment.createdAt).toLocaleDateString()}
+                </span>
+                {user && user.username === comment.author.username && (
+                  <button
+                    className="mod-options"
+                    onClick={() => handleCommentDelete(comment.id)}
+                  >
+                    <TrashCan size={16} />
+                  </button>
+                )}
               </div>
-            )}
-
-            {comments.map(comment => (
-              <div key={comment.id} className="card">
-                <div className="card-block">
-                  <p className="card-text">{comment.body}</p>
-                </div>
-                <div className="card-footer">
-                  <Link to={`/profile/${comment.author.username}`} className="comment-author">
-                    <img
-                      src={comment.author.image || DEFAULT_PROFILE_IMAGE}
-                      alt={comment.author.username}
-                      className="comment-author-img"
-                    />
-                    <span className="comment-author-name">{comment.author.username}</span>
-                  </Link>
-                  <span className="date-posted">
-                    {new Date(comment.createdAt).toLocaleDateString()}
-                  </span>
-                  {user && user.username === comment.author.username && (
-                    <button
-                      className="mod-options"
-                      onClick={() => handleCommentDelete(comment.id)}
-                    >
-                      <TrashCan size={16} />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 };
