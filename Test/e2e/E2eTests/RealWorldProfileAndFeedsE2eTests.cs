@@ -180,7 +180,7 @@ public class RealWorldProfileAndFeedsE2eTests : ConduitPageTest
     {
       // Register user and create an article with a specific tag
       await RegisterUser(_testUsername1, _testEmail1, _testPassword1);
-      var testTag = $"testtag{Random.Shared.Next(100000, 999999)}";
+      var testTag = $"testtag{Guid.NewGuid().ToString("N")[..8]}";
       var articleTitle = await CreateArticleWithTag(testTag);
 
       // Navigate to home page
