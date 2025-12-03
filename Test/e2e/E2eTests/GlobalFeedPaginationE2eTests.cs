@@ -387,9 +387,6 @@ public class GlobalFeedPaginationE2eTests : ConduitPageTest
 
       var articleResponse = await httpClient.PostAsJsonAsync("/api/articles", articleRequest, JsonOptions);
       articleResponse.EnsureSuccessStatusCode();
-
-      // Small delay to ensure proper ordering by creation time
-      await Task.Delay(10);
     }
   }
 
