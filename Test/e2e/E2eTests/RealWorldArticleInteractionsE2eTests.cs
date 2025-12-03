@@ -288,6 +288,10 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Button, new() { Name = "Publish Article" }).ClickAsync();
 
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
+    var articleHeading = Page.GetByRole(AriaRole.Heading, new() { Name = articleTitle });
+    await Expect(articleHeading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
     return articleTitle;
   }
 
@@ -306,6 +310,10 @@ public class RealWorldArticleInteractionsE2eTests : ConduitPageTest
     await Page.GetByRole(AriaRole.Button, new() { Name = "Publish Article" }).ClickAsync();
 
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
+    var articleHeading = Page.GetByRole(AriaRole.Heading, new() { Name = articleTitle });
+    await Expect(articleHeading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+
     return articleTitle;
   }
 }
