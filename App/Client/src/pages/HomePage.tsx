@@ -6,12 +6,22 @@ import { articlesApi } from '../api/articles';
 import { tagsApi } from '../api/tags';
 import { ArticleList } from '../components/ArticleList';
 import { TagList } from '../components/TagList';
+import { PageShell } from '../components/PageShell';
 import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
 import './HomePage.css';
 
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
+
+const HomeBanner: React.FC = () => (
+  <div className="banner">
+    <div className="container">
+      <h1 className="banner-title">conduit</h1>
+      <p className="banner-subtitle">A place to share your <i>Angular</i> knowledge.</p>
+    </div>
+  </div>
+);
 
 export const HomePage: React.FC = () => {
   const { user } = useAuth();
@@ -124,146 +134,138 @@ export const HomePage: React.FC = () => {
     }
   };
 
+  const sidebarContent = (
+    <Tile className="sidebar">
+      <p className="sidebar-title">Popular Tags</p>
+      <TagList tags={tags} loading={tagsLoading} onTagClick={handleTagClick} />
+    </Tile>
+  );
+
   return (
-    <div className="home-page">
-      <div className="banner">
-        <div className="container">
-          <h1 className="banner-title">conduit</h1>
-          <p className="banner-subtitle">A place to share your <i>Angular</i> knowledge.</p>
-        </div>
-      </div>
-
-      <div className="container page">
-        <div className="row">
-          <div className="col-md-9">
-            {error && (
-              <InlineNotification
-                kind="error"
-                title="Error"
-                subtitle={error}
-                lowContrast
-                onCloseButtonClick={() => setError(null)}
+    <PageShell
+      className="home-page"
+      columnLayout="two-column"
+      banner={<HomeBanner />}
+      sidebar={sidebarContent}
+    >
+      {error && (
+        <InlineNotification
+          kind="error"
+          title="Error"
+          subtitle={error}
+          lowContrast
+          onCloseButtonClick={() => setError(null)}
+        />
+      )}
+      {user ? (
+        <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
+          <TabList aria-label="Article feeds">
+            <Tab>Your Feed</Tab>
+            <Tab>Global Feed</Tab>
+            {selectedTag && <Tab>#{selectedTag}</Tab>}
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <ArticleList
+                articles={articles}
+                loading={loading}
+                onFavorite={handleFavorite}
+                onUnfavorite={handleUnfavorite}
               />
+              {articlesCount > 0 && (
+                <Pagination
+                  page={currentPage}
+                  pageSize={pageSize}
+                  pageSizes={PAGE_SIZE_OPTIONS}
+                  totalItems={articlesCount}
+                  onChange={handlePageChange}
+                />
+              )}
+            </TabPanel>
+            <TabPanel>
+              <ArticleList
+                articles={articles}
+                loading={loading}
+                onFavorite={handleFavorite}
+                onUnfavorite={handleUnfavorite}
+              />
+              {articlesCount > 0 && (
+                <Pagination
+                  page={currentPage}
+                  pageSize={pageSize}
+                  pageSizes={PAGE_SIZE_OPTIONS}
+                  totalItems={articlesCount}
+                  onChange={handlePageChange}
+                />
+              )}
+            </TabPanel>
+            {selectedTag && (
+              <TabPanel>
+                <ArticleList
+                  articles={articles}
+                  loading={loading}
+                  onFavorite={handleFavorite}
+                  onUnfavorite={handleUnfavorite}
+                />
+                {articlesCount > 0 && (
+                  <Pagination
+                    page={currentPage}
+                    pageSize={pageSize}
+                    pageSizes={PAGE_SIZE_OPTIONS}
+                    totalItems={articlesCount}
+                    onChange={handlePageChange}
+                  />
+                )}
+              </TabPanel>
             )}
-            {user ? (
-              <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
-                <TabList aria-label="Article feeds">
-                  <Tab>Your Feed</Tab>
-                  <Tab>Global Feed</Tab>
-                  {selectedTag && <Tab>#{selectedTag}</Tab>}
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <ArticleList
-                      articles={articles}
-                      loading={loading}
-                      onFavorite={handleFavorite}
-                      onUnfavorite={handleUnfavorite}
-                    />
-                    {articlesCount > 0 && (
-                      <Pagination
-                        page={currentPage}
-                        pageSize={pageSize}
-                        pageSizes={PAGE_SIZE_OPTIONS}
-                        totalItems={articlesCount}
-                        onChange={handlePageChange}
-                      />
-                    )}
-                  </TabPanel>
-                  <TabPanel>
-                    <ArticleList
-                      articles={articles}
-                      loading={loading}
-                      onFavorite={handleFavorite}
-                      onUnfavorite={handleUnfavorite}
-                    />
-                    {articlesCount > 0 && (
-                      <Pagination
-                        page={currentPage}
-                        pageSize={pageSize}
-                        pageSizes={PAGE_SIZE_OPTIONS}
-                        totalItems={articlesCount}
-                        onChange={handlePageChange}
-                      />
-                    )}
-                  </TabPanel>
-                  {selectedTag && (
-                    <TabPanel>
-                      <ArticleList
-                        articles={articles}
-                        loading={loading}
-                        onFavorite={handleFavorite}
-                        onUnfavorite={handleUnfavorite}
-                      />
-                      {articlesCount > 0 && (
-                        <Pagination
-                          page={currentPage}
-                          pageSize={pageSize}
-                          pageSizes={PAGE_SIZE_OPTIONS}
-                          totalItems={articlesCount}
-                          onChange={handlePageChange}
-                        />
-                      )}
-                    </TabPanel>
-                  )}
-                </TabPanels>
-              </Tabs>
-            ) : (
-              <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
-                <TabList aria-label="Article feeds">
-                  <Tab>Global Feed</Tab>
-                  {selectedTag && <Tab>#{selectedTag}</Tab>}
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <ArticleList
-                      articles={articles}
-                      loading={loading}
-                      onFavorite={handleFavorite}
-                      onUnfavorite={handleUnfavorite}
-                    />
-                    {articlesCount > 0 && (
-                      <Pagination
-                        page={currentPage}
-                        pageSize={pageSize}
-                        pageSizes={PAGE_SIZE_OPTIONS}
-                        totalItems={articlesCount}
-                        onChange={handlePageChange}
-                      />
-                    )}
-                  </TabPanel>
-                  {selectedTag && (
-                    <TabPanel>
-                      <ArticleList
-                        articles={articles}
-                        loading={loading}
-                        onFavorite={handleFavorite}
-                        onUnfavorite={handleUnfavorite}
-                      />
-                      {articlesCount > 0 && (
-                        <Pagination
-                          page={currentPage}
-                          pageSize={pageSize}
-                          pageSizes={PAGE_SIZE_OPTIONS}
-                          totalItems={articlesCount}
-                          onChange={handlePageChange}
-                        />
-                      )}
-                    </TabPanel>
-                  )}
-                </TabPanels>
-              </Tabs>
+          </TabPanels>
+        </Tabs>
+      ) : (
+        <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
+          <TabList aria-label="Article feeds">
+            <Tab>Global Feed</Tab>
+            {selectedTag && <Tab>#{selectedTag}</Tab>}
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <ArticleList
+                articles={articles}
+                loading={loading}
+                onFavorite={handleFavorite}
+                onUnfavorite={handleUnfavorite}
+              />
+              {articlesCount > 0 && (
+                <Pagination
+                  page={currentPage}
+                  pageSize={pageSize}
+                  pageSizes={PAGE_SIZE_OPTIONS}
+                  totalItems={articlesCount}
+                  onChange={handlePageChange}
+                />
+              )}
+            </TabPanel>
+            {selectedTag && (
+              <TabPanel>
+                <ArticleList
+                  articles={articles}
+                  loading={loading}
+                  onFavorite={handleFavorite}
+                  onUnfavorite={handleUnfavorite}
+                />
+                {articlesCount > 0 && (
+                  <Pagination
+                    page={currentPage}
+                    pageSize={pageSize}
+                    pageSizes={PAGE_SIZE_OPTIONS}
+                    totalItems={articlesCount}
+                    onChange={handlePageChange}
+                  />
+                )}
+              </TabPanel>
             )}
-          </div>
-
-          <div className="col-md-3">
-            <Tile className="sidebar">
-              <p className="sidebar-title">Popular Tags</p>
-              <TagList tags={tags} loading={tagsLoading} onTagClick={handleTagClick} />
-            </Tile>
-          </div>
-        </div>
-      </div>
-    </div>
+          </TabPanels>
+        </Tabs>
+      )}
+    </PageShell>
   );
 };

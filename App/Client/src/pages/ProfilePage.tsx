@@ -7,6 +7,7 @@ import { useRequireAuth } from '../hooks/useRequireAuth';
 import { profilesApi } from '../api/profiles';
 import { articlesApi } from '../api/articles';
 import { ArticleList } from '../components/ArticleList';
+import { PageShell } from '../components/PageShell';
 import { ApiError } from '../api/client';
 import type { Profile } from '../types/article';
 import type { Article } from '../types/article';
@@ -15,6 +16,45 @@ import './ProfilePage.css';
 
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
+
+interface ProfileBannerProps {
+  profile: Profile;
+  isOwnProfile: boolean;
+  onFollow: () => void;
+}
+
+const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, onFollow }) => (
+  <div className="user-info">
+    <div className="container">
+      <div className="row">
+        <div className="col-xs-12 col-md-10 offset-md-1">
+          <img
+            src={profile.image || DEFAULT_PROFILE_IMAGE}
+            alt={profile.username}
+            className="user-img"
+          />
+          <h4>{profile.username}</h4>
+          <p>{profile.bio}</p>
+          {isOwnProfile ? (
+            <Link to="/settings">
+              <Button kind="ghost" size="sm" renderIcon={Settings}>
+                Edit Profile Settings
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              kind="ghost"
+              size="sm"
+              onClick={onFollow}
+            >
+              {profile.following ? 'Unfollow' : 'Follow'} {profile.username}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 export const ProfilePage: React.FC = () => {
   const { username } = useParams<{ username: string }>();
@@ -138,112 +178,75 @@ export const ProfilePage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="profile-page">
-        <div className="container">
-          <InlineNotification
-            kind="error"
-            title="Error"
-            subtitle={error}
-            lowContrast
-          />
-        </div>
-      </div>
+      <PageShell className="profile-page">
+        <InlineNotification
+          kind="error"
+          title="Error"
+          subtitle={error}
+          lowContrast
+        />
+      </PageShell>
     );
   }
 
   if (!profile) {
     return (
-      <div className="profile-page">
-        <div className="container">
-          <p>Profile not found</p>
-        </div>
-      </div>
+      <PageShell className="profile-page">
+        <p>Profile not found</p>
+      </PageShell>
     );
   }
 
   const isOwnProfile = user && user.username === profile.username;
 
   return (
-    <div className="profile-page">
-      <div className="user-info">
-        <div className="container">
-          <div className="row">
-            <div className="col-xs-12 col-md-10 offset-md-1">
-              <img
-                src={profile.image || DEFAULT_PROFILE_IMAGE}
-                alt={profile.username}
-                className="user-img"
+    <PageShell
+      className="profile-page"
+      columnLayout="wide"
+      banner={<ProfileBanner profile={profile} isOwnProfile={!!isOwnProfile} onFollow={handleFollow} />}
+    >
+      <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
+        <TabList aria-label="Profile tabs">
+          <Tab>My Articles</Tab>
+          <Tab>Favorited Articles</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <ArticleList
+              articles={articles}
+              loading={articlesLoading}
+              onFavorite={handleFavorite}
+              onUnfavorite={handleUnfavorite}
+            />
+            {articlesCount > 0 && (
+              <Pagination
+                page={currentPage}
+                pageSize={pageSize}
+                pageSizes={PAGE_SIZE_OPTIONS}
+                totalItems={articlesCount}
+                onChange={handlePageChange}
               />
-              <h4>{profile.username}</h4>
-              <p>{profile.bio}</p>
-              {isOwnProfile ? (
-                <Link to="/settings">
-                  <Button kind="ghost" size="sm" renderIcon={Settings}>
-                    Edit Profile Settings
-                  </Button>
-                </Link>
-              ) : (
-                <Button
-                  kind="ghost"
-                  size="sm"
-                  onClick={handleFollow}
-                >
-                  {profile.following ? 'Unfollow' : 'Follow'} {profile.username}
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container">
-        <div className="row">
-          <div className="col-xs-12 col-md-10 offset-md-1">
-            <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
-              <TabList aria-label="Profile tabs">
-                <Tab>My Articles</Tab>
-                <Tab>Favorited Articles</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel>
-                  <ArticleList
-                    articles={articles}
-                    loading={articlesLoading}
-                    onFavorite={handleFavorite}
-                    onUnfavorite={handleUnfavorite}
-                  />
-                  {articlesCount > 0 && (
-                    <Pagination
-                      page={currentPage}
-                      pageSize={pageSize}
-                      pageSizes={PAGE_SIZE_OPTIONS}
-                      totalItems={articlesCount}
-                      onChange={handlePageChange}
-                    />
-                  )}
-                </TabPanel>
-                <TabPanel>
-                  <ArticleList
-                    articles={articles}
-                    loading={articlesLoading}
-                    onFavorite={handleFavorite}
-                    onUnfavorite={handleUnfavorite}
-                  />
-                  {articlesCount > 0 && (
-                    <Pagination
-                      page={currentPage}
-                      pageSize={pageSize}
-                      pageSizes={PAGE_SIZE_OPTIONS}
-                      totalItems={articlesCount}
-                      onChange={handlePageChange}
-                    />
-                  )}
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          </div>
-        </div>
-      </div>
-    </div>
+            )}
+          </TabPanel>
+          <TabPanel>
+            <ArticleList
+              articles={articles}
+              loading={articlesLoading}
+              onFavorite={handleFavorite}
+              onUnfavorite={handleUnfavorite}
+            />
+            {articlesCount > 0 && (
+              <Pagination
+                page={currentPage}
+                pageSize={pageSize}
+                pageSizes={PAGE_SIZE_OPTIONS}
+                totalItems={articlesCount}
+                onChange={handlePageChange}
+              />
+            )}
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </PageShell>
   );
 };
