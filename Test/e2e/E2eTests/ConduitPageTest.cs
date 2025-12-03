@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using E2eTests.PageModels;
+using Microsoft.Playwright;
 using Microsoft.Playwright.Xunit.v3;
 
 namespace E2eTests;
@@ -58,6 +59,23 @@ public abstract class ConduitPageTest : PageTest
     return $"{username}{guid}@test.com";
   }
 
+  // Page model factory methods
+  protected LoginPage GetLoginPage() => new(Page, BaseUrl);
+
+  protected RegisterPage GetRegisterPage() => new(Page, BaseUrl);
+
+  protected HomePage GetHomePage() => new(Page, BaseUrl);
+
+  protected EditorPage GetEditorPage() => new(Page, BaseUrl);
+
+  protected ArticlePage GetArticlePage() => new(Page, BaseUrl);
+
+  protected ProfilePage GetProfilePage() => new(Page, BaseUrl);
+
+  protected SettingsPage GetSettingsPage() => new(Page, BaseUrl);
+
+  protected SwaggerPage GetSwaggerPage() => new(Page, BaseUrl);
+
   /// <summary>
   /// Wipes all users and user-generated content from the database.
   /// Called after each test to ensure test isolation.
@@ -82,38 +100,79 @@ public abstract class ConduitPageTest : PageTest
     }
   }
 
+  /// <summary>
+  /// Registers a user using the default test credentials and returns the HomePage.
+  /// </summary>
+  protected async Task<HomePage> RegisterUserAsync()
+  {
+    return await RegisterUserAsync(TestUsername, TestEmail, TestPassword);
+  }
+
+  /// <summary>
+  /// Registers a user with specified credentials and returns the HomePage.
+  /// </summary>
+  protected async Task<HomePage> RegisterUserAsync(string username, string email, string password)
+  {
+    var homePage = GetHomePage();
+    await homePage.GoToAsync();
+    await homePage.ClickSignUpAsync();
+
+    var registerPage = GetRegisterPage();
+    return await registerPage.RegisterAsync(username, email, password);
+  }
+
+  /// <summary>
+  /// Signs out the current user via the settings page.
+  /// </summary>
+  protected async Task SignOutAsync()
+  {
+    var settingsPage = GetSettingsPage();
+    await settingsPage.GoToAsync();
+    await settingsPage.LogoutAsync();
+  }
+
+  /// <summary>
+  /// Creates a new article and returns the ArticlePage.
+  /// </summary>
+  protected async Task<(ArticlePage ArticlePage, string Title)> CreateArticleAsync()
+  {
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
+    var homePage = GetHomePage();
+    await homePage.ClickNewArticleAsync();
+
+    var editorPage = GetEditorPage();
+    var articlePage = await editorPage.CreateArticleAsync(articleTitle, "Test article for E2E testing", "This is a test article body.");
+    return (articlePage, articleTitle);
+  }
+
+  /// <summary>
+  /// Creates a new article with a specific tag and returns the ArticlePage.
+  /// </summary>
+  protected async Task<(ArticlePage ArticlePage, string Title)> CreateArticleWithTagAsync(string tag)
+  {
+    var articleTitle = $"Tagged Article {GenerateUniqueUsername("tag")}";
+    var homePage = GetHomePage();
+    await homePage.ClickNewArticleAsync();
+
+    var editorPage = GetEditorPage();
+    var articlePage = await editorPage.CreateArticleWithTagsAsync(articleTitle, "Test article with tag", "This is a test article body.", tag);
+    return (articlePage, articleTitle);
+  }
+
+  // Legacy methods for backward compatibility during migration
   protected async Task RegisterUser()
   {
-    await RegisterUser(TestUsername, TestEmail, TestPassword);
+    await RegisterUserAsync(TestUsername, TestEmail, TestPassword);
   }
 
   protected async Task RegisterUser(string username, string email, string password)
   {
-    await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
-    await Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" }).ClickAsync();
-    await Page.WaitForURLAsync($"{BaseUrl}/register", new() { Timeout = DefaultTimeout });
-
-    // Fill in the form
-    await Page.GetByPlaceholder("Username").FillAsync(username);
-    await Page.GetByPlaceholder("Email").FillAsync(email);
-    await Page.GetByPlaceholder("Password").FillAsync(password);
-
-    await Page.GetByRole(AriaRole.Button, new() { Name = "Sign up" }).ClickAsync();
-
-    // Wait for the user link to appear in the header to confirm login completed
-    await Page.GetByRole(AriaRole.Link, new() { Name = username }).First.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = DefaultTimeout });
+    await RegisterUserAsync(username, email, password);
   }
 
   protected async Task SignOut()
   {
-    await Page.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true }).ClickAsync();
-    await Page.WaitForURLAsync($"{BaseUrl}/settings", new() { Timeout = DefaultTimeout });
-
-    // The logout button contains "Or click here to logout."
-    await Page.GetByRole(AriaRole.Button, new() { Name = "Or click here to logout." }).ClickAsync();
-
-    // After logout, the app navigates to login page
-    await Expect(Page.GetByRole(AriaRole.Link, new() { Name = "Sign in" })).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await SignOutAsync();
   }
 
   protected async Task SaveTrace(string testName)
