@@ -2,13 +2,13 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace E2eTests.Tests;
+namespace E2eTests.Tests.HomePage;
 
 /// <summary>
-/// Tests for the Home page (/) including feeds and pagination.
+/// Happy path tests for the Home page (/) including feeds and pagination.
 /// </summary>
 [Collection("E2E Tests")]
-public class HomePageTests : ConduitPageTest
+public class HomePageHappyPathTests : ConduitPageTest
 {
   private const int TotalArticles = 50;
 

@@ -1,10 +1,10 @@
-﻿namespace E2eTests.Tests;
+﻿namespace E2eTests.Tests.SettingsPage;
 
 /// <summary>
-/// Tests for the Settings page (/settings).
+/// Happy path tests for the Settings page (/settings).
 /// </summary>
 [Collection("E2E Tests")]
-public class SettingsPageTests : ConduitPageTest
+public class SettingsPageHappyPathTests : ConduitPageTest
 {
   [Fact]
   public async Task UserCanEditProfile()

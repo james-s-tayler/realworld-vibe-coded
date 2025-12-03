@@ -1,51 +1,11 @@
-﻿namespace E2eTests.Tests;
+﻿namespace E2eTests.Tests.RegisterPage;
 
 /// <summary>
-/// Tests for the Registration page (/register).
+/// Validation tests for the Registration page (/register).
 /// </summary>
 [Collection("E2E Tests")]
-public class RegisterPageTests : ConduitPageTest
+public class RegisterPageValidationTests : ConduitPageTest
 {
-  [Fact]
-  public async Task UserCanSignUp_AndNavigateToProfile()
-  {
-    await Context.Tracing.StartAsync(new()
-    {
-      Title = "User Sign Up Test",
-      Screenshots = true,
-      Snapshots = true,
-      Sources = true,
-    });
-
-    try
-    {
-      // Navigate to home page
-      var homePage = GetHomePage();
-      await homePage.GoToAsync();
-
-      // Click on Sign up link
-      await homePage.ClickSignUpAsync();
-
-      // Fill in registration form using page model
-      var registerPage = GetRegisterPage();
-      var resultHomePage = await registerPage.RegisterAsync(TestUsername, TestEmail, TestPassword);
-
-      // Verify user is logged in
-      Assert.True(await resultHomePage.IsUserLoggedInAsync(TestUsername), "User link should be visible in header after sign up");
-
-      // Click on user profile link
-      await resultHomePage.ClickUserProfileAsync(TestUsername);
-
-      // Verify profile page elements using profile page model
-      var profilePage = GetProfilePage();
-      await profilePage.VerifyProfileHeadingAsync(TestUsername);
-    }
-    finally
-    {
-      await SaveTrace("user_signup_test");
-    }
-  }
-
   [Fact]
   public async Task Register_WithDuplicateEmail_DisplaysErrorMessage()
   {

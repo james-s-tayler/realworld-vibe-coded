@@ -1,10 +1,10 @@
-﻿namespace E2eTests.Tests;
+﻿namespace E2eTests.Tests.SwaggerPage;
 
 /// <summary>
-/// Tests for the Swagger API documentation page (/swagger/index.html).
+/// Happy path tests for the Swagger API documentation page (/swagger/index.html).
 /// </summary>
 [Collection("E2E Tests")]
-public class SwaggerPageTests : ConduitPageTest
+public class SwaggerPageHappyPathTests : ConduitPageTest
 {
   [Fact]
   public async Task SwaggerApiDocs_AreDisplayed()
