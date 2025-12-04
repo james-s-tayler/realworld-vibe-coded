@@ -135,6 +135,10 @@
         "Force": {
           "type": "boolean",
           "description": "Force operation without confirmation"
+        },
+        "SkipPublish": {
+          "type": "boolean",
+          "description": "Toggle special behavior for CI environment"
         }
       }
     },

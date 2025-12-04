@@ -15,6 +15,7 @@ permissions:
   contents: read
   checks: write
   pull-requests: write
+  packages: write
 
 jobs:
   # Detect changes to specific paths to gate downstream jobs
@@ -389,18 +390,18 @@ jobs:
         with:
           script: |
             const { wrapCoverageComment } = require('./.github/scripts/wrap-coverage-comment.js');
-            
+
             const commentBody = wrapCoverageComment(
               'code-coverage-results.md',
               'nuke TestClient Code Coverage',
               context
             );
-            
+
             if (!commentBody) {
               console.log('No comment body generated, skipping PR comment');
               return;
             }
-            
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -520,20 +521,54 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           global-json-file: App/Server/global.json
-          cache: true
-          cache-dependency-path: Test/e2e/E2eTests/E2eTests.csproj
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: App/Client/package-lock.json
+
+      - name: Build and publish (server + client)
+        run: ./build.sh build-server-publish
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Verify .NET version
-        run: dotnet --info
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Playwright E2E image with cache
+        uses: docker/build-push-action@v6
+        with:
+          context: ./Test/e2e
+          file: ./Test/e2e/Dockerfile.playwright
+          # Tag must match what docker-compose expects (see below)
+          tags: ghcr.io/${{ github.repository }}/playwright:ci
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Api E2E image with cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Test/e2e/Dockerfile.api
+          # Tag must match what docker-compose expects (see below)
+          tags: ghcr.io/${{ github.repository }}/api:ci
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Test Server (E2E)
         id: e2e_tests
         run: |
           set +e  # Don't exit on error
-          ./build.sh test-e2e
+          ./build.sh test-e2e -skip-publish true
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment

@@ -15,6 +15,9 @@ public partial class Build
   [Parameter("Postman folder to test")]
   internal readonly string? Folder;
 
+  [Parameter("Toggle special behavior for CI environment")]
+  internal readonly bool SkipPublish;
+
   internal Target TestServer => _ => _
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
@@ -185,65 +188,71 @@ public partial class Build
         }
       });
 
-  internal Target TestE2e => _ => _
-      .Description("Run E2E Playwright tests using Docker Compose")
-      .DependsOn(BuildServerPublish)
-      .DependsOn(DbResetForce)
-      .DependsOn(InstallDotnetToolLiquidReports)
-      .DependsOn(RunLocalCleanDirectories)
-      .Executes(() =>
+  internal Target TestE2e => _ =>
+  {
+    _.Description("Run E2E Playwright tests using Docker Compose")
+    .DependsOn(BuildServerPublish)
+    .DependsOn(DbResetForce)
+    .DependsOn(InstallDotnetToolLiquidReports)
+    .DependsOn(RunLocalCleanDirectories)
+    .Executes(() =>
+    {
+      Log.Information("Running E2E tests with Docker Compose");
+
+      int exitCode = 0;
+      try
       {
-        Log.Information("Running E2E tests with Docker Compose");
+        var args = SkipPublish
+          ? "compose -f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml up --no-build --abort-on-container-exit"
+          : "compose -f Test/e2e/docker-compose.yml up --build --abort-on-container-exit";
+        var envVars = new Dictionary<string, string> { ["DOCKER_BUILDKIT"] = "1", };
+        var process = ProcessTasks.StartProcess(
+          "docker",
+          args,
+          workingDirectory: RootDirectory,
+          environmentVariables: envVars);
+        process.WaitForExit();
+        exitCode = process.ExitCode;
+      }
+      finally
+      {
+        var downArgs = SkipPublish ?
+          "compose -f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml down" :
+          "compose -f Test/e2e/docker-compose.yml down";
+        var downProcess = ProcessTasks.StartProcess(
+          "docker",
+          downArgs,
+          workingDirectory: RootDirectory);
+        downProcess.WaitForExit();
+      }
 
-        int exitCode = 0;
-        try
-        {
-          var args = "compose -f Test/e2e/docker-compose.yml up --build --abort-on-container-exit";
-          var envVars = new Dictionary<string, string>
-          {
-            ["DOCKER_BUILDKIT"] = "1",
-          };
-          var process = ProcessTasks.StartProcess(
-                "docker",
-                args,
-                workingDirectory: RootDirectory,
-                environmentVariables: envVars);
-          process.WaitForExit();
-          exitCode = process.ExitCode;
-        }
-        finally
-        {
-          var downArgs = "compose -f Test/e2e/docker-compose.yml down";
-          var downProcess = ProcessTasks.StartProcess(
-                "docker",
-                downArgs,
-                workingDirectory: RootDirectory);
-          downProcess.WaitForExit();
-        }
+      // Generate LiquidTestReport from TRX files
+      var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
 
-        // Generate LiquidTestReport from TRX files
-        var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
+      try
+      {
+        Liquid(
+          $"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestE2e)} Results\"");
 
-        try
-        {
-          Liquid($"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestE2e)} Results\"");
+        // Extract summary from Report.md (everything before first "---")
+        var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";
+        ExtractReportSummary(reportFile, reportSummaryFile);
+      }
+      catch (Exception ex)
+      {
+        Log.Warning("Failed to generate LiquidTestReport: {Message}", ex.Message);
+      }
 
-          // Extract summary from Report.md (everything before first "---")
-          var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";
-          ExtractReportSummary(reportFile, reportSummaryFile);
-        }
-        catch (Exception ex)
-        {
-          Log.Warning("Failed to generate LiquidTestReport: {Message}", ex.Message);
-        }
+      // Explicitly fail the target if Docker Compose failed
+      if (exitCode != 0)
+      {
+        Log.Error("E2E tests failed with exit code: {ExitCode}", exitCode);
+        throw new Exception($"E2E tests failed with exit code: {exitCode}");
+      }
+    });
 
-        // Explicitly fail the target if Docker Compose failed
-        if (exitCode != 0)
-        {
-          Log.Error("E2E tests failed with exit code: {ExitCode}", exitCode);
-          throw new Exception($"E2E tests failed with exit code: {exitCode}");
-        }
-      });
+    return _;
+  };
 
   // LiquidTestReports.Cli dotnet global tool isn't available as a built-in Nuke tool under Nuke.Common.Tools, so we resolve it manually
   private Tool Liquid => ToolResolver.GetPathTool("liquid");
