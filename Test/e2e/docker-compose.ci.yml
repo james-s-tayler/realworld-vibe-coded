@@ -3,5 +3,5 @@ services:
     image: api:ci
     build: null   # disables build in this override
   playwright:
-    image: playwright:ci
+    image: ghcr.io/james-s-tayler/realworld-vibe-coded/playwright:ci
     build: null   # disables build in this override

@@ -525,11 +525,8 @@ jobs:
           context: ./Test/e2e
           file: ./Test/e2e/Dockerfile.playwright
           # Tag must match what docker-compose expects (see below)
-          tags: playwright:ci
-          # Don't push anywhere (unless you want to)
-          push: false
-          # Load image into the local Docker daemon so docker compose can use it
-          load: true
+          tags: ghcr.io/${{ github.repository }}/playwright:ci
+          push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
