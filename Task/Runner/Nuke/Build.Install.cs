@@ -13,6 +13,12 @@ public partial class Build
       .Description("Run npm ci if node_modules is missing or package-lock.json is newer")
       .Executes(() =>
       {
+        if (SkipPublish)
+        {
+          Log.Information("Already published - skipping");
+          return;
+        }
+
         var packageLock = ClientDirectory / "package-lock.json";
         var nodeModules = ClientDirectory / "node_modules";
 

@@ -517,6 +517,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: App/Client/package-lock.json
+
+      - name: Build and publish (server + client)
+        run: ./build.sh build-server-publish
+
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -544,11 +559,8 @@ jobs:
           context: .
           file: ./Test/e2e/Dockerfile.api
           # Tag must match what docker-compose expects (see below)
-          tags: api:ci
-          # Don't push anywhere (unless you want to)
-          push: false
-          # Load image into the local Docker daemon so docker compose can use it
-          load: true
+          tags: ghcr.io/${{ github.repository }}/api:ci
+          push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -556,7 +568,7 @@ jobs:
         id: e2e_tests
         run: |
           set +e  # Don't exit on error
-          ./build.sh test-e2e
+          ./build.sh test-e2e -skip-publish true
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment

@@ -21,6 +21,12 @@ public partial class Build
     .DependsOn(BuildClient)
     .Executes(() =>
     {
+      if (SkipPublish)
+      {
+        Log.Information("Already published - skipping");
+        return;
+      }
+
       PublishDirectory.CreateOrCleanDirectory();
 
       Log.Information($"Publishing server to {PublishDirectory}");
@@ -51,6 +57,12 @@ public partial class Build
     .DependsOn(InstallClient)
     .Executes(() =>
     {
+      if (SkipPublish)
+      {
+        Log.Information("Already published - skipping");
+        return;
+      }
+
       Console.WriteLine($"Building client in {ClientDirectory}");
       NpmRun(s => s
         .SetProcessWorkingDirectory(ClientDirectory)
