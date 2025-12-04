@@ -545,8 +545,9 @@ jobs:
       - name: Prepend shard identifier and append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
         run: |
-          # Create a temp file with shard header
-          echo "## 🧪 E2E Tests - Shard 1/2" > /tmp/report-with-header.md
+          # Create a temp file with unique shard marker and header
+          echo "<!-- E2E-SHARD-1-COMMENT -->" > /tmp/report-with-header.md
+          echo "## 🧪 E2E Tests - Shard 1/2" >> /tmp/report-with-header.md
           echo "" >> /tmp/report-with-header.md
           cat Reports/Test/e2e/Artifacts/ReportSummary.md >> /tmp/report-with-header.md
           echo "" >> /tmp/report-with-header.md
@@ -554,12 +555,22 @@ jobs:
           echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> /tmp/report-with-header.md
           mv /tmp/report-with-header.md Reports/Test/e2e/Artifacts/ReportSummary.md
 
+      - name: Find existing shard 1 comment
+        if: always() && github.event_name == 'pull_request'
+        id: find_comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.number }}
+          body-includes: '<!-- E2E-SHARD-1-COMMENT -->'
+
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.number }}
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
           body-path: Reports/Test/e2e/Artifacts/ReportSummary.md
+          edit-mode: replace
 
       - name: Upload E2E Test Reports
         uses: actions/upload-artifact@v4
@@ -618,8 +629,9 @@ jobs:
       - name: Prepend shard identifier and append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
         run: |
-          # Create a temp file with shard header
-          echo "## 🧪 E2E Tests - Shard 2/2" > /tmp/report-with-header.md
+          # Create a temp file with unique shard marker and header
+          echo "<!-- E2E-SHARD-2-COMMENT -->" > /tmp/report-with-header.md
+          echo "## 🧪 E2E Tests - Shard 2/2" >> /tmp/report-with-header.md
           echo "" >> /tmp/report-with-header.md
           cat Reports/Test/e2e/Artifacts/ReportSummary.md >> /tmp/report-with-header.md
           echo "" >> /tmp/report-with-header.md
@@ -627,12 +639,22 @@ jobs:
           echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> /tmp/report-with-header.md
           mv /tmp/report-with-header.md Reports/Test/e2e/Artifacts/ReportSummary.md
 
+      - name: Find existing shard 2 comment
+        if: always() && github.event_name == 'pull_request'
+        id: find_comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.number }}
+          body-includes: '<!-- E2E-SHARD-2-COMMENT -->'
+
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.number }}
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
           body-path: Reports/Test/e2e/Artifacts/ReportSummary.md
+          edit-mode: replace
 
       - name: Upload E2E Test Reports
         uses: actions/upload-artifact@v4

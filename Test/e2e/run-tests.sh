@@ -31,8 +31,7 @@ if [ -n "$SHARD" ] && [ -n "$SHARD_TOTAL" ]; then
     # 3. Remove trailing semicolons, whitespace, and carriage returns
     # 4. Sort uniquely
     mapfile -t NAMESPACES < <(grep -rh "namespace E2eTests.Tests" "$TESTS_DIR" --include="*.cs" 2>/dev/null | \
-        sed 's/.*namespace //' | \
-        sed 's/[;[:space:]]*$//' | \
+        sed 's/.*namespace //;s/[;[:space:]]*$//' | \
         tr -d '\r' | \
         sort -u)
     
