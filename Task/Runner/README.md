@@ -145,6 +145,7 @@ The E2E tests can be split across multiple shards for parallel execution. This i
 - Reducing overall CI time
 
 **How sharding works:**
+- Tests are dynamically discovered by scanning source file namespaces
 - Tests are distributed across shards based on their namespace (page-based organization)
 - Each shard receives a deterministic subset of test namespaces
 - The distribution uses modulo arithmetic: namespace index % total shards determines the assigned shard
@@ -154,12 +155,16 @@ The E2E tests can be split across multiple shards for parallel execution. This i
 # Run all tests (no sharding)
 ./build.sh test-e2e
 
-# Run shard 1 of 2 (ArticlePage, HomePage, ProfilePage, SettingsPage)
+# Run shard 1 of 2
 ./build.sh test-e2e --shard 1 --shard-total 2
 
-# Run shard 2 of 2 (EditorPage, LoginPage, RegisterPage, SwaggerPage)
+# Run shard 2 of 2
 ./build.sh test-e2e --shard 2 --shard-total 2
 ```
+
+**Current Distribution (with 2 shards):**
+- **Shard 1**: ArticlePage, HomePage, ProfilePage, SettingsPage
+- **Shard 2**: EditorPage, LoginPage, RegisterPage, SwaggerPage
 
 **CI Integration:**
 In CI, two separate jobs run each shard in parallel:

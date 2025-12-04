@@ -542,12 +542,17 @@ jobs:
         if: always()
         run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
 
-      - name: Append full report link to ReportSummary.md
+      - name: Prepend shard identifier and append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
         run: |
-          echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-          echo "---" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+          # Create a temp file with shard header
+          echo "## 🧪 E2E Tests - Shard 1/2" > /tmp/report-with-header.md
+          echo "" >> /tmp/report-with-header.md
+          cat Reports/Test/e2e/Artifacts/ReportSummary.md >> /tmp/report-with-header.md
+          echo "" >> /tmp/report-with-header.md
+          echo "---" >> /tmp/report-with-header.md
+          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> /tmp/report-with-header.md
+          mv /tmp/report-with-header.md Reports/Test/e2e/Artifacts/ReportSummary.md
 
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
@@ -555,7 +560,6 @@ jobs:
         with:
           issue-number: ${{ github.event.number }}
           body-path: Reports/Test/e2e/Artifacts/ReportSummary.md
-          edit-mode: replace
 
       - name: Upload E2E Test Reports
         uses: actions/upload-artifact@v4
@@ -611,12 +615,17 @@ jobs:
         if: always()
         run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
 
-      - name: Append full report link to ReportSummary.md
+      - name: Prepend shard identifier and append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
         run: |
-          echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-          echo "---" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+          # Create a temp file with shard header
+          echo "## 🧪 E2E Tests - Shard 2/2" > /tmp/report-with-header.md
+          echo "" >> /tmp/report-with-header.md
+          cat Reports/Test/e2e/Artifacts/ReportSummary.md >> /tmp/report-with-header.md
+          echo "" >> /tmp/report-with-header.md
+          echo "---" >> /tmp/report-with-header.md
+          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> /tmp/report-with-header.md
+          mv /tmp/report-with-header.md Reports/Test/e2e/Artifacts/ReportSummary.md
 
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
@@ -624,7 +633,6 @@ jobs:
         with:
           issue-number: ${{ github.event.number }}
           body-path: Reports/Test/e2e/Artifacts/ReportSummary.md
-          edit-mode: replace
 
       - name: Upload E2E Test Reports
         uses: actions/upload-artifact@v4

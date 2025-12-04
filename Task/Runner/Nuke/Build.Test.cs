@@ -260,7 +260,7 @@ public partial class Build
 
         // Generate LiquidTestReport from TRX files
         var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
-        var shardSuffix = Shard.HasValue ? $" (Shard {Shard}/{ShardTotal})" : string.Empty;
+        var shardSuffix = Shard.HasValue ? $"_Shard{Shard}of{ShardTotal}" : string.Empty;
 
         try
         {
