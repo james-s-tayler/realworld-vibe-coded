@@ -1,48 +1,35 @@
-# Stage 1: Base image with .NET SDK
 FROM mcr.microsoft.com/playwright:v1.55.0-noble AS base
 
-# Install .NET SDK using the official installer script
 RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --install-dir /usr/share/dotnet --channel 9.0
 
-# Add .NET to PATH
 ENV PATH="/usr/share/dotnet:${PATH}"
 ENV DOTNET_ROOT="/usr/share/dotnet"
 
 WORKDIR /tests
 
-# Stage 2: Restore dependencies
 FROM base AS restore
 
-# Copy project files for dependency resolution
 COPY E2eTests/E2eTests.csproj E2eTests/
 COPY E2eTests.Analyzers/E2eTests.Analyzers.csproj E2eTests.Analyzers/
 
 # Restore NuGet packages for both projects with cache mount for HTTP cache
-# The HTTP cache stores metadata and speeds up subsequent restores
-# Packages are written to /root/.nuget/packages which persists in the layer
+# For some reason dotnet test seems to need to cache the nuget packages via this http cache
 RUN --mount=type=cache,id=nuget-http,target=/root/.local/share/NuGet/v3-cache \
     dotnet restore E2eTests.Analyzers/E2eTests.Analyzers.csproj
 RUN --mount=type=cache,id=nuget-http,target=/root/.local/share/NuGet/v3-cache \
     dotnet restore E2eTests/E2eTests.csproj
 
-# Stage 3: Build
 FROM restore AS build
 
-# Copy all test source files
 COPY E2eTests/ E2eTests/
 COPY E2eTests.Analyzers/ E2eTests.Analyzers/
 
-# Build the project (packages already restored)
 RUN --mount=type=cache,id=nuget-http,target=/root/.local/share/NuGet/v3-cache \
     dotnet build E2eTests/E2eTests.csproj -c Release --no-restore
 
-# Stage 4: Test
 FROM build AS test
 
-# Set environment variables for headless operation
 ENV CI=true
 ENV PLAYWRIGHT_HEADLESS=true
 
-# Set the entry point to run tests without building
-# Using --no-build ensures we use the already-built binaries from the previous stage
 ENTRYPOINT ["dotnet", "test", "./E2eTests/E2eTests.csproj", "-c", "Release", "--no-build", "--logger", "trx;LogFileName=e2e-results.trx", "--results-directory", "/Reports/Test/e2e/Results", "--verbosity", "normal"]
