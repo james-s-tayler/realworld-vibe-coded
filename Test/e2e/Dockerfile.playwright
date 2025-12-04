@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # Stage 1: Base image with .NET SDK
 FROM mcr.microsoft.com/playwright:v1.55.0-noble AS base
 
@@ -17,9 +18,13 @@ FROM base AS restore
 COPY E2eTests/E2eTests.csproj E2eTests/
 COPY E2eTests.Analyzers/E2eTests.Analyzers.csproj E2eTests.Analyzers/
 
-# Restore NuGet packages for both projects
-RUN dotnet restore E2eTests.Analyzers/E2eTests.Analyzers.csproj
-RUN dotnet restore E2eTests/E2eTests.csproj
+# Restore NuGet packages for both projects with cache mount for HTTP cache
+# The HTTP cache stores metadata and speeds up subsequent restores
+# Packages are written to /root/.nuget/packages which persists in the layer
+RUN --mount=type=cache,id=nuget-http,target=/root/.local/share/NuGet/v3-cache \
+    dotnet restore E2eTests.Analyzers/E2eTests.Analyzers.csproj
+RUN --mount=type=cache,id=nuget-http,target=/root/.local/share/NuGet/v3-cache \
+    dotnet restore E2eTests/E2eTests.csproj
 
 # Stage 3: Build
 FROM restore AS build
@@ -28,8 +33,9 @@ FROM restore AS build
 COPY E2eTests/ E2eTests/
 COPY E2eTests.Analyzers/ E2eTests.Analyzers/
 
-# Build the project (restore will use cached packages)
-RUN dotnet build E2eTests/E2eTests.csproj -c Release
+# Build the project (packages already restored)
+RUN --mount=type=cache,id=nuget-http,target=/root/.local/share/NuGet/v3-cache \
+    dotnet build E2eTests/E2eTests.csproj -c Release --no-restore
 
 # Stage 4: Test
 FROM build AS test
