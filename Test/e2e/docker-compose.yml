@@ -51,6 +51,8 @@ services:
       - PLAYWRIGHT_BASE_URL=http://api:5000
       - DEBUG=pw:api
       - CI=true
+      - SHARD=${SHARD:-}
+      - SHARD_TOTAL=${SHARD_TOTAL:-}
 
 networks:
   default:

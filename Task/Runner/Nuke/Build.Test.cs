@@ -15,6 +15,12 @@ public partial class Build
   [Parameter("Postman folder to test")]
   internal readonly string? Folder;
 
+  [Parameter("Current shard number for E2E tests (1-based index)")]
+  internal readonly int? Shard;
+
+  [Parameter("Total number of shards for E2E tests")]
+  internal readonly int? ShardTotal;
+
   internal Target TestServer => _ => _
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
@@ -186,14 +192,37 @@ public partial class Build
       });
 
   internal Target TestE2e => _ => _
-      .Description("Run E2E Playwright tests using Docker Compose")
+      .Description("Run E2E Playwright tests using Docker Compose. Use --shard and --shard-total to run a specific shard (e.g., --shard 1 --shard-total 2)")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
       .DependsOn(InstallDotnetToolLiquidReports)
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running E2E tests with Docker Compose");
+        // Validate shard parameters if provided
+        if (Shard.HasValue != ShardTotal.HasValue)
+        {
+          throw new ArgumentException("Both --shard and --shard-total must be provided together, or neither");
+        }
+
+        if (Shard.HasValue && ShardTotal.HasValue)
+        {
+          if (Shard < 1 || Shard > ShardTotal)
+          {
+            throw new ArgumentException($"Shard must be between 1 and {ShardTotal}, got {Shard}");
+          }
+
+          if (ShardTotal < 1)
+          {
+            throw new ArgumentException($"ShardTotal must be at least 1, got {ShardTotal}");
+          }
+
+          Log.Information("Running E2E tests with Docker Compose - Shard {Shard}/{ShardTotal}", Shard, ShardTotal);
+        }
+        else
+        {
+          Log.Information("Running E2E tests with Docker Compose");
+        }
 
         int exitCode = 0;
         try
@@ -203,6 +232,14 @@ public partial class Build
           {
             ["DOCKER_BUILDKIT"] = "1",
           };
+
+          // Pass shard parameters to Docker Compose as environment variables
+          if (Shard.HasValue && ShardTotal.HasValue)
+          {
+            envVars["SHARD"] = Shard.Value.ToString();
+            envVars["SHARD_TOTAL"] = ShardTotal.Value.ToString();
+          }
+
           var process = ProcessTasks.StartProcess(
                 "docker",
                 args,
@@ -223,10 +260,11 @@ public partial class Build
 
         // Generate LiquidTestReport from TRX files
         var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
+        var shardSuffix = Shard.HasValue ? $" (Shard {Shard}/{ShardTotal})" : string.Empty;
 
         try
         {
-          Liquid($"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestE2e)} Results\"");
+          Liquid($"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestE2e)} Results{shardSuffix}\"");
 
           // Extract summary from Report.md (everything before first "---")
           var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";

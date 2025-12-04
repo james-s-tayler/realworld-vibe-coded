@@ -36,7 +36,7 @@ build.cmd                 # Cross-platform build script (Windows)
 | `build-client` | Build the frontend (placeholder) |
 | `test-server` | Run backend unit/integration tests |
 | `test-server-postman` | Run Postman API tests |
-| `test-e2e` | Run E2E Playwright tests |
+| `test-e2e` | Run E2E Playwright tests (supports sharding with `--shard` and `--shard-total`) |
 | `lint-server-verify` | Verify backend formatting & analyzers (no changes). Fails if issues found |
 | `lint-server-fix` | Fix backend formatting & analyzer issues automatically |
 | `lint-client-verify` | Verify client code formatting and style |
@@ -91,6 +91,9 @@ These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` t
 # Run Postman tests with specific folder
 ./build.sh test-server-postman --folder Auth
 
+# Run E2E tests with sharding (e.g., shard 1 of 2)
+./build.sh test-e2e --shard 1 --shard-total 2
+
 # Reset SQL Server database
 ./build.sh db-reset-force
 
@@ -133,6 +136,37 @@ rem Use build.cmd instead of build.sh
 build.cmd show-help
 build.cmd build-server
 ```
+
+### E2E Test Sharding
+
+The E2E tests can be split across multiple shards for parallel execution. This is useful for:
+- Speeding up test execution on CI by running tests in parallel
+- Identifying flaky tests isolated by shard
+- Reducing overall CI time
+
+**How sharding works:**
+- Tests are distributed across shards based on their namespace (page-based organization)
+- Each shard receives a deterministic subset of test namespaces
+- The distribution uses modulo arithmetic: namespace index % total shards determines the assigned shard
+
+**Usage:**
+```bash
+# Run all tests (no sharding)
+./build.sh test-e2e
+
+# Run shard 1 of 2 (ArticlePage, HomePage, ProfilePage, SettingsPage)
+./build.sh test-e2e --shard 1 --shard-total 2
+
+# Run shard 2 of 2 (EditorPage, LoginPage, RegisterPage, SwaggerPage)
+./build.sh test-e2e --shard 2 --shard-total 2
+```
+
+**CI Integration:**
+In CI, two separate jobs run each shard in parallel:
+- `test-e2e-shard-1`: Runs the first shard
+- `test-e2e-shard-2`: Runs the second shard
+
+Both jobs must pass for the PR to be considered successful.
 
 ## CI Integration
 

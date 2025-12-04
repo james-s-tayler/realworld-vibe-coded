@@ -135,6 +135,22 @@
         "Force": {
           "type": "boolean",
           "description": "Force operation without confirmation"
+        },
+        "Shard": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Current shard number for E2E tests (1-based index)",
+          "format": "int32"
+        },
+        "ShardTotal": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Total number of shards for E2E tests",
+          "format": "int32"
         }
       }
     },

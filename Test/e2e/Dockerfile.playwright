@@ -38,6 +38,9 @@ FROM build AS test
 ENV CI=true
 ENV PLAYWRIGHT_HEADLESS=true
 
-# Set the entry point to run tests without building
-# Using --no-build ensures we use the already-built binaries from the previous stage
-ENTRYPOINT ["dotnet", "test", "./E2eTests/E2eTests.csproj", "-c", "Release", "--no-build", "--logger", "trx;LogFileName=e2e-results.trx", "--results-directory", "/Reports/Test/e2e/Results", "--verbosity", "normal"]
+# Copy the test runner script
+COPY run-tests.sh /tests/run-tests.sh
+RUN chmod +x /tests/run-tests.sh
+
+# Set the entry point to run tests using the script (supports sharding via SHARD and SHARD_TOTAL env vars)
+ENTRYPOINT ["/tests/run-tests.sh"]
