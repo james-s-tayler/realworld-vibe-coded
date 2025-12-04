@@ -155,23 +155,28 @@ The E2E tests can be split across multiple shards for parallel execution. This i
 # Run all tests (no sharding)
 ./build.sh test-e2e
 
-# Run shard 1 of 2
-./build.sh test-e2e --shard 1 --shard-total 2
+# Run shard 1 of 3
+./build.sh test-e2e --shard 1 --shard-total 3
 
-# Run shard 2 of 2
-./build.sh test-e2e --shard 2 --shard-total 2
+# Run shard 2 of 3
+./build.sh test-e2e --shard 2 --shard-total 3
+
+# Run shard 3 of 3
+./build.sh test-e2e --shard 3 --shard-total 3
 ```
 
-**Current Distribution (with 2 shards):**
-- **Shard 1**: ArticlePage, HomePage, ProfilePage, SettingsPage
-- **Shard 2**: EditorPage, LoginPage, RegisterPage, SwaggerPage
+**Current Distribution (with 3 shards):**
+- **Shard 1**: ArticlePage, LoginPage, SettingsPage
+- **Shard 2**: EditorPage, ProfilePage, SwaggerPage
+- **Shard 3**: HomePage, RegisterPage
 
 **CI Integration:**
-In CI, two separate jobs run each shard in parallel:
+In CI, three separate jobs run each shard in parallel:
 - `test-e2e-shard-1`: Runs the first shard
 - `test-e2e-shard-2`: Runs the second shard
+- `test-e2e-shard-3`: Runs the third shard
 
-Both jobs must pass for the PR to be considered successful.
+All three jobs must pass for the PR to be considered successful.
 
 ## CI Integration
 
