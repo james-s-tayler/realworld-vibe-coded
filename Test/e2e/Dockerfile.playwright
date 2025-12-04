@@ -1,9 +1,13 @@
-FROM mcr.microsoft.com/playwright:v1.55.0-noble AS base
+# Start with dotnet SDK for better layer caching
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS base
 
-RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --install-dir /usr/share/dotnet --channel 9.0
-
-ENV PATH="/usr/share/dotnet:${PATH}"
-ENV DOTNET_ROOT="/usr/share/dotnet"
+# Install npm and Playwright browsers first (stable layer for caching)
+# Install only headless Chromium shell with system dependencies
+# This significantly reduces image size compared to installing all browsers
+RUN apt-get update \
+    && apt-get install -y npm \
+    && npx playwright@1.55.0 install chromium --with-deps --only-shell \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tests
 
