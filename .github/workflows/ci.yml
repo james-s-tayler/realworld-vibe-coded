@@ -516,18 +516,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET (from global.json)
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: App/Server/global.json
-          cache: true
-          cache-dependency-path: Test/e2e/E2eTests/E2eTests.csproj
-
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Verify .NET version
-        run: dotnet --info
 
       - name: Build Playwright E2E image with cache
         uses: docker/build-push-action@v6
@@ -536,6 +526,20 @@ jobs:
           file: ./Test/e2e/Dockerfile.playwright
           # Tag must match what docker-compose expects (see below)
           tags: playwright:ci
+          # Don't push anywhere (unless you want to)
+          push: false
+          # Load image into the local Docker daemon so docker compose can use it
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Api E2E image with cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Test/e2e/Dockerfile.api
+          # Tag must match what docker-compose expects (see below)
+          tags: api:ci
           # Don't push anywhere (unless you want to)
           push: false
           # Load image into the local Docker daemon so docker compose can use it

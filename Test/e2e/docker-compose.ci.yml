@@ -1,4 +1,7 @@
 services:
+  api:
+    image: api:ci
+    build: null   # disables build in this override
   playwright:
     image: playwright:ci
     build: null   # disables build in this override
