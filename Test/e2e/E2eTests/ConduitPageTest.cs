@@ -24,6 +24,9 @@ public abstract class ConduitPageTest : PageTest
   {
     await base.InitializeAsync();
 
+    // Start Playwright tracing automatically for every test
+    await StartTracingAsync();
+
     BaseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
 
     // Wipe all test data BEFORE each test to ensure a clean slate
@@ -42,6 +45,9 @@ public abstract class ConduitPageTest : PageTest
 
   public override async ValueTask DisposeAsync()
   {
+    // Stop Playwright tracing and save the trace file
+    await StopTracingAsync();
+
     // Also wipe after each test for cleanup (optional but helps with debugging)
     await WipeTestData();
     await base.DisposeAsync();
@@ -175,13 +181,58 @@ public abstract class ConduitPageTest : PageTest
     await SignOutAsync();
   }
 
-  protected async Task SaveTrace(string testName)
+  /// <summary>
+  /// Gets the current test name from xUnit's TestContext.
+  /// </summary>
+  private static string GetTestName()
+  {
+    var testDisplayName = TestContext.Current.Test?.TestDisplayName;
+    if (string.IsNullOrEmpty(testDisplayName))
+    {
+      return "unknown_test";
+    }
+
+    // Sanitize the test name to be safe for file names
+    var sanitized = testDisplayName
+      .Replace(" ", "_")
+      .Replace("(", "_")
+      .Replace(")", "_")
+      .Replace(",", "_")
+      .Replace("\"", string.Empty)
+      .Replace("'", string.Empty)
+      .Replace(":", "_")
+      .Replace("/", "_")
+      .Replace("\\", "_");
+
+    return sanitized;
+  }
+
+  /// <summary>
+  /// Starts Playwright tracing for the current test.
+  /// </summary>
+  private async Task StartTracingAsync()
+  {
+    var testName = GetTestName();
+    await Context.Tracing.StartAsync(new()
+    {
+      Title = testName,
+      Screenshots = true,
+      Snapshots = true,
+      Sources = true,
+    });
+  }
+
+  /// <summary>
+  /// Stops Playwright tracing and saves the trace file.
+  /// </summary>
+  private async Task StopTracingAsync()
   {
     if (!Directory.Exists(Constants.TracesDirectory))
     {
       Directory.CreateDirectory(Constants.TracesDirectory);
     }
 
+    var testName = GetTestName();
     await Context.Tracing.StopAsync(new()
     {
       Path = Path.Combine(Constants.TracesDirectory, $"{testName}_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip"),
