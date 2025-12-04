@@ -389,18 +389,18 @@ jobs:
         with:
           script: |
             const { wrapCoverageComment } = require('./.github/scripts/wrap-coverage-comment.js');
-            
+
             const commentBody = wrapCoverageComment(
               'code-coverage-results.md',
               'nuke TestClient Code Coverage',
               context
             );
-            
+
             if (!commentBody) {
               console.log('No comment body generated, skipping PR comment');
               return;
             }
-            
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -528,6 +528,20 @@ jobs:
 
       - name: Verify .NET version
         run: dotnet --info
+
+      - name: Build Playwright E2E image with cache
+        uses: docker/build-push-action@v6
+        with:
+          context: ./Test/e2e
+          file: ./Test/e2e/Dockerfile.playwright
+          # Tag must match what docker-compose expects (see below)
+          tags: playwright:ci
+          # Don't push anywhere (unless you want to)
+          push: false
+          # Load image into the local Docker daemon so docker compose can use it
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Test Server (E2E)
         id: e2e_tests

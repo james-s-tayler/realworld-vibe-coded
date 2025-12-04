@@ -198,7 +198,7 @@ public partial class Build
         int exitCode = 0;
         try
         {
-          var args = "compose -f Test/e2e/docker-compose.yml up --build --abort-on-container-exit";
+          var args = "compose -f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml up --build --abort-on-container-exit";
           var envVars = new Dictionary<string, string>
           {
             ["DOCKER_BUILDKIT"] = "1",
@@ -213,7 +213,7 @@ public partial class Build
         }
         finally
         {
-          var downArgs = "compose -f Test/e2e/docker-compose.yml down";
+          var downArgs = "compose -f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml down";
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,

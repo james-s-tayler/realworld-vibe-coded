@@ -111,6 +111,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{F945F675-1346-46
 		Test\e2e\.dockerignore = Test\e2e\.dockerignore
 		Test\e2e\docker-compose.yml = Test\e2e\docker-compose.yml
 		Test\e2e\Dockerfile.api = Test\e2e\Dockerfile.api
+		Test\e2e\docker-compose.ci.yml = Test\e2e\docker-compose.ci.yml
 	EndProjectSection
 EndProject
 Global
