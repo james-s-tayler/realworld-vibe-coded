@@ -545,11 +545,18 @@ jobs:
       - name: Prepend shard identifier and append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
         run: |
+          # Ensure the directory exists
+          mkdir -p Reports/Test/e2e/Artifacts
           # Create a temp file with unique shard marker and header
           echo "<!-- E2E-SHARD-1-COMMENT -->" > /tmp/report-with-header.md
           echo "## 🧪 E2E Tests - Shard 1/3" >> /tmp/report-with-header.md
           echo "" >> /tmp/report-with-header.md
-          cat Reports/Test/e2e/Artifacts/ReportSummary.md >> /tmp/report-with-header.md
+          # Check if ReportSummary.md exists, otherwise create a placeholder
+          if [ -f "Reports/Test/e2e/Artifacts/ReportSummary.md" ]; then
+            cat Reports/Test/e2e/Artifacts/ReportSummary.md >> /tmp/report-with-header.md
+          else
+            echo "⚠️ Test report not generated. Check the job logs for details." >> /tmp/report-with-header.md
+          fi
           echo "" >> /tmp/report-with-header.md
           echo "---" >> /tmp/report-with-header.md
           echo "📄 **[View Full Test Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})** _(see \`test-e2e-shard-1\` job summary)_" >> /tmp/report-with-header.md
@@ -629,11 +636,18 @@ jobs:
       - name: Prepend shard identifier and append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
         run: |
+          # Ensure the directory exists
+          mkdir -p Reports/Test/e2e/Artifacts
           # Create a temp file with unique shard marker and header
           echo "<!-- E2E-SHARD-2-COMMENT -->" > /tmp/report-with-header.md
           echo "## 🧪 E2E Tests - Shard 2/3" >> /tmp/report-with-header.md
           echo "" >> /tmp/report-with-header.md
-          cat Reports/Test/e2e/Artifacts/ReportSummary.md >> /tmp/report-with-header.md
+          # Check if ReportSummary.md exists, otherwise create a placeholder
+          if [ -f "Reports/Test/e2e/Artifacts/ReportSummary.md" ]; then
+            cat Reports/Test/e2e/Artifacts/ReportSummary.md >> /tmp/report-with-header.md
+          else
+            echo "⚠️ Test report not generated. Check the job logs for details." >> /tmp/report-with-header.md
+          fi
           echo "" >> /tmp/report-with-header.md
           echo "---" >> /tmp/report-with-header.md
           echo "📄 **[View Full Test Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})** _(see \`test-e2e-shard-2\` job summary)_" >> /tmp/report-with-header.md
@@ -713,11 +727,18 @@ jobs:
       - name: Prepend shard identifier and append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
         run: |
+          # Ensure the directory exists
+          mkdir -p Reports/Test/e2e/Artifacts
           # Create a temp file with unique shard marker and header
           echo "<!-- E2E-SHARD-3-COMMENT -->" > /tmp/report-with-header.md
           echo "## 🧪 E2E Tests - Shard 3/3" >> /tmp/report-with-header.md
           echo "" >> /tmp/report-with-header.md
-          cat Reports/Test/e2e/Artifacts/ReportSummary.md >> /tmp/report-with-header.md
+          # Check if ReportSummary.md exists, otherwise create a placeholder
+          if [ -f "Reports/Test/e2e/Artifacts/ReportSummary.md" ]; then
+            cat Reports/Test/e2e/Artifacts/ReportSummary.md >> /tmp/report-with-header.md
+          else
+            echo "⚠️ Test report not generated. Check the job logs for details." >> /tmp/report-with-header.md
+          fi
           echo "" >> /tmp/report-with-header.md
           echo "---" >> /tmp/report-with-header.md
           echo "📄 **[View Full Test Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})** _(see \`test-e2e-shard-3\` job summary)_" >> /tmp/report-with-header.md
