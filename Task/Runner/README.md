@@ -91,8 +91,8 @@ These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` t
 # Run Postman tests with specific folder
 ./build.sh test-server-postman --folder Auth
 
-# Run E2E tests with sharding (e.g., shard 1 of 2)
-./build.sh test-e2e --shard 1 --shard-total 2
+# Run E2E tests with sharding (e.g., shard 1 of 3)
+./build.sh test-e2e --shard 1 --shard-total 3
 
 # Reset SQL Server database
 ./build.sh db-reset-force
