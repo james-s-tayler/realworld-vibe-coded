@@ -53,18 +53,6 @@ public class SettingsPage : BasePage
   public ILocator SuccessMessage => Page.GetByText("Settings updated successfully");
 
   /// <summary>
-  /// Navigates directly to the settings page.
-  /// </summary>
-  public async Task GoToAsync()
-  {
-    await Page.GotoAsync($"{BaseUrl}/settings", new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-  }
-
-  /// <summary>
   /// Waits for the bio input to be visible (settings page loaded).
   /// </summary>
   public async Task WaitForPageToLoadAsync()

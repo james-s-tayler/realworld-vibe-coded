@@ -22,7 +22,6 @@ public class LoginPagePermissionsTests : ConduitPageTest
     // Try to access settings page without authentication
     var settingsPage = GetSettingsPage();
     await settingsPage.GoToAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
 
     // Should redirect to login
     await Expect(Page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/login"), new() { Timeout = DefaultTimeout });

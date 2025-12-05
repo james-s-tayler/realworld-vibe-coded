@@ -64,6 +64,7 @@ public abstract class BasePage
   public async Task GoToHomePageAsync()
   {
     await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -71,8 +72,7 @@ public abstract class BasePage
   /// </summary>
   public async Task ClickSignInAsync()
   {
-    await SignInLink.ClickAsync();
-    await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
+    await NavigateAndWaitForNetworkIdle(SignInLink, $"{BaseUrl}/login");
   }
 
   /// <summary>
@@ -80,8 +80,7 @@ public abstract class BasePage
   /// </summary>
   public async Task ClickSignUpAsync()
   {
-    await SignUpLink.ClickAsync();
-    await Page.WaitForURLAsync($"{BaseUrl}/register", new() { Timeout = DefaultTimeout });
+    await NavigateAndWaitForNetworkIdle(SignUpLink, $"{BaseUrl}/register");
   }
 
   /// <summary>
@@ -89,8 +88,7 @@ public abstract class BasePage
   /// </summary>
   public async Task ClickNewArticleAsync()
   {
-    await NewArticleLink.ClickAsync();
-    await Page.WaitForURLAsync($"{BaseUrl}/editor", new() { Timeout = DefaultTimeout });
+    await NavigateAndWaitForNetworkIdle(NewArticleLink, $"{BaseUrl}/editor");
   }
 
   /// <summary>
@@ -98,8 +96,7 @@ public abstract class BasePage
   /// </summary>
   public async Task ClickSettingsAsync()
   {
-    await SettingsLink.ClickAsync();
-    await Page.WaitForURLAsync($"{BaseUrl}/settings", new() { Timeout = DefaultTimeout });
+    await NavigateAndWaitForNetworkIdle(SettingsLink, $"{BaseUrl}/settings");
   }
 
   /// <summary>
@@ -107,8 +104,7 @@ public abstract class BasePage
   /// </summary>
   public async Task ClickUserProfileAsync(string username)
   {
-    await GetUserProfileLink(username).ClickAsync();
-    await Page.WaitForURLAsync($"{BaseUrl}/profile/{username}", new() { Timeout = DefaultTimeout });
+    await NavigateAndWaitForNetworkIdle(GetUserProfileLink(username), $"{BaseUrl}/profile/{username}");
   }
 
   /// <summary>
@@ -149,5 +145,27 @@ public abstract class BasePage
     {
       return false;
     }
+  }
+
+  public virtual async Task GoToAsync()
+  {
+    await GoToAsync($"{BaseUrl}/{Page}");
+  }
+
+  public virtual async Task GoToAsync(string url)
+  {
+    await Page.GotoAsync(url, new()
+    {
+      WaitUntil = WaitUntilState.Load,
+      Timeout = DefaultTimeout,
+    });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
+  }
+
+  private async Task NavigateAndWaitForNetworkIdle(ILocator locator, string url)
+  {
+    await locator.ClickAsync();
+    await Page.WaitForURLAsync(url, new() { Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
   }
 }

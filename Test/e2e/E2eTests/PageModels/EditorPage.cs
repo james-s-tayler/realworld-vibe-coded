@@ -44,18 +44,6 @@ public class EditorPage : BasePage
   public ILocator ErrorDisplay => Page.GetByTestId("error-display");
 
   /// <summary>
-  /// Navigates directly to the new article editor page.
-  /// </summary>
-  public async Task GoToAsync()
-  {
-    await Page.GotoAsync($"{BaseUrl}/editor", new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-  }
-
-  /// <summary>
   /// Navigates to edit an existing article.
   /// </summary>
   public async Task GoToEditAsync(string slug)
@@ -152,6 +140,7 @@ public class EditorPage : BasePage
     await UpdateTitleAsync(newTitle);
     await ClickPublishButtonAsync();
     await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
 
     var articlePage = new ArticlePage(Page, BaseUrl);
     await articlePage.VerifyArticleTitleAsync(newTitle);

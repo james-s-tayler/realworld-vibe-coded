@@ -78,14 +78,9 @@ public class ProfilePage : BasePage
   /// <summary>
   /// Navigates directly to a user's profile page.
   /// </summary>
-  public async Task GoToAsync(string username)
+  public override async Task GoToAsync(string username)
   {
-    await Page.GotoAsync($"{BaseUrl}/profile/{username}", new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
+    await base.GoToAsync($"{BaseUrl}/profile/{username}");
   }
 
   /// <summary>
@@ -105,6 +100,7 @@ public class ProfilePage : BasePage
     var followButton = GetFollowButton(username);
     await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
     await followButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(GetUnfollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -115,6 +111,7 @@ public class ProfilePage : BasePage
   {
     var unfollowButton = GetUnfollowButton(username);
     await unfollowButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(GetFollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -153,6 +150,7 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task WaitForArticlesToLoadAsync()
   {
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(LoadingIndicator).ToBeHiddenAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -169,6 +167,7 @@ public class ProfilePage : BasePage
   {
     await Expect(PaginationForwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
     await PaginationForwardButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -179,6 +178,7 @@ public class ProfilePage : BasePage
   {
     await Expect(PaginationBackwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
     await PaginationBackwardButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 

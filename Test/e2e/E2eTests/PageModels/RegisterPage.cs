@@ -38,18 +38,6 @@ public class RegisterPage : BasePage
   public ILocator ErrorDisplay => Page.GetByTestId("error-display");
 
   /// <summary>
-  /// Navigates directly to the registration page.
-  /// </summary>
-  public async Task GoToAsync()
-  {
-    await Page.GotoAsync($"{BaseUrl}/register", new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-  }
-
-  /// <summary>
   /// Fills in the registration form.
   /// </summary>
   public async Task FillRegistrationFormAsync(string username, string email, string password)
@@ -65,6 +53,7 @@ public class RegisterPage : BasePage
   public async Task ClickSignUpButtonAsync()
   {
     await SignUpButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -77,21 +66,8 @@ public class RegisterPage : BasePage
   public async Task<HomePage> RegisterAsync(string username, string email, string password)
   {
     await FillRegistrationFormAsync(username, email, password);
-
-    var responseTask = Page.WaitForResponseAsync(
-      response =>
-        response.Url.Contains("/api/users") && response.Request.Method == "POST",
-      new() { Timeout = DefaultTimeout });
-
     await ClickSignUpButtonAsync();
-    await responseTask;
-
-    // Wait for the user link to appear in the header (indicates successful registration)
-    await GetUserProfileLink(username).WaitForAsync(new()
-    {
-      State = WaitForSelectorState.Visible,
-      Timeout = DefaultTimeout,
-    });
+    await Expect(GetUserProfileLink(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
     return new HomePage(Page, BaseUrl);
   }

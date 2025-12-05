@@ -77,13 +77,9 @@ public class ArticlePage : BasePage
   /// <summary>
   /// Navigates directly to an article page by slug.
   /// </summary>
-  public async Task GoToAsync(string slug)
+  public override async Task GoToAsync(string slug)
   {
-    await Page.GotoAsync($"{BaseUrl}/article/{slug}", new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
+    await base.GoToAsync($"{BaseUrl}/article/{slug}");
   }
 
   /// <summary>
@@ -94,6 +90,7 @@ public class ArticlePage : BasePage
     await EditButton.WaitForAsync(new() { Timeout = DefaultTimeout });
     await EditButton.ClickAsync();
     await Page.WaitForURLAsync(new Regex(@"/editor/"), new() { Timeout = DefaultTimeout });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     return new EditorPage(Page, BaseUrl);
   }
 
@@ -111,6 +108,7 @@ public class ArticlePage : BasePage
     };
 
     await DeleteButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Assertions.Expect(Page).ToHaveURLAsync(BaseUrl, new() { Timeout = DefaultTimeout });
     return new HomePage(Page, BaseUrl);
   }
@@ -122,6 +120,7 @@ public class ArticlePage : BasePage
   {
     await FavoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
     await FavoriteButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(UnfavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -131,6 +130,7 @@ public class ArticlePage : BasePage
   public async Task ClickUnfavoriteButtonAsync()
   {
     await UnfavoriteButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(FavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -142,6 +142,7 @@ public class ArticlePage : BasePage
     var followButton = GetFollowButton(username);
     await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
     await followButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(GetUnfollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -152,6 +153,7 @@ public class ArticlePage : BasePage
   {
     var unfollowButton = GetUnfollowButton(username);
     await unfollowButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(GetFollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -182,6 +184,7 @@ public class ArticlePage : BasePage
     await CommentInput.WaitForAsync(new() { Timeout = DefaultTimeout });
     await CommentInput.FillAsync(commentText);
     await PostCommentButton.ClickAsync();
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(Page.GetByText(commentText).First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -193,14 +196,8 @@ public class ArticlePage : BasePage
     var comment = Page.GetByText(commentText);
     await comment.WaitForAsync(new() { Timeout = DefaultTimeout });
 
-    var responseTask = Page.WaitForResponseAsync(
-      response => response.Url.Contains("/api/articles/") &&
-                  response.Url.Contains("/comments/") &&
-                  response.Request.Method == "DELETE",
-      new() { Timeout = DefaultTimeout });
-
     await DeleteCommentButton.ClickAsync();
-    await responseTask;
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(comment).Not.ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -211,7 +208,7 @@ public class ArticlePage : BasePage
   {
     var heading = GetArticleTitle(title);
     await heading.WaitForAsync(new() { Timeout = DefaultTimeout });
-    Assert.True(await heading.IsVisibleAsync(), $"Article title '{title}' should be displayed");
+    await Expect(heading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -220,7 +217,7 @@ public class ArticlePage : BasePage
   public async Task VerifyAuthorAsync(string username)
   {
     var authorLink = GetAuthorLink(username);
-    Assert.True(await authorLink.IsVisibleAsync(), $"Author '{username}' should be displayed");
+    await Expect(authorLink).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>

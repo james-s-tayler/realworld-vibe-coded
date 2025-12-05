@@ -15,7 +15,6 @@ public class SettingsPageHappyPathTests : ConduitPageTest
     // Navigate to settings to edit profile
     var settingsPage = GetSettingsPage();
     await settingsPage.GoToAsync();
-    await settingsPage.WaitForPageToLoadAsync();
 
     // Update bio
     var bioText = "This is my updated bio for E2E test";
