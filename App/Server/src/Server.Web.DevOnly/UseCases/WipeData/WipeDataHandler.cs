@@ -11,6 +11,7 @@ namespace Server.Web.DevOnly.UseCases.WipeData;
 #pragma warning disable PV051 // DevOnly - infrastructure access needed for bulk delete
 #pragma warning disable PV002 // DevOnly - infrastructure access needed for bulk delete
 #pragma warning disable PV014 // DevOnly - using ExecuteDeleteAsync instead of repository
+#pragma warning disable PV003 // DevOnly - using ExecuteSqlRawAsync for join table deletion
 public class WipeDataHandler(AppDbContext dbContext) : Server.SharedKernel.MediatR.ICommandHandler<WipeDataCommand, Unit>
 {
   public async Task<Result<Unit>> Handle(WipeDataCommand request, CancellationToken cancellationToken)
@@ -22,18 +23,22 @@ public class WipeDataHandler(AppDbContext dbContext) : Server.SharedKernel.Media
     // 2. Delete user followings (references users)
     await dbContext.UserFollowings.ExecuteDeleteAsync(cancellationToken);
 
-    // 3. Delete articles (references users and tags via ArticleTags)
+    // 3. Delete article favorites join table (references articles and users)
+    await dbContext.Database.ExecuteSqlRawAsync("DELETE FROM ArticleFavorites", cancellationToken);
+
+    // 4. Delete articles (references users and tags via ArticleTags)
     await dbContext.Articles.ExecuteDeleteAsync(cancellationToken);
 
-    // 4. Delete tags (now safe since ArticleTags are cascade deleted)
+    // 5. Delete tags (now safe since ArticleTags are cascade deleted)
     await dbContext.Tags.ExecuteDeleteAsync(cancellationToken);
 
-    // 5. Delete users (now safe since all references are deleted)
+    // 6. Delete users (now safe since all references are deleted)
     await dbContext.Users.ExecuteDeleteAsync(cancellationToken);
 
     return Result<Unit>.NoContent();
   }
 }
+#pragma warning restore PV003
 #pragma warning restore PV014
 #pragma warning restore PV002
 #pragma warning restore PV051
