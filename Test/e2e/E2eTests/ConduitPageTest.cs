@@ -223,19 +223,31 @@ public abstract class ConduitPageTest : PageTest
   }
 
   /// <summary>
-  /// Stops Playwright tracing and saves the trace file.
+  /// Stops Playwright tracing and saves the trace file only if the test failed.
   /// </summary>
   private async Task StopTracingAsync()
   {
-    if (!Directory.Exists(Constants.TracesDirectory))
-    {
-      Directory.CreateDirectory(Constants.TracesDirectory);
-    }
+    // Check if the test failed - only save trace for failed tests
+    var testState = TestContext.Current.TestState;
+    var testFailed = testState?.Result == Xunit.TestResult.Failed;
 
-    var testName = GetTestName();
-    await Context.Tracing.StopAsync(new()
+    if (testFailed)
     {
-      Path = Path.Combine(Constants.TracesDirectory, $"{testName}_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip"),
-    });
+      if (!Directory.Exists(Constants.TracesDirectory))
+      {
+        Directory.CreateDirectory(Constants.TracesDirectory);
+      }
+
+      var testName = GetTestName();
+      await Context.Tracing.StopAsync(new()
+      {
+        Path = Path.Combine(Constants.TracesDirectory, $"{testName}_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip"),
+      });
+    }
+    else
+    {
+      // Discard the trace for passed tests (don't save to disk)
+      await Context.Tracing.StopAsync();
+    }
   }
 }
