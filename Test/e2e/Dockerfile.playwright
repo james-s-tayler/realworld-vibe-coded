@@ -2,11 +2,40 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS base
 
 # Install npm and Playwright browsers first (stable layer for caching)
-# Install only headless Chromium shell with system dependencies
+# Install only headless Chromium shell with minimal system dependencies
 # This significantly reduces image size compared to installing all browsers
 RUN apt-get update \
-    && apt-get install -y npm \
-    && npx playwright@1.55.0 install chromium --with-deps --only-shell \
+    && apt-get install -y --no-install-recommends \
+        npm \
+        libnspr4 \
+        libnss3 \
+        libatk1.0-0 \
+        libatk-bridge2.0-0 \
+        libatspi2.0-0 \
+        libxdamage1 \
+        libxkbcommon0 \
+        libasound2 \
+        libxcomposite1 \
+        libxfixes3 \
+        libxrandr2 \
+        libgbm1 \
+        libcups2 \
+        libdrm2 \
+        libpango-1.0-0 \
+        libcairo2 \
+        libdbus-1-3 \
+        libexpat1 \
+        libfontconfig1 \
+        libgcc-s1 \
+        libglib2.0-0 \
+        libx11-6 \
+        libx11-xcb1 \
+        libxcb1 \
+        libxext6 \
+        fonts-liberation \
+        fonts-noto-color-emoji \
+        fonts-freefont-ttf \
+    && npx playwright@1.55.0 install chromium --only-shell \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tests
