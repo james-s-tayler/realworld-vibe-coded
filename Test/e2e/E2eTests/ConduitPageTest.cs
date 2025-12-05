@@ -101,7 +101,7 @@ public abstract class ConduitPageTest : PageTest
     }
     catch (Exception ex)
     {
-      // Log but don't fail the test if wipe fails
+      // Log but don't fail the test if wipe fails.
       Console.WriteLine($"Warning: Failed to wipe test data: {ex.Message}");
     }
   }
