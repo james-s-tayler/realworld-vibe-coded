@@ -85,6 +85,7 @@ public class ProfilePage : BasePage
       WaitUntil = WaitUntilState.Load,
       Timeout = DefaultTimeout,
     });
+    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -187,7 +188,7 @@ public class ProfilePage : BasePage
   public async Task VerifyProfileHeadingAsync(string username)
   {
     var heading = GetUsernameHeading(username);
-    Assert.True(await heading.IsVisibleAsync(), $"Profile heading for '{username}' should be visible");
+    await Expect(heading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -195,7 +196,7 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task VerifyMyArticlesTabVisibleAsync()
   {
-    Assert.True(await MyArticlesTab.IsVisibleAsync(), "My Articles tab should be visible");
+    await Expect(MyArticlesTab).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
