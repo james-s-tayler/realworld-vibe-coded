@@ -170,22 +170,6 @@ public abstract class AppPageTest : PageTest
     return (articlePage, articleTitle);
   }
 
-  // Legacy methods for backward compatibility during migration
-  protected async Task RegisterUser()
-  {
-    await RegisterUserAsync(TestUsername, TestEmail, TestPassword);
-  }
-
-  protected async Task RegisterUser(string username, string email, string password)
-  {
-    await RegisterUserAsync(username, email, password);
-  }
-
-  protected async Task SignOut()
-  {
-    await SignOutAsync();
-  }
-
   /// <summary>
   /// Gets the current test name from xUnit's TestContext.
   /// </summary>
