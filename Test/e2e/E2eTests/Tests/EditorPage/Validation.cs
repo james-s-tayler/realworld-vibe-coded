@@ -6,23 +6,25 @@
 [Collection("E2E Tests")]
 public class Validation : AppPageTest
 {
+  public Validation(ApiFixture apiFixture) : base(apiFixture)
+  {
+  }
+
   [Fact]
   public async Task CreateArticle_WithDuplicateTitle_DisplaysErrorMessage()
   {
     // Arrange
-    await RegisterUserAsync();
+    var user = await Api.CreateUserAsync();
 
-    var timestamp = DateTime.UtcNow.Ticks;
-    var articleTitle = $"Duplicate Test Article {timestamp}";
+    var existingArticle = await Api.CreateArticleAsync(user.Token);
 
-    await Pages.HomePage.ClickNewArticleAsync();
-
-    await Pages.EditorPage.CreateArticleAsync(articleTitle, "Test description", "Test body content");
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     await Pages.EditorPage.GoToAsync();
 
     // Act
-    await Pages.EditorPage.CreateArticleAndExpectErrorAsync(articleTitle, "Different description", "Different body content");
+    await Pages.EditorPage.CreateArticleAndExpectErrorAsync(existingArticle.Title, "Different description", "Different body content");
 
     // Assert
     await Pages.EditorPage.VerifyErrorContainsTextAsync("has already been taken");

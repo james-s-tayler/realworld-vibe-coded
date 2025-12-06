@@ -50,7 +50,7 @@ public class LoginPage : BasePage
   }
 
   /// <summary>
-  /// Performs a complete login action.
+  /// Performs a complete login action and waits for navigation to home page.
   /// </summary>
   /// <param name="email">User's email.</param>
   /// <param name="password">User's password.</param>
@@ -58,5 +58,8 @@ public class LoginPage : BasePage
   {
     await FillLoginFormAsync(email, password);
     await ClickSignInButtonAsync();
+
+    // Wait for successful login by verifying the New Article link is visible (only shown when logged in)
+    await Expect(NewArticleLink).ToBeVisibleAsync();
   }
 }

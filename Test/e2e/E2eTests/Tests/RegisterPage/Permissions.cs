@@ -6,5 +6,9 @@
 [Collection("E2E Tests")]
 public class Permissions : AppPageTest
 {
+  public Permissions(ApiFixture apiFixture) : base(apiFixture)
+  {
+  }
+
   // No permission tests for RegisterPage currently
 }

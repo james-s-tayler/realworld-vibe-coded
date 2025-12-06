@@ -12,6 +12,12 @@ public abstract class AppPageTest : PageTest
   protected string TestEmail = null!;
   protected string TestPassword = null!;
   protected PageObjects Pages = null!;
+  protected ApiFixture Api = null!;
+
+  protected AppPageTest(ApiFixture apiFixture)
+  {
+    Api = apiFixture;
+  }
 
   public override BrowserNewContextOptions ContextOptions()
   {
@@ -72,57 +78,6 @@ public abstract class AppPageTest : PageTest
   {
     var guid = Guid.NewGuid().ToString("N")[..8];
     return $"{username}{guid}@test.com";
-  }
-
-
-
-  /// <summary>
-  /// Registers a user using the default test credentials.
-  /// </summary>
-  protected async Task RegisterUserAsync()
-  {
-    await RegisterUserAsync(TestUsername, TestEmail, TestPassword);
-  }
-
-  /// <summary>
-  /// Registers a user with specified credentials.
-  /// </summary>
-  protected async Task RegisterUserAsync(string username, string email, string password)
-  {
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickSignUpAsync();
-    await Pages.RegisterPage.RegisterAsync(username, email, password);
-  }
-
-  /// <summary>
-  /// Signs out the current user via the settings page.
-  /// </summary>
-  protected async Task SignOutAsync()
-  {
-    await Pages.SettingsPage.GoToAsync();
-    await Pages.SettingsPage.LogoutAsync();
-  }
-
-  /// <summary>
-  /// Creates a new article and returns the article title.
-  /// </summary>
-  protected async Task<string> CreateArticleAsync()
-  {
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    await Pages.HomePage.ClickNewArticleAsync();
-    await Pages.EditorPage.CreateArticleAsync(articleTitle, "Test article for E2E testing", "This is a test article body.");
-    return articleTitle;
-  }
-
-  /// <summary>
-  /// Creates a new article with a specific tag and returns the article title.
-  /// </summary>
-  protected async Task<string> CreateArticleWithTagAsync(string tag)
-  {
-    var articleTitle = $"Tagged Article {GenerateUniqueUsername("tag")}";
-    await Pages.HomePage.ClickNewArticleAsync();
-    await Pages.EditorPage.CreateArticleWithTagsAsync(articleTitle, "Test article with tag", "This is a test article body.", tag);
-    return articleTitle;
   }
 
   /// <summary>

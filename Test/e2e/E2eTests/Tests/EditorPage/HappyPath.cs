@@ -6,11 +6,18 @@
 [Collection("E2E Tests")]
 public class HappyPath : AppPageTest
 {
+  public HappyPath(ApiFixture apiFixture) : base(apiFixture)
+  {
+  }
+
   [Fact]
   public async Task UserCanCreateArticle_AndViewArticle()
   {
     // Arrange
-    await RegisterUserAsync();
+    var user = await Api.CreateUserAsync();
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     await Pages.HomePage.ClickNewArticleAsync();
 
@@ -24,19 +31,26 @@ public class HappyPath : AppPageTest
 
     // Assert
     await Pages.ArticlePage.VerifyArticleTitleAsync(articleTitle);
-    await Pages.ArticlePage.VerifyAuthorAsync(TestUsername);
+    await Pages.ArticlePage.VerifyAuthorAsync(user.Username);
   }
 
   [Fact]
   public async Task UserCanEditOwnArticle()
   {
     // Arrange
-    await RegisterUserAsync();
-    var articleTitle = await CreateArticleAsync();
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.ClickArticleAsync(article.Title);
 
     await Pages.ArticlePage.ClickEditButtonAsync();
 
-    var updatedTitle = $"{articleTitle} - Updated";
+    var updatedTitle = $"{article.Title} - Updated";
 
     // Act
     await Pages.EditorPage.UpdateArticleAsync(updatedTitle);

@@ -6,20 +6,22 @@
 [Collection("E2E Tests")]
 public class HappyPath : AppPageTest
 {
+  public HappyPath(ApiFixture apiFixture) : base(apiFixture)
+  {
+  }
+
   [Fact]
   public async Task UserCanSignIn_WithExistingCredentials()
   {
     // Arrange
-    await RegisterUserAsync();
-
-    await SignOutAsync();
+    var user = await Api.CreateUserAsync();
 
     await Pages.LoginPage.GoToAsync();
 
     // Act
-    await Pages.LoginPage.LoginAsync(TestEmail, TestPassword);
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     // Assert
-    await Expect(Pages.HomePage.GetUserProfileLink(TestUsername)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(Pages.HomePage.GetUserProfileLink(user.Username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 }

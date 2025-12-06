@@ -6,19 +6,27 @@
 [Collection("E2E Tests")]
 public class Permissions : AppPageTest
 {
+  public Permissions(ApiFixture apiFixture) : base(apiFixture)
+  {
+  }
+
   [Fact]
-  public async Task ProtectedRoutes_RedirectToLogin_WhenNotAuthenticated()
+  public async Task EditorPage_RedirectToLogin_WhenNotAuthenticated()
   {
     // Arrange
     await Pages.EditorPage.GoToAsync();
 
     // Act + Assert
-    await Expect(Page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/login"), new() { Timeout = DefaultTimeout });
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
+  }
 
+  [Fact]
+  public async Task SettingsPage_RedirectToLogin_WhenNotAuthenticated()
+  {
     // Arrange
     await Pages.SettingsPage.GoToAsync();
 
     // Act + Assert
-    await Expect(Page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/login"), new() { Timeout = DefaultTimeout });
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
   }
 }

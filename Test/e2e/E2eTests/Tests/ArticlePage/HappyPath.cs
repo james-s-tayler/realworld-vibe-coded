@@ -6,32 +6,23 @@
 [Collection("E2E Tests")]
 public class HappyPath : AppPageTest
 {
-  private string _testUsername1 = null!;
-  private string _testEmail1 = null!;
-  private string _testPassword1 = null!;
-  private string _testUsername2 = null!;
-  private string _testEmail2 = null!;
-  private string _testPassword2 = null!;
-
-  public override async ValueTask InitializeAsync()
+  public HappyPath(ApiFixture apiFixture) : base(apiFixture)
   {
-    await base.InitializeAsync();
-
-    _testUsername1 = GenerateUniqueUsername("articleuser1");
-    _testEmail1 = GenerateUniqueEmail(_testUsername1);
-    _testPassword1 = "TestPassword123!";
-
-    _testUsername2 = GenerateUniqueUsername("articleuser2");
-    _testEmail2 = GenerateUniqueEmail(_testUsername2);
-    _testPassword2 = "TestPassword123!";
   }
 
   [Fact]
   public async Task UserCanDeleteOwnArticle()
   {
-    // Arrange
-    await RegisterUserAsync();
-    var articleTitle = await CreateArticleAsync();
+    // Arrange - create user and article via API
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.ClickArticleAsync(article.Title);
 
     // Act
     await Pages.ArticlePage.DeleteArticleAsync();
@@ -39,24 +30,23 @@ public class HappyPath : AppPageTest
     // ToDo: this should actually try to access the article page via its slug and assert a not found error message appears
     // Assert
     await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.VerifyArticleNotVisibleAsync(articleTitle);
+    await Pages.HomePage.VerifyArticleNotVisibleAsync(article.Title);
   }
 
   [Fact]
   public async Task UserCanFavoriteAndUnfavoriteArticle()
   {
-    // Arrange
-    await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
-    var articleTitle = await CreateArticleAsync();
+    // Arrange=
+    var user1 = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user1.Token);
 
-    await SignOutAsync();
+    var user2 = await Api.CreateUserAsync();
 
-    await RegisterUserAsync(_testUsername2, _testEmail2, _testPassword2);
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickGlobalFeedTabAsync();
-
-    await Pages.HomePage.ClickArticleAsync(articleTitle);
+    await Pages.ArticlePage.GoToAsync(article.Slug);
+    await Expect(Pages.ArticlePage.GetArticleTitle(article.Title)).ToBeVisibleAsync();
 
     // Act + Assert
     await Pages.ArticlePage.ClickFavoriteButtonAsync();
@@ -67,8 +57,15 @@ public class HappyPath : AppPageTest
   public async Task UserCanAddCommentToArticle()
   {
     // Arrange
-    await RegisterUserAsync();
-    await CreateArticleAsync();
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.ClickArticleAsync(article.Title);
 
     // Act + Assert
     var commentText = "This is a test comment from E2E tests!";
@@ -79,11 +76,18 @@ public class HappyPath : AppPageTest
   public async Task UserCanDeleteOwnComment()
   {
     // Arrange
-    await RegisterUserAsync();
-    await CreateArticleAsync();
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
 
     var commentText = "This comment will be deleted!";
-    await Pages.ArticlePage.AddCommentAsync(commentText);
+    await Api.CreateCommentAsync(user.Token, article.Slug, commentText);
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.ClickArticleAsync(article.Title);
 
     // Act + Assert
     await Pages.ArticlePage.DeleteCommentAsync(commentText);

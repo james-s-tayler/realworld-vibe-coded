@@ -6,6 +6,10 @@
 [Collection("E2E Tests")]
 public class HappyPath : AppPageTest
 {
+  public HappyPath(ApiFixture apiFixture) : base(apiFixture)
+  {
+  }
+
   [Fact]
   public async Task SwaggerApiDocs_AreDisplayed()
   {
