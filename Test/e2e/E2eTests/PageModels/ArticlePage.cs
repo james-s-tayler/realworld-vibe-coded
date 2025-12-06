@@ -79,7 +79,7 @@ public class ArticlePage : BasePage
   /// </summary>
   public override async Task GoToAsync(string slug)
   {
-    await base.GoToAsync($"{BaseUrl}/article/{slug}");
+    await base.GoToAsync($"article/{slug}");
   }
 
   /// <summary>
