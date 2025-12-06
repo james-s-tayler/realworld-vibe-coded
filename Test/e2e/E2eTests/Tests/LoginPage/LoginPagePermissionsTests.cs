@@ -1,6 +1,4 @@
-﻿using Microsoft.Playwright;
-
-namespace E2eTests.Tests.LoginPage;
+﻿namespace E2eTests.Tests.LoginPage;
 
 /// <summary>
 /// Permission tests for the Login page (/login).
@@ -14,7 +12,6 @@ public class LoginPagePermissionsTests : AppPageTest
     // Try to access editor page without authentication
     var editorPage = GetEditorPage();
     await editorPage.GoToAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
 
     // Should redirect to login
     await Expect(Page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/login"), new() { Timeout = DefaultTimeout });

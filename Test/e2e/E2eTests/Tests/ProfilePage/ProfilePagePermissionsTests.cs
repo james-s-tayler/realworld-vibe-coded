@@ -38,8 +38,7 @@ public class ProfilePagePermissionsTests : AppPageTest
     await homePage.ClickFavoriteButtonOnPreviewAsync();
 
     // Verify redirect to login page
-    await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
-    Assert.Contains("/login", Page.Url);
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
   }
 
   [Fact]
@@ -61,7 +60,6 @@ public class ProfilePagePermissionsTests : AppPageTest
     await profilePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
 
     // Verify redirect to login page
-    await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
-    Assert.Contains("/login", Page.Url);
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
   }
 }

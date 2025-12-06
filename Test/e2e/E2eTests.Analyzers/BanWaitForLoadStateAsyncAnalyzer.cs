@@ -5,18 +5,18 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class BanWaitForTimeoutAsyncAnalyzer : DiagnosticAnalyzer
+public class BanWaitForLoadStateAsyncAnalyzer : DiagnosticAnalyzer
 {
-  public const string DiagnosticId = "E2E001";
+  public const string DiagnosticId = "E2E003";
 
   public static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
       DiagnosticId,
-      "WaitForTimeoutAsync is not allowed",
-      "Do not use Page.WaitForTimeoutAsync(). Use Playwright's Expect() assertions like Expect(...).ToBeVisibleAsync() or Expect(page).ToHaveURLAsync() instead.",
+      "WaitForLoadStateAsync is not allowed",
+      "Do not use Page.WaitForLoadStateAsync(). Use Playwright's Expect() assertions like Expect(locator).ToBeVisibleAsync() instead.",
       "Reliability",
       DiagnosticSeverity.Error,
       isEnabledByDefault: true,
-      description: "WaitForTimeoutAsync is a code smell that leads to flaky tests. Tests should wait for specific conditions using Playwright assertions instead of arbitrary time delays.");
+      description: "WaitForLoadStateAsync leads to flaky tests. Use Playwright's Expect() assertions to wait for specific elements or conditions instead.");
 
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
       ImmutableArray.Create(Rule);
@@ -38,8 +38,8 @@ public class BanWaitForTimeoutAsyncAnalyzer : DiagnosticAnalyzer
       return;
     }
 
-    // Check if the method name is WaitForTimeoutAsync
-    if (memberAccess.Name.Identifier.Text != "WaitForTimeoutAsync")
+    // Check if the method name is WaitForLoadStateAsync
+    if (memberAccess.Name.Identifier.Text != "WaitForLoadStateAsync")
     {
       return;
     }

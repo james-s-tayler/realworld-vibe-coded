@@ -20,7 +20,7 @@ public class LoginPageHappyPathTests : AppPageTest
     await loginPage.GoToAsync();
     var homePage = await loginPage.LoginAsync(TestEmail, TestPassword);
 
-    // Verify user is logged in
-    Assert.True(await homePage.IsUserLoggedInAsync(TestUsername), "User should be logged in after sign in");
+    // Verify user is logged in by checking their profile link is visible
+    await Expect(homePage.GetUserProfileLink(TestUsername)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 }

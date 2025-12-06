@@ -161,6 +161,6 @@ public abstract class BasePage
   private async Task NavigateAndWaitForNetworkIdle(ILocator locator, string url)
   {
     await locator.ClickAsync();
-    await Page.WaitForURLAsync(url, new() { Timeout = DefaultTimeout });
+    await Expect().ToHaveURLAsync(url, new() { Timeout = DefaultTimeout });
   }
 }
