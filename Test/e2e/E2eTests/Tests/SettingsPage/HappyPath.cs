@@ -13,10 +13,9 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanEditProfile()
   {
-    // Arrange - create user via API
+    // Arrange
     var user = await Api.CreateUserAsync();
 
-    // Log in via UI
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
@@ -37,10 +36,9 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanSignOut()
   {
-    // Arrange - create user via API
+    // Arrange
     var user = await Api.CreateUserAsync();
 
-    // Log in via UI
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 

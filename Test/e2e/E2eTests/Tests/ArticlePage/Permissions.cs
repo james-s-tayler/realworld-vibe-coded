@@ -13,7 +13,7 @@ public class Permissions : AppPageTest
   [Fact]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFavoritingArticle()
   {
-    // Arrange - create user and article via API
+    // Arrange
     var user = await Api.CreateUserAsync();
     var article = await Api.CreateArticleAsync(user.Token);
 
@@ -31,7 +31,7 @@ public class Permissions : AppPageTest
   [Fact]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFollowingUserFromArticlePage()
   {
-    // Arrange - create user and article via API
+    // Arrange
     var user = await Api.CreateUserAsync();
     var article = await Api.CreateArticleAsync(user.Token);
 

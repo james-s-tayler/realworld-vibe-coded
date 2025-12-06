@@ -15,13 +15,12 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanViewOtherUsersProfile()
   {
-    // Arrange - create two users and article via API
+    // Arrange
     var user1 = await Api.CreateUserAsync();
     await Api.CreateArticleAsync(user1.Token);
 
     var user2 = await Api.CreateUserAsync();
 
-    // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
@@ -36,13 +35,12 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanFollowAndUnfollowOtherUser()
   {
-    // Arrange - create two users and article via API
+    // Arrange
     var user1 = await Api.CreateUserAsync();
     await Api.CreateArticleAsync(user1.Token);
 
     var user2 = await Api.CreateUserAsync();
 
-    // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
@@ -56,14 +54,13 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanViewFavoritedArticlesOnProfile()
   {
-    // Arrange - create two users, article, and favorite via API
+    // Arrange
     var user1 = await Api.CreateUserAsync();
     var article = await Api.CreateArticleAsync(user1.Token);
 
     var user2 = await Api.CreateUserAsync();
     await Api.FavoriteArticleAsync(user2.Token, article.Slug);
 
-    // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
@@ -79,16 +76,15 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task ProfilePage_MyArticles_DisplaysPaginationAndNavigatesCorrectly()
   {
-    // Arrange - create user and articles via API
+    // Arrange
     var user = await Api.CreateUserAsync();
     await Api.CreateArticlesAsync(user.Token, TotalArticles);
-
     await Pages.ProfilePage.GoToAsync(user.Username);
     await Pages.ProfilePage.WaitForArticlesToLoadAsync();
-
-    // Act
     await Pages.ProfilePage.VerifyArticleCountAsync(20);
     await Pages.ProfilePage.VerifyPaginationVisibleAsync();
+
+    // Act
     await Pages.ProfilePage.ClickNextPageAsync();
     await Pages.ProfilePage.ClickNextPageAsync();
 

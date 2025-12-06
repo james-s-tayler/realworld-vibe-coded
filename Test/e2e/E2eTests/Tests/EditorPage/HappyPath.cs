@@ -13,10 +13,9 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanCreateArticle_AndViewArticle()
   {
-    // Arrange - create user via API
+    // Arrange
     var user = await Api.CreateUserAsync();
 
-    // Log in via UI
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
@@ -38,15 +37,13 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanEditOwnArticle()
   {
-    // Arrange - create user and article via API
+    // Arrange
     var user = await Api.CreateUserAsync();
     var article = await Api.CreateArticleAsync(user.Token);
 
-    // Log in via UI
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
-    // Navigate to article
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
     await Pages.HomePage.ClickArticleAsync(article.Title);

@@ -13,7 +13,7 @@ public class Permissions : AppPageTest
   [Fact]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFavoritingArticleFromHomePage()
   {
-    // Arrange - create user and article via API
+    // Arrange
     var user = await Api.CreateUserAsync();
     await Api.CreateArticleAsync(user.Token);
 
@@ -24,13 +24,13 @@ public class Permissions : AppPageTest
     await Pages.HomePage.ClickFavoriteButtonOnPreviewAsync();
 
     // Assert
-    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
   }
 
   [Fact]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFollowingUser()
   {
-    // Arrange - create user and article via API
+    // Arrange
     var user = await Api.CreateUserAsync();
     await Api.CreateArticleAsync(user.Token);
 
@@ -41,6 +41,6 @@ public class Permissions : AppPageTest
     await Pages.ProfilePage.ClickFollowButtonWithoutWaitAsync(user.Username);
 
     // Assert
-    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
   }
 }

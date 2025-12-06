@@ -13,19 +13,17 @@ public class Validation : AppPageTest
   [Fact]
   public async Task CreateArticle_WithDuplicateTitle_DisplaysErrorMessage()
   {
-    // Arrange - create user and article via API
+    // Arrange
     var user = await Api.CreateUserAsync();
 
-    // Create first article to get its title
     var existingArticle = await Api.CreateArticleAsync(user.Token);
 
-    // Log in via UI
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     await Pages.EditorPage.GoToAsync();
 
-    // Act - try to create article with the same title
+    // Act
     await Pages.EditorPage.CreateArticleAndExpectErrorAsync(existingArticle.Title, "Different description", "Different body content");
 
     // Assert

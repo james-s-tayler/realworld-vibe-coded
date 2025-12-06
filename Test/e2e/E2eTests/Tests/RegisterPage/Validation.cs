@@ -13,19 +13,17 @@ public class Validation : AppPageTest
   [Fact]
   public async Task Register_WithDuplicateEmail_DisplaysErrorMessage()
   {
-    // Arrange - create user via API with a specific email
+    // Arrange
     var timestamp = DateTime.UtcNow.Ticks;
     var username2 = $"user2_{timestamp}";
     var password = "TestPassword123!";
 
-    // Create first user with an email
     var existingUser = await Api.CreateUserAsync();
 
-    // Now use that same email for the second registration
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickSignUpAsync();
 
-    // Act - try to register with the same email
+    // Act
     await Pages.RegisterPage.RegisterAndExpectErrorAsync(username2, existingUser.Email, password);
 
     // Assert

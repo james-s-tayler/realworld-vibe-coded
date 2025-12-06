@@ -75,14 +75,6 @@ public class ArticlePage : BasePage
   public ILocator DeleteCommentButton => Page.Locator(".mod-options").First;
 
   /// <summary>
-  /// Navigates directly to an article page by slug.
-  /// </summary>
-  public override async Task GoToAsync(string slug)
-  {
-    await base.GoToAsync($"article/{slug}");
-  }
-
-  /// <summary>
   /// Clicks the edit button and navigates to the editor page.
   /// </summary>
   public async Task ClickEditButtonAsync()

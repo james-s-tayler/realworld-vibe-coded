@@ -13,7 +13,7 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanSignIn_WithExistingCredentials()
   {
-    // Arrange - create user via API
+    // Arrange
     var user = await Api.CreateUserAsync();
 
     await Pages.LoginPage.GoToAsync();

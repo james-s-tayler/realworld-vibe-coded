@@ -131,14 +131,13 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task YourFeed_DisplaysPaginationAndNavigatesCorrectly()
   {
-    // Arrange - create two users, articles, and follow relationship via API
+    // Arrange
     var user1 = await Api.CreateUserAsync();
     await Api.CreateArticlesAsync(user1.Token, TotalArticles);
 
     var user2 = await Api.CreateUserAsync();
     await Api.FollowUserAsync(user2.Token, user1.Username);
 
-    // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
