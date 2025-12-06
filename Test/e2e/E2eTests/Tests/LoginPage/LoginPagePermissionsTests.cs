@@ -9,18 +9,18 @@ public class LoginPagePermissionsTests : AppPageTest
   [Fact]
   public async Task ProtectedRoutes_RedirectToLogin_WhenNotAuthenticated()
   {
-    // Try to access editor page without authentication
+    // Arrange
     var editorPage = GetEditorPage();
     await editorPage.GoToAsync();
 
-    // Should redirect to login
+    // Act + Assert
     await Expect(Page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/login"), new() { Timeout = DefaultTimeout });
 
-    // Try to access settings page without authentication
+    // Arrange
     var settingsPage = GetSettingsPage();
     await settingsPage.GoToAsync();
 
-    // Should redirect to login
+    // Act + Assert
     await Expect(Page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/login"), new() { Timeout = DefaultTimeout });
   }
 }

@@ -9,10 +9,9 @@ public class EditorPageValidationTests : AppPageTest
   [Fact]
   public async Task CreateArticle_WithDuplicateTitle_DisplaysErrorMessage()
   {
-    // Register a user
+    // Arrange
     await RegisterUserAsync();
 
-    // Create the first article
     var timestamp = DateTime.UtcNow.Ticks;
     var articleTitle = $"Duplicate Test Article {timestamp}";
 
@@ -22,13 +21,12 @@ public class EditorPageValidationTests : AppPageTest
     var editorPage = GetEditorPage();
     await editorPage.CreateArticleAsync(articleTitle, "Test description", "Test body content");
 
-    // Navigate to create another article with the same title
     await homePage.ClickNewArticleAsync();
 
-    // Fill in the same title and expect error
+    // Act
     await editorPage.CreateArticleAndExpectErrorAsync(articleTitle, "Different description", "Different body content");
 
-    // Verify the error contains the validation message about the slug already being taken
+    // Assert
     await editorPage.VerifyErrorContainsTextAsync("has already been taken");
   }
 }

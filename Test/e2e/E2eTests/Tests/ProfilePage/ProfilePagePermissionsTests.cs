@@ -22,44 +22,40 @@ public class ProfilePagePermissionsTests : AppPageTest
   [Fact]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFavoritingArticleFromHomePage()
   {
-    // Register a user and create an article
+    // Arrange
     await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
     await CreateArticleAsync();
 
-    // Sign out
     await SignOutAsync();
 
-    // Navigate to the home page
     var homePage = GetHomePage();
     await homePage.GoToAsync();
     await homePage.ClickGlobalFeedTabAsync();
 
-    // Click the favorite button on the article preview
+    // Act
     await homePage.ClickFavoriteButtonOnPreviewAsync();
 
-    // Verify redirect to login page
+    // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
   }
 
   [Fact]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFollowingUser()
   {
-    // Register a user and create an article
+    // Arrange
     await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
     await CreateArticleAsync();
 
-    // Sign out
     await SignOutAsync();
 
-    // Navigate to the user's profile
     var profilePage = GetProfilePage();
     await profilePage.GoToAsync(_testUsername1);
     await profilePage.WaitForProfileToLoadAsync(_testUsername1);
 
-    // Click the follow button (unauthenticated)
+    // Act
     await profilePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
 
-    // Verify redirect to login page
+    // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
   }
 }
