@@ -83,9 +83,13 @@ public class HomePage : BasePage
   /// <summary>
   /// Clicks on the Global Feed tab and waits for articles to load.
   /// </summary>
-  public async Task ClickGlobalFeedTabAsync()
+  public async Task ClickGlobalFeedTabAsync(bool isAuthenticated = true)
   {
-    await Expect(YourFeedTab).ToBeVisibleAsync();
+    if (isAuthenticated)
+    {
+      await Expect(YourFeedTab).ToBeVisibleAsync();
+    }
+
     await Expect(GlobalFeedTab).ToBeVisibleAsync();
     await GlobalFeedTab.ClickAsync();
     await WaitForArticlesToLoadAsync();

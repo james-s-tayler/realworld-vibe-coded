@@ -32,7 +32,7 @@ public class ArticlePagePermissionsTests : AppPageTest
     // Navigate to the article
     var homePage = GetHomePage();
     await homePage.GoToAsync();
-    await homePage.ClickGlobalFeedTabAsync();
+    await homePage.ClickGlobalFeedTabAsync(isAuthenticated: false);
 
     var articlePage = await homePage.ClickArticleAsync(articleTitle);
 
@@ -56,7 +56,7 @@ public class ArticlePagePermissionsTests : AppPageTest
     // Navigate to the article
     var homePage = GetHomePage();
     await homePage.GoToAsync();
-    await homePage.ClickGlobalFeedTabAsync();
+    await homePage.ClickGlobalFeedTabAsync(isAuthenticated: false);
 
     var articlePage = await homePage.ClickArticleAsync(articleTitle);
 
