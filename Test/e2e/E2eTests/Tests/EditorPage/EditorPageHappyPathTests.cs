@@ -9,23 +9,22 @@ public class EditorPageHappyPathTests : AppPageTest
   [Fact]
   public async Task UserCanCreateArticle_AndViewArticle()
   {
-    // First, sign up a user
+    // Arrange
     await RegisterUserAsync();
 
-    // Navigate to new article page using page model
     var homePage = GetHomePage();
     await homePage.ClickNewArticleAsync();
 
-    // Fill in article form using page model
     var editorPage = GetEditorPage();
     var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
     var articleDescription = "This is a test article created by E2E tests";
     var articleBody = "# Test Article\n\nThis is the body of the test article created for E2E testing purposes.";
     var articleTag = "e2etest";
 
+    // Act
     var articlePage = await editorPage.CreateArticleWithTagsAsync(articleTitle, articleDescription, articleBody, articleTag);
 
-    // Verify article content
+    // Assert
     await articlePage.VerifyArticleTitleAsync(articleTitle);
     await articlePage.VerifyAuthorAsync(TestUsername);
   }
@@ -33,18 +32,18 @@ public class EditorPageHappyPathTests : AppPageTest
   [Fact]
   public async Task UserCanEditOwnArticle()
   {
-    // Register user and create an article
+    // Arrange
     await RegisterUserAsync();
     var (articlePage, articleTitle) = await CreateArticleAsync();
 
-    // Click edit button on article page using page model
     var editorPage = await articlePage.ClickEditButtonAsync();
 
-    // Update article title
     var updatedTitle = $"{articleTitle} - Updated";
+
+    // Act
     var updatedArticlePage = await editorPage.UpdateArticleAsync(updatedTitle);
 
-    // Verify updated title is displayed
+    // Assert
     await updatedArticlePage.VerifyArticleTitleAsync(updatedTitle);
   }
 }

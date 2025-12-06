@@ -40,21 +40,19 @@ public class ProfilePageHappyPathTests : AppPageTest
   [Fact]
   public async Task UserCanViewOtherUsersProfile()
   {
-    // Register first user and create an article
+    // Arrange
     await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
     await CreateArticleAsync();
 
-    // Sign out
     await SignOutAsync();
 
-    // Register second user
     await RegisterUserAsync(_testUsername2, _testEmail2, _testPassword2);
 
-    // Navigate directly to first user's profile using page model
+    // Act
     var profilePage = GetProfilePage();
     await profilePage.GoToAsync(_testUsername1);
 
-    // Verify profile information is displayed
+    // Assert
     await profilePage.VerifyProfileHeadingAsync(_testUsername1);
     await profilePage.VerifyMyArticlesTabVisibleAsync();
   }
@@ -62,21 +60,18 @@ public class ProfilePageHappyPathTests : AppPageTest
   [Fact]
   public async Task UserCanFollowAndUnfollowOtherUser()
   {
-    // Register first user and create an article
+    // Arrange
     await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
     await CreateArticleAsync();
 
-    // Sign out
     await SignOutAsync();
 
-    // Register second user
     await RegisterUserAsync(_testUsername2, _testEmail2, _testPassword2);
 
-    // Navigate to first user's profile using page model
     var profilePage = GetProfilePage();
     await profilePage.GoToAsync(_testUsername1);
 
-    // Follow and unfollow using page model
+    // Act + Assert
     await profilePage.ClickFollowButtonAsync(_testUsername1);
     await profilePage.ClickUnfollowButtonAsync(_testUsername1);
   }
@@ -84,61 +79,55 @@ public class ProfilePageHappyPathTests : AppPageTest
   [Fact]
   public async Task UserCanViewFavoritedArticlesOnProfile()
   {
-    // Register first user and create an article
+    // Arrange
     await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
     var (_, articleTitle) = await CreateArticleAsync();
 
-    // Sign out
     await SignOutAsync();
 
-    // Register second user
     await RegisterUserAsync(_testUsername2, _testEmail2, _testPassword2);
 
-    // Navigate to the first user's article
     var homePage = GetHomePage();
     await homePage.GoToAsync();
     await homePage.ClickGlobalFeedTabAsync();
 
-    // Click on the article and favorite it
     var articlePage = await homePage.ClickArticleAsync(articleTitle);
     await articlePage.ClickFavoriteButtonAsync();
 
-    // Navigate to own profile
     var profilePage = GetProfilePage();
     await profilePage.GoToAsync(_testUsername2);
 
-    // Click on Favorited Articles tab
+    // Act
     await profilePage.ClickFavoritedArticlesTabAsync();
 
-    // Verify favorited article is visible
+    // Assert
     await profilePage.VerifyArticleVisibleAsync(articleTitle);
   }
 
   [Fact]
   public async Task ProfilePage_MyArticles_DisplaysPaginationAndNavigatesCorrectly()
   {
-    // Setup: Create user and 50 articles
+    // Arrange
     var uniqueId = GenerateUniqueUsername("profileuser");
     var (token, username) = await CreateUserViaApiAsync(uniqueId);
     await CreateArticlesForUserAsync(token, TotalArticles, uniqueId);
 
-    // Navigate to profile page using page model
     var profilePage = GetProfilePage();
     await profilePage.GoToAsync(username);
 
-    // Wait for My Articles tab to be visible and articles to load
     await profilePage.WaitForArticlesToLoadAsync();
+
+    // Act
     await profilePage.VerifyArticleCountAsync(20);
 
-    // Verify pagination control is visible
     await profilePage.VerifyPaginationVisibleAsync();
 
-    // Navigate through pages
     await profilePage.ClickNextPageAsync();
     await profilePage.ClickNextPageAsync();
+
+    // Assert
     await profilePage.VerifyArticleCountAsync(10);
 
-    // Navigate backward
     await profilePage.ClickPreviousPageAsync();
     await profilePage.VerifyArticleCountAsync(20);
   }

@@ -9,38 +9,38 @@ public class SettingsPageHappyPathTests : AppPageTest
   [Fact]
   public async Task UserCanEditProfile()
   {
-    // Register a user
+    // Arrange
     await RegisterUserAsync();
 
-    // Navigate to settings to edit profile
     var settingsPage = GetSettingsPage();
     await settingsPage.GoToAsync();
 
-    // Update bio
     var bioText = "This is my updated bio for E2E test";
+
+    // Act
     await settingsPage.UpdateAndSaveBioAsync(bioText);
 
-    // Go back to profile to verify bio was updated
+    // Assert
     var profilePage = GetProfilePage();
     await profilePage.GoToAsync(TestUsername);
     await profilePage.WaitForProfileToLoadAsync(TestUsername);
 
-    // Verify bio is displayed
     await profilePage.VerifyBioVisibleAsync(bioText);
   }
 
   [Fact]
   public async Task UserCanSignOut()
   {
-    // Register and login a user
+    // Arrange
     await RegisterUserAsync();
 
-    // Navigate to settings and logout
     var settingsPage = GetSettingsPage();
     await settingsPage.GoToAsync();
+
+    // Act
     await settingsPage.LogoutAsync();
 
-    // Verify user is logged out
+    // Assert
     await settingsPage.VerifyLoggedOutAsync();
   }
 }

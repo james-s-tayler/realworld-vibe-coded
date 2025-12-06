@@ -20,21 +20,19 @@ public class HomePageHappyPathTests : AppPageTest
   [Fact]
   public async Task CreatedArticle_AppearsInGlobalFeed()
   {
-    // First, sign up and create an article
+    // Arrange
     await RegisterUserAsync();
     var (_, articleTitle) = await CreateArticleAsync();
 
-    // Navigate to home page using page model
     var homePage = GetHomePage();
     await homePage.GoToAsync();
 
-    // Click on Global Feed tab
+    // Act
     await homePage.ClickGlobalFeedTabAsync();
 
-    // Verify article is visible
+    // Assert
     await homePage.VerifyArticleVisibleAsync(articleTitle);
 
-    // Click on article link to view it
     var articlePage = await homePage.ClickArticleAsync(articleTitle);
     await articlePage.VerifyArticleTitleAsync(articleTitle);
   }
@@ -42,11 +40,10 @@ public class HomePageHappyPathTests : AppPageTest
   [Fact]
   public async Task GlobalFeed_IsSelectedByDefaultForUnauthenticatedUser()
   {
-    // Setup: Create user and one article via API so global feed has content
+    // Arrange
     var uniqueId = GenerateUniqueUsername("deftest");
     var (token, _) = await CreateUserViaApiAsync(uniqueId);
 
-    // Create a single article
     using var httpClient = new HttpClient();
     httpClient.BaseAddress = new Uri(BaseUrl);
     httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
@@ -65,56 +62,51 @@ public class HomePageHappyPathTests : AppPageTest
     var articleResponse = await httpClient.PostAsJsonAsync("/api/articles", articleRequest, JsonOptions, TestContext.Current.CancellationToken);
     articleResponse.EnsureSuccessStatusCode();
 
-    // Navigate to home page as unauthenticated user (no login) using page model
+    // Act
     var homePage = GetHomePage();
     await homePage.GoToAsync();
 
-    // Verify Global Feed tab is selected by default
+    // Assert
     await homePage.VerifyGlobalFeedIsSelectedAsync();
 
-    // Verify article preview is visible
     await homePage.VerifyArticleVisibleAsync($"Default Tab Test Article - {uniqueId}");
   }
 
   [Fact]
   public async Task GlobalFeed_DisplaysPaginationAndNavigatesCorrectly()
   {
-    // Setup: Create user and 50 articles via API
+    // Arrange
     var uniqueId = GenerateUniqueUsername("pagtest");
     await CreateUserAndArticlesViaApiAsync(uniqueId);
 
-    // Navigate to home page using page model
     var homePage = GetHomePage();
     await homePage.GoToAsync();
 
-    // Click on Global Feed tab
     await homePage.ClickGlobalFeedTabAsync();
 
-    // Wait for articles to be loaded (first page should show 20 by default)
     await homePage.VerifyArticleCountAsync(20);
 
-    // Verify pagination control is visible
+    // Act
     await homePage.VerifyPaginationVisibleAsync();
 
-    // Navigate through pages
     await homePage.ClickNextPageAsync();
     await homePage.ClickNextPageAsync();
 
-    // Navigate backward
     await homePage.ClickPreviousPageAsync();
     await homePage.VerifyArticleCountAsync(20);
 
-    // Navigate back to first page
     await homePage.ClickPreviousPageAsync();
+
+    // Assert
     await homePage.VerifyArticleCountAsync(20);
 
-    // Verify backward button is disabled on first page
     await homePage.VerifyBackwardButtonDisabledAsync();
   }
 
   [Fact]
   public async Task YourFeed_ShowsArticlesFromFollowedUsers()
   {
+    // Arrange
     var testUsername1 = GenerateUniqueUsername("profileuser1");
     var testEmail1 = GenerateUniqueEmail(testUsername1);
     var testPassword1 = "TestPassword123!";
@@ -122,123 +114,105 @@ public class HomePageHappyPathTests : AppPageTest
     var testEmail2 = GenerateUniqueEmail(testUsername2);
     var testPassword2 = "TestPassword123!";
 
-    // Register first user and create an article
     await RegisterUserAsync(testUsername1, testEmail1, testPassword1);
     var (_, articleTitle) = await CreateArticleAsync();
 
-    // Sign out
     await SignOutAsync();
 
-    // Register second user
     await RegisterUserAsync(testUsername2, testEmail2, testPassword2);
 
-    // Follow first user using profile page model
     var profilePage = GetProfilePage();
     await profilePage.GoToAsync(testUsername1);
     await profilePage.ClickFollowButtonAsync(testUsername1);
 
-    // Navigate to home page
     var homePage = GetHomePage();
     await homePage.GoToAsync();
 
-    // Click on Your Feed tab
+    // Act
     await homePage.ClickYourFeedTabAsync();
 
-    // Verify followed user's article appears in Your Feed
+    // Assert
     await homePage.VerifyArticleVisibleAsync(articleTitle);
   }
 
   [Fact]
   public async Task UserCanFilterArticlesByTag()
   {
+    // Arrange
     var testUsername1 = GenerateUniqueUsername("profileuser1");
     var testEmail1 = GenerateUniqueEmail(testUsername1);
     var testPassword1 = "TestPassword123!";
 
-    // Register user and create an article with a specific tag
     await RegisterUserAsync(testUsername1, testEmail1, testPassword1);
     var testTag = $"testtag{Guid.NewGuid().ToString("N")[..8]}";
     var (_, articleTitle) = await CreateArticleWithTagAsync(testTag);
 
-    // Navigate to home page
     var homePage = GetHomePage();
     await homePage.GoToAsync();
 
-    // First go to Global Feed to see the article
     await homePage.ClickGlobalFeedTabAsync();
 
-    // Click on tag in sidebar
+    // Act
     await homePage.ClickSidebarTagAsync(testTag);
 
-    // Verify the tag filter tab is visible
+    // Assert
     await homePage.VerifyTagFilterTabVisibleAsync(testTag);
 
-    // Verify the article with that tag is displayed
     await homePage.VerifyArticleVisibleAsync(articleTitle);
   }
 
   [Fact]
   public async Task GlobalFeed_ShowsPaginationWithFewArticles()
   {
-    // Setup: Create user and only 5 articles (less than page size of 20)
+    // Arrange
     var uniqueId = GenerateUniqueUsername("fewart");
     var (token, _) = await CreateUserViaApiAsync(uniqueId);
     await CreateArticlesForUserAsync(token, 5, uniqueId);
 
-    // Navigate to the home page using page model
     var homePage = GetHomePage();
     await homePage.GoToAsync();
 
-    // Click on Global Feed tab
+    // Act
     await homePage.ClickGlobalFeedTabAsync();
 
-    // Wait for at least one article to be loaded
+    // Assert
     await homePage.VerifyArticlesLoadedAsync();
 
-    // Verify pagination control is visible
     await homePage.VerifyPaginationVisibleAsync();
   }
 
   [Fact]
   public async Task YourFeed_DisplaysPaginationAndNavigatesCorrectly()
   {
-    // Setup: Create two users and have user2 follow user1
+    // Arrange
     var uniqueId1 = GenerateUniqueUsername("feeduser1");
     var uniqueId2 = GenerateUniqueUsername("feeduser2");
     var (user1Token, user1Username) = await CreateUserViaApiAsync(uniqueId1);
     var (user2Token, _) = await CreateUserViaApiAsync(uniqueId2);
 
-    // User1 creates 50 articles
     await CreateArticlesForUserAsync(user1Token, TotalArticles, uniqueId1);
 
-    // User2 follows user1
     await FollowUserAsync(user2Token, user1Username);
 
-    // Navigate to login page and login as user2
     var loginPage = GetLoginPage();
     await loginPage.GoToAsync();
     await loginPage.LoginAsync($"{uniqueId2}@test.com", "TestPassword123!");
 
-    // Navigate to home page using page model
     var homePage = GetHomePage();
 
-    // Click on Your Feed tab
+    // Act
     await homePage.ClickYourFeedTabAsync();
 
-    // Wait for articles to be loaded (first page should show 20 by default)
+    // Assert
     await homePage.VerifyArticleCountAsync(20);
 
-    // Verify pagination control is visible
     await homePage.VerifyPaginationVisibleAsync();
 
-    // Click forward button to go to page 2
     await homePage.ClickNextPageAsync();
 
-    // Click forward again to page 3 (should show remaining 10 articles)
     await homePage.ClickNextPageAsync();
     await homePage.VerifyArticleCountAsync(10);
 
-    // Navigate backward
     await homePage.ClickPreviousPageAsync();
     await homePage.VerifyArticleCountAsync(20);
   }

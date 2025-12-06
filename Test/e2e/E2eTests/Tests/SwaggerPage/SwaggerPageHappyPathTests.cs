@@ -9,10 +9,13 @@ public class SwaggerPageHappyPathTests : AppPageTest
   [Fact]
   public async Task SwaggerApiDocs_AreDisplayed()
   {
-    // Navigate to Swagger docs using page model
+    // Arrange
     var swaggerPage = GetSwaggerPage();
+
+    // Act
     await swaggerPage.GoToAsync();
 
+    // Assert
     await Expect(swaggerPage.ApiInfo).ToBeVisibleAsync();
   }
 }
