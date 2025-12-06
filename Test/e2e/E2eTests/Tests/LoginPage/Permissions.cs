@@ -1,4 +1,5 @@
-﻿namespace E2eTests.Tests.LoginPage;
+﻿
+namespace E2eTests.Tests.LoginPage;
 
 /// <summary>
 /// Permission tests for the Login page (/login).
@@ -10,15 +11,13 @@ public class Permissions : AppPageTest
   public async Task ProtectedRoutes_RedirectToLogin_WhenNotAuthenticated()
   {
     // Arrange
-    var editorPage = GetEditorPage();
-    await editorPage.GoToAsync();
+    await Pages.EditorPage.GoToAsync();
 
     // Act + Assert
     await Expect(Page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/login"), new() { Timeout = DefaultTimeout });
 
     // Arrange
-    var settingsPage = GetSettingsPage();
-    await settingsPage.GoToAsync();
+    await Pages.SettingsPage.GoToAsync();
 
     // Act + Assert
     await Expect(Page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/login"), new() { Timeout = DefaultTimeout });

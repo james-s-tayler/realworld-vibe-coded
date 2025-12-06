@@ -1,4 +1,5 @@
-﻿namespace E2eTests.Tests.EditorPage;
+﻿
+namespace E2eTests.Tests.EditorPage;
 
 /// <summary>
 /// Validation tests for the Editor page (/editor and /editor/:slug).
@@ -15,18 +16,16 @@ public class Validation : AppPageTest
     var timestamp = DateTime.UtcNow.Ticks;
     var articleTitle = $"Duplicate Test Article {timestamp}";
 
-    var homePage = GetHomePage();
-    await homePage.ClickNewArticleAsync();
+    await Pages.HomePage.ClickNewArticleAsync();
 
-    var editorPage = GetEditorPage();
-    await editorPage.CreateArticleAsync(articleTitle, "Test description", "Test body content");
+    await Pages.EditorPage.CreateArticleAsync(articleTitle, "Test description", "Test body content");
 
-    await editorPage.GoToAsync();
+    await Pages.EditorPage.GoToAsync();
 
     // Act
-    await editorPage.CreateArticleAndExpectErrorAsync(articleTitle, "Different description", "Different body content");
+    await Pages.EditorPage.CreateArticleAndExpectErrorAsync(articleTitle, "Different description", "Different body content");
 
     // Assert
-    await editorPage.VerifyErrorContainsTextAsync("has already been taken");
+    await Pages.EditorPage.VerifyErrorContainsTextAsync("has already been taken");
   }
 }

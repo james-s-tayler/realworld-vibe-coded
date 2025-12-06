@@ -12,12 +12,18 @@ public abstract class BasePage
 {
   protected readonly IPage Page;
   protected readonly string BaseUrl;
+  private PageObjects? _pages;
 
   protected BasePage(IPage page, string baseUrl)
   {
     Page = page;
     BaseUrl = baseUrl;
   }
+
+  /// <summary>
+  /// Gets the Pages API for accessing other page objects.
+  /// </summary>
+  public PageObjects Pages => _pages ??= new PageObjects(Page, BaseUrl);
 
   /// <summary>
   /// Gets an assertion helper for this page.

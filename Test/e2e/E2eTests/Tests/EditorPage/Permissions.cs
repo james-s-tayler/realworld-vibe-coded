@@ -1,4 +1,5 @@
-﻿namespace E2eTests.Tests.EditorPage;
+﻿
+namespace E2eTests.Tests.EditorPage;
 
 /// <summary>
 /// Permission tests for the Editor page (/editor and /editor/:slug).

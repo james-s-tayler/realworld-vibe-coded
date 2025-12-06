@@ -1,4 +1,5 @@
-﻿namespace E2eTests.Tests.ArticlePage;
+﻿
+namespace E2eTests.Tests.ArticlePage;
 
 /// <summary>
 /// Permission tests for the Article page (/article/:slug).
@@ -24,18 +25,17 @@ public class Permissions : AppPageTest
   {
     // Arrange
     await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
-    var (_, articleTitle) = await CreateArticleAsync();
+    var articleTitle = await CreateArticleAsync();
 
     await SignOutAsync();
 
-    var homePage = GetHomePage();
-    await homePage.GoToAsync();
-    await homePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
 
-    var articlePage = await homePage.ClickArticleAsync(articleTitle);
+    await Pages.HomePage.ClickArticleAsync(articleTitle);
 
     // Act
-    await articlePage.ClickFavoriteButtonWithoutWaitAsync();
+    await Pages.ArticlePage.ClickFavoriteButtonWithoutWaitAsync();
 
     // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
@@ -46,17 +46,16 @@ public class Permissions : AppPageTest
   {
     // Arrange
     await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
-    var (_, articleTitle) = await CreateArticleAsync();
+    var articleTitle = await CreateArticleAsync();
 
     await SignOutAsync();
 
-    var homePage = GetHomePage();
-    await homePage.GoToAsync();
-    await homePage.ClickGlobalFeedTabAsync();
-    await homePage.ClickArticleAsync(articleTitle);
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.ClickArticleAsync(articleTitle);
 
     // Act
-    await GetArticlePage().ClickFollowButtonWithoutWaitAsync(_testUsername1);
+    await Pages.ArticlePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
 
     // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");

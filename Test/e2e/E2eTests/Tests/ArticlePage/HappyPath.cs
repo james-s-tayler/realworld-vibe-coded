@@ -1,4 +1,5 @@
-﻿namespace E2eTests.Tests.ArticlePage;
+﻿
+namespace E2eTests.Tests.ArticlePage;
 
 /// <summary>
 /// Happy path tests for the Article page (/article/:slug).
@@ -31,15 +32,15 @@ public class HappyPath : AppPageTest
   {
     // Arrange
     await RegisterUserAsync();
-    var (articlePage, articleTitle) = await CreateArticleAsync();
+    var articleTitle = await CreateArticleAsync();
 
     // Act
-    var homePage = await articlePage.DeleteArticleAsync();
+    await Pages.ArticlePage.DeleteArticleAsync();
 
     // ToDo: this should actually try to access the article page via its slug and assert a not found error message appears
     // Assert
-    await homePage.ClickGlobalFeedTabAsync();
-    await homePage.VerifyArticleNotVisibleAsync(articleTitle);
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.VerifyArticleNotVisibleAsync(articleTitle);
   }
 
   [Fact]
@@ -47,21 +48,20 @@ public class HappyPath : AppPageTest
   {
     // Arrange
     await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
-    var (_, articleTitle) = await CreateArticleAsync();
+    var articleTitle = await CreateArticleAsync();
 
     await SignOutAsync();
 
     await RegisterUserAsync(_testUsername2, _testEmail2, _testPassword2);
 
-    var homePage = GetHomePage();
-    await homePage.GoToAsync();
-    await homePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
 
-    var articlePage = await homePage.ClickArticleAsync(articleTitle);
+    await Pages.HomePage.ClickArticleAsync(articleTitle);
 
     // Act + Assert
-    await articlePage.ClickFavoriteButtonAsync();
-    await articlePage.ClickUnfavoriteButtonAsync();
+    await Pages.ArticlePage.ClickFavoriteButtonAsync();
+    await Pages.ArticlePage.ClickUnfavoriteButtonAsync();
   }
 
   [Fact]
@@ -69,11 +69,11 @@ public class HappyPath : AppPageTest
   {
     // Arrange
     await RegisterUserAsync();
-    var (articlePage, _) = await CreateArticleAsync();
+    await CreateArticleAsync();
 
     // Act + Assert
     var commentText = "This is a test comment from E2E tests!";
-    await articlePage.AddCommentAsync(commentText);
+    await Pages.ArticlePage.AddCommentAsync(commentText);
   }
 
   [Fact]
@@ -81,12 +81,12 @@ public class HappyPath : AppPageTest
   {
     // Arrange
     await RegisterUserAsync();
-    var (articlePage, _) = await CreateArticleAsync();
+    await CreateArticleAsync();
 
     var commentText = "This comment will be deleted!";
-    await articlePage.AddCommentAsync(commentText);
+    await Pages.ArticlePage.AddCommentAsync(commentText);
 
     // Act + Assert
-    await articlePage.DeleteCommentAsync(commentText);
+    await Pages.ArticlePage.DeleteCommentAsync(commentText);
   }
 }

@@ -1,4 +1,5 @@
-﻿namespace E2eTests.Tests.ProfilePage;
+﻿
+namespace E2eTests.Tests.ProfilePage;
 
 /// <summary>
 /// Permission tests for the Profile page (/profile/:username).
@@ -28,12 +29,11 @@ public class Permissions : AppPageTest
 
     await SignOutAsync();
 
-    var homePage = GetHomePage();
-    await homePage.GoToAsync();
-    await homePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
 
     // Act
-    await homePage.ClickFavoriteButtonOnPreviewAsync();
+    await Pages.HomePage.ClickFavoriteButtonOnPreviewAsync();
 
     // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
@@ -48,12 +48,11 @@ public class Permissions : AppPageTest
 
     await SignOutAsync();
 
-    var profilePage = GetProfilePage();
-    await profilePage.GoToAsync(_testUsername1);
-    await profilePage.WaitForProfileToLoadAsync(_testUsername1);
+    await Pages.ProfilePage.GoToAsync(_testUsername1);
+    await Pages.ProfilePage.WaitForProfileToLoadAsync(_testUsername1);
 
     // Act
-    await profilePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
+    await Pages.ProfilePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
 
     // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });

@@ -54,11 +54,9 @@ public class LoginPage : BasePage
   /// </summary>
   /// <param name="email">User's email.</param>
   /// <param name="password">User's password.</param>
-  /// <returns>HomePage after successful login.</returns>
-  public async Task<HomePage> LoginAsync(string email, string password)
+  public async Task LoginAsync(string email, string password)
   {
     await FillLoginFormAsync(email, password);
     await ClickSignInButtonAsync();
-    return new HomePage(Page, BaseUrl);
   }
 }

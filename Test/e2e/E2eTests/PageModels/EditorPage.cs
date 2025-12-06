@@ -84,15 +84,11 @@ public class EditorPage : BasePage
   /// <param name="title">Article title.</param>
   /// <param name="description">Article description.</param>
   /// <param name="body">Article body content.</param>
-  /// <returns>ArticlePage after successful creation.</returns>
-  public async Task<ArticlePage> CreateArticleAsync(string title, string description, string body)
+  public async Task CreateArticleAsync(string title, string description, string body)
   {
     await FillArticleFormAsync(title, description, body);
     await ClickPublishButtonAsync();
-
-    var articlePage = new ArticlePage(Page, BaseUrl);
-    await articlePage.VerifyArticleTitleAsync(title);
-    return articlePage;
+    await Pages.ArticlePage.VerifyArticleTitleAsync(title);
   }
 
   /// <summary>
@@ -102,30 +98,22 @@ public class EditorPage : BasePage
   /// <param name="description">Article description.</param>
   /// <param name="body">Article body content.</param>
   /// <param name="tags">Article tags (space or comma separated).</param>
-  /// <returns>ArticlePage after successful creation.</returns>
-  public async Task<ArticlePage> CreateArticleWithTagsAsync(string title, string description, string body, string tags)
+  public async Task CreateArticleWithTagsAsync(string title, string description, string body, string tags)
   {
     await FillArticleFormAsync(title, description, body, tags);
     await ClickPublishButtonAsync();
-
-    var articlePage = new ArticlePage(Page, BaseUrl);
-    await articlePage.VerifyArticleTitleAsync(title);
-    return articlePage;
+    await Pages.ArticlePage.VerifyArticleTitleAsync(title);
   }
 
   /// <summary>
   /// Updates an existing article and navigates to the article page.
   /// </summary>
   /// <param name="newTitle">New article title.</param>
-  /// <returns>ArticlePage after successful update.</returns>
-  public async Task<ArticlePage> UpdateArticleAsync(string newTitle)
+  public async Task UpdateArticleAsync(string newTitle)
   {
     await UpdateTitleAsync(newTitle);
     await ClickPublishButtonAsync();
-
-    var articlePage = new ArticlePage(Page, BaseUrl);
-    await articlePage.VerifyArticleTitleAsync(newTitle);
-    return articlePage;
+    await Pages.ArticlePage.VerifyArticleTitleAsync(newTitle);
   }
 
   /// <summary>

@@ -1,4 +1,5 @@
-﻿namespace E2eTests.Tests.HomePage;
+﻿
+namespace E2eTests.Tests.HomePage;
 
 /// <summary>
 /// Permission tests for the Home page (/).

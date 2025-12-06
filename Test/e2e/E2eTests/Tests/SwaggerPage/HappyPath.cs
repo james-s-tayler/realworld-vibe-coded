@@ -1,4 +1,5 @@
-﻿namespace E2eTests.Tests.SwaggerPage;
+﻿
+namespace E2eTests.Tests.SwaggerPage;
 
 /// <summary>
 /// Happy path tests for the Swagger API documentation page (/swagger/index.html).
@@ -9,13 +10,10 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task SwaggerApiDocs_AreDisplayed()
   {
-    // Arrange
-    var swaggerPage = GetSwaggerPage();
-
-    // Act
-    await swaggerPage.GoToAsync();
+    // Arrange & Act
+    await Pages.SwaggerPage.GoToAsync();
 
     // Assert
-    await Expect(swaggerPage.ApiInfo).ToBeVisibleAsync();
+    await Expect(Pages.SwaggerPage.ApiInfo).ToBeVisibleAsync();
   }
 }

@@ -11,6 +11,7 @@ public abstract class AppPageTest : PageTest
   protected string TestUsername = null!;
   protected string TestEmail = null!;
   protected string TestPassword = null!;
+  protected PageObjects Pages = null!;
 
   public override BrowserNewContextOptions ContextOptions()
   {
@@ -33,6 +34,9 @@ public abstract class AppPageTest : PageTest
     await StartTracingAsync();
 
     BaseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
+
+    // Initialize the Pages API
+    Pages = new PageObjects(Page, BaseUrl);
 
     // Wipe all test data BEFORE each test to ensure a clean slate
     await WipeTestData();
@@ -70,42 +74,24 @@ public abstract class AppPageTest : PageTest
     return $"{username}{guid}@test.com";
   }
 
-  // Page model factory methods
-  protected LoginPage GetLoginPage() => new(Page, $"{BaseUrl}/login");
 
-  protected RegisterPage GetRegisterPage() => new(Page, $"{BaseUrl}/register");
-
-  protected HomePage GetHomePage() => new(Page, BaseUrl);
-
-  protected EditorPage GetEditorPage() => new(Page, $"{BaseUrl}/editor");
-
-  protected ArticlePage GetArticlePage() => new(Page, $"{BaseUrl}/article");
-
-  protected ProfilePage GetProfilePage() => new(Page, $"{BaseUrl}/profile");
-
-  protected SettingsPage GetSettingsPage() => new(Page, $"{BaseUrl}/settings");
-
-  protected SwaggerPage GetSwaggerPage() => new(Page, $"{BaseUrl}/swagger/index.html");
 
   /// <summary>
-  /// Registers a user using the default test credentials and returns the HomePage.
+  /// Registers a user using the default test credentials.
   /// </summary>
-  protected async Task<HomePage> RegisterUserAsync()
+  protected async Task RegisterUserAsync()
   {
-    return await RegisterUserAsync(TestUsername, TestEmail, TestPassword);
+    await RegisterUserAsync(TestUsername, TestEmail, TestPassword);
   }
 
   /// <summary>
-  /// Registers a user with specified credentials and returns the HomePage.
+  /// Registers a user with specified credentials.
   /// </summary>
-  protected async Task<HomePage> RegisterUserAsync(string username, string email, string password)
+  protected async Task RegisterUserAsync(string username, string email, string password)
   {
-    var homePage = GetHomePage();
-    await homePage.GoToAsync();
-    await homePage.ClickSignUpAsync();
-
-    var registerPage = GetRegisterPage();
-    return await registerPage.RegisterAsync(username, email, password);
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickSignUpAsync();
+    await Pages.RegisterPage.RegisterAsync(username, email, password);
   }
 
   /// <summary>
@@ -113,37 +99,30 @@ public abstract class AppPageTest : PageTest
   /// </summary>
   protected async Task SignOutAsync()
   {
-    var settingsPage = GetSettingsPage();
-    await settingsPage.GoToAsync();
-    await settingsPage.LogoutAsync();
+    await Pages.SettingsPage.GoToAsync();
+    await Pages.SettingsPage.LogoutAsync();
   }
 
   /// <summary>
-  /// Creates a new article and returns the ArticlePage.
+  /// Creates a new article and returns the article title.
   /// </summary>
-  protected async Task<(ArticlePage ArticlePage, string Title)> CreateArticleAsync()
+  protected async Task<string> CreateArticleAsync()
   {
     var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    var homePage = GetHomePage();
-    await homePage.ClickNewArticleAsync();
-
-    var editorPage = GetEditorPage();
-    var articlePage = await editorPage.CreateArticleAsync(articleTitle, "Test article for E2E testing", "This is a test article body.");
-    return (articlePage, articleTitle);
+    await Pages.HomePage.ClickNewArticleAsync();
+    await Pages.EditorPage.CreateArticleAsync(articleTitle, "Test article for E2E testing", "This is a test article body.");
+    return articleTitle;
   }
 
   /// <summary>
-  /// Creates a new article with a specific tag and returns the ArticlePage.
+  /// Creates a new article with a specific tag and returns the article title.
   /// </summary>
-  protected async Task<(ArticlePage ArticlePage, string Title)> CreateArticleWithTagAsync(string tag)
+  protected async Task<string> CreateArticleWithTagAsync(string tag)
   {
     var articleTitle = $"Tagged Article {GenerateUniqueUsername("tag")}";
-    var homePage = GetHomePage();
-    await homePage.ClickNewArticleAsync();
-
-    var editorPage = GetEditorPage();
-    var articlePage = await editorPage.CreateArticleWithTagsAsync(articleTitle, "Test article with tag", "This is a test article body.", tag);
-    return (articlePage, articleTitle);
+    await Pages.HomePage.ClickNewArticleAsync();
+    await Pages.EditorPage.CreateArticleWithTagsAsync(articleTitle, "Test article with tag", "This is a test article body.", tag);
+    return articleTitle;
   }
 
   /// <summary>
