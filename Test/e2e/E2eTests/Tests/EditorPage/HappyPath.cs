@@ -14,10 +14,7 @@ public class HappyPath : AppPageTest
   public async Task UserCanCreateArticle_AndViewArticle()
   {
     // Arrange - create user via API
-    var username = GenerateUniqueUsername("editoruser");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    var (token, _) = await Api.CreateUserAsync(username, email, password);
+    var (_, username, email, password) = await Api.CreateUserAsync();
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
@@ -42,17 +39,8 @@ public class HappyPath : AppPageTest
   public async Task UserCanEditOwnArticle()
   {
     // Arrange - create user and article via API
-    var username = GenerateUniqueUsername("editoruser");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    var (token, _) = await Api.CreateUserAsync(username, email, password);
-
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    var (articleSlug, _) = await Api.CreateArticleAsync(
-      token,
-      articleTitle,
-      "Test article for E2E testing",
-      "This is a test article body.");
+    var (token, username, email, password) = await Api.CreateUserAsync();
+    var (_, articleTitle) = await Api.CreateArticleAsync(token);
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();

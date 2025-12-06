@@ -1,4 +1,4 @@
-﻿namespace E2eTests.Tests.ProfilePage;
+namespace E2eTests.Tests.ProfilePage;
 
 /// <summary>
 /// Happy path tests for the Profile page (/profile/:username).
@@ -16,22 +16,10 @@ public class HappyPath : AppPageTest
   public async Task UserCanViewOtherUsersProfile()
   {
     // Arrange - create two users and article via API
-    var user1Username = GenerateUniqueUsername("profileuser1");
-    var user1Email = GenerateUniqueEmail(user1Username);
-    var user1Password = "TestPassword123!";
-    var (user1Token, _) = await Api.CreateUserAsync(user1Username, user1Email, user1Password);
+    var (user1Token, user1Username, _, _) = await Api.CreateUserAsync();
+    await Api.CreateArticleAsync(user1Token);
 
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    await Api.CreateArticleAsync(
-      user1Token,
-      articleTitle,
-      "Test article for E2E testing",
-      "This is a test article body.");
-
-    var user2Username = GenerateUniqueUsername("profileuser2");
-    var user2Email = GenerateUniqueEmail(user2Username);
-    var user2Password = "TestPassword123!";
-    var (user2Token, _) = await Api.CreateUserAsync(user2Username, user2Email, user2Password);
+    var (_, _, user2Email, user2Password) = await Api.CreateUserAsync();
 
     // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
@@ -49,22 +37,10 @@ public class HappyPath : AppPageTest
   public async Task UserCanFollowAndUnfollowOtherUser()
   {
     // Arrange - create two users and article via API
-    var user1Username = GenerateUniqueUsername("profileuser1");
-    var user1Email = GenerateUniqueEmail(user1Username);
-    var user1Password = "TestPassword123!";
-    var (user1Token, _) = await Api.CreateUserAsync(user1Username, user1Email, user1Password);
+    var (user1Token, user1Username, _, _) = await Api.CreateUserAsync();
+    await Api.CreateArticleAsync(user1Token);
 
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    await Api.CreateArticleAsync(
-      user1Token,
-      articleTitle,
-      "Test article for E2E testing",
-      "This is a test article body.");
-
-    var user2Username = GenerateUniqueUsername("profileuser2");
-    var user2Email = GenerateUniqueEmail(user2Username);
-    var user2Password = "TestPassword123!";
-    var (user2Token, _) = await Api.CreateUserAsync(user2Username, user2Email, user2Password);
+    var (_, _, user2Email, user2Password) = await Api.CreateUserAsync();
 
     // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
@@ -81,23 +57,10 @@ public class HappyPath : AppPageTest
   public async Task UserCanViewFavoritedArticlesOnProfile()
   {
     // Arrange - create two users, article, and favorite via API
-    var user1Username = GenerateUniqueUsername("profileuser1");
-    var user1Email = GenerateUniqueEmail(user1Username);
-    var user1Password = "TestPassword123!";
-    var (user1Token, _) = await Api.CreateUserAsync(user1Username, user1Email, user1Password);
+    var (user1Token, _, _, _) = await Api.CreateUserAsync();
+    var (articleSlug, articleTitle) = await Api.CreateArticleAsync(user1Token);
 
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    var (articleSlug, _) = await Api.CreateArticleAsync(
-      user1Token,
-      articleTitle,
-      "Test article for E2E testing",
-      "This is a test article body.");
-
-    var user2Username = GenerateUniqueUsername("profileuser2");
-    var user2Email = GenerateUniqueEmail(user2Username);
-    var user2Password = "TestPassword123!";
-    var (user2Token, _) = await Api.CreateUserAsync(user2Username, user2Email, user2Password);
-
+    var (user2Token, user2Username, user2Email, user2Password) = await Api.CreateUserAsync();
     await Api.FavoriteArticleAsync(user2Token, articleSlug);
 
     // Log in as user2 via UI
@@ -117,26 +80,20 @@ public class HappyPath : AppPageTest
   public async Task ProfilePage_MyArticles_DisplaysPaginationAndNavigatesCorrectly()
   {
     // Arrange - create user and articles via API
-    var uniqueIdPrefix = GenerateUniqueUsername("profileuser");
-    var email = $"{uniqueIdPrefix}@test.com";
-    var (token, username) = await Api.CreateUserAsync(uniqueIdPrefix, email, "TestPassword123!");
-    await Api.CreateArticlesAsync(token, TotalArticles, uniqueIdPrefix);
+    var (token, username, _, _) = await Api.CreateUserAsync();
+    await Api.CreateArticlesAsync(token, TotalArticles);
 
     await Pages.ProfilePage.GoToAsync(username);
-
     await Pages.ProfilePage.WaitForArticlesToLoadAsync();
 
     // Act
     await Pages.ProfilePage.VerifyArticleCountAsync(20);
-
     await Pages.ProfilePage.VerifyPaginationVisibleAsync();
-
     await Pages.ProfilePage.ClickNextPageAsync();
     await Pages.ProfilePage.ClickNextPageAsync();
 
     // Assert
     await Pages.ProfilePage.VerifyArticleCountAsync(10);
-
     await Pages.ProfilePage.ClickPreviousPageAsync();
     await Pages.ProfilePage.VerifyArticleCountAsync(20);
   }

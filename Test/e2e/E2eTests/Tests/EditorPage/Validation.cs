@@ -1,4 +1,4 @@
-﻿namespace E2eTests.Tests.EditorPage;
+namespace E2eTests.Tests.EditorPage;
 
 /// <summary>
 /// Validation tests for the Editor page (/editor and /editor/:slug).
@@ -14,14 +14,10 @@ public class Validation : AppPageTest
   public async Task CreateArticle_WithDuplicateTitle_DisplaysErrorMessage()
   {
     // Arrange - create user and article via API
-    var username = GenerateUniqueUsername("editoruser");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    var (token, _) = await Api.CreateUserAsync(username, email, password);
+    var (token, username, email, password) = await Api.CreateUserAsync();
 
-    var timestamp = DateTime.UtcNow.Ticks;
-    var articleTitle = $"Duplicate Test Article {timestamp}";
-    await Api.CreateArticleAsync(token, articleTitle, "Test description", "Test body content");
+    // Create first article to get its title
+    var (_, existingTitle) = await Api.CreateArticleAsync(token);
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
@@ -29,8 +25,8 @@ public class Validation : AppPageTest
 
     await Pages.EditorPage.GoToAsync();
 
-    // Act
-    await Pages.EditorPage.CreateArticleAndExpectErrorAsync(articleTitle, "Different description", "Different body content");
+    // Act - try to create article with the same title
+    await Pages.EditorPage.CreateArticleAndExpectErrorAsync(existingTitle, "Different description", "Different body content");
 
     // Assert
     await Pages.EditorPage.VerifyErrorContainsTextAsync("has already been taken");

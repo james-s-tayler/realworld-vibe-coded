@@ -1,4 +1,4 @@
-﻿namespace E2eTests.Tests.SettingsPage;
+namespace E2eTests.Tests.SettingsPage;
 
 /// <summary>
 /// Happy path tests for the Settings page (/settings).
@@ -14,10 +14,7 @@ public class HappyPath : AppPageTest
   public async Task UserCanEditProfile()
   {
     // Arrange - create user via API
-    var username = GenerateUniqueUsername("settingsuser");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    await Api.CreateUserAsync(username, email, password);
+    var (_, username, email, password) = await Api.CreateUserAsync();
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
@@ -41,10 +38,7 @@ public class HappyPath : AppPageTest
   public async Task UserCanSignOut()
   {
     // Arrange - create user via API
-    var username = GenerateUniqueUsername("settingsuser");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    await Api.CreateUserAsync(username, email, password);
+    var (_, username, email, password) = await Api.CreateUserAsync();
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();

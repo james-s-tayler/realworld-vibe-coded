@@ -12,6 +12,9 @@ public class ApiFixture : IAsyncLifetime
 {
   private readonly string _baseUrl;
   private readonly JsonSerializerOptions _jsonOptions;
+  private readonly HttpClient _httpClient;
+  private int _userCounter;
+  private int _articleCounter;
 
   public ApiFixture()
   {
@@ -19,6 +22,10 @@ public class ApiFixture : IAsyncLifetime
     _jsonOptions = new JsonSerializerOptions
     {
       PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
+    _httpClient = new HttpClient
+    {
+      BaseAddress = new Uri(_baseUrl),
     };
   }
 
@@ -29,16 +36,20 @@ public class ApiFixture : IAsyncLifetime
 
   public ValueTask DisposeAsync()
   {
+    _httpClient?.Dispose();
     return ValueTask.CompletedTask;
   }
 
   /// <summary>
-  /// Creates a user via API and returns the authentication token and username.
+  /// Creates a user via API and returns the authentication token, username, email, and password.
+  /// The fixture generates unique test data automatically.
   /// </summary>
-  public async Task<(string Token, string Username)> CreateUserAsync(string username, string email, string password)
+  public async Task<(string Token, string Username, string Email, string Password)> CreateUserAsync()
   {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(_baseUrl);
+    var userId = Interlocked.Increment(ref _userCounter);
+    var username = $"testuser{userId}_{Guid.NewGuid().ToString("N")[..8]}";
+    var email = $"{username}@test.com";
+    var password = "TestPassword123!";
 
     var registerRequest = new
     {
@@ -50,27 +61,32 @@ public class ApiFixture : IAsyncLifetime
       },
     };
 
-    var response = await httpClient.PostAsJsonAsync("/api/users", registerRequest, _jsonOptions);
+    // Clone the client to avoid header conflicts
+    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/users")
+    {
+      Content = JsonContent.Create(registerRequest, options: _jsonOptions),
+    };
+
+    var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
 
     var responseContent = await response.Content.ReadAsStringAsync();
     var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, _jsonOptions)!;
-    return (userResponse.User.Token, username);
+    return (userResponse.User.Token, username, email, password);
   }
 
   /// <summary>
   /// Creates an article for the authenticated user and returns the article slug and title.
+  /// The fixture generates unique test data automatically.
   /// </summary>
   public async Task<(string Slug, string Title)> CreateArticleAsync(
     string token,
-    string title,
-    string description,
-    string body,
     string[]? tags = null)
   {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(_baseUrl);
-    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
+    var articleId = Interlocked.Increment(ref _articleCounter);
+    var title = $"Test Article {articleId} - {Guid.NewGuid().ToString("N")[..8]}";
+    var description = $"Test description for article {articleId}";
+    var body = $"Test body content for article {articleId}";
 
     var articleRequest = new
     {
@@ -83,7 +99,13 @@ public class ApiFixture : IAsyncLifetime
       },
     };
 
-    var response = await httpClient.PostAsJsonAsync("/api/articles", articleRequest, _jsonOptions);
+    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/articles")
+    {
+      Content = JsonContent.Create(articleRequest, options: _jsonOptions),
+    };
+    request.Headers.Add("Authorization", $"Token {token}");
+
+    var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
 
     var responseContent = await response.Content.ReadAsStringAsync();
@@ -94,27 +116,11 @@ public class ApiFixture : IAsyncLifetime
   /// <summary>
   /// Creates multiple articles for the authenticated user.
   /// </summary>
-  public async Task CreateArticlesAsync(string token, int count, string uniqueIdPrefix)
+  public async Task CreateArticlesAsync(string token, int count, string[]? tags = null)
   {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(_baseUrl);
-    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
-
-    for (var i = 1; i <= count; i++)
+    for (var i = 0; i < count; i++)
     {
-      var articleRequest = new
-      {
-        article = new
-        {
-          title = $"Test Article {i} - {uniqueIdPrefix}",
-          description = $"Description for article {i}",
-          body = $"Body content for article {i}",
-          tagList = new[] { "test" },
-        },
-      };
-
-      var response = await httpClient.PostAsJsonAsync("/api/articles", articleRequest, _jsonOptions);
-      response.EnsureSuccessStatusCode();
+      await CreateArticleAsync(token, tags);
     }
   }
 
@@ -123,10 +129,6 @@ public class ApiFixture : IAsyncLifetime
   /// </summary>
   public async Task CreateCommentAsync(string token, string articleSlug, string commentBody)
   {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(_baseUrl);
-    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
-
     var commentRequest = new
     {
       comment = new
@@ -135,7 +137,13 @@ public class ApiFixture : IAsyncLifetime
       },
     };
 
-    var response = await httpClient.PostAsJsonAsync($"/api/articles/{articleSlug}/comments", commentRequest, _jsonOptions);
+    using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/articles/{articleSlug}/comments")
+    {
+      Content = JsonContent.Create(commentRequest, options: _jsonOptions),
+    };
+    request.Headers.Add("Authorization", $"Token {token}");
+
+    var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
   }
 
@@ -144,11 +152,10 @@ public class ApiFixture : IAsyncLifetime
   /// </summary>
   public async Task FollowUserAsync(string followerToken, string usernameToFollow)
   {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(_baseUrl);
-    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {followerToken}");
+    using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/profiles/{usernameToFollow}/follow");
+    request.Headers.Add("Authorization", $"Token {followerToken}");
 
-    var response = await httpClient.PostAsync($"/api/profiles/{usernameToFollow}/follow", null);
+    var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
   }
 
@@ -157,11 +164,10 @@ public class ApiFixture : IAsyncLifetime
   /// </summary>
   public async Task FavoriteArticleAsync(string token, string articleSlug)
   {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(_baseUrl);
-    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
+    using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/articles/{articleSlug}/favorite");
+    request.Headers.Add("Authorization", $"Token {token}");
 
-    var response = await httpClient.PostAsync($"/api/articles/{articleSlug}/favorite", null);
+    var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
   }
 
@@ -170,9 +176,6 @@ public class ApiFixture : IAsyncLifetime
   /// </summary>
   public async Task<string> LoginAsync(string email, string password)
   {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(_baseUrl);
-
     var loginRequest = new
     {
       user = new
@@ -182,7 +185,12 @@ public class ApiFixture : IAsyncLifetime
       },
     };
 
-    var response = await httpClient.PostAsJsonAsync("/api/users/login", loginRequest, _jsonOptions);
+    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/users/login")
+    {
+      Content = JsonContent.Create(loginRequest, options: _jsonOptions),
+    };
+
+    var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
 
     var responseContent = await response.Content.ReadAsStringAsync();

@@ -59,7 +59,7 @@ public class LoginPage : BasePage
     await FillLoginFormAsync(email, password);
     await ClickSignInButtonAsync();
 
-    // Wait for navigation to complete after login (should redirect away from login page)
-    await Expect().Not.ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/login$"));
+    // Wait for successful login by verifying we're on the home page
+    await Expect().ToHaveURLAsync($"{BaseUrl}/");
   }
 }

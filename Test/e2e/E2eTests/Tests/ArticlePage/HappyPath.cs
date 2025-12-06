@@ -14,17 +14,8 @@ public class HappyPath : AppPageTest
   public async Task UserCanDeleteOwnArticle()
   {
     // Arrange - create user and article via API
-    var username = GenerateUniqueUsername("articleuser");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    var (token, _) = await Api.CreateUserAsync(username, email, password);
-
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    var (articleSlug, _) = await Api.CreateArticleAsync(
-      token,
-      articleTitle,
-      "Test article for E2E testing",
-      "This is a test article body.");
+    var (token, username, email, password) = await Api.CreateUserAsync();
+    var (_, articleTitle) = await Api.CreateArticleAsync(token);
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
@@ -48,22 +39,10 @@ public class HappyPath : AppPageTest
   public async Task UserCanFavoriteAndUnfavoriteArticle()
   {
     // Arrange - create two users and one article via API
-    var user1Username = GenerateUniqueUsername("articleuser1");
-    var user1Email = GenerateUniqueEmail(user1Username);
-    var user1Password = "TestPassword123!";
-    var (user1Token, _) = await Api.CreateUserAsync(user1Username, user1Email, user1Password);
+    var (user1Token, user1Username, user1Email, user1Password) = await Api.CreateUserAsync();
+    var (_, articleTitle) = await Api.CreateArticleAsync(user1Token);
 
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    var (articleSlug, _) = await Api.CreateArticleAsync(
-      user1Token,
-      articleTitle,
-      "Test article for E2E testing",
-      "This is a test article body.");
-
-    var user2Username = GenerateUniqueUsername("articleuser2");
-    var user2Email = GenerateUniqueEmail(user2Username);
-    var user2Password = "TestPassword123!";
-    var (user2Token, _) = await Api.CreateUserAsync(user2Username, user2Email, user2Password);
+    var (_, user2Username, user2Email, user2Password) = await Api.CreateUserAsync();
 
     // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
@@ -83,17 +62,8 @@ public class HappyPath : AppPageTest
   public async Task UserCanAddCommentToArticle()
   {
     // Arrange - create user and article via API
-    var username = GenerateUniqueUsername("articleuser");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    var (token, _) = await Api.CreateUserAsync(username, email, password);
-
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    var (articleSlug, _) = await Api.CreateArticleAsync(
-      token,
-      articleTitle,
-      "Test article for E2E testing",
-      "This is a test article body.");
+    var (token, username, email, password) = await Api.CreateUserAsync();
+    var (_, articleTitle) = await Api.CreateArticleAsync(token);
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
@@ -113,17 +83,8 @@ public class HappyPath : AppPageTest
   public async Task UserCanDeleteOwnComment()
   {
     // Arrange - create user, article, and comment via API
-    var username = GenerateUniqueUsername("articleuser");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    var (token, _) = await Api.CreateUserAsync(username, email, password);
-
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    var (articleSlug, _) = await Api.CreateArticleAsync(
-      token,
-      articleTitle,
-      "Test article for E2E testing",
-      "This is a test article body.");
+    var (token, username, email, password) = await Api.CreateUserAsync();
+    var (articleSlug, articleTitle) = await Api.CreateArticleAsync(token);
 
     var commentText = "This comment will be deleted!";
     await Api.CreateCommentAsync(token, articleSlug, commentText);

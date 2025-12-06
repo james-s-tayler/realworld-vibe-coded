@@ -1,4 +1,4 @@
-﻿namespace E2eTests.Tests.ArticlePage;
+namespace E2eTests.Tests.ArticlePage;
 
 /// <summary>
 /// Permission tests for the Article page (/article/:slug).
@@ -14,17 +14,11 @@ public class Permissions : AppPageTest
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFavoritingArticle()
   {
     // Arrange - create user and article via API
-    var username = GenerateUniqueUsername("articleuser1");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    var (token, _) = await Api.CreateUserAsync(username, email, password);
-
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    await Api.CreateArticleAsync(token, articleTitle, "Test article for E2E testing", "This is a test article body.");
+    var (token, username, _, _) = await Api.CreateUserAsync();
+    var (_, articleTitle) = await Api.CreateArticleAsync(token);
 
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
-
     await Pages.HomePage.ClickArticleAsync(articleTitle);
 
     // Act
@@ -38,13 +32,8 @@ public class Permissions : AppPageTest
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFollowingUserFromArticlePage()
   {
     // Arrange - create user and article via API
-    var username = GenerateUniqueUsername("articleuser1");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    var (token, _) = await Api.CreateUserAsync(username, email, password);
-
-    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
-    await Api.CreateArticleAsync(token, articleTitle, "Test article for E2E testing", "This is a test article body.");
+    var (token, username, _, _) = await Api.CreateUserAsync();
+    var (_, articleTitle) = await Api.CreateArticleAsync(token);
 
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();

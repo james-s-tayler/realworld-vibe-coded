@@ -1,4 +1,4 @@
-﻿namespace E2eTests.Tests.LoginPage;
+namespace E2eTests.Tests.LoginPage;
 
 /// <summary>
 /// Happy path tests for the Login page (/login).
@@ -14,10 +14,7 @@ public class HappyPath : AppPageTest
   public async Task UserCanSignIn_WithExistingCredentials()
   {
     // Arrange - create user via API
-    var username = GenerateUniqueUsername("loginuser");
-    var email = GenerateUniqueEmail(username);
-    var password = "TestPassword123!";
-    await Api.CreateUserAsync(username, email, password);
+    var (_, username, email, password) = await Api.CreateUserAsync();
 
     await Pages.LoginPage.GoToAsync();
 
