@@ -8,7 +8,7 @@ namespace E2eTests.Tests.HomePage;
 /// Happy path tests for the Home page (/) including feeds and pagination.
 /// </summary>
 [Collection("E2E Tests")]
-public class HomePageHappyPathTests : AppPageTest
+public class HappyPath : AppPageTest
 {
   private const int TotalArticles = 50;
 

@@ -4,7 +4,7 @@
 /// Happy path tests for the Settings page (/settings).
 /// </summary>
 [Collection("E2E Tests")]
-public class SettingsPageHappyPathTests : AppPageTest
+public class HappyPath : AppPageTest
 {
   [Fact]
   public async Task UserCanEditProfile()

@@ -88,30 +88,6 @@ public abstract class AppPageTest : PageTest
   protected SwaggerPage GetSwaggerPage() => new(Page, $"{BaseUrl}/swagger/index.html");
 
   /// <summary>
-  /// Wipes all users and user-generated content from the database.
-  /// Called after each test to ensure test isolation.
-  /// </summary>
-  private async Task WipeTestData()
-  {
-    try
-    {
-      var apiContext = await Playwright.APIRequest.NewContextAsync(new()
-      {
-        BaseURL = BaseUrl,
-        IgnoreHTTPSErrors = true,
-      });
-
-      await apiContext.DeleteAsync("/dev-only/test-data/wipe");
-      await apiContext.DisposeAsync();
-    }
-    catch (Exception ex)
-    {
-      // Log but don't fail the test if wipe fails.
-      Console.WriteLine($"Warning: Failed to wipe test data: {ex.Message}");
-    }
-  }
-
-  /// <summary>
   /// Registers a user using the default test credentials and returns the HomePage.
   /// </summary>
   protected async Task<HomePage> RegisterUserAsync()
@@ -194,6 +170,30 @@ public abstract class AppPageTest : PageTest
       .Replace("\\", "_");
 
     return sanitized;
+  }
+
+  /// <summary>
+  /// Wipes all users and user-generated content from the database.
+  /// Called after each test to ensure test isolation.
+  /// </summary>
+  private async Task WipeTestData()
+  {
+    try
+    {
+      var apiContext = await Playwright.APIRequest.NewContextAsync(new()
+      {
+        BaseURL = BaseUrl,
+        IgnoreHTTPSErrors = true,
+      });
+
+      await apiContext.DeleteAsync("/dev-only/test-data/wipe");
+      await apiContext.DisposeAsync();
+    }
+    catch (Exception ex)
+    {
+      // Log but don't fail the test if wipe fails.
+      Console.WriteLine($"Warning: Failed to wipe test data: {ex.Message}");
+    }
   }
 
   /// <summary>

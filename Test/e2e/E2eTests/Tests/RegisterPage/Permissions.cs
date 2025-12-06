@@ -4,7 +4,7 @@
 /// Permission tests for the Registration page (/register).
 /// </summary>
 [Collection("E2E Tests")]
-public class RegisterPagePermissionsTests : AppPageTest
+public class Permissions : AppPageTest
 {
   // No permission tests for RegisterPage currently
 }

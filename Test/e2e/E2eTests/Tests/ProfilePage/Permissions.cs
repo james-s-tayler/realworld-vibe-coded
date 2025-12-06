@@ -4,7 +4,7 @@
 /// Permission tests for the Profile page (/profile/:username).
 /// </summary>
 [Collection("E2E Tests")]
-public class ProfilePagePermissionsTests : AppPageTest
+public class Permissions : AppPageTest
 {
   private string _testUsername1 = null!;
   private string _testEmail1 = null!;
