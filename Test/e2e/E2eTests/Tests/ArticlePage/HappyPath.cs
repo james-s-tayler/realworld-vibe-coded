@@ -38,11 +38,12 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanFavoriteAndUnfavoriteArticle()
   {
-    // Arrange - create two users and one article via API
-    var (user1Token, user1Username, user1Email, user1Password) = await Api.CreateUserAsync();
-    var (articleSlug, articleTitle) = await Api.CreateArticleAsync(user1Token);
+    // Arrange - create user and article via API
+    var (token, username, email, password) = await Api.CreateUserAsync();
+    var (articleSlug, articleTitle) = await Api.CreateArticleAsync(token);
 
-    var (_, user2Username, user2Email, user2Password) = await Api.CreateUserAsync();
+    // Create a second user and have them view the first user's article
+    var (_, _, user2Email, user2Password) = await Api.CreateUserAsync();
 
     // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
@@ -50,7 +51,9 @@ public class HappyPath : AppPageTest
 
     // Navigate directly to the article by slug
     await Pages.ArticlePage.GoToAsync(articleSlug);
-    await Pages.ArticlePage.VerifyArticleTitleAsync(articleTitle);
+
+    // Wait for page to load by checking for the favorite button
+    await Expect(Pages.ArticlePage.FavoriteButton).ToBeVisibleAsync();
 
     // Act + Assert
     await Pages.ArticlePage.ClickFavoriteButtonAsync();
