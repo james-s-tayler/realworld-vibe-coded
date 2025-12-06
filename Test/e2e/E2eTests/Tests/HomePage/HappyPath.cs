@@ -1,8 +1,4 @@
-﻿using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
-namespace E2eTests.Tests.HomePage;
+﻿namespace E2eTests.Tests.HomePage;
 
 /// <summary>
 /// Happy path tests for the Home page (/) including feeds and pagination.
@@ -12,17 +8,25 @@ public class HappyPath : AppPageTest
 {
   private const int TotalArticles = 50;
 
-  private static readonly JsonSerializerOptions JsonOptions = new()
+  public HappyPath(ApiFixture apiFixture) : base(apiFixture)
   {
-    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-  };
+  }
 
   [Fact]
   public async Task CreatedArticle_AppearsInGlobalFeed()
   {
-    // Arrange
-    await RegisterUserAsync();
-    var articleTitle = await CreateArticleAsync();
+    // Arrange - create user and article via API
+    var username = GenerateUniqueUsername("homeuser");
+    var email = GenerateUniqueEmail(username);
+    var password = "TestPassword123!";
+    var (token, _) = await Api.CreateUserAsync(username, email, password);
+
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
+    var (articleSlug, _) = await Api.CreateArticleAsync(
+      token,
+      articleTitle,
+      "Test article for E2E testing",
+      "This is a test article body.");
 
     await Pages.HomePage.GoToAsync();
 
@@ -39,27 +43,18 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task GlobalFeed_IsSelectedByDefaultForUnauthenticatedUser()
   {
-    // Arrange
+    // Arrange - create user and article via API
     var uniqueId = GenerateUniqueUsername("deftest");
-    var (token, _) = await CreateUserViaApiAsync(uniqueId);
+    var email = $"{uniqueId}@test.com";
+    var (token, _) = await Api.CreateUserAsync(uniqueId, email, "TestPassword123!");
 
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(BaseUrl);
-    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
-
-    var articleRequest = new
-    {
-      article = new
-      {
-        title = $"Default Tab Test Article - {uniqueId}",
-        description = "Test article for default tab selection",
-        body = "This article verifies the global feed is selected by default",
-        tagList = new[] { "default-test" },
-      },
-    };
-
-    var articleResponse = await httpClient.PostAsJsonAsync("/api/articles", articleRequest, JsonOptions, TestContext.Current.CancellationToken);
-    articleResponse.EnsureSuccessStatusCode();
+    var articleTitle = $"Default Tab Test Article - {uniqueId}";
+    await Api.CreateArticleAsync(
+      token,
+      articleTitle,
+      "Test article for default tab selection",
+      "This article verifies the global feed is selected by default",
+      new[] { "default-test" });
 
     // Act
     await Pages.HomePage.GoToAsync();
@@ -67,15 +62,17 @@ public class HappyPath : AppPageTest
     // Assert
     await Pages.HomePage.VerifyGlobalFeedIsSelectedAsync();
 
-    await Pages.HomePage.VerifyArticleVisibleAsync($"Default Tab Test Article - {uniqueId}");
+    await Pages.HomePage.VerifyArticleVisibleAsync(articleTitle);
   }
 
   [Fact]
   public async Task GlobalFeed_DisplaysPaginationAndNavigatesCorrectly()
   {
-    // Arrange
+    // Arrange - create user and articles via API
     var uniqueId = GenerateUniqueUsername("pagtest");
-    await CreateUserAndArticlesViaApiAsync(uniqueId);
+    var email = $"{uniqueId}@test.com";
+    var (token, _) = await Api.CreateUserAsync(uniqueId, email, "TestPassword123!");
+    await Api.CreateArticlesAsync(token, TotalArticles, uniqueId);
 
     await Pages.HomePage.GoToAsync();
 
@@ -103,23 +100,29 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task YourFeed_ShowsArticlesFromFollowedUsers()
   {
-    // Arrange
-    var testUsername1 = GenerateUniqueUsername("profileuser1");
-    var testEmail1 = GenerateUniqueEmail(testUsername1);
-    var testPassword1 = "TestPassword123!";
-    var testUsername2 = GenerateUniqueUsername("profileuser2");
-    var testEmail2 = GenerateUniqueEmail(testUsername2);
-    var testPassword2 = "TestPassword123!";
+    // Arrange - create two users, article, and follow relationship via API
+    var user1Username = GenerateUniqueUsername("profileuser1");
+    var user1Email = GenerateUniqueEmail(user1Username);
+    var user1Password = "TestPassword123!";
+    var (user1Token, _) = await Api.CreateUserAsync(user1Username, user1Email, user1Password);
 
-    await RegisterUserAsync(testUsername1, testEmail1, testPassword1);
-    var articleTitle = await CreateArticleAsync();
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
+    var (articleSlug, _) = await Api.CreateArticleAsync(
+      user1Token,
+      articleTitle,
+      "Test article for E2E testing",
+      "This is a test article body.");
 
-    await SignOutAsync();
+    var user2Username = GenerateUniqueUsername("profileuser2");
+    var user2Email = GenerateUniqueEmail(user2Username);
+    var user2Password = "TestPassword123!";
+    var (user2Token, _) = await Api.CreateUserAsync(user2Username, user2Email, user2Password);
 
-    await RegisterUserAsync(testUsername2, testEmail2, testPassword2);
+    await Api.FollowUserAsync(user2Token, user1Username);
 
-    await Pages.ProfilePage.GoToAsync(testUsername1);
-    await Pages.ProfilePage.ClickFollowButtonAsync(testUsername1);
+    // Log in as user2 via UI
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user2Email, user2Password);
 
     await Pages.HomePage.GoToAsync();
 
@@ -133,14 +136,20 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanFilterArticlesByTag()
   {
-    // Arrange
-    var testUsername1 = GenerateUniqueUsername("profileuser1");
-    var testEmail1 = GenerateUniqueEmail(testUsername1);
-    var testPassword1 = "TestPassword123!";
+    // Arrange - create user and article with tag via API
+    var username = GenerateUniqueUsername("profileuser1");
+    var email = GenerateUniqueEmail(username);
+    var password = "TestPassword123!";
+    var (token, _) = await Api.CreateUserAsync(username, email, password);
 
-    await RegisterUserAsync(testUsername1, testEmail1, testPassword1);
     var testTag = $"testtag{Guid.NewGuid().ToString("N")[..8]}";
-    var articleTitle = await CreateArticleWithTagAsync(testTag);
+    var articleTitle = $"Tagged Article {GenerateUniqueUsername("tag")}";
+    await Api.CreateArticleAsync(
+      token,
+      articleTitle,
+      "Test article with tag",
+      "This is a test article body.",
+      new[] { testTag });
 
     await Pages.HomePage.GoToAsync();
 
@@ -158,10 +167,11 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task GlobalFeed_ShowsPaginationWithFewArticles()
   {
-    // Arrange
+    // Arrange - create user and few articles via API
     var uniqueId = GenerateUniqueUsername("fewart");
-    var (token, _) = await CreateUserViaApiAsync(uniqueId);
-    await CreateArticlesForUserAsync(token, 5, uniqueId);
+    var email = $"{uniqueId}@test.com";
+    var (token, _) = await Api.CreateUserAsync(uniqueId, email, "TestPassword123!");
+    await Api.CreateArticlesAsync(token, 5, uniqueId);
 
     await Pages.HomePage.GoToAsync();
 
@@ -177,18 +187,22 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task YourFeed_DisplaysPaginationAndNavigatesCorrectly()
   {
-    // Arrange
-    var uniqueId1 = GenerateUniqueUsername("feeduser1");
-    var uniqueId2 = GenerateUniqueUsername("feeduser2");
-    var (user1Token, user1Username) = await CreateUserViaApiAsync(uniqueId1);
-    var (user2Token, _) = await CreateUserViaApiAsync(uniqueId2);
+    // Arrange - create two users, articles, and follow relationship via API
+    var user1Id = GenerateUniqueUsername("feeduser1");
+    var user1Email = $"{user1Id}@test.com";
+    var (user1Token, user1Username) = await Api.CreateUserAsync(user1Id, user1Email, "TestPassword123!");
 
-    await CreateArticlesForUserAsync(user1Token, TotalArticles, uniqueId1);
+    var user2Id = GenerateUniqueUsername("feeduser2");
+    var user2Email = $"{user2Id}@test.com";
+    var (user2Token, _) = await Api.CreateUserAsync(user2Id, user2Email, "TestPassword123!");
 
-    await FollowUserAsync(user2Token, user1Username);
+    await Api.CreateArticlesAsync(user1Token, TotalArticles, user1Id);
 
+    await Api.FollowUserAsync(user2Token, user1Username);
+
+    // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync($"{uniqueId2}@test.com", "TestPassword123!");
+    await Pages.LoginPage.LoginAsync(user2Email, "TestPassword123!");
 
     // Act
     await Pages.HomePage.ClickYourFeedTabAsync();
@@ -205,85 +219,5 @@ public class HappyPath : AppPageTest
 
     await Pages.HomePage.ClickPreviousPageAsync();
     await Pages.HomePage.VerifyArticleCountAsync(20);
-  }
-
-  private async Task<string> CreateUserAndArticlesViaApiAsync(string uniqueId)
-  {
-    var (token, _) = await CreateUserViaApiAsync(uniqueId);
-    await CreateArticlesForUserAsync(token, TotalArticles, uniqueId);
-    return token;
-  }
-
-  private async Task<(string Token, string Username)> CreateUserViaApiAsync(string uniqueId)
-  {
-    var username = uniqueId;
-    var email = $"{uniqueId}@test.com";
-    var password = "TestPassword123!";
-
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(BaseUrl);
-
-    var registerRequest = new
-    {
-      user = new
-      {
-        username,
-        email,
-        password,
-      },
-    };
-
-    var response = await httpClient.PostAsJsonAsync("/api/users", registerRequest, JsonOptions);
-    response.EnsureSuccessStatusCode();
-
-    var responseContent = await response.Content.ReadAsStringAsync();
-    var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, JsonOptions)!;
-    return (userResponse.User.Token, username);
-  }
-
-  private async Task CreateArticlesForUserAsync(string token, int count, string uniqueId)
-  {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(BaseUrl);
-    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
-
-    for (var i = 1; i <= count; i++)
-    {
-      var articleRequest = new
-      {
-        article = new
-        {
-          title = $"Pagination Test Article {i} - {uniqueId}",
-          description = $"Description for article {i}",
-          body = $"Body content for article {i}",
-          tagList = new[] { "pagination-test" },
-        },
-      };
-
-      var articleResponse = await httpClient.PostAsJsonAsync("/api/articles", articleRequest, JsonOptions);
-      articleResponse.EnsureSuccessStatusCode();
-    }
-  }
-
-  private async Task FollowUserAsync(string followerToken, string usernameToFollow)
-  {
-    using var httpClient = new HttpClient();
-    httpClient.BaseAddress = new Uri(BaseUrl);
-    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {followerToken}");
-
-    var response = await httpClient.PostAsync($"/api/profiles/{usernameToFollow}/follow", null);
-    response.EnsureSuccessStatusCode();
-  }
-
-  private class UserResponse
-  {
-    [JsonPropertyName("user")]
-    public UserData User { get; set; } = null!;
-  }
-
-  private class UserData
-  {
-    [JsonPropertyName("token")]
-    public string Token { get; set; } = string.Empty;
   }
 }

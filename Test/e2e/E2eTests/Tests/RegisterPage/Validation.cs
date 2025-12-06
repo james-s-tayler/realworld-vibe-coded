@@ -6,19 +6,21 @@
 [Collection("E2E Tests")]
 public class Validation : AppPageTest
 {
+  public Validation(ApiFixture apiFixture) : base(apiFixture)
+  {
+  }
+
   [Fact]
   public async Task Register_WithDuplicateEmail_DisplaysErrorMessage()
   {
-    // Arrange
+    // Arrange - create user via API
     var timestamp = DateTime.UtcNow.Ticks;
     var email = $"duplicate{timestamp}@test.com";
     var username1 = $"user1_{timestamp}";
     var username2 = $"user2_{timestamp}";
     var password = "TestPassword123!";
 
-    await RegisterUserAsync(username1, email, password);
-
-    await SignOutAsync();
+    await Api.CreateUserAsync(username1, email, password);
 
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickSignUpAsync();

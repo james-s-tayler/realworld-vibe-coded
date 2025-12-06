@@ -6,18 +6,26 @@
 [Collection("E2E Tests")]
 public class Validation : AppPageTest
 {
+  public Validation(ApiFixture apiFixture) : base(apiFixture)
+  {
+  }
+
   [Fact]
   public async Task CreateArticle_WithDuplicateTitle_DisplaysErrorMessage()
   {
-    // Arrange
-    await RegisterUserAsync();
+    // Arrange - create user and article via API
+    var username = GenerateUniqueUsername("editoruser");
+    var email = GenerateUniqueEmail(username);
+    var password = "TestPassword123!";
+    var (token, _) = await Api.CreateUserAsync(username, email, password);
 
     var timestamp = DateTime.UtcNow.Ticks;
     var articleTitle = $"Duplicate Test Article {timestamp}";
+    await Api.CreateArticleAsync(token, articleTitle, "Test description", "Test body content");
 
-    await Pages.HomePage.ClickNewArticleAsync();
-
-    await Pages.EditorPage.CreateArticleAsync(articleTitle, "Test description", "Test body content");
+    // Log in via UI
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(email, password);
 
     await Pages.EditorPage.GoToAsync();
 

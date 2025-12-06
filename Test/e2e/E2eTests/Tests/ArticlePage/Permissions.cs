@@ -6,27 +6,21 @@
 [Collection("E2E Tests")]
 public class Permissions : AppPageTest
 {
-  private string _testUsername1 = null!;
-  private string _testEmail1 = null!;
-  private string _testPassword1 = null!;
-
-  public override async ValueTask InitializeAsync()
+  public Permissions(ApiFixture apiFixture) : base(apiFixture)
   {
-    await base.InitializeAsync();
-
-    _testUsername1 = GenerateUniqueUsername("articleuser1");
-    _testEmail1 = GenerateUniqueEmail(_testUsername1);
-    _testPassword1 = "TestPassword123!";
   }
 
   [Fact]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFavoritingArticle()
   {
-    // Arrange
-    await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
-    var articleTitle = await CreateArticleAsync();
+    // Arrange - create user and article via API
+    var username = GenerateUniqueUsername("articleuser1");
+    var email = GenerateUniqueEmail(username);
+    var password = "TestPassword123!";
+    var (token, _) = await Api.CreateUserAsync(username, email, password);
 
-    await SignOutAsync();
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
+    await Api.CreateArticleAsync(token, articleTitle, "Test article for E2E testing", "This is a test article body.");
 
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
@@ -43,18 +37,21 @@ public class Permissions : AppPageTest
   [Fact]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFollowingUserFromArticlePage()
   {
-    // Arrange
-    await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
-    var articleTitle = await CreateArticleAsync();
+    // Arrange - create user and article via API
+    var username = GenerateUniqueUsername("articleuser1");
+    var email = GenerateUniqueEmail(username);
+    var password = "TestPassword123!";
+    var (token, _) = await Api.CreateUserAsync(username, email, password);
 
-    await SignOutAsync();
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
+    await Api.CreateArticleAsync(token, articleTitle, "Test article for E2E testing", "This is a test article body.");
 
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
     await Pages.HomePage.ClickArticleAsync(articleTitle);
 
     // Act
-    await Pages.ArticlePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
+    await Pages.ArticlePage.ClickFollowButtonWithoutWaitAsync(username);
 
     // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");

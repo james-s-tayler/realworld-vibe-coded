@@ -6,6 +6,10 @@
 [Collection("E2E Tests")]
 public class Permissions : AppPageTest
 {
+  public Permissions(ApiFixture apiFixture) : base(apiFixture)
+  {
+  }
+
   [Fact]
   public async Task ProtectedRoutes_RedirectToLogin_WhenNotAuthenticated()
   {

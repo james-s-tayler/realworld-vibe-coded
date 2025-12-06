@@ -6,11 +6,22 @@
 [Collection("E2E Tests")]
 public class HappyPath : AppPageTest
 {
+  public HappyPath(ApiFixture apiFixture) : base(apiFixture)
+  {
+  }
+
   [Fact]
   public async Task UserCanEditProfile()
   {
-    // Arrange
-    await RegisterUserAsync();
+    // Arrange - create user via API
+    var username = GenerateUniqueUsername("settingsuser");
+    var email = GenerateUniqueEmail(username);
+    var password = "TestPassword123!";
+    await Api.CreateUserAsync(username, email, password);
+
+    // Log in via UI
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(email, password);
 
     await Pages.SettingsPage.GoToAsync();
 
@@ -20,8 +31,8 @@ public class HappyPath : AppPageTest
     await Pages.SettingsPage.UpdateAndSaveBioAsync(bioText);
 
     // Assert
-    await Pages.ProfilePage.GoToAsync(TestUsername);
-    await Pages.ProfilePage.WaitForProfileToLoadAsync(TestUsername);
+    await Pages.ProfilePage.GoToAsync(username);
+    await Pages.ProfilePage.WaitForProfileToLoadAsync(username);
 
     await Pages.ProfilePage.VerifyBioVisibleAsync(bioText);
   }
@@ -29,8 +40,15 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanSignOut()
   {
-    // Arrange
-    await RegisterUserAsync();
+    // Arrange - create user via API
+    var username = GenerateUniqueUsername("settingsuser");
+    var email = GenerateUniqueEmail(username);
+    var password = "TestPassword123!";
+    await Api.CreateUserAsync(username, email, password);
+
+    // Log in via UI
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(email, password);
 
     await Pages.SettingsPage.GoToAsync();
 

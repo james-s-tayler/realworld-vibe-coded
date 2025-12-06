@@ -6,32 +6,34 @@
 [Collection("E2E Tests")]
 public class HappyPath : AppPageTest
 {
-  private string _testUsername1 = null!;
-  private string _testEmail1 = null!;
-  private string _testPassword1 = null!;
-  private string _testUsername2 = null!;
-  private string _testEmail2 = null!;
-  private string _testPassword2 = null!;
-
-  public override async ValueTask InitializeAsync()
+  public HappyPath(ApiFixture apiFixture) : base(apiFixture)
   {
-    await base.InitializeAsync();
-
-    _testUsername1 = GenerateUniqueUsername("articleuser1");
-    _testEmail1 = GenerateUniqueEmail(_testUsername1);
-    _testPassword1 = "TestPassword123!";
-
-    _testUsername2 = GenerateUniqueUsername("articleuser2");
-    _testEmail2 = GenerateUniqueEmail(_testUsername2);
-    _testPassword2 = "TestPassword123!";
   }
 
   [Fact]
   public async Task UserCanDeleteOwnArticle()
   {
-    // Arrange
-    await RegisterUserAsync();
-    var articleTitle = await CreateArticleAsync();
+    // Arrange - create user and article via API
+    var username = GenerateUniqueUsername("articleuser");
+    var email = GenerateUniqueEmail(username);
+    var password = "TestPassword123!";
+    var (token, _) = await Api.CreateUserAsync(username, email, password);
+
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
+    var (articleSlug, _) = await Api.CreateArticleAsync(
+      token,
+      articleTitle,
+      "Test article for E2E testing",
+      "This is a test article body.");
+
+    // Log in via UI
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(email, password);
+
+    // Navigate to article
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.ClickArticleAsync(articleTitle);
 
     // Act
     await Pages.ArticlePage.DeleteArticleAsync();
@@ -45,13 +47,27 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanFavoriteAndUnfavoriteArticle()
   {
-    // Arrange
-    await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
-    var articleTitle = await CreateArticleAsync();
+    // Arrange - create two users and one article via API
+    var user1Username = GenerateUniqueUsername("articleuser1");
+    var user1Email = GenerateUniqueEmail(user1Username);
+    var user1Password = "TestPassword123!";
+    var (user1Token, _) = await Api.CreateUserAsync(user1Username, user1Email, user1Password);
 
-    await SignOutAsync();
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
+    var (articleSlug, _) = await Api.CreateArticleAsync(
+      user1Token,
+      articleTitle,
+      "Test article for E2E testing",
+      "This is a test article body.");
 
-    await RegisterUserAsync(_testUsername2, _testEmail2, _testPassword2);
+    var user2Username = GenerateUniqueUsername("articleuser2");
+    var user2Email = GenerateUniqueEmail(user2Username);
+    var user2Password = "TestPassword123!";
+    var (user2Token, _) = await Api.CreateUserAsync(user2Username, user2Email, user2Password);
+
+    // Log in as user2 via UI
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user2Email, user2Password);
 
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
@@ -66,9 +82,27 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanAddCommentToArticle()
   {
-    // Arrange
-    await RegisterUserAsync();
-    await CreateArticleAsync();
+    // Arrange - create user and article via API
+    var username = GenerateUniqueUsername("articleuser");
+    var email = GenerateUniqueEmail(username);
+    var password = "TestPassword123!";
+    var (token, _) = await Api.CreateUserAsync(username, email, password);
+
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
+    var (articleSlug, _) = await Api.CreateArticleAsync(
+      token,
+      articleTitle,
+      "Test article for E2E testing",
+      "This is a test article body.");
+
+    // Log in via UI
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(email, password);
+
+    // Navigate to article
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.ClickArticleAsync(articleTitle);
 
     // Act + Assert
     var commentText = "This is a test comment from E2E tests!";
@@ -78,12 +112,30 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task UserCanDeleteOwnComment()
   {
-    // Arrange
-    await RegisterUserAsync();
-    await CreateArticleAsync();
+    // Arrange - create user, article, and comment via API
+    var username = GenerateUniqueUsername("articleuser");
+    var email = GenerateUniqueEmail(username);
+    var password = "TestPassword123!";
+    var (token, _) = await Api.CreateUserAsync(username, email, password);
+
+    var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
+    var (articleSlug, _) = await Api.CreateArticleAsync(
+      token,
+      articleTitle,
+      "Test article for E2E testing",
+      "This is a test article body.");
 
     var commentText = "This comment will be deleted!";
-    await Pages.ArticlePage.AddCommentAsync(commentText);
+    var commentId = await Api.CreateCommentAsync(token, articleSlug, commentText);
+
+    // Log in via UI
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(email, password);
+
+    // Navigate to article
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
+    await Pages.HomePage.ClickArticleAsync(articleTitle);
 
     // Act + Assert
     await Pages.ArticlePage.DeleteCommentAsync(commentText);
