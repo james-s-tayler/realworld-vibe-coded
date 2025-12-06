@@ -116,11 +116,7 @@ public abstract class BasePage
   {
     try
     {
-      await GetUserProfileLink(username).WaitForAsync(new()
-      {
-        State = WaitForSelectorState.Visible,
-        Timeout = DefaultTimeout,
-      });
+      await Expect(GetUserProfileLink(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
       return true;
     }
     catch
@@ -136,11 +132,7 @@ public abstract class BasePage
   {
     try
     {
-      await SignInLink.WaitForAsync(new()
-      {
-        State = WaitForSelectorState.Visible,
-        Timeout = DefaultTimeout,
-      });
+      await Expect(SignInLink).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
       return true;
     }
     catch
