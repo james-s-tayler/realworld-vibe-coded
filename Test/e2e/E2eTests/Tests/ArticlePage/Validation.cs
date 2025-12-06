@@ -1,5 +1,4 @@
-﻿
-namespace E2eTests.Tests.ArticlePage;
+﻿namespace E2eTests.Tests.ArticlePage;
 
 /// <summary>
 /// Validation tests for the Article page (/article/:slug).

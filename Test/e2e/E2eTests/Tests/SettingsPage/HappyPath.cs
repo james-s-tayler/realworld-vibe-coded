@@ -1,5 +1,4 @@
-﻿
-namespace E2eTests.Tests.SettingsPage;
+﻿namespace E2eTests.Tests.SettingsPage;
 
 /// <summary>
 /// Happy path tests for the Settings page (/settings).

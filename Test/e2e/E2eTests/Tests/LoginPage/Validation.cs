@@ -1,5 +1,4 @@
-﻿
-namespace E2eTests.Tests.LoginPage;
+﻿namespace E2eTests.Tests.LoginPage;
 
 /// <summary>
 /// Validation tests for the Login page (/login).
