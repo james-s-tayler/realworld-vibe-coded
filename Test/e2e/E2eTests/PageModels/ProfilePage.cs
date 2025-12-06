@@ -90,7 +90,7 @@ public class ProfilePage : BasePage
   public async Task ClickFollowButtonAsync(string username)
   {
     var followButton = GetFollowButton(username);
-    await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(followButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     await followButton.ClickAsync();
     await Expect(GetUnfollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }

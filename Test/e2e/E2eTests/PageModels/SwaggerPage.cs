@@ -50,7 +50,7 @@ public class SwaggerPage
   /// </summary>
   public async Task WaitForSwaggerToLoadAsync()
   {
-    await SwaggerContainer.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(SwaggerContainer).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -66,7 +66,7 @@ public class SwaggerPage
   /// </summary>
   public async Task<string?> GetApiTitleAsync()
   {
-    await ApiInfo.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(ApiInfo).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     return await ApiInfo.TextContentAsync();
   }
 
