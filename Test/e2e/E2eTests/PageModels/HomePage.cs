@@ -74,7 +74,8 @@ public class HomePage : BasePage
   /// </summary>
   public async Task ClickYourFeedTabAsync()
   {
-    await YourFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(YourFeedTab).ToBeVisibleAsync();
+    await Expect(GlobalFeedTab).ToBeVisibleAsync();
     await YourFeedTab.ClickAsync();
     await WaitForArticlesToLoadAsync();
   }
@@ -84,7 +85,8 @@ public class HomePage : BasePage
   /// </summary>
   public async Task ClickGlobalFeedTabAsync()
   {
-    await GlobalFeedTab.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(YourFeedTab).ToBeVisibleAsync();
+    await Expect(GlobalFeedTab).ToBeVisibleAsync();
     await GlobalFeedTab.ClickAsync();
     await WaitForArticlesToLoadAsync();
   }

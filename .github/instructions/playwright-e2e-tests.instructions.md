@@ -37,7 +37,8 @@ Use Appropriate Waiting Strategies
 
     Rely on Playwright's built-in auto-waiting
     Use Expect() assertions instead of manual waits
-    Avoid WaitForUrlAsync() - causes flaky tests
+    Avoid WaitForAsync() - causes flaky tests
+    Avoid WaitForURLAsync() - causes flaky tests
     Avoid WaitForLoadStateAsync() - causes flaky tests
     Avoid WaitForTimeoutAsync() - causes flaky tests
     Avoid Task.Delay() - causes flaky tests
