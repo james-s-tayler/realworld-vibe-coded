@@ -69,10 +69,10 @@ public class HappyPath : AppPageTest
   public async Task GlobalFeed_DisplaysPaginationAndNavigatesCorrectly()
   {
     // Arrange - create user and articles via API
-    var uniqueId = GenerateUniqueUsername("pagtest");
-    var email = $"{uniqueId}@test.com";
-    var (token, _) = await Api.CreateUserAsync(uniqueId, email, "TestPassword123!");
-    await Api.CreateArticlesAsync(token, TotalArticles, uniqueId);
+    var uniqueIdPrefix = GenerateUniqueUsername("pagtest");
+    var email = $"{uniqueIdPrefix}@test.com";
+    var (token, _) = await Api.CreateUserAsync(uniqueIdPrefix, email, "TestPassword123!");
+    await Api.CreateArticlesAsync(token, TotalArticles, uniqueIdPrefix);
 
     await Pages.HomePage.GoToAsync();
 

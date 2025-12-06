@@ -50,7 +50,7 @@ public class LoginPage : BasePage
   }
 
   /// <summary>
-  /// Performs a complete login action.
+  /// Performs a complete login action and waits for navigation to home page.
   /// </summary>
   /// <param name="email">User's email.</param>
   /// <param name="password">User's password.</param>
@@ -58,5 +58,8 @@ public class LoginPage : BasePage
   {
     await FillLoginFormAsync(email, password);
     await ClickSignInButtonAsync();
+    
+    // Wait for navigation to complete after login
+    await Page.WaitForURLAsync(url => url != $"{BaseUrl}/login", new() { Timeout = 10000 });
   }
 }
