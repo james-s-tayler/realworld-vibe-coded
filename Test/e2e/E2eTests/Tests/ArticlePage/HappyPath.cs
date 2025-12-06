@@ -50,6 +50,7 @@ public class HappyPath : AppPageTest
 
     // Navigate directly to the article by slug
     await Pages.ArticlePage.GoToAsync(articleSlug);
+    await Pages.ArticlePage.VerifyArticleTitleAsync(articleTitle);
 
     // Act + Assert
     await Pages.ArticlePage.ClickFavoriteButtonAsync();

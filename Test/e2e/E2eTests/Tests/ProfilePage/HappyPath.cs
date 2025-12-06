@@ -1,4 +1,4 @@
-namespace E2eTests.Tests.ProfilePage;
+﻿namespace E2eTests.Tests.ProfilePage;
 
 /// <summary>
 /// Happy path tests for the Profile page (/profile/:username).

@@ -1,4 +1,4 @@
-namespace E2eTests.Tests.HomePage;
+﻿namespace E2eTests.Tests.HomePage;
 
 /// <summary>
 /// Happy path tests for the Home page (/) including feeds and pagination.

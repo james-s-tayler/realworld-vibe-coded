@@ -1,4 +1,4 @@
-namespace E2eTests.Tests.LoginPage;
+﻿namespace E2eTests.Tests.LoginPage;
 
 /// <summary>
 /// Happy path tests for the Login page (/login).

@@ -1,4 +1,4 @@
-namespace E2eTests.Tests.EditorPage;
+﻿namespace E2eTests.Tests.EditorPage;
 
 /// <summary>
 /// Validation tests for the Editor page (/editor and /editor/:slug).
