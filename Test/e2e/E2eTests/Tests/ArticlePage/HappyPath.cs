@@ -126,7 +126,7 @@ public class HappyPath : AppPageTest
       "This is a test article body.");
 
     var commentText = "This comment will be deleted!";
-    var commentId = await Api.CreateCommentAsync(token, articleSlug, commentText);
+    await Api.CreateCommentAsync(token, articleSlug, commentText);
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();

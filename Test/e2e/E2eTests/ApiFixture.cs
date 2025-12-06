@@ -119,9 +119,9 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
-  /// Creates a comment on an article and returns the comment ID.
+  /// Creates a comment on an article.
   /// </summary>
-  public async Task<int> CreateCommentAsync(string token, string articleSlug, string commentBody)
+  public async Task CreateCommentAsync(string token, string articleSlug, string commentBody)
   {
     using var httpClient = new HttpClient();
     httpClient.BaseAddress = new Uri(_baseUrl);
@@ -137,10 +137,6 @@ public class ApiFixture : IAsyncLifetime
 
     var response = await httpClient.PostAsJsonAsync($"/api/articles/{articleSlug}/comments", commentRequest, _jsonOptions);
     response.EnsureSuccessStatusCode();
-
-    var responseContent = await response.Content.ReadAsStringAsync();
-    var commentResponse = JsonSerializer.Deserialize<CommentResponse>(responseContent, _jsonOptions)!;
-    return commentResponse.Comment.Id;
   }
 
   /// <summary>
@@ -223,17 +219,5 @@ public class ApiFixture : IAsyncLifetime
 
     [JsonPropertyName("title")]
     public string Title { get; set; } = string.Empty;
-  }
-
-  private class CommentResponse
-  {
-    [JsonPropertyName("comment")]
-    public CommentData Comment { get; set; } = null!;
-  }
-
-  private class CommentData
-  {
-    [JsonPropertyName("id")]
-    public int Id { get; set; }
   }
 }
