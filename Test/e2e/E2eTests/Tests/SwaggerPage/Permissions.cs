@@ -1,4 +1,5 @@
 ﻿namespace E2eTests.Tests.SwaggerPage;
+using static E2eTests.PageModels.Pages;
 
 /// <summary>
 /// Permission tests for the Swagger API documentation page (/swagger/index.html).

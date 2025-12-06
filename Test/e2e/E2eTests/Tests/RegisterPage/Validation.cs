@@ -1,4 +1,5 @@
 ﻿namespace E2eTests.Tests.RegisterPage;
+using static E2eTests.PageModels.Pages;
 
 /// <summary>
 /// Validation tests for the Registration page (/register).
@@ -20,16 +21,13 @@ public class Validation : AppPageTest
 
     await SignOutAsync();
 
-    var homePage = GetHomePage();
-    await homePage.GoToAsync();
-    await homePage.ClickSignUpAsync();
-
-    var registerPage = GetRegisterPage();
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickSignUpAsync();
 
     // Act
-    await registerPage.RegisterAndExpectErrorAsync(username2, email, password);
+    await Pages.RegisterPage.RegisterAndExpectErrorAsync(username2, email, password);
 
     // Assert
-    await registerPage.VerifyErrorContainsTextAsync("Email already exists");
+    await Pages.RegisterPage.VerifyErrorContainsTextAsync("Email already exists");
   }
 }

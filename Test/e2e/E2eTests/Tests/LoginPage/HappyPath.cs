@@ -1,4 +1,5 @@
 ﻿namespace E2eTests.Tests.LoginPage;
+using static E2eTests.PageModels.Pages;
 
 /// <summary>
 /// Happy path tests for the Login page (/login).
@@ -14,13 +15,12 @@ public class HappyPath : AppPageTest
 
     await SignOutAsync();
 
-    var loginPage = GetLoginPage();
-    await loginPage.GoToAsync();
+    await Pages.LoginPage.GoToAsync();
 
     // Act
-    var homePage = await loginPage.LoginAsync(TestEmail, TestPassword);
+    await Pages.LoginPage.LoginAsync(TestEmail, TestPassword);
 
     // Assert
-    await Expect(homePage.GetUserProfileLink(TestUsername)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(Pages.HomePage.GetUserProfileLink(TestUsername)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 }

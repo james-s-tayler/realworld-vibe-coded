@@ -61,14 +61,11 @@ public class RegisterPage : BasePage
   /// <param name="username">Username for the new account.</param>
   /// <param name="email">Email for the new account.</param>
   /// <param name="password">Password for the new account.</param>
-  /// <returns>HomePage after successful registration.</returns>
-  public async Task<HomePage> RegisterAsync(string username, string email, string password)
+  public async Task RegisterAsync(string username, string email, string password)
   {
     await FillRegistrationFormAsync(username, email, password);
     await ClickSignUpButtonAsync();
     await Expect(GetUserProfileLink(username)).ToBeVisibleAsync();
-
-    return new HomePage(Page, BaseUrl);
   }
 
   /// <summary>

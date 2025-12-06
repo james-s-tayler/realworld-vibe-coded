@@ -1,4 +1,5 @@
 ﻿namespace E2eTests.Tests.RegisterPage;
+using static E2eTests.PageModels.Pages;
 
 /// <summary>
 /// Happy path tests for the Registration page (/register).

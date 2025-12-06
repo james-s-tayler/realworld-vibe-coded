@@ -123,12 +123,11 @@ public class HomePage : BasePage
   /// <summary>
   /// Clicks on an article link in the feed to navigate to the article page.
   /// </summary>
-  public async Task<ArticlePage> ClickArticleAsync(string title)
+  public async Task ClickArticleAsync(string title)
   {
     var preview = GetArticlePreviewByTitle(title);
     await Expect(preview).ToBeVisibleAsync();
     await preview.Locator(".article-link").ClickAsync();
-    return new ArticlePage(Page, BaseUrl);
   }
 
   /// <summary>

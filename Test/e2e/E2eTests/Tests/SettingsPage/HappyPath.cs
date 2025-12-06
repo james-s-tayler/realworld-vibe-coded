@@ -1,4 +1,5 @@
 ﻿namespace E2eTests.Tests.SettingsPage;
+using static E2eTests.PageModels.Pages;
 
 /// <summary>
 /// Happy path tests for the Settings page (/settings).
@@ -12,20 +13,18 @@ public class HappyPath : AppPageTest
     // Arrange
     await RegisterUserAsync();
 
-    var settingsPage = GetSettingsPage();
-    await settingsPage.GoToAsync();
+    await Pages.SettingsPage.GoToAsync();
 
     var bioText = "This is my updated bio for E2E test";
 
     // Act
-    await settingsPage.UpdateAndSaveBioAsync(bioText);
+    await Pages.SettingsPage.UpdateAndSaveBioAsync(bioText);
 
     // Assert
-    var profilePage = GetProfilePage();
-    await profilePage.GoToAsync(TestUsername);
-    await profilePage.WaitForProfileToLoadAsync(TestUsername);
+    await Pages.ProfilePage.GoToAsync(TestUsername);
+    await Pages.ProfilePage.WaitForProfileToLoadAsync(TestUsername);
 
-    await profilePage.VerifyBioVisibleAsync(bioText);
+    await Pages.ProfilePage.VerifyBioVisibleAsync(bioText);
   }
 
   [Fact]
@@ -34,13 +33,12 @@ public class HappyPath : AppPageTest
     // Arrange
     await RegisterUserAsync();
 
-    var settingsPage = GetSettingsPage();
-    await settingsPage.GoToAsync();
+    await Pages.SettingsPage.GoToAsync();
 
     // Act
-    await settingsPage.LogoutAsync();
+    await Pages.SettingsPage.LogoutAsync();
 
     // Assert
-    await settingsPage.VerifyLoggedOutAsync();
+    await Pages.SettingsPage.VerifyLoggedOutAsync();
   }
 }

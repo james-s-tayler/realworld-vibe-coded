@@ -85,18 +85,17 @@ public class ArticlePage : BasePage
   /// <summary>
   /// Clicks the edit button and navigates to the editor page.
   /// </summary>
-  public async Task<EditorPage> ClickEditButtonAsync()
+  public async Task ClickEditButtonAsync()
   {
     await Expect(EditButton).ToBeVisibleAsync();
     await EditButton.ClickAsync();
     await Expect().ToHaveURLAsync(new Regex(@"/editor/"));
-    return new EditorPage(Page, BaseUrl);
   }
 
   /// <summary>
   /// Clicks the delete button and accepts the confirmation dialog.
   /// </summary>
-  public async Task<HomePage> DeleteArticleAsync()
+  public async Task DeleteArticleAsync()
   {
     await Expect(DeleteButton).ToBeVisibleAsync();
 
@@ -106,7 +105,6 @@ public class ArticlePage : BasePage
     };
 
     await DeleteButton.ClickAsync();
-    return new HomePage(Page, BaseUrl);
   }
 
   /// <summary>

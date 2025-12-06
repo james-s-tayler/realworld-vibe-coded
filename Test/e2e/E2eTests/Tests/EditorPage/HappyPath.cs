@@ -1,4 +1,5 @@
 ﻿namespace E2eTests.Tests.EditorPage;
+using static E2eTests.PageModels.Pages;
 
 /// <summary>
 /// Happy path tests for the Editor page (/editor and /editor/:slug).
@@ -12,21 +13,19 @@ public class HappyPath : AppPageTest
     // Arrange
     await RegisterUserAsync();
 
-    var homePage = GetHomePage();
-    await homePage.ClickNewArticleAsync();
+    await Pages.HomePage.ClickNewArticleAsync();
 
-    var editorPage = GetEditorPage();
     var articleTitle = $"E2E Test Article {GenerateUniqueUsername("art")}";
     var articleDescription = "This is a test article created by E2E tests";
     var articleBody = "# Test Article\n\nThis is the body of the test article created for E2E testing purposes.";
     var articleTag = "e2etest";
 
     // Act
-    var articlePage = await editorPage.CreateArticleWithTagsAsync(articleTitle, articleDescription, articleBody, articleTag);
+    await Pages.EditorPage.CreateArticleWithTagsAsync(articleTitle, articleDescription, articleBody, articleTag);
 
     // Assert
-    await articlePage.VerifyArticleTitleAsync(articleTitle);
-    await articlePage.VerifyAuthorAsync(TestUsername);
+    await Pages.ArticlePage.VerifyArticleTitleAsync(articleTitle);
+    await Pages.ArticlePage.VerifyAuthorAsync(TestUsername);
   }
 
   [Fact]
@@ -34,16 +33,16 @@ public class HappyPath : AppPageTest
   {
     // Arrange
     await RegisterUserAsync();
-    var (articlePage, articleTitle) = await CreateArticleAsync();
+    var articleTitle = await CreateArticleAsync();
 
-    var editorPage = await articlePage.ClickEditButtonAsync();
+    await Pages.ArticlePage.ClickEditButtonAsync();
 
     var updatedTitle = $"{articleTitle} - Updated";
 
     // Act
-    var updatedArticlePage = await editorPage.UpdateArticleAsync(updatedTitle);
+    await Pages.EditorPage.UpdateArticleAsync(updatedTitle);
 
     // Assert
-    await updatedArticlePage.VerifyArticleTitleAsync(updatedTitle);
+    await Pages.ArticlePage.VerifyArticleTitleAsync(updatedTitle);
   }
 }

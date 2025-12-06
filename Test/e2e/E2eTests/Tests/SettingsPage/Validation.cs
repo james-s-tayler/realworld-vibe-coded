@@ -1,4 +1,5 @@
 ﻿namespace E2eTests.Tests.SettingsPage;
+using static E2eTests.PageModels.Pages;
 
 /// <summary>
 /// Validation tests for the Settings page (/settings).
