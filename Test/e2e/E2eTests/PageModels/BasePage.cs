@@ -5,6 +5,9 @@ namespace E2eTests.PageModels;
 /// <summary>
 /// Base class for all page models providing common functionality.
 /// </summary>
+/// <remarks>
+/// This comment triggers Test/e2e change detection for flake detection jobs.
+/// </remarks>
 public abstract class BasePage
 {
   protected const int DefaultTimeout = 10000;

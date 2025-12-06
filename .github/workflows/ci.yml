@@ -504,8 +504,8 @@ jobs:
           echo "Postman tests failed with exit code ${{ steps.postman_tests.outputs.exit_code }}"
           exit ${{ steps.postman_tests.outputs.exit_code }}
 
-  test-e2e:
-    name: test-e2e
+  build-test-e2e:
+    name: build-test-e2e
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.client == 'true' || needs.changes.outputs.test_e2e == 'true' }}
@@ -572,6 +572,31 @@ jobs:
             type=gha,mode=max
             type=registry,ref=ghcr.io/${{ github.repository }}/api:cache,mode=max
 
+  test-e2e:
+    name: test-e2e
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.client == 'true' || needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Test Server (E2E)
         id: e2e_tests
         run: |
@@ -605,6 +630,536 @@ jobs:
         if: always()  # This should actually be failure(), but I will optimize later
         with:
           name: test-e2e-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  test-e2e-flake-detection-1:
+    name: test-e2e-flake-detection-1
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e -skip-publish true
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-flake-detection-1-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  test-e2e-flake-detection-2:
+    name: test-e2e-flake-detection-2
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e -skip-publish true
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-flake-detection-2-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  test-e2e-flake-detection-3:
+    name: test-e2e-flake-detection-3
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e -skip-publish true
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-flake-detection-3-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  test-e2e-flake-detection-4:
+    name: test-e2e-flake-detection-4
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e -skip-publish true
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-flake-detection-4-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  test-e2e-flake-detection-5:
+    name: test-e2e-flake-detection-5
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e -skip-publish true
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-flake-detection-5-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  test-e2e-flake-detection-6:
+    name: test-e2e-flake-detection-6
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e -skip-publish true
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-flake-detection-6-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  test-e2e-flake-detection-7:
+    name: test-e2e-flake-detection-7
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e -skip-publish true
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-flake-detection-7-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  test-e2e-flake-detection-8:
+    name: test-e2e-flake-detection-8
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e -skip-publish true
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-flake-detection-8-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  test-e2e-flake-detection-9:
+    name: test-e2e-flake-detection-9
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e -skip-publish true
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-flake-detection-9-reports
+          path: |
+            Reports/Test/e2e
+          retention-days: 7
+
+      - name: Fail job if tests failed
+        if: steps.e2e_tests.outputs.exit_code != '0'
+        run: |
+          echo "E2E tests failed with exit code ${{ steps.e2e_tests.outputs.exit_code }}"
+          exit ${{ steps.e2e_tests.outputs.exit_code }}
+
+  test-e2e-flake-detection-10:
+    name: test-e2e-flake-detection-10
+    runs-on: ubuntu-latest
+    needs: [changes, build-test-e2e]
+    if: ${{ needs.changes.outputs.test_e2e == 'true' }}
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test Server (E2E)
+        id: e2e_tests
+        run: |
+          set +e  # Don't exit on error
+          ./build.sh test-e2e -skip-publish true
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0  # Always succeed so we can upload artifacts
+
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/e2e/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload E2E Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-e2e-flake-detection-10-reports
           path: |
             Reports/Test/e2e
           retention-days: 7
