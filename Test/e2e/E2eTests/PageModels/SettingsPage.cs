@@ -75,7 +75,7 @@ public class SettingsPage : BasePage
   {
     await UpdateBioAsync(bio);
     await ClickUpdateSettingsButtonAsync();
-    await Expect(SuccessMessage).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(SuccessMessage).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -99,7 +99,7 @@ public class SettingsPage : BasePage
   /// </summary>
   public async Task VerifySuccessMessageAsync()
   {
-    await Expect(SuccessMessage).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(SuccessMessage).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -107,6 +107,6 @@ public class SettingsPage : BasePage
   /// </summary>
   public async Task VerifyLoggedOutAsync()
   {
-    await Expect(SignInLink).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(SignInLink).ToBeVisibleAsync();
   }
 }

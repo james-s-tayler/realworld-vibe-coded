@@ -90,9 +90,9 @@ public class ProfilePage : BasePage
   public async Task ClickFollowButtonAsync(string username)
   {
     var followButton = GetFollowButton(username);
-    await Expect(followButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(followButton).ToBeVisibleAsync();
     await followButton.ClickAsync();
-    await Expect(GetUnfollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(GetUnfollowButton(username)).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -102,7 +102,7 @@ public class ProfilePage : BasePage
   {
     var unfollowButton = GetUnfollowButton(username);
     await unfollowButton.ClickAsync();
-    await Expect(GetFollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(GetFollowButton(username)).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -137,7 +137,7 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task WaitForArticlesToLoadAsync()
   {
-    await Expect(LoadingIndicator).ToBeHiddenAsync(new() { Timeout = DefaultTimeout });
+    await Expect(LoadingIndicator).ToBeHiddenAsync();
   }
 
   /// <summary>
@@ -151,9 +151,9 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task ClickNextPageAsync()
   {
-    await Expect(PaginationForwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
+    await Expect(PaginationForwardButton).ToBeEnabledAsync();
     await PaginationForwardButton.ClickAsync();
-    await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(ArticlePreviews.First).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -161,9 +161,9 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task ClickPreviousPageAsync()
   {
-    await Expect(PaginationBackwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
+    await Expect(PaginationBackwardButton).ToBeEnabledAsync();
     await PaginationBackwardButton.ClickAsync();
-    await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(ArticlePreviews.First).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -172,7 +172,7 @@ public class ProfilePage : BasePage
   public async Task VerifyProfileHeadingAsync(string username)
   {
     var heading = GetUsernameHeading(username);
-    await Expect(heading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(heading).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -180,7 +180,7 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task VerifyMyArticlesTabVisibleAsync()
   {
-    await Expect(MyArticlesTab).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(MyArticlesTab).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -188,7 +188,7 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task VerifyArticleCountAsync(int expectedCount)
   {
-    await Expect(ArticlePreviews).ToHaveCountAsync(expectedCount, new() { Timeout = DefaultTimeout });
+    await Expect(ArticlePreviews).ToHaveCountAsync(expectedCount);
   }
 
   /// <summary>
@@ -197,7 +197,7 @@ public class ProfilePage : BasePage
   public async Task VerifyArticleVisibleAsync(string title)
   {
     var articlePreview = GetArticlePreviewByTitle(title);
-    await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(articlePreview).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -205,7 +205,7 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task VerifyBioVisibleAsync(string bioText)
   {
-    await Expect(GetBioText(bioText)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(GetBioText(bioText)).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -213,6 +213,6 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task VerifyPaginationVisibleAsync()
   {
-    await Expect(Pagination).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(Pagination).ToBeVisibleAsync();
   }
 }
