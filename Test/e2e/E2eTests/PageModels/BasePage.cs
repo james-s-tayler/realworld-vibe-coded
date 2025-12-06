@@ -8,22 +8,16 @@ namespace E2eTests.PageModels;
 /// <remarks>
 /// This comment triggers Test/e2e change detection for flake detection jobs.
 /// </remarks>
-public abstract class BasePage
+public abstract class BasePage(IPage page, string baseUrl)
 {
-  protected readonly IPage Page;
-  protected readonly string BaseUrl;
+  protected readonly IPage Page = page;
+  protected readonly string BaseUrl = baseUrl;
   private PageObjects? _pages;
-
-  protected BasePage(IPage page, string baseUrl)
-  {
-    Page = page;
-    BaseUrl = baseUrl;
-  }
 
   /// <summary>
   /// Gets the Pages API for accessing other page objects.
   /// </summary>
-  public PageObjects Pages => _pages ??= new PageObjects(Page, BaseUrl);
+  protected PageObjects Pages => _pages ??= new PageObjects(Page, BaseUrl);
 
   /// <summary>
   /// Gets an assertion helper for this page.

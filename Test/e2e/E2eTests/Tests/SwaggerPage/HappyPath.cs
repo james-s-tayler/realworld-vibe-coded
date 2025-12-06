@@ -1,5 +1,4 @@
-﻿
-namespace E2eTests.Tests.SwaggerPage;
+﻿namespace E2eTests.Tests.SwaggerPage;
 
 /// <summary>
 /// Happy path tests for the Swagger API documentation page (/swagger/index.html).

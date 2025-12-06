@@ -1,5 +1,4 @@
-﻿
-namespace E2eTests.Tests.ProfilePage;
+﻿namespace E2eTests.Tests.ProfilePage;
 
 /// <summary>
 /// Validation tests for the Profile page (/profile/:username).

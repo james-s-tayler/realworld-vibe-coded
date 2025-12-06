@@ -1,5 +1,4 @@
-﻿
-namespace E2eTests.Tests.HomePage;
+﻿namespace E2eTests.Tests.HomePage;
 
 /// <summary>
 /// Validation tests for the Home page (/).
