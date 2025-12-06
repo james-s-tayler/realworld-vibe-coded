@@ -40,7 +40,7 @@ public class HappyPath : AppPageTest
   {
     // Arrange - create two users and one article via API
     var (user1Token, user1Username, user1Email, user1Password) = await Api.CreateUserAsync();
-    var (_, articleTitle) = await Api.CreateArticleAsync(user1Token);
+    var (articleSlug, articleTitle) = await Api.CreateArticleAsync(user1Token);
 
     var (_, user2Username, user2Email, user2Password) = await Api.CreateUserAsync();
 
@@ -48,10 +48,8 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2Email, user2Password);
 
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickGlobalFeedTabAsync();
-
-    await Pages.HomePage.ClickArticleAsync(articleTitle);
+    // Navigate directly to the article by slug
+    await Pages.ArticlePage.GoToAsync(articleSlug);
 
     // Act + Assert
     await Pages.ArticlePage.ClickFavoriteButtonAsync();
