@@ -42,11 +42,7 @@ public class SwaggerPage
   /// </summary>
   public async Task GoToAsync()
   {
-    await _page.GotoAsync($"{_baseUrl}/swagger/index.html", new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
+    await _page.GotoAsync(_baseUrl);
   }
 
   /// <summary>

@@ -4,7 +4,7 @@
 /// Permission tests for the Editor page (/editor and /editor/:slug).
 /// </summary>
 [Collection("E2E Tests")]
-public class EditorPagePermissionsTests : ConduitPageTest
+public class EditorPagePermissionsTests : AppPageTest
 {
   // No permission tests for EditorPage currently - protected route tests are in LoginPage
 }

@@ -4,7 +4,7 @@ using Microsoft.Playwright.Xunit.v3;
 
 namespace E2eTests;
 
-public abstract class ConduitPageTest : PageTest
+public abstract class AppPageTest : PageTest
 {
   protected const int DefaultTimeout = 10000;
   protected string BaseUrl = null!;
@@ -22,6 +22,11 @@ public abstract class ConduitPageTest : PageTest
 
   public override async ValueTask InitializeAsync()
   {
+    if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_DOCKER") == null)
+    {
+      Environment.SetEnvironmentVariable("HEADED", "1");
+    }
+
     await base.InitializeAsync();
 
     // Start Playwright tracing automatically for every test
@@ -66,21 +71,21 @@ public abstract class ConduitPageTest : PageTest
   }
 
   // Page model factory methods
-  protected LoginPage GetLoginPage() => new(Page, BaseUrl);
+  protected LoginPage GetLoginPage() => new(Page, $"{BaseUrl}/login");
 
-  protected RegisterPage GetRegisterPage() => new(Page, BaseUrl);
+  protected RegisterPage GetRegisterPage() => new(Page, $"{BaseUrl}/register");
 
   protected HomePage GetHomePage() => new(Page, BaseUrl);
 
-  protected EditorPage GetEditorPage() => new(Page, BaseUrl);
+  protected EditorPage GetEditorPage() => new(Page, $"{BaseUrl}/editor");
 
-  protected ArticlePage GetArticlePage() => new(Page, BaseUrl);
+  protected ArticlePage GetArticlePage() => new(Page, $"{BaseUrl}/article");
 
-  protected ProfilePage GetProfilePage() => new(Page, BaseUrl);
+  protected ProfilePage GetProfilePage() => new(Page, $"{BaseUrl}/profile");
 
-  protected SettingsPage GetSettingsPage() => new(Page, BaseUrl);
+  protected SettingsPage GetSettingsPage() => new(Page, $"{BaseUrl}/settings");
 
-  protected SwaggerPage GetSwaggerPage() => new(Page, BaseUrl);
+  protected SwaggerPage GetSwaggerPage() => new(Page, $"{BaseUrl}/swagger/index.html");
 
   /// <summary>
   /// Wipes all users and user-generated content from the database.

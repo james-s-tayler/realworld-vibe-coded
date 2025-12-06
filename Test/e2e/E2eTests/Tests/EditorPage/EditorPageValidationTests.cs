@@ -4,7 +4,7 @@
 /// Validation tests for the Editor page (/editor and /editor/:slug).
 /// </summary>
 [Collection("E2E Tests")]
-public class EditorPageValidationTests : ConduitPageTest
+public class EditorPageValidationTests : AppPageTest
 {
   [Fact]
   public async Task CreateArticle_WithDuplicateTitle_DisplaysErrorMessage()

@@ -53,7 +53,6 @@ public class RegisterPage : BasePage
   public async Task ClickSignUpButtonAsync()
   {
     await SignUpButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>

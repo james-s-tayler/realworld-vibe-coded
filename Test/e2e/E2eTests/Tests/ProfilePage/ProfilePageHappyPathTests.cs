@@ -8,7 +8,7 @@ namespace E2eTests.Tests.ProfilePage;
 /// Happy path tests for the Profile page (/profile/:username).
 /// </summary>
 [Collection("E2E Tests")]
-public class ProfilePageHappyPathTests : ConduitPageTest
+public class ProfilePageHappyPathTests : AppPageTest
 {
   private const int TotalArticles = 50;
 

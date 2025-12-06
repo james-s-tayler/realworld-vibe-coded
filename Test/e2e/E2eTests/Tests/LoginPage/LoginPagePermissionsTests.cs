@@ -6,7 +6,7 @@ namespace E2eTests.Tests.LoginPage;
 /// Permission tests for the Login page (/login).
 /// </summary>
 [Collection("E2E Tests")]
-public class LoginPagePermissionsTests : ConduitPageTest
+public class LoginPagePermissionsTests : AppPageTest
 {
   [Fact]
   public async Task ProtectedRoutes_RedirectToLogin_WhenNotAuthenticated()

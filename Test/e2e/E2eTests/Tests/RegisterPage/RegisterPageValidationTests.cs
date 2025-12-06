@@ -4,7 +4,7 @@
 /// Validation tests for the Registration page (/register).
 /// </summary>
 [Collection("E2E Tests")]
-public class RegisterPageValidationTests : ConduitPageTest
+public class RegisterPageValidationTests : AppPageTest
 {
   [Fact]
   public async Task Register_WithDuplicateEmail_DisplaysErrorMessage()

@@ -4,7 +4,7 @@
 /// Permission tests for the Article page (/article/:slug).
 /// </summary>
 [Collection("E2E Tests")]
-public class ArticlePagePermissionsTests : ConduitPageTest
+public class ArticlePagePermissionsTests : AppPageTest
 {
   private string _testUsername1 = null!;
   private string _testEmail1 = null!;

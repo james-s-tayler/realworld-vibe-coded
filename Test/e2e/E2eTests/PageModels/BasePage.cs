@@ -64,7 +64,6 @@ public abstract class BasePage
   public async Task GoToHomePageAsync()
   {
     await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -147,25 +146,21 @@ public abstract class BasePage
     }
   }
 
-  public virtual async Task GoToAsync()
+  public virtual async Task GoToAsync(string urlParams = "")
   {
-    await GoToAsync($"{BaseUrl}/{Page}");
-  }
-
-  public virtual async Task GoToAsync(string url)
-  {
-    await Page.GotoAsync(url, new()
+    if (!string.IsNullOrWhiteSpace(urlParams))
     {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
+      await Page.GotoAsync($"{BaseUrl}/{urlParams}");
+    }
+    else
+    {
+      await Page.GotoAsync(BaseUrl);
+    }
   }
 
   private async Task NavigateAndWaitForNetworkIdle(ILocator locator, string url)
   {
     await locator.ClickAsync();
     await Page.WaitForURLAsync(url, new() { Timeout = DefaultTimeout });
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
   }
 }

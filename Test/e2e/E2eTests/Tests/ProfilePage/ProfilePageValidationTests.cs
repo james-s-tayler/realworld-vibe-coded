@@ -4,7 +4,7 @@
 /// Validation tests for the Profile page (/profile/:username).
 /// </summary>
 [Collection("E2E Tests")]
-public class ProfilePageValidationTests : ConduitPageTest
+public class ProfilePageValidationTests : AppPageTest
 {
   // No validation tests for ProfilePage currently
 }

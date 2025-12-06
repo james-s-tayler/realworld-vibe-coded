@@ -76,20 +76,12 @@ public class ProfilePage : BasePage
   public ILocator GetBioText(string bioText) => Page.GetByText(bioText);
 
   /// <summary>
-  /// Navigates directly to a user's profile page.
-  /// </summary>
-  public override async Task GoToAsync(string username)
-  {
-    await base.GoToAsync($"{BaseUrl}/profile/{username}");
-  }
-
-  /// <summary>
   /// Waits for the profile to load.
   /// </summary>
   public async Task WaitForProfileToLoadAsync(string username)
   {
     var heading = GetUsernameHeading(username);
-    await heading.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(heading).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -100,7 +92,6 @@ public class ProfilePage : BasePage
     var followButton = GetFollowButton(username);
     await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
     await followButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(GetUnfollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -111,7 +102,6 @@ public class ProfilePage : BasePage
   {
     var unfollowButton = GetUnfollowButton(username);
     await unfollowButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(GetFollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -121,7 +111,6 @@ public class ProfilePage : BasePage
   public async Task ClickFollowButtonWithoutWaitAsync(string username)
   {
     var followButton = GetFollowButton(username);
-    await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
     await followButton.ClickAsync();
   }
 
@@ -130,7 +119,6 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task ClickMyArticlesTabAsync()
   {
-    await MyArticlesTab.WaitForAsync(new() { Timeout = DefaultTimeout });
     await MyArticlesTab.ClickAsync();
     await WaitForArticlesToLoadAsync();
   }
@@ -140,7 +128,6 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task ClickFavoritedArticlesTabAsync()
   {
-    await FavoritedArticlesTab.WaitForAsync(new() { Timeout = DefaultTimeout });
     await FavoritedArticlesTab.ClickAsync();
     await WaitForArticlesToLoadAsync();
   }
@@ -150,7 +137,6 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task WaitForArticlesToLoadAsync()
   {
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(LoadingIndicator).ToBeHiddenAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -167,7 +153,6 @@ public class ProfilePage : BasePage
   {
     await Expect(PaginationForwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
     await PaginationForwardButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -178,7 +163,6 @@ public class ProfilePage : BasePage
   {
     await Expect(PaginationBackwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
     await PaginationBackwardButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 

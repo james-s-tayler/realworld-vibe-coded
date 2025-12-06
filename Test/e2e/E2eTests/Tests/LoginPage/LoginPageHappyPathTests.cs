@@ -4,7 +4,7 @@
 /// Happy path tests for the Login page (/login).
 /// </summary>
 [Collection("E2E Tests")]
-public class LoginPageHappyPathTests : ConduitPageTest
+public class LoginPageHappyPathTests : AppPageTest
 {
   [Fact]
   public async Task UserCanSignIn_WithExistingCredentials()

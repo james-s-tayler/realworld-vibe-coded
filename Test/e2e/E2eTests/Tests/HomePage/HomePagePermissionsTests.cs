@@ -4,7 +4,7 @@
 /// Permission tests for the Home page (/).
 /// </summary>
 [Collection("E2E Tests")]
-public class HomePagePermissionsTests : ConduitPageTest
+public class HomePagePermissionsTests : AppPageTest
 {
   // No permission tests for HomePage currently - favorites are tested in ProfilePage
 }

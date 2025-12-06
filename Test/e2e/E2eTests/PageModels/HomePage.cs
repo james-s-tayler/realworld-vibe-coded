@@ -70,19 +70,6 @@ public class HomePage : BasePage
     Page.Locator(".sidebar .tag-list .cds--tag").Filter(new() { HasText = tagName });
 
   /// <summary>
-  /// Navigates directly to the home page.
-  /// </summary>
-  public override async Task GoToAsync()
-  {
-    await Page.GotoAsync(BaseUrl, new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
-  }
-
-  /// <summary>
   /// Clicks on the Your Feed tab and waits for articles to load.
   /// </summary>
   public async Task ClickYourFeedTabAsync()
@@ -118,7 +105,6 @@ public class HomePage : BasePage
   /// </summary>
   public async Task WaitForArticlesToLoadAsync()
   {
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(LoadingIndicator).ToBeHiddenAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -136,8 +122,6 @@ public class HomePage : BasePage
     var preview = GetArticlePreviewByTitle(title);
     await Expect(preview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     await preview.Locator(".article-link").ClickAsync();
-    await Page.WaitForURLAsync(new System.Text.RegularExpressions.Regex(@"/article/"), new() { Timeout = DefaultTimeout });
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     return new ArticlePage(Page, BaseUrl);
   }
 
@@ -149,7 +133,6 @@ public class HomePage : BasePage
     var favoriteButton = TabPanel.Locator(".article-preview .favorite-button").First;
     await Expect(favoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     await favoriteButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -159,7 +142,6 @@ public class HomePage : BasePage
   {
     await Expect(PaginationForwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
     await PaginationForwardButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -170,7 +152,6 @@ public class HomePage : BasePage
   {
     await Expect(PaginationBackwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
     await PaginationBackwardButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 

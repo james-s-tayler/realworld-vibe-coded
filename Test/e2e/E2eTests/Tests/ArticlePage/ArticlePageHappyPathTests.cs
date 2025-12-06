@@ -4,7 +4,7 @@
 /// Happy path tests for the Article page (/article/:slug).
 /// </summary>
 [Collection("E2E Tests")]
-public class ArticlePageHappyPathTests : ConduitPageTest
+public class ArticlePageHappyPathTests : AppPageTest
 {
   private string _testUsername1 = null!;
   private string _testEmail1 = null!;
@@ -36,6 +36,7 @@ public class ArticlePageHappyPathTests : ConduitPageTest
     // Delete article using page model
     var homePage = await articlePage.DeleteArticleAsync();
 
+    // ToDo: this should actually try to access the article page via its slug and assert a not found error message appears
     // Check that the deleted article is not in the feed
     await homePage.ClickGlobalFeedTabAsync();
     await homePage.VerifyArticleNotVisibleAsync(articleTitle);

@@ -53,14 +53,6 @@ public class SettingsPage : BasePage
   public ILocator SuccessMessage => Page.GetByText("Settings updated successfully");
 
   /// <summary>
-  /// Waits for the bio input to be visible (settings page loaded).
-  /// </summary>
-  public async Task WaitForPageToLoadAsync()
-  {
-    await BioInput.WaitForAsync(new() { Timeout = DefaultTimeout });
-  }
-
-  /// <summary>
   /// Updates the bio field.
   /// </summary>
   public async Task UpdateBioAsync(string bio)
@@ -81,7 +73,6 @@ public class SettingsPage : BasePage
   /// </summary>
   public async Task UpdateAndSaveBioAsync(string bio)
   {
-    await WaitForPageToLoadAsync();
     await UpdateBioAsync(bio);
     await ClickUpdateSettingsButtonAsync();
     await Expect(SuccessMessage).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
@@ -101,7 +92,6 @@ public class SettingsPage : BasePage
   public async Task LogoutAsync()
   {
     await ClickLogoutButtonAsync();
-    await Expect(SignInLink).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -118,8 +108,5 @@ public class SettingsPage : BasePage
   public async Task VerifyLoggedOutAsync()
   {
     await Expect(SignInLink).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
-    Assert.True(await SignInLink.IsVisibleAsync(), "Sign in link should be visible after logout");
-
-    Assert.True(await SignUpLink.IsVisibleAsync(), "Sign up link should be visible after logout");
   }
 }

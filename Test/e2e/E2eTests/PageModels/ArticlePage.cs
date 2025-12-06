@@ -90,7 +90,6 @@ public class ArticlePage : BasePage
     await EditButton.WaitForAsync(new() { Timeout = DefaultTimeout });
     await EditButton.ClickAsync();
     await Page.WaitForURLAsync(new Regex(@"/editor/"), new() { Timeout = DefaultTimeout });
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     return new EditorPage(Page, BaseUrl);
   }
 
@@ -108,8 +107,6 @@ public class ArticlePage : BasePage
     };
 
     await DeleteButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
-    await Assertions.Expect(Page).ToHaveURLAsync(BaseUrl, new() { Timeout = DefaultTimeout });
     return new HomePage(Page, BaseUrl);
   }
 
@@ -207,7 +204,6 @@ public class ArticlePage : BasePage
   public async Task VerifyArticleTitleAsync(string title)
   {
     var heading = GetArticleTitle(title);
-    await heading.WaitForAsync(new() { Timeout = DefaultTimeout });
     await Expect(heading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 

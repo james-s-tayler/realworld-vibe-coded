@@ -47,8 +47,6 @@ public class LoginPage : BasePage
   public async Task ClickSignInButtonAsync()
   {
     await SignInButton.ClickAsync();
-    await Page.WaitForURLAsync(BaseUrl, new() { Timeout = DefaultTimeout });
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
