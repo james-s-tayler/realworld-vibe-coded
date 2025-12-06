@@ -50,7 +50,6 @@ public class LoginPage : BasePage
   }
 
   /// <summary>
-  /// <summary>
   /// Performs a complete login action and waits for navigation to home page.
   /// </summary>
   /// <param name="email">User's email.</param>
