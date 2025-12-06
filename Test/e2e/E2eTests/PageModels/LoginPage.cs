@@ -59,7 +59,7 @@ public class LoginPage : BasePage
     await FillLoginFormAsync(email, password);
     await ClickSignInButtonAsync();
 
-    // Wait for successful login by verifying we're on the home page (with or without trailing slash)
-    await Expect().ToHaveURLAsync(new System.Text.RegularExpressions.Regex($"^{System.Text.RegularExpressions.Regex.Escape(BaseUrl)}/?$"));
+    // Wait for successful login by verifying the New Article link is visible (only shown when logged in)
+    await Expect(NewArticleLink).ToBeVisibleAsync();
   }
 }
