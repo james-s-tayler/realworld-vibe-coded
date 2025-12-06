@@ -1,7 +1,6 @@
 ﻿using E2eTests.PageModels;
 using Microsoft.Playwright;
 using Microsoft.Playwright.Xunit.v3;
-using static E2eTests.PageModels.Pages;
 
 namespace E2eTests;
 
@@ -12,6 +11,7 @@ public abstract class AppPageTest : PageTest
   protected string TestUsername = null!;
   protected string TestEmail = null!;
   protected string TestPassword = null!;
+  protected PageObjects Pages = null!;
 
   public override BrowserNewContextOptions ContextOptions()
   {
@@ -35,8 +35,8 @@ public abstract class AppPageTest : PageTest
 
     BaseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
 
-    // Initialize the static Pages API
-    Pages.Initialize(Page, BaseUrl);
+    // Initialize the Pages API
+    Pages = new PageObjects(Page, BaseUrl);
 
     // Wipe all test data BEFORE each test to ensure a clean slate
     await WipeTestData();

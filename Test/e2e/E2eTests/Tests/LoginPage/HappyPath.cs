@@ -1,5 +1,5 @@
-﻿namespace E2eTests.Tests.LoginPage;
-using static E2eTests.PageModels.Pages;
+
+namespace E2eTests.Tests.LoginPage;
 
 /// <summary>
 /// Happy path tests for the Login page (/login).

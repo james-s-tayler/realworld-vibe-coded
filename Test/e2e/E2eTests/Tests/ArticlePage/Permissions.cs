@@ -1,5 +1,5 @@
-﻿namespace E2eTests.Tests.ArticlePage;
-using static E2eTests.PageModels.Pages;
+
+namespace E2eTests.Tests.ArticlePage;
 
 /// <summary>
 /// Permission tests for the Article page (/article/:slug).

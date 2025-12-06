@@ -1,5 +1,5 @@
-﻿namespace E2eTests.Tests.SettingsPage;
-using static E2eTests.PageModels.Pages;
+
+namespace E2eTests.Tests.SettingsPage;
 
 /// <summary>
 /// Permission tests for the Settings page (/settings).

@@ -1,5 +1,5 @@
-﻿namespace E2eTests.Tests.ProfilePage;
-using static E2eTests.PageModels.Pages;
+
+namespace E2eTests.Tests.ProfilePage;
 
 /// <summary>
 /// Permission tests for the Profile page (/profile/:username).

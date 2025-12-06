@@ -1,5 +1,5 @@
-﻿namespace E2eTests.Tests.RegisterPage;
-using static E2eTests.PageModels.Pages;
+
+namespace E2eTests.Tests.RegisterPage;
 
 /// <summary>
 /// Permission tests for the Registration page (/register).

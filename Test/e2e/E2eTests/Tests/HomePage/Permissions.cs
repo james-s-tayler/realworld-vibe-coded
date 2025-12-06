@@ -1,5 +1,5 @@
-﻿namespace E2eTests.Tests.HomePage;
-using static E2eTests.PageModels.Pages;
+
+namespace E2eTests.Tests.HomePage;
 
 /// <summary>
 /// Permission tests for the Home page (/).

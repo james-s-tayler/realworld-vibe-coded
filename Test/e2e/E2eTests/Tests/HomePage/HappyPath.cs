@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using static E2eTests.PageModels.Pages;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -270,8 +269,6 @@ public class HappyPath : AppPageTest
   {
     using var httpClient = new HttpClient();
     httpClient.BaseAddress = new Uri(BaseUrl);
-    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {followerToken}");
-
     var response = await httpClient.PostAsync($"/api/profiles/{usernameToFollow}/follow", null);
     response.EnsureSuccessStatusCode();
   }

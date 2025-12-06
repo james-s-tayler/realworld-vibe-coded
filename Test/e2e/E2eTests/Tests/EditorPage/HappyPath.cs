@@ -1,5 +1,5 @@
-﻿namespace E2eTests.Tests.EditorPage;
-using static E2eTests.PageModels.Pages;
+
+namespace E2eTests.Tests.EditorPage;
 
 /// <summary>
 /// Happy path tests for the Editor page (/editor and /editor/:slug).

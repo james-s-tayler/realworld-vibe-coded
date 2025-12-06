@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using static E2eTests.PageModels.Pages;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -159,8 +158,6 @@ public class HappyPath : AppPageTest
   {
     using var httpClient = new HttpClient();
     httpClient.BaseAddress = new Uri(BaseUrl);
-    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
-
     for (var i = 1; i <= count; i++)
     {
       var articleRequest = new
