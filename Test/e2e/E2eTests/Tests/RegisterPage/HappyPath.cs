@@ -4,7 +4,7 @@
 /// Happy path tests for the Registration page (/register).
 /// </summary>
 [Collection("E2E Tests")]
-public class RegisterPageHappyPathTests : AppPageTest
+public class HappyPath : AppPageTest
 {
   // No happy path tests for RegisterPage currently
 }

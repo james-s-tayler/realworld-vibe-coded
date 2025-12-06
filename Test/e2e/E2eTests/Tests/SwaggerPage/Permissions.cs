@@ -4,7 +4,7 @@
 /// Permission tests for the Swagger API documentation page (/swagger/index.html).
 /// </summary>
 [Collection("E2E Tests")]
-public class SwaggerPagePermissionsTests : AppPageTest
+public class Permissions : AppPageTest
 {
   // No permission tests for SwaggerPage currently
 }

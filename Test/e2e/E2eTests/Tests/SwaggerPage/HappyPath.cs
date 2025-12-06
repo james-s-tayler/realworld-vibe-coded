@@ -4,7 +4,7 @@
 /// Happy path tests for the Swagger API documentation page (/swagger/index.html).
 /// </summary>
 [Collection("E2E Tests")]
-public class SwaggerPageHappyPathTests : AppPageTest
+public class HappyPath : AppPageTest
 {
   [Fact]
   public async Task SwaggerApiDocs_AreDisplayed()

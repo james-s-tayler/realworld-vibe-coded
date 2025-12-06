@@ -4,7 +4,7 @@
 /// Happy path tests for the Article page (/article/:slug).
 /// </summary>
 [Collection("E2E Tests")]
-public class ArticlePageHappyPathTests : AppPageTest
+public class HappyPath : AppPageTest
 {
   private string _testUsername1 = null!;
   private string _testEmail1 = null!;

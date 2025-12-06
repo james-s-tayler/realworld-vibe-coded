@@ -4,7 +4,7 @@
 /// Permission tests for the Login page (/login).
 /// </summary>
 [Collection("E2E Tests")]
-public class LoginPagePermissionsTests : AppPageTest
+public class Permissions : AppPageTest
 {
   [Fact]
   public async Task ProtectedRoutes_RedirectToLogin_WhenNotAuthenticated()
