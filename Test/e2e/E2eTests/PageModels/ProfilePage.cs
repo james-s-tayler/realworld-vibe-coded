@@ -76,24 +76,12 @@ public class ProfilePage : BasePage
   public ILocator GetBioText(string bioText) => Page.GetByText(bioText);
 
   /// <summary>
-  /// Navigates directly to a user's profile page.
-  /// </summary>
-  public async Task GoToAsync(string username)
-  {
-    await Page.GotoAsync($"{BaseUrl}/profile/{username}", new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-  }
-
-  /// <summary>
   /// Waits for the profile to load.
   /// </summary>
   public async Task WaitForProfileToLoadAsync(string username)
   {
     var heading = GetUsernameHeading(username);
-    await heading.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(heading).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -123,7 +111,6 @@ public class ProfilePage : BasePage
   public async Task ClickFollowButtonWithoutWaitAsync(string username)
   {
     var followButton = GetFollowButton(username);
-    await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
     await followButton.ClickAsync();
   }
 
@@ -132,7 +119,6 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task ClickMyArticlesTabAsync()
   {
-    await MyArticlesTab.WaitForAsync(new() { Timeout = DefaultTimeout });
     await MyArticlesTab.ClickAsync();
     await WaitForArticlesToLoadAsync();
   }
@@ -142,7 +128,6 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task ClickFavoritedArticlesTabAsync()
   {
-    await FavoritedArticlesTab.WaitForAsync(new() { Timeout = DefaultTimeout });
     await FavoritedArticlesTab.ClickAsync();
     await WaitForArticlesToLoadAsync();
   }
@@ -187,7 +172,7 @@ public class ProfilePage : BasePage
   public async Task VerifyProfileHeadingAsync(string username)
   {
     var heading = GetUsernameHeading(username);
-    Assert.True(await heading.IsVisibleAsync(), $"Profile heading for '{username}' should be visible");
+    await Expect(heading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -195,7 +180,7 @@ public class ProfilePage : BasePage
   /// </summary>
   public async Task VerifyMyArticlesTabVisibleAsync()
   {
-    Assert.True(await MyArticlesTab.IsVisibleAsync(), "My Articles tab should be visible");
+    await Expect(MyArticlesTab).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>

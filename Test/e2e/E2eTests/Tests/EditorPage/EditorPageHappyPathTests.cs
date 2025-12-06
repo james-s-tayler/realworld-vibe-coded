@@ -4,7 +4,7 @@
 /// Happy path tests for the Editor page (/editor and /editor/:slug).
 /// </summary>
 [Collection("E2E Tests")]
-public class EditorPageHappyPathTests : ConduitPageTest
+public class EditorPageHappyPathTests : AppPageTest
 {
   [Fact]
   public async Task UserCanCreateArticle_AndViewArticle()

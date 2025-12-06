@@ -4,7 +4,7 @@
 /// Validation tests for the Swagger API documentation page (/swagger/index.html).
 /// </summary>
 [Collection("E2E Tests")]
-public class SwaggerPageValidationTests : ConduitPageTest
+public class SwaggerPageValidationTests : AppPageTest
 {
   // No validation tests for SwaggerPage currently
 }

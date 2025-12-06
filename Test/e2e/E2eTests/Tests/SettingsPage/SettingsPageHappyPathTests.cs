@@ -4,7 +4,7 @@
 /// Happy path tests for the Settings page (/settings).
 /// </summary>
 [Collection("E2E Tests")]
-public class SettingsPageHappyPathTests : ConduitPageTest
+public class SettingsPageHappyPathTests : AppPageTest
 {
   [Fact]
   public async Task UserCanEditProfile()
@@ -15,7 +15,6 @@ public class SettingsPageHappyPathTests : ConduitPageTest
     // Navigate to settings to edit profile
     var settingsPage = GetSettingsPage();
     await settingsPage.GoToAsync();
-    await settingsPage.WaitForPageToLoadAsync();
 
     // Update bio
     var bioText = "This is my updated bio for E2E test";

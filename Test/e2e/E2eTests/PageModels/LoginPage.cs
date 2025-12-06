@@ -33,18 +33,6 @@ public class LoginPage : BasePage
   public ILocator ErrorDisplay => Page.GetByTestId("error-display");
 
   /// <summary>
-  /// Navigates directly to the login page.
-  /// </summary>
-  public async Task GoToAsync()
-  {
-    await Page.GotoAsync($"{BaseUrl}/login", new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-  }
-
-  /// <summary>
   /// Fills in the login form.
   /// </summary>
   public async Task FillLoginFormAsync(string email, string password)
@@ -71,7 +59,6 @@ public class LoginPage : BasePage
   {
     await FillLoginFormAsync(email, password);
     await ClickSignInButtonAsync();
-    await Page.WaitForURLAsync(BaseUrl, new() { Timeout = DefaultTimeout });
     return new HomePage(Page, BaseUrl);
   }
 

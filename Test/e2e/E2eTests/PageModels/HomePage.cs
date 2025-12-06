@@ -70,18 +70,6 @@ public class HomePage : BasePage
     Page.Locator(".sidebar .tag-list .cds--tag").Filter(new() { HasText = tagName });
 
   /// <summary>
-  /// Navigates directly to the home page.
-  /// </summary>
-  public async Task GoToAsync()
-  {
-    await Page.GotoAsync(BaseUrl, new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-  }
-
-  /// <summary>
   /// Clicks on the Your Feed tab and waits for articles to load.
   /// </summary>
   public async Task ClickYourFeedTabAsync()
@@ -117,7 +105,7 @@ public class HomePage : BasePage
   /// </summary>
   public async Task WaitForArticlesToLoadAsync()
   {
-    await Expect(LoadingIndicator).ToBeHiddenAsync(new() { Timeout = 30000 });
+    await Expect(LoadingIndicator).ToBeHiddenAsync(new() { Timeout = DefaultTimeout });
   }
 
   /// <summary>
@@ -134,7 +122,6 @@ public class HomePage : BasePage
     var preview = GetArticlePreviewByTitle(title);
     await Expect(preview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     await preview.Locator(".article-link").ClickAsync();
-    await Page.WaitForURLAsync(new System.Text.RegularExpressions.Regex(@"/article/"), new() { Timeout = DefaultTimeout });
     return new ArticlePage(Page, BaseUrl);
   }
 

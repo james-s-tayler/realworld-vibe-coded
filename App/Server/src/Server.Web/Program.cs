@@ -2,7 +2,7 @@
 using Server.Web.DevOnly.Configuration;
 using Server.Web.Infrastructure;
 
-// setup app
+// setup the app
 var builder = WebApplication.CreateBuilder(args);
 
 var logger = Log.Logger = new LoggerConfiguration()

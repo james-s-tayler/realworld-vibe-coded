@@ -550,8 +550,12 @@ jobs:
           # Tag must match what docker-compose expects (see below)
           tags: ghcr.io/${{ github.repository }}/playwright:ci
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=gha
+            type=registry,ref=ghcr.io/${{ github.repository }}/playwright:cache
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=ghcr.io/${{ github.repository }}/playwright:cache,mode=max
 
       - name: Build Api E2E image with cache
         uses: docker/build-push-action@v6
@@ -561,8 +565,12 @@ jobs:
           # Tag must match what docker-compose expects (see below)
           tags: ghcr.io/${{ github.repository }}/api:ci
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=gha
+            type=registry,ref=ghcr.io/${{ github.repository }}/api:cache
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=ghcr.io/${{ github.repository }}/api:cache,mode=max
 
       - name: Test Server (E2E)
         id: e2e_tests

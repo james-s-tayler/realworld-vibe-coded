@@ -4,7 +4,7 @@
 /// Permission tests for the Article page (/article/:slug).
 /// </summary>
 [Collection("E2E Tests")]
-public class ArticlePagePermissionsTests : ConduitPageTest
+public class ArticlePagePermissionsTests : AppPageTest
 {
   private string _testUsername1 = null!;
   private string _testEmail1 = null!;
@@ -40,8 +40,7 @@ public class ArticlePagePermissionsTests : ConduitPageTest
     await articlePage.ClickFavoriteButtonWithoutWaitAsync();
 
     // Verify redirect to login page
-    await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
-    Assert.Contains("/login", Page.Url);
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
   }
 
   [Fact]
@@ -65,7 +64,6 @@ public class ArticlePagePermissionsTests : ConduitPageTest
     await articlePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
 
     // Verify redirect to login page
-    await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
-    Assert.Contains("/login", Page.Url);
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
   }
 }

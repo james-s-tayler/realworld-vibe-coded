@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Microsoft.Playwright;
+﻿using Microsoft.Playwright;
 
 namespace E2eTests.PageModels;
 
@@ -42,30 +41,6 @@ public class EditorPage : BasePage
   /// Error display element.
   /// </summary>
   public ILocator ErrorDisplay => Page.GetByTestId("error-display");
-
-  /// <summary>
-  /// Navigates directly to the new article editor page.
-  /// </summary>
-  public async Task GoToAsync()
-  {
-    await Page.GotoAsync($"{BaseUrl}/editor", new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-  }
-
-  /// <summary>
-  /// Navigates to edit an existing article.
-  /// </summary>
-  public async Task GoToEditAsync(string slug)
-  {
-    await Page.GotoAsync($"{BaseUrl}/editor/{slug}", new()
-    {
-      WaitUntil = WaitUntilState.Load,
-      Timeout = DefaultTimeout,
-    });
-  }
 
   /// <summary>
   /// Fills in the article form without tags.
@@ -114,8 +89,6 @@ public class EditorPage : BasePage
   {
     await FillArticleFormAsync(title, description, body);
     await ClickPublishButtonAsync();
-    await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
 
     var articlePage = new ArticlePage(Page, BaseUrl);
     await articlePage.VerifyArticleTitleAsync(title);
@@ -134,8 +107,6 @@ public class EditorPage : BasePage
   {
     await FillArticleFormAsync(title, description, body, tags);
     await ClickPublishButtonAsync();
-    await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
 
     var articlePage = new ArticlePage(Page, BaseUrl);
     await articlePage.VerifyArticleTitleAsync(title);
@@ -151,7 +122,6 @@ public class EditorPage : BasePage
   {
     await UpdateTitleAsync(newTitle);
     await ClickPublishButtonAsync();
-    await Page.WaitForURLAsync(new Regex(@"/article/"), new() { Timeout = DefaultTimeout });
 
     var articlePage = new ArticlePage(Page, BaseUrl);
     await articlePage.VerifyArticleTitleAsync(newTitle);
