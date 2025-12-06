@@ -5,18 +5,18 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class BanWaitForTimeoutAsyncAnalyzer : DiagnosticAnalyzer
+public class BanTaskDelayAnalyzer : DiagnosticAnalyzer
 {
-  public const string DiagnosticId = "E2E001";
+  public const string DiagnosticId = "E2E005";
 
   public static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
       DiagnosticId,
-      "WaitForTimeoutAsync is not allowed",
-      "Do not use Page.WaitForTimeoutAsync(). Use Playwright's Expect() assertions like Expect(...).ToBeVisibleAsync() or Expect(page).ToHaveURLAsync() instead.",
+      "Task.Delay is not allowed",
+      "Do not use Task.Delay(). Use Playwright's Expect() assertions like Expect(locator).ToBeVisibleAsync() instead.",
       "Reliability",
       DiagnosticSeverity.Error,
       isEnabledByDefault: true,
-      description: "WaitForTimeoutAsync is a code smell that leads to flaky tests. Tests should wait for specific conditions using Playwright assertions instead of arbitrary time delays.");
+      description: "Task.Delay leads to flaky tests. Use Playwright's Expect() assertions to wait for specific elements or conditions instead of arbitrary time delays.");
 
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
       ImmutableArray.Create(Rule);
@@ -38,29 +38,35 @@ public class BanWaitForTimeoutAsyncAnalyzer : DiagnosticAnalyzer
       return;
     }
 
-    // Check if the method name is WaitForTimeoutAsync
-    if (memberAccess.Name.Identifier.Text != "WaitForTimeoutAsync")
+    // Check if the method name is Delay
+    if (memberAccess.Name.Identifier.Text != "Delay")
     {
       return;
     }
 
-    // Get the method symbol to verify it's from Playwright's IPage
+    // Get the method symbol to verify it's from System.Threading.Tasks.Task
     var symbolInfo = context.SemanticModel.GetSymbolInfo(invocation);
     if (symbolInfo.Symbol is not IMethodSymbol methodSymbol)
     {
       return;
     }
 
-    // Check if the method belongs to IPage or Page from Playwright
+    // Check if the method belongs to Task
     var containingType = methodSymbol.ContainingType;
     if (containingType == null)
     {
       return;
     }
 
-    // Check if it's from Microsoft.Playwright namespace
+    // Check if it's from System.Threading.Tasks namespace
     var namespaceName = containingType.ContainingNamespace?.ToDisplayString();
-    if (namespaceName == null || !namespaceName.StartsWith("Microsoft.Playwright"))
+    if (namespaceName != "System.Threading.Tasks")
+    {
+      return;
+    }
+
+    // Check if the containing type is Task
+    if (containingType.Name != "Task")
     {
       return;
     }

@@ -32,14 +32,13 @@ public class ProfilePagePermissionsTests : AppPageTest
     // Navigate to the home page
     var homePage = GetHomePage();
     await homePage.GoToAsync();
-    await homePage.ClickGlobalFeedTabAsync();
+    await homePage.ClickGlobalFeedTabAsync(isAuthenticated: false);
 
     // Click the favorite button on the article preview
     await homePage.ClickFavoriteButtonOnPreviewAsync();
 
     // Verify redirect to login page
-    await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
-    Assert.Contains("/login", Page.Url);
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
   }
 
   [Fact]
@@ -61,7 +60,6 @@ public class ProfilePagePermissionsTests : AppPageTest
     await profilePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
 
     // Verify redirect to login page
-    await Page.WaitForURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
-    Assert.Contains("/login", Page.Url);
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
   }
 }

@@ -88,7 +88,7 @@ public class HomePageHappyPathTests : AppPageTest
     await homePage.GoToAsync();
 
     // Click on Global Feed tab
-    await homePage.ClickGlobalFeedTabAsync();
+    await homePage.ClickGlobalFeedTabAsync(isAuthenticated: false);
 
     // Wait for articles to be loaded (first page should show 20 by default)
     await homePage.VerifyArticleCountAsync(20);
@@ -190,7 +190,7 @@ public class HomePageHappyPathTests : AppPageTest
     await homePage.GoToAsync();
 
     // Click on Global Feed tab
-    await homePage.ClickGlobalFeedTabAsync();
+    await homePage.ClickGlobalFeedTabAsync(isAuthenticated: false);
 
     // Wait for at least one article to be loaded
     await homePage.VerifyArticlesLoadedAsync();

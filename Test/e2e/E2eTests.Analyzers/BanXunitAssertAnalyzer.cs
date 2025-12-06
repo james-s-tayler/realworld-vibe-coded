@@ -5,18 +5,18 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class BanWaitForTimeoutAsyncAnalyzer : DiagnosticAnalyzer
+public class BanXunitAssertAnalyzer : DiagnosticAnalyzer
 {
-  public const string DiagnosticId = "E2E001";
+  public const string DiagnosticId = "E2E006";
 
   public static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
       DiagnosticId,
-      "WaitForTimeoutAsync is not allowed",
-      "Do not use Page.WaitForTimeoutAsync(). Use Playwright's Expect() assertions like Expect(...).ToBeVisibleAsync() or Expect(page).ToHaveURLAsync() instead.",
+      "xUnit Assert is not allowed",
+      "Do not use xUnit Assert methods. Use Playwright's Expect() assertions like Expect(locator).ToHaveTextAsync() instead.",
       "Reliability",
       DiagnosticSeverity.Error,
       isEnabledByDefault: true,
-      description: "WaitForTimeoutAsync is a code smell that leads to flaky tests. Tests should wait for specific conditions using Playwright assertions instead of arbitrary time delays.");
+      description: "xUnit Assert methods do not integrate with Playwright's auto-waiting mechanism. Use Playwright's Expect() assertions for reliable E2E tests.");
 
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
       ImmutableArray.Create(Rule);
@@ -32,35 +32,35 @@ public class BanWaitForTimeoutAsyncAnalyzer : DiagnosticAnalyzer
   {
     var invocation = (InvocationExpressionSyntax)context.Node;
 
-    // Check if this is a method call
+    // Check if this is a method call on Assert
     if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
     {
       return;
     }
 
-    // Check if the method name is WaitForTimeoutAsync
-    if (memberAccess.Name.Identifier.Text != "WaitForTimeoutAsync")
-    {
-      return;
-    }
-
-    // Get the method symbol to verify it's from Playwright's IPage
+    // Get the method symbol
     var symbolInfo = context.SemanticModel.GetSymbolInfo(invocation);
     if (symbolInfo.Symbol is not IMethodSymbol methodSymbol)
     {
       return;
     }
 
-    // Check if the method belongs to IPage or Page from Playwright
+    // Check if the method belongs to xUnit's Assert class
     var containingType = methodSymbol.ContainingType;
     if (containingType == null)
     {
       return;
     }
 
-    // Check if it's from Microsoft.Playwright namespace
+    // Check if it's the xUnit Assert class
+    if (containingType.Name != "Assert")
+    {
+      return;
+    }
+
+    // Check if it's from Xunit namespace
     var namespaceName = containingType.ContainingNamespace?.ToDisplayString();
-    if (namespaceName == null || !namespaceName.StartsWith("Microsoft.Playwright"))
+    if (namespaceName != "Xunit")
     {
       return;
     }

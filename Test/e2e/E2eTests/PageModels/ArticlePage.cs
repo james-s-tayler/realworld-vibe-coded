@@ -87,9 +87,9 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task<EditorPage> ClickEditButtonAsync()
   {
-    await EditButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(EditButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     await EditButton.ClickAsync();
-    await Page.WaitForURLAsync(new Regex(@"/editor/"), new() { Timeout = DefaultTimeout });
+    await Expect().ToHaveURLAsync(new Regex(@"/editor/"), new() { Timeout = DefaultTimeout });
     return new EditorPage(Page, BaseUrl);
   }
 
@@ -98,7 +98,7 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task<HomePage> DeleteArticleAsync()
   {
-    await DeleteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(DeleteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
     // Handle the confirm dialog - automatically accept it
     Page.Dialog += async (_, dialog) =>
@@ -115,9 +115,8 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task ClickFavoriteButtonAsync()
   {
-    await FavoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(FavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     await FavoriteButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(UnfavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -127,7 +126,6 @@ public class ArticlePage : BasePage
   public async Task ClickUnfavoriteButtonAsync()
   {
     await UnfavoriteButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(FavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -137,9 +135,8 @@ public class ArticlePage : BasePage
   public async Task ClickFollowButtonAsync(string username)
   {
     var followButton = GetFollowButton(username);
-    await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(followButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     await followButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(GetUnfollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -150,7 +147,6 @@ public class ArticlePage : BasePage
   {
     var unfollowButton = GetUnfollowButton(username);
     await unfollowButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(GetFollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -159,7 +155,7 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task ClickFavoriteButtonWithoutWaitAsync()
   {
-    await FavoriteButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(FavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     await FavoriteButton.ClickAsync();
   }
 
@@ -169,7 +165,7 @@ public class ArticlePage : BasePage
   public async Task ClickFollowButtonWithoutWaitAsync(string username)
   {
     var followButton = GetFollowButton(username);
-    await followButton.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(followButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     await followButton.ClickAsync();
   }
 
@@ -178,10 +174,9 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task AddCommentAsync(string commentText)
   {
-    await CommentInput.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(CommentInput).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
     await CommentInput.FillAsync(commentText);
     await PostCommentButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(Page.GetByText(commentText).First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
@@ -191,10 +186,9 @@ public class ArticlePage : BasePage
   public async Task DeleteCommentAsync(string commentText)
   {
     var comment = Page.GetByText(commentText);
-    await comment.WaitForAsync(new() { Timeout = DefaultTimeout });
+    await Expect(comment).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
 
     await DeleteCommentButton.ClickAsync();
-    await Page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = DefaultTimeout });
     await Expect(comment).Not.ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 
