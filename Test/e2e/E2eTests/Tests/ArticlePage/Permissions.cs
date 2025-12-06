@@ -14,12 +14,12 @@ public class Permissions : AppPageTest
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFavoritingArticle()
   {
     // Arrange - create user and article via API
-    var (token, username, _, _) = await Api.CreateUserAsync();
-    var (_, articleTitle) = await Api.CreateArticleAsync(token);
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
 
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(articleTitle);
+    await Pages.HomePage.ClickArticleAsync(article.Title);
 
     // Act
     await Pages.ArticlePage.ClickFavoriteButtonWithoutWaitAsync();
@@ -32,15 +32,15 @@ public class Permissions : AppPageTest
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFollowingUserFromArticlePage()
   {
     // Arrange - create user and article via API
-    var (token, username, _, _) = await Api.CreateUserAsync();
-    var (_, articleTitle) = await Api.CreateArticleAsync(token);
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
 
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(articleTitle);
+    await Pages.HomePage.ClickArticleAsync(article.Title);
 
     // Act
-    await Pages.ArticlePage.ClickFollowButtonWithoutWaitAsync(username);
+    await Pages.ArticlePage.ClickFollowButtonWithoutWaitAsync(user.Username);
 
     // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");

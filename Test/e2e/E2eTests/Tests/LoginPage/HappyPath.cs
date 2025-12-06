@@ -14,14 +14,14 @@ public class HappyPath : AppPageTest
   public async Task UserCanSignIn_WithExistingCredentials()
   {
     // Arrange - create user via API
-    var (_, username, email, password) = await Api.CreateUserAsync();
+    var user = await Api.CreateUserAsync();
 
     await Pages.LoginPage.GoToAsync();
 
     // Act
-    await Pages.LoginPage.LoginAsync(email, password);
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     // Assert
-    await Expect(Pages.HomePage.GetUserProfileLink(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(Pages.HomePage.GetUserProfileLink(user.Username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 }

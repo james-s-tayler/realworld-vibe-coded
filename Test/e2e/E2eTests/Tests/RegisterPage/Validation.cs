@@ -15,20 +15,18 @@ public class Validation : AppPageTest
   {
     // Arrange - create user via API with a specific email
     var timestamp = DateTime.UtcNow.Ticks;
-    var email = $"duplicate{timestamp}@test.com";
-    var username1 = $"user1_{timestamp}";
     var username2 = $"user2_{timestamp}";
     var password = "TestPassword123!";
 
-    // Create first user with the email
-    var (_, _, createdEmail, _) = await Api.CreateUserAsync();
+    // Create first user with an email
+    var existingUser = await Api.CreateUserAsync();
 
     // Now use that same email for the second registration
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickSignUpAsync();
 
     // Act - try to register with the same email
-    await Pages.RegisterPage.RegisterAndExpectErrorAsync(username2, createdEmail, password);
+    await Pages.RegisterPage.RegisterAndExpectErrorAsync(username2, existingUser.Email, password);
 
     // Assert
     await Pages.RegisterPage.VerifyErrorContainsTextAsync("Email already exists");

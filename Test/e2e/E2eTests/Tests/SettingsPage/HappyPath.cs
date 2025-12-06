@@ -14,11 +14,11 @@ public class HappyPath : AppPageTest
   public async Task UserCanEditProfile()
   {
     // Arrange - create user via API
-    var (_, username, email, password) = await Api.CreateUserAsync();
+    var user = await Api.CreateUserAsync();
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(email, password);
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     await Pages.SettingsPage.GoToAsync();
 
@@ -28,8 +28,8 @@ public class HappyPath : AppPageTest
     await Pages.SettingsPage.UpdateAndSaveBioAsync(bioText);
 
     // Assert
-    await Pages.ProfilePage.GoToAsync(username);
-    await Pages.ProfilePage.WaitForProfileToLoadAsync(username);
+    await Pages.ProfilePage.GoToAsync(user.Username);
+    await Pages.ProfilePage.WaitForProfileToLoadAsync(user.Username);
 
     await Pages.ProfilePage.VerifyBioVisibleAsync(bioText);
   }
@@ -38,11 +38,11 @@ public class HappyPath : AppPageTest
   public async Task UserCanSignOut()
   {
     // Arrange - create user via API
-    var (_, username, email, password) = await Api.CreateUserAsync();
+    var user = await Api.CreateUserAsync();
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(email, password);
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     await Pages.SettingsPage.GoToAsync();
 

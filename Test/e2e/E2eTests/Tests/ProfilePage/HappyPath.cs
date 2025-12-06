@@ -16,20 +16,20 @@ public class HappyPath : AppPageTest
   public async Task UserCanViewOtherUsersProfile()
   {
     // Arrange - create two users and article via API
-    var (user1Token, user1Username, _, _) = await Api.CreateUserAsync();
-    await Api.CreateArticleAsync(user1Token);
+    var user1 = await Api.CreateUserAsync();
+    await Api.CreateArticleAsync(user1.Token);
 
-    var (_, _, user2Email, user2Password) = await Api.CreateUserAsync();
+    var user2 = await Api.CreateUserAsync();
 
     // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(user2Email, user2Password);
+    await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
     // Act
-    await Pages.ProfilePage.GoToAsync(user1Username);
+    await Pages.ProfilePage.GoToAsync(user1.Username);
 
     // Assert
-    await Pages.ProfilePage.VerifyProfileHeadingAsync(user1Username);
+    await Pages.ProfilePage.VerifyProfileHeadingAsync(user1.Username);
     await Pages.ProfilePage.VerifyMyArticlesTabVisibleAsync();
   }
 
@@ -37,53 +37,53 @@ public class HappyPath : AppPageTest
   public async Task UserCanFollowAndUnfollowOtherUser()
   {
     // Arrange - create two users and article via API
-    var (user1Token, user1Username, _, _) = await Api.CreateUserAsync();
-    await Api.CreateArticleAsync(user1Token);
+    var user1 = await Api.CreateUserAsync();
+    await Api.CreateArticleAsync(user1.Token);
 
-    var (_, _, user2Email, user2Password) = await Api.CreateUserAsync();
+    var user2 = await Api.CreateUserAsync();
 
     // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(user2Email, user2Password);
+    await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
-    await Pages.ProfilePage.GoToAsync(user1Username);
+    await Pages.ProfilePage.GoToAsync(user1.Username);
 
     // Act + Assert
-    await Pages.ProfilePage.ClickFollowButtonAsync(user1Username);
-    await Pages.ProfilePage.ClickUnfollowButtonAsync(user1Username);
+    await Pages.ProfilePage.ClickFollowButtonAsync(user1.Username);
+    await Pages.ProfilePage.ClickUnfollowButtonAsync(user1.Username);
   }
 
   [Fact]
   public async Task UserCanViewFavoritedArticlesOnProfile()
   {
     // Arrange - create two users, article, and favorite via API
-    var (user1Token, _, _, _) = await Api.CreateUserAsync();
-    var (articleSlug, articleTitle) = await Api.CreateArticleAsync(user1Token);
+    var user1 = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user1.Token);
 
-    var (user2Token, user2Username, user2Email, user2Password) = await Api.CreateUserAsync();
-    await Api.FavoriteArticleAsync(user2Token, articleSlug);
+    var user2 = await Api.CreateUserAsync();
+    await Api.FavoriteArticleAsync(user2.Token, article.Slug);
 
     // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(user2Email, user2Password);
+    await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
-    await Pages.ProfilePage.GoToAsync(user2Username);
+    await Pages.ProfilePage.GoToAsync(user2.Username);
 
     // Act
     await Pages.ProfilePage.ClickFavoritedArticlesTabAsync();
 
     // Assert
-    await Pages.ProfilePage.VerifyArticleVisibleAsync(articleTitle);
+    await Pages.ProfilePage.VerifyArticleVisibleAsync(article.Title);
   }
 
   [Fact]
   public async Task ProfilePage_MyArticles_DisplaysPaginationAndNavigatesCorrectly()
   {
     // Arrange - create user and articles via API
-    var (token, username, _, _) = await Api.CreateUserAsync();
-    await Api.CreateArticlesAsync(token, TotalArticles);
+    var user = await Api.CreateUserAsync();
+    await Api.CreateArticlesAsync(user.Token, TotalArticles);
 
-    await Pages.ProfilePage.GoToAsync(username);
+    await Pages.ProfilePage.GoToAsync(user.Username);
     await Pages.ProfilePage.WaitForArticlesToLoadAsync();
 
     // Act

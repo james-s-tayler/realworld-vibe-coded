@@ -14,8 +14,8 @@ public class Permissions : AppPageTest
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFavoritingArticleFromHomePage()
   {
     // Arrange - create user and article via API
-    var (token, username, _, _) = await Api.CreateUserAsync();
-    await Api.CreateArticleAsync(token);
+    var user = await Api.CreateUserAsync();
+    await Api.CreateArticleAsync(user.Token);
 
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
@@ -31,14 +31,14 @@ public class Permissions : AppPageTest
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFollowingUser()
   {
     // Arrange - create user and article via API
-    var (token, username, _, _) = await Api.CreateUserAsync();
-    await Api.CreateArticleAsync(token);
+    var user = await Api.CreateUserAsync();
+    await Api.CreateArticleAsync(user.Token);
 
-    await Pages.ProfilePage.GoToAsync(username);
-    await Pages.ProfilePage.WaitForProfileToLoadAsync(username);
+    await Pages.ProfilePage.GoToAsync(user.Username);
+    await Pages.ProfilePage.WaitForProfileToLoadAsync(user.Username);
 
     // Act
-    await Pages.ProfilePage.ClickFollowButtonWithoutWaitAsync(username);
+    await Pages.ProfilePage.ClickFollowButtonWithoutWaitAsync(user.Username);
 
     // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
