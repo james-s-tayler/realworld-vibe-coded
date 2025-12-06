@@ -1,4 +1,4 @@
-namespace E2eTests;
+﻿namespace E2eTests;
 
 /// <summary>
 /// xUnit collection definition for E2E tests.
