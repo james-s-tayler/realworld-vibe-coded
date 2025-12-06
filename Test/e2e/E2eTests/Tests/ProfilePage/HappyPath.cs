@@ -158,6 +158,8 @@ public class HappyPath : AppPageTest
   {
     using var httpClient = new HttpClient();
     httpClient.BaseAddress = new Uri(BaseUrl);
+    httpClient.DefaultRequestHeaders.Add("Authorization", $"Token {token}");
+
     for (var i = 1; i <= count; i++)
     {
       var articleRequest = new
