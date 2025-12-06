@@ -1,4 +1,4 @@
-
+﻿
 namespace E2eTests.Tests.LoginPage;
 
 /// <summary>
