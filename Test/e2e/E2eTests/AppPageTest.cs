@@ -91,7 +91,7 @@ public abstract class AppPageTest : PageTest
   /// Wipes all users and user-generated content from the database.
   /// Called after each test to ensure test isolation.
   /// </summary>
-  protected async Task WipeTestData()
+  private async Task WipeTestData()
   {
     try
     {
@@ -234,7 +234,7 @@ public abstract class AppPageTest : PageTest
   {
     // Check if the test failed - only save trace for failed tests
     var testState = TestContext.Current.TestState;
-    var testFailed = testState?.Result == Xunit.TestResult.Failed;
+    var testFailed = testState?.Result == TestResult.Failed;
 
     if (testFailed)
     {
