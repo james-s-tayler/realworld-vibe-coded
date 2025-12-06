@@ -10,7 +10,6 @@ namespace E2eTests.PageModels;
 /// </remarks>
 public abstract class BasePage
 {
-  protected const int DefaultTimeout = 10000;
   protected readonly IPage Page;
   protected readonly string BaseUrl;
 
@@ -66,7 +65,7 @@ public abstract class BasePage
   /// </summary>
   public async Task GoToHomePageAsync()
   {
-    await Page.GotoAsync(BaseUrl, new() { WaitUntil = WaitUntilState.Load, Timeout = DefaultTimeout });
+    await Page.GotoAsync(BaseUrl);
   }
 
   /// <summary>
@@ -74,7 +73,7 @@ public abstract class BasePage
   /// </summary>
   public async Task ClickSignInAsync()
   {
-    await NavigateAndWaitForNetworkIdle(SignInLink, $"{BaseUrl}/login");
+    await Navigate(SignInLink, $"{BaseUrl}/login");
   }
 
   /// <summary>
@@ -82,7 +81,7 @@ public abstract class BasePage
   /// </summary>
   public async Task ClickSignUpAsync()
   {
-    await NavigateAndWaitForNetworkIdle(SignUpLink, $"{BaseUrl}/register");
+    await Navigate(SignUpLink, $"{BaseUrl}/register");
   }
 
   /// <summary>
@@ -90,7 +89,7 @@ public abstract class BasePage
   /// </summary>
   public async Task ClickNewArticleAsync()
   {
-    await NavigateAndWaitForNetworkIdle(NewArticleLink, $"{BaseUrl}/editor");
+    await Navigate(NewArticleLink, $"{BaseUrl}/editor");
   }
 
   /// <summary>
@@ -98,7 +97,7 @@ public abstract class BasePage
   /// </summary>
   public async Task ClickSettingsAsync()
   {
-    await NavigateAndWaitForNetworkIdle(SettingsLink, $"{BaseUrl}/settings");
+    await Navigate(SettingsLink, $"{BaseUrl}/settings");
   }
 
   /// <summary>
@@ -106,39 +105,15 @@ public abstract class BasePage
   /// </summary>
   public async Task ClickUserProfileAsync(string username)
   {
-    await NavigateAndWaitForNetworkIdle(GetUserProfileLink(username), $"{BaseUrl}/profile/{username}");
+    await Navigate(GetUserProfileLink(username), $"{BaseUrl}/profile/{username}");
   }
 
   /// <summary>
   /// Verifies that the user is logged in by checking for their username link.
   /// </summary>
-  public async Task<bool> IsUserLoggedInAsync(string username)
+  public async Task<bool> IsUserLoggedInAsync()
   {
-    try
-    {
-      await Expect(GetUserProfileLink(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
-      return true;
-    }
-    catch
-    {
-      return false;
-    }
-  }
-
-  /// <summary>
-  /// Verifies that the Sign in link is visible (user is logged out).
-  /// </summary>
-  public async Task<bool> IsUserLoggedOutAsync()
-  {
-    try
-    {
-      await Expect(SignInLink).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
-      return true;
-    }
-    catch
-    {
-      return false;
-    }
+    return !await SignInLink.IsVisibleAsync();
   }
 
   public virtual async Task GoToAsync(string urlParams = "")
@@ -153,9 +128,9 @@ public abstract class BasePage
     }
   }
 
-  private async Task NavigateAndWaitForNetworkIdle(ILocator locator, string url)
+  private async Task Navigate(ILocator locator, string url)
   {
     await locator.ClickAsync();
-    await Expect().ToHaveURLAsync(url, new() { Timeout = DefaultTimeout });
+    await Expect().ToHaveURLAsync(url);
   }
 }

@@ -66,7 +66,7 @@ public class RegisterPage : BasePage
   {
     await FillRegistrationFormAsync(username, email, password);
     await ClickSignUpButtonAsync();
-    await Expect(GetUserProfileLink(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(GetUserProfileLink(username)).ToBeVisibleAsync();
 
     return new HomePage(Page, BaseUrl);
   }
@@ -78,7 +78,7 @@ public class RegisterPage : BasePage
   {
     await FillRegistrationFormAsync(username, email, password);
     await ClickSignUpButtonAsync();
-    await Expect(ErrorDisplay).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(ErrorDisplay).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -86,6 +86,6 @@ public class RegisterPage : BasePage
   /// </summary>
   public async Task VerifyErrorContainsTextAsync(string expectedText)
   {
-    await Expect(ErrorDisplay).ToContainTextAsync(expectedText, new() { Timeout = DefaultTimeout });
+    await Expect(ErrorDisplay).ToContainTextAsync(expectedText);
   }
 }

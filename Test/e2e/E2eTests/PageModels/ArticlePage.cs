@@ -87,9 +87,9 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task<EditorPage> ClickEditButtonAsync()
   {
-    await Expect(EditButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(EditButton).ToBeVisibleAsync();
     await EditButton.ClickAsync();
-    await Expect().ToHaveURLAsync(new Regex(@"/editor/"), new() { Timeout = DefaultTimeout });
+    await Expect().ToHaveURLAsync(new Regex(@"/editor/"));
     return new EditorPage(Page, BaseUrl);
   }
 
@@ -98,9 +98,8 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task<HomePage> DeleteArticleAsync()
   {
-    await Expect(DeleteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(DeleteButton).ToBeVisibleAsync();
 
-    // Handle the confirm dialog - automatically accept it
     Page.Dialog += async (_, dialog) =>
     {
       await dialog.AcceptAsync();
@@ -115,9 +114,9 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task ClickFavoriteButtonAsync()
   {
-    await Expect(FavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(FavoriteButton).ToBeVisibleAsync();
     await FavoriteButton.ClickAsync();
-    await Expect(UnfavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(UnfavoriteButton).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -125,8 +124,9 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task ClickUnfavoriteButtonAsync()
   {
+    await Expect(UnfavoriteButton).ToBeVisibleAsync();
     await UnfavoriteButton.ClickAsync();
-    await Expect(FavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(FavoriteButton).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -135,9 +135,9 @@ public class ArticlePage : BasePage
   public async Task ClickFollowButtonAsync(string username)
   {
     var followButton = GetFollowButton(username);
-    await Expect(followButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(followButton).ToBeVisibleAsync();
     await followButton.ClickAsync();
-    await Expect(GetUnfollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(GetUnfollowButton(username)).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -146,8 +146,9 @@ public class ArticlePage : BasePage
   public async Task ClickUnfollowButtonAsync(string username)
   {
     var unfollowButton = GetUnfollowButton(username);
+    await Expect(unfollowButton).ToBeVisibleAsync();
     await unfollowButton.ClickAsync();
-    await Expect(GetFollowButton(username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(GetFollowButton(username)).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -155,7 +156,7 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task ClickFavoriteButtonWithoutWaitAsync()
   {
-    await Expect(FavoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(FavoriteButton).ToBeVisibleAsync();
     await FavoriteButton.ClickAsync();
   }
 
@@ -165,7 +166,7 @@ public class ArticlePage : BasePage
   public async Task ClickFollowButtonWithoutWaitAsync(string username)
   {
     var followButton = GetFollowButton(username);
-    await Expect(followButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(followButton).ToBeVisibleAsync();
     await followButton.ClickAsync();
   }
 
@@ -174,10 +175,10 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task AddCommentAsync(string commentText)
   {
-    await Expect(CommentInput).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(CommentInput).ToBeVisibleAsync();
     await CommentInput.FillAsync(commentText);
     await PostCommentButton.ClickAsync();
-    await Expect(Page.GetByText(commentText).First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(Page.GetByText(commentText).First).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -186,10 +187,10 @@ public class ArticlePage : BasePage
   public async Task DeleteCommentAsync(string commentText)
   {
     var comment = Page.GetByText(commentText);
-    await Expect(comment).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(comment).ToBeVisibleAsync();
 
     await DeleteCommentButton.ClickAsync();
-    await Expect(comment).Not.ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(comment).Not.ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -198,7 +199,7 @@ public class ArticlePage : BasePage
   public async Task VerifyArticleTitleAsync(string title)
   {
     var heading = GetArticleTitle(title);
-    await Expect(heading).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(heading).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -207,7 +208,7 @@ public class ArticlePage : BasePage
   public async Task VerifyAuthorAsync(string username)
   {
     var authorLink = GetAuthorLink(username);
-    await Expect(authorLink).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(authorLink).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -215,7 +216,7 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task VerifyCommentVisibleAsync(string commentText)
   {
-    await Expect(Page.GetByText(commentText).First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(Page.GetByText(commentText).First).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -223,6 +224,6 @@ public class ArticlePage : BasePage
   /// </summary>
   public async Task VerifyCommentNotVisibleAsync(string commentText)
   {
-    await Expect(Page.GetByText(commentText)).Not.ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(Page.GetByText(commentText)).Not.ToBeVisibleAsync();
   }
 }

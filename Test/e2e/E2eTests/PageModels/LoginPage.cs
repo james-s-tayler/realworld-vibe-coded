@@ -61,14 +61,4 @@ public class LoginPage : BasePage
     await ClickSignInButtonAsync();
     return new HomePage(Page, BaseUrl);
   }
-
-  /// <summary>
-  /// Attempts to login and expects it to fail.
-  /// </summary>
-  public async Task LoginAndExpectErrorAsync(string email, string password)
-  {
-    await FillLoginFormAsync(email, password);
-    await ClickSignInButtonAsync();
-    await Expect(ErrorDisplay).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
-  }
 }

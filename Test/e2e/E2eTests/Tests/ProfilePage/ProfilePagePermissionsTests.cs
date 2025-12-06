@@ -32,7 +32,7 @@ public class ProfilePagePermissionsTests : AppPageTest
     // Navigate to the home page
     var homePage = GetHomePage();
     await homePage.GoToAsync();
-    await homePage.ClickGlobalFeedTabAsync(isAuthenticated: false);
+    await homePage.ClickGlobalFeedTabAsync();
 
     // Click the favorite button on the article preview
     await homePage.ClickFavoriteButtonOnPreviewAsync();

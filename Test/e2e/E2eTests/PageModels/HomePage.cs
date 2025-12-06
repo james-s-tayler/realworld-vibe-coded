@@ -83,9 +83,9 @@ public class HomePage : BasePage
   /// <summary>
   /// Clicks on the Global Feed tab and waits for articles to load.
   /// </summary>
-  public async Task ClickGlobalFeedTabAsync(bool isAuthenticated = true)
+  public async Task ClickGlobalFeedTabAsync()
   {
-    if (isAuthenticated)
+    if (await IsUserLoggedInAsync())
     {
       await Expect(YourFeedTab).ToBeVisibleAsync();
     }
@@ -101,7 +101,7 @@ public class HomePage : BasePage
   public async Task ClickSidebarTagAsync(string tagName)
   {
     var tag = GetSidebarTag(tagName);
-    await Expect(tag).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(tag).ToBeVisibleAsync();
     await tag.ClickAsync();
     await WaitForArticlesToLoadAsync();
   }
@@ -111,7 +111,7 @@ public class HomePage : BasePage
   /// </summary>
   public async Task WaitForArticlesToLoadAsync()
   {
-    await Expect(LoadingIndicator).ToBeHiddenAsync(new() { Timeout = DefaultTimeout });
+    await Expect(LoadingIndicator).ToBeHiddenAsync();
   }
 
   /// <summary>
@@ -126,7 +126,7 @@ public class HomePage : BasePage
   public async Task<ArticlePage> ClickArticleAsync(string title)
   {
     var preview = GetArticlePreviewByTitle(title);
-    await Expect(preview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(preview).ToBeVisibleAsync();
     await preview.Locator(".article-link").ClickAsync();
     return new ArticlePage(Page, BaseUrl);
   }
@@ -137,7 +137,7 @@ public class HomePage : BasePage
   public async Task ClickFavoriteButtonOnPreviewAsync()
   {
     var favoriteButton = TabPanel.Locator(".article-preview .favorite-button").First;
-    await Expect(favoriteButton).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(favoriteButton).ToBeVisibleAsync();
     await favoriteButton.ClickAsync();
   }
 
@@ -146,9 +146,9 @@ public class HomePage : BasePage
   /// </summary>
   public async Task ClickNextPageAsync()
   {
-    await Expect(PaginationForwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
+    await Expect(PaginationForwardButton).ToBeEnabledAsync();
     await PaginationForwardButton.ClickAsync();
-    await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(ArticlePreviews.First).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -156,9 +156,9 @@ public class HomePage : BasePage
   /// </summary>
   public async Task ClickPreviousPageAsync()
   {
-    await Expect(PaginationBackwardButton).ToBeEnabledAsync(new() { Timeout = DefaultTimeout });
+    await Expect(PaginationBackwardButton).ToBeEnabledAsync();
     await PaginationBackwardButton.ClickAsync();
-    await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(ArticlePreviews.First).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -166,7 +166,7 @@ public class HomePage : BasePage
   /// </summary>
   public async Task VerifyGlobalFeedIsSelectedAsync()
   {
-    await Expect(GlobalFeedTab).ToHaveAttributeAsync("aria-selected", "true", new() { Timeout = DefaultTimeout });
+    await Expect(GlobalFeedTab).ToHaveAttributeAsync("aria-selected", "true");
   }
 
   /// <summary>
@@ -174,7 +174,7 @@ public class HomePage : BasePage
   /// </summary>
   public async Task VerifyArticleCountAsync(int expectedCount)
   {
-    await Expect(ArticlePreviews).ToHaveCountAsync(expectedCount, new() { Timeout = DefaultTimeout });
+    await Expect(ArticlePreviews).ToHaveCountAsync(expectedCount);
   }
 
   /// <summary>
@@ -183,7 +183,7 @@ public class HomePage : BasePage
   public async Task VerifyArticleVisibleAsync(string title)
   {
     var articlePreview = GetArticlePreviewByTitle(title);
-    await Expect(articlePreview).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(articlePreview).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -192,7 +192,7 @@ public class HomePage : BasePage
   public async Task VerifyArticleNotVisibleAsync(string title)
   {
     var articleElement = Page.GetByText(title).First;
-    await Expect(articleElement).Not.ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(articleElement).Not.ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -200,7 +200,7 @@ public class HomePage : BasePage
   /// </summary>
   public async Task VerifyPaginationVisibleAsync()
   {
-    await Expect(Pagination).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(Pagination).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -208,7 +208,7 @@ public class HomePage : BasePage
   /// </summary>
   public async Task VerifyBackwardButtonDisabledAsync()
   {
-    await Expect(PaginationBackwardButton).ToBeDisabledAsync(new() { Timeout = DefaultTimeout });
+    await Expect(PaginationBackwardButton).ToBeDisabledAsync();
   }
 
   /// <summary>
@@ -217,7 +217,7 @@ public class HomePage : BasePage
   public async Task VerifyTagFilterTabVisibleAsync(string tagName)
   {
     var tagTab = GetTagFilterTab(tagName);
-    await Expect(tagTab).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(tagTab).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -225,6 +225,6 @@ public class HomePage : BasePage
   /// </summary>
   public async Task VerifyArticlesLoadedAsync()
   {
-    await Expect(ArticlePreviews.First).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(ArticlePreviews.First).ToBeVisibleAsync();
   }
 }

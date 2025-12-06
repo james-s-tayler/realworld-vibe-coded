@@ -135,7 +135,7 @@ public class EditorPage : BasePage
   {
     await FillArticleFormAsync(title, description, body);
     await ClickPublishButtonAsync();
-    await Expect(ErrorDisplay).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(ErrorDisplay).ToBeVisibleAsync();
   }
 
   /// <summary>
@@ -143,6 +143,6 @@ public class EditorPage : BasePage
   /// </summary>
   public async Task VerifyErrorContainsTextAsync(string expectedText)
   {
-    await Expect(ErrorDisplay).ToContainTextAsync(expectedText, new() { Timeout = DefaultTimeout });
+    await Expect(ErrorDisplay).ToContainTextAsync(expectedText);
   }
 }

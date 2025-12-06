@@ -22,48 +22,43 @@ public class ArticlePagePermissionsTests : AppPageTest
   [Fact]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFavoritingArticle()
   {
-    // Register a user and create an article
+    // Arrange
     await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
     var (_, articleTitle) = await CreateArticleAsync();
 
-    // Sign out
     await SignOutAsync();
 
-    // Navigate to the article
     var homePage = GetHomePage();
     await homePage.GoToAsync();
-    await homePage.ClickGlobalFeedTabAsync(isAuthenticated: false);
+    await homePage.ClickGlobalFeedTabAsync();
 
     var articlePage = await homePage.ClickArticleAsync(articleTitle);
 
-    // Try to click the favorite button (unauthenticated)
+    // Act
     await articlePage.ClickFavoriteButtonWithoutWaitAsync();
 
-    // Verify redirect to login page
-    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
+    // Assert
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
   }
 
   [Fact]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenFollowingUserFromArticlePage()
   {
-    // Register a user and create an article
+    // Arrange
     await RegisterUserAsync(_testUsername1, _testEmail1, _testPassword1);
     var (_, articleTitle) = await CreateArticleAsync();
 
-    // Sign out
     await SignOutAsync();
 
-    // Navigate to the article
     var homePage = GetHomePage();
     await homePage.GoToAsync();
-    await homePage.ClickGlobalFeedTabAsync(isAuthenticated: false);
+    await homePage.ClickGlobalFeedTabAsync();
+    await homePage.ClickArticleAsync(articleTitle);
 
-    var articlePage = await homePage.ClickArticleAsync(articleTitle);
+    // Act
+    await GetArticlePage().ClickFollowButtonWithoutWaitAsync(_testUsername1);
 
-    // Click the follow button (unauthenticated)
-    await articlePage.ClickFollowButtonWithoutWaitAsync(_testUsername1);
-
-    // Verify redirect to login page
-    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login", new() { Timeout = DefaultTimeout });
+    // Assert
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
   }
 }

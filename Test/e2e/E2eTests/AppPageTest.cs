@@ -91,7 +91,7 @@ public abstract class AppPageTest : PageTest
   /// Wipes all users and user-generated content from the database.
   /// Called after each test to ensure test isolation.
   /// </summary>
-  protected async Task WipeTestData()
+  private async Task WipeTestData()
   {
     try
     {
@@ -170,22 +170,6 @@ public abstract class AppPageTest : PageTest
     return (articlePage, articleTitle);
   }
 
-  // Legacy methods for backward compatibility during migration
-  protected async Task RegisterUser()
-  {
-    await RegisterUserAsync(TestUsername, TestEmail, TestPassword);
-  }
-
-  protected async Task RegisterUser(string username, string email, string password)
-  {
-    await RegisterUserAsync(username, email, password);
-  }
-
-  protected async Task SignOut()
-  {
-    await SignOutAsync();
-  }
-
   /// <summary>
   /// Gets the current test name from xUnit's TestContext.
   /// </summary>
@@ -234,7 +218,7 @@ public abstract class AppPageTest : PageTest
   {
     // Check if the test failed - only save trace for failed tests
     var testState = TestContext.Current.TestState;
-    var testFailed = testState?.Result == Xunit.TestResult.Failed;
+    var testFailed = testState?.Result == TestResult.Failed;
 
     if (testFailed)
     {
