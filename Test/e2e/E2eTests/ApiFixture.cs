@@ -41,10 +41,10 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
-  /// Creates a user via API and returns the authentication token, username, email, and password.
+  /// Creates a user via API and returns the user credentials.
   /// The fixture generates unique test data automatically.
   /// </summary>
-  public async Task<(string Token, string Username, string Email, string Password)> CreateUserAsync()
+  public async Task<CreatedUser> CreateUserAsync()
   {
     var userId = Interlocked.Increment(ref _userCounter);
     var username = $"testuser{userId}_{Guid.NewGuid().ToString("N")[..8]}";
@@ -72,14 +72,20 @@ public class ApiFixture : IAsyncLifetime
 
     var responseContent = await response.Content.ReadAsStringAsync();
     var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, _jsonOptions)!;
-    return (userResponse.User.Token, username, email, password);
+    return new CreatedUser
+    {
+      Token = userResponse.User.Token,
+      Username = username,
+      Email = email,
+      Password = password,
+    };
   }
 
   /// <summary>
-  /// Creates an article for the authenticated user and returns the article slug and title.
+  /// Creates an article for the authenticated user and returns the article details.
   /// The fixture generates unique test data automatically.
   /// </summary>
-  public async Task<(string Slug, string Title)> CreateArticleAsync(
+  public async Task<CreatedArticle> CreateArticleAsync(
     string token,
     string[]? tags = null)
   {
@@ -110,7 +116,11 @@ public class ApiFixture : IAsyncLifetime
 
     var responseContent = await response.Content.ReadAsStringAsync();
     var articleResponse = JsonSerializer.Deserialize<ArticleResponse>(responseContent, _jsonOptions)!;
-    return (articleResponse.Article.Slug, articleResponse.Article.Title);
+    return new CreatedArticle
+    {
+      Slug = articleResponse.Article.Slug,
+      Title = articleResponse.Article.Title,
+    };
   }
 
   /// <summary>

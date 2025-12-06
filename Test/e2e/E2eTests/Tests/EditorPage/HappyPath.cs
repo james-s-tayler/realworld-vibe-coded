@@ -14,11 +14,11 @@ public class HappyPath : AppPageTest
   public async Task UserCanCreateArticle_AndViewArticle()
   {
     // Arrange - create user via API
-    var (_, username, email, password) = await Api.CreateUserAsync();
+    var user = await Api.CreateUserAsync();
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(email, password);
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     await Pages.HomePage.ClickNewArticleAsync();
 
@@ -32,28 +32,28 @@ public class HappyPath : AppPageTest
 
     // Assert
     await Pages.ArticlePage.VerifyArticleTitleAsync(articleTitle);
-    await Pages.ArticlePage.VerifyAuthorAsync(username);
+    await Pages.ArticlePage.VerifyAuthorAsync(user.Username);
   }
 
   [Fact]
   public async Task UserCanEditOwnArticle()
   {
     // Arrange - create user and article via API
-    var (token, username, email, password) = await Api.CreateUserAsync();
-    var (_, articleTitle) = await Api.CreateArticleAsync(token);
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(email, password);
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     // Navigate to article
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(articleTitle);
+    await Pages.HomePage.ClickArticleAsync(article.Title);
 
     await Pages.ArticlePage.ClickEditButtonAsync();
 
-    var updatedTitle = $"{articleTitle} - Updated";
+    var updatedTitle = $"{article.Title} - Updated";
 
     // Act
     await Pages.EditorPage.UpdateArticleAsync(updatedTitle);

@@ -14,17 +14,17 @@ public class HappyPath : AppPageTest
   public async Task UserCanDeleteOwnArticle()
   {
     // Arrange - create user and article via API
-    var (token, username, email, password) = await Api.CreateUserAsync();
-    var (_, articleTitle) = await Api.CreateArticleAsync(token);
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(email, password);
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     // Navigate to article
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(articleTitle);
+    await Pages.HomePage.ClickArticleAsync(article.Title);
 
     // Act
     await Pages.ArticlePage.DeleteArticleAsync();
@@ -32,28 +32,26 @@ public class HappyPath : AppPageTest
     // ToDo: this should actually try to access the article page via its slug and assert a not found error message appears
     // Assert
     await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.VerifyArticleNotVisibleAsync(articleTitle);
+    await Pages.HomePage.VerifyArticleNotVisibleAsync(article.Title);
   }
 
   [Fact]
   public async Task UserCanFavoriteAndUnfavoriteArticle()
   {
     // Arrange - create user and article via API
-    var (token, username, email, password) = await Api.CreateUserAsync();
-    var (articleSlug, articleTitle) = await Api.CreateArticleAsync(token);
+    var user1 = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user1.Token);
 
     // Create a second user and have them view the first user's article
-    var (_, _, user2Email, user2Password) = await Api.CreateUserAsync();
+    var user2 = await Api.CreateUserAsync();
 
     // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(user2Email, user2Password);
+    await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
-    // Navigate directly to the article by slug
-    await Pages.ArticlePage.GoToAsync(articleSlug);
-
-    // Wait for page to load by checking for the favorite button
-    await Expect(Pages.ArticlePage.FavoriteButton).ToBeVisibleAsync();
+    // Navigate to the article page and wait for it to load
+    await Pages.ArticlePage.GoToAsync(article.Slug);
+    await Expect(Pages.ArticlePage.GetArticleTitle(article.Title)).ToBeVisibleAsync();
 
     // Act + Assert
     await Pages.ArticlePage.ClickFavoriteButtonAsync();
@@ -64,17 +62,17 @@ public class HappyPath : AppPageTest
   public async Task UserCanAddCommentToArticle()
   {
     // Arrange - create user and article via API
-    var (token, username, email, password) = await Api.CreateUserAsync();
-    var (_, articleTitle) = await Api.CreateArticleAsync(token);
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(email, password);
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     // Navigate to article
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(articleTitle);
+    await Pages.HomePage.ClickArticleAsync(article.Title);
 
     // Act + Assert
     var commentText = "This is a test comment from E2E tests!";
@@ -85,20 +83,20 @@ public class HappyPath : AppPageTest
   public async Task UserCanDeleteOwnComment()
   {
     // Arrange - create user, article, and comment via API
-    var (token, username, email, password) = await Api.CreateUserAsync();
-    var (articleSlug, articleTitle) = await Api.CreateArticleAsync(token);
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
 
     var commentText = "This comment will be deleted!";
-    await Api.CreateCommentAsync(token, articleSlug, commentText);
+    await Api.CreateCommentAsync(user.Token, article.Slug, commentText);
 
     // Log in via UI
     await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(email, password);
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     // Navigate to article
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(articleTitle);
+    await Pages.HomePage.ClickArticleAsync(article.Title);
 
     // Act + Assert
     await Pages.ArticlePage.DeleteCommentAsync(commentText);
