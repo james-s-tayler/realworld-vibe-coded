@@ -49,10 +49,11 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
-    // Navigate to article through home page
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(article.Title);
+    // Navigate directly to the article by slug
+    await Pages.ArticlePage.GoToAsync(article.Slug);
+    
+    // Wait for article actions section to be visible (ensures page is loaded and user is authenticated)
+    await Expect(Pages.ArticlePage.ArticleActions).ToBeVisibleAsync();
 
     // Act + Assert
     await Pages.ArticlePage.ClickFavoriteButtonAsync();
