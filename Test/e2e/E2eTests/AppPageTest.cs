@@ -1,6 +1,7 @@
 ﻿using E2eTests.PageModels;
 using Microsoft.Playwright;
 using Microsoft.Playwright.Xunit.v3;
+using SixLabors.ImageSharp;
 
 namespace E2eTests;
 
@@ -83,8 +84,9 @@ public abstract class AppPageTest : PageTest
   /// <summary>
   /// Takes a screenshot of the current page and saves it to the artifacts directory.
   /// The screenshot filename will match the current executing test name.
+  /// Returns the path to the saved screenshot file.
   /// </summary>
-  protected async Task TakeScreenshotAsync()
+  protected async Task<string> TakeScreenshotAsync()
   {
     if (!Directory.Exists(Constants.ReportsTestE2eArtifacts))
     {
@@ -99,6 +101,33 @@ public abstract class AppPageTest : PageTest
       Path = screenshotPath,
       FullPage = true,
     });
+
+    return screenshotPath;
+  }
+
+  /// <summary>
+  /// Asserts that the screenshot width does not exceed the viewport width.
+  /// This helps catch layout bugs where content overflows horizontally.
+  /// </summary>
+  protected async Task AssertScreenshotWidthNotExceedingViewportAsync(string screenshotPath)
+  {
+    // Get viewport width
+    var viewportSize = Page.ViewportSize;
+    if (viewportSize == null)
+    {
+      throw new InvalidOperationException("Viewport size is not available");
+    }
+
+    // Read screenshot dimensions using SixLabors.ImageSharp
+    using var image = await Image.LoadAsync(screenshotPath);
+    var screenshotWidth = image.Width;
+
+    // Assert screenshot width does not exceed viewport width
+    if (screenshotWidth > viewportSize.Width)
+    {
+      throw new InvalidOperationException(
+        $"Screenshot width ({screenshotWidth}px) exceeds viewport width ({viewportSize.Width}px). This indicates horizontal overflow/layout issues.");
+    }
   }
 
   /// <summary>

@@ -1,7 +1,7 @@
-﻿namespace E2eTests.Tests.ArticlePage;
+﻿namespace E2eTests.Tests.ProfilePage;
 
 /// <summary>
-/// Screenshot tests for the Article page (/article/:slug) with max-length content.
+/// Screenshot tests for the Profile page (/profile/:username) with favorited articles.
 /// </summary>
 [Collection("E2E Tests")]
 public class Screenshots : AppPageTest
@@ -11,7 +11,7 @@ public class Screenshots : AppPageTest
   }
 
   [Fact]
-  public async Task ArticlePageWithMaxLengthContent()
+  public async Task ProfilePageWithFavoritedArticle()
   {
     // Arrange - create user with max-length fields
     var user = await Api.CreateUserWithMaxLengthsAsync();
@@ -22,14 +22,15 @@ public class Screenshots : AppPageTest
     // Add a comment with max-length body
     await Api.CreateCommentWithMaxLengthAsync(user.Token, article.Slug);
 
-    // Act + Assert
-    await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    // Favorite the article to ensure it appears in favorited tab
+    await Api.FavoriteArticleAsync(user.Token, article.Slug);
 
-    await Pages.ArticlePage.GoToAsync(article.Slug);
+    // Act - navigate to profile page and view favorited articles
+    await Pages.ProfilePage.GoToAsync(user.Username);
+    await Pages.ProfilePage.ClickFavoritedArticlesTabAsync();
 
-    // Wait for the article title to be visible to ensure the page is fully loaded
-    await Expect(Pages.ArticlePage.GetArticleTitle(article.Title)).ToBeVisibleAsync();
+    // Wait for the favorited article to be visible
+    await Expect(Pages.ProfilePage.GetArticlePreviewByTitle(article.Title)).ToBeVisibleAsync();
 
     // Take screenshot of the full page
     var screenshotPath = await TakeScreenshotAsync();
@@ -37,6 +38,7 @@ public class Screenshots : AppPageTest
     // Assert that screenshot width does not exceed viewport width
     await AssertScreenshotWidthNotExceedingViewportAsync(screenshotPath);
 
-    await Expect(Page).ToHaveURLAsync(new Regex($"/article/{article.Slug}"));
+    // Assert we're on the profile page
+    await Expect(Page).ToHaveURLAsync(new Regex($"/profile/{user.Username}"));
   }
 }
