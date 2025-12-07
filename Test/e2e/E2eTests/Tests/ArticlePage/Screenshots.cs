@@ -32,7 +32,10 @@ public class Screenshots : AppPageTest
     await Expect(Pages.ArticlePage.GetArticleTitle(article.Title)).ToBeVisibleAsync();
 
     // Take screenshot of the full page
-    await TakeScreenshotAsync();
+    var screenshotPath = await TakeScreenshotAsync();
+
+    // Assert that screenshot width does not exceed viewport width
+    await AssertScreenshotWidthNotExceedingViewportAsync(screenshotPath);
 
     await Expect(Page).ToHaveURLAsync(new Regex($"/article/{article.Slug}"));
   }
