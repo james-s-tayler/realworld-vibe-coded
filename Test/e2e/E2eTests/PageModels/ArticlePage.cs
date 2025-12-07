@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Microsoft.Playwright;
+﻿using Microsoft.Playwright;
 
 namespace E2eTests.PageModels;
 
