@@ -22,7 +22,7 @@ public class Screenshots : AppPageTest
     // Add a comment with max-length body
     await Api.CreateCommentWithMaxLengthAsync(user.Token, article.Slug);
 
-    // Act - login and navigate to the article page
+    // Act + Assert
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
@@ -34,7 +34,6 @@ public class Screenshots : AppPageTest
     // Take screenshot of the full page
     await TakeScreenshotAsync();
 
-    // Assert - verify the page loaded successfully
     await Expect(Page).ToHaveURLAsync(new Regex($"/article/{article.Slug}"));
   }
 }

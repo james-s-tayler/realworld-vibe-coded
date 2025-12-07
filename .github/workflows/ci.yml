@@ -617,27 +617,6 @@ jobs:
           echo "---" >> Reports/Test/e2e/Artifacts/ReportSummary.md
           echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Test/e2e/Artifacts/ReportSummary.md
 
-      - name: Add screenshots to ReportSummary.md
-        if: always() && github.event_name == 'pull_request'
-        run: |
-          SCREENSHOT_FILES=$(find Reports/Test/e2e/Artifacts -name "*_screenshot_*.png" 2>/dev/null || true)
-          if [ -n "$SCREENSHOT_FILES" ]; then
-            echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-            echo "---" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-            echo "## 📸 Screenshots" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-            echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-            SCREENSHOT_COUNT=$(echo "$SCREENSHOT_FILES" | wc -l)
-            echo "**${SCREENSHOT_COUNT} screenshot(s) captured:**" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-            echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-            for screenshot in $SCREENSHOT_FILES; do
-              FILENAME=$(basename "$screenshot")
-              echo "- \`$FILENAME\`" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-            done
-            echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-            echo "📦 **[Download test-e2e-reports artifact](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})** to view screenshots" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-            echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-          fi
-
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v5
