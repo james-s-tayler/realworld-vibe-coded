@@ -53,6 +53,11 @@ public class SettingsPage : BasePage
   public ILocator SuccessMessage => Page.GetByText("Settings updated successfully");
 
   /// <summary>
+  /// Error display element.
+  /// </summary>
+  public ILocator ErrorDisplay => Page.GetByTestId("error-display");
+
+  /// <summary>
   /// Updates the bio field.
   /// </summary>
   public async Task UpdateBioAsync(string bio)
@@ -108,5 +113,34 @@ public class SettingsPage : BasePage
   public async Task VerifyLoggedOutAsync()
   {
     await Expect(SignInLink).ToBeVisibleAsync();
+  }
+
+  /// <summary>
+  /// Attempts to update settings and expects it to fail with an error.
+  /// </summary>
+  public async Task UpdateSettingsAndExpectErrorAsync(string? username = null, string? email = null)
+  {
+    if (username != null)
+    {
+      await UsernameInput.ClearAsync();
+      await UsernameInput.FillAsync(username);
+    }
+
+    if (email != null)
+    {
+      await EmailInput.ClearAsync();
+      await EmailInput.FillAsync(email);
+    }
+
+    await ClickUpdateSettingsButtonAsync();
+    await Expect(ErrorDisplay).ToBeVisibleAsync();
+  }
+
+  /// <summary>
+  /// Verifies that the error display contains specific text.
+  /// </summary>
+  public async Task VerifyErrorContainsTextAsync(string expectedText)
+  {
+    await Expect(ErrorDisplay).ToContainTextAsync(expectedText);
   }
 }

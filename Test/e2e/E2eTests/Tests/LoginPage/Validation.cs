@@ -10,5 +10,36 @@ public class Validation : AppPageTest
   {
   }
 
-  // No validation tests for LoginPage currently
+  [Fact]
+  public async Task Login_WithUnregisteredEmail_DisplaysErrorMessage()
+  {
+    // Arrange
+    var timestamp = DateTime.UtcNow.Ticks;
+    var unregisteredEmail = $"nonexistent_{timestamp}@test.com";
+    var password = "TestPassword123!";
+
+    await Pages.LoginPage.GoToAsync();
+
+    // Act
+    await Pages.LoginPage.LoginAndExpectErrorAsync(unregisteredEmail, password);
+
+    // Assert
+    await Pages.LoginPage.VerifyErrorContainsTextAsync("email or password is invalid");
+  }
+
+  [Fact]
+  public async Task Login_WithIncorrectPassword_DisplaysErrorMessage()
+  {
+    // Arrange
+    var existingUser = await Api.CreateUserAsync();
+    var incorrectPassword = "WrongPassword123!";
+
+    await Pages.LoginPage.GoToAsync();
+
+    // Act
+    await Pages.LoginPage.LoginAndExpectErrorAsync(existingUser.Email, incorrectPassword);
+
+    // Assert
+    await Pages.LoginPage.VerifyErrorContainsTextAsync("email or password is invalid");
+  }
 }

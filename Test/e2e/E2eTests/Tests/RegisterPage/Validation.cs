@@ -29,4 +29,24 @@ public class Validation : AppPageTest
     // Assert
     await Pages.RegisterPage.VerifyErrorContainsTextAsync("Email already exists");
   }
+
+  [Fact]
+  public async Task Register_WithDuplicateUsername_DisplaysErrorMessage()
+  {
+    // Arrange
+    var timestamp = DateTime.UtcNow.Ticks;
+    var email2 = $"user2_{timestamp}@test.com";
+    var password = "TestPassword123!";
+
+    var existingUser = await Api.CreateUserAsync();
+
+    await Pages.HomePage.GoToAsync();
+    await Pages.HomePage.ClickSignUpAsync();
+
+    // Act
+    await Pages.RegisterPage.RegisterAndExpectErrorAsync(existingUser.Username, email2, password);
+
+    // Assert
+    await Pages.RegisterPage.VerifyErrorContainsTextAsync("Username already exists");
+  }
 }
