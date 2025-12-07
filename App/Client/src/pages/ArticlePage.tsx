@@ -259,12 +259,10 @@ export const ArticlePage: React.FC = () => {
           {user ? (
             <form className="card comment-form" onSubmit={handleCommentSubmit}>
               <div className="card-block">
-                <div data-testid="comment-error-display">
-                  <ErrorDisplay 
-                    error={commentError} 
-                    onClose={() => setCommentError(null)}
-                  />
-                </div>
+                <ErrorDisplay 
+                  error={commentError} 
+                  onClose={() => setCommentError(null)}
+                />
                 <TextArea
                   id="comment"
                   labelText=""

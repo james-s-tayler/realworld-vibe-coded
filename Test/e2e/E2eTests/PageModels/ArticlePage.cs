@@ -72,7 +72,7 @@ public class ArticlePage : BasePage
   /// <summary>
   /// Error display element for comment errors.
   /// </summary>
-  public ILocator CommentErrorDisplay => Page.GetByTestId("comment-error-display");
+  public ILocator CommentErrorDisplay => Page.GetByTestId("error-display");
 
   /// <summary>
   /// Delete comment button (trash icon).
