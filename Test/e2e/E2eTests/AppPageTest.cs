@@ -1,6 +1,7 @@
 ﻿using E2eTests.PageModels;
 using Microsoft.Playwright;
 using Microsoft.Playwright.Xunit.v3;
+using SixLabors.ImageSharp;
 
 namespace E2eTests;
 
@@ -118,7 +119,7 @@ public abstract class AppPageTest : PageTest
     }
 
     // Read screenshot dimensions using SixLabors.ImageSharp
-    using var image = await SixLabors.ImageSharp.Image.LoadAsync(screenshotPath);
+    using var image = await Image.LoadAsync(screenshotPath);
     var screenshotWidth = image.Width;
 
     // Assert screenshot width does not exceed viewport width
