@@ -1,4 +1,4 @@
-namespace E2eTests;
+﻿namespace E2eTests;
 
 /// <summary>
 /// Represents an article created via the API for testing.

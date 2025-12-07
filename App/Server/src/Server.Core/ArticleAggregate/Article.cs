@@ -6,6 +6,10 @@ namespace Server.Core.ArticleAggregate;
 
 public class Article : EntityBase, IAggregateRoot
 {
+  public const int TitleMaxLength = 200;
+  public const int DescriptionMaxLength = 500;
+  public const int SlugMaxLength = 250;
+
   public Article(string title, string description, string body, User author)
   {
     Title = Guard.Against.NullOrEmpty(title);

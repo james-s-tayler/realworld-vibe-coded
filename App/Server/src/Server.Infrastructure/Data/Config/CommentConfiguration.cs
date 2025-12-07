@@ -7,6 +7,7 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
   public void Configure(EntityTypeBuilder<Comment> builder)
   {
     builder.Property(x => x.Body)
+      .HasMaxLength(Comment.BodyMaxLength)
       .IsRequired();
 
     // One-to-many relationship with User (Author)

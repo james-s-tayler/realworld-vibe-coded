@@ -7,18 +7,18 @@ public class ArticleConfiguration : IEntityTypeConfiguration<Article>
   public void Configure(EntityTypeBuilder<Article> builder)
   {
     builder.Property(x => x.Title)
-      .HasMaxLength(DataSchemaConstants.ArticleTitleLength)
+      .HasMaxLength(Article.TitleMaxLength)
       .IsRequired();
 
     builder.Property(x => x.Description)
-      .HasMaxLength(DataSchemaConstants.ArticleDescriptionLength)
+      .HasMaxLength(Article.DescriptionMaxLength)
       .IsRequired();
 
     builder.Property(x => x.Body)
       .IsRequired();
 
     builder.Property(x => x.Slug)
-      .HasMaxLength(DataSchemaConstants.ArticleSlugLength)
+      .HasMaxLength(Article.SlugMaxLength)
       .IsRequired();
 
     builder.HasIndex(x => x.Slug)

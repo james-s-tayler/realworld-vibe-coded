@@ -12,6 +12,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
+import { USER_CONSTRAINTS } from '../constants';
 import './SettingsPage.css';
 
 export const SettingsPage: React.FC = () => {
@@ -102,6 +103,7 @@ export const SettingsPage: React.FC = () => {
             placeholder="URL of profile picture"
             value={image}
             onChange={(e) => setImage(e.target.value)}
+            maxLength={USER_CONSTRAINTS.IMAGE_URL_MAX_LENGTH}
           />
 
           <TextInput
@@ -111,6 +113,8 @@ export const SettingsPage: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            minLength={USER_CONSTRAINTS.USERNAME_MIN_LENGTH}
+            maxLength={USER_CONSTRAINTS.USERNAME_MAX_LENGTH}
           />
 
           <TextArea
@@ -120,6 +124,7 @@ export const SettingsPage: React.FC = () => {
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={8}
+            maxLength={USER_CONSTRAINTS.BIO_MAX_LENGTH}
           />
 
           <TextInput
@@ -130,6 +135,7 @@ export const SettingsPage: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             type="email"
+            maxLength={USER_CONSTRAINTS.EMAIL_MAX_LENGTH}
           />
 
           <TextInput
@@ -139,6 +145,7 @@ export const SettingsPage: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
+            minLength={USER_CONSTRAINTS.PASSWORD_MIN_LENGTH}
           />
 
           <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">

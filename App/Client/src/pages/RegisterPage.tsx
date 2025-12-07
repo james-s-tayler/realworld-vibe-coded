@@ -10,6 +10,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
+import { USER_CONSTRAINTS } from '../constants';
 import './AuthPages.css';
 
 export const RegisterPage: React.FC = () => {
@@ -54,6 +55,8 @@ export const RegisterPage: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            minLength={USER_CONSTRAINTS.USERNAME_MIN_LENGTH}
+            maxLength={USER_CONSTRAINTS.USERNAME_MAX_LENGTH}
           />
 
           <TextInput
@@ -64,6 +67,7 @@ export const RegisterPage: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             type="email"
+            maxLength={USER_CONSTRAINTS.EMAIL_MAX_LENGTH}
           />
 
           <TextInput
@@ -74,6 +78,7 @@ export const RegisterPage: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
             type="password"
+            minLength={USER_CONSTRAINTS.PASSWORD_MIN_LENGTH}
           />
 
           <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">

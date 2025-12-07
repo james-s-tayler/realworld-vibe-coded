@@ -5,6 +5,8 @@ namespace Server.Core.ArticleAggregate;
 
 public class Comment : EntityBase
 {
+  public const int BodyMaxLength = 5000;
+
   public Comment(string body, User author, Article article)
   {
     Body = Guard.Against.NullOrEmpty(body);

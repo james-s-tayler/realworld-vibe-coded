@@ -12,6 +12,7 @@ import { articlesApi } from '../api/articles';
 import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
+import { ARTICLE_CONSTRAINTS, TAG_CONSTRAINTS } from '../constants';
 import './EditorPage.css';
 
 export const EditorPage: React.FC = () => {
@@ -130,6 +131,7 @@ export const EditorPage: React.FC = () => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
+              maxLength={ARTICLE_CONSTRAINTS.TITLE_MAX_LENGTH}
             />
 
             <TextInput
@@ -139,6 +141,7 @@ export const EditorPage: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
+              maxLength={ARTICLE_CONSTRAINTS.DESCRIPTION_MAX_LENGTH}
             />
 
             <TextArea
@@ -160,6 +163,7 @@ export const EditorPage: React.FC = () => {
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyPress={handleTagKeyPress}
                 onBlur={handleAddTag}
+                maxLength={TAG_CONSTRAINTS.NAME_MAX_LENGTH}
               />
               <div className="tag-list">
                 {tags.map(tag => (
