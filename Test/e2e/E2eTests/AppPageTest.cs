@@ -81,6 +81,27 @@ public abstract class AppPageTest : PageTest
   }
 
   /// <summary>
+  /// Takes a screenshot of the current page and saves it to the artifacts directory.
+  /// The screenshot filename will match the current executing test name.
+  /// </summary>
+  protected async Task TakeScreenshotAsync()
+  {
+    if (!Directory.Exists(Constants.ReportsTestE2eArtifacts))
+    {
+      Directory.CreateDirectory(Constants.ReportsTestE2eArtifacts);
+    }
+
+    var testName = GetTestName();
+    var screenshotPath = Path.Combine(Constants.ReportsTestE2eArtifacts, $"{testName}_screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png");
+
+    await Page.ScreenshotAsync(new()
+    {
+      Path = screenshotPath,
+      FullPage = true,
+    });
+  }
+
+  /// <summary>
   /// Gets the current test name from xUnit's TestContext.
   /// </summary>
   private static string GetTestName()
@@ -156,15 +177,15 @@ public abstract class AppPageTest : PageTest
 
     if (testFailed)
     {
-      if (!Directory.Exists(Constants.TracesDirectory))
+      if (!Directory.Exists(Constants.ReportsTestE2eArtifacts))
       {
-        Directory.CreateDirectory(Constants.TracesDirectory);
+        Directory.CreateDirectory(Constants.ReportsTestE2eArtifacts);
       }
 
       var testName = GetTestName();
       await Context.Tracing.StopAsync(new()
       {
-        Path = Path.Combine(Constants.TracesDirectory, $"{testName}_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip"),
+        Path = Path.Combine(Constants.ReportsTestE2eArtifacts, $"{testName}_trace_{DateTime.Now:yyyyMMdd_HHmmss}.zip"),
       });
     }
     else
