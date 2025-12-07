@@ -141,7 +141,9 @@ public class Validation : AppPageTest
     await Pages.SettingsPage.GoToAsync();
 
     // Act
-    await Pages.SettingsPage.BioInput.FillAsync(" "); // Space character triggers validation
+    // Bio validation only applies when bio is provided (not null)
+    // Using a space character sets bio to non-null, triggering NotEmpty() validation
+    await Pages.SettingsPage.BioInput.FillAsync(" ");
     await Pages.SettingsPage.UpdateSettingsAndExpectErrorAsync();
 
     // Assert
