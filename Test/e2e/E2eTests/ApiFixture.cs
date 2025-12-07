@@ -141,30 +141,6 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
-  /// Updates a user's profile (bio and image).
-  /// </summary>
-  private async Task UpdateUserProfileAsync(string token, string bio, string image)
-  {
-    var updateRequest = new
-    {
-      user = new
-      {
-        bio,
-        image,
-      },
-    };
-
-    using var request = new HttpRequestMessage(HttpMethod.Put, "/api/user")
-    {
-      Content = JsonContent.Create(updateRequest, options: _jsonOptions),
-    };
-    request.Headers.Add("Authorization", $"Token {token}");
-
-    var response = await _httpClient.SendAsync(request);
-    response.EnsureSuccessStatusCode();
-  }
-
-  /// <summary>
   /// Creates an article for the authenticated user and returns the article details.
   /// The fixture generates unique test data automatically.
   /// </summary>
@@ -357,6 +333,30 @@ public class ApiFixture : IAsyncLifetime
     var responseContent = await response.Content.ReadAsStringAsync();
     var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, _jsonOptions)!;
     return userResponse.User.Token;
+  }
+
+  /// <summary>
+  /// Updates a user's profile (bio and image).
+  /// </summary>
+  private async Task UpdateUserProfileAsync(string token, string bio, string image)
+  {
+    var updateRequest = new
+    {
+      user = new
+      {
+        bio,
+        image,
+      },
+    };
+
+    using var request = new HttpRequestMessage(HttpMethod.Put, "/api/user")
+    {
+      Content = JsonContent.Create(updateRequest, options: _jsonOptions),
+    };
+    request.Headers.Add("Authorization", $"Token {token}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
   }
 
   // DTOs for API responses
