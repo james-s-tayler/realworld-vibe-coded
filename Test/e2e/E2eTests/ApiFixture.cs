@@ -94,11 +94,16 @@ public class ApiFixture : IAsyncLifetime
     var username = $"testuser{userId}_{guidPart}_{new string('x', 100 - $"testuser{userId}_{guidPart}_".Length)}";
 
     // Email: max 255 chars (including the @domain part)
-    var emailLocalPart = $"{username}_{new string('y', Math.Max(0, 255 - username.Length - 9))}"; // -9 for @test.com
-    if (emailLocalPart.Length > 246)
-    { // Keep room for @test.com (9 chars)
-      emailLocalPart = emailLocalPart[..246];
-    }
+    const int emailDomainLength = 9; // @test.com
+    const int emailMaxLength = 255;
+    const int emailLocalMaxLength = emailMaxLength - emailDomainLength; // 246 chars
+
+    // Calculate how much padding we need for the email local part
+    var emailBasePart = $"{username}_";
+    var emailPaddingLength = Math.Max(0, emailLocalMaxLength - emailBasePart.Length);
+    var emailLocalPart = emailPaddingLength > 0
+        ? $"{emailBasePart}{new string('y', emailPaddingLength)}"
+        : emailBasePart[..emailLocalMaxLength]; // Truncate if needed
 
     var email = $"{emailLocalPart}@test.com";
 
