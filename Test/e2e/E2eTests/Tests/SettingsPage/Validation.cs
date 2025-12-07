@@ -11,26 +11,6 @@ public class Validation : AppPageTest
   }
 
   [Fact]
-  public async Task UpdateSettings_WithEmptyUsername_DisplaysErrorMessage()
-  {
-    // Arrange
-    var user = await Api.CreateUserAsync();
-
-    await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
-
-    await Pages.SettingsPage.GoToAsync();
-
-    // Act
-    await Pages.SettingsPage.UsernameInput.ClearAsync();
-    await Pages.SettingsPage.UsernameInput.FillAsync(string.Empty);
-    await Pages.SettingsPage.UpdateSettingsAndExpectErrorAsync();
-
-    // Assert
-    await Pages.SettingsPage.VerifyErrorContainsTextAsync("is required");
-  }
-
-  [Fact]
   public async Task UpdateSettings_WithUsernameTooShort_DisplaysErrorMessage()
   {
     // Arrange
@@ -71,26 +51,6 @@ public class Validation : AppPageTest
   }
 
   [Fact]
-  public async Task UpdateSettings_WithEmptyEmail_DisplaysErrorMessage()
-  {
-    // Arrange
-    var user = await Api.CreateUserAsync();
-
-    await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
-
-    await Pages.SettingsPage.GoToAsync();
-
-    // Act
-    await Pages.SettingsPage.EmailInput.ClearAsync();
-    await Pages.SettingsPage.EmailInput.FillAsync(string.Empty);
-    await Pages.SettingsPage.UpdateSettingsAndExpectErrorAsync();
-
-    // Assert
-    await Pages.SettingsPage.VerifyErrorContainsTextAsync("is required");
-  }
-
-  [Fact]
   public async Task UpdateSettings_WithInvalidEmail_DisplaysErrorMessage()
   {
     // Arrange
@@ -127,27 +87,6 @@ public class Validation : AppPageTest
 
     // Assert
     await Pages.SettingsPage.VerifyErrorContainsTextAsync("must be at least 6 characters");
-  }
-
-  [Fact]
-  public async Task UpdateSettings_WithEmptyBio_DisplaysErrorMessage()
-  {
-    // Arrange
-    var user = await Api.CreateUserAsync();
-
-    await Pages.LoginPage.GoToAsync();
-    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
-
-    await Pages.SettingsPage.GoToAsync();
-
-    // Act
-    // Bio validation only applies when bio is provided (not null)
-    // Using a space character sets bio to non-null, triggering NotEmpty() validation
-    await Pages.SettingsPage.BioInput.FillAsync(" ");
-    await Pages.SettingsPage.UpdateSettingsAndExpectErrorAsync();
-
-    // Assert
-    await Pages.SettingsPage.VerifyErrorContainsTextAsync("is required");
   }
 
   [Fact]

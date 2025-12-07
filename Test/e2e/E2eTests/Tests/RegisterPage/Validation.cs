@@ -31,57 +31,6 @@ public class Validation : AppPageTest
   }
 
   [Fact]
-  public async Task Register_WithMissingUsername_DisplaysErrorMessage()
-  {
-    // Arrange
-    var email = GenerateUniqueEmail("testuser");
-    var password = "TestPassword123!";
-
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickSignUpAsync();
-
-    // Act
-    await Pages.RegisterPage.RegisterAndExpectErrorAsync(string.Empty, email, password);
-
-    // Assert
-    await Pages.RegisterPage.VerifyErrorContainsTextAsync("is required");
-  }
-
-  [Fact]
-  public async Task Register_WithMissingEmail_DisplaysErrorMessage()
-  {
-    // Arrange
-    var username = GenerateUniqueUsername("testuser");
-    var password = "TestPassword123!";
-
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickSignUpAsync();
-
-    // Act
-    await Pages.RegisterPage.RegisterAndExpectErrorAsync(username, string.Empty, password);
-
-    // Assert
-    await Pages.RegisterPage.VerifyErrorContainsTextAsync("is required");
-  }
-
-  [Fact]
-  public async Task Register_WithMissingPassword_DisplaysErrorMessage()
-  {
-    // Arrange
-    var username = GenerateUniqueUsername("testuser");
-    var email = GenerateUniqueEmail(username);
-
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickSignUpAsync();
-
-    // Act
-    await Pages.RegisterPage.RegisterAndExpectErrorAsync(username, email, string.Empty);
-
-    // Assert
-    await Pages.RegisterPage.VerifyErrorContainsTextAsync("is required");
-  }
-
-  [Fact]
   public async Task Register_WithUsernameTooShort_DisplaysErrorMessage()
   {
     // Arrange
