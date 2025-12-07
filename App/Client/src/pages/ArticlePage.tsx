@@ -8,6 +8,7 @@ import { articlesApi } from '../api/articles';
 import { commentsApi } from '../api/comments';
 import { profilesApi } from '../api/profiles';
 import { PageShell } from '../components/PageShell';
+import { ErrorDisplay } from '../components/ErrorDisplay';
 import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
 import type { Comment } from '../types/comment';
@@ -96,6 +97,7 @@ export const ArticlePage: React.FC = () => {
   const [commentBody, setCommentBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [commentError, setCommentError] = useState<unknown | null>(null);
 
   const loadArticle = useCallback(async () => {
     if (!slug) return;
@@ -175,12 +177,14 @@ export const ArticlePage: React.FC = () => {
     e.preventDefault();
     if (!slug || !commentBody.trim()) return;
     setSubmitting(true);
+    setCommentError(null);
     try {
       const response = await commentsApi.createComment(slug, commentBody);
       setComments([response.comment, ...comments]);
       setCommentBody('');
     } catch (error) {
       console.error('Failed to post comment:', error);
+      setCommentError(error);
     } finally {
       setSubmitting(false);
     }
@@ -255,6 +259,12 @@ export const ArticlePage: React.FC = () => {
           {user ? (
             <form className="card comment-form" onSubmit={handleCommentSubmit}>
               <div className="card-block">
+                <div data-testid="comment-error-display">
+                  <ErrorDisplay 
+                    error={commentError} 
+                    onClose={() => setCommentError(null)}
+                  />
+                </div>
                 <TextArea
                   id="comment"
                   labelText=""

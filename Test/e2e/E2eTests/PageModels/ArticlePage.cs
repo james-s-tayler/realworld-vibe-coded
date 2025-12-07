@@ -70,6 +70,11 @@ public class ArticlePage : BasePage
   public ILocator PostCommentButton => Page.GetByRole(AriaRole.Button, new() { Name = "Post Comment" });
 
   /// <summary>
+  /// Error display element for comment errors.
+  /// </summary>
+  public ILocator CommentErrorDisplay => Page.GetByTestId("comment-error-display");
+
+  /// <summary>
   /// Delete comment button (trash icon).
   /// </summary>
   public ILocator DeleteCommentButton => Page.Locator(".mod-options").First;
@@ -215,5 +220,24 @@ public class ArticlePage : BasePage
   public async Task VerifyCommentNotVisibleAsync(string commentText)
   {
     await Expect(Page.GetByText(commentText)).Not.ToBeVisibleAsync();
+  }
+
+  /// <summary>
+  /// Attempts to add a comment and expects it to fail with an error.
+  /// </summary>
+  public async Task AddCommentAndExpectErrorAsync(string commentText)
+  {
+    await Expect(CommentInput).ToBeVisibleAsync();
+    await CommentInput.FillAsync(commentText);
+    await PostCommentButton.ClickAsync();
+    await Expect(CommentErrorDisplay).ToBeVisibleAsync();
+  }
+
+  /// <summary>
+  /// Verifies that the comment error display contains specific text.
+  /// </summary>
+  public async Task VerifyCommentErrorContainsTextAsync(string expectedText)
+  {
+    await Expect(CommentErrorDisplay).ToContainTextAsync(expectedText);
   }
 }

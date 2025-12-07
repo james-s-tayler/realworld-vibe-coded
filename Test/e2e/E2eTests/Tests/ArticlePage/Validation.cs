@@ -10,5 +10,22 @@ public class Validation : AppPageTest
   {
   }
 
-  // No validation tests for ArticlePage currently
+  [Fact]
+  public async Task AddComment_WithEmptyBody_DisplaysErrorMessage()
+  {
+    // Arrange
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token);
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
+    await Pages.ArticlePage.GoToAsync(article.Slug);
+
+    // Act
+    await Pages.ArticlePage.AddCommentAndExpectErrorAsync(string.Empty);
+
+    // Assert
+    await Pages.ArticlePage.VerifyCommentErrorContainsTextAsync("can't be blank");
+  }
 }

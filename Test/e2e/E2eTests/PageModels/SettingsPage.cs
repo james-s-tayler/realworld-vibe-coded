@@ -48,6 +48,11 @@ public class SettingsPage : BasePage
   public ILocator LogoutButton => Page.GetByRole(AriaRole.Button, new() { Name = "Or click here to logout." });
 
   /// <summary>
+  /// Error display element.
+  /// </summary>
+  public ILocator ErrorDisplay => Page.GetByTestId("error-display");
+
+  /// <summary>
   /// Success message after updating settings.
   /// </summary>
   public ILocator SuccessMessage => Page.GetByText("Settings updated successfully");
@@ -108,5 +113,22 @@ public class SettingsPage : BasePage
   public async Task VerifyLoggedOutAsync()
   {
     await Expect(SignInLink).ToBeVisibleAsync();
+  }
+
+  /// <summary>
+  /// Attempts to update settings and expects it to fail with an error.
+  /// </summary>
+  public async Task UpdateSettingsAndExpectErrorAsync()
+  {
+    await ClickUpdateSettingsButtonAsync();
+    await Expect(ErrorDisplay).ToBeVisibleAsync();
+  }
+
+  /// <summary>
+  /// Verifies that the error display contains specific text.
+  /// </summary>
+  public async Task VerifyErrorContainsTextAsync(string expectedText)
+  {
+    await Expect(ErrorDisplay).ToContainTextAsync(expectedText);
   }
 }
