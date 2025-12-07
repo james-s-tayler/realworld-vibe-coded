@@ -626,14 +626,16 @@ jobs:
             echo "---" >> Reports/Test/e2e/Artifacts/ReportSummary.md
             echo "## 📸 Screenshots" >> Reports/Test/e2e/Artifacts/ReportSummary.md
             echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+            SCREENSHOT_COUNT=$(echo "$SCREENSHOT_FILES" | wc -l)
+            echo "**${SCREENSHOT_COUNT} screenshot(s) captured:**" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+            echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
             for screenshot in $SCREENSHOT_FILES; do
               FILENAME=$(basename "$screenshot")
-              echo "### $FILENAME" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-              echo "![Screenshot](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-              echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-              echo "_Note: Download the \`test-e2e-reports\` artifact from the workflow run to view this screenshot._" >> Reports/Test/e2e/Artifacts/ReportSummary.md
-              echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+              echo "- \`$FILENAME\`" >> Reports/Test/e2e/Artifacts/ReportSummary.md
             done
+            echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+            echo "📦 **[Download test-e2e-reports artifact](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})** to view screenshots" >> Reports/Test/e2e/Artifacts/ReportSummary.md
+            echo "" >> Reports/Test/e2e/Artifacts/ReportSummary.md
           fi
 
       - name: Comment test results on PR

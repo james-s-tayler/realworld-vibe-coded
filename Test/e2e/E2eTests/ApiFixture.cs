@@ -94,10 +94,10 @@ public class ApiFixture : IAsyncLifetime
     var username = $"testuser{userId}_{guidPart}_{new string('x', 100 - $"testuser{userId}_{guidPart}_".Length)}";
 
     // Email: max 255 chars (including the @domain part)
-    var emailLocalPart = $"{username}_{new string('y', Math.Max(0, 255 - username.Length - 10))}"; // -10 for @test.com
-    if (emailLocalPart.Length > 245)
-    { // Keep room for @test.com
-      emailLocalPart = emailLocalPart[..245];
+    var emailLocalPart = $"{username}_{new string('y', Math.Max(0, 255 - username.Length - 9))}"; // -9 for @test.com
+    if (emailLocalPart.Length > 246)
+    { // Keep room for @test.com (9 chars)
+      emailLocalPart = emailLocalPart[..246];
     }
 
     var email = $"{emailLocalPart}@test.com";
@@ -127,7 +127,7 @@ public class ApiFixture : IAsyncLifetime
 
     // Update user profile with max-length bio and image
     var bio = new string('B', 1000); // Bio: max 1000 chars
-    var image = $"https://example.com/{new string('i', 470)}.jpg"; // Image URL: max 500 chars
+    var image = $"https://example.com/{new string('i', 477)}.jpg"; // Image URL: max 500 chars (19+477+4=500)
 
     await UpdateUserProfileAsync(userResponse.User.Token, bio, image);
 
