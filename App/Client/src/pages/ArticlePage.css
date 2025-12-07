@@ -69,7 +69,7 @@
 }
 
 .article-body {
-  font-size: var(--cds-body-long-02-font-size, 1rem);
+  font-size: 1.2rem;
   line-height: var(--cds-body-long-02-line-height, 1.5);
   margin-bottom: var(--cds-spacing-06, 2rem);
 }
@@ -141,7 +141,7 @@
 }
 
 .comment-author-name {
-  color: var(--cds-link-primary, #0f62fe);
+  color: #5cb85c;
   font-weight: 500;
 }
 
