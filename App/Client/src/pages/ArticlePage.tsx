@@ -251,7 +251,7 @@ export const ArticlePage: React.FC = () => {
       <hr />
 
       <Grid narrow>
-        <Column sm={4} md={6} lg={10} xlg={10} max={10} className="article-column-offset">
+        <Column sm={4} md={8} lg={12} xlg={12} max={12} className="article-column-offset">
           {user ? (
             <Tile className="comment-form">
               <form onSubmit={handleCommentSubmit}>

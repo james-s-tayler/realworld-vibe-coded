@@ -22,6 +22,8 @@
   font-weight: var(--cds-heading-05-font-weight, 600);
   line-height: var(--cds-heading-05-line-height, 1.2);
   margin-bottom: var(--cds-spacing-06, 2rem);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .article-meta {
@@ -72,10 +74,14 @@
   font-size: 1.2rem;
   line-height: 1.8;
   margin-bottom: var(--cds-spacing-06, 2rem);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .article-body p {
   margin-bottom: var(--cds-spacing-05, 1rem);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .article-tags {
@@ -88,13 +94,6 @@
 .article-column-offset {
   margin-left: auto;
   margin-right: auto;
-  max-width: 66.67%;
-}
-
-@media (max-width: 768px) {
-  .article-column-offset {
-    max-width: 100%;
-  }
 }
 
 .comment-form {
@@ -119,10 +118,14 @@
 
 .comment-body {
   margin-bottom: var(--cds-spacing-05, 1rem);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .comment-body p {
   margin: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .comment-footer {
