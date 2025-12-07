@@ -132,7 +132,7 @@ public class ApiFixture : IAsyncLifetime
 
     // Update user profile with max-length bio and image
     var bio = new string('B', 1000); // Bio: max 1000 chars
-    var image = $"https://example.com/{new string('i', 477)}.jpg"; // Image URL: max 500 chars (19+477+4=500)
+    var image = $"https://example.com/{new string('i', 476)}.jpg"; // Image URL: max 500 chars (20+476+4=500)
 
     await UpdateUserProfileAsync(userResponse.User.Token, bio, image);
 
