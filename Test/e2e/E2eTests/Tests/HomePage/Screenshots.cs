@@ -1,4 +1,4 @@
-namespace E2eTests.Tests.HomePage;
+﻿namespace E2eTests.Tests.HomePage;
 
 /// <summary>
 /// Screenshot tests for the Home page (/) with global feed.
