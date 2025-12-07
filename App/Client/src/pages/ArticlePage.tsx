@@ -233,24 +233,28 @@ export const ArticlePage: React.FC = () => {
         />
       }
     >
-      <div className="article-content">
-        <div className="article-body">
-          {article.body.split('\n').map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
-        </div>
-        <div className="article-tags">
-          {article.tagList.map(tag => (
-            <Tag key={tag} type="outline" size="sm" as={Link} to={`/?tag=${tag}`}>
-              {tag}
-            </Tag>
-          ))}
-        </div>
-      </div>
+      <Grid>
+        <Column sm={4} md={6} lg={10} xlg={10} max={10} className="article-column-offset">
+          <div className="article-content">
+            <div className="article-body">
+              {article.body.split('\n').map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
+            <div className="article-tags">
+              {article.tagList.map(tag => (
+                <Tag key={tag} type="outline" size="sm" as={Link} to={`/?tag=${tag}`}>
+                  {tag}
+                </Tag>
+              ))}
+            </div>
+          </div>
+        </Column>
+      </Grid>
 
       <hr />
 
-      <Grid narrow>
+      <Grid>
         <Column sm={4} md={6} lg={10} xlg={10} max={10} className="article-column-offset">
           {user ? (
             <Tile className="comment-form">
