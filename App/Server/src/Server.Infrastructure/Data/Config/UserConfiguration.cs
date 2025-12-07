@@ -7,23 +7,23 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
   public void Configure(EntityTypeBuilder<User> builder)
   {
     builder.Property(p => p.Email)
-        .HasMaxLength(DataSchemaConstants.EmailLength)
+        .HasMaxLength(User.EmailMaxLength)
         .IsRequired();
 
     builder.Property(p => p.Username)
-        .HasMaxLength(DataSchemaConstants.UsernameLength)
+        .HasMaxLength(User.UsernameMaxLength)
         .IsRequired();
 
     builder.Property(p => p.HashedPassword)
-        .HasMaxLength(DataSchemaConstants.HashedPasswordLength)
+        .HasMaxLength(User.HashedPasswordMaxLength)
         .IsRequired();
 
     builder.Property(p => p.Bio)
-        .HasMaxLength(DataSchemaConstants.BioLength)
+        .HasMaxLength(User.BioMaxLength)
         .IsRequired();
 
     builder.Property(p => p.Image)
-        .HasMaxLength(DataSchemaConstants.ImageUrlLength);
+        .HasMaxLength(User.ImageUrlMaxLength);
 
     // Create unique indexes
     builder.HasIndex(p => p.Email)

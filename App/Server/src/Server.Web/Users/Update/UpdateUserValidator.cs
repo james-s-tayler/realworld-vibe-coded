@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Server.Core.UserAggregate;
 
 namespace Server.Web.Users.Update;
 
@@ -16,6 +17,8 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
         .WithMessage("is required.")
         .EmailAddress()
         .WithMessage("is invalid.")
+        .MaximumLength(User.EmailMaxLength)
+        .WithMessage($"cannot exceed {User.EmailMaxLength} characters.")
         .OverridePropertyName("email");
     });
 
@@ -25,10 +28,10 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
       RuleFor(x => x.User.Username)
         .NotEmpty()
         .WithMessage("is required.")
-        .MinimumLength(2)
-        .WithMessage("must be at least 2 characters.")
-        .MaximumLength(100)
-        .WithMessage("cannot exceed 100 characters.")
+        .MinimumLength(User.UsernameMinLength)
+        .WithMessage($"must be at least {User.UsernameMinLength} characters.")
+        .MaximumLength(User.UsernameMaxLength)
+        .WithMessage($"cannot exceed {User.UsernameMaxLength} characters.")
         .OverridePropertyName("username");
     });
 
@@ -38,8 +41,8 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
       RuleFor(x => x.User.Password)
         .NotEmpty()
         .WithMessage("is required.")
-        .MinimumLength(6)
-        .WithMessage("must be at least 6 characters.")
+        .MinimumLength(User.PasswordMinLength)
+        .WithMessage($"must be at least {User.PasswordMinLength} characters.")
         .OverridePropertyName("password");
     });
 
@@ -49,8 +52,8 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
       RuleFor(x => x.User.Bio)
         .NotEmpty()
         .WithMessage("is required.")
-        .MaximumLength(1000)
-        .WithMessage("cannot exceed 1000 characters.")
+        .MaximumLength(User.BioMaxLength)
+        .WithMessage($"cannot exceed {User.BioMaxLength} characters.")
         .OverridePropertyName("bio");
     });
   }

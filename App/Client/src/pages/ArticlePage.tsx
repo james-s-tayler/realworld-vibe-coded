@@ -11,7 +11,7 @@ import { PageShell } from '../components/PageShell';
 import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
 import type { Comment } from '../types/comment';
-import { DEFAULT_PROFILE_IMAGE } from '../constants';
+import { DEFAULT_PROFILE_IMAGE, COMMENT_CONSTRAINTS } from '../constants';
 import './ArticlePage.css';
 
 interface ArticleBannerProps {
@@ -262,6 +262,7 @@ export const ArticlePage: React.FC = () => {
                   value={commentBody}
                   onChange={(e) => setCommentBody(e.target.value)}
                   rows={3}
+                  maxLength={COMMENT_CONSTRAINTS.BODY_MAX_LENGTH}
                 />
               </div>
               <div className="card-footer">

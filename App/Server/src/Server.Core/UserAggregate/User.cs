@@ -5,6 +5,14 @@ namespace Server.Core.UserAggregate;
 
 public class User : EntityBase, IAggregateRoot
 {
+  public const int EmailMaxLength = 255;
+  public const int UsernameMinLength = 2;
+  public const int UsernameMaxLength = 100;
+  public const int PasswordMinLength = 6;
+  public const int HashedPasswordMaxLength = 255;
+  public const int BioMaxLength = 1000;
+  public const int ImageUrlMaxLength = 500;
+
   public User(string email, string username, string hashedPassword)
   {
     UpdateEmail(email);
