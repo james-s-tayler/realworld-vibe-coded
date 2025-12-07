@@ -2,5 +2,5 @@
 
 public static class Constants
 {
-  public static readonly string TracesDirectory = "/Reports/Test/e2e/Artifacts";
+  public static readonly string ReportsTestE2eArtifacts = "/Reports/Test/e2e/Artifacts";
 }

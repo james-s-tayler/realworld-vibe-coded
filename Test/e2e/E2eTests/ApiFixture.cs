@@ -82,6 +82,89 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
+  /// Creates a user with all string fields at their maximum length via API.
+  /// The fixture generates unique test data automatically.
+  /// </summary>
+  public async Task<CreatedUser> CreateUserWithMaxLengthsAsync()
+  {
+    var userId = Interlocked.Increment(ref _userCounter);
+    var guidPart = Guid.NewGuid().ToString("N")[..8];
+
+    // Username: max 100 chars
+    var username = $"testuser{userId}_{guidPart}_{new string('x', 100 - $"testuser{userId}_{guidPart}_".Length)}";
+
+    // Email: max 255 chars (including the @domain part)
+    var emailLocalPart = $"{username}_{new string('y', Math.Max(0, 255 - username.Length - 10))}"; // -10 for @test.com
+    if (emailLocalPart.Length > 245)
+    { // Keep room for @test.com
+      emailLocalPart = emailLocalPart[..245];
+    }
+
+    var email = $"{emailLocalPart}@test.com";
+
+    var password = "TestPassword123!";
+
+    var registerRequest = new
+    {
+      user = new
+      {
+        username,
+        email,
+        password,
+      },
+    };
+
+    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/users")
+    {
+      Content = JsonContent.Create(registerRequest, options: _jsonOptions),
+    };
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+
+    var responseContent = await response.Content.ReadAsStringAsync();
+    var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, _jsonOptions)!;
+
+    // Update user profile with max-length bio and image
+    var bio = new string('B', 1000); // Bio: max 1000 chars
+    var image = $"https://example.com/{new string('i', 470)}.jpg"; // Image URL: max 500 chars
+
+    await UpdateUserProfileAsync(userResponse.User.Token, bio, image);
+
+    return new CreatedUser
+    {
+      Token = userResponse.User.Token,
+      Username = username,
+      Email = email,
+      Password = password,
+    };
+  }
+
+  /// <summary>
+  /// Updates a user's profile (bio and image).
+  /// </summary>
+  private async Task UpdateUserProfileAsync(string token, string bio, string image)
+  {
+    var updateRequest = new
+    {
+      user = new
+      {
+        bio,
+        image,
+      },
+    };
+
+    using var request = new HttpRequestMessage(HttpMethod.Put, "/api/user")
+    {
+      Content = JsonContent.Create(updateRequest, options: _jsonOptions),
+    };
+    request.Headers.Add("Authorization", $"Token {token}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+  }
+
+  /// <summary>
   /// Creates an article for the authenticated user and returns the article details.
   /// The fixture generates unique test data automatically.
   /// </summary>
@@ -124,6 +207,64 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
+  /// Creates an article with custom field values for the authenticated user.
+  /// </summary>
+  public async Task<CreatedArticle> CreateArticleAsync(
+    string token,
+    string title,
+    string description,
+    string body,
+    string[]? tags = null)
+  {
+    var articleRequest = new
+    {
+      article = new
+      {
+        title,
+        description,
+        body,
+        tagList = tags ?? Array.Empty<string>(),
+      },
+    };
+
+    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/articles")
+    {
+      Content = JsonContent.Create(articleRequest, options: _jsonOptions),
+    };
+    request.Headers.Add("Authorization", $"Token {token}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+
+    var responseContent = await response.Content.ReadAsStringAsync();
+    var articleResponse = JsonSerializer.Deserialize<ArticleResponse>(responseContent, _jsonOptions)!;
+    return new CreatedArticle
+    {
+      Slug = articleResponse.Article.Slug,
+      Title = articleResponse.Article.Title,
+    };
+  }
+
+  /// <summary>
+  /// Creates an article with maximum length fields (except body = 500 chars as specified).
+  /// </summary>
+  public async Task<CreatedArticle> CreateArticleWithMaxLengthsAsync(string token)
+  {
+    var articleId = Interlocked.Increment(ref _articleCounter);
+
+    // Title: max 200 chars
+    var title = $"Article{articleId} {new string('T', 200 - $"Article{articleId} ".Length)}";
+
+    // Description: max 500 chars
+    var description = new string('D', 500);
+
+    // Body: 500 chars as specified in requirements
+    var body = new string('B', 500);
+
+    return await CreateArticleAsync(token, title, description, body);
+  }
+
+  /// <summary>
   /// Creates multiple articles for the authenticated user.
   /// </summary>
   public async Task CreateArticlesAsync(string token, int count, string[]? tags = null)
@@ -155,6 +296,16 @@ public class ApiFixture : IAsyncLifetime
 
     var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
+  }
+
+  /// <summary>
+  /// Creates a comment with maximum length body on an article.
+  /// </summary>
+  public async Task CreateCommentWithMaxLengthAsync(string token, string articleSlug)
+  {
+    // Comment body: max 5000 chars
+    var commentBody = new string('C', 5000);
+    await CreateCommentAsync(token, articleSlug, commentBody);
   }
 
   /// <summary>
