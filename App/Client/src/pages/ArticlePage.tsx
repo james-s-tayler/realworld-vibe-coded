@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
-import { Button, TextArea, Loading, InlineNotification, Tile, Tag, Grid, Column, IconButton } from '@carbon/react';
+import { Button, TextArea, Loading, InlineNotification, Tile, Tag, IconButton } from '@carbon/react';
 import { FavoriteFilled, Favorite, Edit, TrashCan } from '@carbon/icons-react';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
@@ -233,31 +233,26 @@ export const ArticlePage: React.FC = () => {
         />
       }
     >
-      <Grid>
-        <Column sm={4} md={6} lg={10} xlg={10} max={10} className="article-column-offset">
-          <div className="article-content">
-            <div className="article-body">
-              {article.body.split('\n').map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
-            </div>
-            <div className="article-tags">
-              {article.tagList.map(tag => (
-                <Tag key={tag} type="outline" size="sm" as={Link} to={`/?tag=${tag}`}>
-                  {tag}
-                </Tag>
-              ))}
-            </div>
+      <div className="container">
+        <div className="article-content">
+          <div className="article-body">
+            {article.body.split('\n').map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
           </div>
-        </Column>
-      </Grid>
+          <div className="article-tags">
+            {article.tagList.map(tag => (
+              <Tag key={tag} type="outline" size="sm" as={Link} to={`/?tag=${tag}`}>
+                {tag}
+              </Tag>
+            ))}
+          </div>
+        </div>
 
-      <hr />
+        <hr />
 
-      <Grid>
-        <Column sm={4} md={6} lg={10} xlg={10} max={10} className="article-column-offset">
-          {user ? (
-            <Tile className="comment-form">
+        {user ? (
+          <Tile className="comment-form">
               <form onSubmit={handleCommentSubmit}>
                 <div className="comment-form-body">
                   <TextArea
@@ -321,8 +316,7 @@ export const ArticlePage: React.FC = () => {
               </div>
             </Tile>
           ))}
-        </Column>
-      </Grid>
+      </div>
     </PageShell>
   );
 };
