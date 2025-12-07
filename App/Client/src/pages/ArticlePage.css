@@ -21,6 +21,8 @@
   font-size: 2.8rem;
   font-weight: 600;
   margin-bottom: 2rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .article-meta {
@@ -51,6 +53,8 @@
 .article-meta .author {
   color: white;
   font-weight: 500;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .article-meta .date {
@@ -71,6 +75,8 @@
   font-size: 1.2rem;
   line-height: 1.8;
   margin-bottom: 2rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .article-body p {
@@ -91,6 +97,8 @@
   padding: 0.25rem 0.6rem;
   font-size: 0.8rem;
   text-decoration: none;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .tag-pill:hover {
@@ -110,6 +118,8 @@
 
 .card-text {
   margin: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .card-footer {
@@ -142,6 +152,8 @@
 .comment-author-name {
   color: #5cb85c;
   font-weight: 500;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .date-posted {
