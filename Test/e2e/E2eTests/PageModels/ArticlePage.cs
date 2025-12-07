@@ -71,7 +71,7 @@ public class ArticlePage : BasePage
   /// <summary>
   /// Delete comment button (trash icon).
   /// </summary>
-  public ILocator DeleteCommentButton => Page.Locator(".mod-options").First;
+  public ILocator DeleteCommentButton => Page.GetByLabel("Delete comment").First;
 
   /// <summary>
   /// Clicks the edit button and navigates to the editor page.

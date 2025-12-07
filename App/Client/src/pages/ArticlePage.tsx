@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
-import { Button, TextArea, Loading, InlineNotification } from '@carbon/react';
+import { Button, TextArea, Loading, InlineNotification, Tile, Tag, IconButton } from '@carbon/react';
 import { FavoriteFilled, Favorite, Edit, TrashCan } from '@carbon/icons-react';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
@@ -233,66 +233,65 @@ export const ArticlePage: React.FC = () => {
         />
       }
     >
-      <div className="article-content">
-        <div className="article-body">
-          {article.body.split('\n').map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
+      <div className="container">
+        <div className="article-content">
+          <div className="article-body">
+            {article.body.split('\n').map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </div>
+          <div className="article-tags">
+            {article.tagList.map(tag => (
+              <Tag key={tag} type="outline" size="sm" as={Link} to={`/?tag=${tag}`}>
+                {tag}
+              </Tag>
+            ))}
+          </div>
         </div>
-        <div className="article-tags">
-          {article.tagList.map(tag => (
-            <Link key={tag} to={`/?tag=${tag}`} className="tag-pill">
-              {tag}
-            </Link>
-          ))}
-        </div>
-      </div>
 
-      <hr />
+        <hr />
 
-      <div className="row">
-        <div className="col-xs-12 col-md-8 offset-md-2">
-          {user ? (
-            <form className="card comment-form" onSubmit={handleCommentSubmit}>
-              <div className="card-block">
-                <TextArea
-                  id="comment"
-                  labelText=""
-                  placeholder="Write a comment..."
-                  value={commentBody}
-                  onChange={(e) => setCommentBody(e.target.value)}
-                  rows={3}
-                  maxLength={COMMENT_CONSTRAINTS.BODY_MAX_LENGTH}
-                />
-              </div>
-              <div className="card-footer">
-                <img
-                  src={user.image || DEFAULT_PROFILE_IMAGE}
-                  alt={user.username}
-                  className="comment-author-img"
-                />
-                <Button type="submit" size="sm" disabled={submitting || !commentBody.trim()}>
-                  Post Comment
-                </Button>
-              </div>
-            </form>
+        {user ? (
+          <Tile className="comment-form">
+              <form onSubmit={handleCommentSubmit}>
+                <div className="comment-form-body">
+                  <TextArea
+                    id="comment"
+                    labelText=""
+                    placeholder="Write a comment..."
+                    value={commentBody}
+                    onChange={(e) => setCommentBody(e.target.value)}
+                    rows={3}
+                    maxLength={COMMENT_CONSTRAINTS.BODY_MAX_LENGTH}
+                  />
+                </div>
+                <div className="comment-form-footer">
+                  <img
+                    src={user.image || DEFAULT_PROFILE_IMAGE}
+                    alt={user.username}
+                    className="comment-author-img"
+                  />
+                  <Button type="submit" size="sm" disabled={submitting || !commentBody.trim()}>
+                    Post Comment
+                  </Button>
+                </div>
+              </form>
+            </Tile>
           ) : (
-            <div className="row">
-              <div className="col-xs-12 col-md-8 offset-md-2">
-                <p>
-                  <Link to="/login">Sign in</Link> or <Link to="/register">sign up</Link> to add
-                  comments on this article.
-                </p>
-              </div>
+            <div className="comment-auth-prompt">
+              <p>
+                <Link to="/login">Sign in</Link> or <Link to="/register">sign up</Link> to add
+                comments on this article.
+              </p>
             </div>
           )}
 
           {comments.map(comment => (
-            <div key={comment.id} className="card">
-              <div className="card-block">
-                <p className="card-text">{comment.body}</p>
+            <Tile key={comment.id} className="comment-tile">
+              <div className="comment-body">
+                <p>{comment.body}</p>
               </div>
-              <div className="card-footer">
+              <div className="comment-footer">
                 <Link to={`/profile/${comment.author.username}`} className="comment-author">
                   <img
                     src={comment.author.image || DEFAULT_PROFILE_IMAGE}
@@ -305,17 +304,18 @@ export const ArticlePage: React.FC = () => {
                   {new Date(comment.createdAt).toLocaleDateString()}
                 </span>
                 {user && user.username === comment.author.username && (
-                  <button
-                    className="mod-options"
+                  <IconButton
+                    kind="ghost"
+                    size="sm"
+                    label="Delete comment"
                     onClick={() => handleCommentDelete(comment.id)}
                   >
                     <TrashCan size={16} />
-                  </button>
+                  </IconButton>
                 )}
               </div>
-            </div>
+            </Tile>
           ))}
-        </div>
       </div>
     </PageShell>
   );
