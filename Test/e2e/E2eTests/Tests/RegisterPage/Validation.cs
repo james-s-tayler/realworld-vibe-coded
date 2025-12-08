@@ -20,8 +20,7 @@ public class Validation : AppPageTest
 
     var existingUser = await Api.CreateUserAsync();
 
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickSignUpAsync();
+    await Pages.RegisterPage.GoToAsync();
 
     // Act
     await Pages.RegisterPage.RegisterAndExpectErrorAsync(username2, existingUser.Email, password);
@@ -40,8 +39,7 @@ public class Validation : AppPageTest
 
     var existingUser = await Api.CreateUserAsync();
 
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickSignUpAsync();
+    await Pages.RegisterPage.GoToAsync();
 
     // Act
     await Pages.RegisterPage.RegisterAndExpectErrorAsync(existingUser.Username, email2, password);
