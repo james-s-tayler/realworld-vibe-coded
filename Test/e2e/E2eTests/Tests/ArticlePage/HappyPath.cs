@@ -20,9 +20,7 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(article.Title);
+    await Pages.ArticlePage.GoToAsync(article.Slug);
 
     // Act
     await Pages.ArticlePage.DeleteArticleAsync();
@@ -63,9 +61,7 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(article.Title);
+    await Pages.ArticlePage.GoToAsync(article.Slug);
 
     // Act + Assert
     var commentText = "This is a test comment from E2E tests!";
@@ -85,9 +81,7 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(article.Title);
+    await Pages.ArticlePage.GoToAsync(article.Slug);
 
     // Act + Assert
     await Pages.ArticlePage.DeleteCommentAsync(commentText);

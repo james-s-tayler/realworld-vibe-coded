@@ -62,4 +62,22 @@ public class LoginPage : BasePage
     // Wait for successful login by verifying the New Article link is visible (only shown when logged in)
     await Expect(NewArticleLink).ToBeVisibleAsync();
   }
+
+  /// <summary>
+  /// Attempts to login and expects it to fail with an error.
+  /// </summary>
+  public async Task LoginAndExpectErrorAsync(string email, string password)
+  {
+    await FillLoginFormAsync(email, password);
+    await ClickSignInButtonAsync();
+    await Expect(ErrorDisplay).ToBeVisibleAsync();
+  }
+
+  /// <summary>
+  /// Verifies that the error display contains specific text.
+  /// </summary>
+  public async Task VerifyErrorContainsTextAsync(string expectedText)
+  {
+    await Expect(ErrorDisplay).ToContainTextAsync(expectedText);
+  }
 }

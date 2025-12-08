@@ -17,9 +17,7 @@ public class Permissions : AppPageTest
     var user = await Api.CreateUserAsync();
     var article = await Api.CreateArticleAsync(user.Token);
 
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(article.Title);
+    await Pages.ArticlePage.GoToAsync(article.Slug);
 
     // Act
     await Pages.ArticlePage.ClickFavoriteButtonWithoutWaitAsync();
@@ -35,9 +33,7 @@ public class Permissions : AppPageTest
     var user = await Api.CreateUserAsync();
     var article = await Api.CreateArticleAsync(user.Token);
 
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickGlobalFeedTabAsync();
-    await Pages.HomePage.ClickArticleAsync(article.Title);
+    await Pages.ArticlePage.GoToAsync(article.Slug);
 
     // Act
     await Pages.ArticlePage.ClickFollowButtonWithoutWaitAsync(user.Username);
