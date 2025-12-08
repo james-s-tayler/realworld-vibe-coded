@@ -20,8 +20,11 @@ public class Validation : AppPageTest
 
     await Pages.LoginPage.GoToAsync();
 
-    // Act & Assert
+    // Act
     await Pages.LoginPage.LoginAndExpectErrorAsync(unregisteredEmail, password);
+
+    // Assert
+    await Pages.LoginPage.VerifyErrorContainsTextAsync("email or password is invalid");
   }
 
   [Fact]
@@ -33,7 +36,10 @@ public class Validation : AppPageTest
 
     await Pages.LoginPage.GoToAsync();
 
-    // Act & Assert
+    // Act
     await Pages.LoginPage.LoginAndExpectErrorAsync(existingUser.Email, incorrectPassword);
+
+    // Assert
+    await Pages.LoginPage.VerifyErrorContainsTextAsync("email or password is invalid");
   }
 }

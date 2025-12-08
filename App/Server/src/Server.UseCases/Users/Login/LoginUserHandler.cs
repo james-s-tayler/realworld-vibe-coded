@@ -34,14 +34,22 @@ public class LoginUserHandler : IQueryHandler<LoginUserQuery, User>
     if (user == null)
     {
       _logger.LogWarning("Login failed: User with email {Email} not found", request.Email);
-      return Result<User>.Unauthorized();
+      return Result<User>.Unauthorized(new ErrorDetail
+      {
+        Identifier = "body",
+        ErrorMessage = "email or password is invalid",
+      });
     }
 
     // Verify password
     if (!_passwordHasher.VerifyPassword(request.Password, user.HashedPassword))
     {
       _logger.LogWarning("Login failed: Invalid password for user {Email}", request.Email);
-      return Result<User>.Unauthorized();
+      return Result<User>.Unauthorized(new ErrorDetail
+      {
+        Identifier = "body",
+        ErrorMessage = "email or password is invalid",
+      });
     }
 
     _logger.LogInformation("User {Username} logged in successfully", user.Username);
