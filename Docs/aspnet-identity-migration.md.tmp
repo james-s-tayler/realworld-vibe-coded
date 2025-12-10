@@ -1,0 +1,201 @@
+
+## References & Resources
+
+### Official Documentation
+1. [ASP.NET Core Identity Overview](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity)
+2. [Identity model customization in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model)
+3. [MapIdentityApi Documentation](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.routing.identityapiendpointroutebuilderextensions.mapidentityapi)
+4. [How to use Identity to secure a Web API backend for SPAs](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization)
+5. [Secure ASP.NET Core Blazor WebAssembly with ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/standalone-with-identity)
+
+### Audit.NET Resources
+1. [Audit.NET GitHub Repository](https://github.com/thepirat000/Audit.NET)
+2. [Audit.EntityFramework Documentation](https://github.com/thepirat000/Audit.NET/blob/master/src/Audit.EntityFramework/README.md)
+3. [Audit.EntityFramework.Identity Package](https://www.nuget.org/packages/Audit.EntityFramework.Identity)
+4. [Audit.NET with ASP.NET Identity Integration Guide](https://github.com/thepirat000/Audit.NET/discussions/368)
+
+### Cookie-Based Authentication Resources
+1. [How to use Identity to secure a Web API backend for SPAs - Anuraj](https://anuraj.dev/blog/how-to-use-identity-to-secure-a-web-api-backend-for-spas/)
+2. [Authentication with React.js and ASP.NET Core - Mahedee.net](https://mahedee.net/authentication-and-authorization-using-react.js-and-asp.net-core/)
+
+## Appendix A: Key Code Changes
+
+### A.1: ApplicationUser Definition
+```csharp
+using Microsoft.AspNetCore.Identity;
+using Audit.EntityFramework;
+
+namespace Server.Core.UserAggregate;
+
+public class ApplicationUser : IdentityUser<Guid>
+{
+    // Constants from existing User entity
+    public const int UsernameMinLength = 2;
+    public const int UsernameMaxLength = 100;
+    public const int PasswordMinLength = 6;
+    public const int BioMaxLength = 1000;
+    public const int ImageUrlMaxLength = 500;
+
+    // Conduit-specific properties
+    public string Bio { get; set; } = "I work at statefarm"; // Default bio
+    public string? Image { get; set; }
+
+    // Navigation properties for following relationships
+    public ICollection<UserFollowing> Following { get; set; } = new List<UserFollowing>();
+    public ICollection<UserFollowing> Followers { get; set; } = new List<UserFollowing>();
+
+    // Override to ensure PasswordHash is not audited
+    [AuditIgnore]
+    public override string? PasswordHash { get; set; }
+    
+    // Also ignore security-sensitive fields
+    [AuditIgnore]
+    public override string? SecurityStamp { get; set; }
+    
+    [AuditIgnore]
+    public override string? ConcurrencyStamp { get; set; }
+}
+```
+
+### A.2: AppDbContext Update
+```csharp
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Audit.EntityFramework.Identity;
+
+namespace Server.Infrastructure.Data;
+
+[AuditDbContext(
+    Mode = AuditOptionMode.OptOut,
+    IncludeEntityObjects = false,
+    AuditEventType = "{context}")]
+public class AppDbContext : AuditIdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        // Configure ApplicationUser
+        builder.Entity<ApplicationUser>(entity =>
+        {
+            // Map to existing Users table (if keeping same table name)
+            entity.ToTable("Users");
+            
+            // Configure custom properties
+            entity.Property(u => u.Bio)
+                .HasMaxLength(ApplicationUser.BioMaxLength)
+                .IsRequired();
+            
+            entity.Property(u => u.Image)
+                .HasMaxLength(ApplicationUser.ImageUrlMaxLength);
+            
+            // Configure Identity properties to match existing constraints
+            entity.Property(u => u.Email)
+                .HasMaxLength(255)
+                .IsRequired();
+            
+            entity.Property(u => u.UserName)
+                .HasMaxLength(ApplicationUser.UsernameMaxLength)
+                .IsRequired();
+        });
+
+        // Configure other entities as before
+        builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+    }
+}
+```
+
+### A.3: Program.cs Identity Configuration with Cookie Authentication
+```csharp
+using Microsoft.AspNetCore.Identity;
+using Server.Core.UserAggregate;
+using Server.Infrastructure.Data;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// ... existing configuration ...
+
+// Add Identity with cookie authentication
+builder.Services
+    .AddIdentityApiEndpoints<ApplicationUser>(options =>
+    {
+        // Password settings
+        options.Password.RequireDigit = false;
+        options.Password.RequiredLength = ApplicationUser.PasswordMinLength;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+        
+        // User settings
+        options.User.RequireUniqueEmail = true;
+        options.User.AllowedUserNameCharacters = 
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+        
+        // Sign-in settings
+        options.SignIn.RequireConfirmedEmail = false;
+        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedPhoneNumber = false;
+    })
+    .AddEntityFrameworkStores<AppDbContext>();
+
+var app = builder.Build();
+
+// Map Identity API endpoints
+app.MapIdentityApi<ApplicationUser>();
+
+// ... rest of app configuration ...
+
+app.Run();
+```
+
+### A.4: React API Client Update for Cookie Authentication
+```typescript
+// Updated API client for cookie auth
+const apiRequest = async (url: string, options: RequestInit = {}) => {
+    const response = await fetch(url, {
+        ...options,
+        credentials: 'include', // Always include cookies
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        },
+    });
+    
+    if (response.status === 401) {
+        // User is not authenticated, redirect to login
+        window.location.href = '/login';
+    }
+    
+    return response;
+};
+
+// Login function with cookie authentication
+const login = async (email: string, password: string) => {
+    const response = await apiRequest('/login?useCookies=true', {
+        method: 'POST',
+        body: JSON.stringify({ email, password })
+    });
+    
+    if (response.ok) {
+        // Cookie is set automatically, just update local state
+        const userInfo = await apiRequest('/manage/info', { method: 'GET' });
+        const data = await userInfo.json();
+        setUser(data);
+    }
+};
+```
+
+---
+
+**Document Version**: 2.0  
+**Last Updated**: 2025-12-10  
+**Author**: Development Team  
+**Status**: Ready for Implementation  
+**Changelog**:
+- v2.0: Major update - switched from JWT to cookie-based authentication, removed wrappers (using Identity endpoints directly), removed data migration concerns (dev environment), added specific Nuke test commands, removed timeline/rollback/future enhancement sections
+- v1.1: Added React frontend integration considerations  
+- v1.0: Initial comprehensive migration plan
