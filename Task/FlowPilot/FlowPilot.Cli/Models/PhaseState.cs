@@ -1,4 +1,4 @@
-namespace FlowPilot.Cli.Models;
+﻿namespace FlowPilot.Cli.Models;
 
 /// <summary>
 /// Represents the state of a single phase in a FlowPilot plan.

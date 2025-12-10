@@ -83,7 +83,7 @@ public partial class Build
 
   internal Target LintAllVerify => _ => _
       .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
-      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify)
+      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintFlowPilotVerify)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
@@ -96,7 +96,7 @@ public partial class Build
 
   internal Target LintAllFix => _ => _
       .Description("Fix all C# formatting & analyzer issues automatically")
-      .DependsOn(LintClientFix, LintServerFix, LintNukeFix)
+      .DependsOn(LintClientFix, LintServerFix, LintNukeFix, LintFlowPilotFix)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";

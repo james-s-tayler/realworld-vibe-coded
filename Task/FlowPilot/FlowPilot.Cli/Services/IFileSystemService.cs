@@ -1,4 +1,4 @@
-namespace FlowPilot.Cli.Services;
+﻿namespace FlowPilot.Cli.Services;
 
 /// <summary>
 /// Interface for file system operations to enable testing.

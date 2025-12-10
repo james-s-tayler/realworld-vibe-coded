@@ -1,4 +1,4 @@
-namespace FlowPilot.Cli.Services;
+﻿namespace FlowPilot.Cli.Services;
 
 /// <summary>
 /// Default implementation of file system operations.

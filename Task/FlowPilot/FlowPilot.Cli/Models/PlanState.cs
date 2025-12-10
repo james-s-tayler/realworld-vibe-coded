@@ -1,4 +1,4 @@
-namespace FlowPilot.Cli.Models;
+﻿namespace FlowPilot.Cli.Models;
 
 /// <summary>
 /// Represents the current state of a FlowPilot plan.

@@ -1,4 +1,4 @@
-namespace FlowPilot.Cli.Models;
+﻿namespace FlowPilot.Cli.Models;
 
 /// <summary>
 /// Represents a single item in the state.md checklist.

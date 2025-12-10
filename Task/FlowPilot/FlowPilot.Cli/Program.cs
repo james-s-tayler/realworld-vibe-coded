@@ -1,4 +1,4 @@
-using System.CommandLine;
+﻿using System.CommandLine;
 using FlowPilot.Cli.Commands;
 
 namespace FlowPilot.Cli;
