@@ -4,8 +4,8 @@
 # To make this agent available, merge this file into the default repository branch.
 # For format details, see: https://gh.io/customagents/config
 
-name: standard
-description: default do's and dont's included in instructions
+name: flowpilot
+description: agentic vibe coding assistant
 ---
 
 # FlowPilot
