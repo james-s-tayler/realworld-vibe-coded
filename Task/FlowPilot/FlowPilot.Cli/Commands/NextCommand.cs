@@ -1,4 +1,5 @@
 using System.CommandLine;
+using FlowPilot.Cli.Services;
 
 namespace FlowPilot.Cli.Commands;
 
@@ -27,9 +28,21 @@ public static class NextCommand
 
   private static async Task ExecuteAsync(string planName)
   {
-    Console.WriteLine($"Advancing FlowPilot plan: {planName}");
+    var fileSystem = new FileSystemService();
+    var templateService = new TemplateService();
+    var stateParser = new StateParser();
+    var planManager = new PlanManager(fileSystem, templateService, stateParser);
 
-    // Implementation will be added in Phase 2
+    if (!planManager.PlanExists(planName))
+    {
+      Console.WriteLine($"Error: Plan '{planName}' not found. Run 'flowpilot init {planName}' first.");
+      Environment.Exit(1);
+      return;
+    }
+
+    var handler = new NextCommandHandler(planManager, fileSystem);
+    handler.Execute(planName);
+
     await Task.CompletedTask;
   }
 }
