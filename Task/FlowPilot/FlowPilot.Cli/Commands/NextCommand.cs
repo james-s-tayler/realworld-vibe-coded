@@ -40,6 +40,30 @@ public static class NextCommand
       return;
     }
 
+    // Run lint first
+    var currentDir = fileSystem.GetCurrentDirectory();
+    var gitService = new GitService(currentDir);
+
+    try
+    {
+      gitService.GetRepositoryRoot();
+      var lintHandler = new LintCommandHandler(planManager, fileSystem, gitService, templateService);
+      var lintResult = lintHandler.Execute(planName);
+
+      if (lintResult != 0)
+      {
+        Console.WriteLine();
+        Console.WriteLine("❌ Cannot proceed - lint check failed. Fix the issues above first.");
+        Environment.Exit(1);
+        return;
+      }
+    }
+    catch (InvalidOperationException)
+    {
+      // Not in git repo - continue without lint (for testing purposes)
+      Console.WriteLine("⚠️  Warning: Not in a git repository. Skipping lint check.");
+    }
+
     var handler = new NextCommandHandler(planManager, fileSystem);
     handler.Execute(planName);
 
