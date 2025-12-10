@@ -28,7 +28,8 @@ public static class NextCommand
 
   private static async Task ExecuteAsync(string planName)
   {
-    var fileSystem = new FileSystemService();
+    // Create services
+    IFileSystemService fileSystem = new FileSystemService();
     var templateService = new TemplateService();
     var stateParser = new StateParser();
     var planManager = new PlanManager(fileSystem, templateService, stateParser);
@@ -47,7 +48,12 @@ public static class NextCommand
     try
     {
       gitService.GetRepositoryRoot();
-      var lintHandler = new LintCommandHandler(planManager, fileSystem, gitService, templateService);
+
+      // Create service factory and get linting rules
+      var serviceFactory = new ServiceFactory(fileSystem, templateService, stateParser, gitService, planManager);
+      var lintingRules = serviceFactory.CreateLintingRules();
+
+      var lintHandler = new LintCommandHandler(planManager, lintingRules);
       var lintResult = await lintHandler.ExecuteAsync(planName);
 
       if (lintResult != 0)
@@ -64,7 +70,11 @@ public static class NextCommand
       Console.WriteLine("⚠️  Warning: Not in a git repository. Skipping lint check.");
     }
 
-    var handler = new NextCommandHandler(planManager, fileSystem, templateService, stateParser);
+    // Create state transitions and execute next
+    var serviceFactory2 = new ServiceFactory(fileSystem, templateService, stateParser, gitService, planManager);
+    var stateTransitions = serviceFactory2.CreateStateTransitions();
+
+    var handler = new NextCommandHandler(planManager, stateTransitions);
     handler.Execute(planName);
 
     await Task.CompletedTask;

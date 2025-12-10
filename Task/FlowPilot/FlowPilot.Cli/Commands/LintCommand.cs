@@ -29,7 +29,8 @@ public static class LintCommand
 
   private static async Task<int> ExecuteAsync(string planName)
   {
-    var fileSystem = new FileSystemService();
+    // Create services
+    IFileSystemService fileSystem = new FileSystemService();
     var templateService = new TemplateService();
     var stateParser = new StateParser();
     var planManager = new PlanManager(fileSystem, templateService, stateParser);
@@ -53,7 +54,11 @@ public static class LintCommand
       return 1;
     }
 
-    var handler = new LintCommandHandler(planManager, fileSystem, gitService, templateService);
+    // Create service factory and get linting rules
+    var serviceFactory = new ServiceFactory(fileSystem, templateService, stateParser, gitService, planManager);
+    var lintingRules = serviceFactory.CreateLintingRules();
+
+    var handler = new LintCommandHandler(planManager, lintingRules);
     var exitCode = await handler.ExecuteAsync(planName);
     return exitCode;
   }
