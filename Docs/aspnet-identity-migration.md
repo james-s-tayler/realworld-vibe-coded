@@ -200,174 +200,106 @@ public class ApplicationUser : IdentityUser<Guid>
        .AddDefaultTokenProviders();
    ```
 
-2. Replace `IJwtTokenGenerator` usage with Identity's `UserManager<ApplicationUser>` and `SignInManager<ApplicationUser>`
+2. Remove custom authentication services:
+   - Remove `BcryptPasswordHasher`
+   - Remove custom `JwtTokenGenerator`
+   - Remove custom authentication endpoints
 
-3. Remove custom services:
-   - `BcryptPasswordHasher` (or keep for backward compatibility)
-   - Custom `JwtTokenGenerator` (or adapt to work with Identity)
+3. Update `UserContext` service to work with Identity's claims-based authentication
 
-4. Update `UserContext` service to work with Identity's claims-based authentication
+**Testing**:
+- Run `nuke TestServer` to verify backend tests pass
+- Run `nuke TestServerPostman` to verify API contract tests pass  
+- Run `nuke TestE2e` to verify end-to-end tests pass
+- Fix any failing tests iteratively
 
-**Testing Considerations**:
-- Verify UserManager can create users successfully
-- Confirm password hashing works for both new and existing users
-- Test SignInManager authentication flows
+### Phase 4: Endpoint and Test Migration (Combined)
+**Goal**: Migrate to ASP.NET Core Identity endpoints and update all tests to pass
 
-### Phase 4: Endpoint Migration
-**Goal**: Replace custom FastEndpoints with ASP.NET Core Identity API endpoints
+**Important**: This phase combines endpoint migration with test updates because tests must pass before merging. We are explicitly deviating from the RealWorld API specification to use ASP.NET Core Identity's standard endpoints.
 
-**Current Endpoints**:
-- `POST /api/users/login` → `POST /api/users/login` (Identity: `POST /login`)
-- `POST /api/users` → `POST /api/users` (Identity: `POST /register`)
-- `GET /api/user` → `GET /api/user` (Identity: `GET /manage/info`)
-- `PUT /api/user` → `PUT /api/user` (Identity: `POST /manage/info`)
+**Endpoint Migration**:
 
-**Migration Approaches**:
+Use ASP.NET Core Identity endpoints directly (no wrappers):
+- `POST /register` - User registration
+- `POST /login?useCookies=true` - User login with cookie auth
+- `GET /manage/info` - Get current user info
+- `POST /manage/info` - Update user info
 
-**Option A: Use MapIdentityApi with Custom Wrappers** (Recommended)
-1. Call `MapIdentityApi<ApplicationUser>()` with custom route prefix:
-   ```csharp
-   app.MapGroup("/api/identity").MapIdentityApi<ApplicationUser>();
-   ```
+**Implementation**:
+```csharp
+// In Program.cs
+builder.Services
+    .AddIdentityApiEndpoints<ApplicationUser>(options =>
+    {
+        // Configure Identity options
+        options.Password.RequiredLength = 6;
+        // ... other settings
+    })
+    .AddEntityFrameworkStores<AppDbContext>();
 
-2. Create wrapper endpoints that match RealWorld API spec:
-   ```csharp
-   // POST /api/users (register)
-   app.MapPost("/api/users", async (RegisterRequest request, UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwt) =>
-   {
-       var user = new ApplicationUser
-       {
-           Email = request.User.Email,
-           UserName = request.User.Username,
-           Bio = "I work at statefarm" // Default
-       };
-       
-       var result = await userManager.CreateAsync(user, request.User.Password);
-       if (!result.Succeeded)
-       {
-           return Results.ValidationProblem(/* map errors */);
-       }
-       
-       var token = jwt.GenerateToken(user);
-       return Results.Ok(new UserResponse { User = /* map user */ });
-   });
-   ```
+// Map Identity API endpoints
+app.MapIdentityApi<ApplicationUser>();
+```
 
-3. Maintain custom DTOs for RealWorld API compatibility:
-   - Keep existing request/response models
-   - Map between Identity models and RealWorld models
+**Frontend Updates**:
+1. Update API client to use cookie authentication (credentials: 'include')
+2. Update endpoint URLs to Identity endpoints
+3. Remove JWT token management code
+4. Update AuthContext to work with cookie-based auth
 
-**Option B: Use Identity Services with Custom Endpoints** (Alternative)
-1. Keep existing FastEndpoints structure
-2. Replace internal logic to use `UserManager<ApplicationUser>` and `SignInManager<ApplicationUser>`
-3. Do not use `MapIdentityApi` at all
-4. Example:
-   ```csharp
-   public class Login : Endpoint<LoginRequest, UserResponse>
-   {
-       private readonly SignInManager<ApplicationUser> _signInManager;
-       private readonly UserManager<ApplicationUser> _userManager;
-       private readonly IJwtTokenGenerator _jwtGenerator;
-       
-       public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
-       {
-           var user = await _userManager.FindByEmailAsync(req.User.Email);
-           if (user == null)
-           {
-               await SendErrorsAsync(/* ... */);
-               return;
-           }
-           
-           var result = await _signInManager.CheckPasswordSignInAsync(user, req.User.Password, false);
-           if (!result.Succeeded)
-           {
-               await SendErrorsAsync(/* ... */);
-               return;
-           }
-           
-           var token = _jwtGenerator.GenerateToken(user);
-           await SendOkAsync(/* map response */);
-       }
-   }
-   ```
-
-**Recommendation**: Start with **Option A** as it provides:
-- Built-in security features from Identity
-- Additional endpoints for future features (2FA, password reset, email confirmation)
-- Cleaner separation between Identity concerns and domain logic
-- Can still maintain RealWorld API compatibility through wrapper endpoints
-
-**JWT Token Considerations**:
-- Identity can be configured to return JWT bearer tokens instead of cookies
-- Use `AddIdentityApiEndpoints<ApplicationUser>()` which includes JWT support
-- Configure JWT settings to match existing token format and claims
-- May need to adjust JWT claims mapping to maintain compatibility with existing authorization logic
-
-### Phase 5: Test Migration
-**Goal**: Ensure all tests pass with the new Identity-based authentication
+**Test Migration**:
 
 **Integration Tests** (`Server.IntegrationTests`):
 1. Update test fixtures to use Identity's `UserManager` for user creation
-2. Replace direct `AppDbContext` user manipulation with `UserManager` calls
+2. Replace direct `AppDbContext` user manipulation with `UserManager` calls  
 3. Update assertions to work with Identity's user model
-4. Verify Audit.NET still captures authentication operations
+4. Update cookie-based authentication in test helpers
+5. **Run**: `nuke TestServer` and fix any failing tests iteratively
 
 **Functional Tests** (`Server.FunctionalTests`):
-1. Update helper methods that create authenticated clients:
-   ```csharp
-   // Before
-   var (token, user) = await CreateUserAndLogin("username", "email@test.com", "password");
-   
-   // After (may be similar)
-   var (token, user) = await CreateUserAndLoginWithIdentity("username", "email@test.com", "password");
-   ```
-
-2. Ensure tests work with new endpoint paths (if changed)
-3. Verify JWT tokens work correctly for authentication
-4. Update any tests that directly manipulate user passwords
+1. Update helper methods that create authenticated clients for cookie auth
+2. Update endpoint URLs to use Identity endpoints
+3. Update request/response models to match Identity's format
+4. **Run**: `nuke TestServer` and fix any failing tests iteratively
 
 **Postman Tests** (`Test/Postman/`):
-1. **Critical Decision**: Do we maintain RealWorld API spec or adopt Identity endpoints?
-   - **Option 1**: Keep RealWorld spec by using wrapper endpoints (no Postman changes)
-   - **Option 2**: Update Postman collection to use Identity endpoints
-   
-2. If using Identity endpoints directly:
-   - Update request URLs and payloads
-   - Adjust response validation
-   - Update environment variables if needed
-
-3. Run full Postman suite to verify:
-   - Registration works
-   - Login returns valid JWT
-   - Protected endpoints accept JWT
-   - User updates work correctly
-   - All authentication flows are functional
+1. Update Postman collection to use Identity endpoints
+2. Update requests to use cookie authentication  
+3. Update environment variables if needed
+4. **Run**: `nuke TestServerPostman` and fix any failing tests iteratively
 
 **E2E Playwright Tests** (`Test/e2e/E2eTests/`):
-1. Review page object models for authentication pages
-2. Update if authentication flows change (e.g., different response structures)
-3. Ensure all user journeys still work:
-   - User registration
-   - User login
-   - Profile updates
-   - Article creation/editing (authenticated actions)
-   
-4. Verify UI still works with new authentication backend
+1. Update page object models for new authentication endpoints
+2. Update authentication flows to work with cookies
+3. Ensure all user journeys still work
+4. **Run**: `nuke TestE2e` and fix any failing tests iteratively
 
-**Test Execution Strategy**:
-1. Start with Integration tests (fastest feedback)
-2. Progress to Functional tests
-3. Run Postman tests for API contract validation
-4. Finally, run E2E tests for full system validation
-5. Create a test report comparing before/after migration
+**Iterative Debugging Process**:
 
-**Acceptance Criteria**:
-- All Integration tests pass
-- All Functional tests pass
-- All Postman tests pass (100% success rate)
-- All E2E Playwright tests pass
-- No regression in authentication functionality
-- Audit logs continue to capture authentication events correctly
+When tests fail, follow this systematic approach:
+
+1. **Read error messages carefully**: Error messages often contain specific guidance on what failed
+2. **Check test reports**: Reports are generated in `Reports/Server/Artifacts/Tests/Report.md`
+3. **Review logs**: Check application logs if tests are failing due to runtime errors
+4. **Search for solutions**: Use mslearn MCP server to search for Identity-specific issues
+5. **Web search**: If mslearn doesn't have the answer, use web search for community solutions
+6. **Iterate**: Make small fixes and re-run tests until all pass
+7. **Don't give up early**: This is a complex migration; persist through multiple iterations
+
+**Required Test Commands**:
+```bash
+# Run all backend tests
+nuke TestServer
+
+# Run Postman API tests  
+nuke TestServerPostman
+
+# Run E2E Playwright tests
+nuke TestE2e
+```
+
+**Acceptance Criteria**: All three test suites must pass (100% success rate) before proceeding.
 
 ### Phase 6: Authorization & User Context
 **Goal**: Ensure authorization and user context extraction work with Identity's claims
