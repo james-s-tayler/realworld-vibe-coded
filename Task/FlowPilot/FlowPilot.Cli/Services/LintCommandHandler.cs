@@ -7,6 +7,9 @@ namespace FlowPilot.Cli.Services;
 /// </summary>
 public class LintCommandHandler
 {
+  private const string TemplateReplaceMe = "Replace me";
+  private const string TemplateUpdateMe = "update me";
+
   private readonly PlanManager _planManager;
   private readonly IFileSystemService _fileSystem;
   private readonly GitService _gitService;
@@ -24,7 +27,7 @@ public class LintCommandHandler
     _templateService = templateService;
   }
 
-  public int Execute(string planName)
+  public async Task<int> ExecuteAsync(string planName)
   {
     var errors = new List<string>();
 
@@ -57,7 +60,7 @@ public class LintCommandHandler
     // Check URL validity in references.md if it exists and is checked
     if (state.HasReferences)
     {
-      var urlErrors = CheckReferencesUrls(planName);
+      var urlErrors = await CheckReferencesUrlsAsync(planName);
       errors.AddRange(urlErrors);
     }
 
@@ -266,7 +269,7 @@ public class LintCommandHandler
     return errors;
   }
 
-  private List<string> CheckReferencesUrls(string planName)
+  private async Task<List<string>> CheckReferencesUrlsAsync(string planName)
   {
     var errors = new List<string>();
     var metaDir = _planManager.GetMetaDirectory(planName);
@@ -293,7 +296,7 @@ public class LintCommandHandler
       try
       {
         var request = new HttpRequestMessage(HttpMethod.Head, url);
-        var response = httpClient.Send(request);
+        var response = await httpClient.SendAsync(request);
 
         if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
@@ -316,7 +319,7 @@ public class LintCommandHandler
     var normalizedTemplate = template.Replace("\r\n", "\n").Replace("\r", "\n").Trim();
 
     // Check if content contains only template text (allowing for minor formatting differences)
-    return normalizedContent == normalizedTemplate || normalizedContent.Contains("Replace me") || normalizedContent.Contains("update me");
+    return normalizedContent == normalizedTemplate || normalizedContent.Contains(TemplateReplaceMe) || normalizedContent.Contains(TemplateUpdateMe);
   }
 
   private void PrintErrors(List<string> errors)

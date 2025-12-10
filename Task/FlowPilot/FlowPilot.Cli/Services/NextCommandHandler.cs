@@ -9,11 +9,19 @@ public class NextCommandHandler
 {
   private readonly PlanManager _planManager;
   private readonly IFileSystemService _fileSystem;
+  private readonly TemplateService _templateService;
+  private readonly StateParser _stateParser;
 
-  public NextCommandHandler(PlanManager planManager, IFileSystemService fileSystem)
+  public NextCommandHandler(
+    PlanManager planManager,
+    IFileSystemService fileSystem,
+    TemplateService templateService,
+    StateParser stateParser)
   {
     _planManager = planManager;
     _fileSystem = fileSystem;
+    _templateService = templateService;
+    _stateParser = stateParser;
   }
 
   public void Execute(string planName)
@@ -134,8 +142,7 @@ public class NextCommandHandler
       _fileSystem.CreateDirectory(planDir);
     }
 
-    var templateService = new TemplateService();
-    var phaseTemplate = templateService.ReadTemplate("phase-n-details.md");
+    var phaseTemplate = _templateService.ReadTemplate("phase-n-details.md");
 
     for (int i = 0; i < phaseNames.Count; i++)
     {
@@ -148,9 +155,8 @@ public class NextCommandHandler
     // Update state.md to add phase checklist items and mark phase-n-details as checked
     var stateFilePath = _planManager.GetStateFilePath(planName);
     var stateContent = _fileSystem.ReadAllText(stateFilePath);
-    var stateParser = new StateParser();
-    stateContent = stateParser.UpdateChecklistItem(stateContent, "phase-n-details", true);
-    stateContent = stateParser.AddPhaseChecklistItems(stateContent, phaseNames);
+    stateContent = _stateParser.UpdateChecklistItem(stateContent, "phase-n-details", true);
+    stateContent = _stateParser.AddPhaseChecklistItems(stateContent, phaseNames);
     _fileSystem.WriteAllText(stateFilePath, stateContent);
 
     Console.WriteLine($"✓ Advanced to [phase-n-details] phase");

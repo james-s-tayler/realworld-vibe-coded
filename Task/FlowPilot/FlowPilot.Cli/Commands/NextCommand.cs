@@ -48,7 +48,7 @@ public static class NextCommand
     {
       gitService.GetRepositoryRoot();
       var lintHandler = new LintCommandHandler(planManager, fileSystem, gitService, templateService);
-      var lintResult = lintHandler.Execute(planName);
+      var lintResult = await lintHandler.ExecuteAsync(planName);
 
       if (lintResult != 0)
       {
@@ -64,7 +64,7 @@ public static class NextCommand
       Console.WriteLine("⚠️  Warning: Not in a git repository. Skipping lint check.");
     }
 
-    var handler = new NextCommandHandler(planManager, fileSystem);
+    var handler = new NextCommandHandler(planManager, fileSystem, templateService, stateParser);
     handler.Execute(planName);
 
     await Task.CompletedTask;

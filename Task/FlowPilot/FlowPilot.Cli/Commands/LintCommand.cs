@@ -54,9 +54,7 @@ public static class LintCommand
     }
 
     var handler = new LintCommandHandler(planManager, fileSystem, gitService, templateService);
-    var exitCode = handler.Execute(planName);
-
-    await Task.CompletedTask;
+    var exitCode = await handler.ExecuteAsync(planName);
     return exitCode;
   }
 }
