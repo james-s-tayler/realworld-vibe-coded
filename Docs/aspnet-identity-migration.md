@@ -70,6 +70,247 @@ ASP.NET Core Identity uses several entity types:
 - `IdentityUserToken` - Authentication tokens
 - `IdentityUserRole` - User-role associations (if using roles)
 
+## React Frontend Integration Considerations
+
+### Current Frontend Architecture
+The Conduit application uses a React + Vite + TypeScript frontend that communicates with the backend API using JWT bearer tokens. The frontend currently:
+- Stores JWT tokens (obtained from login/register endpoints)
+- Sends tokens in the `Authorization: Token {jwt}` header format (RealWorld spec uses "Token" prefix instead of "Bearer")
+- Manages authentication state via React Context (`AuthContext`)
+- Uses a centralized API client (`apiRequest` helper) for all HTTP requests
+
+### Identity API Integration Options for React
+
+Based on research and best practices for ASP.NET Core Identity with React SPAs:
+
+**Option 1: JWT Bearer Tokens (Recommended for Conduit)**
+- Identity supports JWT bearer tokens via `AddIdentityApiEndpoints<TUser>()`
+- React continues to manage tokens in memory or sessionStorage
+- Token sent in `Authorization: Bearer {jwt}` header
+- Stateless authentication (no server-side sessions)
+- Works well for SPAs and mobile apps
+- **Best fit for Conduit**: Maintains current architecture with minimal frontend changes
+
+**Option 2: Cookie-Based Authentication**
+- Identity's default authentication mechanism
+- More secure (HTTP-only cookies prevent XSS)
+- Requires CORS configuration for SPA
+- Automatic cookie transmission by browser
+- Server-side session management
+- **Consideration**: May require significant frontend changes to handle cookie-based auth
+
+**Option 3: Hybrid Approach**
+- Use both cookies and JWT tokens
+- Cookies for browser-based auth
+- JWT for API clients and mobile apps
+- Most flexible but more complex
+
+### Recommended Approach: JWT Bearer with Identity
+
+Configure Identity to issue JWT tokens for the React frontend:
+
+```csharp
+// In Program.cs
+builder.Services
+    .AddIdentityApiEndpoints<ApplicationUser>(options =>
+    {
+        // Configure Identity options
+        options.Password.RequiredLength = 6;
+        // ... other settings
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+// Add JWT Bearer Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]))
+    };
+});
+```
+
+### Frontend Changes Required
+
+**Minimal Changes** (using wrapper endpoints):
+1. **No API URL changes**: Continue using `/api/users/login`, `/api/users`, etc.
+2. **Token format**: Change from `Authorization: Token {jwt}` to `Authorization: Bearer {jwt}` (standard)
+3. **Response format**: Ensure wrapper endpoints return RealWorld-compatible responses
+4. **Error handling**: May need to adjust for Identity's error response format
+
+**Token Storage Best Practices** (from research):
+1. **Do NOT use localStorage**: Vulnerable to XSS attacks
+2. **Prefer in-memory storage**: Store token in React state/context
+3. **SessionStorage**: Minimally safer than localStorage for dev/testing
+4. **HTTP-only cookies**: Most secure option (requires backend changes)
+
+**Example React Integration** (based on research patterns):
+
+```typescript
+// API client update
+const apiRequest = async (url: string, options: RequestInit = {}) => {
+    const token = getAuthToken(); // from context or memory
+    
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }), // Changed from "Token"
+        ...options.headers,
+    };
+    
+    const response = await fetch(url, { ...options, headers });
+    
+    if (response.status === 401) {
+        // Handle token expiration
+        clearAuthToken();
+        // Redirect to login or refresh token
+    }
+    
+    return response;
+};
+
+// Login function
+const login = async (email: string, password: string) => {
+    const response = await apiRequest('/api/users/login', {
+        method: 'POST',
+        body: JSON.stringify({ user: { email, password } })
+    });
+    
+    if (response.ok) {
+        const data = await response.json();
+        setAuthToken(data.user.token); // Store in context/memory
+        setUser(data.user);
+    }
+};
+```
+
+### CORS Configuration
+
+Since the frontend and backend may run on different ports during development:
+
+```csharp
+// In Program.cs
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "https://localhost:5173") // Vite default port
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Required if using cookies
+    });
+});
+
+app.UseCors("AllowReactApp");
+```
+
+### Token Refresh Strategy
+
+Identity provides a `/refresh` endpoint for token refresh:
+
+```typescript
+// React refresh token handler
+const refreshToken = async () => {
+    try {
+        const response = await apiRequest('/api/identity/refresh', {
+            method: 'POST',
+            body: JSON.stringify({
+                refreshToken: getRefreshToken()
+            })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            setAuthToken(data.accessToken);
+            setRefreshToken(data.refreshToken);
+            return true;
+        }
+    } catch (error) {
+        // Refresh failed, user needs to re-login
+        logout();
+    }
+    return false;
+};
+
+// Automatic token refresh on API calls
+const apiRequestWithRefresh = async (url: string, options: RequestInit = {}) => {
+    let response = await apiRequest(url, options);
+    
+    if (response.status === 401) {
+        // Try to refresh token
+        const refreshed = await refreshToken();
+        if (refreshed) {
+            // Retry original request with new token
+            response = await apiRequest(url, options);
+        }
+    }
+    
+    return response;
+};
+```
+
+### Security Considerations for React SPA
+
+Based on security best practices from research:
+
+1. **XSS Protection**:
+   - Sanitize all user inputs
+   - Use React's built-in XSS protection (JSX escaping)
+   - Avoid `dangerouslySetInnerHTML`
+   - Store tokens in memory, not localStorage
+
+2. **Token Expiration**:
+   - Set reasonable token lifetimes (e.g., 15 minutes for access, 7 days for refresh)
+   - Implement automatic token refresh
+   - Clear tokens on logout
+
+3. **HTTPS Only**:
+   - Always use HTTPS in production
+   - Set `Secure` flag on cookies (if using cookies)
+   - Configure HSTS headers
+
+4. **CSRF Protection**:
+   - Not needed for JWT bearer tokens
+   - Required if using cookie authentication
+   - Use anti-forgery tokens
+
+### Testing React Integration
+
+After backend migration, frontend tests should verify:
+
+1. **Authentication Flow**:
+   - User can register successfully
+   - User can login successfully
+   - JWT token is received and stored
+   - Token is sent in subsequent requests
+
+2. **Authorization**:
+   - Protected routes require authentication
+   - Unauthorized users are redirected to login
+   - Token expiration is handled gracefully
+
+3. **Error Handling**:
+   - Invalid credentials show appropriate errors
+   - Network errors are handled
+   - Token refresh failures trigger re-login
+
+4. **E2E Tests**:
+   - Playwright tests should continue to work
+   - May need to update token format expectations
+   - Verify full authentication flows
+
 ## Audit.NET and ASP.NET Core Identity Compatibility
 
 ### Compatibility Confirmation
@@ -430,7 +671,62 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser>
 }
 ```
 
-### Phase 8: Documentation & Knowledge Transfer
+### Phase 8: Frontend Integration
+**Goal**: Update React frontend to work with Identity-based authentication
+
+**Steps**:
+1. **Update API client to use Bearer token format**:
+   - Change from `Authorization: Token {jwt}` to `Authorization: Bearer {jwt}`
+   - Maintain backward compatibility during transition if needed
+
+2. **Test authentication flows in React**:
+   - Registration creates users via new endpoints
+   - Login returns valid JWT token
+   - Token is stored securely (in-memory or sessionStorage for dev)
+   - Token is sent with all authenticated requests
+   - Token expiration is handled gracefully
+
+3. **Update AuthContext** (if needed):
+   - Adjust for any changes in token structure
+   - Implement token refresh logic if using refresh tokens
+   - Handle Identity-specific error responses
+
+4. **CORS configuration verification**:
+   - Ensure backend CORS policy allows frontend origin
+   - Test credentials and headers are properly configured
+   - Verify preflight requests work correctly
+
+5. **Security improvements** (optional but recommended):
+   - Move from sessionStorage to in-memory token storage
+   - Implement automatic token refresh
+   - Add token expiration checks before requests
+
+6. **Frontend testing**:
+   - Run React unit tests
+   - Run React integration tests
+   - Manual testing of all authentication flows
+   - Verify error handling works correctly
+
+**Testing Checklist**:
+- [ ] User can register with valid credentials
+- [ ] User receives validation errors for invalid registration
+- [ ] User can login with correct credentials
+- [ ] Login fails with incorrect credentials
+- [ ] JWT token is received and stored
+- [ ] Token is sent in Authorization header
+- [ ] Protected API calls work with valid token
+- [ ] Protected API calls fail with invalid/expired token
+- [ ] User can update profile
+- [ ] User can logout (token cleared)
+- [ ] Page refresh maintains authentication state (if using sessionStorage)
+
+**Coordination with Backend**:
+- Ensure wrapper endpoints return RealWorld-compatible responses
+- Verify error message formats match frontend expectations
+- Confirm token format and claims are correct
+- Test end-to-end integration between React and ASP.NET Core
+
+### Phase 9: Documentation & Knowledge Transfer
 **Goal**: Document changes and provide guidance for future development
 
 **Deliverables**:
@@ -492,7 +788,17 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser>
 
 ### Medium Risks
 
-**Risk 4: Test Suite Failures**
+**Risk 4: Frontend-Backend Integration Issues**
+- **Impact**: React app cannot authenticate, broken user flows
+- **Likelihood**: Medium
+- **Mitigation**:
+  - Use wrapper endpoints to maintain API contract
+  - Update token format gradually (support both "Token" and "Bearer" during transition)
+  - Comprehensive integration testing between frontend and backend
+  - Clear communication between frontend and backend developers
+  - Test in development environment before deployment
+
+**Risk 5: Test Suite Failures**
 - **Impact**: Delayed migration, unknown regressions
 - **Likelihood**: Medium
 - **Mitigation**:
@@ -501,7 +807,7 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser>
   - Run tests frequently during migration
   - Fix tests immediately when they fail
 
-**Risk 5: Performance Degradation**
+**Risk 6: Performance Degradation**
 - **Impact**: Slower authentication operations
 - **Likelihood**: Low
 - **Mitigation**:
@@ -509,7 +815,7 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser>
   - Optimize Identity configuration
   - Use appropriate caching strategies
 
-**Risk 6: Data Migration Errors**
+**Risk 7: Data Migration Errors**
 - **Impact**: User data corruption or loss
 - **Likelihood**: Low
 - **Mitigation**:
@@ -520,7 +826,7 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser>
 
 ### Low Risks
 
-**Risk 7: Missing Identity Features**
+**Risk 8: Missing Identity Features**
 - **Impact**: Cannot implement desired features
 - **Likelihood**: Very Low
 - **Mitigation**:
@@ -537,9 +843,10 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser>
 - **Phase 5**: Test Migration - 3-4 days
 - **Phase 6**: Authorization & User Context - 1-2 days
 - **Phase 7**: Audit.NET Integration Validation - 1-2 days
-- **Phase 8**: Documentation & Knowledge Transfer - 1-2 days
+- **Phase 8**: Frontend Integration - 2-3 days
+- **Phase 9**: Documentation & Knowledge Transfer - 1-2 days
 
-**Total Estimated Time**: 14-22 working days (3-4 weeks)
+**Total Estimated Time**: 16-26 working days (3-5 weeks)
 
 ### Recommended Approach
 1. **Incremental Migration**: Implement one phase at a time with full testing before moving to next phase
@@ -555,6 +862,8 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser>
 - [ ] All Functional tests pass (100% success rate)
 - [ ] All Postman tests pass (100% success rate)
 - [ ] All E2E Playwright tests pass (100% success rate)
+- [ ] Frontend can authenticate via new backend endpoints
+- [ ] JWT tokens work correctly between frontend and backend
 - [ ] Audit.NET continues to log all database operations correctly
 - [ ] No sensitive data in audit logs (passwords, tokens, security stamps)
 - [ ] Authentication performance is equal or better than before
@@ -663,6 +972,15 @@ Once Identity is successfully integrated, these features become easier to implem
 ### Migration Examples
 1. [Migrate Authentication and Identity to ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/migration/fx-to-core/examples/identity)
 2. [Secure ASP.NET Core Blazor WebAssembly with ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/standalone-with-identity)
+
+### React + ASP.NET Core Identity Integration
+1. [React 18 Authentication with .NET 6.0 (ASP.NET Core) JWT API - Jason Watmore](https://jasonwatmore.com/react-18-authentication-with-net-6-aspnet-core-jwt-api)
+2. [JWT Auth Best Practices in .NET Core & React - FacileTechnolab](https://www.faciletechnolab.com/blog/best-practices-for-implementing-jwt-auth-in-net-core-and-react/)
+3. [React + ASP.NET Core JWT Authentication - GitHub Example](https://github.com/HarinduA/react-dotnet-jwt-auth)
+4. [How to use Identity to secure a Web API backend for SPAs - Anuraj](https://anuraj.dev/blog/how-to-use-identity-to-secure-a-web-api-backend-for-spas/)
+5. [JWT Authentication using .NET and React - Andreyka26](https://andreyka26.com/jwt-auth-using-dot-net-and-react)
+6. [Authentication with React.js and ASP.NET Core - Mahedee.net](https://mahedee.net/authentication-and-authorization-using-react.js-and-asp.net-core/)
+7. [ASP.NET Core Identity with JWT and React - RainstormTech](https://www.rainstormtech.com/aspnet-core-identity-with-jwt-and-react/)
 
 ### RealWorld API Specification
 1. [RealWorld API Spec](https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints)
@@ -950,14 +1268,30 @@ public class HybridPasswordHasher : IPasswordHasher<ApplicationUser>
 - [ ] Test transaction rollback scenarios
 - [ ] Review audit configuration
 
-### Phase 8: Documentation
+### Phase 8: Frontend Integration
+- [ ] Update API client to use Bearer token format
+- [ ] Test registration flow from React
+- [ ] Test login flow from React
+- [ ] Verify JWT token storage and retrieval
+- [ ] Test protected API calls with token
+- [ ] Test token expiration handling
+- [ ] Update error handling for Identity errors
+- [ ] Configure CORS settings
+- [ ] Test logout functionality
+- [ ] Run React unit tests
+- [ ] Manual testing of all auth flows
+- [ ] Verify E2E tests still pass
+
+### Phase 9: Documentation
 - [ ] Update AUDIT.md
 - [ ] Create AUTHENTICATION.md
 - [ ] Update README.md
 - [ ] Update backend instructions
+- [ ] Update frontend instructions (if needed)
 - [ ] Create migration notes
 - [ ] Document known issues
 - [ ] Update API documentation
+- [ ] Document React integration patterns
 
 ### Validation & Sign-off
 - [ ] All tests passing (100%)
@@ -991,7 +1325,10 @@ public class HybridPasswordHasher : IPasswordHasher<ApplicationUser>
 
 ---
 
-**Document Version**: 1.0  
+**Document Version**: 1.1  
 **Last Updated**: 2025-12-10  
 **Author**: Development Team  
-**Status**: Ready for Review
+**Status**: Ready for Review  
+**Changelog**:
+- v1.1: Added React frontend integration considerations, token storage best practices, CORS configuration, and security recommendations
+- v1.0: Initial comprehensive migration plan
