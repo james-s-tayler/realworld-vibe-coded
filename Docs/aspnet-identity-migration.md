@@ -166,23 +166,11 @@ public class ApplicationUser : IdentityUser<Guid>
 
 4. Create and apply EF Core migrations:
    - Add Identity tables (AspNetUserClaims, AspNetUserLogins, AspNetUserTokens, etc.)
-   - If needed, rename User table to AspNetUsers (or map ApplicationUser to existing Users table)
+   - Map ApplicationUser to existing Users table or create new AspNetUsers table
    - Add Identity-required fields (PasswordHash, SecurityStamp, etc.)
+   - **Run**: `nuke DbMigrationsVerifyAll` to verify migrations are correct
 
-5. Data Migration Script:
-   - Map existing `HashedPassword` to Identity's `PasswordHash` field
-   - Set required Identity fields (SecurityStamp, ConcurrencyStamp, etc.)
-   - Verify data integrity after migration
-
-**Risks**:
-- Existing user passwords (BCrypt) may not be compatible with Identity's default password hasher (PBKDF2)
-- Table/column naming conflicts between existing schema and Identity defaults
-- Unique constraints may conflict
-
-**Mitigations**:
-- Keep existing BCrypt hashed passwords and implement custom `IPasswordHasher<ApplicationUser>` that supports both BCrypt (legacy) and Identity's default hasher (new users)
-- Use EF Core's Fluent API to map Identity entities to match existing table/column names
-- Carefully review and test migrations in a development environment first
+**Note**: Since the application is in development and always starts from a blank database, there are no data migration compatibility concerns. All users will be created fresh using Identity's password hashing.
 
 ### Phase 3: Authentication Service Migration
 **Goal**: Replace custom authentication services with ASP.NET Core Identity services
