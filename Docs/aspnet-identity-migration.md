@@ -2,19 +2,22 @@
 
 ## Executive Summary
 
-This document outlines a comprehensive plan to migrate the Conduit application's custom authentication system to ASP.NET Core Identity. The migration will leverage ASP.NET Core Identity's built-in API endpoints (`MapIdentityApi`) for authentication while maintaining compatibility with the existing Audit.NET implementation and all current tests.
+This document outlines a comprehensive plan to migrate the Conduit application's custom authentication system to ASP.NET Core Identity. The migration will leverage ASP.NET Core Identity's built-in API endpoints (`MapIdentityApi`) using cookie-based authentication for a more secure implementation.
+
+**Important**: This migration explicitly deviates from the RealWorld API specification in favor of using ASP.NET Core Identity's standard endpoints and authentication patterns.
+
 
 ## Current Architecture
 
 ### Authentication Components
-- **User Entity**: `Server.Core.UserAggregate.User` - Custom user domain entity
-- **Password Hashing**: BCrypt-based custom password hasher (`Server.Infrastructure.Authentication.BcryptPasswordHasher`)
-- **JWT Token Generation**: Custom JWT token generator (`Server.Infrastructure.Authentication.JwtTokenGenerator`)
-- **Endpoints**: FastEndpoints-based custom authentication endpoints:
-  - `POST /api/users/login` - User login
-  - `POST /api/users` - User registration
-  - `GET /api/user` - Get current user
-  - `PUT /api/user` - Update user
+- **User Entity**: `Server.Core.UserAggregate.User` - Custom user domain entity (to be migrated to `ApplicationUser`)
+- **Password Hashing**: ASP.NET Core Identity's password hasher (replacing BCrypt)
+- **Authentication**: Cookie-based authentication via ASP.NET Core Identity
+- **Endpoints**: ASP.NET Core Identity API endpoints:
+  - `POST /register` - User registration
+  - `POST /login?useCookies=true` - User login with cookie auth
+  - `GET /manage/info` - Get current user
+  - `POST /manage/info` - Update user
 
 ### Data Model
 - **Database**: SQLite with Entity Framework Core
@@ -26,6 +29,7 @@ This document outlines a comprehensive plan to migrate the Conduit application's
   - `Bio` (string, max 1000)
   - `Image` (string?, max 500)
   - Following/Followers relationships
+- **Note**: Since the application is in development and starts from a blank database each time, there are no data migration compatibility concerns.
 
 ### Audit Implementation
 - **Library**: Audit.NET with Audit.EntityFramework.Core
@@ -46,8 +50,9 @@ This document outlines a comprehensive plan to migrate the Conduit application's
 ### Key Features
 - **Identity API Endpoints**: `MapIdentityApi<TUser>()` provides REST API endpoints:
   - `POST /register` - User registration
-  - `POST /login` - User login (supports cookie and bearer token auth)
-  - `POST /refresh` - Token refresh
+  - `POST /login?useCookies=true` - User login with cookie authentication
+  - `GET /manage/info` - Get user info
+  - `POST /manage/info` - Update user info
   - `GET /confirmEmail` - Email confirmation
   - `POST /resendConfirmationEmail` - Resend confirmation email
   - `POST /forgotPassword` - Password reset request
@@ -57,8 +62,8 @@ This document outlines a comprehensive plan to migrate the Conduit application's
   - `POST /manage/info` - Update user info
 
 - **Extensibility**: Can customize `IdentityUser` to add custom properties
-- **Password Management**: Built-in password hashing (configurable)
-- **Token Management**: Supports JWT bearer tokens and cookie authentication
+- **Password Management**: Built-in secure password hashing
+- **Cookie Authentication**: HTTP-only cookies for secure, SPA-compatible authentication
 - **EF Core Integration**: Works seamlessly with Entity Framework Core via `IdentityDbContext`
 
 ### Identity Data Model
@@ -70,246 +75,27 @@ ASP.NET Core Identity uses several entity types:
 - `IdentityUserToken` - Authentication tokens
 - `IdentityUserRole` - User-role associations (if using roles)
 
-## React Frontend Integration Considerations
+## Cookie-Based Authentication with ASP.NET Core Identity
 
-### Current Frontend Architecture
-The Conduit application uses a React + Vite + TypeScript frontend that communicates with the backend API using JWT bearer tokens. The frontend currently:
-- Stores JWT tokens (obtained from login/register endpoints)
-- Sends tokens in the `Authorization: Token {jwt}` header format (RealWorld spec uses "Token" prefix instead of "Bearer")
-- Manages authentication state via React Context (`AuthContext`)
-- Uses a centralized API client (`apiRequest` helper) for all HTTP requests
+### Why Cookies Over JWT Tokens
 
-### Identity API Integration Options for React
+For this single-domain SPA application, cookie-based authentication is the recommended approach:
 
-Based on research and best practices for ASP.NET Core Identity with React SPAs:
+1. **More Secure**: HTTP-only cookies prevent XSS attacks
+2. **Built-in Support**: ASP.NET Core Identity provides excellent cookie support for SPAs  
+3. **Automatic Management**: Browser automatically sends cookies with requests
+4. **No Token Storage Issues**: No need to manage token storage in JavaScript
 
-**Option 1: JWT Bearer Tokens (Recommended for Conduit)**
-- Identity supports JWT bearer tokens via `AddIdentityApiEndpoints<TUser>()`
-- React continues to manage tokens in memory or sessionStorage
-- Token sent in `Authorization: Bearer {jwt}` header
-- Stateless authentication (no server-side sessions)
-- Works well for SPAs and mobile apps
-- **Best fit for Conduit**: Maintains current architecture with minimal frontend changes
+### Using Identity Endpoints with Cookies
 
-**Option 2: Cookie-Based Authentication**
-- Identity's default authentication mechanism
-- More secure (HTTP-only cookies prevent XSS)
-- Requires CORS configuration for SPA
-- Automatic cookie transmission by browser
-- Server-side session management
-- **Consideration**: May require significant frontend changes to handle cookie-based auth
+Call Identity endpoints with the `useCookies=true` query parameter:
 
-**Option 3: Hybrid Approach**
-- Use both cookies and JWT tokens
-- Cookies for browser-based auth
-- JWT for API clients and mobile apps
-- Most flexible but more complex
+**Login**: `POST /login?useCookies=true`
+**Registration**: `POST /register`  
+**Get User Info**: `GET /manage/info`
+**Update User**: `POST /manage/info`
 
-### Recommended Approach: JWT Bearer with Identity
-
-Configure Identity to issue JWT tokens for the React frontend:
-
-```csharp
-// In Program.cs
-builder.Services
-    .AddIdentityApiEndpoints<ApplicationUser>(options =>
-    {
-        // Configure Identity options
-        options.Password.RequiredLength = 6;
-        // ... other settings
-    })
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
-
-// Add JWT Bearer Authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]))
-    };
-});
-```
-
-### Frontend Changes Required
-
-**Minimal Changes** (using wrapper endpoints):
-1. **No API URL changes**: Continue using `/api/users/login`, `/api/users`, etc.
-2. **Token format**: Change from `Authorization: Token {jwt}` to `Authorization: Bearer {jwt}` (standard)
-3. **Response format**: Ensure wrapper endpoints return RealWorld-compatible responses
-4. **Error handling**: May need to adjust for Identity's error response format
-
-**Token Storage Best Practices** (from research):
-1. **Do NOT use localStorage**: Vulnerable to XSS attacks
-2. **Prefer in-memory storage**: Store token in React state/context
-3. **SessionStorage**: Minimally safer than localStorage for dev/testing
-4. **HTTP-only cookies**: Most secure option (requires backend changes)
-
-**Example React Integration** (based on research patterns):
-
-```typescript
-// API client update
-const apiRequest = async (url: string, options: RequestInit = {}) => {
-    const token = getAuthToken(); // from context or memory
-    
-    const headers = {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }), // Changed from "Token"
-        ...options.headers,
-    };
-    
-    const response = await fetch(url, { ...options, headers });
-    
-    if (response.status === 401) {
-        // Handle token expiration
-        clearAuthToken();
-        // Redirect to login or refresh token
-    }
-    
-    return response;
-};
-
-// Login function
-const login = async (email: string, password: string) => {
-    const response = await apiRequest('/api/users/login', {
-        method: 'POST',
-        body: JSON.stringify({ user: { email, password } })
-    });
-    
-    if (response.ok) {
-        const data = await response.json();
-        setAuthToken(data.user.token); // Store in context/memory
-        setUser(data.user);
-    }
-};
-```
-
-### CORS Configuration
-
-Since the frontend and backend may run on different ports during development:
-
-```csharp
-// In Program.cs
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowReactApp", policy =>
-    {
-        policy.WithOrigins("http://localhost:5173", "https://localhost:5173") // Vite default port
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // Required if using cookies
-    });
-});
-
-app.UseCors("AllowReactApp");
-```
-
-### Token Refresh Strategy
-
-Identity provides a `/refresh` endpoint for token refresh:
-
-```typescript
-// React refresh token handler
-const refreshToken = async () => {
-    try {
-        const response = await apiRequest('/api/identity/refresh', {
-            method: 'POST',
-            body: JSON.stringify({
-                refreshToken: getRefreshToken()
-            })
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            setAuthToken(data.accessToken);
-            setRefreshToken(data.refreshToken);
-            return true;
-        }
-    } catch (error) {
-        // Refresh failed, user needs to re-login
-        logout();
-    }
-    return false;
-};
-
-// Automatic token refresh on API calls
-const apiRequestWithRefresh = async (url: string, options: RequestInit = {}) => {
-    let response = await apiRequest(url, options);
-    
-    if (response.status === 401) {
-        // Try to refresh token
-        const refreshed = await refreshToken();
-        if (refreshed) {
-            // Retry original request with new token
-            response = await apiRequest(url, options);
-        }
-    }
-    
-    return response;
-};
-```
-
-### Security Considerations for React SPA
-
-Based on security best practices from research:
-
-1. **XSS Protection**:
-   - Sanitize all user inputs
-   - Use React's built-in XSS protection (JSX escaping)
-   - Avoid `dangerouslySetInnerHTML`
-   - Store tokens in memory, not localStorage
-
-2. **Token Expiration**:
-   - Set reasonable token lifetimes (e.g., 15 minutes for access, 7 days for refresh)
-   - Implement automatic token refresh
-   - Clear tokens on logout
-
-3. **HTTPS Only**:
-   - Always use HTTPS in production
-   - Set `Secure` flag on cookies (if using cookies)
-   - Configure HSTS headers
-
-4. **CSRF Protection**:
-   - Not needed for JWT bearer tokens
-   - Required if using cookie authentication
-   - Use anti-forgery tokens
-
-### Testing React Integration
-
-After backend migration, frontend tests should verify:
-
-1. **Authentication Flow**:
-   - User can register successfully
-   - User can login successfully
-   - JWT token is received and stored
-   - Token is sent in subsequent requests
-
-2. **Authorization**:
-   - Protected routes require authentication
-   - Unauthorized users are redirected to login
-   - Token expiration is handled gracefully
-
-3. **Error Handling**:
-   - Invalid credentials show appropriate errors
-   - Network errors are handled
-   - Token refresh failures trigger re-login
-
-4. **E2E Tests**:
-   - Playwright tests should continue to work
-   - May need to update token format expectations
-   - Verify full authentication flows
+All requests must include `credentials: 'include'` to send cookies.
 
 ## Audit.NET and ASP.NET Core Identity Compatibility
 
@@ -756,203 +542,10 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser>
    - Provide rollback procedure
    - List known issues or limitations
 
-## Risk Assessment & Mitigation
 
-### High Risks
 
-**Risk 1: Password Hash Incompatibility**
-- **Impact**: Existing users cannot log in after migration
-- **Likelihood**: High
-- **Mitigation**:
-  - Implement custom `IPasswordHasher<ApplicationUser>` that supports both BCrypt (legacy) and Identity's hasher (new)
-  - On first successful login with BCrypt password, rehash with Identity's hasher
-  - Thoroughly test with sample of real user data
 
-**Risk 2: Breaking API Contract**
-- **Impact**: Frontend application breaks, Postman tests fail
-- **Likelihood**: Medium-High
-- **Mitigation**:
-  - Use wrapper endpoints to maintain RealWorld API spec
-  - Version the API if making breaking changes
-  - Extensive testing with Postman collection
-  - Coordinate with frontend team
 
-**Risk 3: Audit.NET Integration Issues**
-- **Impact**: Loss of audit trail, compliance issues
-- **Likelihood**: Low-Medium
-- **Mitigation**:
-  - Test Audit.NET thoroughly in development
-  - Validate audit logs match expected format
-  - Use `Audit.EntityFramework.Identity` package
-  - Keep backup of audit logs during migration
-
-### Medium Risks
-
-**Risk 4: Frontend-Backend Integration Issues**
-- **Impact**: React app cannot authenticate, broken user flows
-- **Likelihood**: Medium
-- **Mitigation**:
-  - Use wrapper endpoints to maintain API contract
-  - Update token format gradually (support both "Token" and "Bearer" during transition)
-  - Comprehensive integration testing between frontend and backend
-  - Clear communication between frontend and backend developers
-  - Test in development environment before deployment
-
-**Risk 5: Test Suite Failures**
-- **Impact**: Delayed migration, unknown regressions
-- **Likelihood**: Medium
-- **Mitigation**:
-  - Update tests incrementally
-  - Create new test fixtures for Identity
-  - Run tests frequently during migration
-  - Fix tests immediately when they fail
-
-**Risk 6: Performance Degradation**
-- **Impact**: Slower authentication operations
-- **Likelihood**: Low
-- **Mitigation**:
-  - Benchmark authentication operations before/after
-  - Optimize Identity configuration
-  - Use appropriate caching strategies
-
-**Risk 7: Data Migration Errors**
-- **Impact**: User data corruption or loss
-- **Likelihood**: Low
-- **Mitigation**:
-  - Back up database before migration
-  - Test migration scripts on copy of production data
-  - Implement data validation checks
-  - Plan rollback procedure
-
-### Low Risks
-
-**Risk 8: Missing Identity Features**
-- **Impact**: Cannot implement desired features
-- **Likelihood**: Very Low
-- **Mitigation**:
-  - ASP.NET Core Identity is highly extensible
-  - Can fall back to custom implementation if needed
-
-## Implementation Timeline
-
-### Estimated Effort
-- **Phase 1**: Research & Planning - 1-2 days ✓
-- **Phase 2**: Database Schema Migration - 2-3 days
-- **Phase 3**: Authentication Service Migration - 2-3 days
-- **Phase 4**: Endpoint Migration - 3-4 days
-- **Phase 5**: Test Migration - 3-4 days
-- **Phase 6**: Authorization & User Context - 1-2 days
-- **Phase 7**: Audit.NET Integration Validation - 1-2 days
-- **Phase 8**: Frontend Integration - 2-3 days
-- **Phase 9**: Documentation & Knowledge Transfer - 1-2 days
-
-**Total Estimated Time**: 16-26 working days (3-5 weeks)
-
-### Recommended Approach
-1. **Incremental Migration**: Implement one phase at a time with full testing before moving to next phase
-2. **Feature Branch**: Use a long-lived feature branch for the migration
-3. **Regular Integration**: Merge main into feature branch regularly to avoid conflicts
-4. **Review Checkpoints**: Conduct code reviews after each phase
-5. **Rollback Plan**: Maintain ability to rollback at each phase
-
-## Success Criteria
-
-### Technical Success
-- [ ] All Integration tests pass (100% success rate)
-- [ ] All Functional tests pass (100% success rate)
-- [ ] All Postman tests pass (100% success rate)
-- [ ] All E2E Playwright tests pass (100% success rate)
-- [ ] Frontend can authenticate via new backend endpoints
-- [ ] JWT tokens work correctly between frontend and backend
-- [ ] Audit.NET continues to log all database operations correctly
-- [ ] No sensitive data in audit logs (passwords, tokens, security stamps)
-- [ ] Authentication performance is equal or better than before
-- [ ] All existing users can log in successfully
-
-### Code Quality
-- [ ] Code follows repository conventions and patterns
-- [ ] All security best practices followed
-- [ ] No hardcoded credentials or secrets
-- [ ] Proper error handling and logging
-- [ ] Code is well-documented with XML comments
-- [ ] All analyzer warnings resolved
-
-### Documentation
-- [ ] Migration plan document complete and reviewed
-- [ ] Authentication documentation created
-- [ ] Audit documentation updated
-- [ ] README updated
-- [ ] Code comments explain Identity integration
-- [ ] Known issues documented
-
-### Business Success
-- [ ] No user-facing service interruption
-- [ ] All user accounts migrated successfully
-- [ ] API contract maintained (or gracefully versioned)
-- [ ] Feature parity with existing authentication system
-- [ ] Foundation for future authentication features (2FA, OAuth, etc.)
-
-## Rollback Plan
-
-### Pre-Migration Backup
-1. Back up production database
-2. Tag current codebase in Git
-3. Document current configuration
-4. Export audit logs
-
-### Rollback Triggers
-- More than 5% of users cannot log in
-- Critical security vulnerability discovered
-- Audit logs not being generated
-- Performance degradation > 50%
-- Unresolvable bugs in production
-
-### Rollback Procedure
-1. Stop application
-2. Checkout previous Git tag
-3. Restore database from backup
-4. Verify authentication works
-5. Resume application
-6. Investigate issues in development environment
-
-### Post-Rollback Actions
-1. Root cause analysis of failure
-2. Update migration plan to address issues
-3. Additional testing before retry
-4. Communication to stakeholders
-
-## Future Enhancements
-
-### After Migration
-Once Identity is successfully integrated, these features become easier to implement:
-
-1. **Two-Factor Authentication (2FA)**
-   - Identity provides built-in 2FA support
-   - Can enable via `POST /manage/2fa` endpoint
-
-2. **Email Confirmation**
-   - Identity includes email confirmation flows
-   - Endpoints: `GET /confirmEmail`, `POST /resendConfirmationEmail`
-
-3. **Password Reset**
-   - Built-in password reset functionality
-   - Endpoints: `POST /forgotPassword`, `POST /resetPassword`
-
-4. **External Authentication Providers**
-   - Easy integration with Google, GitHub, Microsoft, etc.
-   - Uses `IdentityUserLogin` for external provider mapping
-
-5. **Token Refresh**
-   - Identity API includes `POST /refresh` endpoint
-   - Enables long-lived sessions with refresh tokens
-
-6. **User Lockout**
-   - Automatic account lockout after failed login attempts
-   - Configurable lockout duration and threshold
-
-7. **Security Stamp Validation**
-   - Invalidate tokens when password changes
-   - Force re-login on security events
 
 ## References & Resources
 
@@ -973,18 +566,11 @@ Once Identity is successfully integrated, these features become easier to implem
 1. [Migrate Authentication and Identity to ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/migration/fx-to-core/examples/identity)
 2. [Secure ASP.NET Core Blazor WebAssembly with ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/standalone-with-identity)
 
-### React + ASP.NET Core Identity Integration
-1. [React 18 Authentication with .NET 6.0 (ASP.NET Core) JWT API - Jason Watmore](https://jasonwatmore.com/react-18-authentication-with-net-6-aspnet-core-jwt-api)
-2. [JWT Auth Best Practices in .NET Core & React - FacileTechnolab](https://www.faciletechnolab.com/blog/best-practices-for-implementing-jwt-auth-in-net-core-and-react/)
-3. [React + ASP.NET Core JWT Authentication - GitHub Example](https://github.com/HarinduA/react-dotnet-jwt-auth)
-4. [How to use Identity to secure a Web API backend for SPAs - Anuraj](https://anuraj.dev/blog/how-to-use-identity-to-secure-a-web-api-backend-for-spas/)
-5. [JWT Authentication using .NET and React - Andreyka26](https://andreyka26.com/jwt-auth-using-dot-net-and-react)
-6. [Authentication with React.js and ASP.NET Core - Mahedee.net](https://mahedee.net/authentication-and-authorization-using-react.js-and-asp.net-core/)
-7. [ASP.NET Core Identity with JWT and React - RainstormTech](https://www.rainstormtech.com/aspnet-core-identity-with-jwt-and-react/)
+### Cookie-Based Authentication Resources
+1. [How to use Identity to secure a Web API backend for SPAs](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization)
+2. [Secure ASP.NET Core Blazor WebAssembly with ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/standalone-with-identity)
 
-### RealWorld API Specification
-1. [RealWorld API Spec](https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints)
-2. [Conduit API Endpoints](https://github.com/gothinkster/realworld/tree/main/api)
+
 
 ## Appendix A: Key Code Changes
 
@@ -1077,7 +663,7 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser, IdentityRole
 }
 ```
 
-### A.3: Program.cs Identity Configuration
+### A.3: Program.cs Identity Configuration with Cookie Authentication
 ```csharp
 using Microsoft.AspNetCore.Identity;
 using Server.Core.UserAggregate;
@@ -1141,194 +727,14 @@ app.MapPut("/api/user", async (/* ... */) => { /* update user */ }).RequireAutho
 app.Run();
 ```
 
-### A.4: Custom Password Hasher (BCrypt Compatibility)
-```csharp
-using Microsoft.AspNetCore.Identity;
-using BCrypt.Net;
-
-namespace Server.Infrastructure.Authentication;
-
-/// <summary>
-/// Custom password hasher that supports both BCrypt (legacy) and Identity's default hasher
-/// </summary>
-public class HybridPasswordHasher : IPasswordHasher<ApplicationUser>
-{
-    private readonly PasswordHasher<ApplicationUser> _identityHasher;
-
-    public HybridPasswordHasher()
-    {
-        _identityHasher = new PasswordHasher<ApplicationUser>();
-    }
-
-    public string HashPassword(ApplicationUser user, string password)
-    {
-        // Use Identity's default hasher for new passwords
-        return _identityHasher.HashPassword(user, password);
-    }
-
-    public PasswordVerificationResult VerifyHashedPassword(
-        ApplicationUser user, 
-        string hashedPassword, 
-        string providedPassword)
-    {
-        // Try Identity's default hasher first
-        var identityResult = _identityHasher.VerifyHashedPassword(user, hashedPassword, providedPassword);
-        
-        if (identityResult == PasswordVerificationResult.Success)
-        {
-            return identityResult;
-        }
-
-        // If Identity verification fails, try BCrypt (legacy)
-        try
-        {
-            if (BCrypt.Net.BCrypt.Verify(providedPassword, hashedPassword))
-            {
-                // Password is correct but uses old BCrypt format
-                // Return SuccessRehashNeeded to trigger password rehash
-                return PasswordVerificationResult.SuccessRehashNeeded;
-            }
-        }
-        catch
-        {
-            // BCrypt verification failed or hash format invalid
-        }
-
-        return PasswordVerificationResult.Failed;
-    }
-}
-
-// Register in Program.cs:
-// builder.Services.AddScoped<IPasswordHasher<ApplicationUser>, HybridPasswordHasher>();
-```
-
-## Appendix B: Migration Checklist
-
-### Pre-Migration
-- [ ] Create feature branch for migration
-- [ ] Back up production database
-- [ ] Review and approve migration plan
-- [ ] Set up development environment with test data
-- [ ] Notify team of migration start
-
-### Phase 2: Database Schema
-- [ ] Install NuGet packages
-- [ ] Create ApplicationUser class
-- [ ] Update AppDbContext
-- [ ] Create EF Core migration
-- [ ] Review migration SQL
-- [ ] Test migration on development database
-- [ ] Create data migration script
-- [ ] Test data migration with sample data
-- [ ] Verify data integrity
-
-### Phase 3: Authentication Services
-- [ ] Configure Identity in Program.cs
-- [ ] Implement custom password hasher
-- [ ] Update UserContext service
-- [ ] Remove/update custom authentication services
-- [ ] Test UserManager operations
-- [ ] Test SignInManager operations
-- [ ] Verify JWT token generation
-
-### Phase 4: Endpoints
-- [ ] Map Identity API endpoints
-- [ ] Create wrapper endpoints for RealWorld API
-- [ ] Test registration endpoint
-- [ ] Test login endpoint
-- [ ] Test get current user endpoint
-- [ ] Test update user endpoint
-- [ ] Verify JWT authentication on protected endpoints
-- [ ] Test error responses
-
-### Phase 5: Tests
-- [ ] Update integration test fixtures
-- [ ] Run and fix integration tests
-- [ ] Update functional test helpers
-- [ ] Run and fix functional tests
-- [ ] Update/validate Postman tests
-- [ ] Run full Postman suite
-- [ ] Update E2E test page objects (if needed)
-- [ ] Run and fix E2E tests
-- [ ] Create test report
-
-### Phase 6: Authorization
-- [ ] Update UserContext implementation
-- [ ] Verify JWT claims mapping
-- [ ] Test authorization on all protected endpoints
-- [ ] Test with invalid tokens
-- [ ] Test with expired tokens
-- [ ] Verify user context in audit logs
-
-### Phase 7: Audit.NET
-- [ ] Verify audit logs for Identity operations
-- [ ] Confirm sensitive data excluded
-- [ ] Test custom fields capture
-- [ ] Validate audit log format
-- [ ] Test transaction rollback scenarios
-- [ ] Review audit configuration
-
-### Phase 8: Frontend Integration
-- [ ] Update API client to use Bearer token format
-- [ ] Test registration flow from React
-- [ ] Test login flow from React
-- [ ] Verify JWT token storage and retrieval
-- [ ] Test protected API calls with token
-- [ ] Test token expiration handling
-- [ ] Update error handling for Identity errors
-- [ ] Configure CORS settings
-- [ ] Test logout functionality
-- [ ] Run React unit tests
-- [ ] Manual testing of all auth flows
-- [ ] Verify E2E tests still pass
-
-### Phase 9: Documentation
-- [ ] Update AUDIT.md
-- [ ] Create AUTHENTICATION.md
-- [ ] Update README.md
-- [ ] Update backend instructions
-- [ ] Update frontend instructions (if needed)
-- [ ] Create migration notes
-- [ ] Document known issues
-- [ ] Update API documentation
-- [ ] Document React integration patterns
-
-### Validation & Sign-off
-- [ ] All tests passing (100%)
-- [ ] Code review completed
-- [ ] Security review completed
-- [ ] Performance benchmarks acceptable
-- [ ] Documentation reviewed and approved
-- [ ] Rollback plan tested
-- [ ] Stakeholder sign-off
-
-### Deployment
-- [ ] Deploy to staging environment
-- [ ] Run full test suite on staging
-- [ ] Performance testing on staging
-- [ ] Security scan on staging
-- [ ] Deploy to production (off-peak hours)
-- [ ] Monitor application logs
-- [ ] Monitor audit logs
-- [ ] Monitor error rates
-- [ ] Verify user logins working
-- [ ] 24-hour monitoring period
-
-### Post-Migration
-- [ ] Archive old authentication code
-- [ ] Clean up unused dependencies
-- [ ] Update CI/CD pipelines (if needed)
-- [ ] Team training session
-- [ ] Post-mortem meeting
-- [ ] Document lessons learned
-- [ ] Plan future enhancements
 
 ---
 
-**Document Version**: 1.1  
-**Last Updated**: 2025-12-10  
-**Author**: Development Team  
-**Status**: Ready for Review  
+**Document Version**: 2.0
+**Last Updated**: 2025-12-10
+**Author**: Development Team
+**Status**: Ready for Implementation
 **Changelog**:
-- v1.1: Added React frontend integration considerations, token storage best practices, CORS configuration, and security recommendations
+- v2.0: Major update - switched to cookie-based authentication, removed JWT/wrappers, using Identity endpoints directly, removed data migration concerns, combined Phase 4 and 5, added specific Nuke commands, removed Risk/Timeline/Rollback/Future sections
+- v1.1: Added React frontend integration considerations
 - v1.0: Initial comprehensive migration plan
