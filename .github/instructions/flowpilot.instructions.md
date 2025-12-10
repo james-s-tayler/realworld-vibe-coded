@@ -1,29 +1,65 @@
 ---
-applyTo: "Docs/**"
+applyTo: ".flowpilot/flows/**"
 ---
 
-# Migration Plan Documentation Guidelines
+# Flowpilot guidelines
 
-This document defines the guidelines for creating and executing complex, multi-stage refactorings and migration plans in this repository.
+Flowpilot is an orchestration tool to help vibe-coders and agentic coding assitants like Github Copilot collaborate on
+creating and executing complex, multi-stage featuring development, refactorings and migrations
+via a stateful workflow persisted to the repository as a set of markdown files with a given schema,
+tracked by a checklist in state.md and orchestrated by the flowpilot cli.
 
-## File Structure
+## Flowpilot CLI
 
-Migration plans must be organized under the `Docs/` directory with the following structure:
+- `flowpilot init $plan_name`
+  - the developer will run this, commit it to the repo, and then open an issue asking the agent to run `flowpilot next $plan_name`.
+- `flowpilot next $plan_name`
+  - this will interrogate state.md and copy the relevant markdown file from .flowpilot/template to relevant place under .flowpilot/$plan_name
+  - it will then print a message to the console telling you which file it output and giving you specific instructions on how to update it
+  - you must treat its output as your next prompt and execute its instructions.
+- `flowpilot lint $plan_name`
+  - this enforces the following rules:
+    - state.md checklist is checked off in order
+    - state.md checklist is checked off one item per-commit
+    - state.md checklist item being checked off also has expected accompanying files and those files are valid
+  - git hooks will be configured to run this on commit
+  - CI will be configured to run this before merging
+
+## .flowpilot/ Folder Structure
+
+Plans are organized under the `.flowpilot` directory with the following structure:
 
 ```
-Docs/
-└── $migration_plan/
-    ├── references.md
-    ├── phase_1_$title.md
-    ├── phase_2_$title.md
-    └── phase_n_$title.md
+.flowpilot/
+└── template/
+|       ├── state.md
+|       ├── references.md
+|       ├── system-analysis.md
+|       ├── key-decisions.md
+|       ├── phase-analysis.md
+└── flows/
+    └── $plan_name/
+            └── meta/
+            |   ├── state.md
+            |   ├── references.md
+            |   ├── system-analysis.md
+            |   ├── key-decisions.md
+            |   ├── phase-analysis.md
+            └── plan/
+                ├── phase_1_$title.md
+                ├── phase_2_$title.md
+                └── phase_n_$title.md
 ```
 
-* **`$migration_plan`**: A descriptive name for the migration (e.g., `entity-framework-upgrade`, `api-versioning-migration`)
+* **`$plan_name`**: A descriptive name for the migration (e.g., `entity-framework-upgrade`, `api-versioning-migration`)
+* **`state.md`**: A state-machine implemented as a checklist that tracks and orchestrates the plan through both creation and execution.
 * **`references.md`**: Documents all research sources and references that informed the migration plan
-* **`phase_n_$title.md`**: Each phase in its own file, numbered sequentially with a descriptive title
+* **`system-analysis.md`**: An analysis of the parts of the current system relevant to the migration plan.
+* **`key-decisions.md`**: An outline of key decision points that must be decided before moving to phase analysis.
+* **`phase-analysis.md`**: An outline of the high level goals of each phase that must be decided on before detailing each phase.
+* **`phase_n_$title.md`**: Details of each phase in its own file, numbered sequentially with a descriptive title
 
-## Research Phase
+## References.md
 
 **Before starting to write the migration plan**, Copilot must conduct thorough research:
 
@@ -33,7 +69,6 @@ Docs/
    - Source title and URL
    - Key takeaways
    - Relevance to the migration plan
-   - Date accessed
 
 ### Example references.md Format
 
@@ -43,7 +78,6 @@ Docs/
 ## Microsoft Learn Documentation
 
 ### [Article Title](URL)
-**Accessed:** YYYY-MM-DD
 **Key Takeaways:**
 - Point 1
 - Point 2
@@ -53,7 +87,6 @@ Docs/
 ## Web Resources
 
 ### [Article/Blog Title](URL)
-**Accessed:** YYYY-MM-DD
 **Key Takeaways:**
 - Point 1
 - Point 2
