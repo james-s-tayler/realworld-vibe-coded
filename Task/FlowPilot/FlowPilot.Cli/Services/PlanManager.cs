@@ -75,6 +75,54 @@ public class PlanManager
     return planNames;
   }
 
+  /// <summary>
+  /// Resolves the plan name to use based on command arguments and available plans.
+  /// Returns (planName, shouldExit, exitCode) tuple.
+  /// </summary>
+  public (string? PlanName, bool ShouldExit, int ExitCode) ResolvePlanName(string[] args, Action<string> logInfo, Action<string> logError)
+  {
+    var allPlans = GetAllPlans();
+
+    // If no plans exist, exit successfully
+    if (allPlans.Count == 0)
+    {
+      logInfo("No current plans. Successful exit.");
+      return (null, true, 0);
+    }
+
+    string? planName = null;
+
+    // If no argument provided, try to use the default plan
+    if (args.Length == 0)
+    {
+      // If there's only one plan, use it as default
+      if (allPlans.Count == 1)
+      {
+        planName = allPlans[0];
+        logInfo($"Using default plan: {planName}");
+      }
+      else
+      {
+        // Multiple plans exist, require explicit plan name
+        logError("Multiple plans exist. Please specify a plan name.");
+        logInfo($"Available plans: {string.Join(", ", allPlans)}");
+        return (null, true, 1);
+      }
+    }
+    else
+    {
+      planName = args[0];
+
+      if (!PlanExists(planName))
+      {
+        logError($"Plan '{planName}' not found");
+        return (null, true, 1);
+      }
+    }
+
+    return (planName, false, 0);
+  }
+
   public PlanState GetCurrentState(string planName)
   {
     var stateFilePath = GetStateFilePath(planName);
