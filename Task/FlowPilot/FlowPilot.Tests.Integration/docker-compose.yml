@@ -1,0 +1,11 @@
+services:
+  flowpilot-integration-test:
+    build:
+      context: ../../..
+      dockerfile: Task/FlowPilot/FlowPilot.Tests.Integration/Dockerfile
+    container_name: flowpilot-integration-test
+    volumes:
+      - ../../../Reports/FlowPilot/Integration:/reports
+    environment:
+      - DOTNET_CLI_TELEMETRY_OPTOUT=1
+      - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
