@@ -1,6 +1,6 @@
 ## Goal
 
-Migrate the authentication/authorization system to aspnet identity.
+Migrate the authentication/authorization system to ASP.NET Identity.
 
 ## Requirements
 - **No UI Dependency**: The migration does not require using any UI components provided by ASP.NET Identity.
