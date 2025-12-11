@@ -1,8 +1,11 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Server.Core.IdentityAggregate;
 using Server.Infrastructure;
 using Server.Infrastructure.Authentication;
+using Server.Infrastructure.Data;
 using Server.Infrastructure.Email;
 using Server.UseCases.Interfaces;
 using Server.Web.Infrastructure;
@@ -32,7 +35,13 @@ public static class ServiceConfigs
     var jwtSettings = new JwtSettings();
     builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
 
-    services.AddAuthentication("Token")
+    // Configure authentication with Token (JWT) as default scheme for APIs
+    services.AddAuthentication(options =>
+    {
+      options.DefaultAuthenticateScheme = "Token";
+      options.DefaultChallengeScheme = "Token";
+      options.DefaultScheme = "Token";
+    })
       .AddJwtBearer("Token", options =>
       {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -82,6 +91,60 @@ public static class ServiceConfigs
               ]),
               StatusCodes.Status403Forbidden);
           },
+        };
+      });
+
+    // Configure ASP.NET Identity Core (without authentication defaults to avoid conflicts with JWT)
+    services.AddIdentityCore<ApplicationUser>(options =>
+    {
+      // Password policy (Decision 5: Balanced Security Policy)
+      options.Password.RequireDigit = true;
+      options.Password.RequireLowercase = true;
+      options.Password.RequireUppercase = true;
+      options.Password.RequireNonAlphanumeric = false;
+      options.Password.RequiredLength = 8;
+
+      // Lockout policy
+      options.Lockout.MaxFailedAccessAttempts = 5;
+      options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+      options.Lockout.AllowedForNewUsers = true;
+
+      // User options
+      options.User.RequireUniqueEmail = true;
+
+      // Sign-in options (no email confirmation for now)
+      options.SignIn.RequireConfirmedEmail = false;
+      options.SignIn.RequireConfirmedPhoneNumber = false;
+    })
+    .AddRoles<IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddSignInManager<SignInManager<ApplicationUser>>()
+    .AddDefaultTokenProviders();
+
+    // Add cookie authentication for Identity (without setting as default scheme)
+    services.AddAuthentication()
+      .AddCookie(IdentityConstants.ApplicationScheme, options =>
+      {
+        // Cookie settings (Decision 4: SameSite.Lax)
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.Name = "ConduitAuth";
+
+        // Expiration and sliding
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.SlidingExpiration = true;
+
+        // API-friendly: Return 401/403 instead of redirecting
+        options.Events.OnRedirectToLogin = context =>
+        {
+          context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+          return Task.CompletedTask;
+        };
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+          context.Response.StatusCode = StatusCodes.Status403Forbidden;
+          return Task.CompletedTask;
         };
       });
 
