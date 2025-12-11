@@ -45,6 +45,36 @@ public class PlanManager
     return _fileSystem.FileExists(stateFilePath);
   }
 
+  public string GetPlansDirectory()
+  {
+    var rootDir = _fileSystem.GetCurrentDirectory();
+    return Path.Combine(rootDir, ".flowpilot", "plans");
+  }
+
+  public List<string> GetAllPlans()
+  {
+    var plansDir = GetPlansDirectory();
+
+    if (!_fileSystem.DirectoryExists(plansDir))
+    {
+      return new List<string>();
+    }
+
+    var planDirectories = _fileSystem.GetDirectories(plansDir);
+    var planNames = new List<string>();
+
+    foreach (var dir in planDirectories)
+    {
+      var planName = Path.GetFileName(dir);
+      if (PlanExists(planName))
+      {
+        planNames.Add(planName);
+      }
+    }
+
+    return planNames;
+  }
+
   public PlanState GetCurrentState(string planName)
   {
     var stateFilePath = GetStateFilePath(planName);

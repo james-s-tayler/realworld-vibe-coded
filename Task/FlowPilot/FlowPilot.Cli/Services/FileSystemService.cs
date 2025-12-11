@@ -20,4 +20,6 @@ public class FileSystemService : IFileSystemService
   public string GetCurrentDirectory() => Directory.GetCurrentDirectory();
 
   public string[] GetFiles(string path, string searchPattern) => Directory.GetFiles(path, searchPattern);
+
+  public string[] GetDirectories(string path) => Directory.GetDirectories(path);
 }
