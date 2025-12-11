@@ -66,7 +66,7 @@ public class PlanManager
     foreach (var dir in planDirectories)
     {
       var planName = Path.GetFileName(dir);
-      if (PlanExists(planName))
+      if (!string.IsNullOrEmpty(planName) && PlanExists(planName))
       {
         planNames.Add(planName);
       }

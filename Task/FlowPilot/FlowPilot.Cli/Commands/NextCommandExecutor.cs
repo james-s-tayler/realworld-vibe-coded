@@ -43,12 +43,6 @@ public class NextCommandExecutor : ICommand
       return exitCode;
     }
 
-    if (!_planManager.PlanExists(planName!))
-    {
-      _logger.LogError("Plan '{PlanName}' not found. Run 'flowpilot new {PlanName2}' first", planName, planName);
-      return 1;
-    }
-
     // NextCommandHandler now internally calls lint first
     await _nextHandler.ExecuteAsync(planName!);
 
