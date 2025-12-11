@@ -39,6 +39,26 @@ public partial class Build
         failures.Add(testProject.Name);
       }
 
+      // Run Docker-based integration tests
+      Log.Information("Running Docker-based integration tests for FlowPilot CLI");
+      var integrationTestDirectory = FlowPilotDirectory / "FlowPilot.Tests.Integration";
+
+      try
+      {
+        ProcessTasks.StartProcess(
+          "docker",
+          "compose up --build --abort-on-container-exit --exit-code-from flowpilot-integration-test",
+          workingDirectory: integrationTestDirectory)
+          .AssertZeroExitCode();
+
+        Log.Information("✅ Docker integration tests passed");
+      }
+      catch (ProcessException)
+      {
+        Log.Error("❌ Docker integration tests failed");
+        failures.Add("FlowPilot.Tests.Integration (Docker)");
+      }
+
       if (failures.Any())
       {
         var failedProjects = string.Join(", ", failures);
