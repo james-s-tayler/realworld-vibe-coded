@@ -3,4 +3,12 @@
 - [x] [system-analysis] meta/system-analysis.md describes relevant system parts
 - [x] [key-decisions] meta/key-decisions.md lists decision points and options
 - [x] [phase-analysis] meta/phase-analysis.md defines high-level phases
-- [ ] [phase-n-details] plan/phase-n-details.md files created for each defined phase
+- [x] [phase-n-details] plan/phase-n-details.md files created for each defined phase
+- [ ] [phase_1] phase_1
+- [ ] [phase_2] phase_2
+- [ ] [phase_3] phase_3
+- [ ] [phase_4] phase_4
+- [ ] [phase_5] phase_5
+- [ ] [phase_6] phase_6
+- [ ] [phase_7] phase_7
+- [ ] [phase_8] phase_8
