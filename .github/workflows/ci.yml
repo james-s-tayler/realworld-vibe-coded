@@ -96,7 +96,7 @@ jobs:
         run: ./build.sh install-flowpilot
 
       - name: FlowPilot Lint
-        run: flowpilot lint aspnet-identity-migration
+        run: flowpilot lint
 
   build-server:
     name: build-server

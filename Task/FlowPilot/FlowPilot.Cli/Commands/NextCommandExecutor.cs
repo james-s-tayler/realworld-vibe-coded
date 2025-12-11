@@ -28,23 +28,23 @@ public class NextCommandExecutor : ICommand
 
   public async Task<int> ExecuteAsync(string[] args)
   {
-    if (args.Length == 0)
-    {
-      _logger.LogError("Plan name is required");
-      _logger.LogInformation("Usage: flowpilot next <plan-name>");
-      return 1;
-    }
+    var (planName, shouldExit, exitCode) = _planManager.ResolvePlanName(
+      args,
+      msg => _logger.LogInformation(msg),
+      msg => _logger.LogError(msg));
 
-    var planName = args[0];
-
-    if (!_planManager.PlanExists(planName))
+    if (shouldExit)
     {
-      _logger.LogError("Plan '{PlanName}' not found. Run 'flowpilot new {PlanName2}' first", planName, planName);
-      return 1;
+      if (exitCode == 1)
+      {
+        _logger.LogInformation("Usage: flowpilot next <plan-name>");
+      }
+
+      return exitCode;
     }
 
     // NextCommandHandler now internally calls lint first
-    await _nextHandler.ExecuteAsync(planName);
+    await _nextHandler.ExecuteAsync(planName!);
 
     return 0;
   }

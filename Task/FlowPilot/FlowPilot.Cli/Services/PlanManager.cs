@@ -45,6 +45,84 @@ public class PlanManager
     return _fileSystem.FileExists(stateFilePath);
   }
 
+  public string GetPlansDirectory()
+  {
+    var rootDir = _fileSystem.GetCurrentDirectory();
+    return Path.Combine(rootDir, ".flowpilot", "plans");
+  }
+
+  public List<string> GetAllPlans()
+  {
+    var plansDir = GetPlansDirectory();
+
+    if (!_fileSystem.DirectoryExists(plansDir))
+    {
+      return new List<string>();
+    }
+
+    var planDirectories = _fileSystem.GetDirectories(plansDir);
+    var planNames = new List<string>();
+
+    foreach (var dir in planDirectories)
+    {
+      var planName = Path.GetFileName(dir);
+      if (!string.IsNullOrEmpty(planName) && PlanExists(planName))
+      {
+        planNames.Add(planName);
+      }
+    }
+
+    return planNames;
+  }
+
+  /// <summary>
+  /// Resolves the plan name to use based on command arguments and available plans.
+  /// Returns (planName, shouldExit, exitCode) tuple.
+  /// </summary>
+  public (string? PlanName, bool ShouldExit, int ExitCode) ResolvePlanName(string[] args, Action<string> logInfo, Action<string> logError)
+  {
+    var allPlans = GetAllPlans();
+
+    // If no plans exist, exit successfully
+    if (allPlans.Count == 0)
+    {
+      logInfo("No current plans. Successful exit.");
+      return (null, true, 0);
+    }
+
+    string? planName = null;
+
+    // If no argument provided, try to use the default plan
+    if (args.Length == 0)
+    {
+      // If there's only one plan, use it as default
+      if (allPlans.Count == 1)
+      {
+        planName = allPlans[0];
+        logInfo($"Using default plan: {planName}");
+      }
+      else
+      {
+        // Multiple plans exist, require explicit plan name
+        logError("Multiple plans exist. Please specify a plan name.");
+        logInfo($"Available plans: {string.Join(", ", allPlans)}");
+        return (null, true, 1);
+      }
+    }
+    else
+    {
+      planName = args[0];
+
+      if (!PlanExists(planName))
+      {
+        logError($"Plan '{planName}' not found");
+        return (null, true, 1);
+      }
+    }
+
+    return (planName, false, 0);
+  }
+
   public PlanState GetCurrentState(string planName)
   {
     var stateFilePath = GetStateFilePath(planName);

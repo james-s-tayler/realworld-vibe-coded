@@ -20,4 +20,6 @@ public interface IFileSystemService
   string GetCurrentDirectory();
 
   string[] GetFiles(string path, string searchPattern);
+
+  string[] GetDirectories(string path);
 }
