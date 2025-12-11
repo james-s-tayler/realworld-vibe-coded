@@ -192,29 +192,31 @@ fi
 echo "✅ PASSED: Advanced to key-decisions phase"
 echo ""
 
-# Test 14: Modify key-decisions.md and commit
-echo "[TEST 14] Modifying key-decisions.md and committing..."
+# Test 14: Modify key-decisions.md, commit, and verify lint passes
+echo "[TEST 14] Modifying key-decisions.md, committing, and verifying lint..."
 echo "# Key Decisions" > .flowpilot/plans/test-plan/meta/key-decisions.md
 echo "Decision 1: Use Docker for testing" >> .flowpilot/plans/test-plan/meta/key-decisions.md
 git add .
 git commit -m "Add key decisions"
-echo "✅ PASSED: Key-decisions.md modified and committed"
-echo ""
 
-# Test 15: Next should now require new branch (hard boundary)
-echo "[TEST 15] Testing hard boundary after key-decisions..."
-output=$(flowpilot next test-plan 2>&1)
-if [[ ! $output == *"new branch"* ]]; then
-    echo "❌ FAILED: Should require new branch after key-decisions"
+# Verify lint passes after committing
+output=$(flowpilot lint test-plan 2>&1)
+if [[ $output == *"FAILED"* ]] || [[ $output == *"Error"* ]]; then
+    echo "❌ FAILED: Lint should pass after key-decisions committed"
     echo "Output: $output"
     exit 1
 fi
-echo "✅ PASSED: Hard boundary enforced after key-decisions"
+echo "✅ PASSED: Key-decisions.md modified, committed, and lint passes"
 echo ""
 
-# Test 16: Create new branch and advance to phase-analysis
-echo "[TEST 16] Creating new branch and advancing to phase-analysis..."
+# Test 15: Create new branch (hard boundary workflow)
+echo "[TEST 15] Creating new branch for phase-analysis (hard boundary workflow)..."
 git checkout -b phase-planning
+echo "✅ PASSED: New branch created for crossing hard boundary"
+echo ""
+
+# Test 16: Advance to phase-analysis on new branch
+echo "[TEST 16] Advancing to phase-analysis on new branch..."
 output=$(flowpilot next test-plan 2>&1)
 if [[ ! $output == *"phase-analysis"* ]]; then
     echo "❌ FAILED: Next command should advance to phase-analysis phase"

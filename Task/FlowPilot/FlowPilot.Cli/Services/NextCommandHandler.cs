@@ -34,36 +34,6 @@ public class NextCommandHandler
       return;
     }
 
-    // Check for hard boundary after key-decisions
-    if (state.HasKeyDecisions && !state.HasPhaseAnalysis)
-    {
-      _logger.LogWarning("Hard boundary reached after key-decisions phase");
-      _logger.LogInformation(string.Empty);
-      _logger.LogInformation("Nothing more can be done on this branch.");
-      _logger.LogInformation("To proceed to phase-analysis, you must:");
-      _logger.LogInformation("  1. Merge this branch");
-      _logger.LogInformation("  2. Create a new branch");
-      _logger.LogInformation("  3. Run 'flowpilot next {PlanName}' again", planName);
-      _logger.LogInformation(string.Empty);
-      Environment.Exit(0);
-      return;
-    }
-
-    // Check for hard boundary after phase-details
-    if (state.HasPhaseDetails && !state.Phases.Any(p => p.IsComplete))
-    {
-      _logger.LogWarning("Hard boundary reached after phase-details");
-      _logger.LogInformation(string.Empty);
-      _logger.LogInformation("Nothing more can be done on this branch.");
-      _logger.LogInformation("To proceed to phase implementation, you must:");
-      _logger.LogInformation("  1. Merge this branch");
-      _logger.LogInformation("  2. Create a new branch for the first phase");
-      _logger.LogInformation("  3. Run 'flowpilot next {PlanName}' again", planName);
-      _logger.LogInformation(string.Empty);
-      Environment.Exit(0);
-      return;
-    }
-
     // Build plan context
     var context = new PlanContext
     {
