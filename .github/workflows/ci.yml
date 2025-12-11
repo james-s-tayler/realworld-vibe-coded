@@ -76,6 +76,28 @@ jobs:
       - name: Build (Nuke build system)
         run: dotnet build Task/Runner/Nuke.sln
 
+  flowpilot-lint:
+    name: flowpilot-lint
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Build (server)
+        run: ./build.sh install-flowpilot
+
+      - name: FlowPilot Lint
+        run: flowpilot lint aspnet-identity-migration
+
   build-server:
     name: build-server
     runs-on: ubuntu-latest

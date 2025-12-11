@@ -33,25 +33,6 @@ jobs:
         with:
           global-json-file: App/Server/global.json
 
-      - name: Verify .NET installation
-        run: |
-          dotnet --version
-          dotnet --info
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies including Playwright
-        run: |
-          npm ci
-
-      - name: Install client dependencies
-        run: |
-          cd App/Client && npm ci
-
       - name: Install Playwright Chromium browser
         run: |
           npx playwright install chromium
@@ -59,3 +40,11 @@ jobs:
       - name: Verify Playwright installation
         run: |
           npx playwright --version
+
+      - name: Install Flowpilot
+        run: |
+          ./build.sh InstallFlowPilot
+
+      - name: Install Git Hooks
+        run: |
+          ./build.sh InstallGitHooks
