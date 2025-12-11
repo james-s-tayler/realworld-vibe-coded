@@ -1,4 +1,5 @@
 ﻿using FlowPilot.Cli.Services;
+using Microsoft.Extensions.Logging;
 
 namespace FlowPilot.Cli.Commands;
 
@@ -8,10 +9,12 @@ namespace FlowPilot.Cli.Commands;
 public class InitCommand : ICommand
 {
   private readonly IFileSystemService _fileSystem;
+  private readonly ILogger<InitCommand> _logger;
 
-  public InitCommand(IFileSystemService fileSystem)
+  public InitCommand(IFileSystemService fileSystem, ILogger<InitCommand> logger)
   {
     _fileSystem = fileSystem;
+    _logger = logger;
   }
 
   public string Name => "init";
@@ -20,7 +23,7 @@ public class InitCommand : ICommand
 
   public Task<int> ExecuteAsync(string[] args)
   {
-    Console.WriteLine("Installing FlowPilot into repository...");
+    _logger.LogInformation("Installing FlowPilot into repository...");
 
     var currentDir = _fileSystem.GetCurrentDirectory();
 
@@ -30,8 +33,8 @@ public class InitCommand : ICommand
 
     if (_fileSystem.FileExists(flowpilotAgentFile))
     {
-      Console.WriteLine("⚠️  FlowPilot appears to already be installed (found .github/agents/flowpilot.agent.md)");
-      Console.WriteLine("To reinstall, delete the existing files and run init again.");
+      _logger.LogWarning("FlowPilot appears to already be installed (found .github/agents/flowpilot.agent.md)");
+      _logger.LogInformation("To reinstall, delete the existing files and run init again.");
       return Task.FromResult(1);
     }
 
@@ -73,22 +76,22 @@ public class InitCommand : ICommand
         _fileSystem.CopyFile(sourceFile, targetFile);
       }
 
-      Console.WriteLine("✓ FlowPilot installed successfully!");
-      Console.WriteLine();
-      Console.WriteLine("Files installed:");
-      Console.WriteLine($"  • .github/agents/flowpilot.agent.md");
-      Console.WriteLine($"  • .github/instructions/flowpilot-phase-details.instructions.md");
-      Console.WriteLine($"  • .flowpilot/template/ (7 template files)");
-      Console.WriteLine();
-      Console.WriteLine("Next steps:");
-      Console.WriteLine("  1. Commit these files to your repository");
-      Console.WriteLine("  2. Run 'flowpilot new <plan-name>' to create your first plan");
+      _logger.LogInformation("✓ FlowPilot installed successfully!");
+      _logger.LogInformation(string.Empty);
+      _logger.LogInformation("Files installed:");
+      _logger.LogInformation("  • .github/agents/flowpilot.agent.md");
+      _logger.LogInformation("  • .github/instructions/flowpilot-phase-details.instructions.md");
+      _logger.LogInformation("  • .flowpilot/template/ (7 template files)");
+      _logger.LogInformation(string.Empty);
+      _logger.LogInformation("Next steps:");
+      _logger.LogInformation("  1. Commit these files to your repository");
+      _logger.LogInformation("  2. Run 'flowpilot new <plan-name>' to create your first plan");
 
       return Task.FromResult(0);
     }
     catch (Exception ex)
     {
-      Console.WriteLine($"❌ Error installing FlowPilot: {ex.Message}");
+      _logger.LogError(ex, "Error installing FlowPilot");
       return Task.FromResult(1);
     }
   }

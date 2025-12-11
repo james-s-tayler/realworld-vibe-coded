@@ -1,5 +1,6 @@
 ﻿using FlowPilot.Cli.Linting;
 using FlowPilot.Cli.Models;
+using Microsoft.Extensions.Logging;
 
 namespace FlowPilot.Cli.Services;
 
@@ -11,15 +12,18 @@ public class LintCommandHandler
   private readonly PlanManager _planManager;
   private readonly GitService _gitService;
   private readonly IEnumerable<ILintingRule> _lintingRules;
+  private readonly ILogger<LintCommandHandler> _logger;
 
   public LintCommandHandler(
     PlanManager planManager,
     GitService gitService,
-    IEnumerable<ILintingRule> lintingRules)
+    IEnumerable<ILintingRule> lintingRules,
+    ILogger<LintCommandHandler> logger)
   {
     _planManager = planManager;
     _gitService = gitService;
     _lintingRules = lintingRules;
+    _logger = logger;
   }
 
   public async Task<int> ExecuteAsync(string planName)
@@ -59,21 +63,21 @@ public class LintCommandHandler
       return 1;
     }
 
-    Console.WriteLine("✓ Lint passed - plan follows FlowPilot rules");
+    _logger.LogInformation("✓ Lint passed - plan follows FlowPilot rules");
     return 0;
   }
 
   private void PrintErrors(List<string> errors)
   {
-    Console.WriteLine("❌ Lint failed with the following errors:");
-    Console.WriteLine();
+    _logger.LogError("Lint failed with the following errors:");
+    _logger.LogInformation(string.Empty);
 
     foreach (var error in errors)
     {
-      Console.WriteLine($"  • {error}");
+      _logger.LogInformation("  • {Error}", error);
     }
 
-    Console.WriteLine();
-    Console.WriteLine("Fix these issues and try again.");
+    _logger.LogInformation(string.Empty);
+    _logger.LogInformation("Fix these issues and try again.");
   }
 }

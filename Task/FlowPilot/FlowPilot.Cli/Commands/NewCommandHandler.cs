@@ -1,4 +1,5 @@
 ﻿using FlowPilot.Cli.Services;
+using Microsoft.Extensions.Logging;
 
 namespace FlowPilot.Cli.Commands;
 
@@ -11,17 +12,20 @@ public class NewCommandHandler : ICommand
   private readonly TemplateService _templateService;
   private readonly StateParser _stateParser;
   private readonly PlanManager _planManager;
+  private readonly ILogger<NewCommandHandler> _logger;
 
   public NewCommandHandler(
     IFileSystemService fileSystem,
     TemplateService templateService,
     StateParser stateParser,
-    PlanManager planManager)
+    PlanManager planManager,
+    ILogger<NewCommandHandler> logger)
   {
     _fileSystem = fileSystem;
     _templateService = templateService;
     _stateParser = stateParser;
     _planManager = planManager;
+    _logger = logger;
   }
 
   public string Name => "new";
@@ -32,28 +36,28 @@ public class NewCommandHandler : ICommand
   {
     if (args.Length == 0)
     {
-      Console.WriteLine("Error: Plan name is required.");
-      Console.WriteLine("Usage: flowpilot new <plan-name>");
+      _logger.LogError("Plan name is required");
+      _logger.LogInformation("Usage: flowpilot new <plan-name>");
       return Task.FromResult(1);
     }
 
     var planName = args[0];
-    Console.WriteLine($"Creating FlowPilot plan: {planName}");
+    _logger.LogInformation("Creating FlowPilot plan: {PlanName}", planName);
 
     if (_planManager.PlanExists(planName))
     {
-      Console.WriteLine($"Error: Plan '{planName}' already exists.");
+      _logger.LogError("Plan '{PlanName}' already exists", planName);
       return Task.FromResult(1);
     }
 
     _planManager.InitializePlan(planName);
 
-    Console.WriteLine($"✓ Plan '{planName}' created successfully.");
-    Console.WriteLine();
-    Console.WriteLine("Next steps:");
-    Console.WriteLine($"1. Update .flowpilot/plans/{planName}/meta/goal.md with your feature requirements");
-    Console.WriteLine($"2. Commit this change to your repository");
-    Console.WriteLine($"3. Run 'flowpilot next {planName}' to continue");
+    _logger.LogInformation("✓ Plan '{PlanName}' created successfully", planName);
+    _logger.LogInformation(string.Empty);
+    _logger.LogInformation("Next steps:");
+    _logger.LogInformation("1. Update .flowpilot/plans/{PlanName}/meta/goal.md with your feature requirements", planName);
+    _logger.LogInformation("2. Commit this change to your repository");
+    _logger.LogInformation("3. Run 'flowpilot next {PlanName}' to continue", planName);
 
     return Task.FromResult(0);
   }

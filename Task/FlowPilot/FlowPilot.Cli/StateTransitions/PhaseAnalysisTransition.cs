@@ -1,5 +1,6 @@
 ﻿using FlowPilot.Cli.Models;
 using FlowPilot.Cli.Services;
+using Microsoft.Extensions.Logging;
 
 namespace FlowPilot.Cli.StateTransitions;
 
@@ -9,10 +10,12 @@ namespace FlowPilot.Cli.StateTransitions;
 public class PhaseAnalysisTransition : IStateTransition
 {
   private readonly PlanManager _planManager;
+  private readonly ILogger<PhaseAnalysisTransition> _logger;
 
-  public PhaseAnalysisTransition(PlanManager planManager)
+  public PhaseAnalysisTransition(PlanManager planManager, ILogger<PhaseAnalysisTransition> logger)
   {
     _planManager = planManager;
+    _logger = logger;
   }
 
   public bool CanTransition(PlanContext context)
@@ -25,14 +28,14 @@ public class PhaseAnalysisTransition : IStateTransition
     _planManager.UpdateStateChecklist(context.PlanName, "phase-analysis", true);
     _planManager.CopyTemplateToMeta(context.PlanName, "phase-analysis.md");
 
-    Console.WriteLine("✓ Advanced to [phase-analysis] phase");
-    Console.WriteLine();
-    Console.WriteLine("Instructions:");
-    Console.WriteLine($"Update .flowpilot/plans/{context.PlanName}/meta/phase-analysis.md");
-    Console.WriteLine("Based on the contents of goal.md, system-analysis.md, and key-decisions.md,");
-    Console.WriteLine("define the high-level phases for this plan.");
-    Console.WriteLine();
-    Console.WriteLine("⚠️  Note: A new branch is required to proceed past phase-analysis.");
-    Console.WriteLine("After committing, merge this branch before continuing with phase-details.");
+    _logger.LogInformation("✓ Advanced to [phase-analysis] phase");
+    _logger.LogInformation(string.Empty);
+    _logger.LogInformation("Instructions:");
+    _logger.LogInformation("Update .flowpilot/plans/{PlanName}/meta/phase-analysis.md", context.PlanName);
+    _logger.LogInformation("Based on the contents of goal.md, system-analysis.md, and key-decisions.md,");
+    _logger.LogInformation("define the high-level phases for this plan.");
+    _logger.LogInformation(string.Empty);
+    _logger.LogWarning("A new branch is required to proceed past phase-analysis.");
+    _logger.LogInformation("After committing, merge this branch before continuing with phase-details.");
   }
 }

@@ -1,5 +1,6 @@
 ﻿using FlowPilot.Cli.Models;
 using FlowPilot.Cli.Services;
+using Microsoft.Extensions.Logging;
 
 namespace FlowPilot.Cli.StateTransitions;
 
@@ -12,17 +13,20 @@ public class PhaseDetailsTransition : IStateTransition
   private readonly IFileSystemService _fileSystem;
   private readonly TemplateService _templateService;
   private readonly StateParser _stateParser;
+  private readonly ILogger<PhaseDetailsTransition> _logger;
 
   public PhaseDetailsTransition(
     PlanManager planManager,
     IFileSystemService fileSystem,
     TemplateService templateService,
-    StateParser stateParser)
+    StateParser stateParser,
+    ILogger<PhaseDetailsTransition> logger)
   {
     _planManager = planManager;
     _fileSystem = fileSystem;
     _templateService = templateService;
     _stateParser = stateParser;
+    _logger = logger;
   }
 
   public bool CanTransition(PlanContext context)
@@ -38,7 +42,7 @@ public class PhaseDetailsTransition : IStateTransition
 
     if (phaseNames.Count == 0)
     {
-      Console.WriteLine("Error: No phases found in phase-analysis.md");
+      _logger.LogError("No phases found in phase-analysis.md");
       Environment.Exit(1);
       return;
     }
@@ -65,16 +69,16 @@ public class PhaseDetailsTransition : IStateTransition
     stateContent = _stateParser.AddPhaseChecklistItems(stateContent, phaseNames);
     _fileSystem.WriteAllText(context.StateFilePath, stateContent);
 
-    Console.WriteLine($"✓ Advanced to [phase-n-details] phase");
-    Console.WriteLine($"✓ Created {phaseNames.Count} phase detail files");
-    Console.WriteLine();
-    Console.WriteLine("Instructions:");
-    Console.WriteLine($"Update each phase-*-details.md file in .flowpilot/plans/{context.PlanName}/plan/");
-    Console.WriteLine("based on the contents of goal.md, references.md, system-analysis.md,");
-    Console.WriteLine("and phase-analysis.md.");
-    Console.WriteLine();
-    Console.WriteLine("⚠️  Note: A new branch is required to proceed to implementation.");
-    Console.WriteLine("After committing, merge this branch before starting phase implementations.");
+    _logger.LogInformation("✓ Advanced to [phase-n-details] phase");
+    _logger.LogInformation("✓ Created {PhaseCount} phase detail files", phaseNames.Count);
+    _logger.LogInformation(string.Empty);
+    _logger.LogInformation("Instructions:");
+    _logger.LogInformation("Update each phase-*-details.md file in .flowpilot/plans/{PlanName}/plan/", context.PlanName);
+    _logger.LogInformation("based on the contents of goal.md, references.md, system-analysis.md,");
+    _logger.LogInformation("and phase-analysis.md.");
+    _logger.LogInformation(string.Empty);
+    _logger.LogWarning("A new branch is required to proceed to implementation.");
+    _logger.LogInformation("After committing, merge this branch before starting phase implementations.");
   }
 
   private List<string> ParsePhaseNames(string phaseAnalysisPath)

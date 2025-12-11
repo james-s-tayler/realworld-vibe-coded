@@ -1,5 +1,6 @@
 ﻿using FlowPilot.Cli.Models;
 using FlowPilot.Cli.Services;
+using Microsoft.Extensions.Logging;
 
 namespace FlowPilot.Cli.StateTransitions;
 
@@ -9,10 +10,12 @@ namespace FlowPilot.Cli.StateTransitions;
 public class PhaseImplementationTransition : IStateTransition
 {
   private readonly PlanManager _planManager;
+  private readonly ILogger<PhaseImplementationTransition> _logger;
 
-  public PhaseImplementationTransition(PlanManager planManager)
+  public PhaseImplementationTransition(PlanManager planManager, ILogger<PhaseImplementationTransition> logger)
   {
     _planManager = planManager;
+    _logger = logger;
   }
 
   public bool CanTransition(PlanContext context)
@@ -27,18 +30,18 @@ public class PhaseImplementationTransition : IStateTransition
 
     if (nextPhase == null)
     {
-      Console.WriteLine("✓ All phases complete! Plan finished.");
+      _logger.LogInformation("✓ All phases complete! Plan finished.");
       return;
     }
 
     _planManager.UpdateStateChecklist(context.PlanName, $"phase_{nextPhase.PhaseNumber}", true);
 
-    Console.WriteLine($"✓ Advanced to phase {nextPhase.PhaseNumber}: {nextPhase.PhaseName}");
-    Console.WriteLine();
-    Console.WriteLine("Instructions:");
-    Console.WriteLine($"Implement phase {nextPhase.PhaseNumber} as described in:");
-    Console.WriteLine($".flowpilot/plans/{context.PlanName}/plan/phase-{nextPhase.PhaseNumber}-details.md");
-    Console.WriteLine();
-    Console.WriteLine("When phase verification criteria is met, run 'flowpilot next' again.");
+    _logger.LogInformation("✓ Advanced to phase {PhaseNumber}: {PhaseName}", nextPhase.PhaseNumber, nextPhase.PhaseName);
+    _logger.LogInformation(string.Empty);
+    _logger.LogInformation("Instructions:");
+    _logger.LogInformation("Implement phase {PhaseNumber} as described in:", nextPhase.PhaseNumber);
+    _logger.LogInformation(".flowpilot/plans/{PlanName}/plan/phase-{PhaseNumber}-details.md", context.PlanName, nextPhase.PhaseNumber);
+    _logger.LogInformation(string.Empty);
+    _logger.LogInformation("When phase verification criteria is met, run 'flowpilot next' again.");
   }
 }

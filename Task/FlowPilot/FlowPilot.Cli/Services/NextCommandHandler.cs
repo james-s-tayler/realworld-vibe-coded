@@ -1,5 +1,6 @@
 ﻿using FlowPilot.Cli.Models;
 using FlowPilot.Cli.StateTransitions;
+using Microsoft.Extensions.Logging;
 
 namespace FlowPilot.Cli.Services;
 
@@ -10,13 +11,16 @@ public class NextCommandHandler
 {
   private readonly PlanManager _planManager;
   private readonly IEnumerable<IStateTransition> _stateTransitions;
+  private readonly ILogger<NextCommandHandler> _logger;
 
   public NextCommandHandler(
     PlanManager planManager,
-    IEnumerable<IStateTransition> stateTransitions)
+    IEnumerable<IStateTransition> stateTransitions,
+    ILogger<NextCommandHandler> logger)
   {
     _planManager = planManager;
     _stateTransitions = stateTransitions;
+    _logger = logger;
   }
 
   public void Execute(string planName)
@@ -25,7 +29,7 @@ public class NextCommandHandler
 
     if (!state.IsInitialized)
     {
-      Console.WriteLine("Error: Plan not initialized. Run 'flowpilot init' first.");
+      _logger.LogError("Plan not initialized. Run 'flowpilot new' first");
       Environment.Exit(1);
       return;
     }
@@ -50,7 +54,7 @@ public class NextCommandHandler
     }
     else
     {
-      Console.WriteLine("Error: No applicable state transition found.");
+      _logger.LogError("No applicable state transition found");
       Environment.Exit(1);
     }
   }

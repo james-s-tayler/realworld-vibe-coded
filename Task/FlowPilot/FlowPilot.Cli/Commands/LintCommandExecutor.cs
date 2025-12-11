@@ -1,4 +1,5 @@
 ﻿using FlowPilot.Cli.Services;
+using Microsoft.Extensions.Logging;
 
 namespace FlowPilot.Cli.Commands;
 
@@ -10,15 +11,18 @@ public class LintCommandExecutor : ICommand
   private readonly PlanManager _planManager;
   private readonly GitService _gitService;
   private readonly LintCommandHandler _lintHandler;
+  private readonly ILogger<LintCommandExecutor> _logger;
 
   public LintCommandExecutor(
     PlanManager planManager,
     GitService gitService,
-    LintCommandHandler lintHandler)
+    LintCommandHandler lintHandler,
+    ILogger<LintCommandExecutor> logger)
   {
     _planManager = planManager;
     _gitService = gitService;
     _lintHandler = lintHandler;
+    _logger = logger;
   }
 
   public string Name => "lint";
@@ -29,8 +33,8 @@ public class LintCommandExecutor : ICommand
   {
     if (args.Length == 0)
     {
-      Console.WriteLine("Error: Plan name is required.");
-      Console.WriteLine("Usage: flowpilot lint <plan-name>");
+      _logger.LogError("Plan name is required");
+      _logger.LogInformation("Usage: flowpilot lint <plan-name>");
       return 1;
     }
 
@@ -38,7 +42,7 @@ public class LintCommandExecutor : ICommand
 
     if (!_planManager.PlanExists(planName))
     {
-      Console.WriteLine($"Error: Plan '{planName}' not found.");
+      _logger.LogError("Plan '{PlanName}' not found", planName);
       return 1;
     }
 
@@ -48,7 +52,7 @@ public class LintCommandExecutor : ICommand
     }
     catch (InvalidOperationException)
     {
-      Console.WriteLine("Error: Not in a git repository. FlowPilot lint requires git.");
+      _logger.LogError("Not in a git repository. FlowPilot lint requires git");
       return 1;
     }
 
