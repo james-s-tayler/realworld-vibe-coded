@@ -46,16 +46,16 @@ The linter and next-command can rely on these headings exactly.
 
 ### phase_3
 
-**Goal**: Add Identity API endpoints and update authentication middleware
+**Goal**: Add Identity API endpoints alongside existing authentication (dual operation)
 
 **Key Outcomes**:
 - Add MapIdentityApi<ApplicationUser>() to expose Identity endpoints (/register, /login, /refresh, etc.)
-- Remove old authentication endpoints (Users/Register, Users/Login)
-- Update middleware pipeline for cookie authentication (remove JWT authentication)
-- Remove old authentication services (IJwtTokenGenerator, IPasswordHasher, BcryptPasswordHasher, JwtTokenGenerator)
-- Application serves both old and new endpoints during transition
+- Configure middleware pipeline to support BOTH cookie authentication (Identity) AND JWT authentication (existing)
+- Keep all existing authentication endpoints (Users/Register, Users/Login) functional
+- Keep all existing authentication services (IJwtTokenGenerator, IPasswordHasher, etc.) operational
+- Both authentication systems work simultaneously and independently
 
-**Working State Transition**: Identity endpoints are now available and functional. Old JWT-based endpoints are removed. Cookie authentication replaces JWT authentication. Application builds and runs but tests need updating to use new endpoints and cookie-based auth.
+**Working State Transition**: Application now supports dual authentication - both Identity cookie-based endpoints AND legacy JWT-based endpoints work side-by-side. All existing tests (functional, Postman, E2E) continue to pass using the old JWT endpoints. New Identity endpoints are available and functional for parallel testing. No breaking changes.
 
 ---
 
@@ -69,8 +69,9 @@ The linter and next-command can rely on these headings exactly.
 - Update ArticlesFixture and other test fixtures to authenticate via Identity
 - Refactor test HttpClient creation to preserve cookies across requests
 - All functional tests pass with new authentication system
+- Old JWT-based endpoints remain operational
 
-**Working State Transition**: Functional test suite is fully updated and passing with Identity endpoints. Backend integration tests validate the new authentication flows work correctly. Application is functionally complete but Postman and E2E tests still need updating.
+**Working State Transition**: Functional test suite is fully updated and passing with Identity endpoints. Backend integration tests validate the new authentication flows work correctly. Dual operation continues - both auth systems still work. Postman and E2E tests still use old JWT endpoints and continue to pass.
 
 ---
 
@@ -84,8 +85,9 @@ The linter and next-command can rely on these headings exactly.
 - Configure Postman to send/receive cookies automatically
 - Update pre-request scripts if needed for cookie handling
 - All Postman tests pass with Identity endpoints
+- Old JWT-based endpoints remain operational
 
-**Working State Transition**: Postman test suite fully validates the Identity endpoints. API contract is confirmed working end-to-end through Postman. E2E tests remain the final validation step.
+**Working State Transition**: Postman test suite fully validates the Identity endpoints. API contract is confirmed working end-to-end through Postman. Dual operation continues - both auth systems still work. E2E tests still use old JWT endpoints and continue to pass.
 
 ---
 
@@ -99,23 +101,39 @@ The linter and next-command can rely on these headings exactly.
 - Update frontend to rely on automatic cookie handling by browser
 - Update Playwright E2E tests for new authentication flows
 - All E2E tests pass with cookie-based authentication
+- Old JWT-based endpoints remain operational (unused but available)
 
-**Working State Transition**: Complete end-to-end system works with ASP.NET Identity. Frontend communicates with Identity endpoints, cookies are managed automatically by browser, and all E2E tests validate the full stack. Migration is functionally complete.
+**Working State Transition**: Complete end-to-end system works with ASP.NET Identity. Frontend communicates with Identity endpoints, cookies are managed automatically by browser, and all E2E tests validate the full stack. All tests now use Identity. Old JWT system is still present but no longer used.
 
 ---
 
 ### phase_7
 
-**Goal**: Clean up legacy code and update documentation
+**Goal**: Remove legacy JWT authentication system
 
 **Key Outcomes**:
+- Remove old authentication endpoints (Users/Register, Users/Login)
+- Remove old authentication services (IJwtTokenGenerator, IPasswordHasher, BcryptPasswordHasher, JwtTokenGenerator)
+- Remove JWT authentication from middleware pipeline
 - Remove unused User entity and related specifications (UserByEmailAndPasswordSpec, etc.)
-- Remove unused authentication-related services and interfaces
-- Remove old authentication configuration code
 - Remove JWT-related NuGet packages (JwtBearer, IdentityModel.Tokens.Jwt, BCrypt.Net-Next)
-- Update API documentation to reflect Identity endpoints
-- Clean up any remaining TODO comments or temporary code
+- Clean up any remaining TODO comments or temporary code related to old auth
 
-**Working State Transition**: Codebase is clean with all legacy authentication code removed. Only Identity-based authentication code remains. All tests pass. Application is production-ready with fully migrated authentication system.
+**Working State Transition**: Codebase is clean with all legacy authentication code removed. Only Identity-based authentication code remains. All tests pass using Identity endpoints. Application is production-ready with fully migrated authentication system.
+
+---
+
+### phase_8
+
+**Goal**: Final cleanup and documentation
+
+**Key Outcomes**:
+- Update API documentation to reflect Identity endpoints only
+- Review and clean up any migration-related comments or documentation
+- Verify all tests pass (functional, Postman, E2E)
+- Verify all Nuke build targets pass (LintAllVerify, BuildServer, TestServer, TestServerPostman, TestE2e)
+- Final code review and validation
+
+**Working State Transition**: Migration is complete. Documentation is up-to-date. All tests and build targets pass. System is production-ready with clean, maintainable code using ASP.NET Identity exclusively.
 
 ---
