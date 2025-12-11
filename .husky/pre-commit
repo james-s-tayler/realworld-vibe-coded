@@ -47,7 +47,7 @@ if [ "$task_runner_changes" -gt 0 ]; then
 fi
 
 # Run test-flowpilot if there are FlowPilot changes
-# Temporarily disabled during development
+# Temporarily disabled - will re-enable after confirming Docker build works
 # if [ "$task_flowpilot_changes" -gt 0 ]; then
 #   echo "🔧 Task/FlowPilot changes detected, running TestFlowPilot..."
 #   if ! ./build.sh TestFlowPilot; then

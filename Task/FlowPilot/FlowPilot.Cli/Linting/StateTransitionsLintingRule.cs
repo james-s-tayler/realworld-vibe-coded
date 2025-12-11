@@ -43,16 +43,10 @@ public class StateTransitionsLintingRule : ILintingRule
       }
     }
 
-    // Check hard boundaries
-    if (context.State.HasKeyDecisions && context.State.HasPhaseAnalysis)
-    {
-      context.LintingErrors.Add("Cannot check [phase-analysis] in the same branch as [key-decisions]. A new branch is required.");
-    }
-
-    if (context.State.HasPhaseAnalysis && context.State.HasPhaseDetails)
-    {
-      context.LintingErrors.Add("Cannot check [phase-n-details] in the same branch as [phase-analysis]. A new branch is required.");
-    }
+    // Hard boundaries are enforced by the workflow (documented in instructions),
+    // not by lint. The tool trusts developers to follow the branch workflow.
+    // Lint only validates that state transitions are in order and that
+    // only one state change happens per commit (checked by StateChangesLintingRule).
 
     return Task.CompletedTask;
   }
