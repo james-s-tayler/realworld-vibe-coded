@@ -1,4 +1,5 @@
 ﻿using Nuke.Common;
+using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Serilog;
@@ -83,5 +84,51 @@ public partial class Build
       Log.Information($"Running dotnet format (fix mode) on {FlowPilotSolution}");
       DotNetFormat(s => s
         .SetProject(FlowPilotSolution));
+    });
+
+  internal Target BuildFlowPilotPublish => _ => _
+    .Description("Publish FlowPilot CLI as a NuGet package to local feed")
+    .DependsOn(BuildFlowPilot)
+    .Executes(() =>
+    {
+      // Ensure local NuGet feed directory exists
+      LocalNuGetFeedDirectory.CreateOrCleanDirectory();
+      Log.Information($"Local NuGet feed directory: {LocalNuGetFeedDirectory}");
+
+      // Pack the FlowPilot.Cli project
+      Log.Information($"Packing FlowPilot.Cli from {FlowPilotCliProject}");
+      DotNetPack(s => s
+        .SetProject(FlowPilotCliProject)
+        .SetConfiguration("Release")
+        .SetOutputDirectory(LocalNuGetFeedDirectory)
+        .SetProperty("PackAsTool", "true"));
+
+      Log.Information($"✅ FlowPilot.Cli published to {LocalNuGetFeedDirectory}");
+    });
+
+  internal Target InstallFlowPilot => _ => _
+    .Description("Install FlowPilot CLI as a global dotnet tool from local feed")
+    .DependsOn(BuildFlowPilotPublish)
+    .Executes(() =>
+    {
+      try
+      {
+        Log.Information("Uninstalling existing FlowPilot.Cli tool if present...");
+        DotNetToolUninstall(s => s
+          .SetPackageName("FlowPilot.Cli")
+          .SetGlobal(true));
+      }
+      catch
+      {
+        Log.Information("No existing FlowPilot.Cli tool found to uninstall.");
+      }
+
+      Log.Information($"Installing FlowPilot.Cli from local feed {LocalNuGetFeedDirectory}...");
+      DotNetToolInstall(s => s
+        .SetPackageName("FlowPilot.Cli")
+        .SetGlobal(true)
+        .AddSources(LocalNuGetFeedDirectory));
+
+      Log.Information("✅ FlowPilot.Cli installed successfully. Run 'flowpilot' to verify.");
     });
 }

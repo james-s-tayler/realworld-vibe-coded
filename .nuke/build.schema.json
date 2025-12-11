@@ -26,6 +26,7 @@
       "enum": [
         "BuildClient",
         "BuildFlowPilot",
+        "BuildFlowPilotPublish",
         "BuildServer",
         "BuildServerPublish",
         "DbMigrationsGenerateIdempotentScript",
@@ -37,6 +38,7 @@
         "InstallClient",
         "InstallDotnetToolEf",
         "InstallDotnetToolLiquidReports",
+        "InstallFlowPilot",
         "InstallGitHooks",
         "LintAllFix",
         "LintAllVerify",
