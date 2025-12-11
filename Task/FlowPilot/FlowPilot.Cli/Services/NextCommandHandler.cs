@@ -50,7 +50,7 @@ public class NextCommandHandler
     }
 
     // Check for hard boundary after phase-details
-    if (state.HasPhaseDetails && !state.PhaseStates.Any(p => p.IsChecked))
+    if (state.HasPhaseDetails && !state.Phases.Any(p => p.IsChecked))
     {
       _logger.LogWarning("Hard boundary reached after phase-details");
       _logger.LogInformation(string.Empty);
@@ -85,7 +85,7 @@ public class NextCommandHandler
     else
     {
       // Check if plan is complete
-      if (state.PhaseStates.Any() && state.PhaseStates.All(p => p.IsChecked))
+      if (state.Phases.Any() && state.Phases.All(p => p.IsChecked))
       {
         _logger.LogInformation("✓ Plan '{PlanName}' is complete!", planName);
         _logger.LogInformation("All phases have been finished.");
