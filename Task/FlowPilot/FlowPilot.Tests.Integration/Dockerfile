@@ -21,11 +21,11 @@ COPY stylecop.json ./stylecop.json
 # Set working directory to FlowPilot
 WORKDIR /workspace/Task/FlowPilot
 
-# Build FlowPilot (disable TreatWarningsAsErrors for Docker test environment)
-RUN dotnet build FlowPilot.Cli/FlowPilot.Cli.csproj -c Release /p:TreatWarningsAsErrors=false
+# Build FlowPilot
+RUN dotnet build FlowPilot.Cli/FlowPilot.Cli.csproj -c Release
 
 # Pack FlowPilot as NuGet package
-RUN dotnet pack FlowPilot.Cli/FlowPilot.Cli.csproj -c Release -o /nuget-packages /p:TreatWarningsAsErrors=false
+RUN dotnet pack FlowPilot.Cli/FlowPilot.Cli.csproj -c Release -o /nuget-packages
 
 # Create a local NuGet feed directory
 RUN mkdir -p /nuget-feed && \

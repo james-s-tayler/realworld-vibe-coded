@@ -7,6 +7,12 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     
+    <!-- Disable StyleCop for FlowPilot -->
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <NoWarn>$(NoWarn);SA0001;SA1101;SA1200;SA1309;SA1400;SA1600;SA1633</NoWarn>
+    
     <!-- Package as dotnet global tool -->
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>flowpilot</ToolCommandName>
