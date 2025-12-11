@@ -106,7 +106,7 @@
 
 ## Audit.NET Compatibility Research
 
-### [Audit.NET GitHub Repository](https://github.com/thepirat000/Audit.NET)
+### Audit.NET Entity Framework Identity Support (NuGet Package Documentation)
 **Key Takeaways:**
 - Audit.NET provides Audit.EntityFramework.Core and Audit.EntityFramework.Identity packages
 - AuditIdentityDbContext can be used as base class for Identity contexts
