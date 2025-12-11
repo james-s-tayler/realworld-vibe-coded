@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using FlowPilot.Cli.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowPilot.Cli.Commands;
 
@@ -29,21 +30,22 @@ public static class LintCommand
 
   private static async Task<int> ExecuteAsync(string planName)
   {
-    // Create services
-    IFileSystemService fileSystem = new FileSystemService();
-    var templateService = new TemplateService();
-    var stateParser = new StateParser();
-    var planManager = new PlanManager(fileSystem, templateService, stateParser);
+    // Create service provider
+    var fileSystem = new FileSystemService();
+    var currentDir = fileSystem.GetCurrentDirectory();
 
+    var services = new ServiceCollection();
+    services.ConfigureServices(currentDir);
+    var serviceProvider = services.BuildServiceProvider();
+
+    var planManager = serviceProvider.GetRequiredService<PlanManager>();
     if (!planManager.PlanExists(planName))
     {
       Console.WriteLine($"Error: Plan '{planName}' not found.");
       return 1;
     }
 
-    var currentDir = fileSystem.GetCurrentDirectory();
-    var gitService = new GitService(currentDir);
-
+    var gitService = serviceProvider.GetRequiredService<GitService>();
     try
     {
       gitService.GetRepositoryRoot();
@@ -54,11 +56,7 @@ public static class LintCommand
       return 1;
     }
 
-    // Create service factory and get linting rules
-    var serviceFactory = new ServiceFactory(fileSystem, templateService, stateParser, gitService, planManager);
-    var lintingRules = serviceFactory.CreateLintingRules();
-
-    var handler = new LintCommandHandler(planManager, lintingRules);
+    var handler = serviceProvider.GetRequiredService<LintCommandHandler>();
     var exitCode = await handler.ExecuteAsync(planName);
     return exitCode;
   }

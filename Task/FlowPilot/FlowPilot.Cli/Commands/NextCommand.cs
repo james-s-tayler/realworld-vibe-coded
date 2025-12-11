@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using FlowPilot.Cli.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FlowPilot.Cli.Commands;
 
@@ -28,12 +29,15 @@ public static class NextCommand
 
   private static async Task ExecuteAsync(string planName)
   {
-    // Create services
-    IFileSystemService fileSystem = new FileSystemService();
-    var templateService = new TemplateService();
-    var stateParser = new StateParser();
-    var planManager = new PlanManager(fileSystem, templateService, stateParser);
+    // Create service provider
+    var fileSystem = new FileSystemService();
+    var currentDir = fileSystem.GetCurrentDirectory();
 
+    var services = new ServiceCollection();
+    services.ConfigureServices(currentDir);
+    var serviceProvider = services.BuildServiceProvider();
+
+    var planManager = serviceProvider.GetRequiredService<PlanManager>();
     if (!planManager.PlanExists(planName))
     {
       Console.WriteLine($"Error: Plan '{planName}' not found. Run 'flowpilot init {planName}' first.");
@@ -42,18 +46,12 @@ public static class NextCommand
     }
 
     // Run lint first
-    var currentDir = fileSystem.GetCurrentDirectory();
-    var gitService = new GitService(currentDir);
-
+    var gitService = serviceProvider.GetRequiredService<GitService>();
     try
     {
       gitService.GetRepositoryRoot();
 
-      // Create service factory and get linting rules
-      var serviceFactory = new ServiceFactory(fileSystem, templateService, stateParser, gitService, planManager);
-      var lintingRules = serviceFactory.CreateLintingRules();
-
-      var lintHandler = new LintCommandHandler(planManager, lintingRules);
+      var lintHandler = serviceProvider.GetRequiredService<LintCommandHandler>();
       var lintResult = await lintHandler.ExecuteAsync(planName);
 
       if (lintResult != 0)
@@ -70,11 +68,7 @@ public static class NextCommand
       Console.WriteLine("⚠️  Warning: Not in a git repository. Skipping lint check.");
     }
 
-    // Create state transitions and execute next
-    var serviceFactory2 = new ServiceFactory(fileSystem, templateService, stateParser, gitService, planManager);
-    var stateTransitions = serviceFactory2.CreateStateTransitions();
-
-    var handler = new NextCommandHandler(planManager, stateTransitions);
+    var handler = serviceProvider.GetRequiredService<NextCommandHandler>();
     handler.Execute(planName);
 
     await Task.CompletedTask;

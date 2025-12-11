@@ -15,20 +15,18 @@ public class ReferencesUrlLintingRule : ILintingRule
     _fileSystem = fileSystem;
   }
 
-  public async Task<List<string>> ExecuteAsync(PlanContext context)
+  public async Task ExecuteAsync(PlanContext context)
   {
-    var errors = new List<string>();
-
     if (!context.State.HasReferences)
     {
-      return errors;
+      return;
     }
 
     var referencesPath = Path.Combine(context.MetaDirectory, "references.md");
 
     if (!_fileSystem.FileExists(referencesPath))
     {
-      return errors;
+      return;
     }
 
     var content = _fileSystem.ReadAllText(referencesPath);
@@ -51,15 +49,13 @@ public class ReferencesUrlLintingRule : ILintingRule
 
         if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-          errors.Add($"URL returns 404 Not Found: {url}");
+          context.LintingErrors.Add($"URL returns 404 Not Found: {url}");
         }
       }
       catch (Exception ex)
       {
-        errors.Add($"Failed to validate URL {url}: {ex.Message}");
+        context.LintingErrors.Add($"Failed to validate URL {url}: {ex.Message}");
       }
     }
-
-    return errors;
   }
 }

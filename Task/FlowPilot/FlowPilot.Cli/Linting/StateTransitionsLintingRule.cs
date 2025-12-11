@@ -17,9 +17,8 @@ public class StateTransitionsLintingRule : ILintingRule
     _stateParser = stateParser;
   }
 
-  public Task<List<string>> ExecuteAsync(PlanContext context)
+  public Task ExecuteAsync(PlanContext context)
   {
-    var errors = new List<string>();
     var content = _fileSystem.ReadAllText(context.StateFilePath);
     var items = _stateParser.ParseStateFile(content);
 
@@ -40,21 +39,21 @@ public class StateTransitionsLintingRule : ILintingRule
       }
       else if (foundUnchecked)
       {
-        errors.Add($"State [{item.Identifier}] is checked but previous items are not checked. Items must be checked in order.");
+        context.LintingErrors.Add($"State [{item.Identifier}] is checked but previous items are not checked. Items must be checked in order.");
       }
     }
 
     // Check hard boundaries
     if (context.State.HasKeyDecisions && context.State.HasPhaseAnalysis)
     {
-      errors.Add("Cannot check [phase-analysis] in the same branch as [key-decisions]. A new branch is required.");
+      context.LintingErrors.Add("Cannot check [phase-analysis] in the same branch as [key-decisions]. A new branch is required.");
     }
 
     if (context.State.HasPhaseAnalysis && context.State.HasPhaseDetails)
     {
-      errors.Add("Cannot check [phase-n-details] in the same branch as [phase-analysis]. A new branch is required.");
+      context.LintingErrors.Add("Cannot check [phase-n-details] in the same branch as [phase-analysis]. A new branch is required.");
     }
 
-    return Task.FromResult(errors);
+    return Task.CompletedTask;
   }
 }

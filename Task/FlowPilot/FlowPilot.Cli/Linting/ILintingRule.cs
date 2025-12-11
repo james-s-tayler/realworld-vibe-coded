@@ -8,7 +8,7 @@ namespace FlowPilot.Cli.Linting;
 public interface ILintingRule
 {
   /// <summary>
-  /// Execute the linting rule and return any errors found.
+  /// Execute the linting rule and add any errors found to the context.
   /// </summary>
-  Task<List<string>> ExecuteAsync(PlanContext context);
+  Task ExecuteAsync(PlanContext context);
 }

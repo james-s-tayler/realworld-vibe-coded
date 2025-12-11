@@ -16,4 +16,10 @@ public class PlanContext
   public string PlanSubDirectory { get; set; } = string.Empty;
 
   public string StateFilePath { get; set; } = string.Empty;
+
+  public string RepositoryRoot { get; set; } = string.Empty;
+
+  public List<string> ChangedFiles { get; set; } = new List<string>();
+
+  public List<string> LintingErrors { get; set; } = new List<string>();
 }
