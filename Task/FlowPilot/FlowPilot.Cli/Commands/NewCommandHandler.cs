@@ -3,16 +3,16 @@
 namespace FlowPilot.Cli.Commands;
 
 /// <summary>
-/// Handler for the init command.
+/// Handler for the new command.
 /// </summary>
-public class InitCommandHandler : ICommand
+public class NewCommandHandler : ICommand
 {
   private readonly IFileSystemService _fileSystem;
   private readonly TemplateService _templateService;
   private readonly StateParser _stateParser;
   private readonly PlanManager _planManager;
 
-  public InitCommandHandler(
+  public NewCommandHandler(
     IFileSystemService fileSystem,
     TemplateService templateService,
     StateParser stateParser,
@@ -24,21 +24,21 @@ public class InitCommandHandler : ICommand
     _planManager = planManager;
   }
 
-  public string Name => "init";
+  public string Name => "new";
 
-  public string Description => "Initialize a new FlowPilot plan";
+  public string Description => "Create a new FlowPilot plan";
 
   public Task<int> ExecuteAsync(string[] args)
   {
     if (args.Length == 0)
     {
       Console.WriteLine("Error: Plan name is required.");
-      Console.WriteLine("Usage: flowpilot init <plan-name>");
+      Console.WriteLine("Usage: flowpilot new <plan-name>");
       return Task.FromResult(1);
     }
 
     var planName = args[0];
-    Console.WriteLine($"Initializing FlowPilot plan: {planName}");
+    Console.WriteLine($"Creating FlowPilot plan: {planName}");
 
     if (_planManager.PlanExists(planName))
     {
@@ -48,7 +48,7 @@ public class InitCommandHandler : ICommand
 
     _planManager.InitializePlan(planName);
 
-    Console.WriteLine($"✓ Plan '{planName}' initialized successfully.");
+    Console.WriteLine($"✓ Plan '{planName}' created successfully.");
     Console.WriteLine();
     Console.WriteLine("Next steps:");
     Console.WriteLine($"1. Update .flowpilot/plans/{planName}/meta/goal.md with your feature requirements");

@@ -1,40 +1,42 @@
-﻿using System.Reflection;
-
-namespace FlowPilot.Cli.Services;
+﻿namespace FlowPilot.Cli.Services;
 
 /// <summary>
-/// Service for reading embedded template resources.
+/// Service for reading template files from the repository's .flowpilot/template directory.
 /// </summary>
 public class TemplateService
 {
-  private readonly Assembly _assembly;
+  private readonly string _templateDirectory;
 
   public TemplateService()
   {
-    _assembly = Assembly.GetExecutingAssembly();
+    // Template directory is expected to be at .flowpilot/template in the repository root
+    var currentDir = Directory.GetCurrentDirectory();
+    _templateDirectory = Path.Combine(currentDir, ".flowpilot", "template");
   }
 
   public string ReadTemplate(string templateName)
   {
-    var resourceName = $"FlowPilot.Cli.Templates.{templateName}";
-    using var stream = _assembly.GetManifestResourceStream(resourceName);
+    var templatePath = Path.Combine(_templateDirectory, templateName);
 
-    if (stream == null)
+    if (!File.Exists(templatePath))
     {
-      throw new FileNotFoundException($"Template '{templateName}' not found in embedded resources.");
+      throw new FileNotFoundException($"Template '{templateName}' not found at {templatePath}. Make sure FlowPilot is installed (run 'flowpilot init').");
     }
 
-    using var reader = new StreamReader(stream);
-    return reader.ReadToEnd();
+    return File.ReadAllText(templatePath);
   }
 
   public List<string> ListTemplates()
   {
-    var resourceNames = _assembly.GetManifestResourceNames()
-      .Where(n => n.StartsWith("FlowPilot.Cli.Templates.", StringComparison.Ordinal))
-      .Select(n => n.Substring("FlowPilot.Cli.Templates.".Length))
-      .ToList();
+    if (!Directory.Exists(_templateDirectory))
+    {
+      return new List<string>();
+    }
 
-    return resourceNames;
+    return Directory.GetFiles(_templateDirectory, "*.md")
+      .Select(Path.GetFileName)
+      .Where(f => f != null)
+      .Select(f => f!)
+      .ToList();
   }
 }

@@ -44,7 +44,8 @@ public static class ServiceConfiguration
 
     // Commands as keyed services
     services.AddKeyedTransient<ICommand, HelpCommand>("help");
-    services.AddKeyedTransient<ICommand, InitCommandHandler>("init");
+    services.AddKeyedTransient<ICommand, InitCommand>("init");
+    services.AddKeyedTransient<ICommand, NewCommandHandler>("new");
     services.AddKeyedTransient<ICommand, LintCommandExecutor>("lint");
     services.AddKeyedTransient<ICommand, NextCommandExecutor>("next");
 

@@ -16,15 +16,17 @@ public class HelpCommand : ICommand
     Console.WriteLine("Usage: flowpilot <command> [options]");
     Console.WriteLine();
     Console.WriteLine("Commands:");
-    Console.WriteLine("  init <plan-name>  Initialize a new FlowPilot plan");
+    Console.WriteLine("  init              Install FlowPilot into the current repository");
+    Console.WriteLine("  new <plan-name>   Create a new FlowPilot plan");
     Console.WriteLine("  next <plan-name>  Advance to the next phase of the plan");
     Console.WriteLine("  lint <plan-name>  Validate the plan follows FlowPilot rules");
     Console.WriteLine("  help              Display this help information");
     Console.WriteLine();
-    Console.WriteLine("Examples:");
-    Console.WriteLine("  flowpilot init my-feature");
-    Console.WriteLine("  flowpilot next my-feature");
-    Console.WriteLine("  flowpilot lint my-feature");
+    Console.WriteLine("Getting Started:");
+    Console.WriteLine("  1. flowpilot init                 # Install FlowPilot");
+    Console.WriteLine("  2. flowpilot new my-feature       # Create a new plan");
+    Console.WriteLine("  3. flowpilot next my-feature      # Advance through phases");
+    Console.WriteLine("  4. flowpilot lint my-feature      # Validate your plan");
 
     return Task.FromResult(0);
   }

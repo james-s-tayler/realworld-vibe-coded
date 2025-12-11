@@ -22,11 +22,9 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
   </ItemGroup>
 
-  <!-- Include template files as embedded resources -->
+  <!-- Include Installation files as content to be copied to output -->
   <ItemGroup>
-    <EmbeddedResource Include="../../../.flowpilot/template/**/*.md" LinkBase="Templates" />
-    <EmbeddedResource Include="../../../.github/agents/flowpilot.agent.md" Link="Agents/flowpilot.agent.md" />
-    <EmbeddedResource Include="../../../.github/instructions/flowpilot-phase-details.instructions.md" Link="Instructions/flowpilot-phase-details.instructions.md" />
+    <Content Include="Installation/**/*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
