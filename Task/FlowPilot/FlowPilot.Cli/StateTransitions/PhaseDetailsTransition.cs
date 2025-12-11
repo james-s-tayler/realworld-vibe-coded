@@ -36,9 +36,14 @@ public class PhaseDetailsTransition : IStateTransition
 
   public void Execute(PlanContext context)
   {
+    _logger.LogDebug("PhaseDetailsTransition.Execute called");
+
     // Parse phase-analysis.md to get phase names
     var phaseAnalysisPath = Path.Combine(context.MetaDirectory, "phase-analysis.md");
+    _logger.LogDebug("Parsing phase names from {PhaseAnalysisPath}", phaseAnalysisPath);
+
     var phaseNames = ParsePhaseNames(phaseAnalysisPath);
+    _logger.LogDebug("Found {Count} phases: {PhaseNames}", phaseNames.Count, string.Join(", ", phaseNames));
 
     if (phaseNames.Count == 0)
     {

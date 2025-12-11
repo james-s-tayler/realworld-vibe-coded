@@ -28,9 +28,12 @@ public class NextCommandHandler
 
   public async Task ExecuteAsync(string planName)
   {
+    _logger.LogDebug("NextCommandHandler.ExecuteAsync called for plan '{PlanName}'", planName);
+
     // First, run lint to validate current state
     _logger.LogInformation("Running lint validation...");
     var lintResult = await _lintCommandHandler.ExecuteAsync(planName);
+    _logger.LogDebug("Lint result: {LintResult}", lintResult);
 
     if (lintResult != 0)
     {
@@ -42,6 +45,10 @@ public class NextCommandHandler
     _logger.LogInformation(string.Empty);
 
     var state = _planManager.GetCurrentState(planName);
+    _logger.LogDebug(
+      "Current state: HasPhaseAnalysis={HasPhaseAnalysis}, HasPhaseDetails={HasPhaseDetails}",
+      state.HasPhaseAnalysis,
+      state.HasPhaseDetails);
 
     if (!state.IsInitialized)
     {
@@ -62,10 +69,20 @@ public class NextCommandHandler
     };
 
     // Find and execute the first applicable transition
-    var transition = _stateTransitions.FirstOrDefault(t => t.CanTransition(context));
+    _logger.LogDebug("Searching for applicable state transition among {Count} transitions", _stateTransitions.Count());
+    var transition = _stateTransitions.FirstOrDefault(t =>
+    {
+      var canTransition = t.CanTransition(context);
+      _logger.LogDebug(
+        "Transition {TransitionType} CanTransition: {CanTransition}",
+        t.GetType().Name,
+        canTransition);
+      return canTransition;
+    });
 
     if (transition != null)
     {
+      _logger.LogDebug("Executing transition: {TransitionType}", transition.GetType().Name);
       transition.Execute(context);
     }
     else

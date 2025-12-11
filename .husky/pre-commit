@@ -13,6 +13,9 @@ client_changes=$(echo "$staged_files" | grep "^App/Client/" | wc -l)
 # Check if there are any changes in Task/Runner  
 task_runner_changes=$(echo "$staged_files" | grep "^Task/Runner/" | wc -l)
 
+# Check if there are any changes in Task/FlowPilot
+task_flowpilot_changes=$(echo "$staged_files" | grep "^Task/FlowPilot/" | wc -l)
+
 # Run lint-server-fix if there are server changes
 if [ "$server_changes" -gt 0 ]; then
   echo "🔧 Server changes detected, running lint-server-verify..."
@@ -43,9 +46,20 @@ if [ "$task_runner_changes" -gt 0 ]; then
   echo "✅ Nuke linting completed successfully."
 fi
 
+# Run test-flowpilot if there are FlowPilot changes
+# Temporarily disabled during development
+# if [ "$task_flowpilot_changes" -gt 0 ]; then
+#   echo "🔧 Task/FlowPilot changes detected, running TestFlowPilot..."
+#   if ! ./build.sh TestFlowPilot; then
+#     echo "❌ FlowPilot tests failed."
+#     exit 1
+#   fi
+#   echo "✅ FlowPilot tests completed successfully."
+# fi
+
 # If no relevant changes, skip linting
-if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ]; then
-  echo "ℹ️  No changes detected in App/Server, App/Client, or Task/Runner directories. Skipping linting."
+if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ] && [ "$task_flowpilot_changes" -eq 0 ]; then
+  echo "ℹ️  No changes detected in App/Server, App/Client, Task/Runner, or Task/FlowPilot directories. Skipping linting."
 fi
 
 echo "🎉 Pre-commit hook completed successfully."

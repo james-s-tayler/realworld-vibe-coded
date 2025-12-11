@@ -10,11 +10,15 @@ public class Program
 {
   public static async Task<int> Main(string[] args)
   {
-    // Configure Serilog
+    // Configure Serilog with both console and file sinks
+    var logFilePath = Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? "/tmp", "flowpilot.log");
     Log.Logger = new LoggerConfiguration()
-      .MinimumLevel.Information()
+      .MinimumLevel.Debug()
       .WriteTo.Console()
+      .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 3)
       .CreateLogger();
+
+    Log.Information("FlowPilot starting - logs will be written to {LogFilePath}", logFilePath);
 
     try
     {

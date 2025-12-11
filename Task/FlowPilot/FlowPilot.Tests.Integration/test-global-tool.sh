@@ -276,22 +276,31 @@ echo ""
 
 # Test 18: Advance to phase-details phase
 echo "[TEST 18] Advancing to phase-details..."
+set +e  # Temporarily allow errors
 output=$(flowpilot next test-plan 2>&1)
+exit_code=$?
+set -e  # Re-enable exit on error
+echo "DEBUG: flowpilot next exit code: $exit_code"
+echo "DEBUG: flowpilot next output:"
+echo "$output"
+echo "DEBUG: Log file contents:"
+cat ~/flowpilot.log 2>/dev/null || echo "No log file found"
 if [[ ! $output == *"phase-n-details"* ]]; then
     echo "❌ FAILED: Should advance to phase-details"
-    echo "Output: $output"
+    echo "Full log file:"
+    cat ~/flowpilot.log 2>/dev/null || echo "No log file found"
     exit 1
 fi
-# Should create phase-1-details.md, phase-2-details.md, phase-3-details.md
-if [ ! -f ".flowpilot/plans/test-plan/phase-1-details.md" ]; then
+# Should create phase-1-details.md, phase-2-details.md, phase-3-details.md in plan/ directory
+if [ ! -f ".flowpilot/plans/test-plan/plan/phase-1-details.md" ]; then
     echo "❌ FAILED: phase-1-details.md not created"
     exit 1
 fi
-if [ ! -f ".flowpilot/plans/test-plan/phase-2-details.md" ]; then
+if [ ! -f ".flowpilot/plans/test-plan/plan/phase-2-details.md" ]; then
     echo "❌ FAILED: phase-2-details.md not created"
     exit 1
 fi
-if [ ! -f ".flowpilot/plans/test-plan/phase-3-details.md" ]; then
+if [ ! -f ".flowpilot/plans/test-plan/plan/phase-3-details.md" ]; then
     echo "❌ FAILED: phase-3-details.md not created"
     exit 1
 fi
@@ -300,12 +309,12 @@ echo ""
 
 # Test 19: Modify phase details files and commit
 echo "[TEST 19] Modifying phase details files..."
-echo "# Phase 1: Setup Details" > .flowpilot/plans/test-plan/phase-1-details.md
-echo "Detailed setup steps" >> .flowpilot/plans/test-plan/phase-1-details.md
-echo "# Phase 2: Implementation Details" > .flowpilot/plans/test-plan/phase-2-details.md
-echo "Detailed implementation steps" >> .flowpilot/plans/test-plan/phase-2-details.md
-echo "# Phase 3: Testing Details" > .flowpilot/plans/test-plan/phase-3-details.md
-echo "Detailed testing steps" >> .flowpilot/plans/test-plan/phase-3-details.md
+echo "# Phase 1: Setup Details" > .flowpilot/plans/test-plan/plan/phase-1-details.md
+echo "Detailed setup steps" >> .flowpilot/plans/test-plan/plan/phase-1-details.md
+echo "# Phase 2: Implementation Details" > .flowpilot/plans/test-plan/plan/phase-2-details.md
+echo "Detailed implementation steps" >> .flowpilot/plans/test-plan/plan/phase-2-details.md
+echo "# Phase 3: Testing Details" > .flowpilot/plans/test-plan/plan/phase-3-details.md
+echo "Detailed testing steps" >> .flowpilot/plans/test-plan/plan/phase-3-details.md
 git add .
 git commit -m "Add phase details"
 echo "✅ PASSED: Phase details modified and committed"
