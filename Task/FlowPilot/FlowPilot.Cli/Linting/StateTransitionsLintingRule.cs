@@ -47,7 +47,6 @@ public class StateTransitionsLintingRule : ILintingRule
     // not by lint. The tool trusts developers to follow the branch workflow.
     // Lint only validates that state transitions are in order and that
     // only one state change happens per commit (checked by StateChangesLintingRule).
-
     return Task.CompletedTask;
   }
 }

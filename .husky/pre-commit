@@ -47,15 +47,14 @@ if [ "$task_runner_changes" -gt 0 ]; then
 fi
 
 # Run test-flowpilot if there are FlowPilot changes
-# Temporarily disabled - will re-enable after confirming Docker build works
-# if [ "$task_flowpilot_changes" -gt 0 ]; then
-#   echo "🔧 Task/FlowPilot changes detected, running TestFlowPilot..."
-#   if ! ./build.sh TestFlowPilot; then
-#     echo "❌ FlowPilot tests failed."
-#     exit 1
-#   fi
-#   echo "✅ FlowPilot tests completed successfully."
-# fi
+if [ "$task_flowpilot_changes" -gt 0 ]; then
+  echo "🔧 Task/FlowPilot changes detected, running TestFlowPilot..."
+  if ! ./build.sh TestFlowPilot; then
+    echo "❌ FlowPilot tests failed."
+    exit 1
+  fi
+  echo "✅ FlowPilot tests completed successfully."
+fi
 
 # If no relevant changes, skip linting
 if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ] && [ "$task_flowpilot_changes" -eq 0 ]; then
