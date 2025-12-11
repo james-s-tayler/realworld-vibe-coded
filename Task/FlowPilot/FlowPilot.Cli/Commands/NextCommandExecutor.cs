@@ -9,21 +9,15 @@ namespace FlowPilot.Cli.Commands;
 public class NextCommandExecutor : ICommand
 {
   private readonly PlanManager _planManager;
-  private readonly GitService _gitService;
-  private readonly LintCommandHandler _lintHandler;
   private readonly NextCommandHandler _nextHandler;
   private readonly ILogger<NextCommandExecutor> _logger;
 
   public NextCommandExecutor(
     PlanManager planManager,
-    GitService gitService,
-    LintCommandHandler lintHandler,
     NextCommandHandler nextHandler,
     ILogger<NextCommandExecutor> logger)
   {
     _planManager = planManager;
-    _gitService = gitService;
-    _lintHandler = lintHandler;
     _nextHandler = nextHandler;
     _logger = logger;
   }
@@ -49,26 +43,8 @@ public class NextCommandExecutor : ICommand
       return 1;
     }
 
-    // Run lint first
-    try
-    {
-      _gitService.GetRepositoryRoot();
-
-      var lintResult = await _lintHandler.ExecuteAsync(planName);
-
-      if (lintResult != 0)
-      {
-        _logger.LogError("Cannot proceed - lint check failed. Fix the issues above first");
-        return 1;
-      }
-    }
-    catch (InvalidOperationException)
-    {
-      // Not in git repo - continue without lint (for testing purposes)
-      _logger.LogWarning("Not in a git repository. Skipping lint check");
-    }
-
-    _nextHandler.Execute(planName);
+    // NextCommandHandler now internally calls lint first
+    await _nextHandler.ExecuteAsync(planName);
 
     return 0;
   }

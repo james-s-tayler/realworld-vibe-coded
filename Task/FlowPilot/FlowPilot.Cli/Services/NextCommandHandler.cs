@@ -10,21 +10,37 @@ namespace FlowPilot.Cli.Services;
 public class NextCommandHandler
 {
   private readonly PlanManager _planManager;
+  private readonly LintCommandHandler _lintCommandHandler;
   private readonly IEnumerable<IStateTransition> _stateTransitions;
   private readonly ILogger<NextCommandHandler> _logger;
 
   public NextCommandHandler(
     PlanManager planManager,
+    LintCommandHandler lintCommandHandler,
     IEnumerable<IStateTransition> stateTransitions,
     ILogger<NextCommandHandler> logger)
   {
     _planManager = planManager;
+    _lintCommandHandler = lintCommandHandler;
     _stateTransitions = stateTransitions;
     _logger = logger;
   }
 
-  public void Execute(string planName)
+  public async Task ExecuteAsync(string planName)
   {
+    // First, run lint to validate current state
+    _logger.LogInformation("Running lint validation...");
+    var lintResult = await _lintCommandHandler.ExecuteAsync(planName);
+
+    if (lintResult != 0)
+    {
+      _logger.LogError("Lint failed. Fix the errors before proceeding.");
+      Environment.Exit(1);
+      return;
+    }
+
+    _logger.LogInformation(string.Empty);
+
     var state = _planManager.GetCurrentState(planName);
 
     if (!state.IsInitialized)

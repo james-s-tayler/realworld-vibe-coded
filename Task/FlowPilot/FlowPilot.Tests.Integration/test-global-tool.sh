@@ -233,16 +233,41 @@ echo ""
 # Test 17: Modify phase-analysis.md and commit
 echo "[TEST 17] Modifying phase-analysis.md with phases..."
 cat > .flowpilot/plans/test-plan/meta/phase-analysis.md <<'EOF'
-# Phase Analysis
+## Phase Analysis
 
-## Phase 1: Setup
-Initial setup phase
+### phase_1
 
-## Phase 2: Implementation
-Core implementation phase
+**Goal**: Setup infrastructure
 
-## Phase 3: Testing
-Testing phase
+**Key Outcomes**:
+- Infrastructure configured
+- Environment ready
+
+**Working State Transition**: Start with clean state, end with configured environment
+
+---
+
+### phase_2
+
+**Goal**: Core implementation
+
+**Key Outcomes**:
+- Features implemented
+- Tests passing
+
+**Working State Transition**: Start with configured environment, end with working features
+
+---
+
+### phase_3
+
+**Goal**: Testing and validation
+
+**Key Outcomes**:
+- All tests passing
+- System validated
+
+**Working State Transition**: Start with working features, end with validated system
 EOF
 git add .
 git commit -m "Add phase analysis"
