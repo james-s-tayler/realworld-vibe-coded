@@ -81,5 +81,8 @@ node_modules/
 # Publish/package artifacts
 publish/
 
+# Local NuGet feed
+.local-nuget/
+
 # Logs
 Logs/

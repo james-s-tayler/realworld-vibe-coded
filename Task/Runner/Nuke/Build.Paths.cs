@@ -44,7 +44,11 @@ public partial class Build
 
   internal AbsolutePath FlowPilotSolution => FlowPilotDirectory / "FlowPilot.sln";
 
+  internal AbsolutePath FlowPilotCliProject => FlowPilotDirectory / "FlowPilot.Cli" / "FlowPilot.Cli.csproj";
+
   internal AbsolutePath FlowPilotTestProject => FlowPilotDirectory / "FlowPilot.Tests" / "FlowPilot.Tests.csproj";
+
+  internal AbsolutePath LocalNuGetFeedDirectory => RootDirectory / ".local-nuget";
 
   #endregion
 
