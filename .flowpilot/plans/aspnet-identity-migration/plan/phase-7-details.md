@@ -76,7 +76,6 @@ Remove all legacy JWT authentication code from the codebase. This includes old a
 9. **Remove Migration-Related Comments**
    - Search codebase for comments like "TEMPORARY: Both Identity and legacy JWT"
    - Remove or update comments that reference the old authentication system
-   - Update XML documentation if it references old patterns
 
 10. **Search for Remaining References**
     - Use IDE or grep to search for:
