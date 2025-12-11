@@ -2,7 +2,7 @@
 
 ### Phase Overview
 
-Final cleanup, documentation review, and comprehensive validation. Ensure all code is clean, all documentation is updated (only if explicitly needed), all tests pass, and all Nuke build targets succeed. Conduct a final review to confirm the migration is complete and the system is production-ready with ASP.NET Identity.
+Final cleanup and comprehensive validation. Ensure all code is clean, all tests pass, and all Nuke build targets succeed. Conduct a final review to confirm the migration is complete and the system is production-ready with ASP.NET Identity.
 
 ### Prerequisites
 

@@ -71,6 +71,7 @@ Update the frontend React application and Playwright E2E tests to use Identity e
 
 7. **Update Playwright E2E Tests - Authentication Helpers**
    - Open E2E test base classes or helper files (e.g., `Test/e2e/E2eTests/Common/BasePage.cs` or similar)
+   - **Note**: `ApiFixture` will need to be updated to support cookie-based authentication
    - Update authentication methods:
      - Change registration to use /register endpoint
      - Change login to use /login endpoint

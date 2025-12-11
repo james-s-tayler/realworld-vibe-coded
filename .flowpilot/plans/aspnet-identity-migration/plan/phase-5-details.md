@@ -57,38 +57,22 @@ Update the Postman collection to use Identity endpoints (/register, /login) with
      - Verify "Enable cookie jar" is on
    - Test that cookies persist across requests in a collection run
 
-6. **Update User Profile Tests**
-   - Update "Get Current User" tests:
-     - Identity's equivalent is GET `/manage/info`
-     - Or use the existing /api/user endpoint if it works with cookie auth
-   - Update "Update User" tests to work with cookies instead of JWT
+6. **Update User Profile Tests - Critical Decision Point**
+   - The existing `/api/user` endpoint (GetCurrent) returns custom fields (Bio, Image) that Identity's `/manage/info` doesn't provide
+   - **Strategy**: Keep the existing `/api/user` endpoint but update its authentication to work with cookies
+     - Update the endpoint's `AuthSchemes` configuration to accept both "Token" (JWT) and cookie authentication
+     - This allows the endpoint to work with both auth methods during the migration
+     - The endpoint will continue to return Bio, Image, and other custom fields
+   - Update "Get Current User" Postman tests to continue using `/api/user` endpoint
+   - Update "Update User" tests (`PUT /api/user`) to work with cookies instead of JWT
    - Verify authenticated requests work with cookies
+   - Note: In later phases, we may decide to fully replace with Identity patterns, but for now this maintains functionality
 
 7. **Update Tests for Other Entities**
    - Review and update tests for articles, comments, profiles that require authentication
    - Ensure they rely on cookies instead of JWT tokens
    - No URL changes needed for non-auth endpoints
    - Just ensure cookie authentication works
-
-8. **Add Cookie-Specific Tests**
-   - Add test cases for cookie scenarios:
-     - Test that unauthenticated requests return 401
-     - Test that expired cookies return 401
-     - Test that logout clears cookies
-   - Consider adding a logout test using POST `/logout` if Identity provides it
-
-9. **Test Postman Collection**
-   - Run the full Postman collection in Postman UI:
-     - Verify registration works
-     - Verify login works and sets cookies
-     - Verify authenticated requests succeed
-     - Verify unauthenticated requests fail with 401
-   - Fix any failing tests
-
-10. **Run Automated Postman Tests**
-    - Run `./build.sh TestServerPostman`
-    - Investigate and fix any failures
-    - Ensure all Postman tests pass
 
 ### Verification
 

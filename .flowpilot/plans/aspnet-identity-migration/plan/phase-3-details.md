@@ -75,13 +75,6 @@ Add Identity API endpoints using MapIdentityApi<ApplicationUser>() to expose reg
      // This will be cleaned up in Phase 7 after all tests are migrated.
      ```
 
-6. **Build and Test**
-   - Run `./build.sh BuildServer` to ensure compilation succeeds
-   - Run `./build.sh TestServer` - all tests should still pass using old endpoints
-   - Run `./build.sh TestServerPostman` - Postman tests should still pass
-   - Run `./build.sh TestE2e` - E2E tests should still pass
-   - Manually verify both old and new auth endpoints work
-
 ### Verification
 
 Run the following Nuke targets to verify this phase:

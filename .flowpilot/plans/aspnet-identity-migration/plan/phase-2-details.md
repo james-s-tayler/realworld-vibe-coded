@@ -76,7 +76,7 @@ Configure ASP.NET Identity services with appropriate security policies and cooki
    - Verify it works with Identity's cookie claims (should be compatible)
    - Identity uses the same ClaimTypes (NameIdentifier, Email, Name)
    - Test that GetCurrentUserId(), GetRequiredCurrentUserId(), IsAuthenticated() work correctly
-   - Note: GetCurrentToken() method may need adjustment - for now it can return empty string or be marked obsolete since cookies don't expose tokens to code the same way
+   - Note: GetCurrentToken() method can return empty string since cookies don't expose tokens the same way - the JWT implementation must still work for Postman and E2E tests to pass
 
 4. **Verify Service Registration Order**
    - Ensure AddIdentity is called before ConfigureApplicationCookie

@@ -48,13 +48,9 @@ Add ASP.NET Identity infrastructure to the application without breaking existing
    - Review the migration file to ensure it adds Identity tables (AspNetUsers, AspNetRoles, AspNetUserClaims, etc.)
    - Verify the migration includes ApplicationUser custom properties (Bio, Image)
    - Verify Following/Followers relationship tables are configured correctly
+   - Note: Migrations are applied automatically on application startup
 
-6. **Apply Migration to Database**
-   - Run `dotnet ef database update -p App/Server/src/Server.Infrastructure -s App/Server/src/Server.Web`
-   - Verify tables are created by checking database schema
-   - Confirm both old User table and new AspNetUsers table exist
-
-7. **Build and Run Application**
+6. **Build and Run Application**
    - Run `./build.sh BuildServer` to ensure compilation succeeds
    - Run `./build.sh TestServer` to verify existing tests still pass
    - Start the application and verify it runs without errors
@@ -69,7 +65,7 @@ Run the following Nuke targets to verify this phase:
 ./build.sh BuildServer
 ./build.sh TestServer
 ./build.sh TestServerPostman
-./build.sh TestE2e
+./build.sh DbMigrationsVerifyAll
 ```
 
 All targets must pass with no errors. The application should build successfully, all tests should pass, and the old authentication system should remain fully functional.

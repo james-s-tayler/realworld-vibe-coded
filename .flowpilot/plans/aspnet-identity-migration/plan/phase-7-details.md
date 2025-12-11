@@ -40,16 +40,17 @@ Remove all legacy JWT authentication code from the codebase. This includes old a
    - Remove `JwtSettings` section (Secret, Issuer, Audience, ExpirationInDays)
    - If JwtSettings class exists in code, delete it
 
-5. **Remove Old User Entity and Specifications**
-   - Delete `Server.Core/UserAggregate/User.cs` (old entity)
-   - Delete User specifications:
+5. **Update or Remove User Specifications**
+   - Delete authentication-specific specifications (no longer needed):
      - `Server.Core/UserAggregate/Specifications/UserByEmailAndPasswordSpec.cs`
      - `Server.Core/UserAggregate/Specifications/UserByEmailSpec.cs`
      - `Server.Core/UserAggregate/Specifications/UserByUsernameSpec.cs`
-     - `Server.Core/UserAggregate/Specifications/UserWithFollowingSpec.cs`
-     - `Server.Core/UserAggregate/Specifications/UserByUsernameWithFollowingSpec.cs`
-     - `Server.Core/UserAggregate/Specifications/IsFollowingSpec.cs`
-   - If any code still references User entity, update to use ApplicationUser
+   - **Keep and update** relationship specifications (still needed for Following/Followers functionality):
+     - Update `UserWithFollowingSpec` to query `ApplicationUser` instead of `User`
+     - Update `UserByUsernameWithFollowingSpec` to query `ApplicationUser` instead of `User`
+     - Update `IsFollowingSpec` if needed (it queries UserFollowing table, may not need changes)
+   - Update all calling code (handlers, mappers) to use the updated specifications
+   - Delete `Server.Core/UserAggregate/User.cs` (old entity) after all references are updated
 
 6. **Remove Users DbSet from AppDbContext**
    - Open `Server.Infrastructure/Data/AppDbContext.cs`
@@ -67,11 +68,11 @@ Remove all legacy JWT authentication code from the codebase. This includes old a
    - Remove JWT-related packages if any are there
    - Run `dotnet restore` to update dependencies
 
-8. **Create and Apply EF Core Migration to Remove Old User Table**
+8. **Create EF Core Migration to Remove Old User Table**
    - Run `dotnet ef migrations add RemoveOldUserTable -p App/Server/src/Server.Infrastructure -s App/Server/src/Server.Web`
    - Review the migration to ensure it drops the old User table
    - Be careful: verify it doesn't drop ApplicationUser (AspNetUsers) table
-   - Apply migration: `dotnet ef database update -p App/Server/src/Server.Infrastructure -s App/Server/src/Server.Web`
+   - Note: Migrations are applied automatically on application startup
 
 9. **Remove Migration-Related Comments**
    - Search codebase for comments like "TEMPORARY: Both Identity and legacy JWT"
@@ -88,13 +89,6 @@ Remove all legacy JWT authentication code from the codebase. This includes old a
       - "/api/users" POST endpoint
     - Ensure no references remain (except in git history or documentation)
 
-11. **Build and Test**
-    - Run `./build.sh BuildServer` to ensure compilation succeeds
-    - Run `./build.sh TestServer` to verify all tests still pass
-    - Run `./build.sh TestServerPostman` to verify Postman tests pass
-    - Run `./build.sh TestE2e` to verify E2E tests pass
-    - Fix any issues that arise from removals
-
 ### Verification
 
 Run the following Nuke targets to verify this phase:
@@ -105,6 +99,7 @@ Run the following Nuke targets to verify this phase:
 ./build.sh TestServer
 ./build.sh TestServerPostman
 ./build.sh TestE2e
+./build.sh DbMigrationsVerifyAll
 ```
 
 All targets must pass. The codebase should be clean with no legacy authentication code remaining. Only Identity-based authentication code exists. All tests pass using Identity endpoints exclusively.
