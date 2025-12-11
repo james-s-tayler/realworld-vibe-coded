@@ -1,4 +1,5 @@
-﻿using FlowPilot.Cli.Linting;
+﻿using FlowPilot.Cli.Commands;
+using FlowPilot.Cli.Linting;
 using FlowPilot.Cli.StateTransitions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,6 +41,12 @@ public static class ServiceConfiguration
     // Command handlers
     services.AddTransient<LintCommandHandler>();
     services.AddTransient<NextCommandHandler>();
+
+    // Commands as keyed services
+    services.AddKeyedTransient<ICommand, HelpCommand>("help");
+    services.AddKeyedTransient<ICommand, InitCommandHandler>("init");
+    services.AddKeyedTransient<ICommand, LintCommandExecutor>("lint");
+    services.AddKeyedTransient<ICommand, NextCommandExecutor>("next");
 
     return services;
   }
