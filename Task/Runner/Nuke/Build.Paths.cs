@@ -40,6 +40,12 @@ public partial class Build
 
   internal AbsolutePath TaskLocalDevDirectory => RootDirectory / "Task" / "LocalDev";
 
+  internal AbsolutePath FlowPilotDirectory => RootDirectory / "Task" / "FlowPilot";
+
+  internal AbsolutePath FlowPilotSolution => FlowPilotDirectory / "FlowPilot.sln";
+
+  internal AbsolutePath FlowPilotTestProject => FlowPilotDirectory / "FlowPilot.Tests" / "FlowPilot.Tests.csproj";
+
   #endregion
 
   #region Reports
@@ -62,6 +68,12 @@ public partial class Build
   internal AbsolutePath ReportsTestE2eArtifactsDirectory => RootDirectory / "Reports" / "Test" / "e2e" / "Artifacts";
 
   internal AbsolutePath ReportsTestPostmanDirectory => RootDirectory / "Reports" / "Test" / "Postman";
+
+  internal AbsolutePath ReportsFlowPilotDirectory => RootDirectory / "Reports" / "FlowPilot";
+
+  internal AbsolutePath ReportsFlowPilotResultsDirectory => RootDirectory / "Reports" / "FlowPilot" / "Results";
+
+  internal AbsolutePath ReportsFlowPilotArtifactsDirectory => RootDirectory / "Reports" / "FlowPilot" / "Artifacts";
   #endregion
 
   #region Logs

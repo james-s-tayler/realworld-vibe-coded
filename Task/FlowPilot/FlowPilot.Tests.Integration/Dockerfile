@@ -1,0 +1,50 @@
+# Use .NET 9 SDK image for building and testing
+FROM mcr.microsoft.com/dotnet/sdk:9.0
+
+WORKDIR /workspace
+
+# Install git for FlowPilot git operations
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Configure git with dummy user for testing
+RUN git config --global user.email "test@flowpilot.test" && \
+    git config --global user.name "FlowPilot Test"
+
+# Copy FlowPilot source code
+COPY Task/FlowPilot/FlowPilot.Cli ./Task/FlowPilot/FlowPilot.Cli
+COPY Task/FlowPilot/FlowPilot.sln ./Task/FlowPilot/FlowPilot.sln
+COPY Directory.Build.props ./Directory.Build.props
+COPY stylecop.json ./stylecop.json
+
+# Set working directory to FlowPilot
+WORKDIR /workspace/Task/FlowPilot
+
+# Build FlowPilot
+RUN dotnet build FlowPilot.Cli/FlowPilot.Cli.csproj -c Release
+
+# Pack FlowPilot as NuGet package
+RUN dotnet pack FlowPilot.Cli/FlowPilot.Cli.csproj -c Release -o /nuget-packages
+
+# Create a local NuGet feed directory
+RUN mkdir -p /nuget-feed && \
+    cp /nuget-packages/*.nupkg /nuget-feed/
+
+# Install FlowPilot as a global tool from local feed
+RUN dotnet tool install --global --add-source /nuget-feed FlowPilot.Cli
+
+# Add dotnet global tools to PATH
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+# Create a test directory
+RUN mkdir -p /test-repo
+
+WORKDIR /test-repo
+
+# Copy test script
+COPY Task/FlowPilot/FlowPilot.Tests.Integration/test-global-tool.sh /test-global-tool.sh
+RUN chmod +x /test-global-tool.sh
+
+# Run the test script
+CMD ["/test-global-tool.sh"]

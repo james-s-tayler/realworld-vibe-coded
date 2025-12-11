@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    
+    <!-- Disable StyleCop for FlowPilot -->
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <NoWarn>$(NoWarn);SA0001;SA1101;SA1200;SA1309;SA1400;SA1600;SA1633</NoWarn>
+    
+    <!-- Package as dotnet global tool -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>flowpilot</ToolCommandName>
+    <PackageId>FlowPilot.Cli</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>FlowPilot Contributors</Authors>
+    <Description>FlowPilot CLI - Orchestration tool for multi-stage feature development and migrations</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+  </ItemGroup>
+
+  <!-- Include Installation files as content to be copied to output -->
+  <ItemGroup>
+    <Content Include="Installation/**/*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
