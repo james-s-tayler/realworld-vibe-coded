@@ -1,5 +1,7 @@
 ﻿using Audit.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using Server.Core.ArticleAggregate;
+using Server.Core.IdentityAggregate;
 using Server.Core.TagAggregate;
 using Server.Core.UserAggregate;
 using Server.SharedKernel.DomainEvents;
@@ -8,7 +10,7 @@ using Server.SharedKernel.Persistence;
 namespace Server.Infrastructure.Data;
 
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false)]
-public class AppDbContext : AuditDbContext
+public class AppDbContext : AuditIdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
   private readonly IDomainEventDispatcher? _dispatcher;
 
@@ -19,7 +21,8 @@ public class AppDbContext : AuditDbContext
     _dispatcher = dispatcher;
   }
 
-  public DbSet<User> Users => Set<User>();
+  // Hide the inherited Users property from IdentityDbContext to use our own User entity
+  public new DbSet<User> Users => Set<User>();
 
   public DbSet<Article> Articles => Set<Article>();
 

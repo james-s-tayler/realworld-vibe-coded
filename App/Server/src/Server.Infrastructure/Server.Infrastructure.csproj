@@ -5,10 +5,12 @@
     <PackageReference Include="Ardalis.Result" />
     <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" />
     <PackageReference Include="Audit.EntityFramework.Core" />
+    <PackageReference Include="Audit.EntityFramework.Identity.Core" />
     <PackageReference Include="Azure.Identity" />
     <PackageReference Include="BCrypt.Net-Next" />
     <PackageReference Include="FastEndpoints" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
     <PackageReference Include="MailKit" />
     <PackageReference Include="MediatR" />
