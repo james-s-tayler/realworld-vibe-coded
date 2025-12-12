@@ -1,4 +1,4 @@
-using FlowPilot.Cli.Models;
+﻿using FlowPilot.Cli.Models;
 
 namespace FlowPilot.Cli.Linting;
 

@@ -1,4 +1,4 @@
-using FlowPilot.Cli.Linting;
+﻿using FlowPilot.Cli.Linting;
 using FlowPilot.Cli.Models;
 using Xunit;
 
