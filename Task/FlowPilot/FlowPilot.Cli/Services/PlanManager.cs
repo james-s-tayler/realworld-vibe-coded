@@ -167,6 +167,7 @@ public class PlanManager
               PhaseNumber = item.PhaseNumber.Value,
               PhaseName = item.Description,
               IsComplete = item.IsChecked,
+              IsPullRequestBoundary = item.IsPullRequestBoundary,
             });
           }
 

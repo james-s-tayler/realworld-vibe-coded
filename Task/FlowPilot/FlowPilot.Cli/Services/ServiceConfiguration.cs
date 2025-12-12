@@ -16,13 +16,14 @@ public static class ServiceConfiguration
     services.AddSingleton<IFileSystemService, FileSystemService>();
     services.AddSingleton<TemplateService>();
     services.AddSingleton<StateParser>();
+    services.AddSingleton<PhaseAnalysisParser>();
     services.AddSingleton<PlanManager>();
     services.AddSingleton(sp => new GitService(currentDirectory));
 
     // Linting rules
     services.AddTransient<ILintingRule, StateChangesLintingRule>();
     services.AddTransient<ILintingRule, StateTransitionsLintingRule>();
-    services.AddTransient<ILintingRule, BranchPerPhaseLintingRule>();
+    services.AddTransient<ILintingRule, PullRequestBoundaryLintingRule>();
     services.AddTransient<ILintingRule, GoalTemplateChangedRule>();
     services.AddTransient<ILintingRule, ReferencesTemplateChangedRule>();
     services.AddTransient<ILintingRule, SystemAnalysisTemplateChangedRule>();

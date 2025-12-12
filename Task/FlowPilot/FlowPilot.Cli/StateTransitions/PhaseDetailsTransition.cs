@@ -13,6 +13,7 @@ public class PhaseDetailsTransition : IStateTransition
   private readonly IFileSystemService _fileSystem;
   private readonly TemplateService _templateService;
   private readonly StateParser _stateParser;
+  private readonly PhaseAnalysisParser _phaseAnalysisParser;
   private readonly ILogger<PhaseDetailsTransition> _logger;
 
   public PhaseDetailsTransition(
@@ -20,12 +21,14 @@ public class PhaseDetailsTransition : IStateTransition
     IFileSystemService fileSystem,
     TemplateService templateService,
     StateParser stateParser,
+    PhaseAnalysisParser phaseAnalysisParser,
     ILogger<PhaseDetailsTransition> logger)
   {
     _planManager = planManager;
     _fileSystem = fileSystem;
     _templateService = templateService;
     _stateParser = stateParser;
+    _phaseAnalysisParser = phaseAnalysisParser;
     _logger = logger;
   }
 
@@ -38,14 +41,14 @@ public class PhaseDetailsTransition : IStateTransition
   {
     _logger.LogDebug("PhaseDetailsTransition.Execute called");
 
-    // Parse phase-analysis.md to get phase names
+    // Parse phase-analysis.md to get phase information including PR boundaries
     var phaseAnalysisPath = Path.Combine(context.MetaDirectory, "phase-analysis.md");
-    _logger.LogDebug("Parsing phase names from {PhaseAnalysisPath}", phaseAnalysisPath);
+    _logger.LogDebug("Parsing phases from {PhaseAnalysisPath}", phaseAnalysisPath);
 
-    var phaseNames = ParsePhaseNames(phaseAnalysisPath);
-    _logger.LogDebug("Found {Count} phases: {PhaseNames}", phaseNames.Count, string.Join(", ", phaseNames));
+    var phases = _phaseAnalysisParser.ParsePhases(phaseAnalysisPath);
+    _logger.LogDebug("Found {Count} phases", phases.Count);
 
-    if (phaseNames.Count == 0)
+    if (phases.Count == 0)
     {
       _logger.LogError("No phases found in phase-analysis.md");
       Environment.Exit(1);
@@ -60,22 +63,24 @@ public class PhaseDetailsTransition : IStateTransition
 
     var phaseTemplate = _templateService.ReadTemplate("phase-n-details.md");
 
-    for (int i = 0; i < phaseNames.Count; i++)
+    foreach (var phase in phases)
     {
-      var fileName = $"phase-{i + 1}-details.md";
+      var fileName = $"phase-{phase.PhaseNumber}-details.md";
       var filePath = Path.Combine(context.PlanSubDirectory, fileName);
-      var content = phaseTemplate.Replace("phase_n", $"phase_{i + 1}");
+      var content = phaseTemplate.Replace("phase_n", phase.PhaseName);
       _fileSystem.WriteAllText(filePath, content);
     }
 
     // Update state.md to add phase checklist items and mark phase-n-details as checked
     var stateContent = _fileSystem.ReadAllText(context.StateFilePath);
     stateContent = _stateParser.UpdateChecklistItem(stateContent, "phase-n-details", true);
-    stateContent = _stateParser.AddPhaseChecklistItems(stateContent, phaseNames);
+
+    // Add phase checklist items with PR boundary markers
+    stateContent = AddPhaseChecklistItemsWithBoundaries(stateContent, phases);
     _fileSystem.WriteAllText(context.StateFilePath, stateContent);
 
     _logger.LogInformation("✓ Advanced to [phase-n-details] phase");
-    _logger.LogInformation("✓ Created {PhaseCount} phase detail files", phaseNames.Count);
+    _logger.LogInformation("✓ Created {PhaseCount} phase detail files", phases.Count);
     _logger.LogInformation(string.Empty);
     _logger.LogInformation("Instructions:");
     _logger.LogInformation("Update each phase-*-details.md file in .flowpilot/plans/{PlanName}/plan/", context.PlanName);
@@ -86,28 +91,26 @@ public class PhaseDetailsTransition : IStateTransition
     _logger.LogInformation("After committing, merge this branch before starting phase implementations.");
   }
 
-  private List<string> ParsePhaseNames(string phaseAnalysisPath)
+  private string AddPhaseChecklistItemsWithBoundaries(string content, List<PhaseInfo> phases)
   {
-    var phaseNames = new List<string>();
+    var lines = content.Split('\n').ToList();
 
-    if (!_fileSystem.FileExists(phaseAnalysisPath))
+    // Find the position after [phase-n-details]
+    var detailsIndex = lines.FindIndex(l => l.Contains("[phase-n-details]"));
+    if (detailsIndex == -1)
     {
-      return phaseNames;
+      return content;
     }
 
-    var content = _fileSystem.ReadAllText(phaseAnalysisPath);
-    var lines = content.Split('\n');
-
-    foreach (var line in lines)
+    // Add phase items after the phase-n-details line
+    for (int i = 0; i < phases.Count; i++)
     {
-      // Look for phase headers: ### phase_N
-      if (line.StartsWith("### phase_", StringComparison.Ordinal))
-      {
-        var phaseName = line.Substring(4).Trim();
-        phaseNames.Add(phaseName);
-      }
+      var phase = phases[i];
+      var prBoundaryMarker = phase.IsPullRequestBoundary ? " [PR-BOUNDARY]" : string.Empty;
+      var phaseItem = $"- [ ] [phase_{phase.PhaseNumber}] {phase.PhaseName}{prBoundaryMarker}";
+      lines.Insert(detailsIndex + 1 + i, phaseItem);
     }
 
-    return phaseNames;
+    return string.Join('\n', lines);
   }
 }

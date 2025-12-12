@@ -332,23 +332,10 @@ fi
 echo "✅ PASSED: Advanced to phase 1 implementation"
 echo ""
 
-# Test 21: Verify lint fails when trying to advance to phase 2 without creating new branch
-echo "[TEST 21] Verifying lint fails when advancing to phase 2 on phase-1 branch..."
+# Test 21: Mark phase 1 complete and advance to phase 2
+echo "[TEST 21] Marking phase 1 complete and advancing to phase 2..."
 git commit --allow-empty -m "Complete phase 1"
-# Checkout phase-1 branch (matching the phase-N pattern)
-git checkout -b phase-1
-output=$(flowpilot next test-plan 2>&1 || true)
-if [[ ! $output == *"Cannot advance to phase 2 while on branch 'phase-1'"* ]]; then
-    echo "❌ FAILED: Lint should fail when trying to advance to phase 2 on phase-1 branch"
-    echo "Output: $output"
-    exit 1
-fi
-echo "✅ PASSED: Lint correctly prevents advancing to next phase on same phase branch"
-echo ""
-
-# Test 22: Mark phase 1 complete and advance to phase 2 on new branch
-echo "[TEST 22] Marking phase 1 complete and advancing to phase 2 on new branch..."
-git checkout -b phase-2
+git checkout -b phase-2-implementation
 output=$(flowpilot next test-plan 2>&1)
 if [[ ! $output == *"phase_2"* ]] && [[ ! $output == *"Phase 2"* ]]; then
     echo "❌ FAILED: Should advance to phase 2 implementation"
@@ -358,10 +345,10 @@ fi
 echo "✅ PASSED: Advanced to phase 2 implementation"
 echo ""
 
-# Test 23: Complete remaining phases
-echo "[TEST 23] Completing remaining phases..."
+# Test 22: Complete remaining phases
+echo "[TEST 22] Completing remaining phases..."
 git commit --allow-empty -m "Complete phase 2"
-git checkout -b phase-3
+git checkout -b phase-3-implementation
 output=$(flowpilot next test-plan 2>&1)
 if [[ ! $output == *"phase_3"* ]] && [[ ! $output == *"Phase 3"* ]]; then
     echo "❌ FAILED: Should advance to phase 3 implementation"
@@ -372,8 +359,8 @@ git commit --allow-empty -m "Complete phase 3"
 echo "✅ PASSED: Completed all phases"
 echo ""
 
-# Test 24: Verify plan is complete
-echo "[TEST 24] Verifying plan is complete..."
+# Test 23: Verify plan is complete
+echo "[TEST 23] Verifying plan is complete..."
 output=$(flowpilot next test-plan 2>&1)
 if [[ ! $output == *"complete"* ]] && [[ ! $output == *"finished"* ]]; then
     echo "❌ FAILED: Should indicate plan is complete"
@@ -384,7 +371,7 @@ echo "✅ PASSED: Plan marked as complete"
 echo ""
 
 echo "=========================================="
-echo "✅ ALL TESTS PASSED (24/24)"
+echo "✅ ALL TESTS PASSED (23/23)"
 echo "=========================================="
 echo ""
 echo "Summary:"
@@ -392,7 +379,6 @@ echo "  - Basic commands: init, new, help"
 echo "  - Linting validation"
 echo "  - State transitions through all phases"
 echo "  - Hard boundary enforcement"
-echo "  - Branch-per-phase enforcement"
 echo "  - Template file creation"
 echo "  - Complete plan workflow"
 echo ""

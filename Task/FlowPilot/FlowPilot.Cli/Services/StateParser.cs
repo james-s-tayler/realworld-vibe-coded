@@ -15,11 +15,21 @@ public partial class StateParser
 
     foreach (Match match in matches)
     {
+      var description = match.Groups[3].Value;
+      var isPrBoundary = description.Contains("[PR-BOUNDARY]", StringComparison.OrdinalIgnoreCase);
+
+      // Remove the PR-BOUNDARY marker from description for storage
+      if (isPrBoundary)
+      {
+        description = description.Replace(" [PR-BOUNDARY]", string.Empty, StringComparison.OrdinalIgnoreCase).Trim();
+      }
+
       var item = new StateChecklistItem
       {
         IsChecked = match.Groups[1].Value == "x",
         Identifier = match.Groups[2].Value,
-        Description = match.Groups[3].Value,
+        Description = description,
+        IsPullRequestBoundary = isPrBoundary,
       };
 
       // Check if this is a phase item (phase_N)

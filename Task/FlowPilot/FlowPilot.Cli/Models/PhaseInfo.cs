@@ -1,15 +1,13 @@
 ﻿namespace FlowPilot.Cli.Models;
 
 /// <summary>
-/// Represents the state of a single phase in a FlowPilot plan.
+/// Represents parsed phase information from phase-analysis.md.
 /// </summary>
-public class PhaseState
+public class PhaseInfo
 {
   public int PhaseNumber { get; set; }
 
   public string PhaseName { get; set; } = string.Empty;
-
-  public bool IsComplete { get; set; }
 
   public bool IsPullRequestBoundary { get; set; }
 }

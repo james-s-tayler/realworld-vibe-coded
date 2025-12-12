@@ -12,4 +12,6 @@ public class StateChecklistItem
   public bool IsChecked { get; set; }
 
   public int? PhaseNumber { get; set; }
+
+  public bool IsPullRequestBoundary { get; set; }
 }

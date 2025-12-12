@@ -19,8 +19,6 @@ public class PlanContext
 
   public string RepositoryRoot { get; set; } = string.Empty;
 
-  public string CurrentBranch { get; set; } = string.Empty;
-
   public List<string> ChangedFiles { get; set; } = new List<string>();
 
   public List<string> LintingErrors { get; set; } = new List<string>();
