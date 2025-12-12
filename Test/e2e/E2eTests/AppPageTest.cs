@@ -37,6 +37,9 @@ public abstract class AppPageTest : PageTest
 
     await base.InitializeAsync();
 
+    // Set default timeout to 10 seconds for all Playwright operations
+    Page.SetDefaultTimeout(DefaultTimeout);
+
     // Start Playwright tracing automatically for every test
     await StartTracingAsync();
 
