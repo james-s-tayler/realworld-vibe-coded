@@ -47,6 +47,7 @@ public class LintCommandHandler
       PlanSubDirectory = _planManager.GetPlanSubDirectory(planName),
       StateFilePath = _planManager.GetStateFilePath(planName),
       RepositoryRoot = _gitService.GetRepositoryRoot(),
+      CurrentBranch = _gitService.GetCurrentBranch(),
       ChangedFiles = _gitService.GetChangedFiles(),
       LintingErrors = new List<string>(),
     };

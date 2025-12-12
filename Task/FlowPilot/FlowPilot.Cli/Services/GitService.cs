@@ -55,4 +55,10 @@ public class GitService
       throw new InvalidOperationException("Not a git repository");
     }
   }
+
+  public string GetCurrentBranch()
+  {
+    using var repo = new Repository(_repositoryPath);
+    return repo.Head.FriendlyName;
+  }
 }

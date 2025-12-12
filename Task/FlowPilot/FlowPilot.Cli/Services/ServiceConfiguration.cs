@@ -22,6 +22,7 @@ public static class ServiceConfiguration
     // Linting rules
     services.AddTransient<ILintingRule, StateChangesLintingRule>();
     services.AddTransient<ILintingRule, StateTransitionsLintingRule>();
+    services.AddTransient<ILintingRule, BranchPerPhaseLintingRule>();
     services.AddTransient<ILintingRule, GoalTemplateChangedRule>();
     services.AddTransient<ILintingRule, ReferencesTemplateChangedRule>();
     services.AddTransient<ILintingRule, SystemAnalysisTemplateChangedRule>();
