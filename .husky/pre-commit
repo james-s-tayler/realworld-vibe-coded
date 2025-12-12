@@ -16,6 +16,9 @@ task_runner_changes=$(echo "$staged_files" | grep "^Task/Runner/" | wc -l)
 # Check if there are any changes in Task/FlowPilot
 task_flowpilot_changes=$(echo "$staged_files" | grep "^Task/FlowPilot/" | wc -l)
 
+# Check if there are any changes in Test/e2e
+e2e_test_changes=$(echo "$staged_files" | grep "^Test/e2e/" | wc -l)
+
 # Run lint-server-fix if there are server changes
 if [ "$server_changes" -gt 0 ]; then
   echo "🔧 Server changes detected, running lint-server-verify..."
@@ -56,9 +59,19 @@ if [ "$task_flowpilot_changes" -gt 0 ]; then
   echo "✅ FlowPilot tests completed successfully."
 fi
 
+# Run TestE2e if there are e2e test changes
+if [ "$e2e_test_changes" -gt 0 ]; then
+  echo "🔧 Test/e2e changes detected, running TestE2e..."
+  if ! ./build.sh TestE2e; then
+    echo "❌ E2E tests failed."
+    exit 1
+  fi
+  echo "✅ E2E tests completed successfully."
+fi
+
 # If no relevant changes, skip linting
-if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ] && [ "$task_flowpilot_changes" -eq 0 ]; then
-  echo "ℹ️  No changes detected in App/Server, App/Client, Task/Runner, or Task/FlowPilot directories. Skipping linting."
+if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ] && [ "$task_flowpilot_changes" -eq 0 ] && [ "$e2e_test_changes" -eq 0 ]; then
+  echo "ℹ️  No changes detected in App/Server, App/Client, Task/Runner, Task/FlowPilot, or Test/e2e directories. Skipping linting."
 fi
 
 flowpilot lint

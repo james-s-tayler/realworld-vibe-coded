@@ -1,7 +1,7 @@
 {
   "methodDisplay": "method",
   "methodTimeout": 15000,
-  "stopOnFail": false,
+  "stopOnFail": true,
   "parallelizeAssembly": false,
   "parallelizeTestCollections": false
 }
