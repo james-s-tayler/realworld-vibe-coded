@@ -1,5 +1,6 @@
 ﻿using Ardalis.ListStartupServices;
 using Microsoft.EntityFrameworkCore;
+using Server.Core.IdentityAggregate;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
 
@@ -58,6 +59,12 @@ public static class MiddlewareConfig
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
     app.UseAuthentication();
     app.UseAuthorization();
+
+    // TEMPORARY: Both Identity (cookie-based) and legacy JWT authentication are active
+    // during migration. Old endpoints: /api/users, /api/users/login
+    // New endpoints: /register, /login (via MapIdentityApi)
+    // This will be cleaned up in Phase 7 after all tests are migrated.
+    app.MapIdentityApi<ApplicationUser>();
 
     // Map health check endpoints
     // /health/live - Liveness probe (always returns healthy if app is running)

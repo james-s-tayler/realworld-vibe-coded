@@ -47,11 +47,20 @@ app.UseStaticFiles();
 await app.UseAppMiddlewareAndSeedDatabase();
 
 // Only serve SPA fallback for non-API routes to prevent API 404s from returning index.html
+// TEMPORARY: During Identity migration, exclude both /api routes and Identity endpoints
 app.MapWhen(
   context =>
     !context.Request.Path.StartsWithSegments("/api") &&
     !context.Request.Path.StartsWithSegments("/health") &&
-    !context.Request.Path.StartsWithSegments($"/{DevOnly.ROUTE}"),
+    !context.Request.Path.StartsWithSegments($"/{DevOnly.ROUTE}") &&
+    !context.Request.Path.StartsWithSegments("/register") &&
+    !context.Request.Path.StartsWithSegments("/login") &&
+    !context.Request.Path.StartsWithSegments("/refresh") &&
+    !context.Request.Path.StartsWithSegments("/confirmEmail") &&
+    !context.Request.Path.StartsWithSegments("/resendConfirmationEmail") &&
+    !context.Request.Path.StartsWithSegments("/forgotPassword") &&
+    !context.Request.Path.StartsWithSegments("/resetPassword") &&
+    !context.Request.Path.StartsWithSegments("/manage"),
   builder => builder.Run(async context =>
   {
     context.Response.ContentType = "text/html";
