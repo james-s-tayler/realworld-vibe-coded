@@ -222,30 +222,38 @@ echo ""
 # Setup for boundary tests - advance planning to completion
 echo "Setting up boundary state..."
 # Advance through all planning phases
+# First transition to references phase
+flowpilot next test-plan
+git add .
+git commit -m "Advance to references"
+# Fill in references content
 printf "# References\n- [Test](https://example.com)\n" > .flowpilot/plans/test-plan/meta/references.md
 git add .
 git commit -m "Add references content"
+# Transition to system-analysis
 flowpilot next test-plan
 git add .
 git commit -m "Advance to system-analysis"
-
+# Fill in system-analysis content
 printf "# System Analysis\nSystem details here\n" > .flowpilot/plans/test-plan/meta/system-analysis.md
 git add .
 git commit -m "Add system analysis content"
+# Transition to key-decisions
 flowpilot next test-plan
 git add .
 git commit -m "Advance to key-decisions"
-
+# Fill in key-decisions content
 printf "# Key Decisions\nDecision details here\n" > .flowpilot/plans/test-plan/meta/key-decisions.md
 git add .
 git commit -m "Add key decisions content"
 
-# Now at hard boundary - need new branch
-git checkout -b planning-complete
+# Now at hard boundary - need new branch for phase-analysis
+git checkout -b planning-analysis
+# Transition to phase-analysis
 flowpilot next test-plan
 git add .
 git commit -m "Advance to phase-analysis"
-
+# Fill in phase-analysis content
 cat > .flowpilot/plans/test-plan/meta/phase-analysis.md <<'EOF'
 ## Phase Analysis
 
@@ -263,19 +271,25 @@ cat > .flowpilot/plans/test-plan/meta/phase-analysis.md <<'EOF'
 EOF
 git add .
 git commit -m "Add phase analysis content"
+# Merge back to master
+git checkout master
+git merge --no-ff planning-analysis -m "Merge phase-analysis"
+
+# Now another boundary - need new branch for phase-details
+git checkout -b planning-details
+# Transition to phase-details
 flowpilot next test-plan
 git add .
 git commit -m "Advance to phase-details"
-
+# Fill in phase details content
 echo "# Phase 1 Details" > .flowpilot/plans/test-plan/plan/phase-1-details.md
 echo "# Phase 2 Details" > .flowpilot/plans/test-plan/plan/phase-2-details.md
 echo "# Phase 3 Details" > .flowpilot/plans/test-plan/plan/phase-3-details.md
 git add .
 git commit -m "Add phase details content"
-
 # Merge back to master to reset merge-base
 git checkout master
-git merge --no-ff planning-complete -m "Merge planning phase"
+git merge --no-ff planning-details -m "Merge phase-details"
 
 # Test 8-13: Boundary tests (renamed to start from 8)
 for i in 8 9 10 11 12 13; do
