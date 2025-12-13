@@ -62,9 +62,9 @@ public static class MiddlewareConfig
 
     // TEMPORARY: Both Identity (cookie-based) and legacy JWT authentication are active
     // during migration. Old endpoints: /api/users, /api/users/login
-    // New endpoints: /register, /login (via MapIdentityApi)
+    // New endpoints: /api/identity/* (via MapIdentityApi with /api/identity prefix)
     // This will be cleaned up in Phase 7 after all tests are migrated.
-    app.MapIdentityApi<ApplicationUser>();
+    app.MapGroup("/api/identity").MapIdentityApi<ApplicationUser>();
 
     // Map health check endpoints
     // /health/live - Liveness probe (always returns healthy if app is running)

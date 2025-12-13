@@ -47,39 +47,11 @@ app.UseStaticFiles();
 await app.UseAppMiddlewareAndSeedDatabase();
 
 // Only serve SPA fallback for non-API routes to prevent API 404s from returning index.html
-// TEMPORARY: During Identity migration, exclude Identity API endpoints but only for non-GET requests
-// This allows the SPA to serve the React app for GET /login etc. while allowing POST /login for Identity API
 app.MapWhen(
   context =>
-  {
-    var path = context.Request.Path;
-    var method = context.Request.Method;
-
-    // Never serve SPA for these paths
-    if (path.StartsWithSegments("/api") ||
-        path.StartsWithSegments("/health") ||
-        path.StartsWithSegments($"/{DevOnly.ROUTE}"))
-    {
-      return false;
-    }
-
-    // For Identity endpoints, only exclude non-GET requests (Identity API uses POST)
-    // This allows GET requests to serve the SPA for React routes like /login
-    if (method != "GET" && (
-        path.StartsWithSegments("/register") ||
-        path.StartsWithSegments("/login") ||
-        path.StartsWithSegments("/refresh") ||
-        path.StartsWithSegments("/confirmEmail") ||
-        path.StartsWithSegments("/resendConfirmationEmail") ||
-        path.StartsWithSegments("/forgotPassword") ||
-        path.StartsWithSegments("/resetPassword") ||
-        path.StartsWithSegments("/manage")))
-    {
-      return false;
-    }
-
-    return true;
-  },
+    !context.Request.Path.StartsWithSegments("/api") &&
+    !context.Request.Path.StartsWithSegments("/health") &&
+    !context.Request.Path.StartsWithSegments($"/{DevOnly.ROUTE}"),
   builder => builder.Run(async context =>
   {
     context.Response.ContentType = "text/html";
