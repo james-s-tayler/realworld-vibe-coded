@@ -396,8 +396,7 @@ public class GitService
           CheckoutModifiers = CheckoutModifiers.Force,
         });
 
-        // Explicitly unstage to ensure the file is fully unstaged from the index
-        // This is a safety measure to ensure the file is not left in a staged state
+        // Explicitly unstage file to ensure it's completely removed from the index
         try
         {
           LibGit2Sharp.Commands.Unstage(repo, normalizedPath);

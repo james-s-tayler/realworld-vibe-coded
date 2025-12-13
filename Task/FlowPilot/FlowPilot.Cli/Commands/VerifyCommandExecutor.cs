@@ -8,6 +8,9 @@ namespace FlowPilot.Cli.Commands;
 /// </summary>
 public class VerifyCommandExecutor : ICommand
 {
+  private const string VerificationSectionHeader = "### Verification";
+  private const string MarkdownSectionDelimiter = "\n###";
+
   private readonly PlanManager _planManager;
   private readonly IFileSystemService _fileSystem;
   private readonly ILogger<VerifyCommandExecutor> _logger;
@@ -91,7 +94,7 @@ public class VerifyCommandExecutor : ICommand
     var phaseContent = _fileSystem.ReadAllText(phaseFilePath);
 
     // Look for the ### Verification section
-    var verificationSectionStart = phaseContent.IndexOf("### Verification", StringComparison.OrdinalIgnoreCase);
+    var verificationSectionStart = phaseContent.IndexOf(VerificationSectionHeader, StringComparison.OrdinalIgnoreCase);
 
     if (verificationSectionStart == -1)
     {
@@ -102,7 +105,7 @@ public class VerifyCommandExecutor : ICommand
 
     // Extract the verification section content (from ### Verification to the next ### or end of file)
     var verificationContent = phaseContent.Substring(verificationSectionStart);
-    var nextSectionStart = verificationContent.IndexOf("\n###", 1, StringComparison.Ordinal); // Skip the first ### (Verification header)
+    var nextSectionStart = verificationContent.IndexOf(MarkdownSectionDelimiter, 1, StringComparison.Ordinal); // Skip the first ### (Verification header)
 
     if (nextSectionStart != -1)
     {
