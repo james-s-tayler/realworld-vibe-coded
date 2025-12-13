@@ -37,14 +37,10 @@ RUN dotnet tool install --global --add-source /nuget-feed FlowPilot.Cli
 # Add dotnet global tools to PATH
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
-# Create a test directory
-RUN mkdir -p /test-repo
-
-WORKDIR /test-repo
-
 # Copy test script
 COPY Task/FlowPilot/FlowPilot.Tests.Integration/test-pr-merge-boundary.sh /test-pr-merge-boundary.sh
 RUN chmod +x /test-pr-merge-boundary.sh
 
+# Create a fresh test directory at runtime (not in image)
 # Run the test script
-CMD ["/test-pr-merge-boundary.sh"]
+CMD ["sh", "-c", "cd /tmp && mkdir -p test-repo && cd test-repo && /test-pr-merge-boundary.sh"]

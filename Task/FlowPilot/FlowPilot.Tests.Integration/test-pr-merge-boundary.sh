@@ -19,33 +19,10 @@ git commit -m "Initial FlowPilot installation"
 # Create a test plan
 flowpilot new test-plan
 echo "# Test Goal" > .flowpilot/plans/test-plan/meta/goal.md
-git add .
-git commit -m "Initial test plan"
 
-# Helper function to reset state.md to a specific configuration
-reset_state() {
-  local state_config=$1
-  cat > .flowpilot/plans/test-plan/meta/state.md <<EOF
-$state_config
-EOF
-}
-
-# Helper function to advance one checkbox (from [ ] to [x])
-advance_one_checkbox() {
-  local from=$1
-  sed -i "s/- \[ \] \[$from\]/- [x] [$from]/" .flowpilot/plans/test-plan/meta/state.md
-}
-
-# Helper function to advance two checkboxes
-advance_two_checkboxes() {
-  local from1=$1
-  local from2=$2
-  sed -i "s/- \[ \] \[$from1\]/- [x] [$from1]/" .flowpilot/plans/test-plan/meta/state.md
-  sed -i "s/- \[ \] \[$from2\]/- [x] [$from2]/" .flowpilot/plans/test-plan/meta/state.md
-}
-
-# Planning phase initial state
-PLANNING_INITIAL="- [ ] [state] FlowPilot plan initialized
+# Set initial state (all unchecked for planning tests)
+cat > .flowpilot/plans/test-plan/meta/state.md <<'EOF'
+- [ ] [state] FlowPilot plan initialized
 - [ ] [references] meta/references.md drafted with initial sources
 - [ ] [system-analysis] meta/system-analysis.md describes relevant system parts
 - [ ] [key-decisions] meta/key-decisions.md lists decision points and options
@@ -53,10 +30,133 @@ PLANNING_INITIAL="- [ ] [state] FlowPilot plan initialized
 - [ ] [phase-n-details] plan/phase-n-details.md files created for each defined phase
 - [ ] [phase_1] phase_1
 - [ ] [phase_2] phase_2
-- [ ] [phase_3] phase_3"
+- [ ] [phase_3] phase_3
+EOF
 
-# Boundary initial state (planning complete, ready to start implementation)
-BOUNDARY_INITIAL="- [x] [state] FlowPilot plan initialized
+git add .
+git commit -m "Initial test plan with planning state"
+
+test_count=0
+pass_count=0
+fail_count=0
+
+# Test 1: Planning_Pass_CommittedOnly
+test_count=$((test_count + 1))
+echo "[TEST $test_count] Planning_Pass_CommittedOnly..."
+git checkout -b test-1
+sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
+git add .flowpilot/plans/test-plan/meta/state.md
+git commit -m "Advance state checkbox"
+if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+  echo "❌ FAILED: Should pass with single committed change"
+  fail_count=$((fail_count + 1))
+else
+  echo "✅ PASSED"
+  pass_count=$((pass_count + 1))
+fi
+git checkout master
+git branch -D test-1
+echo ""
+
+# Test 2: Planning_Pass_StagedOnly
+test_count=$((test_count + 1))
+echo "[TEST $test_count] Planning_Pass_StagedOnly..."
+git checkout -b test-2
+sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
+git add .flowpilot/plans/test-plan/meta/state.md
+if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+  echo "❌ FAILED: Should pass with single staged change"
+  fail_count=$((fail_count + 1))
+else
+  echo "✅ PASSED"
+  pass_count=$((pass_count + 1))
+fi
+git reset --hard HEAD
+git checkout master
+git branch -D test-2
+echo ""
+
+# Test 3: Planning_Pass_CommittedAndStaged
+test_count=$((test_count + 1))
+echo "[TEST $test_count] Planning_Pass_CommittedAndStaged..."
+git checkout -b test-3
+sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
+git add .flowpilot/plans/test-plan/meta/state.md
+if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+  echo "❌ FAILED: Should pass with single change (staged)"
+  fail_count=$((fail_count + 1))
+else
+  echo "✅ PASSED"
+  pass_count=$((pass_count + 1))
+fi
+git reset --hard HEAD
+git checkout master
+git branch -D test-3
+echo ""
+
+# Test 4: Planning_Fail_CommittedOnly
+test_count=$((test_count + 1))
+echo "[TEST $test_count] Planning_Fail_CommittedOnly..."
+git checkout -b test-4
+sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
+sed -i 's/- \[ \] \[references\]/- [x] [references]/' .flowpilot/plans/test-plan/meta/state.md
+git add .flowpilot/plans/test-plan/meta/state.md
+git commit -m "Advance two checkboxes"
+if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+  echo "✅ PASSED"
+  pass_count=$((pass_count + 1))
+else
+  echo "❌ FAILED: Should fail with two committed changes"
+  fail_count=$((fail_count + 1))
+fi
+git checkout master
+git branch -D test-4
+echo ""
+
+# Test 5: Planning_Fail_StagedOnly
+test_count=$((test_count + 1))
+echo "[TEST $test_count] Planning_Fail_StagedOnly..."
+git checkout -b test-5
+sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
+sed -i 's/- \[ \] \[references\]/- [x] [references]/' .flowpilot/plans/test-plan/meta/state.md
+git add .flowpilot/plans/test-plan/meta/state.md
+if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+  echo "✅ PASSED"
+  pass_count=$((pass_count + 1))
+else
+  echo "❌ FAILED: Should fail with two staged changes"
+  fail_count=$((fail_count + 1))
+fi
+git reset --hard HEAD
+git checkout master
+git branch -D test-5
+echo ""
+
+# Test 6: Planning_Fail_CommittedAndStaged
+test_count=$((test_count + 1))
+echo "[TEST $test_count] Planning_Fail_CommittedAndStaged..."
+git checkout -b test-6
+sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
+git add .flowpilot/plans/test-plan/meta/state.md
+git commit -m "Advance state"
+sed -i 's/- \[ \] \[references\]/- [x] [references]/' .flowpilot/plans/test-plan/meta/state.md
+git add .flowpilot/plans/test-plan/meta/state.md
+if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+  echo "✅ PASSED"
+  pass_count=$((pass_count + 1))
+else
+  echo "❌ FAILED: Should fail with one committed + one staged change"
+  fail_count=$((fail_count + 1))
+fi
+git reset --hard HEAD
+git checkout master
+git branch -D test-6
+echo ""
+
+# Setup for boundary tests - advance planning to completion
+echo "Setting up boundary state..."
+cat > .flowpilot/plans/test-plan/meta/state.md <<'EOF'
+- [x] [state] FlowPilot plan initialized
 - [x] [references] meta/references.md drafted with initial sources
 - [x] [system-analysis] meta/system-analysis.md describes relevant system parts
 - [x] [key-decisions] meta/key-decisions.md lists decision points and options
@@ -64,10 +164,76 @@ BOUNDARY_INITIAL="- [x] [state] FlowPilot plan initialized
 - [x] [phase-n-details] plan/phase-n-details.md files created for each defined phase
 - [ ] [phase_1] phase_1
 - [ ] [phase_2] phase_2
-- [ ] [phase_3] phase_3"
+- [ ] [phase_3] phase_3
+EOF
+git add .flowpilot/plans/test-plan/meta/state.md
+git commit -m "Planning complete - ready for implementation"
 
-# Implementation initial state (phase 1 complete)
-IMPLEMENTATION_INITIAL="- [x] [state] FlowPilot plan initialized
+# Test 7-12: Boundary tests
+for i in 7 8 9 10 11 12; do
+  test_count=$((test_count + 1))
+  case $i in
+    7) name="Boundary_Pass_CommittedOnly"; should_pass=true; change_type="committed" ;;
+    8) name="Boundary_Pass_StagedOnly"; should_pass=true; change_type="staged" ;;
+    9) name="Boundary_Pass_CommittedAndStaged"; should_pass=true; change_type="both" ;;
+    10) name="Boundary_Fail_CommittedOnly"; should_pass=false; change_type="committed" ;;
+    11) name="Boundary_Fail_StagedOnly"; should_pass=false; change_type="staged" ;;
+    12) name="Boundary_Fail_CommittedAndStaged"; should_pass=false; change_type="both" ;;
+  esac
+  
+  echo "[TEST $test_count] $name..."
+  git checkout -b test-$i
+  
+  if [ "$should_pass" = "true" ]; then
+    sed -i 's/- \[ \] \[phase_1\]/- [x] [phase_1]/' .flowpilot/plans/test-plan/meta/state.md
+  else
+    sed -i 's/- \[ \] \[phase_1\]/- [x] [phase_1]/' .flowpilot/plans/test-plan/meta/state.md
+    sed -i 's/- \[ \] \[phase_2\]/- [x] [phase_2]/' .flowpilot/plans/test-plan/meta/state.md
+  fi
+  
+  if [ "$change_type" = "committed" ]; then
+    git add .flowpilot/plans/test-plan/meta/state.md
+    git commit -m "Changes"
+  elif [ "$change_type" = "staged" ]; then
+    git add .flowpilot/plans/test-plan/meta/state.md
+  else
+    sed -i 's/- \[ \] \[phase_1\]/- [x] [phase_1]/' .flowpilot/plans/test-plan/meta/state.md
+    git add .flowpilot/plans/test-plan/meta/state.md
+    git commit -m "First change"
+    if [ "$should_pass" = "false" ]; then
+      sed -i 's/- \[ \] \[phase_2\]/- [x] [phase_2]/' .flowpilot/plans/test-plan/meta/state.md
+      git add .flowpilot/plans/test-plan/meta/state.md
+    fi
+  fi
+  
+  if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+    if [ "$should_pass" = "true" ]; then
+      echo "❌ FAILED: Should pass"
+      fail_count=$((fail_count + 1))
+    else
+      echo "✅ PASSED"
+      pass_count=$((pass_count + 1))
+    fi
+  else
+    if [ "$should_pass" = "true" ]; then
+      echo "✅ PASSED"
+      pass_count=$((pass_count + 1))
+    else
+      echo "❌ FAILED: Should fail"
+      fail_count=$((fail_count + 1))
+    fi
+  fi
+  
+  git reset --hard HEAD 2>/dev/null || true
+  git checkout master
+  git branch -D test-$i
+  echo ""
+done
+
+# Setup for implementation tests
+echo "Setting up implementation state..."
+cat > .flowpilot/plans/test-plan/meta/state.md <<'EOF'
+- [x] [state] FlowPilot plan initialized
 - [x] [references] meta/references.md drafted with initial sources
 - [x] [system-analysis] meta/system-analysis.md describes relevant system parts
 - [x] [key-decisions] meta/key-decisions.md lists decision points and options
@@ -75,202 +241,80 @@ IMPLEMENTATION_INITIAL="- [x] [state] FlowPilot plan initialized
 - [x] [phase-n-details] plan/phase-n-details.md files created for each defined phase
 - [x] [phase_1] phase_1
 - [ ] [phase_2] phase_2
-- [ ] [phase_3] phase_3"
+- [ ] [phase_3] phase_3
+EOF
+git add .flowpilot/plans/test-plan/meta/state.md
+git commit -m "Phase 1 complete - in implementation"
 
-test_count=0
-pass_count=0
-fail_count=0
-
-run_test() {
-  local test_name=$1
-  local should_pass=$2
-  local phase=$3
-  local change_type=$4
-
+# Test 13-18: Implementation tests
+for i in 13 14 15 16 17 18; do
   test_count=$((test_count + 1))
-  echo "[TEST $test_count] $test_name..."
-
-  # Create a fresh branch for this test
-  git checkout master 2>/dev/null || git checkout -b master
-
-  # Set initial state based on phase and commit to master first
-  case $phase in
-    "planning")
-      reset_state "$PLANNING_INITIAL"
-      ;;
-    "boundary")
-      reset_state "$BOUNDARY_INITIAL"
-      ;;
-    "implementation")
-      reset_state "$IMPLEMENTATION_INITIAL"
-      ;;
+  case $i in
+    13) name="Implementation_Pass_CommittedOnly"; should_pass=true; change_type="committed" ;;
+    14) name="Implementation_Pass_StagedOnly"; should_pass=true; change_type="staged" ;;
+    15) name="Implementation_Pass_CommittedAndStaged"; should_pass=true; change_type="both" ;;
+    16) name="Implementation_Fail_CommittedOnly"; should_pass=false; change_type="committed" ;;
+    17) name="Implementation_Fail_StagedOnly"; should_pass=false; change_type="staged" ;;
+    18) name="Implementation_Fail_CommittedAndStaged"; should_pass=false; change_type="both" ;;
   esac
-
-  git add .flowpilot/plans/test-plan/meta/state.md
-  git commit -m "Reset to $phase initial state for test $test_count"
-
-  # Now create branch for the test - this establishes the merge-base
-  git checkout -b "test-$test_count"
-
-  # Make changes based on should_pass flag and change_type
+  
+  echo "[TEST $test_count] $name..."
+  git checkout -b test-$i
+  
   if [ "$should_pass" = "true" ]; then
-    # Pass: only one checkbox change
-    case $phase in
-      "planning")
-        advance_one_checkbox "state"
-        ;;
-      "boundary")
-        advance_one_checkbox "phase_1"
-        ;;
-      "implementation")
-        advance_one_checkbox "phase_2"
-        ;;
-    esac
+    sed -i 's/- \[ \] \[phase_2\]/- [x] [phase_2]/' .flowpilot/plans/test-plan/meta/state.md
   else
-    # Fail: two checkbox changes
-    case $phase in
-      "planning")
-        advance_two_checkboxes "state" "references"
-        ;;
-      "boundary")
-        advance_two_checkboxes "phase_1" "phase_2"
-        ;;
-      "implementation")
-        advance_two_checkboxes "phase_2" "phase_3"
-        ;;
-    esac
+    sed -i 's/- \[ \] \[phase_2\]/- [x] [phase_2]/' .flowpilot/plans/test-plan/meta/state.md
+    sed -i 's/- \[ \] \[phase_3\]/- [x] [phase_3]/' .flowpilot/plans/test-plan/meta/state.md
   fi
-
-  # Apply changes based on change_type
-  case $change_type in
-    "committed")
+  
+  if [ "$change_type" = "committed" ]; then
+    git add .flowpilot/plans/test-plan/meta/state.md
+    git commit -m "Changes"
+  elif [ "$change_type" = "staged" ]; then
+    git add .flowpilot/plans/test-plan/meta/state.md
+  else
+    sed -i 's/- \[ \] \[phase_2\]/- [x] [phase_2]/' .flowpilot/plans/test-plan/meta/state.md
+    git add .flowpilot/plans/test-plan/meta/state.md
+    git commit -m "First change"
+    if [ "$should_pass" = "false" ]; then
+      sed -i 's/- \[ \] \[phase_3\]/- [x] [phase_3]/' .flowpilot/plans/test-plan/meta/state.md
       git add .flowpilot/plans/test-plan/meta/state.md
-      git commit -m "Change for test $test_count"
-      ;;
-    "staged")
-      git add .flowpilot/plans/test-plan/meta/state.md
-      ;;
-    "both")
-      # First make and commit one change
-      if [ "$should_pass" = "true" ]; then
-        # For pass case with 'both', we still only want one total change
-        # So just stage the one change
-        git add .flowpilot/plans/test-plan/meta/state.md
-      else
-        # For fail case with 'both', commit one change then stage another
-        # First undo our two changes
-        git checkout .flowpilot/plans/test-plan/meta/state.md
-        # Make first change and commit
-        case $phase in
-          "planning")
-            advance_one_checkbox "state"
-            ;;
-          "boundary")
-            advance_one_checkbox "phase_1"
-            ;;
-          "implementation")
-            advance_one_checkbox "phase_2"
-            ;;
-        esac
-        git add .flowpilot/plans/test-plan/meta/state.md
-        git commit -m "First change for test $test_count"
-        # Make second change and stage
-        case $phase in
-          "planning")
-            advance_one_checkbox "references"
-            ;;
-          "boundary")
-            advance_one_checkbox "phase_2"
-            ;;
-          "implementation")
-            advance_one_checkbox "phase_3"
-            ;;
-        esac
-        git add .flowpilot/plans/test-plan/meta/state.md
-      fi
-      ;;
-  esac
-
-  # Run lint and check result
-  set +e
-  output=$(flowpilot lint test-plan 2>&1)
-  lint_exit_code=$?
-  set -e
-
-  # Check if the result matches expectation
-  if [ "$should_pass" = "true" ]; then
-    # Should pass - lint should succeed (exit code 0) and not contain error message
-    if [ $lint_exit_code -eq 0 ] && [[ ! $output == *"pull request merge boundary"* ]]; then
-      echo "✅ PASSED: $test_name"
-      pass_count=$((pass_count + 1))
-    else
-      echo "❌ FAILED: $test_name - Expected lint to pass but it failed"
-      echo "Exit code: $lint_exit_code"
-      echo "Output: $output"
+    fi
+  fi
+  
+  if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+    if [ "$should_pass" = "true" ]; then
+      echo "❌ FAILED: Should pass"
       fail_count=$((fail_count + 1))
+    else
+      echo "✅ PASSED"
+      pass_count=$((pass_count + 1))
     fi
   else
-    # Should fail - lint should fail with the boundary message
-    if [[ $output == *"pull request merge boundary"* ]]; then
-      echo "✅ PASSED: $test_name"
+    if [ "$should_pass" = "true" ]; then
+      echo "✅ PASSED"
       pass_count=$((pass_count + 1))
     else
-      echo "❌ FAILED: $test_name - Expected lint to fail with boundary message but it didn't"
-      echo "Exit code: $lint_exit_code"
-      echo "Output: $output"
+      echo "❌ FAILED: Should fail"
       fail_count=$((fail_count + 1))
     fi
   fi
-  echo ""
-
-  # Clean up - go back to master, discard staged changes
+  
   git reset --hard HEAD 2>/dev/null || true
   git checkout master
-  git branch -D "test-$test_count" 2>/dev/null || true
-}
-
-# Planning Phase Tests (6 tests)
-echo "=== Planning Phase Tests ==="
-run_test "Planning_Pass_CommittedOnly" "true" "planning" "committed"
-run_test "Planning_Pass_StagedOnly" "true" "planning" "staged"
-run_test "Planning_Pass_CommittedAndStaged" "true" "planning" "both"
-run_test "Planning_Fail_CommittedOnly" "false" "planning" "committed"
-run_test "Planning_Fail_StagedOnly" "false" "planning" "staged"
-run_test "Planning_Fail_CommittedAndStaged" "false" "planning" "both"
-echo ""
-
-# Boundary Phase Tests (6 tests)
-echo "=== Boundary Phase Tests ==="
-run_test "Boundary_Pass_CommittedOnly" "true" "boundary" "committed"
-run_test "Boundary_Pass_StagedOnly" "true" "boundary" "staged"
-run_test "Boundary_Pass_CommittedAndStaged" "true" "boundary" "both"
-run_test "Boundary_Fail_CommittedOnly" "false" "boundary" "committed"
-run_test "Boundary_Fail_StagedOnly" "false" "boundary" "staged"
-run_test "Boundary_Fail_CommittedAndStaged" "false" "boundary" "both"
-echo ""
-
-# Implementation Phase Tests (6 tests)
-echo "=== Implementation Phase Tests ==="
-run_test "Implementation_Pass_CommittedOnly" "true" "implementation" "committed"
-run_test "Implementation_Pass_StagedOnly" "true" "implementation" "staged"
-run_test "Implementation_Pass_CommittedAndStaged" "true" "implementation" "both"
-run_test "Implementation_Fail_CommittedOnly" "false" "implementation" "committed"
-run_test "Implementation_Fail_StagedOnly" "false" "implementation" "staged"
-run_test "Implementation_Fail_CommittedAndStaged" "false" "implementation" "both"
-echo ""
+  git branch -D test-$i
+  echo ""
+done
 
 # Summary
 echo "=========================================="
 if [ $fail_count -eq 0 ]; then
   echo "✅ ALL TESTS PASSED ($pass_count/$test_count)"
+  echo "=========================================="
+  exit 0
 else
   echo "❌ SOME TESTS FAILED ($pass_count passed, $fail_count failed out of $test_count)"
-fi
-echo "=========================================="
-echo ""
-
-if [ $fail_count -gt 0 ]; then
+  echo "=========================================="
   exit 1
 fi
-
-exit 0
