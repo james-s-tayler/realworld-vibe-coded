@@ -11,17 +11,20 @@ public class NextCommandHandler
 {
   private readonly PlanManager _planManager;
   private readonly LintCommandHandler _lintCommandHandler;
+  private readonly GitService _gitService;
   private readonly IEnumerable<IStateTransition> _stateTransitions;
   private readonly ILogger<NextCommandHandler> _logger;
 
   public NextCommandHandler(
     PlanManager planManager,
     LintCommandHandler lintCommandHandler,
+    GitService gitService,
     IEnumerable<IStateTransition> stateTransitions,
     ILogger<NextCommandHandler> logger)
   {
     _planManager = planManager;
     _lintCommandHandler = lintCommandHandler;
+    _gitService = gitService;
     _stateTransitions = stateTransitions;
     _logger = logger;
   }
@@ -29,20 +32,6 @@ public class NextCommandHandler
   public async Task ExecuteAsync(string planName)
   {
     _logger.LogDebug("NextCommandHandler.ExecuteAsync called for plan '{PlanName}'", planName);
-
-    // First, run lint to validate current state
-    _logger.LogInformation("Running lint validation...");
-    var lintResult = await _lintCommandHandler.ExecuteAsync(planName);
-    _logger.LogDebug("Lint result: {LintResult}", lintResult);
-
-    if (lintResult != 0)
-    {
-      _logger.LogError("Lint failed. Fix the errors before proceeding.");
-      Environment.Exit(1);
-      return;
-    }
-
-    _logger.LogInformation(string.Empty);
 
     var state = _planManager.GetCurrentState(planName);
     _logger.LogDebug(
@@ -68,7 +57,7 @@ public class NextCommandHandler
       StateFilePath = _planManager.GetStateFilePath(planName),
     };
 
-    // Find and execute the first applicable transition
+    // Find the first applicable transition
     _logger.LogDebug("Searching for applicable state transition among {Count} transitions", _stateTransitions.Count());
     var transition = _stateTransitions.FirstOrDefault(t =>
     {
@@ -83,7 +72,48 @@ public class NextCommandHandler
     if (transition != null)
     {
       _logger.LogDebug("Executing transition: {TransitionType}", transition.GetType().Name);
+
+      // Save the original state.md content before transition
+      var originalStateContent = File.ReadAllText(context.StateFilePath);
+
+      // Execute the state transition (which updates state.md and creates template files)
       transition.Execute(context);
+
+      // Save the new state.md content after transition
+      var newStateContent = File.ReadAllText(context.StateFilePath);
+
+      // Get the relative path to state.md for git operations
+      var repositoryRoot = _gitService.GetRepositoryRoot();
+      var relativeStatePath = Path.GetRelativePath(repositoryRoot, context.StateFilePath);
+
+      // Stage the new state content so PullRequestMergeBoundary can see it
+      _gitService.StageFile(relativeStatePath);
+
+      // Temporarily restore old state content on disk so template rules see the old state
+      // This prevents template rules from checking templates that were just created
+      File.WriteAllText(context.StateFilePath, originalStateContent);
+
+      // Now run lint to validate the transition
+      // Template rules will see the old state (from disk)
+      // PullRequestMergeBoundary will see the new state (from staged area)
+      _logger.LogInformation(string.Empty);
+      _logger.LogInformation("Running lint validation...");
+      var lintResult = await _lintCommandHandler.ExecuteAsync(planName);
+      _logger.LogDebug("Lint result: {LintResult}", lintResult);
+
+      if (lintResult != 0)
+      {
+        // Lint failed - keep the original state and unstage
+        _logger.LogError("Lint failed. Reverting state transition.");
+
+        // state.md already has original content, just unstage it
+        _gitService.ResetFile(relativeStatePath);
+        Environment.Exit(1);
+        return;
+      }
+
+      // Lint passed - restore the new state content on disk
+      File.WriteAllText(context.StateFilePath, newStateContent);
     }
     else
     {

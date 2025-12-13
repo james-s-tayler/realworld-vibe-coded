@@ -160,6 +160,35 @@ public class GitService
   }
 
   /// <summary>
+  /// Stage a specific file to the git index.
+  /// </summary>
+  /// <param name="filePath">The relative path to the file to stage</param>
+  public void StageFile(string filePath)
+  {
+    using var repo = new Repository(_repositoryPath);
+    LibGit2Sharp.Commands.Stage(repo, filePath);
+  }
+
+  /// <summary>
+  /// Reset a specific file to match HEAD, removing changes from both index and working directory.
+  /// This only affects the specified file and does not touch other files.
+  /// </summary>
+  /// <param name="filePath">The relative path to the file to reset</param>
+  public void ResetFile(string filePath)
+  {
+    using var repo = new Repository(_repositoryPath);
+
+    // Normalize the file path
+    var normalizedPath = filePath.Replace('\\', '/');
+
+    // Reset the file to HEAD (both index and working directory)
+    repo.CheckoutPaths("HEAD", new[] { normalizedPath }, new CheckoutOptions
+    {
+      CheckoutModifiers = CheckoutModifiers.Force,
+    });
+  }
+
+  /// <summary>
   /// Count changed lines in a patch by looking for lines starting with + or -.
   /// </summary>
   private static int CountChangedLinesInPatch(Patch patch)
