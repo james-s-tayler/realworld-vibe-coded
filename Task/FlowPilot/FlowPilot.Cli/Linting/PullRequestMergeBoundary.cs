@@ -31,6 +31,7 @@ public class PullRequestMergeBoundary : ILintingRule
     var baseBranches = new[] { "origin/main", "origin/master", "main", "master" };
     string? mergeBaseSha = null;
     string? foundBaseBranch = null;
+    const int ExpectedBranchParts = 2; // remote/branch format
 
     foreach (var baseBranch in baseBranches)
     {
@@ -64,8 +65,8 @@ public class PullRequestMergeBoundary : ILintingRule
         }
 
         // Parse remote and branch name (expecting format "remote/branch")
-        var parts = baseBranch.Split('/', 2);
-        if (parts.Length != 2)
+        var parts = baseBranch.Split('/', ExpectedBranchParts);
+        if (parts.Length != ExpectedBranchParts)
         {
           _logger.LogDebug("Unexpected branch format: {BaseBranch}, expected 'remote/branch'", baseBranch);
           continue;

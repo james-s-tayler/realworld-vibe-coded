@@ -330,9 +330,14 @@ public class GitService
       LibGit2Sharp.Commands.Fetch(repo, remoteName, new[] { refSpec }, null, null);
       _logger.LogDebug("Fetch completed successfully");
     }
+    catch (LibGit2SharpException ex)
+    {
+      _logger.LogWarning(ex, "Failed to fetch {RemoteName}/{BranchName}: {Message}", remoteName, branchName, ex.Message);
+      throw new InvalidOperationException($"Failed to fetch branch '{branchName}' from remote '{remoteName}': {ex.Message}", ex);
+    }
     catch (Exception ex) when (ex is not ArgumentException and not InvalidOperationException)
     {
-      _logger.LogWarning(ex, "Failed to fetch {RemoteName}/{BranchName}", remoteName, branchName);
+      _logger.LogWarning(ex, "Unexpected error fetching {RemoteName}/{BranchName}", remoteName, branchName);
       throw new InvalidOperationException($"Failed to fetch branch '{branchName}' from remote '{remoteName}': {ex.Message}", ex);
     }
   }
