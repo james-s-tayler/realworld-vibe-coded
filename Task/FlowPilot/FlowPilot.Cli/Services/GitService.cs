@@ -160,6 +160,73 @@ public class GitService
   }
 
   /// <summary>
+  /// Count the number of modified lines (not additions) in a file between two commits.
+  /// This counts line modifications (deletions + corresponding additions) but excludes pure additions.
+  /// </summary>
+  /// <param name="filePath">The relative path to the file</param>
+  /// <param name="oldCommitSha">The old commit SHA</param>
+  /// <param name="newCommitSha">The new commit SHA</param>
+  /// <returns>The number of modified lines (deletions * 2)</returns>
+  public int CountModifiedLines(string filePath, string? oldCommitSha, string? newCommitSha)
+  {
+    using var repo = new Repository(_repositoryPath);
+
+    if (string.IsNullOrEmpty(oldCommitSha) || string.IsNullOrEmpty(newCommitSha))
+    {
+      return 0;
+    }
+
+    // Look up the commits
+    var oldCommit = repo.Lookup<Commit>(oldCommitSha);
+    var newCommit = repo.Lookup<Commit>(newCommitSha);
+
+    if (oldCommit == null || newCommit == null)
+    {
+      return 0;
+    }
+
+    // Normalize the file path to use forward slashes
+    var normalizedPath = filePath.Replace('\\', '/');
+
+    // Get the tree entries for the file in both commits
+    var oldTree = oldCommit.Tree;
+    var newTree = newCommit.Tree;
+
+    var oldEntry = oldTree?[normalizedPath];
+    var newEntry = newTree?[normalizedPath];
+
+    // If file doesn't exist in either commit, no changes
+    if (oldEntry == null && newEntry == null)
+    {
+      return 0;
+    }
+
+    // Get the patch between the two versions
+    var patch = repo.Diff.Compare<Patch>(oldTree, newTree, new[] { normalizedPath });
+
+    return CountModifiedLinesInPatch(patch);
+  }
+
+  /// <summary>
+  /// Count the number of modified lines (not additions) in staged changes (index vs HEAD).
+  /// This counts line modifications (deletions + corresponding additions) but excludes pure additions.
+  /// </summary>
+  /// <param name="filePath">The relative path to the file</param>
+  /// <returns>The number of modified lines in staged changes</returns>
+  public int CountStagedModifiedLines(string filePath)
+  {
+    using var repo = new Repository(_repositoryPath);
+
+    // Normalize the file path
+    var normalizedPath = filePath.Replace('\\', '/');
+
+    // Compare index (staged) to HEAD
+    var patch = repo.Diff.Compare<Patch>(repo.Head.Tip?.Tree, DiffTargets.Index, new[] { normalizedPath });
+
+    return CountModifiedLinesInPatch(patch);
+  }
+
+  /// <summary>
   /// Stage a specific file to the git index.
   /// </summary>
   /// <param name="filePath">The relative path to the file to stage</param>
@@ -237,5 +304,26 @@ public class GitService
     }
 
     return changedLines;
+  }
+
+  private static int CountModifiedLinesInPatch(Patch patch)
+  {
+    // Count only deletions, then multiply by 2 to account for the corresponding additions
+    // This excludes pure additions (new lines) from the count
+    var deletions = 0;
+    foreach (var change in patch)
+    {
+      foreach (var line in change.Patch.Split('\n'))
+      {
+        // Count lines that start with - (but not ---)
+        if (line.StartsWith("-", StringComparison.Ordinal) && !line.StartsWith("---", StringComparison.Ordinal))
+        {
+          deletions++;
+        }
+      }
+    }
+
+    // Each deletion has a corresponding addition (the modified line)
+    return deletions * 2;
   }
 }
