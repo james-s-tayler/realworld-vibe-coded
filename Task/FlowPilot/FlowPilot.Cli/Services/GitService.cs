@@ -181,11 +181,40 @@ public class GitService
     // Normalize the file path
     var normalizedPath = filePath.Replace('\\', '/');
 
-    // Reset the file to HEAD (both index and working directory)
-    repo.CheckoutPaths("HEAD", new[] { normalizedPath }, new CheckoutOptions
+    // Check if file exists in HEAD
+    var headCommit = repo.Head.Tip;
+    if (headCommit != null)
     {
-      CheckoutModifiers = CheckoutModifiers.Force,
-    });
+      var headTree = headCommit.Tree;
+      var fileExistsInHead = headTree[normalizedPath] != null;
+
+      if (fileExistsInHead)
+      {
+        // Reset the file to HEAD (both index and working directory)
+        repo.CheckoutPaths("HEAD", new[] { normalizedPath }, new CheckoutOptions
+        {
+          CheckoutModifiers = CheckoutModifiers.Force,
+        });
+      }
+      else
+      {
+        // File doesn't exist in HEAD, just unstage and delete it
+        try
+        {
+          LibGit2Sharp.Commands.Unstage(repo, normalizedPath);
+        }
+        catch
+        {
+          // Ignore errors if file wasn't staged
+        }
+
+        var absolutePath = Path.Combine(_repositoryPath, normalizedPath);
+        if (File.Exists(absolutePath))
+        {
+          File.Delete(absolutePath);
+        }
+      }
+    }
   }
 
   /// <summary>

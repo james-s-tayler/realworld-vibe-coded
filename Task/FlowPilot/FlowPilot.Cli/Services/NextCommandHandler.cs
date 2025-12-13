@@ -89,6 +89,19 @@ public class NextCommandHandler
       // Stage the new state content so PullRequestMergeBoundary can see it
       _gitService.StageFile(relativeStatePath);
 
+      // Also stage any newly created template files in the plan directory
+      var planDirectoryRelative = Path.GetRelativePath(repositoryRoot, context.PlanDirectory);
+      var changedFiles = _gitService.GetChangedFiles();
+      foreach (var changedFile in changedFiles)
+      {
+        // Stage files in the plan directory (meta/ and plan/ subdirectories)
+        if (changedFile.StartsWith(planDirectoryRelative, StringComparison.OrdinalIgnoreCase) &&
+            changedFile != relativeStatePath)
+        {
+          _gitService.StageFile(changedFile);
+        }
+      }
+
       // Temporarily restore old state content on disk so template rules see the old state
       // This prevents template rules from checking templates that were just created
       File.WriteAllText(context.StateFilePath, originalStateContent);

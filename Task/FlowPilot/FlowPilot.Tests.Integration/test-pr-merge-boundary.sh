@@ -40,18 +40,20 @@ git commit -m "Add implementation changes"
 flowpilot next test-plan
 git add .
 git commit -m "Advance state with flowpilot next"
-if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+# Test flowpilot next (should succeed without boundary error)
+if flowpilot next test-plan 2>&1 | grep -q "pull request merge boundary"; then
   echo "❌ FAILED: Should pass with single committed change"
   fail_count=$((fail_count + 1))
 else
   echo "✅ PASSED"
   pass_count=$((pass_count + 1))
 fi
+git reset --hard HEAD
 git checkout master
 git branch -D test-1
 echo ""
 
-# Test 2: Planning_Pass_StagedOnly  
+# Test 2: Planning_Pass_StagedOnly
 test_count=$((test_count + 1))
 echo "[TEST $test_count] Planning_Pass_StagedOnly..."
 git checkout -b test-2
@@ -62,8 +64,8 @@ echo "// More code" > src/utils.js
 git add .flowpilot/plans/test-plan/meta/goal.md src/utils.js
 git commit -m "Add implementation files"
 # Use flowpilot next to advance state (leaves state.md staged)
-flowpilot next test-plan
-if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+# Test flowpilot next (should succeed without boundary error)
+if flowpilot next test-plan 2>&1 | grep -q "pull request merge boundary"; then
   echo "❌ FAILED: Should pass with single staged change"
   fail_count=$((fail_count + 1))
 else
@@ -84,8 +86,8 @@ echo "Test documentation" > .flowpilot/plans/test-plan/meta/notes.md
 git add .flowpilot/plans/test-plan/meta/notes.md
 git commit -m "Add notes"
 # Use flowpilot next to advance state (leaves state.md staged)
-flowpilot next test-plan
-if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+# Test flowpilot next (should succeed without boundary error)
+if flowpilot next test-plan 2>&1 | grep -q "pull request merge boundary"; then
   echo "❌ FAILED: Should pass with single change (staged)"
   fail_count=$((fail_count + 1))
 else
@@ -109,19 +111,18 @@ git commit -m "Add context"
 flowpilot next test-plan
 git add .
 git commit -m "Advance to references"
-echo "# References\n- [Test](https://example.com)" > .flowpilot/plans/test-plan/meta/references.md
+printf "# References\n- [Test](https://example.com)\n" > .flowpilot/plans/test-plan/meta/references.md
 git add .
 git commit -m "Add references content"
-flowpilot next test-plan
-git add .
-git commit -m "Advance to system-analysis"
-if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+# Test flowpilot next (should fail with boundary error)
+if flowpilot next test-plan 2>&1 | grep -q "pull request merge boundary"; then
   echo "✅ PASSED"
   pass_count=$((pass_count + 1))
 else
   echo "❌ FAILED: Should fail with two committed changes"
   fail_count=$((fail_count + 1))
 fi
+git reset --hard HEAD
 git checkout master
 git branch -D test-4
 echo ""
@@ -139,11 +140,11 @@ git commit -m "Add config"
 flowpilot next test-plan
 git add .
 git commit -m "Advance to references"
-echo "# References\n- [Test](https://example.com)" > .flowpilot/plans/test-plan/meta/references.md
+printf "# References\n- [Test](https://example.com)\n" > .flowpilot/plans/test-plan/meta/references.md
 git add .
 git commit -m "Add references content"
-flowpilot next test-plan
-if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+# Test flowpilot next (should fail with boundary error)
+if flowpilot next test-plan 2>&1 | grep -q "pull request merge boundary"; then
   echo "✅ PASSED"
   pass_count=$((pass_count + 1))
 else
@@ -168,15 +169,14 @@ git commit -m "Add README"
 flowpilot next test-plan
 git add .
 git commit -m "Advance to references"
-echo "# References\n- [Test](https://example.com)" > .flowpilot/plans/test-plan/meta/references.md
+printf "# References\n- [Test](https://example.com)\n" > .flowpilot/plans/test-plan/meta/references.md
 git add .
 git commit -m "Add references content"
 # Add more file changes (staged)
 echo "Additional docs" > docs/CONTRIBUTING.md
 git add docs/CONTRIBUTING.md
-# Use flowpilot next for second phase (stays staged)
-flowpilot next test-plan
-if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+# Test flowpilot next (should fail with boundary error)
+if flowpilot next test-plan 2>&1 | grep -q "pull request merge boundary"; then
   echo "✅ PASSED"
   pass_count=$((pass_count + 1))
 else
@@ -188,24 +188,55 @@ git checkout master
 git branch -D test-6
 echo ""
 
+# Test 7: Verify flowpilot lint and flowpilot next output same boundary message
+test_count=$((test_count + 1))
+echo "[TEST $test_count] Verify lint and next output same boundary message..."
+git checkout -b test-7
+echo "Additional context" >> .flowpilot/plans/test-plan/meta/goal.md
+git add .
+git commit -m "Add context"
+# Advance twice to trigger boundary
+flowpilot next test-plan
+git add .
+git commit -m "Advance to references"
+printf "# References\n- [Test](https://example.com)\n" > .flowpilot/plans/test-plan/meta/references.md
+git add .
+git commit -m "Add references content"
+# Capture output from both commands
+next_output=$(flowpilot next test-plan 2>&1 || true)
+lint_output=$(flowpilot lint test-plan 2>&1 || true)
+if echo "$next_output" | grep -q "pull request merge boundary" && echo "$lint_output" | grep -q "pull request merge boundary"; then
+  echo "✅ PASSED: Both commands output boundary message"
+  pass_count=$((pass_count + 1))
+else
+  echo "❌ FAILED: Commands should output same boundary message"
+  echo "flowpilot next output: $next_output"
+  echo "flowpilot lint output: $lint_output"
+  fail_count=$((fail_count + 1))
+fi
+git reset --hard HEAD
+git checkout master
+git branch -D test-7
+echo ""
+
 # Setup for boundary tests - advance planning to completion
 echo "Setting up boundary state..."
 # Advance through all planning phases
-echo "# References\n- [Test](https://example.com)" > .flowpilot/plans/test-plan/meta/references.md
+printf "# References\n- [Test](https://example.com)\n" > .flowpilot/plans/test-plan/meta/references.md
 git add .
 git commit -m "Add references content"
 flowpilot next test-plan
 git add .
 git commit -m "Advance to system-analysis"
 
-echo "# System Analysis\nSystem details here" > .flowpilot/plans/test-plan/meta/system-analysis.md
+printf "# System Analysis\nSystem details here\n" > .flowpilot/plans/test-plan/meta/system-analysis.md
 git add .
 git commit -m "Add system analysis content"
 flowpilot next test-plan
 git add .
 git commit -m "Advance to key-decisions"
 
-echo "# Key Decisions\nDecision details here" > .flowpilot/plans/test-plan/meta/key-decisions.md
+printf "# Key Decisions\nDecision details here\n" > .flowpilot/plans/test-plan/meta/key-decisions.md
 git add .
 git commit -m "Add key decisions content"
 
@@ -246,16 +277,16 @@ git commit -m "Add phase details content"
 git checkout master
 git merge --no-ff planning-complete -m "Merge planning phase"
 
-# Test 7-12: Boundary tests
-for i in 7 8 9 10 11 12; do
+# Test 8-13: Boundary tests (renamed to start from 8)
+for i in 8 9 10 11 12 13; do
   test_count=$((test_count + 1))
   case $i in
-    7) name="Boundary_Pass_CommittedOnly"; should_pass=true; change_type="committed" ;;
-    8) name="Boundary_Pass_StagedOnly"; should_pass=true; change_type="staged" ;;
-    9) name="Boundary_Pass_CommittedAndStaged"; should_pass=true; change_type="both" ;;
-    10) name="Boundary_Fail_CommittedOnly"; should_pass=false; change_type="committed" ;;
-    11) name="Boundary_Fail_StagedOnly"; should_pass=false; change_type="staged" ;;
-    12) name="Boundary_Fail_CommittedAndStaged"; should_pass=false; change_type="both" ;;
+    8) name="Boundary_Pass_CommittedOnly"; should_pass=true; change_type="committed" ;;
+    9) name="Boundary_Pass_StagedOnly"; should_pass=true; change_type="staged" ;;
+    10) name="Boundary_Pass_CommittedAndStaged"; should_pass=true; change_type="both" ;;
+    11) name="Boundary_Fail_CommittedOnly"; should_pass=false; change_type="committed" ;;
+    12) name="Boundary_Fail_StagedOnly"; should_pass=false; change_type="staged" ;;
+    13) name="Boundary_Fail_CommittedAndStaged"; should_pass=false; change_type="both" ;;
   esac
   
   echo "[TEST $test_count] $name..."
@@ -275,8 +306,8 @@ for i in 7 8 9 10 11 12; do
       git add .
       git commit -m "Advance to phase_1"
     elif [ "$change_type" = "staged" ]; then
-      flowpilot next test-plan
-      # Leave state.md staged
+      # Test flowpilot next (stays staged)
+      true
     else
       # Both: commit first transition
       flowpilot next test-plan
@@ -294,9 +325,6 @@ for i in 7 8 9 10 11 12; do
       echo "More code" >> "src/phase1-feature-$i.js"
       git add .
       git commit -m "More changes"
-      flowpilot next test-plan
-      git add .
-      git commit -m "Advance to phase_2"
     elif [ "$change_type" = "staged" ]; then
       flowpilot next test-plan
       git add .
@@ -304,8 +332,6 @@ for i in 7 8 9 10 11 12; do
       echo "More code" >> "src/phase1-feature-$i.js"
       git add .
       git commit -m "More changes"
-      flowpilot next test-plan
-      # Leave second transition staged
     else
       # Both: one committed, one staged
       flowpilot next test-plan
@@ -314,12 +340,11 @@ for i in 7 8 9 10 11 12; do
       echo "More code" >> "src/phase1-feature-$i.js"
       git add .
       git commit -m "More changes"
-      flowpilot next test-plan
-      # Leave second transition staged
     fi
   fi
   
-  if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+  # Test flowpilot next
+  if flowpilot next test-plan 2>&1 | grep -q "pull request merge boundary"; then
     if [ "$should_pass" = "true" ]; then
       echo "❌ FAILED: Should pass"
       fail_count=$((fail_count + 1))
@@ -337,6 +362,7 @@ for i in 7 8 9 10 11 12; do
     fi
   fi
   
+  git reset --hard HEAD
   git checkout master
   git branch -D test-$i
   echo ""
@@ -351,16 +377,16 @@ git commit -m "Advance to phase_1"
 git checkout master
 git merge --no-ff phase-1-impl -m "Merge phase 1"
 
-# Test 13-18: Implementation tests
-for i in 13 14 15 16 17 18; do
+# Test 14-19: Implementation tests (renamed to start from 14)
+for i in 14 15 16 17 18 19; do
   test_count=$((test_count + 1))
   case $i in
-    13) name="Implementation_Pass_CommittedOnly"; should_pass=true; change_type="committed" ;;
-    14) name="Implementation_Pass_StagedOnly"; should_pass=true; change_type="staged" ;;
-    15) name="Implementation_Pass_CommittedAndStaged"; should_pass=true; change_type="both" ;;
-    16) name="Implementation_Fail_CommittedOnly"; should_pass=false; change_type="committed" ;;
-    17) name="Implementation_Fail_StagedOnly"; should_pass=false; change_type="staged" ;;
-    18) name="Implementation_Fail_CommittedAndStaged"; should_pass=false; change_type="both" ;;
+    14) name="Implementation_Pass_CommittedOnly"; should_pass=true; change_type="committed" ;;
+    15) name="Implementation_Pass_StagedOnly"; should_pass=true; change_type="staged" ;;
+    16) name="Implementation_Pass_CommittedAndStaged"; should_pass=true; change_type="both" ;;
+    17) name="Implementation_Fail_CommittedOnly"; should_pass=false; change_type="committed" ;;
+    18) name="Implementation_Fail_StagedOnly"; should_pass=false; change_type="staged" ;;
+    19) name="Implementation_Fail_CommittedAndStaged"; should_pass=false; change_type="both" ;;
   esac
   
   echo "[TEST $test_count] $name..."
@@ -381,8 +407,8 @@ for i in 13 14 15 16 17 18; do
       git add .
       git commit -m "Advance to phase_2"
     elif [ "$change_type" = "staged" ]; then
-      flowpilot next test-plan
-      # Leave state.md staged
+      # Test flowpilot next (stays staged)
+      true
     else
       # Both: commit first transition
       flowpilot next test-plan
@@ -400,9 +426,6 @@ for i in 13 14 15 16 17 18; do
       echo "More code" >> "src/phase2-feature-$i.js"
       git add .
       git commit -m "More changes"
-      flowpilot next test-plan
-      git add .
-      git commit -m "Advance to phase_3"
     elif [ "$change_type" = "staged" ]; then
       flowpilot next test-plan
       git add .
@@ -410,8 +433,6 @@ for i in 13 14 15 16 17 18; do
       echo "More code" >> "src/phase2-feature-$i.js"
       git add .
       git commit -m "More changes"
-      flowpilot next test-plan
-      # Leave second transition staged
     else
       # Both: one committed, one staged
       flowpilot next test-plan
@@ -420,12 +441,11 @@ for i in 13 14 15 16 17 18; do
       echo "More code" >> "src/phase2-feature-$i.js"
       git add .
       git commit -m "More changes"
-      flowpilot next test-plan
-      # Leave second transition staged
     fi
   fi
   
-  if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
+  # Test flowpilot next
+  if flowpilot next test-plan 2>&1 | grep -q "pull request merge boundary"; then
     if [ "$should_pass" = "true" ]; then
       echo "❌ FAILED: Should pass"
       fail_count=$((fail_count + 1))
@@ -443,6 +463,7 @@ for i in 13 14 15 16 17 18; do
     fi
   fi
   
+  git reset --hard HEAD
   git checkout master
   git branch -D test-$i
   echo ""
