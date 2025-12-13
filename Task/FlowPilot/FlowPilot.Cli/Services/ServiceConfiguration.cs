@@ -53,6 +53,7 @@ public static class ServiceConfiguration
     services.AddKeyedTransient<ICommand, NewCommandHandler>("new");
     services.AddKeyedTransient<ICommand, LintCommandExecutor>("lint");
     services.AddKeyedTransient<ICommand, NextCommandExecutor>("next");
+    services.AddKeyedTransient<ICommand, VerifyCommandExecutor>("verify");
 
     return services;
   }

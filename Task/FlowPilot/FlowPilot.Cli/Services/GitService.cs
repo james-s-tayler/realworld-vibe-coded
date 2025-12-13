@@ -389,11 +389,24 @@ public class GitService
       {
         _logger.LogDebug("Resetting file to HEAD using CheckoutPaths");
 
-        // Reset the file to HEAD (both index and working directory)
+        // Reset the file to HEAD in both index and working directory
+        // CheckoutPaths with Force modifier resets working directory and index
         repo.CheckoutPaths("HEAD", new[] { normalizedPath }, new CheckoutOptions
         {
           CheckoutModifiers = CheckoutModifiers.Force,
         });
+
+        // Explicitly unstage file to ensure it's completely removed from the index
+        try
+        {
+          LibGit2Sharp.Commands.Unstage(repo, normalizedPath);
+          _logger.LogDebug("File explicitly unstaged from index");
+        }
+        catch (Exception ex)
+        {
+          _logger.LogDebug(ex, "Error unstaging file after checkout (ignoring, file may already be unstaged)");
+        }
+
         _logger.LogDebug("File reset to HEAD successfully");
       }
       else

@@ -109,7 +109,7 @@ public class NextCommandHandler
       var changedFiles = _gitService.GetChangedFiles();
       _logger.LogDebug("Found {ChangedFilesCount} changed files in repository", changedFiles.Count);
 
-      var stagedCount = 0;
+      var stagedPlanFiles = new List<string>();
       foreach (var changedFile in changedFiles)
       {
         // Stage files in the plan directory (meta/ and plan/ subdirectories)
@@ -118,11 +118,11 @@ public class NextCommandHandler
         {
           _logger.LogDebug("Staging plan file: {ChangedFile}", changedFile);
           _gitService.StageFile(changedFile);
-          stagedCount++;
+          stagedPlanFiles.Add(changedFile);
         }
       }
 
-      _logger.LogDebug("Staged {StagedCount} plan files", stagedCount);
+      _logger.LogDebug("Staged {StagedCount} plan files", stagedPlanFiles.Count);
 
       // Temporarily restore old state content on disk so template rules see the old state
       // This prevents template rules from checking templates that were just created
@@ -139,12 +139,20 @@ public class NextCommandHandler
 
       if (lintResult != 0)
       {
-        // Lint failed - keep the original state and unstage
+        // Lint failed - keep the original state and unstage all changes
         _logger.LogError("Lint failed. Reverting state transition.");
-        _logger.LogDebug("Resetting staged state file");
+        _logger.LogDebug("Resetting staged state file and template files");
 
-        // state.md already has original content, just unstage it
+        // state.md already has original content, just unstage it from both working tree and index
         _gitService.ResetFile(relativeStatePath);
+
+        // Also reset all staged plan files (template files created during transition)
+        foreach (var stagedFile in stagedPlanFiles)
+        {
+          _logger.LogDebug("Resetting staged plan file: {StagedFile}", stagedFile);
+          _gitService.ResetFile(stagedFile);
+        }
+
         Environment.Exit(1);
         return;
       }
