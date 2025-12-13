@@ -1,4 +1,5 @@
-﻿using FlowPilot.Cli.Commands;
+﻿using System.Reflection;
+using FlowPilot.Cli.Commands;
 using FlowPilot.Cli.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,12 @@ public class Program
       .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 3)
       .CreateLogger();
 
+    // Log version info with commit SHA before any other logging
+    var assembly = Assembly.GetExecutingAssembly();
+    var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
+    var assemblyVersion = assembly.GetName().Version?.ToString() ?? "unknown";
+
+    Log.Information("FlowPilot {Version}, commit {CommitSha}", assemblyVersion, version);
     Log.Information("FlowPilot starting - logs will be written to {LogFilePath}", logFilePath);
 
     try

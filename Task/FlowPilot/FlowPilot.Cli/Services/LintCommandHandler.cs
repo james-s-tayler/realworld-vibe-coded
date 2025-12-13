@@ -28,16 +28,25 @@ public class LintCommandHandler
 
   public async Task<int> ExecuteAsync(string planName)
   {
+    _logger.LogInformation("LintCommandHandler.ExecuteAsync called for plan: {PlanName}", planName);
+
     // Build plan context
     var state = _planManager.GetCurrentState(planName);
+
+    _logger.LogDebug(
+      "Plan state loaded: IsInitialized={IsInitialized}, PhaseCount={PhaseCount}",
+      state.IsInitialized,
+      state.Phases.Count);
 
     if (!state.IsInitialized)
     {
       var errors = new List<string> { "Plan not initialized" };
+      _logger.LogError("Plan not initialized: {PlanName}", planName);
       PrintErrors(errors);
       return 1;
     }
 
+    _logger.LogDebug("Building plan context");
     var context = new PlanContext
     {
       PlanName = planName,
@@ -51,11 +60,37 @@ public class LintCommandHandler
       LintingErrors = new List<string>(),
     };
 
+    _logger.LogDebug(
+      "Plan context built: RepositoryRoot={RepositoryRoot}, ChangedFilesCount={ChangedFilesCount}",
+      context.RepositoryRoot,
+      context.ChangedFiles.Count);
+
     // Execute all linting rules
+    _logger.LogInformation("Executing {RuleCount} linting rules", _lintingRules.Count());
+    var ruleIndex = 0;
     foreach (var rule in _lintingRules)
     {
+      ruleIndex++;
+      var ruleName = rule.GetType().Name;
+      _logger.LogDebug(
+        "Executing linting rule {RuleIndex}/{RuleCount}: {RuleName}",
+        ruleIndex,
+        _lintingRules.Count(),
+        ruleName);
+
       await rule.ExecuteAsync(context);
+
+      if (context.LintingErrors.Count > 0)
+      {
+        _logger.LogDebug("Linting rule {RuleName} added {ErrorCount} errors", ruleName, context.LintingErrors.Count);
+      }
+      else
+      {
+        _logger.LogDebug("Linting rule {RuleName} passed", ruleName);
+      }
     }
+
+    _logger.LogInformation("All linting rules executed. Total errors: {ErrorCount}", context.LintingErrors.Count);
 
     if (context.LintingErrors.Count > 0)
     {

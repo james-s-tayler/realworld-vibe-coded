@@ -31,6 +31,7 @@ public class NextCommandHandler
 
   public async Task ExecuteAsync(string planName)
   {
+    _logger.LogInformation("NextCommandHandler.ExecuteAsync called for plan: {PlanName}", planName);
     _logger.LogDebug("NextCommandHandler.ExecuteAsync called for plan '{PlanName}'", planName);
 
     var state = _planManager.GetCurrentState(planName);
@@ -38,6 +39,7 @@ public class NextCommandHandler
       "Current state: HasPhaseAnalysis={HasPhaseAnalysis}, HasPhaseDetails={HasPhaseDetails}",
       state.HasPhaseAnalysis,
       state.HasPhaseDetails);
+    _logger.LogDebug("State loaded: IsInitialized={IsInitialized}, PhaseCount={PhaseCount}", state.IsInitialized, state.Phases.Count);
 
     if (!state.IsInitialized)
     {
@@ -47,6 +49,7 @@ public class NextCommandHandler
     }
 
     // Build plan context
+    _logger.LogDebug("Building plan context");
     var context = new PlanContext
     {
       PlanName = planName,
@@ -56,6 +59,11 @@ public class NextCommandHandler
       PlanSubDirectory = _planManager.GetPlanSubDirectory(planName),
       StateFilePath = _planManager.GetStateFilePath(planName),
     };
+
+    _logger.LogDebug(
+      "Plan context built: PlanDirectory={PlanDirectory}, StateFilePath={StateFilePath}",
+      context.PlanDirectory,
+      context.StateFilePath);
 
     // Find the first applicable transition
     _logger.LogDebug("Searching for applicable state transition among {Count} transitions", _stateTransitions.Count());
@@ -71,39 +79,54 @@ public class NextCommandHandler
 
     if (transition != null)
     {
+      _logger.LogInformation("Found applicable transition: {TransitionType}", transition.GetType().Name);
       _logger.LogDebug("Executing transition: {TransitionType}", transition.GetType().Name);
 
       // Save the original state.md content before transition
+      _logger.LogDebug("Reading original state file content");
       var originalStateContent = File.ReadAllText(context.StateFilePath);
 
       // Execute the state transition (which updates state.md and creates template files)
+      _logger.LogInformation("Executing state transition");
       transition.Execute(context);
+      _logger.LogDebug("State transition executed");
 
       // Save the new state.md content after transition
+      _logger.LogDebug("Reading new state file content");
       var newStateContent = File.ReadAllText(context.StateFilePath);
 
       // Get the relative path to state.md for git operations
       var repositoryRoot = _gitService.GetRepositoryRoot();
       var relativeStatePath = Path.GetRelativePath(repositoryRoot, context.StateFilePath);
+      _logger.LogDebug("Relative state path: {RelativeStatePath}", relativeStatePath);
 
       // Stage the new state content so PullRequestMergeBoundary can see it
+      _logger.LogDebug("Staging state file");
       _gitService.StageFile(relativeStatePath);
 
       // Also stage any newly created template files in the plan directory
       var planDirectoryRelative = Path.GetRelativePath(repositoryRoot, context.PlanDirectory);
       var changedFiles = _gitService.GetChangedFiles();
+      _logger.LogDebug("Found {ChangedFilesCount} changed files in repository", changedFiles.Count);
+
+      var stagedCount = 0;
       foreach (var changedFile in changedFiles)
       {
         // Stage files in the plan directory (meta/ and plan/ subdirectories)
         if (changedFile.StartsWith(planDirectoryRelative, StringComparison.OrdinalIgnoreCase) &&
             changedFile != relativeStatePath)
         {
+          _logger.LogDebug("Staging plan file: {ChangedFile}", changedFile);
           _gitService.StageFile(changedFile);
+          stagedCount++;
         }
       }
 
+      _logger.LogDebug("Staged {StagedCount} plan files", stagedCount);
+
       // Temporarily restore old state content on disk so template rules see the old state
       // This prevents template rules from checking templates that were just created
+      _logger.LogDebug("Temporarily restoring original state content for lint validation");
       File.WriteAllText(context.StateFilePath, originalStateContent);
 
       // Now run lint to validate the transition
@@ -118,6 +141,7 @@ public class NextCommandHandler
       {
         // Lint failed - keep the original state and unstage
         _logger.LogError("Lint failed. Reverting state transition.");
+        _logger.LogDebug("Resetting staged state file");
 
         // state.md already has original content, just unstage it
         _gitService.ResetFile(relativeStatePath);
@@ -126,10 +150,14 @@ public class NextCommandHandler
       }
 
       // Lint passed - restore the new state content on disk
+      _logger.LogDebug("Lint passed, restoring new state content");
       File.WriteAllText(context.StateFilePath, newStateContent);
+      _logger.LogInformation("State transition completed successfully");
     }
     else
     {
+      _logger.LogDebug("No applicable state transition found");
+
       // Check if plan is complete
       if (state.Phases.Any() && state.Phases.All(p => p.IsComplete))
       {
