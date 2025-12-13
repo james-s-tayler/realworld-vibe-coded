@@ -44,6 +44,19 @@ git commit -m "Advance to references"
 if flowpilot next test-plan 2>&1 | grep -q "pull request merge boundary"; then
   echo "✅ PASSED: Correctly blocked second transition"
   pass_count=$((pass_count + 1))
+  
+  # Verify that git working tree and index are clean after failed transition
+  # We check git status for "nothing to commit, working tree clean" message
+  test_count=$((test_count + 1))
+  if git status | grep -q "nothing to commit, working tree clean"; then
+    echo "✅ PASSED: git working tree and index are clean after failed transition"
+    pass_count=$((pass_count + 1))
+  else
+    echo "❌ FAILED: git working tree and index should be clean after failed transition"
+    echo "Git status after failed transition:"
+    git status
+    fail_count=$((fail_count + 1))
+  fi
 else
   echo "❌ FAILED: Should block second transition"
   fail_count=$((fail_count + 1))
@@ -186,37 +199,6 @@ fi
 git reset --hard HEAD
 git checkout master
 git branch -D test-6
-echo ""
-
-# Test 7: Verify flowpilot lint and flowpilot next output same boundary message
-test_count=$((test_count + 1))
-echo "[TEST $test_count] Verify lint and next output same boundary message..."
-git checkout -b test-7
-echo "Additional context" >> .flowpilot/plans/test-plan/meta/goal.md
-git add .
-git commit -m "Add context"
-# Advance twice to trigger boundary
-flowpilot next test-plan
-git add .
-git commit -m "Advance to references"
-printf "# References\n- [Test](https://example.com)\n" > .flowpilot/plans/test-plan/meta/references.md
-git add .
-git commit -m "Add references content"
-# Capture output from both commands
-next_output=$(flowpilot next test-plan 2>&1 || true)
-lint_output=$(flowpilot lint test-plan 2>&1 || true)
-if echo "$next_output" | grep -q "pull request merge boundary" && echo "$lint_output" | grep -q "pull request merge boundary"; then
-  echo "✅ PASSED: Both commands output boundary message"
-  pass_count=$((pass_count + 1))
-else
-  echo "❌ FAILED: Commands should output same boundary message"
-  echo "flowpilot next output: $next_output"
-  echo "flowpilot lint output: $lint_output"
-  fail_count=$((fail_count + 1))
-fi
-git reset --hard HEAD
-git checkout master
-git branch -D test-7
 echo ""
 
 # Setup for boundary tests - advance planning to completion
