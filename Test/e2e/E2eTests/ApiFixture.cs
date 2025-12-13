@@ -23,7 +23,12 @@ public class ApiFixture : IAsyncLifetime
     {
       PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
-    _httpClient = new HttpClient
+
+    // Configure HttpClientHandler to accept self-signed certificates in test environments
+    var handler = new HttpClientHandler();
+    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+
+    _httpClient = new HttpClient(handler)
     {
       BaseAddress = new Uri(_baseUrl),
     };
