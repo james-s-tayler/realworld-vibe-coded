@@ -295,6 +295,31 @@ public class GitService
   }
 
   /// <summary>
+  /// Fetch a specific remote branch.
+  /// </summary>
+  /// <param name="remoteName">The remote name (e.g., "origin")</param>
+  /// <param name="branchName">The branch name (e.g., "main")</param>
+  public void FetchRemoteBranch(string remoteName, string branchName)
+  {
+    _logger.LogDebug("FetchRemoteBranch called with remoteName: {RemoteName}, branchName: {BranchName}", remoteName, branchName);
+
+    using var repo = new Repository(_repositoryPath);
+    var remote = repo.Network.Remotes[remoteName];
+
+    if (remote == null)
+    {
+      _logger.LogWarning("Remote {RemoteName} not found", remoteName);
+      throw new InvalidOperationException($"Remote '{remoteName}' not found");
+    }
+
+    var refSpec = $"+refs/heads/{branchName}:refs/remotes/{remoteName}/{branchName}";
+    _logger.LogDebug("Fetching with refspec: {RefSpec}", refSpec);
+
+    LibGit2Sharp.Commands.Fetch(repo, remoteName, new[] { refSpec }, null, null);
+    _logger.LogDebug("Fetch completed successfully");
+  }
+
+  /// <summary>
   /// Stage a specific file to the git index.
   /// </summary>
   /// <param name="filePath">The relative path to the file to stage</param>

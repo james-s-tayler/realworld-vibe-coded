@@ -1,5 +1,6 @@
 ﻿using FlowPilot.Cli.Models;
 using FlowPilot.Cli.Services;
+using Microsoft.Extensions.Logging;
 
 namespace FlowPilot.Cli.Linting;
 
@@ -12,11 +13,13 @@ public class PullRequestMergeBoundary : ILintingRule
 {
   private readonly GitService _gitService;
   private readonly IFileSystemService _fileSystem;
+  private readonly ILogger<PullRequestMergeBoundary> _logger;
 
-  public PullRequestMergeBoundary(GitService gitService, IFileSystemService fileSystem)
+  public PullRequestMergeBoundary(GitService gitService, IFileSystemService fileSystem, ILogger<PullRequestMergeBoundary> logger)
   {
     _gitService = gitService;
     _fileSystem = fileSystem;
+    _logger = logger;
   }
 
   public Task ExecuteAsync(PlanContext context)
@@ -27,6 +30,7 @@ public class PullRequestMergeBoundary : ILintingRule
     // Try to find merge-base with common base branches
     var baseBranches = new[] { "origin/main", "origin/master", "main", "master" };
     string? mergeBaseSha = null;
+    string? foundBaseBranch = null;
 
     foreach (var baseBranch in baseBranches)
     {
@@ -35,6 +39,7 @@ public class PullRequestMergeBoundary : ILintingRule
         mergeBaseSha = _gitService.GetMergeBaseSha(baseBranch);
         if (mergeBaseSha != null)
         {
+          foundBaseBranch = baseBranch;
           break;
         }
       }
@@ -44,10 +49,57 @@ public class PullRequestMergeBoundary : ILintingRule
       }
     }
 
-    // If we can't find a merge-base, skip this rule (e.g., first commit, or detached HEAD)
+    // If we can't find a merge-base, try to fetch the missing branch
     if (mergeBaseSha == null)
     {
-      return Task.CompletedTask;
+      _logger.LogDebug("No merge-base found with any of the standard branches, attempting to fetch");
+
+      // Try to fetch each base branch directly
+      foreach (var baseBranch in baseBranches)
+      {
+        // Only try to fetch origin/* branches
+        if (!baseBranch.StartsWith("origin/", StringComparison.Ordinal))
+        {
+          continue;
+        }
+
+        // Parse remote and branch name
+        var parts = baseBranch.Split('/', 2);
+        if (parts.Length == 2)
+        {
+          var remoteName = parts[0];
+          var branchName = parts[1];
+
+          try
+          {
+            _logger.LogDebug("Attempting to fetch {RemoteName}/{BranchName}", remoteName, branchName);
+            _gitService.FetchRemoteBranch(remoteName, branchName);
+            _logger.LogWarning(
+              "Fetched missing base branch {BaseBranch}. " +
+              "Consider updating .github/workflows/copilot-setup-steps.yml to checkout this branch to avoid this fetch in the future.",
+              baseBranch);
+
+            // Try to get merge-base again after fetching
+            mergeBaseSha = _gitService.GetMergeBaseSha(baseBranch);
+            if (mergeBaseSha != null)
+            {
+              foundBaseBranch = baseBranch;
+              break;
+            }
+          }
+          catch (Exception ex)
+          {
+            _logger.LogDebug(ex, "Failed to fetch branch {BaseBranch}", baseBranch);
+          }
+        }
+      }
+
+      // If still no merge-base found, skip this rule
+      if (mergeBaseSha == null)
+      {
+        _logger.LogDebug("Unable to find merge-base even after attempting fetch, skipping merge boundary check");
+        return Task.CompletedTask;
+      }
     }
 
     // Get current HEAD SHA using GitService
