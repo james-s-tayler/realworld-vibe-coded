@@ -78,11 +78,13 @@ public class LintCommandHandler
         _lintingRules.Count(),
         ruleName);
 
+      var errorCountBefore = context.LintingErrors.Count;
       await rule.ExecuteAsync(context);
+      var errorsAdded = context.LintingErrors.Count - errorCountBefore;
 
-      if (context.LintingErrors.Count > 0)
+      if (errorsAdded > 0)
       {
-        _logger.LogDebug("Linting rule {RuleName} added {ErrorCount} errors", ruleName, context.LintingErrors.Count);
+        _logger.LogDebug("Linting rule {RuleName} added {ErrorCount} errors", ruleName, errorsAdded);
       }
       else
       {

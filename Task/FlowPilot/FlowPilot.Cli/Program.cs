@@ -24,7 +24,7 @@ public class Program
     var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
     var assemblyVersion = assembly.GetName().Version?.ToString() ?? "unknown";
 
-    Log.Information("FlowPilot {Version}, commit {CommitSha}", assemblyVersion, version);
+    Log.Information("FlowPilot {AssemblyVersion}, commit {CommitSha}", assemblyVersion, version);
     Log.Information("FlowPilot starting - logs will be written to {LogFilePath}", logFilePath);
 
     try

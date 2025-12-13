@@ -32,14 +32,14 @@ public class NextCommandHandler
   public async Task ExecuteAsync(string planName)
   {
     _logger.LogInformation("NextCommandHandler.ExecuteAsync called for plan: {PlanName}", planName);
-    _logger.LogDebug("NextCommandHandler.ExecuteAsync called for plan '{PlanName}'", planName);
 
     var state = _planManager.GetCurrentState(planName);
     _logger.LogDebug(
-      "Current state: HasPhaseAnalysis={HasPhaseAnalysis}, HasPhaseDetails={HasPhaseDetails}",
+      "Current state: HasPhaseAnalysis={HasPhaseAnalysis}, HasPhaseDetails={HasPhaseDetails}, IsInitialized={IsInitialized}, PhaseCount={PhaseCount}",
       state.HasPhaseAnalysis,
-      state.HasPhaseDetails);
-    _logger.LogDebug("State loaded: IsInitialized={IsInitialized}, PhaseCount={PhaseCount}", state.IsInitialized, state.Phases.Count);
+      state.HasPhaseDetails,
+      state.IsInitialized,
+      state.Phases.Count);
 
     if (!state.IsInitialized)
     {
