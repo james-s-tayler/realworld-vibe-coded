@@ -148,6 +148,10 @@ public static class ServiceConfigs
         };
       });
 
+    // Register Identity email sender adapter (required by MapIdentityApi)
+    // Must be singleton because MapIdentityApi resolves it during startup
+    services.AddSingleton<Microsoft.AspNetCore.Identity.IEmailSender<ApplicationUser>, Server.Infrastructure.Email.IdentityEmailSender>();
+
     services.AddAuthorization();
     services.AddProblemDetails();
     services.AddMemoryCache();
