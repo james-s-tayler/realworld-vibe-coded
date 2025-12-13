@@ -94,14 +94,22 @@ public class PullRequestMergeBoundary : ILintingRule
         }
         catch (Exception ex)
         {
-          _logger.LogDebug(ex, "Failed to fetch branch {BaseBranch}", baseBranch);
+          _logger.LogError(ex, "Failed to fetch branch {BaseBranch}", baseBranch);
+          context.LintingErrors.Add(
+            $"Failed to fetch base branch {baseBranch}. " +
+            "Ensure .github/workflows/copilot-setup-steps.yml checks out the base branch, " +
+            "or verify network connectivity and repository permissions.");
+          return Task.CompletedTask;
         }
       }
 
-      // If still no merge-base found, skip this rule
+      // If still no merge-base found, this is a critical error
       if (mergeBaseSha == null)
       {
-        _logger.LogDebug("Unable to find merge-base even after attempting fetch, skipping merge boundary check");
+        _logger.LogError("Unable to find merge-base even after attempting fetch");
+        context.LintingErrors.Add(
+          "Unable to find merge-base with any standard base branches (origin/main, origin/master, main, master). " +
+          "Ensure .github/workflows/copilot-setup-steps.yml checks out a base branch.");
         return Task.CompletedTask;
       }
     }
