@@ -221,7 +221,8 @@ echo ""
 
 # Setup for boundary tests - advance planning to completion
 echo "Setting up boundary state..."
-# Advance through all planning phases
+# Create branch for initial planning phases (references, system-analysis, key-decisions)
+git checkout -b initial-planning
 # First transition to references phase
 flowpilot next test-plan
 git add .
@@ -246,6 +247,9 @@ git commit -m "Advance to key-decisions"
 printf "# Key Decisions\nDecision details here\n" > .flowpilot/plans/test-plan/meta/key-decisions.md
 git add .
 git commit -m "Add key decisions content"
+# Merge back to master
+git checkout master
+git merge --no-ff initial-planning -m "Merge initial planning"
 
 # Now at hard boundary - need new branch for phase-analysis
 git checkout -b planning-analysis

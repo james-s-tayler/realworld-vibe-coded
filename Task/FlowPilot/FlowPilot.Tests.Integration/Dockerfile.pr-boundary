@@ -43,4 +43,4 @@ RUN chmod +x /test-pr-merge-boundary.sh
 
 # Create a fresh test directory at runtime (not in image)
 # Run the test script
-CMD ["sh", "-c", "cd /tmp && mkdir -p test-repo && cd test-repo && /test-pr-merge-boundary.sh"]
+CMD ["sh", "-c", "cd /tmp && rm -rf test-repo && mkdir test-repo && cd test-repo && /test-pr-merge-boundary.sh"]
