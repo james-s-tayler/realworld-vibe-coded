@@ -327,7 +327,12 @@ public class GitService
       var refSpec = $"+refs/heads/{branchName}:refs/remotes/{remoteName}/{branchName}";
       _logger.LogDebug("Fetching with refspec: {RefSpec}", refSpec);
 
-      LibGit2Sharp.Commands.Fetch(repo, remoteName, new[] { refSpec }, null, null);
+      LibGit2Sharp.Commands.Fetch(
+        repository: repo,
+        remote: remoteName,
+        refspecs: new[] { refSpec },
+        options: null,
+        logMessage: null);
       _logger.LogDebug("Fetch completed successfully");
     }
     catch (LibGit2SharpException ex)

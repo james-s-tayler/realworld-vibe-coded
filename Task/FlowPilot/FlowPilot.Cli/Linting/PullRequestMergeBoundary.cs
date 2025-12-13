@@ -65,7 +65,7 @@ public class PullRequestMergeBoundary : ILintingRule
         }
 
         // Parse remote and branch name (expecting format "remote/branch")
-        var parts = baseBranch.Split('/', ExpectedBranchParts);
+        var parts = baseBranch.Split('/');
         if (parts.Length != ExpectedBranchParts)
         {
           _logger.LogDebug("Unexpected branch format: {BaseBranch}, expected 'remote/branch'", baseBranch);
