@@ -246,8 +246,9 @@ public partial class Build
       // Explicitly fail the target if Docker Compose failed
       if (exitCode != 0)
       {
-        Log.Error("E2E tests failed with exit code: {ExitCode}", exitCode);
-        throw new Exception($"E2E tests failed with exit code: {exitCode}");
+        const string debugInstructions = "For a high-level summary of specific failures, see Reports/Test/e2e/Artifacts/ReportSummary.md. Then view logs in Logs/Test/e2e/Server.Web/Serilog to diagnose specific failures.";
+        Log.Error("E2E tests failed. {DebugInstructions}", debugInstructions);
+        throw new Exception($"E2E tests failed with exit code: {exitCode}. {debugInstructions}");
       }
     });
 
