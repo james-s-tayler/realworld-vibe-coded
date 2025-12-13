@@ -370,8 +370,48 @@ fi
 echo "✅ PASSED: Plan marked as complete"
 echo ""
 
+# Test 24: PullRequestMergeBoundary - Planning Phase Pass (Single change on branch)
+echo "[TEST 24] Testing PullRequestMergeBoundary - Planning phase single change..."
+git checkout master
+git checkout -b test-pr-boundary-planning
+# Create a new plan for this test
+flowpilot new boundary-test 2>&1 > /dev/null
+echo "# Test Boundary Goal" > .flowpilot/plans/boundary-test/meta/goal.md
+git add .
+git commit -m "Initial boundary test plan"
+# Advance one state (should pass - only 1 checkbox change)
+flowpilot next boundary-test 2>&1 > /dev/null
+git add .
+git commit -m "Advance to references"
+output=$(flowpilot lint boundary-test 2>&1)
+if [[ $output == *"pull request merge boundary"* ]]; then
+    echo "❌ FAILED: Lint should pass with single state change"
+    echo "Output: $output"
+    exit 1
+fi
+echo "✅ PASSED: Planning phase single change allowed"
+echo ""
+
+# Test 25: PullRequestMergeBoundary - Planning Phase Fail (Two changes on same branch)
+echo "[TEST 25] Testing PullRequestMergeBoundary - Planning phase multiple changes..."
+# Advance another state without creating a new branch (should fail)
+echo "- [Microsoft](https://microsoft.com)" >> .flowpilot/plans/boundary-test/meta/references.md
+git add .
+git commit -m "Add reference"
+flowpilot next boundary-test 2>&1 > /dev/null
+git add .
+git commit -m "Advance to system-analysis"
+output=$(flowpilot lint boundary-test 2>&1 || true)
+if [[ ! $output == *"pull request merge boundary"* ]]; then
+    echo "❌ FAILED: Lint should fail with multiple state changes on same branch"
+    echo "Output: $output"
+    exit 1
+fi
+echo "✅ PASSED: Planning phase multiple changes blocked"
+echo ""
+
 echo "=========================================="
-echo "✅ ALL TESTS PASSED (23/23)"
+echo "✅ ALL TESTS PASSED (25/25)"
 echo "=========================================="
 echo ""
 echo "Summary:"
@@ -381,5 +421,6 @@ echo "  - State transitions through all phases"
 echo "  - Hard boundary enforcement"
 echo "  - Template file creation"
 echo "  - Complete plan workflow"
+echo "  - PullRequestMergeBoundary enforcement (2 tests)"
 echo ""
 exit 0
