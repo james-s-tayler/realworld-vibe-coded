@@ -17,7 +17,11 @@ public static class ServiceConfiguration
     services.AddSingleton<TemplateService>();
     services.AddSingleton<StateParser>();
     services.AddSingleton<PlanManager>();
-    services.AddSingleton(sp => new GitService(currentDirectory));
+    services.AddSingleton(sp =>
+    {
+      var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<GitService>>();
+      return new GitService(currentDirectory, logger);
+    });
 
     // Linting rules
     services.AddTransient<ILintingRule, StateChangesLintingRule>();
