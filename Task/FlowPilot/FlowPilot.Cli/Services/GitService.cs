@@ -295,6 +295,59 @@ public class GitService
   }
 
   /// <summary>
+  /// Fetch a specific remote branch.
+  /// </summary>
+  /// <param name="remoteName">The remote name (e.g., "origin")</param>
+  /// <param name="branchName">The branch name (e.g., "main")</param>
+  public void FetchRemoteBranch(string remoteName, string branchName)
+  {
+    if (string.IsNullOrWhiteSpace(remoteName))
+    {
+      throw new ArgumentException("Remote name cannot be null or empty", nameof(remoteName));
+    }
+
+    if (string.IsNullOrWhiteSpace(branchName))
+    {
+      throw new ArgumentException("Branch name cannot be null or empty", nameof(branchName));
+    }
+
+    _logger.LogDebug("FetchRemoteBranch called with remoteName: {RemoteName}, branchName: {BranchName}", remoteName, branchName);
+
+    try
+    {
+      using var repo = new Repository(_repositoryPath);
+      var remote = repo.Network.Remotes[remoteName];
+
+      if (remote == null)
+      {
+        _logger.LogWarning("Remote {RemoteName} not found", remoteName);
+        throw new InvalidOperationException($"Remote '{remoteName}' not found");
+      }
+
+      var refSpec = $"+refs/heads/{branchName}:refs/remotes/{remoteName}/{branchName}";
+      _logger.LogDebug("Fetching with refspec: {RefSpec}", refSpec);
+
+      LibGit2Sharp.Commands.Fetch(
+        repository: repo,
+        remote: remoteName,
+        refspecs: new[] { refSpec },
+        options: null,
+        logMessage: null);
+      _logger.LogDebug("Fetch completed successfully");
+    }
+    catch (LibGit2SharpException ex)
+    {
+      _logger.LogWarning(ex, "Failed to fetch {RemoteName}/{BranchName}: {Message}", remoteName, branchName, ex.Message);
+      throw new InvalidOperationException($"Failed to fetch branch '{branchName}' from remote '{remoteName}': {ex.Message}", ex);
+    }
+    catch (Exception ex) when (ex is not ArgumentException and not InvalidOperationException)
+    {
+      _logger.LogWarning(ex, "Unexpected error fetching {RemoteName}/{BranchName}", remoteName, branchName);
+      throw new InvalidOperationException($"Failed to fetch branch '{branchName}' from remote '{remoteName}': {ex.Message}", ex);
+    }
+  }
+
+  /// <summary>
   /// Stage a specific file to the git index.
   /// </summary>
   /// <param name="filePath">The relative path to the file to stage</param>
