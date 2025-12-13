@@ -86,6 +86,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Fetch base branch
+        run: git fetch origin main:refs/remotes/origin/main
+
       - name: Setup .NET (from global.json)
         uses: actions/setup-dotnet@v4
 
