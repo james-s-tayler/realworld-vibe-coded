@@ -274,8 +274,19 @@ git commit -m "Add phase analysis"
 echo "✅ PASSED: Phase-analysis.md modified and committed"
 echo ""
 
-# Test 18: Advance to phase-details phase
-echo "[TEST 18] Advancing to phase-details..."
+# Test 17b: Merge phase-analysis to master before advancing to phase-details
+echo "[TEST 17b] Merging phase-analysis to master..."
+git checkout master
+git merge --no-ff phase-planning -m "Merge phase analysis"
+echo "DEBUG: state.md on master after merging phase-analysis:"
+cat .flowpilot/plans/test-plan/meta/state.md
+echo ""
+echo "✅ PASSED: Phase-analysis merged to master"
+echo ""
+
+# Test 18: Create new branch and advance to phase-details phase
+echo "[TEST 18] Creating phase-details branch and advancing..."
+git checkout -b phase-details
 set +e  # Temporarily allow errors
 output=$(flowpilot next test-plan 2>&1)
 exit_code=$?
@@ -283,12 +294,12 @@ set -e  # Re-enable exit on error
 echo "DEBUG: flowpilot next exit code: $exit_code"
 echo "DEBUG: flowpilot next output:"
 echo "$output"
-echo "DEBUG: Log file contents:"
-cat ~/flowpilot.log 2>/dev/null || echo "No log file found"
+echo ""
+echo "DEBUG: state.md after flowpilot next:"
+cat .flowpilot/plans/test-plan/meta/state.md
+echo ""
 if [[ ! $output == *"phase-n-details"* ]]; then
     echo "❌ FAILED: Should advance to phase-details"
-    echo "Full log file:"
-    cat ~/flowpilot.log 2>/dev/null || echo "No log file found"
     exit 1
 fi
 # Should create phase-1-details.md, phase-2-details.md, phase-3-details.md in plan/ directory
@@ -304,6 +315,12 @@ if [ ! -f ".flowpilot/plans/test-plan/plan/phase-3-details.md" ]; then
     echo "❌ FAILED: phase-3-details.md not created"
     exit 1
 fi
+# Commit the state transition
+git add .
+git commit -m "Advance to phase-details phase"
+echo "DEBUG: state.md after committing:"
+cat .flowpilot/plans/test-plan/meta/state.md
+echo ""
 echo "✅ PASSED: Phase details files created"
 echo ""
 
@@ -316,57 +333,82 @@ echo "Detailed implementation steps" >> .flowpilot/plans/test-plan/plan/phase-2-
 echo "# Phase 3: Testing Details" > .flowpilot/plans/test-plan/plan/phase-3-details.md
 echo "Detailed testing steps" >> .flowpilot/plans/test-plan/plan/phase-3-details.md
 git add .
-git commit -m "Add phase details"
+git commit -m "Add phase details content"
 echo "✅ PASSED: Phase details modified and committed"
 echo ""
 
-# Simulate PR merge: merge phase-planning back to master to reset merge-base
-echo "[TEST 19b] Simulating PR merge: merging phase-planning to master..."
+# Simulate PR merge: merge phase-details back to master to reset merge-base
+echo "[TEST 19b] Simulating PR merge: merging phase-details to master..."
 git checkout master
-git merge --no-ff phase-planning -m "Merge planning phase"
-echo "✅ PASSED: Planning phase merged to master"
+git merge --no-ff phase-details -m "Merge phase details"
+echo "DEBUG: state.md on master after merging phase-details:"
+cat .flowpilot/plans/test-plan/meta/state.md
+echo ""
+echo "✅ PASSED: Phase details merged to master"
 echo ""
 
 # Test 20: Advance to phase 1 implementation
 echo "[TEST 20] Advancing to phase 1 implementation..."
 git checkout -b phase-1-implementation
+echo "DEBUG: state.md before flowpilot next:"
+cat .flowpilot/plans/test-plan/meta/state.md
+echo ""
 output=$(flowpilot next test-plan 2>&1)
+echo "DEBUG: flowpilot next output:"
+echo "$output"
+echo "DEBUG: state.md after flowpilot next:"
+cat .flowpilot/plans/test-plan/meta/state.md
+echo ""
 if [[ ! $output == *"phase_1"* ]] && [[ ! $output == *"Phase 1"* ]]; then
     echo "❌ FAILED: Should advance to phase 1 implementation"
     echo "Output: $output"
     exit 1
 fi
+git add .
+git commit -m "Advance to phase 1"
+# Simulate doing the implementation work
+echo "Phase 1 implementation work done" >> .flowpilot/plans/test-plan/plan/phase-1-details.md
+git add .
+git commit -m "Complete phase 1 implementation"
 echo "✅ PASSED: Advanced to phase 1 implementation"
 echo ""
 
-# Test 21: Mark phase 1 complete and merge to master
-echo "[TEST 21] Marking phase 1 complete and merging to master..."
-git add .
-git commit -m "Complete phase 1"
+# Test 21: Merge phase 1 to master
+echo "[TEST 21] Merging phase 1 to master..."
 git checkout master
 git merge --no-ff phase-1-implementation -m "Merge phase 1"
-echo "✅ PASSED: Phase 1 completed and merged"
+echo "✅ PASSED: Phase 1 merged to master"
+echo ""
+echo "DEBUG: state.md after merging phase 1:"
+cat .flowpilot/plans/test-plan/meta/state.md
 echo ""
 
 # Test 22: Advance to phase 2 implementation
 echo "[TEST 22] Advancing to phase 2 implementation..."
 git checkout -b phase-2-implementation
+echo "DEBUG: state.md on phase-2-implementation branch:"
+cat .flowpilot/plans/test-plan/meta/state.md
+echo ""
 output=$(flowpilot next test-plan 2>&1)
 if [[ ! $output == *"phase_2"* ]] && [[ ! $output == *"Phase 2"* ]]; then
     echo "❌ FAILED: Should advance to phase 2 implementation"
     echo "Output: $output"
     exit 1
 fi
+git add .
+git commit -m "Advance to phase 2"
+# Simulate doing the implementation work
+echo "Phase 2 implementation work done" >> .flowpilot/plans/test-plan/plan/phase-2-details.md
+git add .
+git commit -m "Complete phase 2 implementation"
 echo "✅ PASSED: Advanced to phase 2 implementation"
 echo ""
 
-# Test 23: Mark phase 2 complete and merge to master
-echo "[TEST 23] Marking phase 2 complete and merging to master..."
-git add .
-git commit -m "Complete phase 2"
+# Test 23: Merge phase 2 to master
+echo "[TEST 23] Merging phase 2 to master..."
 git checkout master
 git merge --no-ff phase-2-implementation -m "Merge phase 2"
-echo "✅ PASSED: Phase 2 completed and merged"
+echo "✅ PASSED: Phase 2 merged to master"
 echo ""
 
 # Test 24: Advance to phase 3 implementation
@@ -379,7 +421,11 @@ if [[ ! $output == *"phase_3"* ]] && [[ ! $output == *"Phase 3"* ]]; then
     exit 1
 fi
 git add .
-git commit -m "Complete phase 3"
+git commit -m "Advance to phase 3"
+# Simulate doing the implementation work
+echo "Phase 3 implementation work done" >> .flowpilot/plans/test-plan/plan/phase-3-details.md
+git add .
+git commit -m "Complete phase 3 implementation"
 echo "✅ PASSED: Advanced to phase 3 and completed"
 echo ""
 
