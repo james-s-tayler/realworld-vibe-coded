@@ -60,6 +60,25 @@ public partial class Build
         failures.Add("FlowPilot.Tests.Integration (Docker)");
       }
 
+      // Run PullRequestMergeBoundary-specific integration tests
+      Log.Information("Running PullRequestMergeBoundary integration tests for FlowPilot CLI");
+
+      try
+      {
+        ProcessTasks.StartProcess(
+          "docker",
+          "compose -f docker-compose-pr-boundary.yml up --build --abort-on-container-exit --exit-code-from flowpilot-pr-boundary-test",
+          workingDirectory: integrationTestDirectory)
+          .AssertZeroExitCode();
+
+        Log.Information("✅ PullRequestMergeBoundary integration tests passed");
+      }
+      catch (ProcessException)
+      {
+        Log.Error("❌ PullRequestMergeBoundary integration tests failed");
+        failures.Add("FlowPilot.Tests.Integration.PRBoundary (Docker)");
+      }
+
       if (failures.Any())
       {
         var failedProjects = string.Join(", ", failures);
