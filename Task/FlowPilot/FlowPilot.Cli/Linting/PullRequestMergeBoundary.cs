@@ -4,8 +4,8 @@ using FlowPilot.Cli.Services;
 namespace FlowPilot.Cli.Linting;
 
 /// <summary>
-/// Validates that at most only a single line in state.md has changed by comparing
-/// the merge-base against staged changes and already committed changes.
+/// Validates that at most two lines in state.md have changed (one checkbox change)
+/// by comparing the merge-base against staged changes and already committed changes.
 /// This enforces the branch-per-phase workflow.
 /// </summary>
 public class PullRequestMergeBoundary : ILintingRule
@@ -50,12 +50,8 @@ public class PullRequestMergeBoundary : ILintingRule
       return Task.CompletedTask;
     }
 
-    // Get current HEAD SHA
-    string? headSha = null;
-    using (var repo = new LibGit2Sharp.Repository(context.RepositoryRoot))
-    {
-      headSha = repo.Head.Tip?.Sha;
-    }
+    // Get current HEAD SHA using GitService
+    var headSha = _gitService.GetHeadSha();
 
     // Count changes between merge-base and HEAD (committed changes on this branch)
     var committedChanges = _gitService.CountChangedLines(relativeStatePath, mergeBaseSha, headSha);

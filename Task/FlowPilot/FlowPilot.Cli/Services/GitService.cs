@@ -74,7 +74,7 @@ public class GitService
 
     // Get the base branch
     var baseBranch = repo.Branches[baseBranchName];
-    if (baseBranch == null)
+    if (baseBranch == null || baseBranch.Tip == null)
     {
       return null;
     }
@@ -82,6 +82,16 @@ public class GitService
     // Find merge base
     var mergeBase = repo.ObjectDatabase.FindMergeBase(headCommit, baseBranch.Tip);
     return mergeBase?.Sha;
+  }
+
+  /// <summary>
+  /// Get the current HEAD commit SHA.
+  /// </summary>
+  /// <returns>The HEAD commit SHA, or null if no HEAD</returns>
+  public string? GetHeadSha()
+  {
+    using var repo = new Repository(_repositoryPath);
+    return repo.Head.Tip?.Sha;
   }
 
   /// <summary>
@@ -128,21 +138,7 @@ public class GitService
     // Get the patch between the two versions
     var patch = repo.Diff.Compare<Patch>(oldTree, newTree, new[] { normalizedPath });
 
-    var changedLines = 0;
-    foreach (var change in patch)
-    {
-      foreach (var line in change.Patch.Split('\n'))
-      {
-        // Count lines that start with + or - (but not +++ or ---)
-        if ((line.StartsWith("+", StringComparison.Ordinal) && !line.StartsWith("+++", StringComparison.Ordinal)) ||
-            (line.StartsWith("-", StringComparison.Ordinal) && !line.StartsWith("---", StringComparison.Ordinal)))
-        {
-          changedLines++;
-        }
-      }
-    }
-
-    return changedLines;
+    return CountChangedLinesInPatch(patch);
   }
 
   /// <summary>
@@ -160,6 +156,14 @@ public class GitService
     // Compare index (staged) to HEAD
     var patch = repo.Diff.Compare<Patch>(repo.Head.Tip?.Tree, DiffTargets.Index, new[] { normalizedPath });
 
+    return CountChangedLinesInPatch(patch);
+  }
+
+  /// <summary>
+  /// Count changed lines in a patch by looking for lines starting with + or -.
+  /// </summary>
+  private static int CountChangedLinesInPatch(Patch patch)
+  {
     var changedLines = 0;
     foreach (var change in patch)
     {
