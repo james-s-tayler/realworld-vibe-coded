@@ -320,6 +320,13 @@ git commit -m "Add phase details"
 echo "✅ PASSED: Phase details modified and committed"
 echo ""
 
+# Simulate PR merge: merge phase-planning back to master to reset merge-base
+echo "[TEST 19b] Simulating PR merge: merging phase-planning to master..."
+git checkout master
+git merge --no-ff phase-planning -m "Merge planning phase"
+echo "✅ PASSED: Planning phase merged to master"
+echo ""
+
 # Test 20: Advance to phase 1 implementation
 echo "[TEST 20] Advancing to phase 1 implementation..."
 git checkout -b phase-1-implementation
@@ -332,9 +339,17 @@ fi
 echo "✅ PASSED: Advanced to phase 1 implementation"
 echo ""
 
-# Test 21: Mark phase 1 complete and advance to phase 2
-echo "[TEST 21] Marking phase 1 complete and advancing to phase 2..."
-git commit --allow-empty -m "Complete phase 1"
+# Test 21: Mark phase 1 complete and merge to master
+echo "[TEST 21] Marking phase 1 complete and merging to master..."
+git add .
+git commit -m "Complete phase 1"
+git checkout master
+git merge --no-ff phase-1-implementation -m "Merge phase 1"
+echo "✅ PASSED: Phase 1 completed and merged"
+echo ""
+
+# Test 22: Advance to phase 2 implementation
+echo "[TEST 22] Advancing to phase 2 implementation..."
 git checkout -b phase-2-implementation
 output=$(flowpilot next test-plan 2>&1)
 if [[ ! $output == *"phase_2"* ]] && [[ ! $output == *"Phase 2"* ]]; then
@@ -345,9 +360,17 @@ fi
 echo "✅ PASSED: Advanced to phase 2 implementation"
 echo ""
 
-# Test 22: Complete remaining phases
-echo "[TEST 22] Completing remaining phases..."
-git commit --allow-empty -m "Complete phase 2"
+# Test 23: Mark phase 2 complete and merge to master
+echo "[TEST 23] Marking phase 2 complete and merging to master..."
+git add .
+git commit -m "Complete phase 2"
+git checkout master
+git merge --no-ff phase-2-implementation -m "Merge phase 2"
+echo "✅ PASSED: Phase 2 completed and merged"
+echo ""
+
+# Test 24: Advance to phase 3 implementation
+echo "[TEST 24] Advancing to phase 3 implementation..."
 git checkout -b phase-3-implementation
 output=$(flowpilot next test-plan 2>&1)
 if [[ ! $output == *"phase_3"* ]] && [[ ! $output == *"Phase 3"* ]]; then
@@ -355,12 +378,13 @@ if [[ ! $output == *"phase_3"* ]] && [[ ! $output == *"Phase 3"* ]]; then
     echo "Output: $output"
     exit 1
 fi
-git commit --allow-empty -m "Complete phase 3"
-echo "✅ PASSED: Completed all phases"
+git add .
+git commit -m "Complete phase 3"
+echo "✅ PASSED: Advanced to phase 3 and completed"
 echo ""
 
-# Test 23: Verify plan is complete
-echo "[TEST 23] Verifying plan is complete..."
+# Test 25: Verify plan is complete
+echo "[TEST 25] Verifying plan is complete..."
 output=$(flowpilot next test-plan 2>&1)
 if [[ ! $output == *"complete"* ]] && [[ ! $output == *"finished"* ]]; then
     echo "❌ FAILED: Should indicate plan is complete"
@@ -370,15 +394,16 @@ fi
 echo "✅ PASSED: Plan marked as complete"
 echo ""
 
+
 echo "=========================================="
-echo "✅ ALL TESTS PASSED (23/23)"
+echo "✅ ALL TESTS PASSED (25/25)"
 echo "=========================================="
 echo ""
 echo "Summary:"
 echo "  - Basic commands: init, new, help"
 echo "  - Linting validation"
 echo "  - State transitions through all phases"
-echo "  - Hard boundary enforcement"
+echo "  - Hard boundary enforcement with PR merges"
 echo "  - Template file creation"
 echo "  - Complete plan workflow"
 echo ""
