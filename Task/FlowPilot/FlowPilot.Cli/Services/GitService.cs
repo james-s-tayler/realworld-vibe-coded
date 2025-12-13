@@ -301,22 +301,40 @@ public class GitService
   /// <param name="branchName">The branch name (e.g., "main")</param>
   public void FetchRemoteBranch(string remoteName, string branchName)
   {
-    _logger.LogDebug("FetchRemoteBranch called with remoteName: {RemoteName}, branchName: {BranchName}", remoteName, branchName);
-
-    using var repo = new Repository(_repositoryPath);
-    var remote = repo.Network.Remotes[remoteName];
-
-    if (remote == null)
+    if (string.IsNullOrWhiteSpace(remoteName))
     {
-      _logger.LogWarning("Remote {RemoteName} not found", remoteName);
-      throw new InvalidOperationException($"Remote '{remoteName}' not found");
+      throw new ArgumentException("Remote name cannot be null or empty", nameof(remoteName));
     }
 
-    var refSpec = $"+refs/heads/{branchName}:refs/remotes/{remoteName}/{branchName}";
-    _logger.LogDebug("Fetching with refspec: {RefSpec}", refSpec);
+    if (string.IsNullOrWhiteSpace(branchName))
+    {
+      throw new ArgumentException("Branch name cannot be null or empty", nameof(branchName));
+    }
 
-    LibGit2Sharp.Commands.Fetch(repo, remoteName, new[] { refSpec }, null, null);
-    _logger.LogDebug("Fetch completed successfully");
+    _logger.LogDebug("FetchRemoteBranch called with remoteName: {RemoteName}, branchName: {BranchName}", remoteName, branchName);
+
+    try
+    {
+      using var repo = new Repository(_repositoryPath);
+      var remote = repo.Network.Remotes[remoteName];
+
+      if (remote == null)
+      {
+        _logger.LogWarning("Remote {RemoteName} not found", remoteName);
+        throw new InvalidOperationException($"Remote '{remoteName}' not found");
+      }
+
+      var refSpec = $"+refs/heads/{branchName}:refs/remotes/{remoteName}/{branchName}";
+      _logger.LogDebug("Fetching with refspec: {RefSpec}", refSpec);
+
+      LibGit2Sharp.Commands.Fetch(repo, remoteName, new[] { refSpec }, null, null);
+      _logger.LogDebug("Fetch completed successfully");
+    }
+    catch (Exception ex) when (ex is not ArgumentException and not InvalidOperationException)
+    {
+      _logger.LogWarning(ex, "Failed to fetch {RemoteName}/{BranchName}", remoteName, branchName);
+      throw new InvalidOperationException($"Failed to fetch branch '{branchName}' from remote '{remoteName}': {ex.Message}", ex);
+    }
   }
 
   /// <summary>

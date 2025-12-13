@@ -57,40 +57,43 @@ public class PullRequestMergeBoundary : ILintingRule
       // Try to fetch each base branch directly
       foreach (var baseBranch in baseBranches)
       {
-        // Only try to fetch origin/* branches
+        // Only try to fetch origin/* branches (remote branches)
         if (!baseBranch.StartsWith("origin/", StringComparison.Ordinal))
         {
           continue;
         }
 
-        // Parse remote and branch name
+        // Parse remote and branch name (expecting format "remote/branch")
         var parts = baseBranch.Split('/', 2);
-        if (parts.Length == 2)
+        if (parts.Length != 2)
         {
-          var remoteName = parts[0];
-          var branchName = parts[1];
+          _logger.LogDebug("Unexpected branch format: {BaseBranch}, expected 'remote/branch'", baseBranch);
+          continue;
+        }
 
-          try
-          {
-            _logger.LogDebug("Attempting to fetch {RemoteName}/{BranchName}", remoteName, branchName);
-            _gitService.FetchRemoteBranch(remoteName, branchName);
-            _logger.LogWarning(
-              "Fetched missing base branch {BaseBranch}. " +
-              "Consider updating .github/workflows/copilot-setup-steps.yml to checkout this branch to avoid this fetch in the future.",
-              baseBranch);
+        var remoteName = parts[0];
+        var branchName = parts[1];
 
-            // Try to get merge-base again after fetching
-            mergeBaseSha = _gitService.GetMergeBaseSha(baseBranch);
-            if (mergeBaseSha != null)
-            {
-              foundBaseBranch = baseBranch;
-              break;
-            }
-          }
-          catch (Exception ex)
+        try
+        {
+          _logger.LogDebug("Attempting to fetch {RemoteName}/{BranchName}", remoteName, branchName);
+          _gitService.FetchRemoteBranch(remoteName, branchName);
+          _logger.LogWarning(
+            "Fetched missing base branch {BaseBranch}. " +
+            "Consider updating .github/workflows/copilot-setup-steps.yml to checkout this branch to avoid this fetch in the future.",
+            baseBranch);
+
+          // Try to get merge-base again after fetching
+          mergeBaseSha = _gitService.GetMergeBaseSha(baseBranch);
+          if (mergeBaseSha != null)
           {
-            _logger.LogDebug(ex, "Failed to fetch branch {BaseBranch}", baseBranch);
+            foundBaseBranch = baseBranch;
+            break;
           }
+        }
+        catch (Exception ex)
+        {
+          _logger.LogDebug(ex, "Failed to fetch branch {BaseBranch}", baseBranch);
         }
       }
 
