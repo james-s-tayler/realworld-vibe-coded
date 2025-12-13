@@ -274,14 +274,14 @@ git commit -m "Add phase analysis"
 echo "✅ PASSED: Phase-analysis.md modified and committed"
 echo ""
 
-# Test 17b: Merge phase-analysis to master before advancing to phase-details
-echo "[TEST 17b] Merging phase-analysis to master..."
+# Test 17b: Merge phase-planning (with phase-analysis) to master before advancing to phase-details
+echo "[TEST 17b] Merging phase-planning to master..."
 git checkout master
 git merge --no-ff phase-planning -m "Merge phase analysis"
-echo "DEBUG: state.md on master after merging phase-analysis:"
+echo "DEBUG: state.md on master after merging phase-planning:"
 cat .flowpilot/plans/test-plan/meta/state.md
 echo ""
-echo "✅ PASSED: Phase-analysis merged to master"
+echo "✅ PASSED: Phase-planning merged to master"
 echo ""
 
 # Test 18: Create new branch and advance to phase-details phase
