@@ -53,20 +53,20 @@ public class PullRequestMergeBoundary : ILintingRule
     // Get current HEAD SHA using GitService
     var headSha = _gitService.GetHeadSha();
 
-    // Count changes between merge-base and HEAD (committed changes on this branch)
-    var committedChanges = _gitService.CountChangedLines(relativeStatePath, mergeBaseSha, headSha);
+    // Count changed lines (modified, not added or deleted)
+    // We only care about modifications (checkbox state changes), not additions (new checkboxes)
+    var committedModifications = _gitService.CountModifiedLines(relativeStatePath, mergeBaseSha, headSha);
+    var stagedModifications = _gitService.CountStagedModifiedLines(relativeStatePath);
 
-    // Count changes in staged area (index vs HEAD)
-    var stagedChanges = _gitService.CountStagedChangedLines(relativeStatePath);
+    // Total modifications (checkbox state changes)
+    var totalModifications = committedModifications + stagedModifications;
 
-    // Total changes
-    var totalChanges = committedChanges + stagedChanges;
+    // A single checkbox change results in 2 line modifications: one deletion ([ ]) and one addition ([x])
+    // So we allow at most 2 modifications (1 checkbox state change)
+    // Note: Adding new checkboxes (new lines) doesn't count toward this limit
+    const int maxAllowedModifications = 2;
 
-    // A single checkbox change results in 2 line changes: one deletion ([ ]) and one addition ([x])
-    // So we allow at most 2 total changes
-    const int maxAllowedChanges = 2;
-
-    if (totalChanges > maxAllowedChanges)
+    if (totalModifications > maxAllowedModifications)
     {
       context.LintingErrors.Add(
         "Unable to proceed to the next phase. You have reached a pull request merge boundary. " +

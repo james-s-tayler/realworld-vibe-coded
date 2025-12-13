@@ -46,9 +46,17 @@ public partial class Build
 
       try
       {
+        // Build without cache first
         ProcessTasks.StartProcess(
           "docker",
-          "compose up --build --abort-on-container-exit --exit-code-from flowpilot-integration-test",
+          "compose build --no-cache",
+          workingDirectory: integrationTestDirectory)
+          .AssertZeroExitCode();
+
+        // Then run the tests
+        ProcessTasks.StartProcess(
+          "docker",
+          "compose up --abort-on-container-exit --exit-code-from flowpilot-integration-test",
           workingDirectory: integrationTestDirectory)
           .AssertZeroExitCode();
 
@@ -65,9 +73,17 @@ public partial class Build
 
       try
       {
+        // Build without cache first
         ProcessTasks.StartProcess(
           "docker",
-          "compose -f docker-compose-pr-boundary.yml up --build --abort-on-container-exit --exit-code-from flowpilot-pr-boundary-test",
+          "compose -f docker-compose-pr-boundary.yml build --no-cache",
+          workingDirectory: integrationTestDirectory)
+          .AssertZeroExitCode();
+
+        // Then run the tests
+        ProcessTasks.StartProcess(
+          "docker",
+          "compose -f docker-compose-pr-boundary.yml up --abort-on-container-exit --exit-code-from flowpilot-pr-boundary-test",
           workingDirectory: integrationTestDirectory)
           .AssertZeroExitCode();
 
