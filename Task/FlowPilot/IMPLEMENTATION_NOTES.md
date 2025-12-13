@@ -49,6 +49,12 @@ By merging each phase back to master:
 
 ## Test Results
 
+All 43 tests pass successfully:
+- 25 existing integration tests (workflow validation)
+- 18 new PR boundary tests (rule validation with realistic PR content including non-state.md file changes)
+
+The tests validate the linting rule correctly enforces one state.md transition per branch while ignoring other file changes.
+
 All 25 tests now pass successfully:
 ```
 ✅ ALL TESTS PASSED (25/25)
