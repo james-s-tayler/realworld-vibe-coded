@@ -44,9 +44,13 @@ fail_count=0
 test_count=$((test_count + 1))
 echo "[TEST $test_count] Planning_Pass_CommittedOnly..."
 git checkout -b test-1
+# Add other file changes to simulate real PR
+echo "Additional implementation notes" >> .flowpilot/plans/test-plan/meta/goal.md
+mkdir -p src
+echo "// Implementation code" > src/implementation.js
 sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
-git add .flowpilot/plans/test-plan/meta/state.md
-git commit -m "Advance state checkbox"
+git add .
+git commit -m "Advance state checkbox with implementation changes"
 if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
   echo "❌ FAILED: Should pass with single committed change"
   fail_count=$((fail_count + 1))
@@ -62,6 +66,12 @@ echo ""
 test_count=$((test_count + 1))
 echo "[TEST $test_count] Planning_Pass_StagedOnly..."
 git checkout -b test-2
+# Add other file changes to simulate real PR
+echo "More implementation notes" >> .flowpilot/plans/test-plan/meta/goal.md
+mkdir -p src
+echo "// More code" > src/utils.js
+git add .flowpilot/plans/test-plan/meta/goal.md src/utils.js
+git commit -m "Add implementation files"
 sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
 git add .flowpilot/plans/test-plan/meta/state.md
 if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
@@ -80,6 +90,10 @@ echo ""
 test_count=$((test_count + 1))
 echo "[TEST $test_count] Planning_Pass_CommittedAndStaged..."
 git checkout -b test-3
+# Add other file changes to simulate real PR
+echo "Test documentation" > .flowpilot/plans/test-plan/meta/notes.md
+git add .flowpilot/plans/test-plan/meta/notes.md
+git commit -m "Add notes"
 sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
 git add .flowpilot/plans/test-plan/meta/state.md
 if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
@@ -98,9 +112,11 @@ echo ""
 test_count=$((test_count + 1))
 echo "[TEST $test_count] Planning_Fail_CommittedOnly..."
 git checkout -b test-4
+# Add other file changes to simulate real PR
+echo "Additional context" >> .flowpilot/plans/test-plan/meta/goal.md
 sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
 sed -i 's/- \[ \] \[references\]/- [x] [references]/' .flowpilot/plans/test-plan/meta/state.md
-git add .flowpilot/plans/test-plan/meta/state.md
+git add .
 git commit -m "Advance two checkboxes"
 if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
   echo "✅ PASSED"
@@ -117,6 +133,11 @@ echo ""
 test_count=$((test_count + 1))
 echo "[TEST $test_count] Planning_Fail_StagedOnly..."
 git checkout -b test-5
+# Add other file changes to simulate real PR
+mkdir -p config
+echo "Configuration changes" > config/config.json
+git add config/config.json
+git commit -m "Add config"
 sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
 sed -i 's/- \[ \] \[references\]/- [x] [references]/' .flowpilot/plans/test-plan/meta/state.md
 git add .flowpilot/plans/test-plan/meta/state.md
@@ -136,9 +157,17 @@ echo ""
 test_count=$((test_count + 1))
 echo "[TEST $test_count] Planning_Fail_CommittedAndStaged..."
 git checkout -b test-6
+# Add other file changes to simulate real PR (committed)
+mkdir -p docs
+echo "README update" > docs/README.md
+git add docs/README.md
+git commit -m "Add README"
 sed -i 's/- \[ \] \[state\]/- [x] [state]/' .flowpilot/plans/test-plan/meta/state.md
 git add .flowpilot/plans/test-plan/meta/state.md
 git commit -m "Advance state"
+# Add more file changes (staged)
+echo "Additional docs" > docs/CONTRIBUTING.md
+git add docs/CONTRIBUTING.md
 sed -i 's/- \[ \] \[references\]/- [x] [references]/' .flowpilot/plans/test-plan/meta/state.md
 git add .flowpilot/plans/test-plan/meta/state.md
 if flowpilot lint test-plan 2>&1 | grep -q "pull request merge boundary"; then
@@ -184,6 +213,11 @@ for i in 7 8 9 10 11 12; do
   echo "[TEST $test_count] $name..."
   git checkout -b test-$i
   
+  # Add other file changes to simulate real PR
+  mkdir -p src test
+  echo "Phase implementation code $i" > "src/phase1-feature-$i.js"
+  echo "Test file $i" > "test/test-$i.spec.js"
+  
   if [ "$should_pass" = "true" ]; then
     sed -i 's/- \[ \] \[phase_1\]/- [x] [phase_1]/' .flowpilot/plans/test-plan/meta/state.md
   else
@@ -192,17 +226,20 @@ for i in 7 8 9 10 11 12; do
   fi
   
   if [ "$change_type" = "committed" ]; then
-    git add .flowpilot/plans/test-plan/meta/state.md
+    git add .
     git commit -m "Changes"
   elif [ "$change_type" = "staged" ]; then
+    git add "src/phase1-feature-$i.js" "test/test-$i.spec.js"
+    git commit -m "Add implementation files"
     git add .flowpilot/plans/test-plan/meta/state.md
   else
     sed -i 's/- \[ \] \[phase_1\]/- [x] [phase_1]/' .flowpilot/plans/test-plan/meta/state.md
-    git add .flowpilot/plans/test-plan/meta/state.md
+    git add .
     git commit -m "First change"
     if [ "$should_pass" = "false" ]; then
+      echo "More changes $i" >> "src/phase1-feature-$i.js"
       sed -i 's/- \[ \] \[phase_2\]/- [x] [phase_2]/' .flowpilot/plans/test-plan/meta/state.md
-      git add .flowpilot/plans/test-plan/meta/state.md
+      git add .
     fi
   fi
   
@@ -261,6 +298,12 @@ for i in 13 14 15 16 17 18; do
   echo "[TEST $test_count] $name..."
   git checkout -b test-$i
   
+  # Add other file changes to simulate real PR
+  mkdir -p src test docs
+  echo "Phase 2 implementation code $i" > "src/phase2-feature-$i.js"
+  echo "Integration test $i" > "test/integration-$i.spec.js"
+  echo "Documentation for feature $i" > "docs/feature-$i.md"
+  
   if [ "$should_pass" = "true" ]; then
     sed -i 's/- \[ \] \[phase_2\]/- [x] [phase_2]/' .flowpilot/plans/test-plan/meta/state.md
   else
@@ -269,17 +312,20 @@ for i in 13 14 15 16 17 18; do
   fi
   
   if [ "$change_type" = "committed" ]; then
-    git add .flowpilot/plans/test-plan/meta/state.md
+    git add .
     git commit -m "Changes"
   elif [ "$change_type" = "staged" ]; then
+    git add "src/phase2-feature-$i.js" "test/integration-$i.spec.js" "docs/feature-$i.md"
+    git commit -m "Add implementation files"
     git add .flowpilot/plans/test-plan/meta/state.md
   else
     sed -i 's/- \[ \] \[phase_2\]/- [x] [phase_2]/' .flowpilot/plans/test-plan/meta/state.md
-    git add .flowpilot/plans/test-plan/meta/state.md
+    git add .
     git commit -m "First change"
     if [ "$should_pass" = "false" ]; then
+      echo "Additional changes $i" >> "src/phase2-feature-$i.js"
       sed -i 's/- \[ \] \[phase_3\]/- [x] [phase_3]/' .flowpilot/plans/test-plan/meta/state.md
-      git add .flowpilot/plans/test-plan/meta/state.md
+      git add .
     fi
   fi
   
