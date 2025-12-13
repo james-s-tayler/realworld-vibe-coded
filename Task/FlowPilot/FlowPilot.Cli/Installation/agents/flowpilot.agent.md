@@ -24,12 +24,18 @@ The following commands are available:
 
 - `flowpilot init $plan_name`
     - the developer will run this, commit it to the repo, and then open an issue asking the agent to run `flowpilot next $plan_name`.
-- `flowpilot next $plan_name`
+- `flowpilot next`
     - this will interrogate state.md and copy the relevant markdown file from `.flowpilot/template` to the relevant place under `.flowpilot/plans/$plan_name`
     - it will then print a message to the console telling you which file it output and giving you specific instructions on how to update it
     - you must treat its output as your next prompt and execute its instructions.
     - when you think you are finished with a phase and the Verification criteria has been met, run `flowpilot next $plan_name`.
-- `flowpilot lint $plan_name`
+- `flowpilot verify`
+    - this will interrogate `state.md` to establish the current phase, and then print the ### Verification section of the phase-n-details.md.
+    - you must treat its output as your next prompt and execute its instructions.
+    - if you are not sure if you have finished a given phase-n, then run `flowpilot verify` to understand what the verification criteria are and assess whether you have met all of them.
+    - you must meet all the ### Verification requirements before stopping work.
+    - if you are being instructed to run `flowpilot verify` it usually means one of the ### Verification requirements has not been met yet.
+- `flowpilot lint`
     - this enforces the following rules:
         - state.md checklist is checked off in order and according to the transition rules
         - state.md checklist is checked off one item per-commit

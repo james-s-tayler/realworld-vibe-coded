@@ -166,7 +166,7 @@ public class PlanManager
             {
               PhaseNumber = item.PhaseNumber.Value,
               PhaseName = item.Description,
-              IsComplete = item.IsChecked,
+              IsChecked = item.IsChecked,
             });
           }
 

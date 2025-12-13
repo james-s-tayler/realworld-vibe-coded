@@ -9,5 +9,5 @@ public class PhaseState
 
   public string PhaseName { get; set; } = string.Empty;
 
-  public bool IsComplete { get; set; }
+  public bool IsChecked { get; set; }
 }
