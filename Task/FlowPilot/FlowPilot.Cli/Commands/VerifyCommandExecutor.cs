@@ -55,8 +55,7 @@ public class VerifyCommandExecutor : ICommand
       return Task.FromResult(1);
     }
 
-    // Find the current phase (first incomplete phase or last phase if all complete)
-    var currentPhase = state.Phases.FirstOrDefault(p => !p.IsComplete);
+    var currentPhase = state.Phases.LastOrDefault(p => p.IsChecked);
 
     // If all phases are complete, check the last phase
     if (currentPhase == null && state.Phases.Any())

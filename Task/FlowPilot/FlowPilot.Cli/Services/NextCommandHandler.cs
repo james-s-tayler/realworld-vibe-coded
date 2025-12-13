@@ -167,7 +167,7 @@ public class NextCommandHandler
       _logger.LogDebug("No applicable state transition found");
 
       // Check if plan is complete
-      if (state.Phases.Any() && state.Phases.All(p => p.IsComplete))
+      if (state.Phases.Any() && state.Phases.All(p => p.IsChecked))
       {
         _logger.LogInformation("✓ Plan '{PlanName}' is complete!", planName);
         _logger.LogInformation("All phases have been finished.");

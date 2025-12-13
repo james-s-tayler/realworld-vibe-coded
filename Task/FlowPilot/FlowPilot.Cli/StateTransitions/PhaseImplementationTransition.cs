@@ -26,7 +26,7 @@ public class PhaseImplementationTransition : IStateTransition
   public void Execute(PlanContext context)
   {
     // Find the next uncompleted phase
-    var nextPhase = context.State.Phases.FirstOrDefault(p => !p.IsComplete);
+    var nextPhase = context.State.Phases.FirstOrDefault(p => !p.IsChecked);
 
     if (nextPhase == null)
     {
