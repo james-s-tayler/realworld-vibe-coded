@@ -11,10 +11,18 @@ public class Program
 {
   public static async Task<int> Main(string[] args)
   {
+    // Check for --verbose flag
+    var isVerbose = args.Contains("--verbose");
+
+    // Remove --verbose from args if present so it doesn't interfere with command parsing
+    var filteredArgs = args.Where(arg => arg != "--verbose").ToArray();
+
     // Configure Serilog with both console and file sinks
     var logFilePath = Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? "/tmp", "flowpilot.log");
+    var logLevel = isVerbose ? Serilog.Events.LogEventLevel.Debug : Serilog.Events.LogEventLevel.Information;
+
     Log.Logger = new LoggerConfiguration()
-      .MinimumLevel.Debug()
+      .MinimumLevel.Is(logLevel)
       .WriteTo.Console()
       .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 3)
       .CreateLogger();
@@ -39,8 +47,8 @@ public class Program
       var serviceProvider = services.BuildServiceProvider();
 
       // Default to help command if no arguments provided
-      var commandName = args.Length == 0 ? "help" : args[0];
-      var commandArgs = args.Skip(1).ToArray();
+      var commandName = filteredArgs.Length == 0 ? "help" : filteredArgs[0];
+      var commandArgs = filteredArgs.Skip(1).ToArray();
 
       // Resolve command from keyed service
       var command = serviceProvider.GetKeyedService<ICommand>(commandName);

@@ -1,5 +1,6 @@
 ﻿using FlowPilot.Cli.Models;
 using FlowPilot.Cli.Services;
+using Microsoft.Extensions.Logging;
 
 namespace FlowPilot.Cli.Linting;
 
@@ -12,11 +13,13 @@ public class PullRequestMergeBoundary : ILintingRule
 {
   private readonly GitService _gitService;
   private readonly IFileSystemService _fileSystem;
+  private readonly ILogger<PullRequestMergeBoundary> _logger;
 
-  public PullRequestMergeBoundary(GitService gitService, IFileSystemService fileSystem)
+  public PullRequestMergeBoundary(GitService gitService, IFileSystemService fileSystem, ILogger<PullRequestMergeBoundary> logger)
   {
     _gitService = gitService;
     _fileSystem = fileSystem;
+    _logger = logger;
   }
 
   public Task ExecuteAsync(PlanContext context)
@@ -27,6 +30,8 @@ public class PullRequestMergeBoundary : ILintingRule
     // Try to find merge-base with common base branches
     var baseBranches = new[] { "origin/main", "origin/master", "main", "master" };
     string? mergeBaseSha = null;
+    string? foundBaseBranch = null;
+    const int ExpectedBranchParts = 2; // remote/branch format
 
     foreach (var baseBranch in baseBranches)
     {
@@ -35,6 +40,7 @@ public class PullRequestMergeBoundary : ILintingRule
         mergeBaseSha = _gitService.GetMergeBaseSha(baseBranch);
         if (mergeBaseSha != null)
         {
+          foundBaseBranch = baseBranch;
           break;
         }
       }
@@ -44,10 +50,68 @@ public class PullRequestMergeBoundary : ILintingRule
       }
     }
 
-    // If we can't find a merge-base, skip this rule (e.g., first commit, or detached HEAD)
+    // If we can't find a merge-base, try to fetch the missing branch
     if (mergeBaseSha == null)
     {
-      return Task.CompletedTask;
+      _logger.LogDebug("No merge-base found with any of the standard branches, attempting to fetch");
+
+      // Try to fetch each base branch directly
+      foreach (var baseBranch in baseBranches)
+      {
+        // Only try to fetch origin/* branches (remote branches)
+        if (!baseBranch.StartsWith("origin/", StringComparison.Ordinal))
+        {
+          continue;
+        }
+
+        // Parse remote and branch name (expecting format "remote/branch")
+        var parts = baseBranch.Split('/');
+        if (parts.Length != ExpectedBranchParts)
+        {
+          _logger.LogDebug("Unexpected branch format: {BaseBranch}, expected 'remote/branch'", baseBranch);
+          continue;
+        }
+
+        var remoteName = parts[0];
+        var branchName = parts[1];
+
+        try
+        {
+          _logger.LogDebug("Attempting to fetch {RemoteName}/{BranchName}", remoteName, branchName);
+          _gitService.FetchRemoteBranch(remoteName, branchName);
+          _logger.LogWarning(
+            "Fetched missing base branch {BaseBranch}. " +
+            "Consider updating .github/workflows/copilot-setup-steps.yml to checkout this branch to avoid this fetch in the future.",
+            baseBranch);
+
+          // Try to get merge-base again after fetching
+          mergeBaseSha = _gitService.GetMergeBaseSha(baseBranch);
+          if (mergeBaseSha != null)
+          {
+            foundBaseBranch = baseBranch;
+            break;
+          }
+        }
+        catch (Exception ex)
+        {
+          _logger.LogError(ex, "Failed to fetch branch {BaseBranch}", baseBranch);
+          context.LintingErrors.Add(
+            $"Failed to fetch base branch {baseBranch}. " +
+            "Ensure .github/workflows/copilot-setup-steps.yml checks out the base branch, " +
+            "or verify network connectivity and repository permissions.");
+          return Task.CompletedTask;
+        }
+      }
+
+      // If still no merge-base found, this is a critical error
+      if (mergeBaseSha == null)
+      {
+        _logger.LogError("Unable to find merge-base even after attempting fetch");
+        context.LintingErrors.Add(
+          "Unable to find merge-base with any standard base branches (origin/main, origin/master, main, master). " +
+          "Ensure .github/workflows/copilot-setup-steps.yml checks out a base branch.");
+        return Task.CompletedTask;
+      }
     }
 
     // Get current HEAD SHA using GitService
