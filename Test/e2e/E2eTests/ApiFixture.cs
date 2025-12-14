@@ -23,7 +23,15 @@ public class ApiFixture : IAsyncLifetime
     {
       PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
-    _httpClient = new HttpClient
+
+    // Configure HttpClientHandler to accept self-signed certificates in test environments
+    var handler = new HttpClientHandler();
+    // WARNING: Disables all SSL/TLS certificate validation for E2E tests.
+    // This is safe ONLY in isolated test environments (e.g., E2E tests with self-signed dev certificates in Docker containers).
+    // NEVER use this pattern in production code, as it allows any certificate (including expired, self-signed, or malicious).
+    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+
+    _httpClient = new HttpClient(handler)
     {
       BaseAddress = new Uri(_baseUrl),
     };

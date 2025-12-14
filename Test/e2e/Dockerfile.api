@@ -1,21 +1,21 @@
-# Use the official .NET 9 runtime image
+# Stage 1: Generate HTTPS certificate
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS cert-generator
+ARG CERT_PASSWORD=DevPassword123!
+RUN mkdir -p /https && dotnet dev-certs https -ep /https/aspnetapp.pfx -p "$CERT_PASSWORD"
+
+# Stage 2: Runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 
 WORKDIR /app
 
-# Set environment variables to force HTTP only
-ENV ASPNETCORE_ENVIRONMENT=Development
-ENV ASPNETCORE_URLS=http://+:5000
-ENV ASPNETCORE_HTTPS_PORT=
+# Copy the published application
+COPY publish/ ./
+
+# Copy the HTTPS certificate from the cert-generator stage
+COPY --from=cert-generator /https/aspnetapp.pfx /https/aspnetapp.pfx
 
 # Install curl for health checks
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-# Expose port
-EXPOSE 5000
-
-# Copy the published application
-COPY publish/ ./
 
 # Run the published application
 ENTRYPOINT ["./Server.Web"]

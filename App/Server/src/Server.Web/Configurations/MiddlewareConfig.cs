@@ -1,5 +1,6 @@
 ﻿using Ardalis.ListStartupServices;
 using Microsoft.EntityFrameworkCore;
+using Server.Core.IdentityAggregate;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
 
@@ -58,6 +59,8 @@ public static class MiddlewareConfig
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
     app.UseAuthentication();
     app.UseAuthorization();
+
+    app.MapGroup("/api/identity").MapIdentityApi<ApplicationUser>();
 
     // Map health check endpoints
     // /health/live - Liveness probe (always returns healthy if app is running)
