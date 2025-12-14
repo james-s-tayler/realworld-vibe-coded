@@ -735,61 +735,7 @@
           "response": []
         },
         {
-          "name": "Current User - error - unauthenticated, missing authorization header",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Response is HTTP 401', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  "// Clear all cookies for the current domain to ensure unauthenticated request",
-                  "const jar = pm.cookies.jar();",
-                  "jar.clear(pm.request.url.toString(), function(error) {",
-                  "    if (error) {",
-                  "        console.log('Error clearing cookies:', error);",
-                  "    }",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              }
-            ],
-            "url": {
-              "raw": "{{APIURL}}/user",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "user"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Current User - error - unauthenticated, invalid token",
+          "name": "Current User - error - unauthenticated (no cookie)",
           "event": [
             {
               "listen": "test",
