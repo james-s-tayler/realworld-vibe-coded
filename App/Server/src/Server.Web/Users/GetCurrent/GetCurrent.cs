@@ -15,7 +15,7 @@ public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint
   public override void Configure()
   {
     Get("/api/user");
-    AuthSchemes("Token");
+    AuthSchemes("Token", Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
     Summary(s =>
     {
       s.Summary = "Get current user";

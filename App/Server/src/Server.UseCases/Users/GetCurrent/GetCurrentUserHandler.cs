@@ -1,20 +1,21 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Server.Core.IdentityAggregate;
 using Server.Core.UserAggregate;
 using Server.SharedKernel.MediatR;
-using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Users.GetCurrent;
 
 public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
 {
-  private readonly IRepository<User> _repository;
+  private readonly UserManager<ApplicationUser> _userManager;
   private readonly ILogger<GetCurrentUserHandler> _logger;
 
   public GetCurrentUserHandler(
-    IRepository<User> repository,
+    UserManager<ApplicationUser> userManager,
     ILogger<GetCurrentUserHandler> logger)
   {
-    _repository = repository;
+    _userManager = userManager;
     _logger = logger;
   }
 
@@ -22,16 +23,34 @@ public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
   {
     _logger.LogInformation("Getting current user for ID {UserId}", request.UserId);
 
-    var user = await _repository.GetByIdAsync(request.UserId, cancellationToken);
+    // Look up ApplicationUser by ID
+    var appUser = await _userManager.FindByIdAsync(request.UserId.ToString());
 
-    if (user == null)
+    if (appUser == null)
     {
       _logger.LogWarning("User with ID {UserId} not found", request.UserId);
       return Result<User>.NotFound();
     }
 
-    _logger.LogInformation("Retrieved current user {Username}", user.Username);
+    _logger.LogInformation("Retrieved current user {Username}", appUser.UserName);
 
-    return Result<User>.Success(user);
+    // Map ApplicationUser to legacy User for backward compatibility
+    var legacyUser = MapToLegacyUser(appUser);
+    return Result<User>.Success(legacyUser);
+  }
+
+  private static User MapToLegacyUser(ApplicationUser appUser)
+  {
+    // Create a User entity with a dummy hashed password since we're using Identity now
+    // This is for backward compatibility with code that expects a User entity
+    var user = new User(appUser.Email!, appUser.UserName!, "identity-managed");
+
+    // Set the ID to match the ApplicationUser ID
+    typeof(User).GetProperty("Id")!.SetValue(user, appUser.Id);
+
+    user.UpdateBio(appUser.Bio);
+    user.UpdateImage(appUser.Image);
+
+    return user;
   }
 }

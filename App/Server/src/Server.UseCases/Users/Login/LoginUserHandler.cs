@@ -1,25 +1,24 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Server.Core.IdentityAggregate;
 using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
 using Server.SharedKernel.MediatR;
-using Server.SharedKernel.Persistence;
-using Server.UseCases.Interfaces;
 
 namespace Server.UseCases.Users.Login;
 
 public class LoginUserHandler : IQueryHandler<LoginUserQuery, User>
 {
-  private readonly IRepository<User> _repository;
-  private readonly IPasswordHasher _passwordHasher;
+  private readonly UserManager<ApplicationUser> _userManager;
+  private readonly SignInManager<ApplicationUser> _signInManager;
   private readonly ILogger<LoginUserHandler> _logger;
 
   public LoginUserHandler(
-    IRepository<User> repository,
-    IPasswordHasher passwordHasher,
+    UserManager<ApplicationUser> userManager,
+    SignInManager<ApplicationUser> signInManager,
     ILogger<LoginUserHandler> logger)
   {
-    _repository = repository;
-    _passwordHasher = passwordHasher;
+    _userManager = userManager;
+    _signInManager = signInManager;
     _logger = logger;
   }
 
@@ -28,8 +27,7 @@ public class LoginUserHandler : IQueryHandler<LoginUserQuery, User>
     _logger.LogInformation("Handling user login for {Email}", request.Email);
 
     // Find user by email
-    var user = await _repository
-      .FirstOrDefaultAsync(new UserByEmailSpec(request.Email), cancellationToken);
+    var user = await _userManager.FindByEmailAsync(request.Email);
 
     if (user == null)
     {
@@ -41,8 +39,10 @@ public class LoginUserHandler : IQueryHandler<LoginUserQuery, User>
       });
     }
 
-    // Verify password
-    if (!_passwordHasher.VerifyPassword(request.Password, user.HashedPassword))
+    // Verify password using SignInManager
+    var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
+
+    if (!result.Succeeded)
     {
       _logger.LogWarning("Login failed: Invalid password for user {Email}", request.Email);
       return Result<User>.Unauthorized(new ErrorDetail
@@ -52,8 +52,25 @@ public class LoginUserHandler : IQueryHandler<LoginUserQuery, User>
       });
     }
 
-    _logger.LogInformation("User {Username} logged in successfully", user.Username);
+    _logger.LogInformation("User {Username} logged in successfully", user.UserName);
 
-    return Result<User>.Success(user);
+    // Map ApplicationUser to legacy User for backward compatibility
+    var legacyUser = MapToLegacyUser(user);
+    return Result<User>.Success(legacyUser);
+  }
+
+  private static User MapToLegacyUser(ApplicationUser appUser)
+  {
+    // Create a User entity with a dummy hashed password since we're using Identity now
+    // This is for backward compatibility with code that expects a User entity
+    var user = new User(appUser.Email!, appUser.UserName!, "identity-managed");
+
+    // Set the ID to match the ApplicationUser ID
+    typeof(User).GetProperty("Id")!.SetValue(user, appUser.Id);
+
+    user.UpdateBio(appUser.Bio);
+    user.UpdateImage(appUser.Image);
+
+    return user;
   }
 }

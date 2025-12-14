@@ -1,25 +1,24 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Server.Core.IdentityAggregate;
 using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
 using Server.SharedKernel.MediatR;
-using Server.SharedKernel.Persistence;
-using Server.UseCases.Interfaces;
 
 namespace Server.UseCases.Users.Register;
 
+// PV014: This handler uses ASP.NET Identity's UserManager instead of the repository pattern.
+// UserManager.CreateAsync performs the database mutation internally.
+#pragma warning disable PV014
 public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
 {
-  private readonly IRepository<User> _repository;
-  private readonly IPasswordHasher _passwordHasher;
+  private readonly UserManager<ApplicationUser> _userManager;
   private readonly ILogger<RegisterUserHandler> _logger;
 
   public RegisterUserHandler(
-    IRepository<User> repository,
-    IPasswordHasher passwordHasher,
+    UserManager<ApplicationUser> userManager,
     ILogger<RegisterUserHandler> logger)
   {
-    _repository = repository;
-    _passwordHasher = passwordHasher;
+    _userManager = userManager;
     _logger = logger;
   }
 
@@ -27,10 +26,8 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
   {
     _logger.LogInformation("Handling user registration for {Email}", request.Email);
 
-    // Check if user already exists by email or username
-    var existingUserByEmail = await _repository
-      .FirstOrDefaultAsync(new UserByEmailSpec(request.Email), cancellationToken);
-
+    // Check if user already exists by email
+    var existingUserByEmail = await _userManager.FindByEmailAsync(request.Email);
     if (existingUserByEmail != null)
     {
       _logger.LogWarning("Registration failed: Email {Email} already exists", request.Email);
@@ -41,9 +38,8 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
       });
     }
 
-    var existingUserByUsername = await _repository
-      .FirstOrDefaultAsync(new UserByUsernameSpec(request.Username), cancellationToken);
-
+    // Check if user already exists by username
+    var existingUserByUsername = await _userManager.FindByNameAsync(request.Username);
     if (existingUserByUsername != null)
     {
       _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
@@ -54,17 +50,57 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
       });
     }
 
-    // Hash password and create user
-    var hashedPassword = _passwordHasher.HashPassword(request.Password);
-    var newUser = new User(request.Email, request.Username, hashedPassword);
+    // Create ApplicationUser from request
+    var user = new ApplicationUser
+    {
+      UserName = request.Username,
+      Email = request.Email,
+      Bio = "I work at statefarm",  // Default bio as per existing User entity
+      Image = null,
+    };
 
-    var createdUser = await _repository.AddAsync(newUser, cancellationToken);
+    // Use UserManager to create user with password
+    var result = await _userManager.CreateAsync(user, request.Password);
+
+    if (!result.Succeeded)
+    {
+      _logger.LogWarning("Registration failed for {Email}: {Errors}", request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+
+      // Map IdentityError to response format
+      var errors = result.Errors.Select(e => new ErrorDetail
+      {
+        Identifier = e.Code.ToLowerInvariant().Contains("password") ? "Password" :
+                      e.Code.ToLowerInvariant().Contains("email") ? "Email" :
+                      e.Code.ToLowerInvariant().Contains("username") ? "Username" : "body",
+        ErrorMessage = e.Description,
+      }).ToList();
+
+      return Result<User>.Invalid(errors);
+    }
 
     _logger.LogInformation(
       "User {Username} registered successfully with ID {UserId}",
-      createdUser.Username,
-      createdUser.Id);
+      user.UserName,
+      user.Id);
 
-    return Result<User>.Created(createdUser);
+    // Map ApplicationUser to legacy User for backward compatibility
+    var legacyUser = MapToLegacyUser(user);
+    return Result<User>.Created(legacyUser);
+  }
+
+  private static User MapToLegacyUser(ApplicationUser appUser)
+  {
+    // Create a User entity with a dummy hashed password since we're using Identity now
+    // This is for backward compatibility with code that expects a User entity
+    var user = new User(appUser.Email!, appUser.UserName!, "identity-managed");
+
+    // Set the ID to match the ApplicationUser ID
+    typeof(User).GetProperty("Id")!.SetValue(user, appUser.Id);
+
+    user.UpdateBio(appUser.Bio);
+    user.UpdateImage(appUser.Image);
+
+    return user;
   }
 }
+#pragma warning restore PV014
