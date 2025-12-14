@@ -2,108 +2,271 @@
 
 ### Phase Overview
 
-Update functional integration tests to use Identity endpoints and cookie-based authentication instead of JWT tokens. Tests will call /register and /login endpoints and use HttpClient with cookie support to maintain authentication state across requests. All functional tests should pass with the new authentication system.
+Migrate the existing /api/users/register and /api/users/login endpoints to use ASP.NET Identity's UserManager and SignInManager internally, and enable cookie authentication for all FastEndpoints endpoints. This phase transitions the legacy endpoints to use Identity infrastructure while maintaining their existing API contracts, ensuring backward compatibility while leveraging Identity's robust authentication features.
 
 ### Prerequisites
 
-- Phase 3 completed: Identity API endpoints available via MapIdentityApi
-- Both authentication systems working simultaneously
+- Phase 3 completed: Identity API endpoints available via MapIdentityApi at /api/identity
+- Both authentication systems working independently
 - Manual testing confirms Identity endpoints work correctly
 
 ### Implementation Steps
 
-1. **Update Test Authentication Helper Methods**
-   - Open test fixtures (e.g., `Server.FunctionalTests/UsersFixture.cs`, `ArticlesFixture.cs`)
-   - Update `CreateUserAndLogin` helper methods to use Identity endpoints:
-     - Change registration from `POST /api/users` to `POST /register`
-     - Change login from `POST /api/users/login` to `POST /login`
-     - Update request/response DTOs to match Identity's structure
-     - Remove JWT token extraction from response body
-     - Return user information instead of token
-
-2. **Update HttpClient Creation for Cookie Support**
-   - In test fixtures, update `CreateClient` methods to support cookies:
+1. **Update Register Endpoint to Use UserManager**
+   - Open `Server.Web/Users/Register/RegisterHandler.cs`
+   - Inject `UserManager<ApplicationUser>` into the handler
+   - Replace current user creation logic with UserManager:
      ```csharp
-     protected HttpClient CreateAuthenticatedClient(string email, string password)
+     // Create ApplicationUser from request
+     var user = new ApplicationUser
      {
-         var client = CreateClient(new WebApplicationFactoryClientOptions
-         {
-             AllowAutoRedirect = false,
-             HandleCookies = true  // Enable cookie handling
-         });
-         
-         // Register and login to get authentication cookie
-         var registerResponse = client.PostAsJsonAsync("/register", new 
-         {
-             email = email,
-             password = password
-         }).GetAwaiter().GetResult();
-         
-         // Cookie is automatically stored in client
-         return client;
+         UserName = request.User.Username,
+         Email = request.User.Email,
+         Bio = string.Empty,  // Default empty, can be updated later
+         Image = null
+     };
+     
+     // Use UserManager to create user with password
+     var result = await _userManager.CreateAsync(user, request.User.Password);
+     
+     if (!result.Succeeded)
+     {
+         // Handle validation errors from Identity
+         // Map IdentityError to response format
      }
      ```
+   - Remove legacy User entity creation code
+   - Remove calls to legacy password hasher
+   - Keep JWT token generation for backward compatibility (existing clients expect token in response)
+   - Return same response format (UserResponse with token)
 
-3. **Remove JWT Token Authorization Headers**
-   - Remove code that adds `Authorization: Token <jwt>` headers
-   - Remove JWT token storage in test fixtures
-   - Remove GetCurrentToken() calls from tests
-   - Cookies will be automatically sent with requests
+2. **Update Login Endpoint to Use SignInManager**
+   - Open `Server.Web/Users/Login/LoginHandler.cs`
+   - Inject `SignInManager<ApplicationUser>` and `UserManager<ApplicationUser>`
+   - Replace current authentication logic with SignInManager:
+     ```csharp
+     // Find user by email
+     var user = await _userManager.FindByEmailAsync(request.User.Email);
+     
+     if (user == null)
+     {
+         // Return authentication failed
+     }
+     
+     // Verify password using SignInManager
+     var result = await _signInManager.CheckPasswordSignInAsync(user, request.User.Password, lockoutOnFailure: false);
+     
+     if (!result.Succeeded)
+     {
+         // Return authentication failed
+     }
+     ```
+   - Remove legacy password verification code
+   - Keep JWT token generation for backward compatibility
+   - Return same response format (LoginResponse with token)
 
-4. **Update Users Tests**
-   - Open `Server.FunctionalTests/Users/UsersTests.cs`
-   - Update test methods to use new endpoints:
-     - Registration tests use `/register`
-     - Login tests use `/login`
-     - Get current user tests may need adjustment (Identity's `/manage/info` endpoint)
-     - Update user tests may need adjustment
-   - Update expected request/response formats to match Identity
-   - Verify all user tests pass
+3. **Update GetCurrent Endpoint for Identity Users**
+   - Open `Server.Web/Users/GetCurrent/GetCurrentHandler.cs`
+   - Update `IUserContext` implementation to work with both auth schemes
+   - If user authenticated via cookie (Identity), look up ApplicationUser
+   - If user authenticated via JWT token, continue using existing logic
+   - Map ApplicationUser to UserDto response format
+   - Ensure Bio and Image are retrieved from ApplicationUser
 
-5. **Update Articles Tests Authentication**
-   - Open article test files (e.g., `ArticlesTests.cs`)
-   - Update `ArticlesFixture` to use cookie-based authentication
-   - Update test setup methods to create authenticated clients with cookies
-   - Verify article tests that require authentication still pass
-   - No changes needed to article endpoint tests themselves (only auth setup)
+4. **Update Update User Endpoint for Identity Users**
+   - Open `Server.Web/Users/Update/UpdateHandler.cs`
+   - Inject `UserManager<ApplicationUser>`
+   - Update user information logic to work with ApplicationUser:
+     ```csharp
+     var user = await _userManager.FindByIdAsync(userId);
+     
+     // Update properties
+     user.Email = request.User.Email ?? user.Email;
+     user.UserName = request.User.Username ?? user.UserName;
+     user.Bio = request.User.Bio ?? user.Bio;
+     user.Image = request.User.Image ?? user.Image;
+     
+     // Update password if provided
+     if (!string.IsNullOrEmpty(request.User.Password))
+     {
+         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+         await _userManager.ResetPasswordAsync(user, token, request.User.Password);
+     }
+     
+     var result = await _userManager.UpdateAsync(user);
+     ```
+   - Remove legacy User entity update code
 
-6. **Update Other Test Fixtures**
-   - Update any other test fixtures that create authenticated clients:
-     - Comments tests
-     - Profiles tests (follow/unfollow)
-     - Tags tests (if any require auth)
-   - Follow same pattern: use cookie-based clients instead of JWT tokens
+5. **Enable Cookie Authentication for FastEndpoints**
+   - Open `Server.Web/Configurations/AuthConfig.cs` (or wherever auth is configured)
+   - Update FastEndpoints configuration to accept both authentication schemes:
+     - Default scheme: Cookie (for Identity)
+     - Additional scheme: "Token" (for JWT)
+   - Update all FastEndpoints endpoints to accept both schemes:
+     ```csharp
+     AuthSchemes("Token", CookieAuthenticationDefaults.AuthenticationScheme)
+     ```
+   - This allows endpoints to work with either JWT tokens or cookies
+   - Verify IUserContext implementation can extract user from both auth types
 
-7. **Handle Bio and Image in Registration**
-   - Identity's /register endpoint doesn't support custom fields like Bio and Image
-   - For tests that need these, make a second request after registration to update profile
-   - Or create a custom registration helper that calls /register then updates profile
+6. **Update IUserContext Implementation**
+   - Open `Server.Infrastructure/Identity/UserContext.cs` (or similar)
+   - Update to work with both ApplicationUser and legacy User
+   - Check authentication scheme to determine which user store to query
+   - For cookie auth: query ApplicationUser by ClaimsPrincipal user ID
+   - For JWT auth: continue using existing logic
+   - Ensure consistent user information is returned regardless of auth method
 
-8. **Run and Fix Failing Tests**
-   - Run `./build.sh TestServer` to execute all functional tests
-   - Fix any failing tests by adjusting request/response formats
-   - Common issues to watch for:
-     - Different error response formats
-     - Different validation messages
-     - Different HTTP status codes
-     - Cookie handling issues
+7. **Create Functional Tests for Cross-Authentication (Legacy Endpoint -> Identity Login)**
+   - Create `Server.FunctionalTests/Users/CrossAuthenticationTests.cs` test class
+   - Test: Register via `/api/users/register`, then login via `/api/identity/login`:
+     ```csharp
+     // Register via legacy endpoint (which now uses UserManager internally)
+     var registerRequest = new RegisterRequest
+     {
+         User = new UserData
+         {
+             Email = "test@example.com",
+             Username = "testuser",
+             Password = "TestPass123"
+         }
+     };
+     var (regResponse, regResult) = await client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+     
+     // Login via Identity endpoint (raw HttpClient)
+     // SRV007: Using raw HttpClient.PostAsJsonAsync is necessary to test ASP.NET Identity
+     // endpoints which are not FastEndpoints. ASP.NET Identity endpoints are mapped via
+     // MapIdentityApi and have different request/response structures. FastEndpoints testing
+     // extensions (POSTAsync, GETAsync) only work with FastEndpoints-based endpoints.
+     #pragma warning disable SRV007
+     var identityLoginResponse = await client.PostAsJsonAsync("/api/identity/login", new
+     {
+         email = "test@example.com",
+         password = "TestPass123"
+     });
+     #pragma warning restore SRV007
+     
+     // Verify login succeeded and cookie is set
+     identityLoginResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+     var cookies = identityLoginResponse.Headers.GetValues("Set-Cookie");
+     cookies.ShouldNotBeEmpty();
+     ```
+   - Test: Register via `/api/users/register`, call `/api/user` with Token auth:
+     ```csharp
+     // Use FastEndpoints POSTAsync for legacy registration
+     var (regResponse, regResult) = await client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request);
+     
+     // Extract token and set Authorization header
+     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", regResult.User.Token);
+     
+     // Call /api/user
+     var (userResponse, userResult) = await client.GETAsync<GetCurrent, GetCurrentResponse>();
+     
+     // Verify user data is retrieved correctly
+     userResult.User.Email.ShouldBe(request.User.Email);
+     userResult.User.Username.ShouldBe(request.User.Username);
+     ```
 
-9. **Verify Test Coverage**
-   - Ensure all test scenarios from old system are covered:
-     - Registration with valid/invalid data
-     - Login with correct/incorrect credentials
-     - Authenticated operations work with cookies
-     - Unauthenticated operations return 401
-     - Invalid tokens/cookies return appropriate errors
+8. **Create Functional Tests for Cross-Authentication (Identity Endpoint -> Legacy Login)**
+   - In `CrossAuthenticationTests.cs`, add tests for opposite direction
+   - Test: Register via `/api/identity/register`, then login via `/api/users/login`:
+     ```csharp
+     // Register with Identity (raw HttpClient)
+     #pragma warning disable SRV007
+     var identityRegResponse = await client.PostAsJsonAsync("/api/identity/register", new
+     {
+         email = "test@example.com",
+         password = "TestPass123"
+     });
+     #pragma warning restore SRV007
+     identityRegResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+     
+     // Login via legacy endpoint (FastEndpoints)
+     var loginRequest = new LoginRequest
+     {
+         User = new LoginUserData
+         {
+             Email = "test@example.com",
+             Password = "TestPass123"
+         }
+     };
+     var (loginResponse, loginResult) = await client.POSTAsync<Login, LoginRequest, LoginResponse>(loginRequest);
+     
+     // Verify login succeeded and JWT token is returned
+     loginResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+     loginResult.User.Token.ShouldNotBeNullOrEmpty();
+     ```
+   - Test: Register via `/api/identity/register`, call `/api/user` with cookie auth:
+     ```csharp
+     // Register with Identity (sets cookie automatically)
+     #pragma warning disable SRV007
+     var identityRegResponse = await client.PostAsJsonAsync("/api/identity/register", new
+     {
+         email = "test@example.com",
+         password = "TestPass123"
+     });
+     #pragma warning restore SRV007
+     
+     // Cookie is automatically sent with subsequent requests
+     var (userResponse, userResult) = await client.GETAsync<GetCurrent, GetCurrentResponse>();
+     
+     // Verify user data is retrieved correctly via cookie auth
+     userResult.User.Email.ShouldBe("test@example.com");
+     ```
+
+9. **Update Test Fixtures for Cookie Support**
+   - Update `UsersFixture.cs` and other test fixtures:
+     ```csharp
+     protected HttpClient CreateClientWithCookieSupport()
+     {
+         return CreateClient(new WebApplicationFactoryClientOptions
+         {
+             AllowAutoRedirect = false,
+             HandleCookies = true
+         });
+     }
+     ```
+   - Add helper methods for both auth types:
+     - `CreateClientWithJwtAuth(string email, string password)` - returns client with JWT token
+     - `CreateClientWithCookieAuth(string email, string password)` - returns client with cookie
+
+10. **Remove Legacy User Entity and Related Code**
+    - After all endpoints are migrated to use ApplicationUser:
+      - Remove legacy User entity from `Server.Core/UserAggregate/User.cs`
+      - Remove legacy password hasher interfaces and implementations
+      - Remove any User-related specifications that query the old Users table
+      - Remove legacy authentication services that are no longer used
+    - Update EF Core DbContext:
+      - Remove `DbSet<User> Users` from AppDbContext
+      - Remove User entity configuration
+    - Create and apply EF Core migration to drop the Users table
+    - Note: This step removes the legacy dual-table setup
+
+11. **Run and Fix Tests**
+    - Run `./build.sh TestServer` to execute all functional tests
+    - Fix any issues with:
+      - Endpoint response formats
+      - Authentication flows
+      - Cookie handling in tests
+      - Database queries expecting legacy User entity
+    - Ensure no regressions in existing tests
+
+12. **Verify Dual Authentication Works**
+    - Manually test the complete flows:
+      - Register via /api/users -> login via /api/identity
+      - Register via /api/identity -> login via /api/users
+      - Access protected endpoints with both auth types
+    - Verify only AspNetUsers table is used (no legacy Users table)
+    - Verify no data loss or issues with user operations
 
 ### Verification
 
 Run the following Nuke targets to verify this phase:
 
 ```bash
-./build.sh LintServerVerify
-./build.sh BuildServer
 ./build.sh TestServer
+./build.sh TestServerPostman
+./build.sh TestE2e
 ```
 
-All targets must pass. Functional tests should now use Identity endpoints and cookie authentication. Postman and E2E tests still use old JWT authentication and continue to pass.
+All targets must pass. The existing /api/users endpoints now use ASP.NET Identity internally (UserManager and SignInManager) while maintaining backward compatibility. Functional tests validate cross-authentication scenarios between /api/users and /api/identity endpoints. Postman and E2E tests continue to work with /api/users endpoints without changes.
