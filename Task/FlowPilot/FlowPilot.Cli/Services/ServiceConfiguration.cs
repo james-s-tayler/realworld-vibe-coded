@@ -55,6 +55,7 @@ public static class ServiceConfiguration
     services.AddKeyedTransient<ICommand, NextCommandExecutor>("next");
     services.AddKeyedTransient<ICommand, VerifyCommandExecutor>("verify");
     services.AddKeyedTransient<ICommand, StuckCommand>("stuck");
+    services.AddKeyedTransient<ICommand, UnstuckCommand>("unstuck");
 
     return services;
   }
