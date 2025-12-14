@@ -82,14 +82,14 @@ The linter and next-command can rely on these headings exactly.
 **Goal**: Update Postman collection to use Identity endpoints
 
 **Key Outcomes**:
-- Update Postman auth requests to use /register and /login endpoints
+- Update Postman auth requests to use /api/identity/register and /api/identity/login endpoints
 - Update Postman environment to use cookies instead of JWT tokens
 - Configure Postman to send/receive cookies automatically
 - Update pre-request scripts if needed for cookie handling
 - All Postman tests pass with Identity endpoints
-- Old JWT-based endpoints remain operational
+- old /api/users/register and /api/users/login endpoints remain operational, since they are still called by the frontend, and needed for the e2e tests to pass at this point, but the postman collection no longer uses them at all.
 
-**Working State Transition**: Postman test suite fully validates the Identity endpoints. API contract is confirmed working end-to-end through Postman. Dual operation continues - both auth systems still work. E2E tests still use old JWT endpoints and continue to pass.
+**Working State Transition**: Postman test suite fully validates the Identity endpoints. API contract is confirmed working end-to-end through Postman. Dual operation continues - both auth systems still work. E2E tests still use old endpoints and continue to pass.
 
 ---
 
