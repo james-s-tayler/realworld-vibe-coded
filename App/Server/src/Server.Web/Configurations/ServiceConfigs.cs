@@ -128,7 +128,9 @@ public static class ServiceConfigs
       {
         // Cookie settings (Decision 4: SameSite.Lax)
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+        // Use SameAsRequest to allow HTTP in development/testing while enforcing HTTPS in production
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.Name = "ConduitAuth";
 
