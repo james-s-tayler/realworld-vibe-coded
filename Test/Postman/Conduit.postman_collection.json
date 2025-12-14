@@ -44,13 +44,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -101,13 +107,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -167,13 +179,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -233,13 +251,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -299,13 +323,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -367,13 +397,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -435,13 +471,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -481,13 +523,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -504,6 +552,17 @@
                   "    pm.response.to.have.status(401);",
                   "});",
                   ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear all cookies to ensure unauthenticated request",
+                  "pm.cookies.clear();"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -527,13 +586,19 @@
               "raw": "{\"email\":\"nonexistent@example.com\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -550,6 +615,17 @@
                   "    pm.response.to.have.status(401);",
                   "});",
                   ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear all cookies to ensure unauthenticated request",
+                  "pm.cookies.clear();"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -573,13 +649,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"wrongpassword\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -629,13 +711,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -720,6 +808,17 @@
                 "type": "text/javascript",
                 "packages": {}
               }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear all cookies to ensure unauthenticated request",
+                  "pm.cookies.clear();"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
             }
           ],
           "request": {
@@ -752,6 +851,17 @@
                   "pm.test('Response is HTTP 401', function() {",
                   "    pm.expect(pm.response.status).to.eql('Unauthorized')",
                   "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear all cookies to ensure unauthenticated request",
+                  "pm.cookies.clear();"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1073,6 +1183,17 @@
                   "pm.test('Response is HTTP 401', function() {",
                   "    pm.expect(pm.response.status).to.eql('Unauthorized')",
                   "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear all cookies to ensure unauthenticated request",
+                  "pm.cookies.clear();"
                 ],
                 "type": "text/javascript",
                 "packages": {}
