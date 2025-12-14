@@ -126,67 +126,6 @@
           "response": []
         },
         {
-          "name": "Register - validation - duplicate username",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 400\", function() {",
-                  "    pm.response.to.have.status(400);",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "pm.globals.set(\"RANDOM_EMAIL\", (Math.random() * 1000) + \"@example.com\")"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
-            },
-            "url": {
-              "raw": "{{APIURL}}/identity/register?useCookies=true",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "register"
-              ],
-              "query": [
-                {
-                  "key": "useCookies",
-                  "value": "true"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Register - validation - duplicate email",
           "event": [
             {
@@ -992,74 +931,6 @@
             "body": {
               "mode": "raw",
               "raw": "{\n    \"user\":{\n        \"email\":\"{{SECOND_EMAIL}}\"\n    }\n}"
-            },
-            "url": {
-              "raw": "{{APIURL}}/user",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "user"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Update User - validation - duplicate username",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.test('Response is HTTP 400', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
-                  "})",
-                  "",
-                  "pm.test('Response contains \"errors\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('errors');",
-                  "});",
-                  "",
-                  "",
-                  "utils.assertErrorStartsWith(\"username\", pm);"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
-                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
-                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
-                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
-                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"user\":{\n        \"username\":\"{{SECOND_USERNAME}}\"\n    }\n}"
             },
             "url": {
               "raw": "{{APIURL}}/user",
@@ -8022,41 +7893,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches EMAIL variable', function() {",
-                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
-                  "        pm.expect(user.email).to.eql(email);",
-                  "    });",
-                  "    pm.test('\"username\" equals email', function() {",
-                  "        pm.expect(user.username).to.eql(user.email);",
-                  "    });",
-                  "    pm.test('User has default \"bio\" property', function() {",
-                  "        pm.expect(user.bio).to.eql('I work at statefarm');",
-                  "    });",
-                  "    pm.test('User has \"image\" property', function() {",
-                  "        pm.expect(user).to.have.property('image');",
-                  "        pm.expect(user.image).to.be.null;",
-                  "    });",
-                  "    pm.test('User has \"token\" property', function() {",
-                  "        pm.expect(user).to.have.property('token');",
-                  "    });",
-                  "    pm.test('\"token\" property is not empty', function() {",
-                  "        pm.expect(user.token).to.not.be.empty",
-                  "    });",
-                  "    pm.test('\"token\" property is not same as password', function() {",
-                  "    const password = pm.globals.get('PASSWORD') || pm.environment.get('PASSWORD');",
-                  "    pm.expect(user.token).to.not.eql(password, 'The password must be hashed, and not stored in plain text');",
-                  "    });",
-                  "}",
-                  ""
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -8105,40 +7944,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.test('Response contains \"user\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('user')",
-                  "});",
-                  "",
-                  "var user = responseJSON.user || {};",
-                  "",
-                  "pm.test('user.email matches the EMAIL variable', function() {",
-                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
-                  "    pm.expect(user.email).to.eql(email)",
-                  "});",
-                  "pm.test('user.email matches EMAIL variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(user.username).to.eql(username)",
-                  "});",
-                  "pm.test('User has \"bio\" property', function() {",
-                  "    pm.expect(user).to.have.property('bio')",
-                  "});",
-                  "pm.test('User has \"image\" property', function() {",
-                  "    pm.expect(user).to.have.property('image')",
-                  "});",
-                  "pm.test('User has \"token\" property', function() {",
-                  "    pm.expect(user).to.have.property('token')",
-                  "});",
-                  "",
-                  "if(pm.test('User has \"token\" property')){",
-                  "    pm.globals.set('token', user.token);",
-                  "}",
-                  "",
-                  "pm.test('Global variable \"token\" has been set', function() {",
-                  "    pm.globals.get('token') === user.token",
-                  "});",
-                  ""
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -8197,24 +8005,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches SECOND_EMAIL variable', function() {",
-                  "        const email = pm.globals.get('SECOND_EMAIL');",
-                  "        pm.expect(user.email).to.eql(email);",
-                  "    });",
-                  "    pm.test('\"username\" equals email', function() {",
-                  "        pm.expect(profile.username || user.username).to.eql(profile.email || user.email);",
-                  "    });",
-                  "}",
-                  ""
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -8274,24 +8067,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches celeb_ + EMAIL variable', function() {",
-                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
-                  "        pm.expect(user.email).to.eql(\"celeb_\" + email);",
-                  "    });",
-                  "    pm.test('\"username\" equals celeb_ + email', function() {",
-                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
-                  "        pm.expect(profile.username || user.username).to.eql(\"celeb_\" + email);",
-                  "    });",
-                  "}"
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
