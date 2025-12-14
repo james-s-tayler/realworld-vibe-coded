@@ -15,7 +15,7 @@ public class Unfollow(IMediator mediator, IUserContext userContext) : Endpoint<U
   public override void Configure()
   {
     Delete("/api/profiles/{username}/follow");
-    AuthSchemes("Token");
+    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme);
     Summary(s =>
     {
       s.Summary = "Unfollow user profile";

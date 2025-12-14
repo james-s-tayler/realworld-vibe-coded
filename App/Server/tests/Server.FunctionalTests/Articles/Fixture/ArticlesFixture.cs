@@ -1,7 +1,5 @@
-﻿using System.Net.Http.Headers;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
-using Server.Web.Users.Register;
 using Testcontainers.MsSql;
 
 namespace Server.FunctionalTests.Articles.Fixture;
@@ -85,49 +83,18 @@ public class ArticlesFixture : AppFixture<Program>
     // Schema is already created in PreSetupAsync
     // SetupAsync still needs to run to create test data (users, clients, etc.)
 
-    ArticlesUser1Username = $"articlesuser1-{Guid.NewGuid()}";
-    ArticlesUser1Email = $"articlesuser1-{Guid.NewGuid()}@example.com";
-    var articlesUser1Password = "password123";
+    var articlesUser1Password = "TestPass123!";
+    var articlesUser2Password = "TestPass123!";
 
-    ArticlesUser2Username = $"articlesuser2-{Guid.NewGuid()}";
-    ArticlesUser2Email = $"articlesuser2-{Guid.NewGuid()}@example.com";
-    var articlesUser2Password = "password123";
+    // Create first authenticated user using Identity API
+    (ArticlesUser1Client, ArticlesUser1Email, var user1Name) =
+        await IdentityAuthHelper.CreateAuthenticatedClient(this);
+    ArticlesUser1Username = user1Name;
 
-    var registerRequest1 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = ArticlesUser1Email,
-        Username = ArticlesUser1Username,
-        Password = articlesUser1Password,
-      },
-    };
-
-    var (_, registerResult1) = await Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest1);
-    var token1 = registerResult1.User.Token;
-
-    ArticlesUser1Client = CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token1);
-    });
-
-    var registerRequest2 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = ArticlesUser2Email,
-        Username = ArticlesUser2Username,
-        Password = articlesUser2Password,
-      },
-    };
-
-    var (_, registerResult2) = await Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest2);
-    var token2 = registerResult2.User.Token;
-
-    ArticlesUser2Client = CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token2);
-    });
+    // Create second authenticated user using Identity API
+    (ArticlesUser2Client, ArticlesUser2Email, var user2Name) =
+        await IdentityAuthHelper.CreateAuthenticatedClient(this);
+    ArticlesUser2Username = user2Name;
   }
 
   protected override ValueTask TearDownAsync()
