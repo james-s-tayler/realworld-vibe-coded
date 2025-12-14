@@ -43,10 +43,10 @@ public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
   {
     // Create a User entity with a dummy hashed password since we're using Identity now
     // This is for backward compatibility with code that expects a User entity
-    var user = new User(appUser.Email!, appUser.UserName!, "identity-managed");
-
-    // Set the ID to match the ApplicationUser ID
-    typeof(User).GetProperty("Id")!.SetValue(user, appUser.Id);
+    var user = new User(appUser.Email!, appUser.UserName!, "identity-managed")
+    {
+      Id = appUser.Id,
+    };
 
     user.UpdateBio(appUser.Bio);
     user.UpdateImage(appUser.Image);
