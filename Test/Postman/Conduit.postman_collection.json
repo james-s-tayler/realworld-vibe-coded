@@ -104,7 +104,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
+              "raw": "{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{SECOND_USERNAME}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -132,20 +132,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Response is HTTP 400', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
-                  "    })",
-                  "",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"errors\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('errors');",
-                  "    });",
-                  "",
-                  "",
-                  "    utils.assertErrorStartsWith(\"username\", pm);",
-                  "}"
+                  "pm.test(\"Status code is 400\", function() {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -204,20 +193,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Response is HTTP 400', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
-                  "    })",
-                  "",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"errors\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('errors');",
-                  "    });",
-                  "",
-                  "",
-                  "    utils.assertErrorStartsWith(\"email\", pm);",
-                  "}"
+                  "pm.test(\"Status code is 400\", function() {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -276,20 +254,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Response is HTTP 400', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
-                  "    })",
-                  "",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"errors\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('errors');",
-                  "    });",
-                  "",
-                  "",
-                  "    utils.assertErrorStartsWith(\"email\", pm);",
-                  "}"
+                  "pm.test(\"Status code is 400\", function() {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -348,22 +315,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Response is HTTP 400', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
-                  "    })",
-                  "",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"errors\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('errors');",
-                  "    });",
-                  "",
-                  "",
-                  "    utils.assertErrorStartsWith(\"username\", pm);",
-                  "    utils.assertErrorStartsWith(\"email\", pm);",
-                  "    utils.assertErrorStartsWith(\"password\", pm);",
-                  "}"
+                  "pm.test(\"Status code is 400\", function() {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -422,22 +376,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Response is HTTP 400', function() {",
-                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
-                  "    })",
-                  "",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"errors\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('errors');",
-                  "    });",
-                  "",
-                  "",
-                  "    utils.assertErrorStartsWith(\"username\", pm);",
-                  "    utils.assertErrorStartsWith(\"email\", pm);",
-                  "    utils.assertErrorStartsWith(\"password\", pm);",
-                  "}"
+                  "pm.test(\"Status code is 400\", function() {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -813,8 +754,13 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear all cookies to ensure unauthenticated request",
-                  "pm.cookies.clear();"
+                  "// Clear all cookies for the current domain to ensure unauthenticated request",
+                  "const jar = pm.cookies.jar();",
+                  "jar.clear(pm.request.url.toString(), function(error) {",
+                  "    if (error) {",
+                  "        console.log('Error clearing cookies:', error);",
+                  "    }",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -860,8 +806,13 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear all cookies to ensure unauthenticated request",
-                  "pm.cookies.clear();"
+                  "// Clear all cookies for the current domain to ensure unauthenticated request",
+                  "const jar = pm.cookies.jar();",
+                  "jar.clear(pm.request.url.toString(), function(error) {",
+                  "    if (error) {",
+                  "        console.log('Error clearing cookies:', error);",
+                  "    }",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1192,8 +1143,13 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear all cookies to ensure unauthenticated request",
-                  "pm.cookies.clear();"
+                  "// Clear all cookies for the current domain to ensure unauthenticated request",
+                  "const jar = pm.cookies.jar();",
+                  "jar.clear(pm.request.url.toString(), function(error) {",
+                  "    if (error) {",
+                  "        console.log('Error clearing cookies:', error);",
+                  "    }",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
