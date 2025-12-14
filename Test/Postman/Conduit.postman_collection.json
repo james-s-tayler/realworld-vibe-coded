@@ -674,6 +674,91 @@
           "response": []
         },
         {
+          "name": "Logout before: Current User - error - unauthenticated (no cookie)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Current User - error - unauthenticated (no cookie)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
+                  "// Clear all cookies for the current domain to ensure unauthenticated request",
+                  "const jar = pm.cookies.jar();",
+                  "jar.clear(pm.request.url.toString(), function(error) {",
+                  "    if (error) {",
+                  "        console.log('Error clearing cookies:', error);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/user",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Update User",
           "event": [
             {
@@ -877,6 +962,99 @@
             "body": {
               "mode": "raw",
               "raw": "{\n    \"user\":{\n        \"email\":\"{{SECOND_EMAIL}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/user",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout before: Update User - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
+                  "// Clear all cookies for the current domain to ensure unauthenticated request",
+                  "const jar = pm.cookies.jar();",
+                  "jar.clear(pm.request.url.toString(), function(error) {",
+                  "    if (error) {",
+                  "        console.log('Error clearing cookies:', error);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"bio\":\"I no longer work at statefarm\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/user",
@@ -1965,6 +2143,91 @@
           "response": []
         },
         {
+          "name": "Logout before: Create Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"article\":{\"title\":\"How to train your dragon\", \"description\":\"Ever wonder how?\", \"body\":\"Very carefully.\", \"tagList\":[\"training\", \"dragons\"]}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Get Tags",
           "event": [
             {
@@ -2817,6 +3080,93 @@
           "response": []
         },
         {
+          "name": "Logout before: Favorite Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Favorite Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Favorite Article - error - not found",
           "event": [
             {
@@ -3048,6 +3398,85 @@
               "path": [
                 "articles",
                 "{{ARTICLE_SLUG}}2",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout before: Unfavorite Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unfavorite Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
                 "favorite"
               ]
             }
@@ -3353,6 +3782,96 @@
           "response": []
         },
         {
+          "name": "Logout before: Create Comment - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Create Comment - error - article not found",
           "event": [
             {
@@ -3534,6 +4053,89 @@
                 "articles",
                 "{{ARTICLE_SLUG}}",
                 "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout before: Delete Comment - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/{{DELETE_COMMENT_ID}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments",
+                "{{DELETE_COMMENT_ID}}"
               ]
             }
           },
@@ -4091,6 +4693,100 @@
           "response": []
         },
         {
+          "name": "Logout before: Update Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}3\", \n        \"description\":\"{{ARTICLE_DESCRIPTION}}3\", \n        \"body\":\"{{ARTICLE_BODY}}3\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Update Article - error - article not found",
           "event": [
             {
@@ -4577,6 +5273,92 @@
               "path": [
                 "articles",
                 "no-such-article"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout before: Delete Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}"
               ]
             }
           },
@@ -6158,6 +6940,86 @@
           "response": []
         },
         {
+          "name": "Logout before: Get Feed - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Feed - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/feed",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "feed"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Get Articles",
           "event": [
             {
@@ -7560,6 +8422,93 @@
           "response": []
         },
         {
+          "name": "Logout before: Follow Profile - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Follow Profile - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "profiles",
+                "celeb_{{USERNAME}}",
+                "follow"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Follow Profile",
           "event": [
             {
@@ -7983,6 +8932,85 @@
               "path": [
                 "profiles",
                 "celeb_{{USERNAME}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout before: Unfollow Profile - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout successful', function() {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{APIURL}}/identity/logout",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unfollow Profile - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "profiles",
+                "celeb_{{USERNAME}}",
+                "follow"
               ]
             }
           },
