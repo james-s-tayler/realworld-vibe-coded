@@ -1,12 +1,13 @@
-﻿using Server.Core.ArticleAggregate;
+﻿using Microsoft.AspNetCore.Identity;
+using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications.Articles;
-using Server.Core.UserAggregate;
+using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Favorite;
 
-public class FavoriteArticleHandler(IRepository<Article> articleRepository, IRepository<User> userRepository)
+public class FavoriteArticleHandler(IRepository<Article> articleRepository, UserManager<ApplicationUser> userManager)
   : ICommandHandler<FavoriteArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(FavoriteArticleCommand request, CancellationToken cancellationToken)
@@ -19,10 +20,10 @@ public class FavoriteArticleHandler(IRepository<Article> articleRepository, IRep
       return Result<Article>.NotFound(request.Slug);
     }
 
-    var user = await userRepository.GetByIdAsync(request.UserId, cancellationToken);
+    var user = await userManager.FindByIdAsync(request.UserId.ToString());
     if (user == null)
     {
-      return Result<Article>.ErrorMissingRequiredEntity(typeof(User), request.UserId);
+      return Result<Article>.ErrorMissingRequiredEntity(typeof(ApplicationUser), request.UserId);
     }
 
     article.AddToFavorites(user);

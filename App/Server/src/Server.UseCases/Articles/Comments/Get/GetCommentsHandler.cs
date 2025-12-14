@@ -1,14 +1,15 @@
-﻿using Server.Core.ArticleAggregate;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications.Articles;
-using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
+using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Comments.Get;
 
-public class GetCommentsHandler(IRepository<Article> articleRepository, IRepository<User> userRepository)
+public class GetCommentsHandler(IRepository<Article> articleRepository, UserManager<ApplicationUser> userManager)
   : IQueryHandler<GetCommentsQuery, CommentsResponse>
 {
   public async Task<Result<CommentsResponse>> Handle(GetCommentsQuery request, CancellationToken cancellationToken)
@@ -22,11 +23,12 @@ public class GetCommentsHandler(IRepository<Article> articleRepository, IReposit
     }
 
     // Get current user with following relationships if authenticated
-    User? currentUser = null;
+    ApplicationUser? currentUser = null;
     if (request.CurrentUserId.HasValue)
     {
-      currentUser = await userRepository.FirstOrDefaultAsync(
-        new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken);
+      currentUser = await userManager.Users
+        .Include(u => u.Following)
+        .FirstOrDefaultAsync(u => u.Id == request.CurrentUserId.Value, cancellationToken);
     }
 
     var commentDtos = article.Comments.Select(c => CommentMappers.MapToDto(c, currentUser)).ToList();

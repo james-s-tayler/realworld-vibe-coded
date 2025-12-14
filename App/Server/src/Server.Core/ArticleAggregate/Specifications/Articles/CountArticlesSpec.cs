@@ -16,12 +16,12 @@ public class CountArticlesSpec : Specification<Article>
 
     if (!string.IsNullOrEmpty(author))
     {
-      Query.Where(x => x.Author.Username == author);
+      Query.Where(x => x.Author.UserName == author);
     }
 
     if (!string.IsNullOrEmpty(favorited))
     {
-      Query.Where(x => x.FavoritedBy.Any(u => u.Username == favorited));
+      Query.Where(x => x.FavoritedBy.Any(u => u.UserName == favorited));
     }
   }
 }

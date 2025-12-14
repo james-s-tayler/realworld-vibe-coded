@@ -1,7 +1,8 @@
-﻿using Server.Core.ArticleAggregate;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
-using Server.Core.UserAggregate;
-using Server.SharedKernel.Persistence;
+using Server.Core.IdentityAggregate;
 using Server.UseCases.Articles;
 using Server.UseCases.Interfaces;
 
@@ -23,12 +24,13 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
     var isFavorited = article.IsFavoritedBy(currentUserId);
 
     // Get current user for following status check
-    User? currentUser = null;
+    ApplicationUser? currentUser = null;
     if (currentUserId.HasValue)
     {
-      var userRepository = Resolve<IRepository<User>>();
-      var userSpec = new Server.Core.UserAggregate.Specifications.UserWithFollowingSpec(currentUserId.Value);
-      currentUser = await userRepository.FirstOrDefaultAsync(userSpec, ct);
+      var userManager = Resolve<UserManager<ApplicationUser>>();
+      currentUser = await userManager.Users
+        .Include(u => u.Following)
+        .FirstOrDefaultAsync(u => u.Id == currentUserId.Value, ct);
     }
 
     // Use domain method to check if current user follows the article author
@@ -45,7 +47,7 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
       isFavorited,
       article.FavoritesCount,
       new AuthorDto(
-        article.Author.Username,
+        article.Author.UserName!,
         article.Author.Bio ?? string.Empty,
         article.Author.Image,
         isFollowing

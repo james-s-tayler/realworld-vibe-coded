@@ -1,6 +1,6 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
-using Server.Core.UserAggregate;
+using Server.Core.IdentityAggregate;
 
 namespace Server.UseCases.Articles.Comments;
 
@@ -12,9 +12,9 @@ public static class CommentMappers
   /// <summary>
   /// Maps Comment entity to CommentDto with current user context for following status
   /// </summary>
-  public static CommentDto MapToDto(Comment comment, User? currentUser = null)
+  public static CommentDto MapToDto(Comment comment, ApplicationUser? currentUser = null)
   {
-    var isFollowing = currentUser?.IsFollowing(comment.AuthorId) ?? false;
+    var isFollowing = currentUser?.Following.Any(f => f.FollowedId == comment.AuthorId) ?? false;
 
     return new CommentDto(
       comment.Id,
@@ -22,7 +22,7 @@ public static class CommentMappers
       comment.UpdatedAt,
       comment.Body,
       new AuthorDto(
-        comment.Author.Username,
+        comment.Author.UserName!,
         comment.Author.Bio ?? string.Empty,
         comment.Author.Image,
         isFollowing
