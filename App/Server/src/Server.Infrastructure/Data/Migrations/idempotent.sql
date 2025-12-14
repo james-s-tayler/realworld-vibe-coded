@@ -1146,6 +1146,163 @@ BEGIN
     VALUES (N'20251211185450_AddIdentityTables', N'9.0.7');
 END;
 
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [ArticleFavorites] DROP CONSTRAINT [FK_ArticleFavorites_Users_FavoritedById];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [Articles] DROP CONSTRAINT [FK_Articles_Users_AuthorId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [Comments] DROP CONSTRAINT [FK_Comments_Users_AuthorId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [UserFollowing] DROP CONSTRAINT [FK_UserFollowing_AspNetUsers_ApplicationUserId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [UserFollowing] DROP CONSTRAINT [FK_UserFollowing_AspNetUsers_ApplicationUserId1];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [UserFollowing] DROP CONSTRAINT [FK_UserFollowing_Users_FollowedId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [UserFollowing] DROP CONSTRAINT [FK_UserFollowing_Users_FollowerId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    DROP TABLE [Users];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    DROP INDEX [IX_UserFollowing_ApplicationUserId] ON [UserFollowing];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    DROP INDEX [IX_UserFollowing_ApplicationUserId1] ON [UserFollowing];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    DECLARE @var10 sysname;
+    SELECT @var10 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[UserFollowing]') AND [c].[name] = N'ApplicationUserId');
+    IF @var10 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT [' + @var10 + '];');
+    ALTER TABLE [UserFollowing] DROP COLUMN [ApplicationUserId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    DECLARE @var11 sysname;
+    SELECT @var11 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[UserFollowing]') AND [c].[name] = N'ApplicationUserId1');
+    IF @var11 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT [' + @var11 + '];');
+    ALTER TABLE [UserFollowing] DROP COLUMN [ApplicationUserId1];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [ArticleFavorites] ADD CONSTRAINT [FK_ArticleFavorites_AspNetUsers_FavoritedById] FOREIGN KEY ([FavoritedById]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [Articles] ADD CONSTRAINT [FK_Articles_AspNetUsers_AuthorId] FOREIGN KEY ([AuthorId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [Comments] ADD CONSTRAINT [FK_Comments_AspNetUsers_AuthorId] FOREIGN KEY ([AuthorId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [UserFollowing] ADD CONSTRAINT [FK_UserFollowing_AspNetUsers_FollowedId] FOREIGN KEY ([FollowedId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    ALTER TABLE [UserFollowing] ADD CONSTRAINT [FK_UserFollowing_AspNetUsers_FollowerId] FOREIGN KEY ([FollowerId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20251214103130_MigrateToApplicationUserOnly', N'9.0.7');
+END;
+
 COMMIT;
 GO
 
