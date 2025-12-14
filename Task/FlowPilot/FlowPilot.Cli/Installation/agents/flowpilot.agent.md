@@ -45,6 +45,9 @@ The following commands are available:
 - `flowpilot stuck`
     - call this if you get stuck during an implementation phase and you unsuccessful in carrying out the plan as described.
     - you must treat its output as your next prompt and execute its instructions.
+- `flowpilot unstuck`
+    - call this after stuck analysis has been performed via `flowpilot stuck` to select an option, update the plan, and carry out the updated plan.
+    - you must treat its output as your next prompt and execute its instructions.
 
 ## Important
 
