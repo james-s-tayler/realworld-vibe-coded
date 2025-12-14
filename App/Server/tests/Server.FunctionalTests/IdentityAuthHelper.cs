@@ -1,4 +1,8 @@
-﻿namespace Server.FunctionalTests;
+﻿using Microsoft.AspNetCore.Identity;
+using Server.Core.IdentityAggregate;
+using Server.Infrastructure.Services;
+
+namespace Server.FunctionalTests;
 
 /// <summary>
 /// Helper class for creating authenticated HttpClients using ASP.NET Core Identity endpoints
@@ -6,7 +10,8 @@
 public static class IdentityAuthHelper
 {
   /// <summary>
-  /// Creates an authenticated HttpClient by registering a new user with Identity and capturing the authentication cookie
+  /// Creates an authenticated HttpClient by registering a new user with Identity and capturing the authentication cookie.
+  /// Also syncs the ApplicationUser to the old Users table for backward compatibility.
   /// </summary>
   public static async Task<(HttpClient client, string email, string username)> CreateAuthenticatedClient<TFixture>(
       AppFixture<TFixture> fixture,
@@ -50,6 +55,9 @@ public static class IdentityAuthHelper
           $"Failed to register user. Status: {registerResponse.StatusCode}, Content: {errorContent}");
     }
 
+    // Sync ApplicationUser to User table for backward compatibility
+    await SyncIdentityUserToOldUserTable(fixture, email, password);
+
     // Cookie is automatically stored in the client
     return (client, email, username);
   }
@@ -92,5 +100,30 @@ public static class IdentityAuthHelper
     }
 
     return client;
+  }
+
+  /// <summary>
+  /// Syncs an Identity user to the old Users table by calling the sync service
+  /// </summary>
+  private static async Task SyncIdentityUserToOldUserTable<TFixture>(
+      AppFixture<TFixture> fixture,
+      string email,
+      string password)
+      where TFixture : class
+  {
+    // Get services from the test fixture
+    using var scope = fixture.Services.CreateScope();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var syncService = scope.ServiceProvider.GetRequiredService<UserIdentitySyncService>();
+
+    // Find the ApplicationUser that was just created
+    var applicationUser = await userManager.FindByEmailAsync(email);
+    if (applicationUser == null)
+    {
+      throw new InvalidOperationException($"ApplicationUser not found for email {email}");
+    }
+
+    // Sync to old Users table
+    await syncService.SyncApplicationUserToUser(applicationUser, CancellationToken.None);
   }
 }

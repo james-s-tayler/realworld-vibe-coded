@@ -34,7 +34,8 @@ public static class InfrastructureServiceExtensions
            .AddScoped<IUnitOfWork, UnitOfWork>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
            .AddScoped<IJwtTokenGenerator, JwtTokenGenerator>()
-           .AddScoped<IUserContext, UserContext>();
+           .AddScoped<IUserContext, UserContext>()
+           .AddScoped<UserIdentitySyncService>();
 
     // Configure JWT settings
     var jwtSettings = new JwtSettings();
