@@ -1,4 +1,5 @@
-﻿using Server.SharedKernel.Persistence;
+﻿using Server.Core.IdentityAggregate;
+using Server.SharedKernel.Persistence;
 
 namespace Server.Core.UserAggregate;
 
@@ -20,7 +21,7 @@ public class UserFollowing : EntityBase
   public Guid FollowedId { get; private set; }
 
   // Navigation properties
-  public User Follower { get; private set; } = default!;
+  public ApplicationUser Follower { get; private set; } = default!;
 
-  public User Followed { get; private set; } = default!;
+  public ApplicationUser Followed { get; private set; } = default!;
 }

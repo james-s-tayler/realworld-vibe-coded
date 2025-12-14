@@ -1,37 +1,41 @@
-﻿using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
-using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Profiles.Follow;
 
-public class FollowUserHandler(IRepository<User> userRepository)
-  : ICommandHandler<FollowUserCommand, User>
+// PV014: This handler uses ASP.NET Identity's UserManager instead of the repository pattern.
+// UserManager.UpdateAsync performs the database mutation internally.
+#pragma warning disable PV014
+public class FollowUserHandler(UserManager<ApplicationUser> userManager)
+  : ICommandHandler<FollowUserCommand, ApplicationUser>
 {
-  public async Task<Result<User>> Handle(FollowUserCommand request, CancellationToken cancellationToken)
+  public async Task<Result<ApplicationUser>> Handle(FollowUserCommand request, CancellationToken cancellationToken)
   {
     // Find the user to follow
-    var userToFollow = await userRepository.FirstOrDefaultAsync(
-      new UserByUsernameSpec(request.Username), cancellationToken);
+    var userToFollow = await userManager.FindByNameAsync(request.Username);
 
     if (userToFollow == null)
     {
-      return Result<User>.NotFound(request.Username);
+      return Result<ApplicationUser>.NotFound(request.Username);
     }
 
     // Get current user with following relationships
-    var currentUser = await userRepository.FirstOrDefaultAsync(
-      new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
+    var currentUser = await userManager.Users
+      .Include(u => u.Following)
+      .FirstOrDefaultAsync(u => u.Id == request.CurrentUserId, cancellationToken);
 
     if (currentUser == null)
     {
-      return Result<User>.NotFound(request.CurrentUserId);
+      return Result<ApplicationUser>.NotFound(request.CurrentUserId);
     }
 
     // Follow the user
     currentUser.Follow(userToFollow);
-    await userRepository.UpdateAsync(currentUser, cancellationToken);
+    await userManager.UpdateAsync(currentUser);
 
-    return Result<User>.Success(userToFollow);
+    return Result<ApplicationUser>.Success(userToFollow);
   }
 }
+#pragma warning restore PV014
