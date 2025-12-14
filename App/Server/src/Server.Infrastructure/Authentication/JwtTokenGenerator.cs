@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using Server.Core.UserAggregate;
+using Server.Core.IdentityAggregate;
 using Server.UseCases.Interfaces;
 
 namespace Server.Infrastructure.Authentication;
@@ -16,7 +16,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     _jwtSettings = jwtSettings;
   }
 
-  public string GenerateToken(User user)
+  public string GenerateToken(ApplicationUser user)
   {
     var tokenHandler = new JwtSecurityTokenHandler();
     var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
@@ -25,8 +25,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
       Subject = new ClaimsIdentity(new[]
       {
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.Email, user.Email!),
+        new Claim(ClaimTypes.Name, user.UserName!),
       }),
       Expires = DateTime.UtcNow.AddDays(_jwtSettings.ExpirationInDays),
       SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),

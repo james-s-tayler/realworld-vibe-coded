@@ -1,32 +1,27 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
-using Server.Core.UserAggregate;
 using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Users.Register;
 
 // PV014: This handler uses ASP.NET Identity's UserManager instead of the repository pattern.
-// UserManager.CreateAsync performs the database mutation internally. We also write to the legacy
-// User table for backward compatibility during the migration period.
+// UserManager.CreateAsync performs the database mutation internally.
 #pragma warning disable PV014
-public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
+public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, ApplicationUser>
 {
   private readonly UserManager<ApplicationUser> _userManager;
-  private readonly Server.SharedKernel.Persistence.IRepository<User> _userRepository;
   private readonly ILogger<RegisterUserHandler> _logger;
 
   public RegisterUserHandler(
     UserManager<ApplicationUser> userManager,
-    Server.SharedKernel.Persistence.IRepository<User> userRepository,
     ILogger<RegisterUserHandler> logger)
   {
     _userManager = userManager;
-    _userRepository = userRepository;
     _logger = logger;
   }
 
-  public async Task<Result<User>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+  public async Task<Result<ApplicationUser>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
   {
     _logger.LogInformation("Handling user registration for {Email}", request.Email);
 
@@ -35,7 +30,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
     if (existingUserByEmail != null)
     {
       _logger.LogWarning("Registration failed: Email {Email} already exists", request.Email);
-      return Result<User>.Invalid(new ErrorDetail
+      return Result<ApplicationUser>.Invalid(new ErrorDetail
       {
         Identifier = nameof(request.Email),
         ErrorMessage = "Email already exists",
@@ -47,7 +42,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
     if (existingUserByUsername != null)
     {
       _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
-      return Result<User>.Invalid(new ErrorDetail
+      return Result<ApplicationUser>.Invalid(new ErrorDetail
       {
         Identifier = nameof(request.Username),
         ErrorMessage = "Username already exists",
@@ -79,7 +74,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
         ErrorMessage = e.Description,
       }).ToList();
 
-      return Result<User>.Invalid(errors);
+      return Result<ApplicationUser>.Invalid(errors);
     }
 
     _logger.LogInformation(
@@ -87,28 +82,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
       user.UserName,
       user.Id);
 
-    // Also save to legacy User table for backward compatibility during migration
-    var legacyUser = MapToLegacyUser(user);
-    await _userRepository.AddAsync(legacyUser, cancellationToken);
-
-    _logger.LogInformation("Legacy User record created for backward compatibility");
-
-    return Result<User>.Created(legacyUser);
-  }
-
-  private static User MapToLegacyUser(ApplicationUser appUser)
-  {
-    // Create a User entity with a dummy hashed password since we're using Identity now
-    // This is for backward compatibility with code that expects a User entity
-    var user = new User(appUser.Email!, appUser.UserName!, "identity-managed")
-    {
-      Id = appUser.Id,
-    };
-
-    user.UpdateBio(appUser.Bio);
-    user.UpdateImage(appUser.Image);
-
-    return user;
+    return Result<ApplicationUser>.Created(user);
   }
 }
 #pragma warning restore PV014

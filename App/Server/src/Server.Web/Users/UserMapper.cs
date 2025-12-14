@@ -1,15 +1,15 @@
-﻿using Server.Core.UserAggregate;
+﻿using Server.Core.IdentityAggregate;
 using Server.UseCases.Interfaces;
 
 namespace Server.Web.Users;
 
 /// <summary>
-/// FastEndpoints mapper for User entity to UserResponse
+/// FastEndpoints mapper for ApplicationUser entity to UserResponse
 /// Maps domain entity to response DTO with JWT token generation
 /// </summary>
-public class UserMapper : ResponseMapper<UserResponse, User>
+public class UserMapper : ResponseMapper<UserResponse, ApplicationUser>
 {
-  public override UserResponse FromEntity(User user)
+  public override UserResponse FromEntity(ApplicationUser user)
   {
     // Check if there's already a valid token in the current request
     var currentUserService = Resolve<IUserContext>();
@@ -30,8 +30,8 @@ public class UserMapper : ResponseMapper<UserResponse, User>
 
     return new UserResponse
     {
-      Email = user.Email,
-      Username = user.Username,
+      Email = user.Email!,
+      Username = user.UserName!,
       Bio = user.Bio,
       Image = user.Image,
       Token = token,

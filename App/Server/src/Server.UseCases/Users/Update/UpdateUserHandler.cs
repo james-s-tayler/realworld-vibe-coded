@@ -1,32 +1,27 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
-using Server.Core.UserAggregate;
 using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Users.Update;
 
 // PV014: This handler uses ASP.NET Identity's UserManager instead of the repository pattern.
-// UserManager.UpdateAsync and ResetPasswordAsync perform database mutations internally. We also
-// update the legacy User table for backward compatibility during the migration period.
+// UserManager.UpdateAsync and ResetPasswordAsync perform database mutations internally.
 #pragma warning disable PV014
-public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
+public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationUser>
 {
   private readonly UserManager<ApplicationUser> _userManager;
-  private readonly Server.SharedKernel.Persistence.IRepository<User> _userRepository;
   private readonly ILogger<UpdateUserHandler> _logger;
 
   public UpdateUserHandler(
     UserManager<ApplicationUser> userManager,
-    Server.SharedKernel.Persistence.IRepository<User> userRepository,
     ILogger<UpdateUserHandler> logger)
   {
     _userManager = userManager;
-    _userRepository = userRepository;
     _logger = logger;
   }
 
-  public async Task<Result<User>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+  public async Task<Result<ApplicationUser>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
   {
     _logger.LogInformation("Updating user {UserId}", request.UserId);
 
@@ -35,7 +30,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
     if (user == null)
     {
       _logger.LogWarning("User with ID {UserId} not found", request.UserId);
-      return Result<User>.NotFound();
+      return Result<ApplicationUser>.NotFound();
     }
 
     // Check for duplicate email
@@ -46,7 +41,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       if (existingUserByEmail != null && existingUserByEmail.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Email {Email} already exists", request.Email);
-        return Result<User>.Invalid(new ErrorDetail
+        return Result<ApplicationUser>.Invalid(new ErrorDetail
         {
           Identifier = "email",
           ErrorMessage = "Email already exists",
@@ -64,7 +59,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       if (existingUserByUsername != null && existingUserByUsername.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Username {Username} already exists", request.Username);
-        return Result<User>.Invalid(new ErrorDetail
+        return Result<ApplicationUser>.Invalid(new ErrorDetail
         {
           Identifier = "username",
           ErrorMessage = "Username already exists",
@@ -83,7 +78,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
       if (!passwordResult.Succeeded)
       {
         _logger.LogWarning("Password update failed for user {UserId}: {Errors}", request.UserId, string.Join(", ", passwordResult.Errors.Select(e => e.Description)));
-        return Result<User>.Invalid(new ErrorDetail
+        return Result<ApplicationUser>.Invalid(new ErrorDetail
         {
           Identifier = "password",
           ErrorMessage = string.Join(", ", passwordResult.Errors.Select(e => e.Description)),
@@ -108,7 +103,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
     if (!result.Succeeded)
     {
       _logger.LogWarning("User update failed for {UserId}: {Errors}", request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
-      return Result<User>.Invalid(new ErrorDetail
+      return Result<ApplicationUser>.Invalid(new ErrorDetail
       {
         Identifier = "body",
         ErrorMessage = string.Join(", ", result.Errors.Select(e => e.Description)),
@@ -117,54 +112,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
 
     _logger.LogInformation("User {Username} updated successfully", user.UserName);
 
-    // Also update legacy User table for backward compatibility during migration
-    var legacyUser = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
-    if (legacyUser != null)
-    {
-      // Update legacy user with same changes
-      if (!string.IsNullOrEmpty(request.Email))
-      {
-        legacyUser.UpdateEmail(request.Email);
-      }
-
-      if (!string.IsNullOrEmpty(request.Username))
-      {
-        legacyUser.UpdateUsername(request.Username);
-      }
-
-      if (request.Bio != null)
-      {
-        legacyUser.UpdateBio(request.Bio);
-      }
-
-      if (request.Image != null)
-      {
-        legacyUser.UpdateImage(request.Image);
-      }
-
-      // Don't update password in legacy table since it's managed by Identity
-      await _userRepository.UpdateAsync(legacyUser, cancellationToken);
-      _logger.LogInformation("Legacy User record updated for backward compatibility");
-    }
-
-    // Map ApplicationUser to legacy User for response
-    var responseUser = MapToLegacyUser(user);
-    return Result<User>.Success(responseUser);
-  }
-
-  private static User MapToLegacyUser(ApplicationUser appUser)
-  {
-    // Create a User entity with a dummy hashed password since we're using Identity now
-    // This is for backward compatibility with code that expects a User entity
-    var user = new User(appUser.Email!, appUser.UserName!, "identity-managed")
-    {
-      Id = appUser.Id,
-    };
-
-    user.UpdateBio(appUser.Bio);
-    user.UpdateImage(appUser.Image);
-
-    return user;
+    return Result<ApplicationUser>.Success(user);
   }
 }
 #pragma warning restore PV014

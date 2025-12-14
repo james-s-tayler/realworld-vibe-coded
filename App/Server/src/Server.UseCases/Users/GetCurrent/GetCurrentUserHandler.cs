@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
-using Server.Core.UserAggregate;
 using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Users.GetCurrent;
 
-public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
+public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, ApplicationUser>
 {
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly ILogger<GetCurrentUserHandler> _logger;
@@ -19,7 +18,7 @@ public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
     _logger = logger;
   }
 
-  public async Task<Result<User>> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
+  public async Task<Result<ApplicationUser>> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
   {
     _logger.LogInformation("Getting current user for ID {UserId}", request.UserId);
 
@@ -29,28 +28,11 @@ public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
     if (appUser == null)
     {
       _logger.LogWarning("User with ID {UserId} not found", request.UserId);
-      return Result<User>.NotFound();
+      return Result<ApplicationUser>.NotFound();
     }
 
     _logger.LogInformation("Retrieved current user {Username}", appUser.UserName);
 
-    // Map ApplicationUser to legacy User for backward compatibility
-    var legacyUser = MapToLegacyUser(appUser);
-    return Result<User>.Success(legacyUser);
-  }
-
-  private static User MapToLegacyUser(ApplicationUser appUser)
-  {
-    // Create a User entity with a dummy hashed password since we're using Identity now
-    // This is for backward compatibility with code that expects a User entity
-    var user = new User(appUser.Email!, appUser.UserName!, "identity-managed")
-    {
-      Id = appUser.Id,
-    };
-
-    user.UpdateBio(appUser.Bio);
-    user.UpdateImage(appUser.Image);
-
-    return user;
+    return Result<ApplicationUser>.Success(appUser);
   }
 }

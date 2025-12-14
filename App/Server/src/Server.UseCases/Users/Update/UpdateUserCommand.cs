@@ -1,4 +1,4 @@
-﻿using Server.Core.UserAggregate;
+﻿using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Users.Update;
@@ -10,4 +10,4 @@ public record UpdateUserCommand(
   string? Password = null,
   string? Bio = null,
   string? Image = null
-) : ICommand<User>;
+) : ICommand<ApplicationUser>;
