@@ -19,13 +19,13 @@ Build and test a sync mechanism between the existing Users table and the new ASP
      - Maps Username -> UserName, Email -> Email
      - Maps Password hash from legacy system to Identity's PasswordHash
      - Maps Bio and Image custom properties
-     - Handle duplicate detection (by email or username)
+     - Handle duplicate detection: Check if ApplicationUser exists by Email (primary) or UserName (secondary). If exists, update properties; if not, create new
    - Implement method `SyncIdentityUserToLegacy(ApplicationUser identityUser)`:
      - Takes an ApplicationUser and creates/updates corresponding legacy User entity
      - Maps UserName -> Username, Email -> Email
      - Maps PasswordHash to legacy password hash format
      - Maps Bio and Image custom properties
-     - Handle duplicate detection
+     - Handle duplicate detection: Check if User exists by Email (primary) or Username (secondary). If exists, update properties; if not, create new
 
 2. **Integrate Sync Service into Registration Flows**
    - Update `Server.Web/Users/Register/RegisterHandler.cs`:
@@ -62,7 +62,9 @@ Build and test a sync mechanism between the existing Users table and the new ASP
      ```csharp
      // Use raw HttpClient for Identity endpoints with SRV007 suppression
      // SRV007: Using raw HttpClient.PostAsJsonAsync is necessary to test ASP.NET Identity
-     // endpoints which are not FastEndpoints and return different response structures
+     // endpoints which are not FastEndpoints. ASP.NET Identity endpoints are mapped via
+     // MapIdentityApi and have different request/response structures. FastEndpoints testing
+     // extensions (POSTAsync, GETAsync) only work with FastEndpoints-based endpoints.
      #pragma warning disable SRV007
      var identityLoginResponse = await client.PostAsJsonAsync("/api/identity/login", new { ... });
      #pragma warning restore SRV007
@@ -123,13 +125,17 @@ Build and test a sync mechanism between the existing Users table and the new ASP
 
 8. **Handle Password Hash Compatibility**
    - Legacy system uses BCrypt password hashing
-   - ASP.NET Identity uses its own password hasher
-   - Options:
-     a) Store original hash format marker and use appropriate hasher for login
-     b) Re-hash passwords during sync (user must login to complete sync)
-     c) Use custom IPasswordHasher<ApplicationUser> that supports both formats
-   - Document decision and implement chosen approach
-   - Ensure tests verify password validation works after sync
+   - ASP.NET Identity uses its own password hasher (PBKDF2)
+   - **Recommended approach**: Use custom IPasswordHasher<ApplicationUser> that supports both formats (option c)
+     - Implement custom hasher that detects hash format by prefix or structure
+     - If hash is BCrypt format, verify using BCrypt
+     - If hash is Identity format, verify using Identity's hasher
+     - When creating new hashes, use Identity's hasher
+     - This allows seamless authentication from either system without re-hashing
+   - Alternative approaches (not recommended for this phase):
+     - Option a: Store format marker - requires database schema changes
+     - Option b: Re-hash on first login - requires users to login before sync is complete
+   - Ensure tests verify password validation works after sync for both hash formats
 
 9. **Run and Fix Tests**
    - Run `./build.sh TestServer` to execute all functional tests
