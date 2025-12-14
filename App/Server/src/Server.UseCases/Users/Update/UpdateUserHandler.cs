@@ -7,18 +7,22 @@ using Server.SharedKernel.MediatR;
 namespace Server.UseCases.Users.Update;
 
 // PV014: This handler uses ASP.NET Identity's UserManager instead of the repository pattern.
-// UserManager.UpdateAsync and ResetPasswordAsync perform database mutations internally.
+// UserManager.UpdateAsync and ResetPasswordAsync perform database mutations internally. We also
+// update the legacy User table for backward compatibility during the migration period.
 #pragma warning disable PV014
 public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
 {
   private readonly UserManager<ApplicationUser> _userManager;
+  private readonly Server.SharedKernel.Persistence.IRepository<User> _userRepository;
   private readonly ILogger<UpdateUserHandler> _logger;
 
   public UpdateUserHandler(
     UserManager<ApplicationUser> userManager,
+    Server.SharedKernel.Persistence.IRepository<User> userRepository,
     ILogger<UpdateUserHandler> logger)
   {
     _userManager = userManager;
+    _userRepository = userRepository;
     _logger = logger;
   }
 
@@ -113,9 +117,39 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, User>
 
     _logger.LogInformation("User {Username} updated successfully", user.UserName);
 
-    // Map ApplicationUser to legacy User for backward compatibility
-    var legacyUser = MapToLegacyUser(user);
-    return Result<User>.Success(legacyUser);
+    // Also update legacy User table for backward compatibility during migration
+    var legacyUser = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
+    if (legacyUser != null)
+    {
+      // Update legacy user with same changes
+      if (!string.IsNullOrEmpty(request.Email))
+      {
+        legacyUser.UpdateEmail(request.Email);
+      }
+
+      if (!string.IsNullOrEmpty(request.Username))
+      {
+        legacyUser.UpdateUsername(request.Username);
+      }
+
+      if (request.Bio != null)
+      {
+        legacyUser.UpdateBio(request.Bio);
+      }
+
+      if (request.Image != null)
+      {
+        legacyUser.UpdateImage(request.Image);
+      }
+
+      // Don't update password in legacy table since it's managed by Identity
+      await _userRepository.UpdateAsync(legacyUser, cancellationToken);
+      _logger.LogInformation("Legacy User record updated for backward compatibility");
+    }
+
+    // Map ApplicationUser to legacy User for response
+    var responseUser = MapToLegacyUser(user);
+    return Result<User>.Success(responseUser);
   }
 
   private static User MapToLegacyUser(ApplicationUser appUser)

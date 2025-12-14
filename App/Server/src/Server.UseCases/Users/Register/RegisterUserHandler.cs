@@ -7,18 +7,22 @@ using Server.SharedKernel.MediatR;
 namespace Server.UseCases.Users.Register;
 
 // PV014: This handler uses ASP.NET Identity's UserManager instead of the repository pattern.
-// UserManager.CreateAsync performs the database mutation internally.
+// UserManager.CreateAsync performs the database mutation internally. We also write to the legacy
+// User table for backward compatibility during the migration period.
 #pragma warning disable PV014
 public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
 {
   private readonly UserManager<ApplicationUser> _userManager;
+  private readonly Server.SharedKernel.Persistence.IRepository<User> _userRepository;
   private readonly ILogger<RegisterUserHandler> _logger;
 
   public RegisterUserHandler(
     UserManager<ApplicationUser> userManager,
+    Server.SharedKernel.Persistence.IRepository<User> userRepository,
     ILogger<RegisterUserHandler> logger)
   {
     _userManager = userManager;
+    _userRepository = userRepository;
     _logger = logger;
   }
 
@@ -83,8 +87,12 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, User>
       user.UserName,
       user.Id);
 
-    // Map ApplicationUser to legacy User for backward compatibility
+    // Also save to legacy User table for backward compatibility during migration
     var legacyUser = MapToLegacyUser(user);
+    await _userRepository.AddAsync(legacyUser, cancellationToken);
+
+    _logger.LogInformation("Legacy User record created for backward compatibility");
+
     return Result<User>.Created(legacyUser);
   }
 
