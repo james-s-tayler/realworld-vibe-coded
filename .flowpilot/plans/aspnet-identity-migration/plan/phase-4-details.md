@@ -2,7 +2,7 @@
 
 ### Phase Overview
 
-Build and test a sync mechanism between the existing Users table and the new ASP.NET Identity AspNetUsers table, and enable cookie authentication for all FastEndpoints endpoints. This phase establishes bidirectional synchronization ensuring users can authenticate through either system regardless of where they registered, and proves this functionality through comprehensive functional tests.
+Migrate the existing /api/users/register and /api/users/login endpoints to use ASP.NET Identity's UserManager and SignInManager internally, and enable cookie authentication for all FastEndpoints endpoints. This phase transitions the legacy endpoints to use Identity infrastructure while maintaining their existing API contracts, ensuring backward compatibility while leveraging Identity's robust authentication features.
 
 ### Prerequisites
 
@@ -12,39 +12,92 @@ Build and test a sync mechanism between the existing Users table and the new ASP
 
 ### Implementation Steps
 
-1. **Create User Synchronization Service**
-   - Create `Server.Infrastructure/Identity/UserSyncService.cs` implementing `IUserSyncService`
-   - Implement method `SyncLegacyUserToIdentity(User legacyUser)`:
-     - Takes a legacy User entity and creates/updates corresponding ApplicationUser
-     - Maps Username -> UserName, Email -> Email
-     - Maps Password hash from legacy system to Identity's PasswordHash
-     - Maps Bio and Image custom properties
-     - Handle duplicate detection: Check if ApplicationUser exists by Email (primary) or UserName (secondary). If exists, update properties; if not, create new
-   - Implement method `SyncIdentityUserToLegacy(ApplicationUser identityUser)`:
-     - Takes an ApplicationUser and creates/updates corresponding legacy User entity
-     - Maps UserName -> Username, Email -> Email
-     - Maps PasswordHash to legacy password hash format
-     - Maps Bio and Image custom properties
-     - Handle duplicate detection: Check if User exists by Email (primary) or Username (secondary). If exists, update properties; if not, create new
+1. **Update Register Endpoint to Use UserManager**
+   - Open `Server.Web/Users/Register/RegisterHandler.cs`
+   - Inject `UserManager<ApplicationUser>` into the handler
+   - Replace current user creation logic with UserManager:
+     ```csharp
+     // Create ApplicationUser from request
+     var user = new ApplicationUser
+     {
+         UserName = request.User.Username,
+         Email = request.User.Email,
+         Bio = string.Empty,  // Default empty, can be updated later
+         Image = null
+     };
+     
+     // Use UserManager to create user with password
+     var result = await _userManager.CreateAsync(user, request.User.Password);
+     
+     if (!result.Succeeded)
+     {
+         // Handle validation errors from Identity
+         // Map IdentityError to response format
+     }
+     ```
+   - Remove legacy User entity creation code
+   - Remove calls to legacy password hasher
+   - Keep JWT token generation for backward compatibility (existing clients expect token in response)
+   - Return same response format (UserResponse with token)
 
-2. **Integrate Sync Service into Registration Flows**
-   - Update `Server.Web/Users/Register/RegisterHandler.cs`:
-     - After creating legacy User, call `UserSyncService.SyncLegacyUserToIdentity()`
-     - Ensure ApplicationUser is created in AspNetUsers table
-   - Create event handler or middleware for Identity registration:
-     - Intercept Identity `/api/identity/register` endpoint completion
-     - Call `UserSyncService.SyncIdentityUserToLegacy()`
-     - Ensure legacy User is created in Users table
-   - Both registration paths should result in entries in both tables
+2. **Update Login Endpoint to Use SignInManager**
+   - Open `Server.Web/Users/Login/LoginHandler.cs`
+   - Inject `SignInManager<ApplicationUser>` and `UserManager<ApplicationUser>`
+   - Replace current authentication logic with SignInManager:
+     ```csharp
+     // Find user by email
+     var user = await _userManager.FindByEmailAsync(request.User.Email);
+     
+     if (user == null)
+     {
+         // Return authentication failed
+     }
+     
+     // Verify password using SignInManager
+     var result = await _signInManager.CheckPasswordSignInAsync(user, request.User.Password, lockoutOnFailure: false);
+     
+     if (!result.Succeeded)
+     {
+         // Return authentication failed
+     }
+     ```
+   - Remove legacy password verification code
+   - Keep JWT token generation for backward compatibility
+   - Return same response format (LoginResponse with token)
 
-3. **Integrate Sync Service into Login Flows**
-   - Update `Server.Web/Users/Login/LoginHandler.cs`:
-     - After successful legacy login, verify ApplicationUser exists
-     - If missing, sync legacy User to Identity using `SyncLegacyUserToIdentity()`
-   - For Identity login, no handler modification needed (ASP.NET Identity handles it)
-   - Both login paths should ensure both user records exist
+3. **Update GetCurrent Endpoint for Identity Users**
+   - Open `Server.Web/Users/GetCurrent/GetCurrentHandler.cs`
+   - Update `IUserContext` implementation to work with both auth schemes
+   - If user authenticated via cookie (Identity), look up ApplicationUser
+   - If user authenticated via JWT token, continue using existing logic
+   - Map ApplicationUser to UserDto response format
+   - Ensure Bio and Image are retrieved from ApplicationUser
 
-4. **Enable Cookie Authentication for FastEndpoints**
+4. **Update Update User Endpoint for Identity Users**
+   - Open `Server.Web/Users/Update/UpdateHandler.cs`
+   - Inject `UserManager<ApplicationUser>`
+   - Update user information logic to work with ApplicationUser:
+     ```csharp
+     var user = await _userManager.FindByIdAsync(userId);
+     
+     // Update properties
+     user.Email = request.User.Email ?? user.Email;
+     user.UserName = request.User.Username ?? user.UserName;
+     user.Bio = request.User.Bio ?? user.Bio;
+     user.Image = request.User.Image ?? user.Image;
+     
+     // Update password if provided
+     if (!string.IsNullOrEmpty(request.User.Password))
+     {
+         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+         await _userManager.ResetPasswordAsync(user, token, request.User.Password);
+     }
+     
+     var result = await _userManager.UpdateAsync(user);
+     ```
+   - Remove legacy User entity update code
+
+5. **Enable Cookie Authentication for FastEndpoints**
    - Open `Server.Web/Configurations/AuthConfig.cs` (or wherever auth is configured)
    - Update FastEndpoints configuration to accept both authentication schemes:
      - Default scheme: Cookie (for Identity)
@@ -56,58 +109,112 @@ Build and test a sync mechanism between the existing Users table and the new ASP
    - This allows endpoints to work with either JWT tokens or cookies
    - Verify IUserContext implementation can extract user from both auth types
 
-5. **Create Functional Tests for Cross-Authentication (Legacy -> Identity)**
-   - Create `Server.FunctionalTests/Users/UserSyncTests.cs` test class
+6. **Update IUserContext Implementation**
+   - Open `Server.Infrastructure/Identity/UserContext.cs` (or similar)
+   - Update to work with both ApplicationUser and legacy User
+   - Check authentication scheme to determine which user store to query
+   - For cookie auth: query ApplicationUser by ClaimsPrincipal user ID
+   - For JWT auth: continue using existing logic
+   - Ensure consistent user information is returned regardless of auth method
+
+7. **Create Functional Tests for Cross-Authentication (Legacy Endpoint -> Identity Login)**
+   - Create `Server.FunctionalTests/Users/CrossAuthenticationTests.cs` test class
    - Test: Register via `/api/users/register`, then login via `/api/identity/login`:
      ```csharp
-     // Use raw HttpClient for Identity endpoints with SRV007 suppression
+     // Register via legacy endpoint (which now uses UserManager internally)
+     var registerRequest = new RegisterRequest
+     {
+         User = new UserData
+         {
+             Email = "test@example.com",
+             Username = "testuser",
+             Password = "TestPass123"
+         }
+     };
+     var (regResponse, regResult) = await client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
+     
+     // Login via Identity endpoint (raw HttpClient)
      // SRV007: Using raw HttpClient.PostAsJsonAsync is necessary to test ASP.NET Identity
      // endpoints which are not FastEndpoints. ASP.NET Identity endpoints are mapped via
      // MapIdentityApi and have different request/response structures. FastEndpoints testing
      // extensions (POSTAsync, GETAsync) only work with FastEndpoints-based endpoints.
      #pragma warning disable SRV007
-     var identityLoginResponse = await client.PostAsJsonAsync("/api/identity/login", new { ... });
+     var identityLoginResponse = await client.PostAsJsonAsync("/api/identity/login", new
+     {
+         email = "test@example.com",
+         password = "TestPass123"
+     });
      #pragma warning restore SRV007
+     
+     // Verify login succeeded and cookie is set
+     identityLoginResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+     var cookies = identityLoginResponse.Headers.GetValues("Set-Cookie");
+     cookies.ShouldNotBeEmpty();
      ```
-   - Verify login succeeds and cookie is set
    - Test: Register via `/api/users/register`, call `/api/user` with Token auth:
      ```csharp
      // Use FastEndpoints POSTAsync for legacy registration
      var (regResponse, regResult) = await client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request);
+     
      // Extract token and set Authorization header
      client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", regResult.User.Token);
+     
      // Call /api/user
      var (userResponse, userResult) = await client.GETAsync<GetCurrent, GetCurrentResponse>();
+     
+     // Verify user data is retrieved correctly
+     userResult.User.Email.ShouldBe(request.User.Email);
+     userResult.User.Username.ShouldBe(request.User.Username);
      ```
-   - Verify user data is retrieved correctly
 
-6. **Create Functional Tests for Cross-Authentication (Identity -> Legacy)**
-   - In `UserSyncTests.cs`, add tests for opposite direction
+8. **Create Functional Tests for Cross-Authentication (Identity Endpoint -> Legacy Login)**
+   - In `CrossAuthenticationTests.cs`, add tests for opposite direction
    - Test: Register via `/api/identity/register`, then login via `/api/users/login`:
      ```csharp
      // Register with Identity (raw HttpClient)
      #pragma warning disable SRV007
-     var identityRegResponse = await client.PostAsJsonAsync("/api/identity/register", new { ... });
+     var identityRegResponse = await client.PostAsJsonAsync("/api/identity/register", new
+     {
+         email = "test@example.com",
+         password = "TestPass123"
+     });
      #pragma warning restore SRV007
+     identityRegResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
      
      // Login via legacy endpoint (FastEndpoints)
-     var loginRequest = new LoginRequest { ... };
+     var loginRequest = new LoginRequest
+     {
+         User = new LoginUserData
+         {
+             Email = "test@example.com",
+             Password = "TestPass123"
+         }
+     };
      var (loginResponse, loginResult) = await client.POSTAsync<Login, LoginRequest, LoginResponse>(loginRequest);
+     
+     // Verify login succeeded and JWT token is returned
+     loginResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+     loginResult.User.Token.ShouldNotBeNullOrEmpty();
      ```
-   - Verify login succeeds and JWT token is returned
    - Test: Register via `/api/identity/register`, call `/api/user` with cookie auth:
      ```csharp
      // Register with Identity (sets cookie automatically)
      #pragma warning disable SRV007
-     var identityRegResponse = await client.PostAsJsonAsync("/api/identity/register", new { ... });
+     var identityRegResponse = await client.PostAsJsonAsync("/api/identity/register", new
+     {
+         email = "test@example.com",
+         password = "TestPass123"
+     });
      #pragma warning restore SRV007
      
      // Cookie is automatically sent with subsequent requests
      var (userResponse, userResult) = await client.GETAsync<GetCurrent, GetCurrentResponse>();
+     
+     // Verify user data is retrieved correctly via cookie auth
+     userResult.User.Email.ShouldBe("test@example.com");
      ```
-   - Verify user data is retrieved correctly via cookie auth
 
-7. **Update Test Fixtures for Cookie Support**
+9. **Update Test Fixtures for Cookie Support**
    - Update `UsersFixture.cs` and other test fixtures:
      ```csharp
      protected HttpClient CreateClientWithCookieSupport()
@@ -123,36 +230,34 @@ Build and test a sync mechanism between the existing Users table and the new ASP
      - `CreateClientWithJwtAuth(string email, string password)` - returns client with JWT token
      - `CreateClientWithCookieAuth(string email, string password)` - returns client with cookie
 
-8. **Handle Password Hash Compatibility**
-   - Legacy system uses BCrypt password hashing
-   - ASP.NET Identity uses its own password hasher (PBKDF2)
-   - **Recommended approach**: Use custom IPasswordHasher<ApplicationUser> that supports both formats (option c)
-     - Implement custom hasher that detects hash format by prefix or structure
-     - If hash is BCrypt format, verify using BCrypt
-     - If hash is Identity format, verify using Identity's hasher
-     - When creating new hashes, use Identity's hasher
-     - This allows seamless authentication from either system without re-hashing
-   - Alternative approaches (not recommended for this phase):
-     - Option a: Store format marker - requires database schema changes
-     - Option b: Re-hash on first login - requires users to login before sync is complete
-   - Ensure tests verify password validation works after sync for both hash formats
+10. **Remove Legacy User Entity and Related Code**
+    - After all endpoints are migrated to use ApplicationUser:
+      - Remove legacy User entity from `Server.Core/UserAggregate/User.cs`
+      - Remove legacy password hasher interfaces and implementations
+      - Remove any User-related specifications that query the old Users table
+      - Remove legacy authentication services that are no longer used
+    - Update EF Core DbContext:
+      - Remove `DbSet<User> Users` from AppDbContext
+      - Remove User entity configuration
+    - Create and apply EF Core migration to drop the Users table
+    - Note: This step removes the legacy dual-table setup
 
-9. **Run and Fix Tests**
-   - Run `./build.sh TestServer` to execute all functional tests
-   - Fix any issues with:
-     - Sync logic (missing fields, incorrect mappings)
-     - Cookie handling in tests
-     - Password hash compatibility
-     - Database transaction boundaries
-   - Ensure no regressions in existing tests
+11. **Run and Fix Tests**
+    - Run `./build.sh TestServer` to execute all functional tests
+    - Fix any issues with:
+      - Endpoint response formats
+      - Authentication flows
+      - Cookie handling in tests
+      - Database queries expecting legacy User entity
+    - Ensure no regressions in existing tests
 
-10. **Verify Dual Authentication Works**
+12. **Verify Dual Authentication Works**
     - Manually test the complete flows:
-      - Register via legacy -> login via Identity
-      - Register via Identity -> login via legacy
+      - Register via /api/users -> login via /api/identity
+      - Register via /api/identity -> login via /api/users
       - Access protected endpoints with both auth types
-    - Verify both tables (Users and AspNetUsers) are in sync
-    - Verify no data loss or corruption during sync
+    - Verify only AspNetUsers table is used (no legacy Users table)
+    - Verify no data loss or issues with user operations
 
 ### Verification
 
@@ -164,4 +269,4 @@ Run the following Nuke targets to verify this phase:
 ./build.sh TestE2e
 ```
 
-All targets must pass. The sync mechanism should ensure users can authenticate through either system. Functional tests should validate all cross-authentication scenarios. Postman and E2E tests continue to use their existing authentication methods and pass without changes.
+All targets must pass. The existing /api/users endpoints now use ASP.NET Identity internally (UserManager and SignInManager) while maintaining backward compatibility. Functional tests validate cross-authentication scenarios between /api/users and /api/identity endpoints. Postman and E2E tests continue to work with /api/users endpoints without changes.

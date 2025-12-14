@@ -61,17 +61,18 @@ The linter and next-command can rely on these headings exactly.
 
 ### phase_4
 
-**Goal**: Build and test sync mechanism between existing users table and new ASP.NET Identity users table and enable cookie auth for all FastEndpoints endpoints
+**Goal**: Migrate existing /api/users endpoints to use ASP.NET Identity's UserManager and SignInManager, and enable cookie auth for all FastEndpoints endpoints
 
 **Key Outcomes**:
+- Existing /api/users/register endpoint uses ASP.NET Identity's UserManager to register users directly
+- Existing /api/users/login endpoint uses ASP.NET Identity's SignInManager to log users in directly
 - Functional test exists to prove users registered via /api/users/register can login via both /api/users/login and /api/identity/login
 - Functional test exists to prove users registered via /api/identity/register can login via both /api/identity/login and /api/users/login
 - Functional test exists to prove users registered via /api/users/register can be retrieved at /api/user via Token auth
 - Functional test exists to prove users registered via /api/identity/register can be retrieved at /api/user via cookie auth
-- User sync mechanism ensures users can authenticate using either authentication system regardless of where they registered
 - All FastEndpoints endpoints support cookie authentication in addition to Token auth
 
-**Working State Transition**: User data is synchronized between the legacy Users table and the new AspNetUsers table. Users registered through either system can authenticate through either system. FastEndpoints are configured to accept both cookie and Token authentication. Functional tests validate cross-authentication scenarios. Postman and E2E tests still use old JWT endpoints and continue to pass.
+**Working State Transition**: The existing /api/users/register and /api/users/login endpoints now use ASP.NET Identity internally (UserManager and SignInManager). Users registered through either /api/users or /api/identity endpoints are stored in AspNetUsers table. FastEndpoints are configured to accept both cookie and Token authentication. Functional tests validate cross-authentication scenarios. Postman and E2E tests continue to use /api/users endpoints which now use Identity internally.
 
 ---
 
