@@ -6,20 +6,20 @@ namespace FlowPilot.Cli.Commands;
 /// <summary>
 /// Handler for the refine command.
 /// </summary>
-public class StuckCommand : ICommand
+public class UnstuckCommand : ICommand
 {
   private readonly PlanManager _planManager;
-  private readonly ILogger<StuckCommand> _logger;
+  private readonly ILogger<UnstuckCommand> _logger;
 
-  public StuckCommand(ILogger<StuckCommand> logger, PlanManager planManager)
+  public UnstuckCommand(ILogger<UnstuckCommand> logger, PlanManager planManager)
   {
     _logger = logger;
     _planManager = planManager;
   }
 
-  public string Name => "stuck";
+  public string Name => "unstuck";
 
-  public string Description => "Analyze unsuccessful implementation attempts and present options to the user for guidance.";
+  public string Description => "Receive guidance from the user about how to proceed when stuck.";
 
   public Task<int> ExecuteAsync(string[] args)
   {
@@ -32,7 +32,7 @@ public class StuckCommand : ICommand
     {
       if (exitCode == 1)
       {
-        _logger.LogInformation("Usage: flowpilot verify <plan-name>");
+        _logger.LogInformation("Usage: flowpilot unstuck");
       }
 
       return Task.FromResult(exitCode);
@@ -70,9 +70,9 @@ public class StuckCommand : ICommand
     }
 
     _logger.LogInformation($"It looks like you're stuck on phase {currentPhase.PhaseNumber} and unable to carry out the plan successfully as described.");
-    _logger.LogInformation("The user has request you do some analysis to help you both understand the challenges and refine the plan together.");
-    _logger.LogInformation("Based on your understanding of the challenges, present a series of options in the .flowpilot/template/key-decisions.md format " +
-                           $"saved to .flowpilot/plans/{planName}/plan/phase-{currentPhase.PhaseNumber}-stuck-analysis.md and report them to the user for guidance.");
+    _logger.LogInformation($"The user has approved the selected option in .flowpilot/plans/{planName}/plan/phase-{currentPhase.PhaseNumber}-stuck-analysis.md as the way forward.");
+    _logger.LogInformation($"Update .flowpilot/plans/{planName}/meta/phase-analysis.md and .flowpilot/plans/{planName}/plan/phase-{currentPhase.PhaseNumber}-details.md to reflect this.");
+    _logger.LogInformation("Afterwards, please proceed to carry out the updated plan now that you are unstuck.");
 
     return Task.FromResult(0);
   }
