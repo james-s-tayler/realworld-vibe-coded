@@ -139,12 +139,20 @@ public static class ServiceConfigs
         // API-friendly: Return 401/403 instead of redirecting
         options.Events.OnRedirectToLogin = context =>
         {
-          context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+          if (!context.Response.HasStarted)
+          {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+          }
+
           return Task.CompletedTask;
         };
         options.Events.OnRedirectToAccessDenied = context =>
         {
-          context.Response.StatusCode = StatusCodes.Status403Forbidden;
+          if (!context.Response.HasStarted)
+          {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+          }
+
           return Task.CompletedTask;
         };
       });
