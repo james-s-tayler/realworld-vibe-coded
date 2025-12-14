@@ -754,6 +754,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   "// Clear all cookies for the current domain to ensure unauthenticated request",
                   "const jar = pm.cookies.jar();",
                   "jar.clear(pm.request.url.toString(), function(error) {",
@@ -806,6 +808,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   "// Clear all cookies for the current domain to ensure unauthenticated request",
                   "const jar = pm.cookies.jar();",
                   "jar.clear(pm.request.url.toString(), function(error) {",
@@ -1143,6 +1147,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   "// Clear all cookies for the current domain to ensure unauthenticated request",
                   "const jar = pm.cookies.jar();",
                   "jar.clear(pm.request.url.toString(), function(error) {",
@@ -2272,6 +2278,16 @@
                 "type": "text/javascript",
                 "packages": {}
               }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
+              }
             }
           ],
           "request": {
@@ -2657,6 +2673,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   ""
                 ],
                 "type": "text/javascript",
@@ -3166,6 +3184,16 @@
                 "type": "text/javascript",
                 "packages": {}
               }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
+              }
             }
           ],
           "request": {
@@ -3449,6 +3477,16 @@
                 ],
                 "type": "text/javascript",
                 "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
               }
             }
           ],
@@ -3791,6 +3829,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   "pm.globals.set('COMMENT_BODY', 'Is that so?')",
                   "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
                 ],
@@ -4035,6 +4075,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   "pm.globals.set('COMMENT_BODY', 'Is that so?')",
                   "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
                 ],
@@ -4085,6 +4127,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   "pm.globals.set('COMMENT_BODY', 'Is that so?')",
                   "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
                 ],
@@ -4480,6 +4524,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   ""
                 ],
                 "type": "text/javascript",
@@ -4632,6 +4678,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
                   "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
                   "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
@@ -4754,6 +4802,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
                   "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
                   "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
@@ -5183,6 +5233,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
                   "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
                   "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
@@ -5236,6 +5288,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
                   "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
                   "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
@@ -6809,6 +6863,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   ""
                 ],
                 "type": "text/javascript",
@@ -6942,6 +6998,8 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());",
                   ""
                 ],
                 "type": "text/javascript",
@@ -8346,6 +8404,16 @@
                 "type": "text/javascript",
                 "packages": {}
               }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
+              }
             }
           ],
           "request": {
@@ -8773,6 +8841,16 @@
                 "type": "text/javascript",
                 "packages": {}
               }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
+              }
             }
           ],
           "request": {
@@ -8809,6 +8887,16 @@
                 ],
                 "type": "text/javascript",
                 "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Clear cookies before unauthenticated test",
+                  "pm.cookies.clear(pm.request.url.toString());"
+                ],
+                "type": "text/javascript"
               }
             }
           ],
