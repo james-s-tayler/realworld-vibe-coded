@@ -4,7 +4,7 @@ public class ArticlesFavoritedByUserSpec : Specification<Article>
 {
   public ArticlesFavoritedByUserSpec(string username)
   {
-    Query.Where(x => x.FavoritedBy.Any(u => u.Username == username))
+    Query.Where(x => x.FavoritedBy.Any(u => u.UserName == username))
          .Include(x => x.Author)
          .Include(x => x.Tags)
          .Include(x => x.FavoritedBy)

@@ -1,17 +1,17 @@
-﻿using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
-using Server.SharedKernel.Persistence;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Server.Core.IdentityAggregate;
 using Server.UseCases.Interfaces;
 
 namespace Server.Web.Profiles;
 
 /// <summary>
-/// FastEndpoints mapper for User entity to ProfileResponse DTO
+/// FastEndpoints mapper for ApplicationUser entity to ProfileResponse DTO
 /// Maps domain entity to profile response with current user context for following status
 /// </summary>
-public class ProfileMapper : ResponseMapper<ProfileResponse, User>
+public class ProfileMapper : ResponseMapper<ProfileResponse, ApplicationUser>
 {
-  public override async Task<ProfileResponse> FromEntityAsync(User user, CancellationToken ct)
+  public override async Task<ProfileResponse> FromEntityAsync(ApplicationUser user, CancellationToken ct)
   {
     // Resolve current user service to get authentication context
     var currentUserService = Resolve<IUserContext>();
@@ -22,13 +22,14 @@ public class ProfileMapper : ResponseMapper<ProfileResponse, User>
     if (currentUserId.HasValue)
     {
       // Get the current user to check if they are following
-      var userRepository = Resolve<IRepository<User>>();
-      var currentUser = await userRepository.FirstOrDefaultAsync(
-        new UserWithFollowingSpec(currentUserId.Value), ct);
+      var userManager = Resolve<UserManager<ApplicationUser>>();
+      var currentUser = await userManager.Users
+        .Include(u => u.Following)
+        .FirstOrDefaultAsync(u => u.Id == currentUserId.Value, ct);
 
       if (currentUser != null)
       {
-        isFollowing = currentUser.IsFollowing(user);
+        isFollowing = currentUser.Following.Any(f => f.FollowedId == user.Id);
       }
     }
 
@@ -36,7 +37,7 @@ public class ProfileMapper : ResponseMapper<ProfileResponse, User>
     {
       Profile = new ProfileDto
       {
-        Username = user.Username,
+        Username = user.UserName!,
         Bio = user.Bio,
         Image = user.Image,
         Following = isFollowing,

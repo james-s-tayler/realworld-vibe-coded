@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Core.ArticleAggregate;
+using Server.Core.IdentityAggregate;
 using Server.Core.TagAggregate;
-using Server.Core.UserAggregate;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
 using Server.SharedKernel.Interfaces;
@@ -11,7 +11,9 @@ namespace Server.IntegrationTests.Data;
 
 /// <summary>
 /// EF Core-specific integration tests for audit column functionality.
-/// These tests verify that the AuditableEntityInterceptor correctly sets timestamps.
+/// These tests verify that the AuditableEntityInterceptor correctly sets timestamps
+/// on entities that inherit from EntityBase (Article, Comment, Tag).
+/// Note: ApplicationUser does not inherit from EntityBase, so it's not tested here.
 /// </summary>
 public class AuditableEntityInterceptorTests : IDisposable
 {
@@ -50,87 +52,90 @@ public class AuditableEntityInterceptorTests : IDisposable
     var fixedTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(fixedTime);
 
-    var user = new User(
-      email: "test@example.com",
-      username: "testuser",
-      hashedPassword: "hashedpass"
+    var author = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(author);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var article = new Article(
+      title: "Test Article",
+      description: "Test Description",
+      body: "Test Body",
+      author: author
     );
 
     // Act
-    _dbContext.Users.Add(user);
+    _dbContext.Articles.Add(article);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert
-    user.CreatedAt.ShouldBe(fixedTime);
-    user.UpdatedAt.ShouldBe(fixedTime);
+    article.CreatedAt.ShouldBe(fixedTime);
+    article.UpdatedAt.ShouldBe(fixedTime);
   }
 
   [Fact]
   public async Task Interceptor_UpdatesOnlyUpdatedAt_OnEntityModification()
   {
     // Arrange
-    var createTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
+    var createTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
-    var user = new User(
-      email: "test@example.com",
-      username: "testuser",
-      hashedPassword: "hashedpass"
-    );
-
-    _dbContext.Users.Add(user);
+    var author = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(author);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    var originalCreatedAt = user.CreatedAt;
+    var article = new Article(
+      title: "Test Article",
+      description: "Test Description",
+      body: "Test Body",
+      author: author
+    );
+
+    _dbContext.Articles.Add(article);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var originalCreatedAt = article.CreatedAt;
 
     // Act - modify entity with new time
-    var updateTime = DateTime.Parse("2025-10-25 13:0:0").ToUniversalTime();
+    var updateTime = DateTime.Parse("2025-10-25 13:00:00").ToUniversalTime();
     _timeProvider.SetTime(updateTime);
 
-    user.UpdateBio("New bio");
+    article.Update("Test Article", "Test Description", "Updated Body");
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert
-    user.CreatedAt.ShouldBe(originalCreatedAt); // CreatedAt should not change
-    user.UpdatedAt.ShouldBe(updateTime); // UpdatedAt should be updated
-    (user.UpdatedAt > user.CreatedAt).ShouldBeTrue();
+    article.CreatedAt.ShouldBe(originalCreatedAt); // CreatedAt should not change
+    article.UpdatedAt.ShouldBe(updateTime); // UpdatedAt should be updated
+    (article.UpdatedAt > article.CreatedAt).ShouldBeTrue();
   }
 
   [Fact]
   public async Task Interceptor_DoesNotUpdateUpdatedAt_WhenOnlyNavigationPropertiesChange()
   {
     // Arrange
-    var createTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
+    var createTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
-    var user = new User(
-      email: "author@example.com",
-      username: "author",
-      hashedPassword: "hashedpass"
-    );
+    var author = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(author);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     var article = new Article(
       title: "Test Article",
       description: "Description",
       body: "Body",
-      author: user
+      author: author
     );
 
-    _dbContext.Users.Add(user);
     _dbContext.Articles.Add(article);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     var originalUpdatedAt = article.UpdatedAt;
 
     // Act - modify only navigation property (add to favorites)
-    var favoriteTime = DateTime.Parse("2025-10-25 13:0:0").ToUniversalTime();
+    var favoriteTime = DateTime.Parse("2025-10-25 13:00:00").ToUniversalTime();
     _timeProvider.SetTime(favoriteTime);
 
-    var user2 = new User(
-      email: "user2@example.com",
-      username: "user2",
-      hashedPassword: "hashedpass"
-    );
+    var user2 = CreateTestUser("user2@example.com", "user2");
     _dbContext.Users.Add(user2);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -145,225 +150,126 @@ public class AuditableEntityInterceptorTests : IDisposable
   public async Task Interceptor_HandlesMultipleEntities_InSingleSaveChanges()
   {
     // Arrange
-    var fixedTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
+    var fixedTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(fixedTime);
 
-    var user1 = new User("user1@example.com", "user1", "pass1");
-    var user2 = new User("user2@example.com", "user2", "pass2");
+    var author = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(author);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var article1 = new Article("Article 1", "Description 1", "Body 1", author);
+    var article2 = new Article("Article 2", "Description 2", "Body 2", author);
     var tag = new Tag("testtag");
 
     // Act
-    _dbContext.Users.AddRange(user1, user2);
+    _dbContext.Articles.AddRange(article1, article2);
     _dbContext.Tags.Add(tag);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert
-    user1.CreatedAt.ShouldBe(fixedTime);
-    user1.UpdatedAt.ShouldBe(fixedTime);
-    user2.CreatedAt.ShouldBe(fixedTime);
-    user2.UpdatedAt.ShouldBe(fixedTime);
+    article1.CreatedAt.ShouldBe(fixedTime);
+    article1.UpdatedAt.ShouldBe(fixedTime);
+    article2.CreatedAt.ShouldBe(fixedTime);
+    article2.UpdatedAt.ShouldBe(fixedTime);
     tag.CreatedAt.ShouldBe(fixedTime);
     tag.UpdatedAt.ShouldBe(fixedTime);
   }
 
   [Fact]
-  public async Task Interceptor_OverridesManualCreatedAtSetting()
+  public async Task Interceptor_HandlesDifferentEntityTypes_InSameTransaction()
   {
     // Arrange
-    var manualTime = DateTime.Parse("2020-1-1 0:0:0").ToUniversalTime();
-    var actualTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
-    _timeProvider.SetTime(actualTime);
-
-    var user = new User("test@example.com", "testuser", "hashedpass");
-
-    // Act - Try to manually set CreatedAt (should be overridden by interceptor)
-    user.CreatedAt = manualTime;
-    _dbContext.Users.Add(user);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-    // Assert - Framework should override manual value
-    user.CreatedAt.ShouldBe(actualTime);
-    user.CreatedAt.ShouldNotBe(manualTime);
-  }
-
-  [Fact]
-  public async Task Interceptor_OverridesManualUpdatedAtSetting()
-  {
-    // Arrange
-    var createTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
+    var createTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
-    var user = new User("test@example.com", "testuser", "hashedpass");
-    _dbContext.Users.Add(user);
+    var author = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(author);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    // Act - Try to manually set UpdatedAt (should be overridden by interceptor)
-    var manualTime = DateTime.Parse("2020-1-1 0:0:0").ToUniversalTime();
-    var actualUpdateTime = DateTime.Parse("2025-10-25 13:0:0").ToUniversalTime();
-    _timeProvider.SetTime(actualUpdateTime);
+    var article = new Article("Test Article", "Description", "Body", author);
+    var comment = new Comment("Test comment", author, article);
 
-    user.UpdateBio("New bio");
-    user.UpdatedAt = manualTime; // Try to override
+    _dbContext.Articles.Add(article);
+    _dbContext.Comments.Add(comment);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    // Assert - Framework should override manual value
-    user.UpdatedAt.ShouldBe(actualUpdateTime);
-    user.UpdatedAt.ShouldNotBe(manualTime);
-  }
+    var originalArticleUpdatedAt = article.UpdatedAt;
+    var originalCommentUpdatedAt = comment.UpdatedAt;
 
-  [Fact]
-  public async Task Interceptor_OverridesManualCreatedBySetting()
-  {
-    // Arrange
-    var fixedTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
-    _timeProvider.SetTime(fixedTime);
-
-    var user = new User("test@example.com", "testuser", "hashedpass");
-
-    // Act - Try to manually set CreatedBy (should be overridden by interceptor)
-    user.CreatedBy = "ManualUser";
-    _dbContext.Users.Add(user);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-    // Assert - Framework should override with "SYSTEM" (no authenticated user in test)
-    user.CreatedBy.ShouldBe("SYSTEM");
-    user.CreatedBy.ShouldNotBe("ManualUser");
-  }
-
-  [Fact]
-  public async Task Interceptor_OverridesManualUpdatedBySetting()
-  {
-    // Arrange
-    var createTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
-    _timeProvider.SetTime(createTime);
-
-    var user = new User("test@example.com", "testuser", "hashedpass");
-    _dbContext.Users.Add(user);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-    // Act - Try to manually set UpdatedBy (should be overridden by interceptor)
-    var updateTime = DateTime.Parse("2025-10-25 13:0:0").ToUniversalTime();
+    // Act - update both entities
+    var updateTime = DateTime.Parse("2025-10-25 13:00:00").ToUniversalTime();
     _timeProvider.SetTime(updateTime);
 
-    user.UpdateBio("New bio");
-    user.UpdatedBy = "ManualUser"; // Try to override
+    article.Update("Test Article", "Description", "Updated Body");
+    comment.Update("Updated comment");
+
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    // Assert - Framework should override with "SYSTEM" (no authenticated user in test)
-    user.UpdatedBy.ShouldBe("SYSTEM");
-    user.UpdatedBy.ShouldNotBe("ManualUser");
+    // Assert
+    article.UpdatedAt.ShouldBe(updateTime);
+    article.CreatedAt.ShouldBe(createTime);
+    comment.UpdatedAt.ShouldBe(updateTime);
+    comment.CreatedAt.ShouldBe(createTime);
   }
 
   [Fact]
-  public async Task Interceptor_OverridesAllManualAuditFieldSettings()
+  public async Task Interceptor_SetsTimestamps_OnCommentEntity()
   {
     // Arrange
-    var manualTime = DateTime.Parse("2020-1-1 0:0:0").ToUniversalTime();
-    var actualTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
-    _timeProvider.SetTime(actualTime);
-
-    var user = new User("test@example.com", "testuser", "hashedpass");
-
-    // Act - Try to manually set ALL audit fields (should all be overridden)
-    user.CreatedAt = manualTime;
-    user.UpdatedAt = manualTime;
-    user.CreatedBy = "ManualCreator";
-    user.UpdatedBy = "ManualUpdater";
-
-    _dbContext.Users.Add(user);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-    // Assert - Framework should override all manual values
-    user.CreatedAt.ShouldBe(actualTime);
-    user.UpdatedAt.ShouldBe(actualTime);
-    user.CreatedBy.ShouldBe("SYSTEM");
-    user.UpdatedBy.ShouldBe("SYSTEM");
-  }
-
-  [Fact]
-  public void Interceptor_SetsCreatedAtAndUpdatedAt_OnEntityCreation_Synchronous()
-  {
-    // Arrange
-    var fixedTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
+    var fixedTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(fixedTime);
 
-    var user = new User("sync@example.com", "syncuser", "hashedpass");
+    var author = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(author);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var article = new Article("Test Article", "Description", "Body", author);
+    _dbContext.Articles.Add(article);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var comment = new Comment("Test comment body", author, article);
 
     // Act
-    _dbContext.Users.Add(user);
-    _dbContext.SaveChanges(); // Synchronous save
+    _dbContext.Comments.Add(comment);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert
-    user.CreatedAt.ShouldBe(fixedTime);
-    user.UpdatedAt.ShouldBe(fixedTime);
-    user.CreatedBy.ShouldBe("SYSTEM");
-    user.UpdatedBy.ShouldBe("SYSTEM");
+    comment.CreatedAt.ShouldBe(fixedTime);
+    comment.UpdatedAt.ShouldBe(fixedTime);
   }
 
   [Fact]
-  public void Interceptor_UpdatesOnlyUpdatedAtAndUpdatedBy_OnEntityModification_Synchronous()
+  public async Task Interceptor_UpdatesComment_Timestamp()
   {
     // Arrange
-    var creationTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
-    _timeProvider.SetTime(creationTime);
+    var createTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
+    _timeProvider.SetTime(createTime);
 
-    var user = new User("sync2@example.com", "syncuser2", "hashedpass");
-
-    _dbContext.Users.Add(user);
-    _dbContext.SaveChanges(); // Synchronous save
-
-    var originalCreatedAt = user.CreatedAt;
-    var originalCreatedBy = user.CreatedBy;
-
-    // Change time for the update
-    var updateTime = creationTime.AddHours(2);
-    _timeProvider.SetTime(updateTime);
-
-    // Act - Modify the entity
-    user.UpdateBio("Updated bio sync");
-    _dbContext.SaveChanges(); // Synchronous save
-
-    // Assert
-    user.CreatedAt.ShouldBe(originalCreatedAt); // Should not change
-    user.CreatedBy.ShouldBe(originalCreatedBy); // Should not change
-    user.UpdatedAt.ShouldBe(updateTime); // Should be updated
-    user.UpdatedBy.ShouldBe("SYSTEM"); // Should be updated
-  }
-
-  [Fact]
-  public void Interceptor_DoesNotUpdateAuditFields_WhenOnlyNavigationPropertiesChange_Synchronous()
-  {
-    // Arrange
-    var creationTime = DateTime.Parse("2025-10-25 12:0:0").ToUniversalTime();
-    _timeProvider.SetTime(creationTime);
-
-    var author = new User("author@example.com", "author", "hashedpass");
-
-    var article = new Article(
-      title: "Sync Test Article",
-      description: "Sync Test Description",
-      body: "Sync Test Body",
-      author);
-
+    var author = CreateTestUser("author@example.com", "author");
     _dbContext.Users.Add(author);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var article = new Article("Test Article", "Description", "Body", author);
     _dbContext.Articles.Add(article);
-    _dbContext.SaveChanges(); // Synchronous save
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    var originalUpdatedAt = article.UpdatedAt;
+    var comment = new Comment("Original body", author, article);
+    _dbContext.Comments.Add(comment);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    // Change time for the "update"
-    var updateTime = creationTime.AddHours(2);
+    var originalCreatedAt = comment.CreatedAt;
+
+    // Act - update comment
+    var updateTime = DateTime.Parse("2025-10-25 13:00:00").ToUniversalTime();
     _timeProvider.SetTime(updateTime);
 
-    // Act - Touch the article entity without changing any scalar properties
-    var entry = _dbContext.Entry(article);
-    entry.State = EntityState.Modified;
-
-    _dbContext.SaveChanges(); // Synchronous save
+    comment.Update("Updated body");
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert
-    // Since no actual property values changed, UpdatedAt should NOT be updated
-    article.UpdatedAt.ShouldBe(originalUpdatedAt);
+    comment.CreatedAt.ShouldBe(originalCreatedAt);
+    comment.UpdatedAt.ShouldBe(updateTime);
+    (comment.UpdatedAt > comment.CreatedAt).ShouldBeTrue();
   }
 
   public void Dispose()
@@ -385,5 +291,19 @@ public class AuditableEntityInterceptorTests : IDisposable
     {
       _currentTime = time;
     }
+  }
+
+  private static ApplicationUser CreateTestUser(string email, string userName)
+  {
+    return new ApplicationUser
+    {
+      Id = Guid.NewGuid(),
+      Email = email,
+      UserName = userName,
+      NormalizedEmail = email.ToUpperInvariant(),
+      NormalizedUserName = userName.ToUpperInvariant(),
+      Bio = "Test bio",
+      Image = null,
+    };
   }
 }

@@ -21,9 +21,6 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser, IdentityRole
     _dispatcher = dispatcher;
   }
 
-  // Hide the inherited Users property from IdentityDbContext to use our own User entity
-  public new DbSet<User> Users => Set<User>();
-
   public DbSet<Article> Articles => Set<Article>();
 
   public DbSet<Tag> Tags => Set<Tag>();

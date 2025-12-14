@@ -1,43 +1,47 @@
-﻿using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
-using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Profiles.Unfollow;
 
-public class UnfollowUserHandler(IRepository<User> userRepository)
-  : ICommandHandler<UnfollowUserCommand, User>
+// PV014: This handler uses ASP.NET Identity's UserManager instead of the repository pattern.
+// UserManager.UpdateAsync performs the database mutation internally.
+#pragma warning disable PV014
+public class UnfollowUserHandler(UserManager<ApplicationUser> userManager)
+  : ICommandHandler<UnfollowUserCommand, ApplicationUser>
 {
-  public async Task<Result<User>> Handle(UnfollowUserCommand request, CancellationToken cancellationToken)
+  public async Task<Result<ApplicationUser>> Handle(UnfollowUserCommand request, CancellationToken cancellationToken)
   {
     // Find the user to unfollow
-    var userToUnfollow = await userRepository.FirstOrDefaultAsync(
-      new UserByUsernameSpec(request.Username), cancellationToken);
+    var userToUnfollow = await userManager.FindByNameAsync(request.Username);
 
     if (userToUnfollow == null)
     {
-      return Result<User>.NotFound(request.Username);
+      return Result<ApplicationUser>.NotFound(request.Username);
     }
 
     // Get current user with following relationships
-    var currentUser = await userRepository.FirstOrDefaultAsync(
-      new UserWithFollowingSpec(request.CurrentUserId), cancellationToken);
+    var currentUser = await userManager.Users
+      .Include(u => u.Following)
+      .FirstOrDefaultAsync(u => u.Id == request.CurrentUserId, cancellationToken);
 
     if (currentUser == null)
     {
-      return Result<User>.NotFound(request.CurrentUserId);
+      return Result<ApplicationUser>.NotFound(request.CurrentUserId);
     }
 
     // Check if the user is currently following the target user
     if (!currentUser.IsFollowing(userToUnfollow))
     {
-      return Result<User>.Invalid(new ErrorDetail("username", "is not being followed"));
+      return Result<ApplicationUser>.Invalid(new ErrorDetail("username", "is not being followed"));
     }
 
     // Unfollow the user
     currentUser.Unfollow(userToUnfollow);
-    await userRepository.UpdateAsync(currentUser, cancellationToken);
+    await userManager.UpdateAsync(currentUser);
 
-    return Result<User>.Success(userToUnfollow);
+    return Result<ApplicationUser>.Success(userToUnfollow);
   }
 }
+#pragma warning restore PV014

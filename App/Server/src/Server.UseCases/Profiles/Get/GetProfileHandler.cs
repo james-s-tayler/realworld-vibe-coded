@@ -1,23 +1,25 @@
-﻿using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
-using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Profiles.Get;
 
-public class GetProfileHandler(IRepository<User> userRepository)
-  : IQueryHandler<GetProfileQuery, User>
+public class GetProfileHandler(UserManager<ApplicationUser> userManager)
+  : IQueryHandler<GetProfileQuery, ApplicationUser>
 {
-  public async Task<Result<User>> Handle(GetProfileQuery request, CancellationToken cancellationToken)
+  public async Task<Result<ApplicationUser>> Handle(GetProfileQuery request, CancellationToken cancellationToken)
   {
-    var user = await userRepository.FirstOrDefaultAsync(
-      new UserByUsernameWithFollowingSpec(request.Username), cancellationToken);
+    var user = await userManager.Users
+      .Include(u => u.Following)
+      .Include(u => u.Followers)
+      .FirstOrDefaultAsync(u => u.UserName == request.Username, cancellationToken);
 
     if (user == null)
     {
-      return Result<User>.NotFound(request.Username);
+      return Result<ApplicationUser>.NotFound(request.Username);
     }
 
-    return Result<User>.Success(user);
+    return Result<ApplicationUser>.Success(user);
   }
 }

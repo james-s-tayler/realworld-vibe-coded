@@ -61,18 +61,19 @@ The linter and next-command can rely on these headings exactly.
 
 ### phase_4
 
-**Goal**: Migrate existing /api/users endpoints to use ASP.NET Identity's UserManager and SignInManager, and enable cookie auth for all FastEndpoints endpoints
+**Goal**: Complete migration to ApplicationUser as single source of truth (Option A approach)
 
 **Key Outcomes**:
-- Existing /api/users/register endpoint uses ASP.NET Identity's UserManager to register users directly
-- Existing /api/users/login endpoint uses ASP.NET Identity's SignInManager to log users in directly
-- Functional test exists to prove users registered via /api/users/register can login via both /api/users/login and /api/identity/login
-- Functional test exists to prove users registered via /api/identity/register can login via both /api/identity/login and /api/users/login
-- Functional test exists to prove users registered via /api/users/register can be retrieved at /api/user via Token auth
-- Functional test exists to prove users registered via /api/identity/register can be retrieved at /api/user via cookie auth
-- All FastEndpoints endpoints support cookie authentication in addition to Token auth
+- ALL handlers migrated from IRepository<User> to UserManager<ApplicationUser>
+- Register, Login, GetCurrent, UpdateUser use Identity UserManager/SignInManager
+- Article, Profile, Comment handlers updated to use ApplicationUser
+- JWT token generation updated to work with ApplicationUser
+- Legacy User entity and IRepository<User> completely removed
+- Only AspNetUsers table remains (Users table dropped)
+- All tests updated and passing with ApplicationUser
+- FastEndpoints support both cookie and Token authentication
 
-**Working State Transition**: The existing /api/users/register and /api/users/login endpoints now use ASP.NET Identity internally (UserManager and SignInManager). Users registered through either /api/users or /api/identity endpoints are stored in AspNetUsers table. FastEndpoints are configured to accept both cookie and Token authentication. Functional tests validate cross-authentication scenarios. Postman and E2E tests continue to use /api/users endpoints which now use Identity internally.
+**Working State Transition**: Complete migration from legacy User entity to ApplicationUser. All user data stored exclusively in AspNetUsers table. All handlers query/update via UserManager. Legacy User table dropped. JWT tokens generated from ApplicationUser. Cross-authentication works (register via /api/users or /api/identity, login via either). All tests pass.
 
 ---
 

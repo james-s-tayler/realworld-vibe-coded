@@ -1,37 +1,38 @@
-﻿using Microsoft.Extensions.Logging;
-using Server.Core.UserAggregate;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
-using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Users.GetCurrent;
 
-public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, User>
+public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, ApplicationUser>
 {
-  private readonly IRepository<User> _repository;
+  private readonly UserManager<ApplicationUser> _userManager;
   private readonly ILogger<GetCurrentUserHandler> _logger;
 
   public GetCurrentUserHandler(
-    IRepository<User> repository,
+    UserManager<ApplicationUser> userManager,
     ILogger<GetCurrentUserHandler> logger)
   {
-    _repository = repository;
+    _userManager = userManager;
     _logger = logger;
   }
 
-  public async Task<Result<User>> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
+  public async Task<Result<ApplicationUser>> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
   {
     _logger.LogInformation("Getting current user for ID {UserId}", request.UserId);
 
-    var user = await _repository.GetByIdAsync(request.UserId, cancellationToken);
+    // Look up ApplicationUser by ID
+    var appUser = await _userManager.FindByIdAsync(request.UserId.ToString());
 
-    if (user == null)
+    if (appUser == null)
     {
       _logger.LogWarning("User with ID {UserId} not found", request.UserId);
-      return Result<User>.NotFound();
+      return Result<ApplicationUser>.NotFound();
     }
 
-    _logger.LogInformation("Retrieved current user {Username}", user.Username);
+    _logger.LogInformation("Retrieved current user {Username}", appUser.UserName);
 
-    return Result<User>.Success(user);
+    return Result<ApplicationUser>.Success(appUser);
   }
 }

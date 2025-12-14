@@ -1,22 +1,24 @@
-﻿using Server.Core.ArticleAggregate;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications.Articles;
-using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
+using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Feed;
 
 public class GetFeedHandler(
-  IReadRepository<User> userRepository,
+  UserManager<ApplicationUser> userManager,
   IReadRepository<Article> articleRepository)
   : IQueryHandler<GetFeedQuery, GetFeedResult>
 {
   public async Task<Result<GetFeedResult>> Handle(GetFeedQuery request, CancellationToken cancellationToken)
   {
     // Get the user with their following relationships
-    var user = await userRepository.FirstOrDefaultAsync(
-      new UserWithFollowingSpec(request.UserId), cancellationToken);
+    var user = await userManager.Users
+      .Include(u => u.Following)
+      .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
 
     if (user == null)
     {

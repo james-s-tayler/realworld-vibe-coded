@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications.Articles;
-using Server.Core.UserAggregate;
-using Server.Core.UserAggregate.Specifications;
+using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
 
@@ -12,16 +13,16 @@ namespace Server.UseCases.Articles.Comments.Create;
 public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, CommentResponse>
 {
   private readonly IRepository<Article> _articleRepository;
-  private readonly IRepository<User> _userRepository;
+  private readonly UserManager<ApplicationUser> _userManager;
   private readonly ILogger<CreateCommentHandler> _logger;
 
   public CreateCommentHandler(
     IRepository<Article> articleRepository,
-    IRepository<User> userRepository,
+    UserManager<ApplicationUser> userManager,
     ILogger<CreateCommentHandler> logger)
   {
     _articleRepository = articleRepository;
-    _userRepository = userRepository;
+    _userManager = userManager;
     _logger = logger;
   }
 
@@ -35,10 +36,10 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
     }
 
     // Find the user
-    var user = await _userRepository.GetByIdAsync(request.AuthorId, cancellationToken);
+    var user = await _userManager.FindByIdAsync(request.AuthorId.ToString());
     if (user == null)
     {
-      return Result<CommentResponse>.ErrorMissingRequiredEntity(typeof(User), request.AuthorId);
+      return Result<CommentResponse>.ErrorMissingRequiredEntity(typeof(ApplicationUser), request.AuthorId);
     }
 
     // Create the comment
@@ -53,8 +54,13 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
     _logger.LogInformation("Comment created successfully with ID {CommentId}", comment.Id);
 
     // Check if current user is following the comment author
-    var currentUser = request.CurrentUserId.HasValue ?
-        await _userRepository.FirstOrDefaultAsync(new UserWithFollowingSpec(request.CurrentUserId.Value), cancellationToken) : null;
+    ApplicationUser? currentUser = null;
+    if (request.CurrentUserId.HasValue)
+    {
+      currentUser = await _userManager.Users
+        .Include(u => u.Following)
+        .FirstOrDefaultAsync(u => u.Id == request.CurrentUserId.Value, cancellationToken);
+    }
 
     // Return the comment response
     var response = new CommentResponse(CommentMappers.MapToDto(comment, currentUser));
