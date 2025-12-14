@@ -7,14 +7,11 @@ namespace Server.Infrastructure.Email;
 /// <summary>
 /// Adapter that implements Microsoft.AspNetCore.Identity.IEmailSender for ApplicationUser
 /// by wrapping the existing application IEmailSender service.
-/// This is required by MapIdentityApi to send confirmation and password reset emails.
-/// Uses IServiceProvider to resolve scoped IEmailSender at runtime since MapIdentityApi
-/// requires a singleton service but IEmailSender is registered as scoped.
 /// </summary>
-public class IdentityEmailSender(IServiceProvider serviceProvider, ILogger<IdentityEmailSender> logger)
+public class IdentityEmailSender(IEmailSender emailSender, ILogger<IdentityEmailSender> logger)
   : IEmailSender<ApplicationUser>
 {
-  private readonly IServiceProvider _serviceProvider = serviceProvider;
+  private readonly IEmailSender _emailSender = emailSender;
   private readonly ILogger<IdentityEmailSender> _logger = logger;
   private const string DefaultFromAddress = "noreply@conduit.com";
 
@@ -24,9 +21,7 @@ public class IdentityEmailSender(IServiceProvider serviceProvider, ILogger<Ident
     var subject = "Confirm your email";
     var body = $"Please confirm your account by clicking this link: {confirmationLink}";
 
-    using var scope = _serviceProvider.CreateScope();
-    var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
-    await emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
+    await _emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
   }
 
   public async Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink)
@@ -35,9 +30,7 @@ public class IdentityEmailSender(IServiceProvider serviceProvider, ILogger<Ident
     var subject = "Reset your password";
     var body = $"Please reset your password by clicking this link: {resetLink}";
 
-    using var scope = _serviceProvider.CreateScope();
-    var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
-    await emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
+    await _emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
   }
 
   public async Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode)
@@ -46,8 +39,6 @@ public class IdentityEmailSender(IServiceProvider serviceProvider, ILogger<Ident
     var subject = "Reset your password";
     var body = $"Please reset your password using the following code: {resetCode}";
 
-    using var scope = _serviceProvider.CreateScope();
-    var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
-    await emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
+    await _emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
   }
 }

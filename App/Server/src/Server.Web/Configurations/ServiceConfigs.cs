@@ -148,10 +148,6 @@ public static class ServiceConfigs
         };
       });
 
-    // Register Identity email sender adapter (required by MapIdentityApi)
-    // Must be singleton because MapIdentityApi resolves it during startup
-    services.AddSingleton<Microsoft.AspNetCore.Identity.IEmailSender<ApplicationUser>, Server.Infrastructure.Email.IdentityEmailSender>();
-
     services.AddAuthorization();
     services.AddProblemDetails();
     services.AddMemoryCache();
@@ -165,15 +161,17 @@ public static class ServiceConfigs
     {
       // Use a local test email server
       // See: https://ardalis.com/configuring-a-local-test-email-server/
-      services.AddScoped<IEmailSender, MimeKitEmailSender>();
+      services.AddSingleton<IEmailSender, MimeKitEmailSender>();
 
       // Otherwise use this:
-      // builder.Services.AddScoped<IEmailSender, FakeEmailSender>();
+      // builder.Services.AddSingleton<IEmailSender, FakeEmailSender>();
     }
     else
     {
-      services.AddScoped<IEmailSender, MimeKitEmailSender>();
+      services.AddSingleton<IEmailSender, MimeKitEmailSender>();
     }
+
+    services.AddSingleton<Microsoft.AspNetCore.Identity.IEmailSender<ApplicationUser>, Server.Infrastructure.Email.IdentityEmailSender>();
 
     logger.LogInformation("{Project} services registered", "Mediatr and Email Sender");
 
