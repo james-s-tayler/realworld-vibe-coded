@@ -30,7 +30,7 @@ public class HelpCommand : ICommand
     _logger.LogInformation("  next <plan-name>  Advance to the next phase of the plan");
     _logger.LogInformation("  lint <plan-name>  Validate the plan follows FlowPilot rules");
     _logger.LogInformation("  verify <plan-name> Check verification requirements for the current phase");
-    _logger.LogInformation("  refine            Analyze unsuccessful implementation attempts and present options to the user for guidance.");
+    _logger.LogInformation("  stuck             Analyze unsuccessful implementation attempts and present options to the user for guidance.");
     _logger.LogInformation("  help              Display this help information");
     _logger.LogInformation(string.Empty);
     _logger.LogInformation("Getting Started:");
