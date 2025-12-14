@@ -16,7 +16,7 @@ public class Feed(IMediator mediator, IUserContext userContext) : Endpoint<FeedR
   public override void Configure()
   {
     Get("/api/articles/feed");
-    AuthSchemes("Token");
+    AuthSchemes("Token", "Identity.Application");
     Summary(s =>
     {
       s.Summary = "Get user's feed";

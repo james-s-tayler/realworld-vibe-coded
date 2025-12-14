@@ -11,13 +11,16 @@ namespace Server.UseCases.Users.Register;
 public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, ApplicationUser>
 {
   private readonly UserManager<ApplicationUser> _userManager;
+  private readonly SignInManager<ApplicationUser> _signInManager;
   private readonly ILogger<RegisterUserHandler> _logger;
 
   public RegisterUserHandler(
     UserManager<ApplicationUser> userManager,
+    SignInManager<ApplicationUser> signInManager,
     ILogger<RegisterUserHandler> logger)
   {
     _userManager = userManager;
+    _signInManager = signInManager;
     _logger = logger;
   }
 
@@ -76,6 +79,10 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Applicat
 
       return Result<ApplicationUser>.Invalid(errors);
     }
+
+    // Sign in the user to create authentication cookie
+    // This allows endpoints to authenticate via cookies in addition to JWT tokens
+    await _signInManager.SignInAsync(user, isPersistent: false);
 
     _logger.LogInformation(
       "User {Username} registered successfully with ID {UserId}",

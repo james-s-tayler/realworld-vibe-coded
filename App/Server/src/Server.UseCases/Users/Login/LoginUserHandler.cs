@@ -51,6 +51,10 @@ public class LoginUserHandler : IQueryHandler<LoginUserQuery, ApplicationUser>
       });
     }
 
+    // Sign in the user to create authentication cookie
+    // This allows endpoints to authenticate via cookies in addition to JWT tokens
+    await _signInManager.SignInAsync(user, isPersistent: false);
+
     _logger.LogInformation("User {Username} logged in successfully", user.UserName);
 
     return Result<ApplicationUser>.Success(user);

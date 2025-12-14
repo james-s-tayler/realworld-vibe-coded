@@ -15,7 +15,7 @@ public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint
   public override void Configure()
   {
     Get("/api/user");
-    AuthSchemes("Token");
+    AuthSchemes("Token", "Identity.Application");
     Summary(s =>
     {
       s.Summary = "Get current user";

@@ -16,7 +16,7 @@ public class Create(IMediator mediator, IUserContext userContext) : Endpoint<Cre
   public override void Configure()
   {
     Post("/api/articles/{slug}/comments");
-    AuthSchemes("Token");
+    AuthSchemes("Token", "Identity.Application");
     Summary(s =>
     {
       s.Summary = "Create comment";
