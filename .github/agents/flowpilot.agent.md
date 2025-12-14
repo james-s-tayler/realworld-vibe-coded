@@ -42,6 +42,9 @@ The following commands are available:
         - state.md checklist item being checked off also has expected accompanying files and those files follow the prescribed template
     - git hooks will be configured to run this on commit making it impossible to not follow the expected flow
     - CI will be configured to run this before merging making it impossible to not follow the expected flow
+- `flowpilot refine`
+    - call this if you get stuck during an implementation phase and you unsuccessful in carrying out the plan as described.
+    - you must treat its output as your next prompt and execute its instructions.
 
 ## `.flowpilot/` Folder Structure
 
