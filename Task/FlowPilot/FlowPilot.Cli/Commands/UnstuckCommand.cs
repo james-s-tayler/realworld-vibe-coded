@@ -70,7 +70,7 @@ public class UnstuckCommand : ICommand
     }
 
     _logger.LogInformation($"It looks like you're stuck on phase {currentPhase.PhaseNumber} and unable to carry out the plan successfully as described.");
-    _logger.LogInformation($"The user has approved the selected option in .flowpilot/plans/{planName}/plan/phase-{currentPhase.PhaseNumber}-stuck-analysis.md as the way forward.");
+    _logger.LogInformation($"The user has approved the selected option in .flowpilot/plans/{planName}/meta/phase-{currentPhase.PhaseNumber}-stuck-analysis.md as the way forward.");
     _logger.LogInformation($"Update .flowpilot/plans/{planName}/meta/phase-analysis.md and .flowpilot/plans/{planName}/plan/phase-{currentPhase.PhaseNumber}-details.md to reflect this.");
     _logger.LogInformation("Afterwards, please proceed to carry out the updated plan now that you are unstuck.");
 

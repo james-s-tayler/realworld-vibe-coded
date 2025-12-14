@@ -102,7 +102,7 @@ How should we handle the data synchronization between ApplicationUser (Identity)
 - Requires updating Phase 5 plan
 - May not meet phase verification criteria
 
-**Impact:** 
+**Impact:**
 - Phase 4: Focus only on User endpoints (Register, Login, GetCurrent, Update)
 - Accept breaking Article/Profile functionality temporarily
 - Phase 5: Update all dependent handlers to use ApplicationUser
@@ -158,33 +158,14 @@ How should we handle the data synchronization between ApplicationUser (Identity)
 
 ### Choice
 
-- [ ] Option A: Single Source of Truth - Identity Only (Aggressive)
+- [x] Option A: Single Source of Truth - Identity Only (Aggressive)
 - [ ] Option B: Database-Level Sync (Triggers/Views)
-- [x] Option C: Staged Migration - Complete Phase 4 Without Dual-Write
+- [ ] Option C: Staged Migration - Complete Phase 4 Without Dual-Write
 - [ ] Option D: Read-Through Cache Pattern
 - [ ] Option E: Synchronous Dual-Write with Explicit Transaction
 
-**Rationale:** 
+**Rationale:**
 
-Option C provides the cleanest path forward while respecting the phase-based migration approach. Here's why:
-
-1. **Alignment with Phase Structure**: The original phase plan has 8 phases. Phase 4 should focus solely on migrating the core user authentication endpoints. Updating all dependent handlers is naturally a separate phase (Phase 5).
-
-2. **Clear Scope**: By accepting that Article/Profile functionality will temporarily break, we can deliver a clean Phase 4 that:
-   - Fully migrates Register, Login, GetCurrent, Update to Identity
-   - Has no dual-write complexity
-   - Has clear, understandable code
-   - Passes all User-specific tests
-
-3. **Better Testing**: Without dual-write complexity, we can properly test that Identity integration works correctly without worrying about synchronization issues.
-
-4. **Pragmatic**: The 10 failing tests and Postman failures are likely due to dependent handlers trying to query the legacy User table. This is expected and should be addressed in a follow-up phase.
-
-5. **Risk Management**: Making 15-20 file changes in one phase (Option A) increases risk. Spreading changes across phases reduces risk per phase.
-
-**Next Steps:**
-1. Remove dual-write from Register and Update handlers
-2. Update Phase 4 verification criteria to exclude Article/Profile tests
-3. Create Phase 5 plan: "Migrate dependent handlers to use ApplicationUser"
-4. Document the temporary breaking change in phase details
+Option A is aggresive but we don't need to preserve any data, and we have extremely robust Postman and E2E test suites.
+It is closest to our desired end-state and it minimizes transaction and data consistency issues.
 
