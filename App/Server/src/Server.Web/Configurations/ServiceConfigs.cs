@@ -155,7 +155,8 @@ public static class ServiceConfigs
 
           return Task.CompletedTask;
         };
-      });
+      })
+      .AddBearerToken(IdentityConstants.BearerScheme);
 
     services.AddAuthorization();
     services.AddProblemDetails();
@@ -166,17 +167,14 @@ public static class ServiceConfigs
     services.AddHealthChecks()
       .AddCheck<DatabaseMigrationHealthCheck>("database", tags: new[] { "db", "ready" });
 
-    if (builder.Environment.IsDevelopment())
+    if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing"))
     {
-      // Use a local test email server
-      // See: https://ardalis.com/configuring-a-local-test-email-server/
-      services.AddSingleton<IEmailSender, MimeKitEmailSender>();
-
-      // Otherwise use this:
-      // builder.Services.AddSingleton<IEmailSender, FakeEmailSender>();
+      // Use fake email sender for development and testing to avoid SMTP configuration issues
+      services.AddSingleton<IEmailSender, FakeEmailSender>();
     }
     else
     {
+      // Use real email sender in production
       services.AddSingleton<IEmailSender, MimeKitEmailSender>();
     }
 

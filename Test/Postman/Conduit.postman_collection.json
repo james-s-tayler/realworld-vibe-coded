@@ -17,41 +17,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches EMAIL variable', function() {",
-                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
-                  "        pm.expect(user.email).to.eql(email);",
-                  "    });",
-                  "    pm.test('\"usermame\" property matches USERNAME variable', function() {",
-                  "        const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME');",
-                  "        pm.expect(user.username).to.eql(username);",
-                  "    });",
-                  "    pm.test('User has default \"bio\" property', function() {",
-                  "        pm.expect(user.bio).to.eql('I work at statefarm');",
-                  "    });",
-                  "    pm.test('User has \"image\" property', function() {",
-                  "        pm.expect(user).to.have.property('image');",
-                  "        pm.expect(user.image).to.be.null;",
-                  "    });",
-                  "    pm.test('User has \"token\" property', function() {",
-                  "        pm.expect(user).to.have.property('token');",
-                  "    });",
-                  "    pm.test('\"token\" property is not empty', function() {",
-                  "        pm.expect(user.token).to.not.be.empty",
-                  "    });",
-                  "    pm.test('\"token\" property is not same as password', function() {",
-                  "    const password = pm.globals.get('PASSWORD') || pm.environment.get('PASSWORD');",
-                  "    pm.expect(user.token).to.not.eql(password, 'The password must be hashed, and not stored in plain text');",
-                  "    });",
-                  "}",
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
                   ""
                 ],
                 "type": "text/javascript",
@@ -73,15 +41,16 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -94,24 +63,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches SECOND_EMAIL variable', function() {",
-                  "        const email = pm.globals.get('SECOND_EMAIL');",
-                  "        pm.expect(user.email).to.eql(email);",
-                  "    });",
-                  "    pm.test('\"usermame\" property matches SECOND_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('SECOND_USERNAME');",
-                  "        pm.expect(user.username).to.eql(username);",
-                  "    });",
-                  "}",
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
                   ""
                 ],
                 "type": "text/javascript",
@@ -144,15 +98,16 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{SECOND_USERNAME}}\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -209,15 +164,16 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{RANDOM_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -274,15 +230,16 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{RANDOM_USERNAME}}\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -339,15 +296,16 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"soloyolo\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{RANDOM_USERNAME}}\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -406,15 +364,16 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -473,15 +432,16 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\": \"\", \"password\":\"\", \"username\":\"\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -494,30 +454,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.test('Response contains \"user\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('user')",
-                  "});",
-                  "",
-                  "var user = responseJSON.user || {};",
-                  "",
-                  "pm.test('user.email matches the EMAIL variable', function() {",
-                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
-                  "    pm.expect(user.email).to.eql(email)",
-                  "});",
-                  "pm.test('user.usermame matches USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(user.username).to.eql(username)",
-                  "});",
-                  "pm.test('User has \"bio\" property', function() {",
-                  "    pm.expect(user).to.have.property('bio')",
-                  "});",
-                  "pm.test('User has \"image\" property', function() {",
-                  "    pm.expect(user).to.have.property('image')",
-                  "});",
-                  "pm.test('User has \"token\" property', function() {",
-                  "    pm.expect(user).to.have.property('token')",
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
                   "});",
                   ""
                 ],
@@ -540,15 +478,15 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
               ]
             }
@@ -562,9 +500,10 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 401', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
-                  "})"
+                  "pm.test(\"Status code is 401\", function() {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -585,15 +524,15 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"someone@example.com\", \"password\":\"{{PASSWORD}}\"}}"
+              "raw": "{\"email\":\"nonexistent@example.com\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
               ]
             }
@@ -607,9 +546,10 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Response is HTTP 401', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
-                  "})"
+                  "pm.test(\"Status code is 401\", function() {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -630,15 +570,15 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"oops\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"wrongpassword\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
               ]
             }
@@ -652,38 +592,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.test('Response contains \"user\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('user')",
-                  "});",
-                  "",
-                  "var user = responseJSON.user || {};",
-                  "",
-                  "pm.test('user.email matches the EMAIL variable', function() {",
-                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
-                  "    pm.expect(user.email).to.eql(email)",
-                  "});",
-                  "pm.test('user.usermame matches USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(user.username).to.eql(username)",
-                  "});",
-                  "pm.test('User has \"bio\" property', function() {",
-                  "    pm.expect(user).to.have.property('bio')",
-                  "});",
-                  "pm.test('User has \"image\" property', function() {",
-                  "    pm.expect(user).to.have.property('image')",
-                  "});",
-                  "pm.test('User has \"token\" property', function() {",
-                  "    pm.expect(user).to.have.property('token')",
-                  "});",
-                  "",
-                  "if(pm.test('User has \"token\" property')){",
-                  "    pm.globals.set('token', user.token);",
-                  "}",
-                  "",
-                  "pm.test('Global variable \"token\" has been set', function() {",
-                  "    pm.globals.get('token') === user.token",
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
                   "});",
                   ""
                 ],
@@ -716,15 +626,15 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
               ]
             }
@@ -760,8 +670,6 @@
                   "pm.test('User has \"image\" property', function() {",
                   "    pm.expect(user).to.have.property('image')",
                   "});",
-                  "pm.test('User has \"token\" property that matches the token in the Authorization header', function() {",
-                  "    pm.expect(user.token).to.eql(pm.globals.get('token'))",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -785,10 +693,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "url": {
@@ -825,11 +729,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -866,10 +765,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token 123"
               }
             ],
             "url": {
@@ -913,8 +808,6 @@
                   "pm.test('\"image\" matches the UPDATED_IMAGE variable', function() {",
                   "    pm.expect(user.image).to.eql(pm.globals.get('UPDATED_IMAGE'))",
                   "});",
-                  "pm.test('User has \"token\" property', function() {",
-                  "    pm.expect(user).to.have.property('token')",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -947,10 +840,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -1021,10 +910,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -1094,10 +979,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -1166,10 +1047,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -1214,11 +1091,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}",
-                "disabled": true
               }
             ],
             "body": {
@@ -1787,10 +1659,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -1949,10 +1817,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -2025,10 +1889,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -2083,10 +1943,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -2142,10 +1998,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -2215,10 +2067,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -2288,10 +2136,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -2361,10 +2205,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -2409,11 +2249,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}",
-                "disabled": true
               }
             ],
             "body": {
@@ -2598,10 +2433,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "url": {
@@ -2665,10 +2496,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "url": {
@@ -2808,11 +2635,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -2866,10 +2688,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "url": {
@@ -3003,10 +2821,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -3145,10 +2959,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -3287,10 +3097,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -3337,11 +3143,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}",
-                "disabled": true
               }
             ],
             "body": {
@@ -3388,10 +3189,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -3526,10 +3323,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "url": {
@@ -3592,10 +3385,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "url": {
@@ -3634,11 +3423,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -3677,10 +3461,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "url": {
@@ -3794,10 +3574,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -3870,10 +3646,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -3945,10 +3717,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -4006,11 +3774,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}",
-                "disabled": true
               }
             ],
             "body": {
@@ -4068,10 +3831,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -4137,10 +3896,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -4206,10 +3961,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -4263,11 +4014,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -4318,10 +4064,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "url": {
@@ -4372,10 +4114,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "url": {
@@ -4426,10 +4164,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "url": {
@@ -4489,10 +4223,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "url": {
@@ -4543,10 +4273,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "url": {
@@ -4671,10 +4397,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "url": {
@@ -4736,11 +4458,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -4797,11 +4514,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -4850,10 +4562,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "url": {
@@ -4912,11 +4620,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}",
-                "disabled": true
               }
             ],
             "body": {
@@ -4978,10 +4681,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -5043,10 +4742,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "body": {
@@ -5117,10 +4812,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -5193,10 +4884,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -5267,10 +4954,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -5374,10 +5057,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "body": {
@@ -5435,10 +5114,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "url": {
@@ -5492,11 +5167,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -5550,10 +5220,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "url": {
@@ -5607,10 +5273,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token}}"
               }
             ],
             "url": {
@@ -5664,10 +5326,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{articles_user_token_2}}"
               }
             ],
             "url": {
@@ -6283,10 +5941,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "body": {
@@ -6333,10 +5987,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "body": {
@@ -6399,10 +6049,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "body": {
@@ -6457,10 +6103,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token_2}}"
               }
             ],
             "body": {
@@ -6515,10 +6157,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token_3}}"
               }
             ],
             "body": {
@@ -6573,10 +6211,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token_2}}"
               }
             ],
             "body": {
@@ -6631,10 +6265,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token_4}}"
               }
             ],
             "body": {
@@ -6679,10 +6309,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "body": {
@@ -6729,10 +6355,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token_3}}"
               }
             ],
             "body": {
@@ -6779,10 +6401,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token_3}}"
               }
             ],
             "body": {
@@ -6853,10 +6471,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -6921,10 +6535,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -6994,10 +6604,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7071,10 +6677,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7144,10 +6746,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7212,10 +6810,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7273,11 +6867,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -7345,10 +6934,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7415,11 +7000,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -7489,10 +7069,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7568,10 +7144,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7650,10 +7222,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7718,10 +7286,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7792,10 +7356,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7866,10 +7426,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -7934,10 +7490,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -8022,10 +7574,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -8090,10 +7638,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -8163,10 +7707,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -8235,10 +7775,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -8306,10 +7842,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -8376,10 +7908,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -8442,10 +7970,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -8508,10 +8032,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{feed_user_token}}"
               }
             ],
             "url": {
@@ -8856,11 +8376,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}",
-                "disabled": true
               }
             ],
             "body": {
@@ -8926,10 +8441,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -8995,10 +8506,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -9045,10 +8552,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -9110,10 +8613,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "url": {
@@ -9170,10 +8669,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "url": {
@@ -9211,10 +8706,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "url": {
@@ -9252,10 +8743,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "url": {
@@ -9312,11 +8799,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -9354,11 +8836,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}",
-                "disabled": true
               }
             ],
             "url": {
@@ -9416,10 +8893,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "url": {
@@ -9467,10 +8940,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "url": {
@@ -9528,10 +8997,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Token {{token}}"
               }
             ],
             "url": {
