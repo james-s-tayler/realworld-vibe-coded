@@ -7,8 +7,7 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
   public void Configure(EntityTypeBuilder<ApplicationUser> builder)
   {
     builder.Property(p => p.Bio)
-        .HasMaxLength(ApplicationUser.BioMaxLength)
-        .IsRequired();
+        .HasMaxLength(ApplicationUser.BioMaxLength);
 
     builder.Property(p => p.Image)
         .HasMaxLength(ApplicationUser.ImageUrlMaxLength);
