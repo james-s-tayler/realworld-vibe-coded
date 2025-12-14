@@ -1463,7 +1463,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -1525,7 +1525,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -1586,7 +1586,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/login?useCookies=true",
@@ -1647,7 +1647,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/login?useCookies=true",
@@ -5422,7 +5422,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -5483,7 +5483,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -5544,7 +5544,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -5605,7 +5605,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -5666,7 +5666,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/login?useCookies=true",
@@ -5727,7 +5727,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/login?useCookies=true",
@@ -5788,7 +5788,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/login?useCookies=true",
@@ -5849,7 +5849,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/login?useCookies=true",
@@ -8075,7 +8075,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -8167,7 +8167,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/login?useCookies=true",
@@ -8245,7 +8245,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -8311,7 +8311,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"celeb_{{EMAIL}}\", \"password\":\"{{PASSWORD}}\""
+              "raw": "{\"email\":\"celeb_{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
