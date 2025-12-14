@@ -669,7 +669,6 @@
                   "});",
                   "pm.test('User has \"image\" property', function() {",
                   "    pm.expect(user).to.have.property('image')",
-                  "});",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -807,7 +806,6 @@
                   "});",
                   "pm.test('\"image\" matches the UPDATED_IMAGE variable', function() {",
                   "    pm.expect(user.image).to.eql(pm.globals.get('UPDATED_IMAGE'))",
-                  "});",
                   "});"
                 ],
                 "type": "text/javascript",

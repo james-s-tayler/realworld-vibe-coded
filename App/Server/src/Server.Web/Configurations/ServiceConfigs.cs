@@ -128,7 +128,11 @@ public static class ServiceConfigs
       {
         // Cookie settings (Decision 4: SameSite.Lax)
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+        // Allow non-HTTPS in development/testing environments
+        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing")
+          ? CookieSecurePolicy.None
+          : CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.Name = "ConduitAuth";
 
