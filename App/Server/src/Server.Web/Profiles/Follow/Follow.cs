@@ -15,7 +15,7 @@ public class Follow(IMediator mediator, IUserContext userContext) : Endpoint<Fol
   public override void Configure()
   {
     Post("/api/profiles/{username}/follow");
-    AuthSchemes("Token");
+    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme);
     Summary(s =>
     {
       s.Summary = "Follow user profile";

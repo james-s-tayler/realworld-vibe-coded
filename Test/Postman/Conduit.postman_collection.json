@@ -41,7 +41,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -104,7 +104,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{SECOND_USERNAME}}\"}"
+              "raw": "{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -165,7 +165,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -226,7 +226,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -287,7 +287,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -348,7 +348,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -409,7 +409,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register?useCookies=true",
@@ -1429,25 +1429,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches ARTICLES_USER_EMAIL variable', function() {",
-                  "        const email = pm.globals.get('ARTICLES_USER_EMAIL');",
-                  "        pm.expect(user.email).to.eql(email);",
-                  "    });",
-                  "    pm.test('\"usermame\" property matches ARTICLES_USER_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('ARTICLES_USER_USERNAME');",
-                  "        pm.expect(user.username).to.eql(username);",
-                  "    });",
-                  "}",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1479,15 +1463,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{ARTICLES_USER_USERNAME}}\"}}"
+              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -1500,25 +1491,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches ARTICLES_USER_EMAIL_2 variable', function() {",
-                  "        const email = pm.globals.get('ARTICLES_USER_EMAIL_2');",
-                  "        pm.expect(user.email).to.eql(email);",
-                  "    });",
-                  "    pm.test('\"usermame\" property matches ARTICLES_USER_USERNAME_2 variable', function() {",
-                  "        const username = pm.globals.get('ARTICLES_USER_USERNAME_2');",
-                  "        pm.expect(user.username).to.eql(username);",
-                  "    });",
-                  "}",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1550,15 +1525,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{ARTICLES_USER_USERNAME_2}}\"}}"
+              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -1571,26 +1553,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.test('Response contains \"user\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('user')",
-                  "});",
-                  "",
-                  "var user = responseJSON.user || {};",
-                  "",
-                  "pm.test('User has \"token\" property', function() {",
-                  "    pm.expect(user).to.have.property('token')",
-                  "});",
-                  "",
-                  "if(pm.test('User has \"token\" property')){",
-                  "    pm.globals.set('articles_user_token', user.token);",
-                  "}",
-                  "",
-                  "pm.test('Global variable \"articles_user_token\" has been set', function() {",
-                  "    pm.globals.get('articles_user_token') === user.token",
-                  "});",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1621,16 +1586,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -1643,26 +1614,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.test('Response contains \"user\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('user')",
-                  "});",
-                  "",
-                  "var user = responseJSON.user || {};",
-                  "",
-                  "pm.test('User has \"token\" property', function() {",
-                  "    pm.expect(user).to.have.property('token')",
-                  "});",
-                  "",
-                  "if(pm.test('User has \"token\" property')){",
-                  "    pm.globals.set('articles_user_token_2', user.token);",
-                  "}",
-                  "",
-                  "pm.test('Global variable \"articles_user_token_2\" has been set', function() {",
-                  "    pm.globals.get('articles_user_token_2') === user.token",
-                  "});",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1693,16 +1647,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\"}}"
+              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -5428,25 +5388,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches FEED_USER_EMAIL variable', function() {",
-                  "        const email = pm.globals.get('FEED_USER_EMAIL');",
-                  "        pm.expect(user.email).to.eql(email);",
-                  "    });",
-                  "    pm.test('\"usermame\" property matches FEED_USER_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('FEED_USER_USERNAME');",
-                  "        pm.expect(user.username).to.eql(username);",
-                  "    });",
-                  "}",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -5478,15 +5422,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{FEED_USER_USERNAME}}\"}}"
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -5499,25 +5450,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches FEED_USER_EMAIL variable', function() {",
-                  "        const email = pm.globals.get('FEED_USER_EMAIL')+2;",
-                  "        pm.expect(user.email).to.eql(email);",
-                  "    });",
-                  "    pm.test('\"usermame\" property matches FEED_USER_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('FEED_USER_USERNAME') + 2;",
-                  "        pm.expect(user.username).to.eql(username);",
-                  "    });",
-                  "}",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -5548,15 +5483,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{FEED_USER_USERNAME}}2\"}}"
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -5569,25 +5511,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches FEED_USER_EMAIL variable', function() {",
-                  "        const email = pm.globals.get('FEED_USER_EMAIL')+3;",
-                  "        pm.expect(user.email).to.eql(email);",
-                  "    });",
-                  "    pm.test('\"usermame\" property matches FEED_USER_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('FEED_USER_USERNAME') + 3;",
-                  "        pm.expect(user.username).to.eql(username);",
-                  "    });",
-                  "}",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -5618,15 +5544,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{FEED_USER_USERNAME}}3\"}}"
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -5639,25 +5572,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (!(pm.environment.isIntegrationTest)) {",
-                  "    var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "    pm.test('Response contains \"user\" property', function() {",
-                  "        pm.expect(responseJSON).to.have.property('user');",
-                  "    });",
-                  "",
-                  "    var user = responseJSON.user || {};",
-                  "",
-                  "    pm.test('\"email\" property matches FEED_USER_EMAIL variable', function() {",
-                  "        const email = pm.globals.get('FEED_USER_EMAIL')+4;",
-                  "        pm.expect(user.email).to.eql(email);",
-                  "    });",
-                  "    pm.test('\"usermame\" property matches FEED_USER_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('FEED_USER_USERNAME') + 4;",
-                  "        pm.expect(user.username).to.eql(username);",
-                  "    });",
-                  "}",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -5688,15 +5605,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{FEED_USER_USERNAME}}4\"}}"
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -5709,26 +5633,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.test('Response contains \"user\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('user')",
-                  "});",
-                  "",
-                  "var user = responseJSON.user || {};",
-                  "",
-                  "pm.test('User has \"token\" property', function() {",
-                  "    pm.expect(user).to.have.property('token')",
-                  "});",
-                  "",
-                  "if(pm.test('User has \"token\" property')){",
-                  "    pm.globals.set('feed_user_token', user.token);",
-                  "}",
-                  "",
-                  "pm.test('Global variable \"feed_user_token\" has been set', function() {",
-                  "    pm.globals.get('feed_user_token') === user.token",
-                  "});",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -5759,16 +5666,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -5781,26 +5694,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.test('Response contains \"user\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('user')",
-                  "});",
-                  "",
-                  "var user = responseJSON.user || {};",
-                  "",
-                  "pm.test('User has \"token\" property', function() {",
-                  "    pm.expect(user).to.have.property('token')",
-                  "});",
-                  "",
-                  "if(pm.test('User has \"token\" property')){",
-                  "    pm.globals.set('feed_user_token_2', user.token);",
-                  "}",
-                  "",
-                  "pm.test('Global variable \"feed_user_token_2\" has been set', function() {",
-                  "    pm.globals.get('feed_user_token_2') === user.token",
-                  "});",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -5831,16 +5727,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\"}}"
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -5853,26 +5755,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.test('Response contains \"user\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('user')",
-                  "});",
-                  "",
-                  "var user = responseJSON.user || {};",
-                  "",
-                  "pm.test('User has \"token\" property', function() {",
-                  "    pm.expect(user).to.have.property('token')",
-                  "});",
-                  "",
-                  "if(pm.test('User has \"token\" property')){",
-                  "    pm.globals.set('feed_user_token_3', user.token);",
-                  "}",
-                  "",
-                  "pm.test('Global variable \"feed_user_token_3\" has been set', function() {",
-                  "    pm.globals.get('feed_user_token_3') === user.token",
-                  "});",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -5903,16 +5788,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\"}}"
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -5925,26 +5816,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.test('Response contains \"user\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('user')",
-                  "});",
-                  "",
-                  "var user = responseJSON.user || {};",
-                  "",
-                  "pm.test('User has \"token\" property', function() {",
-                  "    pm.expect(user).to.have.property('token')",
-                  "});",
-                  "",
-                  "if(pm.test('User has \"token\" property')){",
-                  "    pm.globals.set('feed_user_token_4', user.token);",
-                  "}",
-                  "",
-                  "pm.test('Global variable \"feed_user_token_4\" has been set', function() {",
-                  "    pm.globals.get('feed_user_token_4') === user.token",
-                  "});",
-                  ""
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -5975,16 +5849,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\"}}"
+              "raw": "{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -8195,15 +8075,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -8280,16 +8167,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -8352,15 +8245,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{SECOND_USERNAME}}\"}}"
+              "raw": "{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
@@ -8411,15 +8311,22 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"celeb_{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"celeb_{{USERNAME}}\"}}"
+              "raw": "{\"email\":\"celeb_{{EMAIL}}\", \"password\":\"{{PASSWORD}}\""
             },
             "url": {
-              "raw": "{{APIURL}}/users",
+              "raw": "{{APIURL}}/identity/register?useCookies=true",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
               ]
             }
           },
