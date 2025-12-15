@@ -16,6 +16,7 @@ public class Get(IMediator mediator, IUserContext userContext) : Endpoint<GetPro
   {
     Get("/api/profiles/{username}");
     AllowAnonymous();
+    AuthSchemes("Token", Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
     Summary(s =>
     {
       s.Summary = "Get user profile";

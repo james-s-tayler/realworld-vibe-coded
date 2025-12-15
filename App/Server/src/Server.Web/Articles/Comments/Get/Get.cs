@@ -17,6 +17,7 @@ public class Get(IMediator mediator, IUserContext userContext) : Endpoint<GetCom
   {
     Get("/api/articles/{slug}/comments");
     AllowAnonymous();
+    AuthSchemes("Token", Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
     Summary(s =>
     {
       s.Summary = "Get article comments";
