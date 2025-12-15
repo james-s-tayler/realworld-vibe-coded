@@ -1147,7 +1147,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-pm.globals.set("ARTICLES_USER_EMAIL", (Math.random() * 1000) + "@example.com")
+                  "pm.globals.set(\"ARTICLES_USER_EMAIL\", (Math.random() * 1000) + \"@example.com\")"
                 ],
                 "type": "text/javascript",
                 "packages": {}
