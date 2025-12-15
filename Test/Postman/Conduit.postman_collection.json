@@ -3452,6 +3452,57 @@
           "response": []
         },
         {
+          "name": "Login as User 2 - setup (for create comment 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\"}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/identity/login?useCookies=true",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "identity",
+                "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Create Comment",
           "event": [
             {
@@ -3469,7 +3520,6 @@
                   "",
                   "pm.test('Comment contains \"id\" property', function() {",
                   "    pm.expect(comment).to.have.property('id');",
-                  "    pm.globals.set('DELETE_COMMENT_ID', comment.id);",
                   "});",
                   "",
                   "pm.test('Comment contains \"body\" property', function() {",
@@ -3570,7 +3620,7 @@
           "response": []
         },
         {
-          "name": "Login as User 2 - setup (for create comment 2)",
+          "name": "Login as User 1 - setup (for create comment 2)",
           "event": [
             {
               "listen": "test",
@@ -3609,7 +3659,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\"}"
+              "raw": "{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/login?useCookies=true",
@@ -3785,6 +3835,7 @@
                   "",
                   "pm.test('Comment contains \"id\" property', function() {",
                   "    pm.expect(comment).to.have.property('id');",
+                  "    pm.globals.set('DELETE_COMMENT_ID', comment.id);",
                   "    pm.globals.set('COMMENT_CREATED_AT_2', comment.createdAt);",
                   "    pm.globals.set('COMMENT_UPDATED_AT_2', comment.updatedAt);",
                   "});"
