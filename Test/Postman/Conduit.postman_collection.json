@@ -3703,8 +3703,8 @@
                   "    pm.expect(comment).to.have.property('id');",
                   "});",
                   "",
-                  "pm.globals.set('COMMENT_CREATED_AT', comment.createdAt);",
-                  "pm.globals.set('COMMENT_UPDATED_AT', comment.updatedAt);"
+                  "pm.globals.set('COMMENT_CREATED_AT_2', comment.createdAt);",
+                  "pm.globals.set('COMMENT_UPDATED_AT_2', comment.updatedAt);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
