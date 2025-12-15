@@ -6,7 +6,7 @@ using Server.Web.Users.Update;
 
 namespace Server.FunctionalTests.Users;
 
-[Collection("Users Integration Tests")]
+[Collection("SqlServer Assembly Collection")]
 public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
 {
   [Fact]

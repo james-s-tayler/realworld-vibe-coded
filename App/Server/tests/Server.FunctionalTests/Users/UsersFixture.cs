@@ -1,42 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
-using Testcontainers.MsSql;
 
 namespace Server.FunctionalTests.Users;
 
+[Collection("SqlServer Assembly Collection")]
 public class UsersFixture : AppFixture<Program>
 {
-  private MsSqlContainer _container = null!;
-  private string _connectionString = null!;
+  private readonly SqlServerAssemblyFixture _assemblyFixture;
+  private DatabaseLease? _databaseLease;
+  private string? _connectionString;
+
+  public UsersFixture(SqlServerAssemblyFixture assemblyFixture)
+  {
+    _assemblyFixture = assemblyFixture;
+  }
 
   protected override async ValueTask PreSetupAsync()
   {
-    // PreSetupAsync is called once per test assembly, before the WAF/SUT is created.
-    // This ensures a single container and schema for all tests using this fixture.
-    _container = new MsSqlBuilder()
-        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-        .Build();
-
-    await _container.StartAsync();
-
-    _connectionString = _container.GetConnectionString();
-
-    // Create database schema once per assembly
-    // Services is not available yet, so create a temporary service provider
-    var serviceCollection = new ServiceCollection();
-    serviceCollection.AddDbContext<AppDbContext>(options =>
-    {
-      options.UseSqlServer(_connectionString);
-      options.EnableSensitiveDataLogging();
-    });
-
-    using var serviceProvider = serviceCollection.BuildServiceProvider();
-
-    // AppDbContext constructor requires IDomainEventDispatcher but it's nullable,
-    // so we can create it with a null DbContextOptions
-    var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    using var db = new AppDbContext(dbContextOptions, null);
-    await db.Database.MigrateAsync();
+    // Lease a database from the assembly fixture
+    _databaseLease = await _assemblyFixture.LeaseDatabaseAsync();
+    _connectionString = _databaseLease.ConnectionString;
   }
 
   protected override void ConfigureServices(IServiceCollection services)
@@ -68,14 +51,14 @@ public class UsersFixture : AppFixture<Program>
 
   protected override ValueTask SetupAsync()
   {
-    // No longer need to create schema here - it's done once in PreSetupAsync
     return ValueTask.CompletedTask;
   }
 
-  protected override ValueTask TearDownAsync()
+  protected override async ValueTask TearDownAsync()
   {
-    // No need to dispose the container when WAF caching is enabled.
-    // TestContainers will automatically dispose it when the test run finishes.
-    return ValueTask.CompletedTask;
+    if (_databaseLease != null)
+    {
+      await _databaseLease.DisposeAsync();
+    }
   }
 }
