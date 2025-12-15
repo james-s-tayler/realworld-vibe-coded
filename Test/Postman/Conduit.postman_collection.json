@@ -674,37 +674,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Current User - error - unauthenticated (no cookie)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Current User - error - unauthenticated (no cookie)",
           "event": [
             {
@@ -723,18 +692,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  "// Clear all cookies for the current domain to ensure unauthenticated request",
-                  "const jar = pm.cookies.jar();",
-                  "jar.clear(pm.request.url.toString(), function(error) {",
-                  "    if (error) {",
-                  "        console.log('Error clearing cookies:', error);",
-                  "    }",
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
                   "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -976,37 +942,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Update User - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Update User - error - unauthenticated",
           "event": [
             {
@@ -1025,18 +960,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  "// Clear all cookies for the current domain to ensure unauthenticated request",
-                  "const jar = pm.cookies.jar();",
-                  "jar.clear(pm.request.url.toString(), function(error) {",
-                  "    if (error) {",
-                  "        console.log('Error clearing cookies:', error);",
-                  "    }",
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
                   "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -2143,37 +2075,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Create Article - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Create Article - error - unauthenticated",
           "event": [
             {
@@ -2192,8 +2093,13 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -2582,12 +2488,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  ""
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -3080,37 +2989,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Favorite Article - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Favorite Article - error - unauthenticated",
           "event": [
             {
@@ -3129,8 +3007,13 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -3405,37 +3288,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Unfavorite Article - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Unfavorite Article - error - unauthenticated",
           "event": [
             {
@@ -3454,8 +3306,13 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -3782,37 +3639,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Create Comment - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Create Comment - error - unauthenticated",
           "event": [
             {
@@ -3831,13 +3657,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
-                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -4059,37 +3887,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Delete Comment - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Delete Comment - error - unauthenticated",
           "event": [
             {
@@ -4108,13 +3905,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
-                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -4160,13 +3959,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
-                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -4557,12 +4358,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  ""
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -4693,37 +4497,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Update Article - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Update Article - error - unauthenticated",
           "event": [
             {
@@ -4742,18 +4515,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
-                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
-                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
-                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
-                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
-                  "pm.globals.set('TAG_1', 'training')",
-                  "pm.globals.set('TAG_2', 'dragons')"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -4866,18 +4636,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
-                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
-                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
-                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
-                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
-                  "pm.globals.set('TAG_1', 'training')",
-                  "pm.globals.set('TAG_2', 'dragons')"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -5279,37 +5046,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Delete Article - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Delete Article - error - unauthenticated",
           "event": [
             {
@@ -5328,18 +5064,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
-                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
-                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
-                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
-                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
-                  "pm.globals.set('TAG_1', 'training')",
-                  "pm.globals.set('TAG_2', 'dragons')"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -5383,18 +5116,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
-                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
-                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
-                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
-                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
-                  "pm.globals.set('TAG_1', 'training')",
-                  "pm.globals.set('TAG_2', 'dragons')"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -6940,37 +6670,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Get Feed - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Get Feed - error - unauthenticated",
           "event": [
             {
@@ -6989,12 +6688,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  ""
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -7124,12 +6826,15 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());",
-                  ""
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
-                "type": "text/javascript",
-                "packages": {}
+                "type": "text/javascript"
               }
             }
           ],
@@ -8422,37 +8127,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Follow Profile - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Follow Profile - error - unauthenticated",
           "event": [
             {
@@ -8471,8 +8145,13 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -8909,8 +8588,13 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -8938,37 +8622,6 @@
           "response": []
         },
         {
-          "name": "Logout before: Unfollow Profile - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Logout successful', function() {",
-                  "    pm.expect([200, 204]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{APIURL}}/identity/logout",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Unfollow Profile - error - unauthenticated",
           "event": [
             {
@@ -8987,8 +8640,13 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Clear cookies before unauthenticated test",
-                  "pm.cookies.clear(pm.request.url.toString());"
+                  "// Logout to clear authentication before testing unauthenticated access",
+                  "pm.sendRequest({",
+                  "    url: pm.variables.get('APIURL') + '/identity/logout',",
+                  "    method: 'POST'",
+                  "}, function (err, res) {",
+                  "    // Logout completed, continue with test",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
