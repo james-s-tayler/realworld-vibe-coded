@@ -1,25 +1,34 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Server.FunctionalTests.Infrastructure;
 using Server.Infrastructure.Data;
 
 namespace Server.FunctionalTests.Users;
 
-[Collection("SqlServer Assembly Collection")]
 public class UsersFixture : AppFixture<Program>
 {
-  private readonly SqlServerAssemblyFixture _assemblyFixture;
-  private DatabaseLease? _databaseLease;
-  private string? _connectionString;
-
-  public UsersFixture(SqlServerAssemblyFixture assemblyFixture)
-  {
-    _assemblyFixture = assemblyFixture;
-  }
+  private string _connectionString = null!;
 
   protected override async ValueTask PreSetupAsync()
   {
-    // Lease a database from the assembly fixture
-    _databaseLease = await _assemblyFixture.LeaseDatabaseAsync();
-    _connectionString = _databaseLease.ConnectionString;
+    // Use shared SQL Server container instead of creating a new one
+    _connectionString = await SharedSqlServerContainer.GetConnectionStringAsync();
+
+    // Create database schema once per fixture
+    // Services is not available yet, so create a temporary service provider
+    var serviceCollection = new ServiceCollection();
+    serviceCollection.AddDbContext<AppDbContext>(options =>
+    {
+      options.UseSqlServer(_connectionString);
+      options.EnableSensitiveDataLogging();
+    });
+
+    using var serviceProvider = serviceCollection.BuildServiceProvider();
+
+    // AppDbContext constructor requires IDomainEventDispatcher but it's nullable,
+    // so we can create it with a null DbContextOptions
+    var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
+    using var db = new AppDbContext(dbContextOptions, null);
+    await db.Database.MigrateAsync();
   }
 
   protected override void ConfigureServices(IServiceCollection services)
@@ -51,14 +60,13 @@ public class UsersFixture : AppFixture<Program>
 
   protected override ValueTask SetupAsync()
   {
+    // Schema is already created in PreSetupAsync
     return ValueTask.CompletedTask;
   }
 
-  protected override async ValueTask TearDownAsync()
+  protected override ValueTask TearDownAsync()
   {
-    if (_databaseLease != null)
-    {
-      await _databaseLease.DisposeAsync();
-    }
+    // Shared container will be disposed automatically by Testcontainers
+    return ValueTask.CompletedTask;
   }
 }

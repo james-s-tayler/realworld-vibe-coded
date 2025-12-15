@@ -1,28 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Server.FunctionalTests.Infrastructure;
 using Server.Infrastructure.Data;
-using Testcontainers.MsSql;
 
 namespace Server.FunctionalTests.Articles.Fixture;
 
 public class EmptyArticlesFixture : AppFixture<Program>
 {
-  private MsSqlContainer _container = null!;
   private string _connectionString = null!;
 
   protected override async ValueTask PreSetupAsync()
   {
-    // PreSetupAsync is called once per test assembly, before the WAF/SUT is created.
-    // This ensures a single container and schema for all tests using this fixture.
-    _container = new MsSqlBuilder()
-        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-        .Build();
+    // Use shared SQL Server container
+    _connectionString = await SharedSqlServerContainer.GetConnectionStringAsync();
 
-    await _container.StartAsync();
-
-    _connectionString = _container.GetConnectionString();
-
-    // Create database schema once per assembly
-    // Services is not available yet, so create a temporary service provider
+    // Create database schema
     var serviceCollection = new ServiceCollection();
     serviceCollection.AddDbContext<AppDbContext>(options =>
     {

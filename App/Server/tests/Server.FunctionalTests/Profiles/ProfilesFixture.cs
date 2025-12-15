@@ -1,23 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Server.FunctionalTests.Infrastructure;
 using Server.Infrastructure.Data;
-using Testcontainers.MsSql;
 
 namespace Server.FunctionalTests.Profiles;
 
 public class ProfilesFixture : AppFixture<Program>
 {
-  private MsSqlContainer _container = null!;
   private string _connectionString = null!;
 
   protected override async ValueTask PreSetupAsync()
   {
-    _container = new MsSqlBuilder()
-        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-        .Build();
-
-    await _container.StartAsync();
-
-    _connectionString = _container.GetConnectionString();
+    // Use shared SQL Server container
+    _connectionString = await SharedSqlServerContainer.GetConnectionStringAsync();
 
     var serviceCollection = new ServiceCollection();
     serviceCollection.AddDbContext<AppDbContext>(options =>
