@@ -1147,8 +1147,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"ARTICLES_USER_EMAIL\", (Math.random() * 1000) + \"@example.com\")",
-                  "pm.globals.set(\"ARTICLES_USER_USERNAME\", (Math.random() * 1000) + \"\")"
+pm.globals.set("ARTICLES_USER_EMAIL", (Math.random() * 1000) + "@example.com")
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1209,8 +1208,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"ARTICLES_USER_EMAIL_2\", (Math.random() * 1000) + \"@example.com\")",
-                  "pm.globals.set(\"ARTICLES_USER_USERNAME_2\", (Math.random() * 1000) + \"\")"
+                  "pm.globals.set(\"ARTICLES_USER_EMAIL_2\", (Math.random() * 1000) + \"@example2.com\")"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1407,13 +1405,13 @@
               "raw": "{}"
             },
             "url": {
-              "raw": "{{APIURL}}/profiles/{{ARTICLES_USER_USERNAME}}/follow",
+              "raw": "{{APIURL}}/profiles/{{ARTICLES_USER_EMAIL}}/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "{{ARTICLES_USER_USERNAME}}",
+                "{{ARTICLES_USER_EMAIL}}",
                 "follow"
               ]
             }
@@ -4767,8 +4765,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"FEED_USER_EMAIL\", (Math.random() * 1000) + \"@example.com\")",
-                  "pm.globals.set(\"FEED_USER_USERNAME\", (Math.random() * 1000) + \"\")"
+                  "pm.globals.set(\"FEED_USER_EMAIL\", (Math.random() * 1000) + \"@feed.com\")"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -5270,13 +5267,13 @@
               "raw": "{}"
             },
             "url": {
-              "raw": "{{APIURL}}/profiles/{{FEED_USER_USERNAME}}2/follow",
+              "raw": "{{APIURL}}/profiles/{{FEED_USER_EMAIL}}2/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "{{FEED_USER_USERNAME}}2",
+                "{{FEED_USER_EMAIL}}2",
                 "follow"
               ]
             }
@@ -5316,13 +5313,13 @@
               "raw": "{}"
             },
             "url": {
-              "raw": "{{APIURL}}/profiles/{{FEED_USER_USERNAME}}3/follow",
+              "raw": "{{APIURL}}/profiles/{{FEED_USER_EMAIL}}3/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "{{FEED_USER_USERNAME}}3",
+                "{{FEED_USER_EMAIL}}3",
                 "follow"
               ]
             }
@@ -6854,7 +6851,7 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/articles?favorited={{FEED_USER_USERNAME}}3",
+              "raw": "{{APIURL}}/articles?favorited={{FEED_USER_EMAIL}}3",
               "host": [
                 "{{APIURL}}"
               ],
@@ -6864,7 +6861,7 @@
               "query": [
                 {
                   "key": "favorited",
-                  "value": "{{FEED_USER_USERNAME}}3"
+                  "value": "{{FEED_USER_EMAIL}}3"
                 }
               ]
             }

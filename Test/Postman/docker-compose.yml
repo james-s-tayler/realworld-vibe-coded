@@ -61,7 +61,7 @@ services:
     entrypoint: >
       sh -c '
       if [ -n "$$FOLDER" ]; then
-        newman run /etc/newman/Conduit.postman_collection.json --folder "$$FOLDER" --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+        newman run /etc/newman/Conduit.postman_collection.json --folder "$$FOLDER" --bail --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
       else
-        newman run /etc/newman/Conduit.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+        newman run /etc/newman/Conduit.postman_collection.json --bail --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
       fi'
