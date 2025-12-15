@@ -1016,7 +1016,7 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/articles?favorited={{USERNAME}}",
+              "raw": "{{APIURL}}/articles?favorited={{EMAIL}}",
               "host": [
                 "{{APIURL}}"
               ],
@@ -1026,7 +1026,7 @@
               "query": [
                 {
                   "key": "favorited",
-                  "value": "{{USERNAME}}"
+                  "value": "{{EMAIL}}"
                 }
               ]
             }
@@ -7617,7 +7617,7 @@
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}",
+                "celeb_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -7682,7 +7682,7 @@
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}",
+                "celeb_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -7728,7 +7728,7 @@
               ],
               "path": [
                 "profiles",
-                "nonexistentuser_{{USERNAME}}",
+                "nonexistentuser_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -7785,7 +7785,7 @@
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}"
+                "celeb_{{EMAIL}}"
               ]
             }
           },
@@ -7879,7 +7879,7 @@
               ],
               "path": [
                 "profiles",
-                "nonexistant_{{USERNAME}}"
+                "nonexistant_{{EMAIL}}"
               ]
             }
           },
@@ -7982,7 +7982,7 @@
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}"
+                "celeb_{{EMAIL}}"
               ]
             }
           },
@@ -8038,7 +8038,7 @@
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}",
+                "celeb_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -8085,7 +8085,7 @@
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}",
+                "celeb_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -8142,7 +8142,7 @@
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}"
+                "celeb_{{EMAIL}}"
               ]
             }
           },
