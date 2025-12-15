@@ -15,7 +15,8 @@ public class Get(IMediator mediator, IUserContext userContext) : Endpoint<GetPro
   public override void Configure()
   {
     Get("/api/profiles/{username}");
-    AllowAnonymous();
+    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme);
+    Options(x => x.AllowAnonymous());
     Summary(s =>
     {
       s.Summary = "Get user profile";
