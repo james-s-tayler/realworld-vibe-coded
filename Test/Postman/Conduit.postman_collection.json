@@ -3469,6 +3469,7 @@
                   "",
                   "pm.test('Comment contains \"id\" property', function() {",
                   "    pm.expect(comment).to.have.property('id');",
+                  "    pm.globals.set('DELETE_COMMENT_ID', comment.id);",
                   "});",
                   "",
                   "pm.test('Comment contains \"body\" property', function() {",
@@ -3723,7 +3724,6 @@
                   "",
                   "pm.test('Comment contains \"id\" property', function() {",
                   "    pm.expect(comment).to.have.property('id');",
-                  "    pm.globals.set('DELETE_COMMENT_ID', comment.id);",
                   "});"
                 ],
                 "type": "text/javascript",
