@@ -29,7 +29,7 @@ public class Logout(SignInManager<ApplicationUser> signInManager) : Endpoint<Emp
     // SignOut will clear the authentication cookie
     await signInManager.SignOutAsync();
 
-    // Return 200 OK with no content
-    HttpContext.Response.StatusCode = 200;
+    // FastEndpoints returns 204 No Content by default for empty responses
+    // This is semantically correct for logout - the operation succeeded with no content to return
   }
 }
