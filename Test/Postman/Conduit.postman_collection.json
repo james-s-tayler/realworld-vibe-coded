@@ -3836,8 +3836,8 @@
                   "pm.test('Comment contains \"id\" property', function() {",
                   "    pm.expect(comment).to.have.property('id');",
                   "    pm.globals.set('DELETE_COMMENT_ID', comment.id);",
-                  "    pm.globals.set('COMMENT_CREATED_AT_2', comment.createdAt);",
-                  "    pm.globals.set('COMMENT_UPDATED_AT_2', comment.updatedAt);",
+                  "    pm.globals.set('COMMENT_CREATED_AT_3', comment.createdAt);",
+                  "    pm.globals.set('COMMENT_UPDATED_AT_3', comment.updatedAt);",
                   "});"
                 ],
                 "type": "text/javascript",
