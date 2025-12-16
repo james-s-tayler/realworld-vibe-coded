@@ -32,6 +32,52 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
   }
 
   [Fact]
+  public async Task Register_WithoutUsername_DefaultsUsernameToEmail()
+  {
+    var email = $"test-{Guid.NewGuid()}@example.com";
+    var request = new RegisterRequest
+    {
+      User = new UserData
+      {
+        Email = email,
+        Username = null!,
+        Password = "password123",
+      },
+    };
+
+    var (response, result) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.Created);
+    result.User.ShouldNotBeNull();
+    result.User.Token.ShouldNotBeNullOrEmpty();
+    result.User.Email.ShouldBe(email);
+    result.User.Username.ShouldBe(email);
+  }
+
+  [Fact]
+  public async Task Register_WithEmptyUsername_DefaultsUsernameToEmail()
+  {
+    var email = $"test-{Guid.NewGuid()}@example.com";
+    var request = new RegisterRequest
+    {
+      User = new UserData
+      {
+        Email = email,
+        Username = string.Empty,
+        Password = "password123",
+      },
+    };
+
+    var (response, result) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.Created);
+    result.User.ShouldNotBeNull();
+    result.User.Token.ShouldNotBeNullOrEmpty();
+    result.User.Email.ShouldBe(email);
+    result.User.Username.ShouldBe(email);
+  }
+
+  [Fact]
   public async Task Register_WithDuplicateEmail_ReturnsErrorDetail()
   {
     var email = $"duplicate-{Guid.NewGuid()}@example.com";

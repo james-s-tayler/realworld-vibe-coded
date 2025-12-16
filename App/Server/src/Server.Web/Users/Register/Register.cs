@@ -35,10 +35,15 @@ public class Register(IMediator mediator) : Endpoint<RegisterRequest, RegisterRe
     RegisterRequest request,
     CancellationToken cancellationToken)
   {
+    // Default username to email if not provided
+    var username = string.IsNullOrEmpty(request.User.Username)
+      ? request.User.Email
+      : request.User.Username;
+
     var result = await mediator.Send(
       new RegisterUserCommand(
         request.User.Email,
-        request.User.Username,
+        username,
         request.User.Password),
       cancellationToken);
 
