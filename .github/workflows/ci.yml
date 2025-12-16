@@ -457,24 +457,28 @@ jobs:
         run: ./build.sh lint-client-verify
 
   test-server-postman:
-    name: test-server-postman-${{ matrix.folder }}
+    name: test-server-postman-${{ matrix.collection }}
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.test_postman == 'true' }}
     strategy:
       fail-fast: false
       matrix:
-        folder:
-          - Auth
-          - ArticlesEmpty
-          - Article
-          - FeedAndArticles
-          - Profiles
+        include:
+          - collection: articles-empty
+            report_dir: ArticlesEmpty
+          - collection: auth
+            report_dir: Auth
+          - collection: profiles
+            report_dir: Profiles
+          - collection: feed-and-articles
+            report_dir: FeedAndArticles
+          - collection: article
+            report_dir: Article
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOCKER_BUILDKIT: 1
-      FOLDER: ${{ matrix.folder }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -490,11 +494,11 @@ jobs:
       - name: Verify .NET version
         run: dotnet --info
 
-      - name: Test Server (Postman - ${{ matrix.folder }})
+      - name: Test Server (Postman - ${{ matrix.collection }})
         id: postman_tests
         run: |
           set +e  # Don't exit on error
-          ./build.sh test-server-postman
+          ./build.sh test-server-postman-${{ matrix.collection }}
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
@@ -503,9 +507,9 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()  # Upload even if tests failed
         with:
-          name: postman-test-reports-${{ matrix.folder }}
+          name: postman-test-reports-${{ matrix.collection }}
           path: |
-            Reports/Test/Postman/newman-report.json
+            Reports/Test/Postman/${{ matrix.report_dir }}/newman-report.json
           retention-days: 7
 
       - name: Parse test results and create PR comment
@@ -517,19 +521,21 @@ jobs:
             const { createOrUpdateStickyComment } = require('./.github/scripts/sticky-comment.js');
 
             try {
-              const folderName = '${{ matrix.folder }}';
-              const commentBody = parseNewmanReport('Reports/Test/Postman/newman-report.json', context, `(${folderName})`);
+              const collectionName = '${{ matrix.collection }}';
+              const reportDir = '${{ matrix.report_dir }}';
+              const reportPath = `Reports/Test/Postman/${reportDir}/newman-report.json`;
+              const commentBody = parseNewmanReport(reportPath, context, `(${collectionName})`);
 
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');
                 return;
               }
 
-              // Use sticky comment with unique header per folder
+              // Use sticky comment with unique header per collection
               await createOrUpdateStickyComment(
                 github,
                 context,
-                `postman-test-${folderName}`,
+                `postman-test-${collectionName}`,
                 commentBody
               );
 

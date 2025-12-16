@@ -1,0 +1,287 @@
+{
+  "info": {
+    "name": "Conduit - ArticlesEmpty",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "8915fafc-debc-4df0-abde-4d52d8e3f4a1-articlesempty"
+  },
+  "item": [
+    {
+      "name": "ArticlesEmpty",
+      "item": [
+        {
+          "name": "All Articles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('response has property \"articles\"', function() {",
+                  "    pm.expect(responseJSON).to.have.property('articles')",
+                  "})",
+                  "",
+                  "pm.test('articlesCount is 0 when feed is empty', function() {",
+                  "    responseJSON.articlesCount === 0",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Articles by Author",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('response has property \"articles\"', function() {",
+                  "    pm.expect(responseJSON).to.have.property('articles')",
+                  "})",
+                  "",
+                  "pm.test('articlesCount is 0 when feed is empty', function() {",
+                  "    responseJSON.articlesCount === 0",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles?author=johnjacob",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ],
+              "query": [
+                {
+                  "key": "author",
+                  "value": "johnjacob"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Articles Favorited by Username",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('response has property \"articles\"', function() {",
+                  "    pm.expect(responseJSON).to.have.property('articles')",
+                  "})",
+                  "",
+                  "pm.test('articlesCount is 0 when feed is empty', function() {",
+                  "    responseJSON.articlesCount === 0",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles?favorited={{USERNAME}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ],
+              "query": [
+                {
+                  "key": "favorited",
+                  "value": "{{USERNAME}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Articles by Tag",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('response has property \"articles\"', function() {",
+                  "    pm.expect(responseJSON).to.have.property('articles')",
+                  "})",
+                  "",
+                  "pm.test('articlesCount is 0 when feed is empty', function() {",
+                  "    responseJSON.articlesCount === 0",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles?tag=dragons",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "dragons"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('response has property \"tags\"', function() {",
+                  "    pm.expect(responseJSON).to.have.property('tags')",
+                  "})",
+                  "",
+                  "pm.test('No tags present', function() {",
+                  "    pm.expect(responseJSON.tags.length).to.eql(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/tags",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "tags"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          "utils = {",
+          "    assertErrorStartsWith: function(fieldName, pm) {",
+          "        const response = pm.response.json();",
+          "        // Handle ProblemDetails format: errors is an array of {name, reason}",
+          "        const errors = response.errors || [];",
+          "        const hasFieldError = errors.some(err => err.name === fieldName || err.name.startsWith(fieldName));",
+          "        pm.test(`At least one error for field '${fieldName}'`, function () {",
+          "            pm.expect(hasFieldError).to.be.true;",
+          "        });",
+          "    }",
+          "}",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          "",
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "errorHelpersDefined",
+      "value": ""
+    },
+    {
+      "key": "customHelpersDefined",
+      "value": ""
+    }
+  ]
+}

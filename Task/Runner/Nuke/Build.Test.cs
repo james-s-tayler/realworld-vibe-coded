@@ -12,9 +12,6 @@ using static Nuke.Common.Tools.ReportGenerator.ReportGeneratorTasks;
 
 public partial class Build
 {
-  [Parameter("Postman folder to test")]
-  internal readonly string? Folder;
-
   [Parameter("Toggle special behavior for CI environment")]
   internal readonly bool SkipPublish;
 
@@ -120,29 +117,24 @@ public partial class Build
         }
       });
 
-  internal Target TestServerPostman => _ => _
-      .Description("Run postman tests using Docker Compose. Optionally specify a FOLDER parameter to run a specific Postman collection folder. E.g. FOLDER=Auth nuke TestServerPostman")
+  internal Target TestServerPostmanArticlesEmpty => _ => _
+      .Description("Run postman tests for ArticlesEmpty collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman tests with Docker Compose");
+        Log.Information("Running Postman ArticlesEmpty tests with Docker Compose");
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
         };
-        if (!string.IsNullOrEmpty(Folder))
-        {
-          envVars["FOLDER"] = Folder;
-          Log.Information("Setting FOLDER environment variable to: {Folder}", Folder);
-        }
 
         int exitCode = 0;
         try
         {
-          var args = "compose -f Test/Postman/docker-compose.yml up --build --abort-on-container-exit";
+          var args = "compose -f Test/Postman/docker-compose.ArticlesEmpty.yml up --build --abort-on-container-exit";
           var process = ProcessTasks.StartProcess(
                 "docker",
                 args,
@@ -153,7 +145,7 @@ public partial class Build
         }
         finally
         {
-          var downArgs = "compose -f Test/Postman/docker-compose.yml down";
+          var downArgs = "compose -f Test/Postman/docker-compose.ArticlesEmpty.yml down";
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
@@ -163,8 +155,8 @@ public partial class Build
         }
 
         // Generate markdown report summary from Newman JSON report
-        var newmanReportFile = ReportsTestPostmanDirectory / "newman-report.json";
-        var reportSummaryFile = ReportsTestPostmanDirectory / "Artifacts" / "ReportSummary.md";
+        var newmanReportFile = ReportsTestPostmanDirectory / "ArticlesEmpty" / "newman-report.json";
+        var reportSummaryFile = ReportsTestPostmanDirectory / "ArticlesEmpty" / "Artifacts" / "ReportSummary.md";
 
         if (newmanReportFile.FileExists())
         {
@@ -181,10 +173,262 @@ public partial class Build
         // Explicitly fail the target if Docker Compose failed
         if (exitCode != 0)
         {
-          const string debugInstructions = "For a high-level summary of specific failures, see Reports/Test/Postman/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.";
+          const string debugInstructions = "For a high-level summary of specific failures, see Reports/Test/Postman/ArticlesEmpty/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.";
           Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
           Log.Error("Test failed. {DebugInstructions}", debugInstructions);
-          throw new Exception($"Postman tests failed with exit code: {exitCode}. {debugInstructions}");
+          throw new Exception($"Postman ArticlesEmpty tests failed with exit code: {exitCode}. {debugInstructions}");
+        }
+      });
+
+  internal Target TestServerPostmanAuth => _ => _
+      .Description("Run postman tests for Auth collection using Docker Compose")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(DbResetForce)
+      .DependsOn(RunLocalCleanDirectories)
+      .Executes(() =>
+      {
+        Log.Information("Running Postman Auth tests with Docker Compose");
+
+        var envVars = new Dictionary<string, string>
+        {
+          ["DOCKER_BUILDKIT"] = "1",
+        };
+
+        int exitCode = 0;
+        try
+        {
+          var args = "compose -f Test/Postman/docker-compose.Auth.yml up --build --abort-on-container-exit";
+          var process = ProcessTasks.StartProcess(
+                "docker",
+                args,
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
+          process.WaitForExit();
+          exitCode = process.ExitCode;
+        }
+        finally
+        {
+          var downArgs = "compose -f Test/Postman/docker-compose.Auth.yml down";
+          var downProcess = ProcessTasks.StartProcess(
+                "docker",
+                downArgs,
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
+          downProcess.WaitForExit();
+        }
+
+        // Generate markdown report summary from Newman JSON report
+        var newmanReportFile = ReportsTestPostmanDirectory / "Auth" / "newman-report.json";
+        var reportSummaryFile = ReportsTestPostmanDirectory / "Auth" / "Artifacts" / "ReportSummary.md";
+
+        if (newmanReportFile.FileExists())
+        {
+          try
+          {
+            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+          }
+          catch (Exception ex)
+          {
+            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+          }
+        }
+
+        // Explicitly fail the target if Docker Compose failed
+        if (exitCode != 0)
+        {
+          const string debugInstructions = "For a high-level summary of specific failures, see Reports/Test/Postman/Auth/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.";
+          Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
+          Log.Error("Test failed. {DebugInstructions}", debugInstructions);
+          throw new Exception($"Postman Auth tests failed with exit code: {exitCode}. {debugInstructions}");
+        }
+      });
+
+  internal Target TestServerPostmanProfiles => _ => _
+      .Description("Run postman tests for Profiles collection using Docker Compose")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(DbResetForce)
+      .DependsOn(RunLocalCleanDirectories)
+      .Executes(() =>
+      {
+        Log.Information("Running Postman Profiles tests with Docker Compose");
+
+        var envVars = new Dictionary<string, string>
+        {
+          ["DOCKER_BUILDKIT"] = "1",
+        };
+
+        int exitCode = 0;
+        try
+        {
+          var args = "compose -f Test/Postman/docker-compose.Profiles.yml up --build --abort-on-container-exit";
+          var process = ProcessTasks.StartProcess(
+                "docker",
+                args,
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
+          process.WaitForExit();
+          exitCode = process.ExitCode;
+        }
+        finally
+        {
+          var downArgs = "compose -f Test/Postman/docker-compose.Profiles.yml down";
+          var downProcess = ProcessTasks.StartProcess(
+                "docker",
+                downArgs,
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
+          downProcess.WaitForExit();
+        }
+
+        // Generate markdown report summary from Newman JSON report
+        var newmanReportFile = ReportsTestPostmanDirectory / "Profiles" / "newman-report.json";
+        var reportSummaryFile = ReportsTestPostmanDirectory / "Profiles" / "Artifacts" / "ReportSummary.md";
+
+        if (newmanReportFile.FileExists())
+        {
+          try
+          {
+            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+          }
+          catch (Exception ex)
+          {
+            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+          }
+        }
+
+        // Explicitly fail the target if Docker Compose failed
+        if (exitCode != 0)
+        {
+          const string debugInstructions = "For a high-level summary of specific failures, see Reports/Test/Postman/Profiles/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.";
+          Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
+          Log.Error("Test failed. {DebugInstructions}", debugInstructions);
+          throw new Exception($"Postman Profiles tests failed with exit code: {exitCode}. {debugInstructions}");
+        }
+      });
+
+  internal Target TestServerPostmanFeedAndArticles => _ => _
+      .Description("Run postman tests for FeedAndArticles collection using Docker Compose")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(DbResetForce)
+      .DependsOn(RunLocalCleanDirectories)
+      .Executes(() =>
+      {
+        Log.Information("Running Postman FeedAndArticles tests with Docker Compose");
+
+        var envVars = new Dictionary<string, string>
+        {
+          ["DOCKER_BUILDKIT"] = "1",
+        };
+
+        int exitCode = 0;
+        try
+        {
+          var args = "compose -f Test/Postman/docker-compose.FeedAndArticles.yml up --build --abort-on-container-exit";
+          var process = ProcessTasks.StartProcess(
+                "docker",
+                args,
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
+          process.WaitForExit();
+          exitCode = process.ExitCode;
+        }
+        finally
+        {
+          var downArgs = "compose -f Test/Postman/docker-compose.FeedAndArticles.yml down";
+          var downProcess = ProcessTasks.StartProcess(
+                "docker",
+                downArgs,
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
+          downProcess.WaitForExit();
+        }
+
+        // Generate markdown report summary from Newman JSON report
+        var newmanReportFile = ReportsTestPostmanDirectory / "FeedAndArticles" / "newman-report.json";
+        var reportSummaryFile = ReportsTestPostmanDirectory / "FeedAndArticles" / "Artifacts" / "ReportSummary.md";
+
+        if (newmanReportFile.FileExists())
+        {
+          try
+          {
+            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+          }
+          catch (Exception ex)
+          {
+            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+          }
+        }
+
+        // Explicitly fail the target if Docker Compose failed
+        if (exitCode != 0)
+        {
+          const string debugInstructions = "For a high-level summary of specific failures, see Reports/Test/Postman/FeedAndArticles/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.";
+          Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
+          Log.Error("Test failed. {DebugInstructions}", debugInstructions);
+          throw new Exception($"Postman FeedAndArticles tests failed with exit code: {exitCode}. {debugInstructions}");
+        }
+      });
+
+  internal Target TestServerPostmanArticle => _ => _
+      .Description("Run postman tests for Article collection using Docker Compose")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(DbResetForce)
+      .DependsOn(RunLocalCleanDirectories)
+      .Executes(() =>
+      {
+        Log.Information("Running Postman Article tests with Docker Compose");
+
+        var envVars = new Dictionary<string, string>
+        {
+          ["DOCKER_BUILDKIT"] = "1",
+        };
+
+        int exitCode = 0;
+        try
+        {
+          var args = "compose -f Test/Postman/docker-compose.Article.yml up --build --abort-on-container-exit";
+          var process = ProcessTasks.StartProcess(
+                "docker",
+                args,
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
+          process.WaitForExit();
+          exitCode = process.ExitCode;
+        }
+        finally
+        {
+          var downArgs = "compose -f Test/Postman/docker-compose.Article.yml down";
+          var downProcess = ProcessTasks.StartProcess(
+                "docker",
+                downArgs,
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
+          downProcess.WaitForExit();
+        }
+
+        // Generate markdown report summary from Newman JSON report
+        var newmanReportFile = ReportsTestPostmanDirectory / "Article" / "newman-report.json";
+        var reportSummaryFile = ReportsTestPostmanDirectory / "Article" / "Artifacts" / "ReportSummary.md";
+
+        if (newmanReportFile.FileExists())
+        {
+          try
+          {
+            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+          }
+          catch (Exception ex)
+          {
+            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+          }
+        }
+
+        // Explicitly fail the target if Docker Compose failed
+        if (exitCode != 0)
+        {
+          const string debugInstructions = "For a high-level summary of specific failures, see Reports/Test/Postman/Article/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.";
+          Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
+          Log.Error("Test failed. {DebugInstructions}", debugInstructions);
+          throw new Exception($"Postman Article tests failed with exit code: {exitCode}. {debugInstructions}");
         }
       });
 
