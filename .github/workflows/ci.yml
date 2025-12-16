@@ -474,6 +474,7 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOCKER_BUILDKIT: 1
+      FOLDER: ${{ matrix.folder }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -493,7 +494,7 @@ jobs:
         id: postman_tests
         run: |
           set +e  # Don't exit on error
-          ./build.sh test-server-postman --folder ${{ matrix.folder }}
+          ./build.sh test-server-postman
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
