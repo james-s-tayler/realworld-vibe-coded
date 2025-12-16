@@ -7,38 +7,45 @@
  * @returns {Promise<void>}
  */
 async function createOrUpdateStickyComment(github, context, header, body) {
-  const commentMarker = `<!-- sticky-comment:${header} -->`;
-  const fullBody = `${commentMarker}\n${body}`;
+  try {
+    const commentMarker = `<!-- sticky-comment:${header} -->`;
+    const fullBody = `${commentMarker}\n${body}`;
 
-  // Find existing comment with this header
-  const { data: comments } = await github.rest.issues.listComments({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    issue_number: context.issue.number,
-  });
-
-  const existingComment = comments.find(comment => 
-    comment.body?.includes(commentMarker)
-  );
-
-  if (existingComment) {
-    // Update existing comment
-    await github.rest.issues.updateComment({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      comment_id: existingComment.id,
-      body: fullBody
-    });
-    console.log(`Updated existing comment (ID: ${existingComment.id}) with header: ${header}`);
-  } else {
-    // Create new comment
-    await github.rest.issues.createComment({
+    // Find existing comment with this header
+    const { data: comments } = await github.rest.issues.listComments({
       owner: context.repo.owner,
       repo: context.repo.repo,
       issue_number: context.issue.number,
-      body: fullBody
     });
-    console.log(`Created new comment with header: ${header}`);
+
+    const existingComment = comments.find(comment =>
+      comment.body?.includes(commentMarker) &&
+      comment.user?.type === 'Bot' &&
+      comment.user?.login === 'github-actions[bot]'
+    );
+
+    if (existingComment) {
+      // Update existing comment
+      await github.rest.issues.updateComment({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        comment_id: existingComment.id,
+        body: fullBody
+      });
+      console.log(`Updated existing comment (ID: ${existingComment.id}) with header: ${header}`);
+    } else {
+      // Create new comment
+      await github.rest.issues.createComment({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        issue_number: context.issue.number,
+        body: fullBody
+      });
+      console.log(`Created new comment with header: ${header}`);
+    }
+  } catch (error) {
+    console.error(`Error creating/updating sticky comment with header '${header}':`, error);
+    throw error;
   }
 }
 
