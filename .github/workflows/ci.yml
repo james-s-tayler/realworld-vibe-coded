@@ -167,11 +167,10 @@ jobs:
 
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
-        uses: peter-evans/create-or-update-comment@v5
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          issue-number: ${{ github.event.number }}
-          body-path: Reports/Server/Artifacts/Tests/ReportSummary.md
-          edit-mode: replace
+          header: test-server
+          path: Reports/Server/Artifacts/Tests/ReportSummary.md
 
       - name: Upload TestServer Reports
         uses: actions/upload-artifact@v4
@@ -220,6 +219,7 @@ jobs:
         with:
           script: |
             const { wrapCoverageComment } = require('./.github/scripts/wrap-coverage-comment.js');
+            const { createOrUpdateStickyComment } = require('./.github/scripts/sticky-comment.js');
 
             const commentBody = wrapCoverageComment(
               'code-coverage-results.md',
@@ -232,12 +232,12 @@ jobs:
               return;
             }
 
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: commentBody
-            });
+            await createOrUpdateStickyComment(
+              github,
+              context,
+              'server-code-coverage',
+              commentBody
+            );
 
   lint-server-verify:
     name: lint-server-verify
@@ -365,11 +365,10 @@ jobs:
 
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
-        uses: peter-evans/create-or-update-comment@v5
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          issue-number: ${{ github.event.number }}
-          body-path: Reports/Client/Artifacts/ReportSummary.md
-          edit-mode: replace
+          header: test-client
+          path: Reports/Client/Artifacts/ReportSummary.md
 
       - name: Upload TestClient Reports
         uses: actions/upload-artifact@v4
@@ -418,6 +417,7 @@ jobs:
         with:
           script: |
             const { wrapCoverageComment } = require('./.github/scripts/wrap-coverage-comment.js');
+            const { createOrUpdateStickyComment } = require('./.github/scripts/sticky-comment.js');
 
             const commentBody = wrapCoverageComment(
               'code-coverage-results.md',
@@ -430,12 +430,12 @@ jobs:
               return;
             }
 
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: commentBody
-            });
+            await createOrUpdateStickyComment(
+              github,
+              context,
+              'client-code-coverage',
+              commentBody
+            );
 
   lint-client-verify:
     name: lint-client-verify
@@ -514,6 +514,7 @@ jobs:
         with:
           script: |
             const { parseNewmanReport } = require('./.github/scripts/newman-report-parser.js');
+            const { createOrUpdateStickyComment } = require('./.github/scripts/sticky-comment.js');
 
             try {
               const folderName = '${{ matrix.folder }}';
@@ -524,14 +525,13 @@ jobs:
                 return;
               }
 
-              // Always create a new comment for each test run
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: commentBody
-              });
-              console.log('Created new PR comment');
+              // Use sticky comment with unique header per folder
+              await createOrUpdateStickyComment(
+                github,
+                context,
+                `postman-test-${folderName}`,
+                commentBody
+              );
 
             } catch (error) {
               console.error('Error creating/updating PR comment:', error);
@@ -658,11 +658,10 @@ jobs:
 
       - name: Comment test results on PR
         if: always() && github.event_name == 'pull_request'
-        uses: peter-evans/create-or-update-comment@v5
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          issue-number: ${{ github.event.number }}
-          body-path: Reports/Test/e2e/Artifacts/ReportSummary.md
-          edit-mode: replace
+          header: test-e2e
+          path: Reports/Test/e2e/Artifacts/ReportSummary.md
 
       - name: Upload E2E Test Reports
         uses: actions/upload-artifact@v4
