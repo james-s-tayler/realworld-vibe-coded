@@ -16,7 +16,7 @@ public class Update(IMediator mediator, IUserContext userContext) : Endpoint<Upd
   public override void Configure()
   {
     Put("/api/articles/{slug}");
-    AuthSchemes("Token");
+    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme);
     Summary(s =>
     {
       s.Summary = "Update article";
