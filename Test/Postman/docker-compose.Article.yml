@@ -45,17 +45,13 @@ services:
         condition: service_healthy
     volumes:
       - ./:/etc/newman
-      - ../../Reports/Test/Postman:/Reports/Test/Postman
+      - ../../Reports/Test/Postman/Article:/Reports/Test/Postman/Article
     environment:
       - APIURL=http://api:5000/api
       - USERNAME=soloyolo
       - EMAIL=soloyolo@mail.com
       - PASSWORD=password123
-      - FOLDER=${FOLDER}
     entrypoint: >
       sh -c '
-      if [ -n "$$FOLDER" ]; then
-        newman run /etc/newman/Conduit.postman_collection.json --folder "$$FOLDER" --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
-      else
-        newman run /etc/newman/Conduit.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
-      fi'
+      newman run /etc/newman/Conduit.Article.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/Article/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+      '

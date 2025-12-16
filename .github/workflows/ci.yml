@@ -457,89 +457,6 @@ jobs:
         run: ./build.sh lint-client-verify
 
   test-server-postman:
-    name: test-server-postman-${{ matrix.folder }}
-    runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.test_postman == 'true' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        folder:
-          - Article
-    env:
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-      DOTNET_CLI_TELEMETRY_OPTOUT: 1
-      DOCKER_BUILDKIT: 1
-      FOLDER: ${{ matrix.folder }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET (from global.json)
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: App/Server/global.json
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Verify .NET version
-        run: dotnet --info
-
-      - name: Test Server (Postman - ${{ matrix.folder }})
-        id: postman_tests
-        run: |
-          set +e  # Don't exit on error
-          ./build.sh test-server-postman
-          TEST_EXIT_CODE=$?
-          echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
-          exit 0  # Always succeed so we can upload artifacts and comment
-
-      - name: Upload Postman Reports
-        uses: actions/upload-artifact@v4
-        if: always()  # Upload even if tests failed
-        with:
-          name: postman-test-reports-${{ matrix.folder }}
-          path: |
-            Reports/Test/Postman/newman-report.json
-          retention-days: 7
-
-      - name: Parse test results and create PR comment
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { parseNewmanReport } = require('./.github/scripts/newman-report-parser.js');
-            const { createOrUpdateStickyComment } = require('./.github/scripts/sticky-comment.js');
-
-            try {
-              const folderName = '${{ matrix.folder }}';
-              const commentBody = parseNewmanReport('Reports/Test/Postman/newman-report.json', context, `(${folderName})`);
-
-              if (!commentBody) {
-                console.log('No comment body generated, skipping PR comment');
-                return;
-              }
-
-              // Use sticky comment with unique header per folder
-              await createOrUpdateStickyComment(
-                github,
-                context,
-                `postman-test-${folderName}`,
-                commentBody
-              );
-
-            } catch (error) {
-              console.error('Error creating/updating PR comment:', error);
-            }
-
-      - name: Fail job if tests failed
-        if: steps.postman_tests.outputs.exit_code != '0'
-        run: |
-          echo "Postman tests failed with exit code ${{ steps.postman_tests.outputs.exit_code }}"
-          exit ${{ steps.postman_tests.outputs.exit_code }}
-
-  test-server-postman-split:
     name: test-server-postman-${{ matrix.collection }}
     runs-on: ubuntu-latest
     needs: changes
@@ -556,6 +473,8 @@ jobs:
             report_dir: Profiles
           - collection: feed-and-articles
             report_dir: FeedAndArticles
+          - collection: article
+            report_dir: Article
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1

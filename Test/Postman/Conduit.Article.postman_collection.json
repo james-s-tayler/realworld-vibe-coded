@@ -1,0 +1,4267 @@
+{
+  "info": {
+    "name": "Conduit - Article",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "8915fafc-debc-4df0-abde-4d52d8e3f4a1-article"
+  },
+  "item": [
+    {
+      "name": "Article",
+      "item": [
+        {
+          "name": "Register Articles User - setup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"user\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('user');",
+                  "    });",
+                  "",
+                  "    var user = responseJSON.user || {};",
+                  "",
+                  "    pm.test('\"email\" property matches ARTICLES_USER_EMAIL variable', function() {",
+                  "        const email = pm.globals.get('ARTICLES_USER_EMAIL');",
+                  "        pm.expect(user.email).to.eql(email);",
+                  "    });",
+                  "    pm.test('\"usermame\" property matches ARTICLES_USER_USERNAME variable', function() {",
+                  "        const username = pm.globals.get('ARTICLES_USER_USERNAME');",
+                  "        pm.expect(user.username).to.eql(username);",
+                  "    });",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set(\"ARTICLES_USER_EMAIL\", (Math.random() * 1000) + \"@example.com\")",
+                  "pm.globals.set(\"ARTICLES_USER_USERNAME\", (Math.random() * 1000) + \"\")"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{ARTICLES_USER_USERNAME}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Articles User 2 - setup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"user\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('user');",
+                  "    });",
+                  "",
+                  "    var user = responseJSON.user || {};",
+                  "",
+                  "    pm.test('\"email\" property matches ARTICLES_USER_EMAIL_2 variable', function() {",
+                  "        const email = pm.globals.get('ARTICLES_USER_EMAIL_2');",
+                  "        pm.expect(user.email).to.eql(email);",
+                  "    });",
+                  "    pm.test('\"usermame\" property matches ARTICLES_USER_USERNAME_2 variable', function() {",
+                  "        const username = pm.globals.get('ARTICLES_USER_USERNAME_2');",
+                  "        pm.expect(user.username).to.eql(username);",
+                  "    });",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set(\"ARTICLES_USER_EMAIL_2\", (Math.random() * 1000) + \"@example.com\")",
+                  "pm.globals.set(\"ARTICLES_USER_USERNAME_2\", (Math.random() * 1000) + \"\")"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{ARTICLES_USER_USERNAME_2}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login and Remember Token - setup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"user\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('user')",
+                  "});",
+                  "",
+                  "var user = responseJSON.user || {};",
+                  "",
+                  "pm.test('User has \"token\" property', function() {",
+                  "    pm.expect(user).to.have.property('token')",
+                  "});",
+                  "",
+                  "if(pm.test('User has \"token\" property')){",
+                  "    pm.globals.set('articles_user_token', user.token);",
+                  "}",
+                  "",
+                  "pm.test('Global variable \"articles_user_token\" has been set', function() {",
+                  "    pm.globals.get('articles_user_token') === user.token",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users/login",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login and Remember Token 2 - setup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"user\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('user')",
+                  "});",
+                  "",
+                  "var user = responseJSON.user || {};",
+                  "",
+                  "pm.test('User has \"token\" property', function() {",
+                  "    pm.expect(user).to.have.property('token')",
+                  "});",
+                  "",
+                  "if(pm.test('User has \"token\" property')){",
+                  "    pm.globals.set('articles_user_token_2', user.token);",
+                  "}",
+                  "",
+                  "pm.test('Global variable \"articles_user_token_2\" has been set', function() {",
+                  "    pm.globals.get('articles_user_token_2') === user.token",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users/login",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Follow Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 200', function() {",
+                  "    pm.expect(pm.response.status).to.eql('OK')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/profiles/{{ARTICLES_USER_USERNAME}}/follow",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "profiles",
+                "{{ARTICLES_USER_USERNAME}}",
+                "follow"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"title\" property', function() {",
+                  "    pm.expect(article).to.have.property('title');",
+                  "    pm.expect(article.title).to.eql(pm.globals.get('ARTICLE_TITLE'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"slug\" property', function() {",
+                  "    pm.expect(article).to.have.property('slug');",
+                  "    pm.expect(article.slug).to.eql(pm.globals.get('ARTICLE_SLUG'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"body\" property', function() {",
+                  "    pm.expect(article).to.have.property('body');",
+                  "    pm.expect(article.body).to.eql(pm.globals.get('ARTICLE_BODY'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"createdAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('createdAt');",
+                  "});",
+                  "pm.test('Article\\'s \"createdAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.createdAt);",
+                  "});",
+                  "pm.test('Article \"createdAt\" is after REQUEST_DATE_TIME', function() {",
+                  "    const requestDateTime = new Date(pm.globals.get('REQUEST_DATE_TIME'))",
+                  "    const createdAt = new Date(article.createdAt)",
+                  "    pm.expect(createdAt).to.be.above(requestDateTime)",
+                  "    pm.globals.set('ARTICLE_CREATED_AT', article.createdAt);",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"updatedAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('updatedAt');",
+                  "});",
+                  "pm.test('Article\\'s \"updatedAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.updatedAt);",
+                  "});",
+                  "pm.test('Article \"updatedAt\" is after REQUEST_DATE_TIME', function() {",
+                  "    const requestDateTime = new Date(pm.globals.get('REQUEST_DATE_TIME'))",
+                  "    const updatedAt = new Date(article.updatedAt)",
+                  "    pm.expect(updatedAt).to.be.above(requestDateTime)",
+                  "    pm.globals.set('ARTICLE_UPDATED_AT', article.updatedAt);",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"description\" property', function() {",
+                  "    pm.expect(article).to.have.property('description');",
+                  "    pm.expect(article.description).to.eql(pm.globals.get('ARTICLE_DESCRIPTION'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"tagList\" property', function() {",
+                  "    pm.expect(article).to.have.property('tagList');",
+                  "});",
+                  "pm.test('Article\\'s \"tagList\" property is an Array', function() {",
+                  "    Array.isArray(article.tagList);",
+                  "    pm.expect(article.tagList).to.have.members([",
+                  "        pm.globals.get('TAG_1'),",
+                  "        pm.globals.get('TAG_2')",
+                  "    ]);",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"author\" property', function() {",
+                  "    pm.expect(article).to.have.property('author');",
+                  "});",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "    pm.expect(article.author).to.have.property('username');",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "})",
+                  "pm.test('Author \"bio\" equals default', function() {",
+                  "    pm.expect(article.author).to.have.property('bio');",
+                  "    pm.expect(article.author.bio).to.eql('I work at statefarm')",
+                  "})",
+                  "pm.test('Author \"image\" equals null', function() {",
+                  "    pm.expect(article.author).to.have.property('image');",
+                  "    pm.expect(article.author.image).to.be.null;",
+                  "})",
+                  "pm.test('Author \"following\" equals false', function() {",
+                  "    pm.expect(article.author).to.have.property('following');",
+                  "    pm.expect(article.author.following).to.be.false;",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"favorited\" property', function() {",
+                  "    pm.expect(article).to.have.property('favorited');",
+                  "    pm.expect(article.favorited).to.eql(false)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"favoritesCount\" property', function() {",
+                  "    pm.expect(article).to.have.property('favoritesCount');",
+                  "    pm.expect(article.favoritesCount).to.eql(0)",
+                  "});",
+                  "",
+                  "pm.test('favoritesCount is an integer', function() {",
+                  "    Number.isInteger(article.favoritesCount);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}\", \n        \"description\":\"{{ARTICLE_DESCRIPTION}}\", \n        \"body\":\"{{ARTICLE_BODY}}\",\n        \"tagList\":[\"{{TAG_1}}\", \"{{TAG_2}}\"]\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article without tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"tagList\" property', function() {",
+                  "    pm.expect(article).to.have.property('tagList');",
+                  "});",
+                  "pm.test('Article\\'s \"tagList\" property is an empty Array', function() {",
+                  "    Array.isArray(article.tagList);",
+                  "    pm.expect(article.tagList).to.have.members([]);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}2\", \n        \"description\":\"{{ARTICLE_DESCRIPTION}}\", \n        \"body\":\"{{ARTICLE_BODY}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article - validation - missing required fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "utils.assertErrorStartsWith(\"title\", pm);",
+                  "utils.assertErrorStartsWith(\"description\", pm);",
+                  "utils.assertErrorStartsWith(\"body\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"article\":{}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article - validation - required fields empty",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"title\", pm);",
+                  "utils.assertErrorStartsWith(\"description\", pm);",
+                  "utils.assertErrorStartsWith(\"body\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"article\":{\"title\":\"\", \"description\":\"\", \"body\":\"\", \"tagList\":[]}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article - validation - invalid tag (comma)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"article.TagList[0]\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}3\", \n        \"description\":\"{{ARTICLE_DESCRIPTION}}\", \n        \"body\":\"{{ARTICLE_BODY}}\",\n        \"tagList\":[\"ta,g\"]\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article - validation - invalid tag (empty)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"article.TagList[0]\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}4\", \n        \"description\":\"{{ARTICLE_DESCRIPTION}}\", \n        \"body\":\"{{ARTICLE_BODY}}\",\n        \"tagList\":[\"\"]\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article - validation - duplicate slug",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"slug\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}\", \n        \"description\":\"{{ARTICLE_DESCRIPTION}}\", \n        \"body\":\"{{ARTICLE_BODY}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"article\":{\"title\":\"How to train your dragon\", \"description\":\"Ever wonder how?\", \"body\":\"Very carefully.\", \"tagList\":[\"training\", \"dragons\"]}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tags",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('response has property \"tags\"', function() {",
+                  "    pm.expect(responseJSON).to.have.property('tags')",
+                  "})",
+                  "",
+                  "pm.test('no tags present', function() {",
+                  "    pm.expect(responseJSON.tags.length === 0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/tags",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "tags"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Article",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"title\" property', function() {",
+                  "    pm.expect(article).to.have.property('title');",
+                  "    pm.expect(article.title).to.eql(pm.globals.get('ARTICLE_TITLE'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"slug\" property', function() {",
+                  "    pm.expect(article).to.have.property('slug');",
+                  "    pm.expect(article.slug).to.eql(pm.globals.get('ARTICLE_SLUG'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"body\" property', function() {",
+                  "    pm.expect(article).to.have.property('body');",
+                  "    pm.expect(article.body).to.eql(pm.globals.get('ARTICLE_BODY'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"createdAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('createdAt');",
+                  "});",
+                  "pm.test('Article\\'s \"createdAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.createdAt);",
+                  "});",
+                  "pm.test('Article \"createdAt\" equals ARTICLE_CREATED_AT', function() {",
+                  "    const articleCreatedAt = pm.globals.get('ARTICLE_CREATED_AT')",
+                  "    pm.expect(article.createdAt).to.eql(articleCreatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"updatedAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('updatedAt');",
+                  "});",
+                  "pm.test('Article\\'s \"updatedAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.updatedAt);",
+                  "});",
+                  "pm.test('Article \"updatedAt\" equals ARTICLE_UPDATED_AT', function() {",
+                  "    const articleUpdatedAt = pm.globals.get('ARTICLE_UPDATED_AT')",
+                  "    pm.expect(article.updatedAt).to.eql(articleUpdatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"description\" property', function() {",
+                  "    pm.expect(article).to.have.property('description');",
+                  "    pm.expect(article.description).to.eql(pm.globals.get('ARTICLE_DESCRIPTION'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"tagList\" property', function() {",
+                  "    pm.expect(article).to.have.property('tagList');",
+                  "});",
+                  "pm.test('Article\\'s \"tagList\" property is an Array', function() {",
+                  "    Array.isArray(article.tagList);",
+                  "    pm.expect(article.tagList).to.have.members([",
+                  "        pm.globals.get('TAG_1'),",
+                  "        pm.globals.get('TAG_2')",
+                  "    ]);",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"author\" property', function() {",
+                  "    pm.expect(article).to.have.property('author');",
+                  "});",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "    pm.expect(article.author).to.have.property('username');",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "})",
+                  "pm.test('Author \"bio\" equals default', function() {",
+                  "    pm.expect(article.author).to.have.property('bio');",
+                  "    pm.expect(article.author.bio).to.eql('I work at statefarm')",
+                  "})",
+                  "pm.test('Author \"image\" equals null', function() {",
+                  "    pm.expect(article.author).to.have.property('image');",
+                  "    pm.expect(article.author.image).to.be.null;",
+                  "})",
+                  "pm.test('Author \"following\" equals false', function() {",
+                  "    pm.expect(article.author).to.have.property('following');",
+                  "    pm.expect(article.author.following).to.be.false;",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"favorited\" property', function() {",
+                  "    pm.expect(article).to.have.property('favorited');",
+                  "    pm.expect(article.favorited).to.eql(false)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"favoritesCount\" property', function() {",
+                  "    pm.expect(article).to.have.property('favoritesCount');",
+                  "    pm.expect(article.favoritesCount).to.eql(0)",
+                  "});",
+                  "",
+                  "pm.test('favoritesCount is an integer', function() {",
+                  "    Number.isInteger(article.favoritesCount);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Article - following author",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"author\" property', function() {",
+                  "    pm.expect(article).to.have.property('author');",
+                  "});",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "    pm.expect(article.author).to.have.property('username');",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "})",
+                  "pm.test('Author \"following\" equals true', function() {",
+                  "    pm.expect(article.author).to.have.property('following');",
+                  "    pm.expect(article.author.following).to.be.true;",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Article - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"title\" property', function() {",
+                  "    pm.expect(article).to.have.property('title');",
+                  "    pm.expect(article.title).to.eql(pm.globals.get('ARTICLE_TITLE'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"slug\" property', function() {",
+                  "    pm.expect(article).to.have.property('slug');",
+                  "    pm.expect(article.slug).to.eql(pm.globals.get('ARTICLE_SLUG'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"body\" property', function() {",
+                  "    pm.expect(article).to.have.property('body');",
+                  "    pm.expect(article.body).to.eql(pm.globals.get('ARTICLE_BODY'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"createdAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('createdAt');",
+                  "});",
+                  "pm.test('Article\\'s \"createdAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.createdAt);",
+                  "});",
+                  "pm.test('Article \"createdAt\" equals ARTICLE_CREATED_AT', function() {",
+                  "    const articleCreatedAt = pm.globals.get('ARTICLE_CREATED_AT')",
+                  "    pm.expect(article.createdAt).to.eql(articleCreatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"updatedAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('updatedAt');",
+                  "});",
+                  "pm.test('Article\\'s \"updatedAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.updatedAt);",
+                  "});",
+                  "pm.test('Article \"updatedAt\" equals ARTICLE_UPDATED_AT', function() {",
+                  "    const articleUpdatedAt = pm.globals.get('ARTICLE_UPDATED_AT')",
+                  "    pm.expect(article.updatedAt).to.eql(articleUpdatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"description\" property', function() {",
+                  "    pm.expect(article).to.have.property('description');",
+                  "    pm.expect(article.description).to.eql(pm.globals.get('ARTICLE_DESCRIPTION'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"tagList\" property', function() {",
+                  "    pm.expect(article).to.have.property('tagList');",
+                  "});",
+                  "pm.test('Article\\'s \"tagList\" property is an Array', function() {",
+                  "    Array.isArray(article.tagList);",
+                  "    pm.expect(article.tagList).to.have.members([",
+                  "        pm.globals.get('TAG_1'),",
+                  "        pm.globals.get('TAG_2')",
+                  "    ]);",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"author\" property', function() {",
+                  "    pm.expect(article).to.have.property('author');",
+                  "});",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "    pm.expect(article.author).to.have.property('username');",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "})",
+                  "pm.test('Author \"bio\" equals default', function() {",
+                  "    pm.expect(article.author).to.have.property('bio');",
+                  "    pm.expect(article.author.bio).to.eql('I work at statefarm')",
+                  "})",
+                  "pm.test('Author \"image\" equals null', function() {",
+                  "    pm.expect(article.author).to.have.property('image');",
+                  "    pm.expect(article.author.image).to.be.null;",
+                  "})",
+                  "pm.test('Author \"following\" equals false', function() {",
+                  "    pm.expect(article.author).to.have.property('following');",
+                  "    pm.expect(article.author.following).to.be.false;",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"favorited\" property', function() {",
+                  "    pm.expect(article).to.have.property('favorited');",
+                  "    pm.expect(article.favorited).to.eql(false)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"favoritesCount\" property', function() {",
+                  "    pm.expect(article).to.have.property('favoritesCount');",
+                  "    pm.expect(article.favoritesCount).to.eql(0)",
+                  "});",
+                  "",
+                  "pm.test('favoritesCount is an integer', function() {",
+                  "    Number.isInteger(article.favoritesCount);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Article - error - not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 404', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Not Found')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/no-such-article",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "no-such-article"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Favorite Article",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"title\" property', function() {",
+                  "    pm.expect(article).to.have.property('title');",
+                  "    pm.expect(article.title).to.eql(pm.globals.get('ARTICLE_TITLE'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"slug\" property', function() {",
+                  "    pm.expect(article).to.have.property('slug');",
+                  "    pm.expect(article.slug).to.eql(pm.globals.get('ARTICLE_SLUG'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"body\" property', function() {",
+                  "    pm.expect(article).to.have.property('body');",
+                  "    pm.expect(article.body).to.eql(pm.globals.get('ARTICLE_BODY'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"createdAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('createdAt');",
+                  "});",
+                  "pm.test('Article\\'s \"createdAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.createdAt);",
+                  "});",
+                  "pm.test('Article \"createdAt\" equals ARTICLE_CREATED_AT', function() {",
+                  "    const articleCreatedAt = pm.globals.get('ARTICLE_CREATED_AT')",
+                  "    pm.expect(article.createdAt).to.eql(articleCreatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"updatedAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('updatedAt');",
+                  "});",
+                  "pm.test('Article\\'s \"updatedAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.updatedAt);",
+                  "});",
+                  "pm.test('Article \"updatedAt\" equals ARTICLE_UPDATED_AT', function() {",
+                  "    const articleUpdatedAt = pm.globals.get('ARTICLE_UPDATED_AT')",
+                  "    pm.expect(article.updatedAt).to.eql(articleUpdatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"description\" property', function() {",
+                  "    pm.expect(article).to.have.property('description');",
+                  "    pm.expect(article.description).to.eql(pm.globals.get('ARTICLE_DESCRIPTION'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"tagList\" property', function() {",
+                  "    pm.expect(article).to.have.property('tagList');",
+                  "});",
+                  "pm.test('Article\\'s \"tagList\" property is an Array', function() {",
+                  "    Array.isArray(article.tagList);",
+                  "    pm.expect(article.tagList).to.have.members([",
+                  "        pm.globals.get('TAG_1'),",
+                  "        pm.globals.get('TAG_2')",
+                  "    ]);",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"author\" property', function() {",
+                  "    pm.expect(article).to.have.property('author');",
+                  "});",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "    pm.expect(article.author).to.have.property('username');",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "})",
+                  "pm.test('Author \"bio\" equals default', function() {",
+                  "    pm.expect(article.author).to.have.property('bio');",
+                  "    pm.expect(article.author.bio).to.eql('I work at statefarm')",
+                  "})",
+                  "pm.test('Author \"image\" equals null', function() {",
+                  "    pm.expect(article.author).to.have.property('image');",
+                  "    pm.expect(article.author.image).to.be.null;",
+                  "})",
+                  "pm.test('Author \"following\" equals false', function() {",
+                  "    pm.expect(article.author).to.have.property('following');",
+                  "    pm.expect(article.author.following).to.be.false;",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"favorited\" property', function() {",
+                  "    pm.expect(article).to.have.property('favorited');",
+                  "    pm.expect(article.favorited).to.eql(true)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"favoritesCount\" property', function() {",
+                  "    pm.expect(article).to.have.property('favoritesCount');",
+                  "    pm.expect(article.favoritesCount).to.eql(1);",
+                  "});",
+                  "",
+                  "pm.test('favoritesCount is an integer', function() {",
+                  "    Number.isInteger(article.favoritesCount);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Favorite Article - already favorited",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"title\" property', function() {",
+                  "    pm.expect(article).to.have.property('title');",
+                  "    pm.expect(article.title).to.eql(pm.globals.get('ARTICLE_TITLE'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"slug\" property', function() {",
+                  "    pm.expect(article).to.have.property('slug');",
+                  "    pm.expect(article.slug).to.eql(pm.globals.get('ARTICLE_SLUG'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"body\" property', function() {",
+                  "    pm.expect(article).to.have.property('body');",
+                  "    pm.expect(article.body).to.eql(pm.globals.get('ARTICLE_BODY'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"createdAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('createdAt');",
+                  "});",
+                  "pm.test('Article\\'s \"createdAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.createdAt);",
+                  "});",
+                  "pm.test('Article \"createdAt\" equals ARTICLE_CREATED_AT', function() {",
+                  "    const articleCreatedAt = pm.globals.get('ARTICLE_CREATED_AT')",
+                  "    pm.expect(article.createdAt).to.eql(articleCreatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"updatedAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('updatedAt');",
+                  "});",
+                  "pm.test('Article\\'s \"updatedAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.updatedAt);",
+                  "});",
+                  "pm.test('Article \"updatedAt\" equals ARTICLE_UPDATED_AT', function() {",
+                  "    const articleUpdatedAt = pm.globals.get('ARTICLE_UPDATED_AT')",
+                  "    pm.expect(article.updatedAt).to.eql(articleUpdatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"description\" property', function() {",
+                  "    pm.expect(article).to.have.property('description');",
+                  "    pm.expect(article.description).to.eql(pm.globals.get('ARTICLE_DESCRIPTION'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"tagList\" property', function() {",
+                  "    pm.expect(article).to.have.property('tagList');",
+                  "});",
+                  "pm.test('Article\\'s \"tagList\" property is an Array', function() {",
+                  "    Array.isArray(article.tagList);",
+                  "    pm.expect(article.tagList).to.have.members([",
+                  "        pm.globals.get('TAG_1'),",
+                  "        pm.globals.get('TAG_2')",
+                  "    ]);",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"author\" property', function() {",
+                  "    pm.expect(article).to.have.property('author');",
+                  "});",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "    pm.expect(article.author).to.have.property('username');",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "})",
+                  "pm.test('Author \"bio\" equals default', function() {",
+                  "    pm.expect(article.author).to.have.property('bio');",
+                  "    pm.expect(article.author.bio).to.eql('I work at statefarm')",
+                  "})",
+                  "pm.test('Author \"image\" equals null', function() {",
+                  "    pm.expect(article.author).to.have.property('image');",
+                  "    pm.expect(article.author.image).to.be.null;",
+                  "})",
+                  "pm.test('Author \"following\" equals false', function() {",
+                  "    pm.expect(article.author).to.have.property('following');",
+                  "    pm.expect(article.author.following).to.be.false;",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"favorited\" property', function() {",
+                  "    pm.expect(article).to.have.property('favorited');",
+                  "    pm.expect(article.favorited).to.eql(true)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"favoritesCount\" property', function() {",
+                  "    pm.expect(article).to.have.property('favoritesCount');",
+                  "    pm.expect(article.favoritesCount).to.eql(1);",
+                  "});",
+                  "",
+                  "pm.test('favoritesCount is an integer', function() {",
+                  "    Number.isInteger(article.favoritesCount);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Favorite Article - user 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"title\" property', function() {",
+                  "    pm.expect(article).to.have.property('title');",
+                  "    pm.expect(article.title).to.eql(pm.globals.get('ARTICLE_TITLE'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"slug\" property', function() {",
+                  "    pm.expect(article).to.have.property('slug');",
+                  "    pm.expect(article.slug).to.eql(pm.globals.get('ARTICLE_SLUG'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"body\" property', function() {",
+                  "    pm.expect(article).to.have.property('body');",
+                  "    pm.expect(article.body).to.eql(pm.globals.get('ARTICLE_BODY'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"createdAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('createdAt');",
+                  "});",
+                  "pm.test('Article\\'s \"createdAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.createdAt);",
+                  "});",
+                  "pm.test('Article \"createdAt\" equals ARTICLE_CREATED_AT', function() {",
+                  "    const articleCreatedAt = pm.globals.get('ARTICLE_CREATED_AT')",
+                  "    pm.expect(article.createdAt).to.eql(articleCreatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"updatedAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('updatedAt');",
+                  "});",
+                  "pm.test('Article\\'s \"updatedAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.updatedAt);",
+                  "});",
+                  "pm.test('Article \"updatedAt\" equals ARTICLE_UPDATED_AT', function() {",
+                  "    const articleUpdatedAt = pm.globals.get('ARTICLE_UPDATED_AT')",
+                  "    pm.expect(article.updatedAt).to.eql(articleUpdatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"description\" property', function() {",
+                  "    pm.expect(article).to.have.property('description');",
+                  "    pm.expect(article.description).to.eql(pm.globals.get('ARTICLE_DESCRIPTION'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"tagList\" property', function() {",
+                  "    pm.expect(article).to.have.property('tagList');",
+                  "});",
+                  "pm.test('Article\\'s \"tagList\" property is an Array', function() {",
+                  "    Array.isArray(article.tagList);",
+                  "    pm.expect(article.tagList).to.have.members([",
+                  "        pm.globals.get('TAG_1'),",
+                  "        pm.globals.get('TAG_2')",
+                  "    ]);",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"author\" property', function() {",
+                  "    pm.expect(article).to.have.property('author');",
+                  "});",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "    pm.expect(article.author).to.have.property('username');",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "})",
+                  "pm.test('Author \"bio\" equals default', function() {",
+                  "    pm.expect(article.author).to.have.property('bio');",
+                  "    pm.expect(article.author.bio).to.eql('I work at statefarm')",
+                  "})",
+                  "pm.test('Author \"image\" equals null', function() {",
+                  "    pm.expect(article.author).to.have.property('image');",
+                  "    pm.expect(article.author.image).to.be.null;",
+                  "})",
+                  "pm.test('Author \"following\" equals true', function() {",
+                  "    pm.expect(article.author).to.have.property('following');",
+                  "    pm.expect(article.author.following).to.be.true;",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"favorited\" property', function() {",
+                  "    pm.expect(article).to.have.property('favorited');",
+                  "    pm.expect(article.favorited).to.eql(true)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"favoritesCount\" property', function() {",
+                  "    pm.expect(article).to.have.property('favoritesCount');",
+                  "    pm.expect(article.favoritesCount).to.eql(2);",
+                  "});",
+                  "",
+                  "pm.test('favoritesCount is an integer', function() {",
+                  "    Number.isInteger(article.favoritesCount);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Favorite Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Favorite Article - error - not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 404', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Not Found')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/no-such-article/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "no-such-article",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unfavorite Article",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"title\" property', function() {",
+                  "    pm.expect(article).to.have.property('title');",
+                  "    pm.expect(article.title).to.eql(pm.globals.get('ARTICLE_TITLE'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"slug\" property', function() {",
+                  "    pm.expect(article).to.have.property('slug');",
+                  "    pm.expect(article.slug).to.eql(pm.globals.get('ARTICLE_SLUG'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"body\" property', function() {",
+                  "    pm.expect(article).to.have.property('body');",
+                  "    pm.expect(article.body).to.eql(pm.globals.get('ARTICLE_BODY'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"createdAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('createdAt');",
+                  "});",
+                  "pm.test('Article\\'s \"createdAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.createdAt);",
+                  "});",
+                  "pm.test('Article \"createdAt\" equals ARTICLE_CREATED_AT', function() {",
+                  "    const articleCreatedAt = pm.globals.get('ARTICLE_CREATED_AT')",
+                  "    pm.expect(article.createdAt).to.eql(articleCreatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"updatedAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('updatedAt');",
+                  "});",
+                  "pm.test('Article\\'s \"updatedAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.updatedAt);",
+                  "});",
+                  "pm.test('Article \"updatedAt\" equals ARTICLE_UPDATED_AT', function() {",
+                  "    const articleUpdatedAt = pm.globals.get('ARTICLE_UPDATED_AT')",
+                  "    pm.expect(article.updatedAt).to.eql(articleUpdatedAt)",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"description\" property', function() {",
+                  "    pm.expect(article).to.have.property('description');",
+                  "    pm.expect(article.description).to.eql(pm.globals.get('ARTICLE_DESCRIPTION'))",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"tagList\" property', function() {",
+                  "    pm.expect(article).to.have.property('tagList');",
+                  "});",
+                  "pm.test('Article\\'s \"tagList\" property is an Array', function() {",
+                  "    Array.isArray(article.tagList);",
+                  "    pm.expect(article.tagList).to.have.members([",
+                  "        pm.globals.get('TAG_1'),",
+                  "        pm.globals.get('TAG_2')",
+                  "    ]);",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"author\" property', function() {",
+                  "    pm.expect(article).to.have.property('author');",
+                  "});",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "    pm.expect(article.author).to.have.property('username');",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "})",
+                  "pm.test('Author \"bio\" equals default', function() {",
+                  "    pm.expect(article.author).to.have.property('bio');",
+                  "    pm.expect(article.author.bio).to.eql('I work at statefarm')",
+                  "})",
+                  "pm.test('Author \"image\" equals null', function() {",
+                  "    pm.expect(article.author).to.have.property('image');",
+                  "    pm.expect(article.author.image).to.be.null;",
+                  "})",
+                  "pm.test('Author \"following\" equals false', function() {",
+                  "    pm.expect(article.author).to.have.property('following');",
+                  "    pm.expect(article.author.following).to.be.false;",
+                  "})",
+                  "",
+                  "pm.test('Article contains \"favorited\" property', function() {",
+                  "    pm.expect(article).to.have.property('favorited');",
+                  "    pm.expect(article.favorited).to.eql(false)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"favoritesCount\" property', function() {",
+                  "    pm.expect(article).to.have.property('favoritesCount');",
+                  "    pm.expect(article.favoritesCount).to.eql(1);",
+                  "});",
+                  "",
+                  "pm.test('favoritesCount is an integer', function() {",
+                  "    Number.isInteger(article.favoritesCount);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unfavorite Article - not already favorited",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"slug\" property', function() {",
+                  "    pm.expect(article).to.have.property('slug');",
+                  "    pm.expect(article.slug).to.eql(pm.globals.get('ARTICLE_SLUG')+\"2\")",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"favorited\" property', function() {",
+                  "    pm.expect(article).to.have.property('favorited');",
+                  "    pm.expect(article.favorited).to.eql(false)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"favoritesCount\" property', function() {",
+                  "    pm.expect(article).to.have.property('favoritesCount');",
+                  "    pm.expect(article.favoritesCount).to.eql(0);",
+                  "});",
+                  "",
+                  "pm.test('favoritesCount is an integer', function() {",
+                  "    Number.isInteger(article.favoritesCount);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}2",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unfavorite Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unfavorite Article - error - not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 404', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Not Found')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/no-such-article/favorite",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "no-such-article",
+                "favorite"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"comment\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('comment');",
+                  "});",
+                  "",
+                  "var comment = responseJSON.comment || {};",
+                  "",
+                  "",
+                  "pm.test('Comment contains \"id\" property', function() {",
+                  "    pm.expect(comment).to.have.property('id');",
+                  "});",
+                  "",
+                  "pm.test('Comment contains \"body\" property', function() {",
+                  "    pm.expect(comment).to.have.property('body');",
+                  "    pm.expect(comment.body).to.eql(pm.globals.get('COMMENT_BODY'))",
+                  "});",
+                  "",
+                  "pm.test('Comment contains \"createdAt\" property', function() {",
+                  "    pm.expect(comment).to.have.property('createdAt');",
+                  "});",
+                  "pm.test('Comments\\'s \"createdAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(comment.createdAt);",
+                  "});",
+                  "pm.test('Comment \"createdAt\" is after COMMENT_REQUEST_DATE_TIME', function() {",
+                  "    const requestDateTime = new Date(pm.globals.get('COMMENT_REQUEST_DATE_TIME'))",
+                  "    const createdAt = new Date(comment.createdAt)",
+                  "    pm.expect(createdAt).to.be.above(requestDateTime)",
+                  "    pm.globals.set('COMMENT_CREATED_AT', comment.createdAt);",
+                  "})",
+                  "",
+                  "pm.test('Comment contains \"updatedAt\" property', function() {",
+                  "    pm.expect(comment).to.have.property('updatedAt');",
+                  "});",
+                  "pm.test('Comment\\'s \"updatedAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(comment.updatedAt);",
+                  "});",
+                  "pm.test('Comment \"updatedAt\" is after REQUEST_DATE_TIME', function() {",
+                  "    const requestDateTime = new Date(pm.globals.get('COMMENT_REQUEST_DATE_TIME'))",
+                  "    const updatedAt = new Date(comment.updatedAt)",
+                  "    pm.expect(updatedAt).to.be.above(requestDateTime)",
+                  "    pm.globals.set('COMMENT_UPDATED_AT', comment.updatedAt);",
+                  "})",
+                  "",
+                  "pm.test('Comment contains \"author\" property', function() {",
+                  "    pm.expect(comment).to.have.property('author');",
+                  "});",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME_2', function() {",
+                  "    pm.expect(comment.author).to.have.property('username');",
+                  "    pm.expect(comment.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME_2'))",
+                  "})",
+                  "pm.test('Author \"bio\" equals default', function() {",
+                  "    pm.expect(comment.author).to.have.property('bio');",
+                  "    pm.expect(comment.author.bio).to.eql('I work at statefarm')",
+                  "})",
+                  "pm.test('Author \"image\" equals null', function() {",
+                  "    pm.expect(comment.author).to.have.property('image');",
+                  "    pm.expect(comment.author.image).to.be.null;",
+                  "})",
+                  "pm.test('Author \"following\" equals false', function() {",
+                  "    pm.expect(comment.author).to.have.property('following');",
+                  "    pm.expect(comment.author.following).to.be.false;",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 201', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Created')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"comment\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('comment');",
+                  "});",
+                  "",
+                  "var comment = responseJSON.comment || {};",
+                  "",
+                  "pm.test('Comment contains \"id\" property', function() {",
+                  "    pm.expect(comment).to.have.property('id');",
+                  "});",
+                  "",
+                  "pm.globals.set('COMMENT_CREATED_AT_2', comment.createdAt);",
+                  "pm.globals.set('COMMENT_UPDATED_AT_2', comment.updatedAt);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}2\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment 3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 201', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Created')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"comment\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('comment');",
+                  "});",
+                  "",
+                  "var comment = responseJSON.comment || {};",
+                  "",
+                  "",
+                  "pm.test('Comment contains \"id\" property', function() {",
+                  "    pm.expect(comment).to.have.property('id');",
+                  "    pm.globals.set('DELETE_COMMENT_ID', comment.id);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}3\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment - error - article not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 404', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Not Found')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"comment\": {\n        \"body\":\"{{COMMENT_BODY}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/no-such-article/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "no-such-article",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment - error - missing required fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "utils.assertErrorStartsWith(\"body\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"comment\": {\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Comment - error - required fields blank",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "utils.assertErrorStartsWith(\"body\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"comment\": {\n        \"body\":\"\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/{{DELETE_COMMENT_ID}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments",
+                "{{DELETE_COMMENT_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment - error - unauthorized (wrong user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 403', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Forbidden')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/{{DELETE_COMMENT_ID}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments",
+                "{{DELETE_COMMENT_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment - error - article not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 422', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/no-such-article/comments/{{DELETE_COMMENT_ID}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "no-such-article",
+                "comments",
+                "{{DELETE_COMMENT_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment - error - comment not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 404', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Not Found')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/00000000-0000-0000-0000-0000000000000000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments",
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment - error - invalid comment id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"id\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/abc",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments",
+                "abc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 204', function() {",
+                  "    pm.expect(pm.response.status).to.eql('No Content')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('COMMENT_BODY', 'Is that so?')",
+                  "pm.globals.set('COMMENT_REQUEST_DATE_TIME', new Date().toISOString())"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments/{{DELETE_COMMENT_ID}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments",
+                "{{DELETE_COMMENT_ID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Comments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"comments\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('comments');",
+                  "});",
+                  "",
+                  "var comments = responseJSON.comments || [];",
+                  "",
+                  "pm.test(\"Article has 2 comments\", function() {",
+                  "    pm.expect(comments.length).to.eql(2)",
+                  "});",
+                  "",
+                  "pm.test('Comment contains \"id\" property', function() {",
+                  "    pm.expect(comments[0]).to.have.property('id');",
+                  "    pm.expect(comments[1]).to.have.property('id');",
+                  "});",
+                  "",
+                  "pm.test('Comment contains \"body\" property', function() {",
+                  "    pm.expect(comments[0]).to.have.property('body');",
+                  "    pm.expect(comments[1]).to.have.property('body');",
+                  "    pm.expect(comments[0].body).to.eql(pm.globals.get('COMMENT_BODY'))",
+                  "    pm.expect(comments[1].body).to.eql(pm.globals.get('COMMENT_BODY')+2)",
+                  "});",
+                  "",
+                  "pm.test('Comment contains \"createdAt\" property', function() {",
+                  "    pm.expect(comments[0]).to.have.property('createdAt');",
+                  "    pm.expect(comments[1]).to.have.property('createdAt');",
+                  "});",
+                  "pm.test('Comments\\'s \"createdAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(comments[0].createdAt);",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(comments[1].createdAt);",
+                  "});",
+                  "pm.test('Comment \"createdAt\" equals COMMENT_CREATED_AT', function() {",
+                  "    pm.expect(comments[0].createdAt).to.eql(pm.globals.get('COMMENT_CREATED_AT'));",
+                  "    pm.expect(comments[1].createdAt).to.eql(pm.globals.get('COMMENT_CREATED_AT_2'));",
+                  "})",
+                  "",
+                  "pm.test('Comment contains \"updatedAt\" property', function() {",
+                  "    pm.expect(comments[0]).to.have.property('updatedAt');",
+                  "    pm.expect(comments[1]).to.have.property('updatedAt');",
+                  "});",
+                  "pm.test('Comment\\'s \"updatedAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(comments[0].updatedAt);",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(comments[1].updatedAt);",
+                  "});",
+                  "pm.test('Comment \"updatedAt\" equals COMMENT_UPDATED_AT', function() {",
+                  "    pm.expect(comments[0].updatedAt).to.eql(pm.globals.get('COMMENT_UPDATED_AT'))",
+                  "    pm.expect(comments[1].updatedAt).to.eql(pm.globals.get('COMMENT_UPDATED_AT_2'))",
+                  "})",
+                  "",
+                  "pm.test('Comment contains \"author\" property', function() {",
+                  "    pm.expect(comments[0]).to.have.property('author');",
+                  "    pm.expect(comments[1]).to.have.property('author');",
+                  "});",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME_2', function() {",
+                  "    pm.expect(comments[0].author).to.have.property('username');",
+                  "    pm.expect(comments[1].author).to.have.property('username');",
+                  "    pm.expect(comments[0].author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME_2'));",
+                  "    pm.expect(comments[1].author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'));",
+                  "})",
+                  "pm.test('Author \"bio\" equals default', function() {",
+                  "    pm.expect(comments[0].author).to.have.property('bio');",
+                  "    pm.expect(comments[1].author).to.have.property('bio');",
+                  "    pm.expect(comments[0].author.bio).to.eql('I work at statefarm');",
+                  "    pm.expect(comments[1].author.bio).to.eql('I work at statefarm');",
+                  "})",
+                  "pm.test('Author \"image\" equals null', function() {",
+                  "    pm.expect(comments[0].author).to.have.property('image');",
+                  "    pm.expect(comments[1].author).to.have.property('image');",
+                  "    pm.expect(comments[0].author.image).to.be.null;",
+                  "    pm.expect(comments[1].author.image).to.be.null;",
+                  "})",
+                  "pm.test('Author \"following\" equals false', function() {",
+                  "    pm.expect(comments[0].author).to.have.property('following');",
+                  "    pm.expect(comments[1].author).to.have.property('following');",
+                  "    pm.expect(comments[0].author.following).to.be.false;",
+                  "    pm.expect(comments[1].author.following).to.be.true;",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Comments - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"comments\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('comments');",
+                  "});",
+                  "",
+                  "var comments = responseJSON.comments || [];",
+                  "",
+                  "pm.test(\"Article has 2 comments\", function() {",
+                  "    pm.expect(comments.length).to.eql(2)",
+                  "});",
+                  "",
+                  "pm.test(\"Not following any comment authors\", function() {",
+                  "    pm.expect(comments[0].author.following).to.be.false",
+                  "    pm.expect(comments[1].author.following).to.be.false",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Comments - no comments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"comments\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('comments');",
+                  "});",
+                  "",
+                  "var comments = responseJSON.comments || [];",
+                  "",
+                  "pm.test(\"Article has 0 comments\", function() {",
+                  "    pm.expect(comments.length).to.eql(0)",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}2",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Comments - error - not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 422', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unprocessable Entity')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/no-such-article/comments",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "no-such-article",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}3\", \n        \"description\":\"{{ARTICLE_DESCRIPTION}}3\", \n        \"body\":\"{{ARTICLE_BODY}}3\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Article - error - article not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 404', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Not Found')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}3\", \n        \"description\":\"{{ARTICLE_DESCRIPTION}}3\", \n        \"body\":\"{{ARTICLE_BODY}}3\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/no-such-article",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "no-such-article"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Article - error - unauthorized",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 403', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Forbidden')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}3\", \n        \"description\":\"{{ARTICLE_DESCRIPTION}}3\", \n        \"body\":\"{{ARTICLE_BODY}}3\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Article - error - missing required fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"article\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Article - error - required fields blank",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"title\", pm);",
+                  "utils.assertErrorStartsWith(\"body\", pm);",
+                  "utils.assertErrorStartsWith(\"description\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"\", \n        \"description\":\"\", \n        \"body\":\"\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Article - error - duplicate slug",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 400', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"slug\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Article",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"article\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('article');",
+                  "});",
+                  "",
+                  "var article = responseJSON.article || {};",
+                  "",
+                  "pm.test('Article contains \"title\" property', function() {",
+                  "    pm.expect(article).to.have.property('title');",
+                  "    pm.expect(article.title).to.eql(pm.globals.get('ARTICLE_TITLE')+3)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"slug\" property', function() {",
+                  "    pm.expect(article).to.have.property('slug');",
+                  "    pm.expect(article.slug).to.eql(pm.globals.get('ARTICLE_SLUG')+3)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"body\" property', function() {",
+                  "    pm.expect(article).to.have.property('body');",
+                  "    pm.expect(article.body).to.eql(pm.globals.get('ARTICLE_BODY')+3)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"description\" property', function() {",
+                  "    pm.expect(article).to.have.property('description');",
+                  "    pm.expect(article.description).to.eql(pm.globals.get('ARTICLE_DESCRIPTION')+3)",
+                  "});",
+                  "",
+                  "pm.test('Article contains \"createdAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('createdAt');",
+                  "});",
+                  "pm.test('Article\\'s \"createdAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.createdAt);",
+                  "});",
+                  "pm.test('Article contains \"updatedAt\" property', function() {",
+                  "    pm.expect(article).to.have.property('updatedAt');",
+                  "});",
+                  "pm.test('Article\\'s \"updatedAt\" property is an ISO 8601 timestamp', function() {",
+                  "    /^\\d{4,}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d.\\d+(?:[+-][0-2]\\d:[0-5]\\d|Z)$/.test(article.updatedAt);",
+                  "});",
+                  "pm.test('Article \"updatedAt\" is after \"createdAt\"', function() {",
+                  "    const updatedAt = new Date(article.updatedAt)",
+                  "    const createdAt = new Date(article.createdAt)",
+                  "    pm.expect(updatedAt).to.be.above(createdAt)",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"article\": {\n        \"title\":\"{{ARTICLE_TITLE}}3\", \n        \"description\":\"{{ARTICLE_DESCRIPTION}}3\", \n        \"body\":\"{{ARTICLE_BODY}}3\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}2",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Article - error - not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 404', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Not Found')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/no-such-article",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "no-such-article"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Article - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Article - error - unauthorized (wrong user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 403', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Forbidden')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Article",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 204', function() {",
+                  "    pm.expect(pm.response.status).to.eql('No Content')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Article 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 204', function() {",
+                  "    pm.expect(pm.response.status).to.eql('No Content')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{articles_user_token_2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/articles/{{ARTICLE_SLUG}}3",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "articles",
+                "{{ARTICLE_SLUG}}3"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          "utils = {",
+          "    assertErrorStartsWith: function(fieldName, pm) {",
+          "        const response = pm.response.json();",
+          "        // Handle ProblemDetails format: errors is an array of {name, reason}",
+          "        const errors = response.errors || [];",
+          "        const hasFieldError = errors.some(err => err.name === fieldName || err.name.startsWith(fieldName));",
+          "        pm.test(`At least one error for field '${fieldName}'`, function () {",
+          "            pm.expect(hasFieldError).to.be.true;",
+          "        });",
+          "    }",
+          "}",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          "",
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "errorHelpersDefined",
+      "value": ""
+    },
+    {
+      "key": "customHelpersDefined",
+      "value": ""
+    }
+  ]
+}
