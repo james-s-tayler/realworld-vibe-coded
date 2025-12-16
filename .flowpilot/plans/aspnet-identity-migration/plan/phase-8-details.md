@@ -2,100 +2,81 @@
 
 ### Phase Overview
 
-Final cleanup and comprehensive validation. Ensure all code is clean, all tests pass, and all Nuke build targets succeed. Conduct a final review to confirm the migration is complete and the system is production-ready with ASP.NET Identity.
+Update the FeedAndArticles postman collection to remove username dependency. When registering test users, do not provide username field - it will default to email. Update all test setup data to remove username references.
 
 ### Prerequisites
 
-- Phase 7 completed: All legacy JWT authentication code removed
-- All tests passing with Identity
-- Codebase clean with no old authentication references
+- Phase 7 completed: Profiles collection updated and passing without username
+- Auth and Profiles collections using email as username
+- Other collections still passing with or without username
 
 ### Implementation Steps
 
-1. **Run Full Linting**
-   - Run `./build.sh LintAllVerify`
-   - Fix any linting issues that may have been introduced
-   - Ensure code style is consistent throughout
-   - Address any warnings or code quality issues
+1. **Open FeedAndArticles Postman Collection**
+   - Open `Test/Postman/Conduit.FeedAndArticles.postman_collection.json`
+   - Review all requests that register users for test setup
+   - Identify any variables or test data that reference username
 
-2. **Review and Clean Up Comments**
-   - Search for TODO comments related to the migration
-   - Remove or address any temporary comments
-   - Ensure comments are accurate and helpful
-   - Remove any commented-out code from migration process
+2. **Update Registration Requests in FeedAndArticles Collection**
+   - Find all POST /api/users/register requests
+   - Remove `username` field from request bodies:
+     ```json
+     {
+       "user": {
+         "email": "testuser@example.com",
+         "password": "password123"
+       }
+     }
+     ```
+   - Ensure only email and password are provided
 
-3. **Verify Database Schema**
-   - Check database schema to ensure:
-     - AspNetUsers table exists with ApplicationUser properties (Bio, Image)
-     - Identity tables are properly configured (AspNetRoles, AspNetUserClaims, etc.)
-     - Old User table is removed
-     - Following/Followers relationships work with ApplicationUser
-   - Run a manual test to verify data integrity
+3. **Update Collection Variables**
+   - Review collection-level variables
+   - Remove or update any username-related variables
+   - Ensure variables use email values where username was previously used
 
-4. **Test All Authentication Flows**
-   - Manually test critical authentication scenarios:
-     - User registration with valid data
-     - User registration with invalid data (weak password, duplicate email)
-     - User login with correct credentials
-     - User login with incorrect credentials (verify lockout after 5 attempts)
-     - Authenticated requests to protected endpoints
-     - Unauthenticated requests to protected endpoints (should return 401)
-     - Cookie persistence across browser sessions
-     - Logout functionality
+4. **Update Pre-Request Scripts**
+   - Review pre-request scripts that may set username variables
+   - Update to use email instead of separate username
+   - Ensure dynamic user generation uses email format
 
-5. **Run All Test Suites**
-   - Run `./build.sh TestServer` - verify all functional tests pass
-   - Run `./build.sh TestServerPostman` - verify Postman tests pass
-   - Run `./build.sh TestE2e` - verify E2E tests pass
-   - If any test fails, investigate and fix before proceeding
-   - Review test reports in `Reports/` folder
+5. **Update Test Assertions**
+   - Review test scripts that assert username values
+   - Update to expect username to equal email
+   - Remove any assertions that compare username to a different value than email
 
-6. **Verify All Build Targets**
-   - Run `./build.sh BuildServer` - server builds successfully
-   - Run `./build.sh BuildClient` - client builds successfully
-   - Run `./build.sh LintServerVerify` - server linting passes
-   - Run `./build.sh LintClientVerify` - client linting passes
-   - Ensure all targets complete without errors
+6. **Update Test Data in Request Bodies**
+   - Review any request bodies that may reference usernames
+   - Ensure article and feed operations work with email-based usernames
+   - Update any hardcoded test data
 
-7. **Review Security Configuration**
-   - Verify password policy is appropriate (8 chars, digit, upper, lower)
-   - Verify lockout policy is configured (5 attempts, 10 minutes)
-   - Verify cookie security settings (HttpOnly, Secure, SameSite)
-   - Verify sensitive data is not logged (passwords, etc.)
-   - Check that Audit.NET is properly logging user actions
+7. **Test FeedAndArticles Collection Independently**
+   - Run `FOLDER=FeedAndArticles ./build.sh TestServerPostman`
+   - Verify all tests pass
+   - Verify users are registered with email as username
+   - Verify feed and article list operations work correctly
 
-8. **Test Audit Logging**
-   - Perform a few operations (register, login, update profile, create article)
-   - Check Audit.NET logs in `Logs/Server.Web/Audit.NET/`
-   - Verify operations are logged with correct user context
-   - Verify sensitive data (passwords) are not in audit logs
-   - Verify both EntityFrameworkEvent and DatabaseTransactionEvent are logged
-
-9. **Conduct Code Review**
-   - Review changes made during migration
-   - Ensure clean architecture principles are maintained
-   - Verify no coupling between layers
-   - Check for any code smells or technical debt
-   - Ensure error handling is appropriate
-
-10. **Final Validation**
-    - Start the application and perform end-to-end manual testing
-    - Test as a real user would use the application
-    - Verify no console errors or warnings
-    - Verify browser cookies are set and managed correctly
-    - Verify application behavior matches expectations
+8. **Verify Previously Updated Collections Still Pass**
+   - Run `FOLDER=Auth ./build.sh TestServerPostman` - should still pass
+   - Run `FOLDER=Profiles ./build.sh TestServerPostman` - should still pass
+   - Run `FOLDER=Article ./build.sh TestServerPostman` - not yet updated
+   - Run `FOLDER=ArticlesEmpty ./build.sh TestServerPostman` - not yet updated
 
 ### Verification
 
 Run the following Nuke targets to verify this phase:
 
 ```bash
-./build.sh LintAllVerify
+./build.sh LintServerVerify
 ./build.sh BuildServer
-./build.sh BuildClient
 ./build.sh TestServer
+FOLDER=Auth ./build.sh TestServerPostman
+FOLDER=Profiles ./build.sh TestServerPostman
+FOLDER=FeedAndArticles ./build.sh TestServerPostman
+FOLDER=Article ./build.sh TestServerPostman
+FOLDER=ArticlesEmpty ./build.sh TestServerPostman
 ./build.sh TestServerPostman
 ./build.sh TestE2e
 ```
 
-All targets must pass with no errors or warnings. The migration is complete. The application is fully using ASP.NET Identity with cookie-based authentication. All tests pass. The codebase is clean and maintainable. The system is production-ready.
+All targets must pass. Auth, Profiles, and FeedAndArticles collections should now use email as username. Article and ArticlesEmpty collections may still provide username explicitly and should continue to work.
