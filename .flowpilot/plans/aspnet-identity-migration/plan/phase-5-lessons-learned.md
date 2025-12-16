@@ -66,7 +66,31 @@
 
 **Lesson**: When editing structured data formats programmatically, validate syntax after each change. Use tooling (JSON validators) to catch errors early.
 
-### 6. **--bail Flag for Focused Debugging**
+### 6. **Authentication State Management in Multi-User Tests**
+**Problem**: After "Login 2" (User 2), the "Follow Profile" operation succeeded, but subsequent "Create Article" request still ran as User 2, causing articles to be created by the wrong user.
+
+**Root Cause**: Cookie-based authentication persists across requests. After User 2 logs in and follows User 1, the authentication doesn't automatically switch back. This caused User 2 to create articles, and when checking `following` status, it returned `false` because User 2 doesn't follow themselves.
+
+**Solution**:
+- Added explicit "Login and Remember Token - setup (switch back to User 1)" request after "Follow Profile"
+- This ensures the correct user is authenticated for subsequent operations
+- Pattern: Setup User 2 → User 2 action → Switch back to User 1 → User 1 operations
+
+**Lesson**: With cookie-based authentication, you must explicitly manage which user is authenticated at each step in multi-user interaction tests. Don't assume authentication context - explicitly control it.
+
+### 7. **Anonymous Endpoints Need Explicit AuthSchemes**
+**Problem**: Endpoints that allow anonymous access (like Get Article without authentication) weren't properly supporting both JWT and cookie authentication when credentials were provided.
+
+**Root Cause**: FastEndpoints requires explicit `AuthSchemes()` configuration on endpoints that use `Options(x => x.AllowAnonymous())` to support multiple authentication schemes.
+
+**Solution**:
+- Changed from: `.AllowAnonymous()`
+- Changed to: `.Options(x => x.AllowAnonymous().AuthSchemes("Token", IdentityConstants.ApplicationScheme))`
+- Applied to: Get Article, List Articles, Get Comments, Get Profile endpoints
+
+**Lesson**: When supporting multiple authentication schemes in a microservices/API context, explicitly configure which schemes each endpoint accepts, even for anonymous endpoints. This ensures proper authentication resolution when credentials are optionally provided.
+
+### 8. **--bail Flag for Focused Debugging**
 **Problem**: Full test runs with hundreds of failures made it hard to identify root causes.
 
 **Solution**:
@@ -136,7 +160,15 @@ This migration went through multiple iterations:
 
 Each iteration deepened understanding and improved results. Embrace the iteration process.
 
-### 8. **Document Mental Models**
+### 8. **Authentication Context in Multi-User Flows**
+Multi-user test scenarios (like follow/unfollow, feed queries) require explicit authentication switching:
+- After User B performs an action on User A, explicitly log back in as User A if needed
+- Don't assume authentication persists or switches automatically
+- Add "Login as [User]" requests to explicitly control who is authenticated
+
+This is especially important with cookie-based auth where sessions persist.
+
+### 9. **Document Mental Models**
 Write down:
 - Key insights about how the system works
 - Gotchas and non-obvious behaviors
