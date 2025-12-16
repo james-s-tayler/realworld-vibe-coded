@@ -60,7 +60,8 @@
         "TestE2e",
         "TestFlowPilot",
         "TestServer",
-        "TestServerPostman"
+        "TestServerPostman",
+        "TestServerPostmanArticlesEmpty"
       ]
     },
     "Verbosity": {
