@@ -79,6 +79,8 @@ public partial class Build
 
   internal AbsolutePath ReportsTestPostmanProfilesDirectory => ReportsTestPostmanDirectory / "Profiles";
 
+  internal AbsolutePath ReportsTestPostmanFeedAndArticlesDirectory => ReportsTestPostmanDirectory / "FeedAndArticles";
+
   internal AbsolutePath ReportsFlowPilotDirectory => RootDirectory / "Reports" / "FlowPilot";
 
   internal AbsolutePath ReportsFlowPilotResultsDirectory => RootDirectory / "Reports" / "FlowPilot" / "Results";

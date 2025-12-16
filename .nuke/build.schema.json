@@ -63,6 +63,7 @@
         "TestServerPostman",
         "TestServerPostmanArticlesEmpty",
         "TestServerPostmanAuth",
+        "TestServerPostmanFeedAndArticles",
         "TestServerPostmanProfiles"
       ]
     },

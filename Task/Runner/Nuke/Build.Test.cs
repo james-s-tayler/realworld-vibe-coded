@@ -377,6 +377,69 @@ public partial class Build
         }
       });
 
+  internal Target TestServerPostmanFeedAndArticles => _ => _
+      .Description("Run postman tests for FeedAndArticles collection using Docker Compose")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(DbResetForce)
+      .DependsOn(RunLocalCleanDirectories)
+      .Executes(() =>
+      {
+        Log.Information("Running Postman FeedAndArticles tests with Docker Compose");
+
+        var envVars = new Dictionary<string, string>
+        {
+          ["DOCKER_BUILDKIT"] = "1",
+        };
+
+        int exitCode = 0;
+        try
+        {
+          var args = "compose -f Test/Postman/docker-compose.FeedAndArticles.yml up --build --abort-on-container-exit";
+          var process = ProcessTasks.StartProcess(
+                "docker",
+                args,
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
+          process.WaitForExit();
+          exitCode = process.ExitCode;
+        }
+        finally
+        {
+          var downArgs = "compose -f Test/Postman/docker-compose.FeedAndArticles.yml down";
+          var downProcess = ProcessTasks.StartProcess(
+                "docker",
+                downArgs,
+                workingDirectory: RootDirectory,
+                environmentVariables: envVars);
+          downProcess.WaitForExit();
+        }
+
+        // Generate markdown report summary from Newman JSON report
+        var newmanReportFile = ReportsTestPostmanDirectory / "FeedAndArticles" / "newman-report.json";
+        var reportSummaryFile = ReportsTestPostmanDirectory / "FeedAndArticles" / "Artifacts" / "ReportSummary.md";
+
+        if (newmanReportFile.FileExists())
+        {
+          try
+          {
+            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+          }
+          catch (Exception ex)
+          {
+            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+          }
+        }
+
+        // Explicitly fail the target if Docker Compose failed
+        if (exitCode != 0)
+        {
+          const string debugInstructions = "For a high-level summary of specific failures, see Reports/Test/Postman/FeedAndArticles/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.";
+          Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
+          Log.Error("Test failed. {DebugInstructions}", debugInstructions);
+          throw new Exception($"Postman FeedAndArticles tests failed with exit code: {exitCode}. {debugInstructions}");
+        }
+      });
+
   internal Target TestE2e => _ =>
   {
     _.Description("Run E2E Playwright tests using Docker Compose")
