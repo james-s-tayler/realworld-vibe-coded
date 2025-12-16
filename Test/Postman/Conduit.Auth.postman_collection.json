@@ -1,0 +1,1286 @@
+{
+  "info": {
+    "name": "Conduit - Auth",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "8915fafc-debc-4df0-abde-4d52d8e3f4a1-auth"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"user\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('user');",
+                  "    });",
+                  "",
+                  "    var user = responseJSON.user || {};",
+                  "",
+                  "    pm.test('\"email\" property matches EMAIL variable', function() {",
+                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
+                  "        pm.expect(user.email).to.eql(email);",
+                  "    });",
+                  "    pm.test('\"usermame\" property matches USERNAME variable', function() {",
+                  "        const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME');",
+                  "        pm.expect(user.username).to.eql(username);",
+                  "    });",
+                  "    pm.test('User has default \"bio\" property', function() {",
+                  "        pm.expect(user.bio).to.eql('I work at statefarm');",
+                  "    });",
+                  "    pm.test('User has \"image\" property', function() {",
+                  "        pm.expect(user).to.have.property('image');",
+                  "        pm.expect(user.image).to.be.null;",
+                  "    });",
+                  "    pm.test('User has \"token\" property', function() {",
+                  "        pm.expect(user).to.have.property('token');",
+                  "    });",
+                  "    pm.test('\"token\" property is not empty', function() {",
+                  "        pm.expect(user.token).to.not.be.empty",
+                  "    });",
+                  "    pm.test('\"token\" property is not same as password', function() {",
+                  "    const password = pm.globals.get('PASSWORD') || pm.environment.get('PASSWORD');",
+                  "    pm.expect(user.token).to.not.eql(password, 'The password must be hashed, and not stored in plain text');",
+                  "    });",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register (second user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"user\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('user');",
+                  "    });",
+                  "",
+                  "    var user = responseJSON.user || {};",
+                  "",
+                  "    pm.test('\"email\" property matches SECOND_EMAIL variable', function() {",
+                  "        const email = pm.globals.get('SECOND_EMAIL');",
+                  "        pm.expect(user.email).to.eql(email);",
+                  "    });",
+                  "    pm.test('\"usermame\" property matches SECOND_USERNAME variable', function() {",
+                  "        const username = pm.globals.get('SECOND_USERNAME');",
+                  "        pm.expect(user.username).to.eql(username);",
+                  "    });",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set(\"SECOND_EMAIL\", (Math.random() * 1000) + \"@example.com\")",
+                  "pm.globals.set(\"SECOND_USERNAME\", (Math.random() * 1000) + \"\")"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{SECOND_USERNAME}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register - validation - duplicate username",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "    })",
+                  "",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"errors\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('errors');",
+                  "    });",
+                  "",
+                  "",
+                  "    utils.assertErrorStartsWith(\"username\", pm);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set(\"RANDOM_EMAIL\", (Math.random() * 1000) + \"@example.com\")"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{RANDOM_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register - validation - duplicate email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "    })",
+                  "",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"errors\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('errors');",
+                  "    });",
+                  "",
+                  "",
+                  "    utils.assertErrorStartsWith(\"email\", pm);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set(\"RANDOM_USERNAME\", \"yolo\" + (Math.random() * 1000))"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{RANDOM_USERNAME}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register - validation - not a valid email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "    })",
+                  "",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"errors\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('errors');",
+                  "    });",
+                  "",
+                  "",
+                  "    utils.assertErrorStartsWith(\"email\", pm);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('RANDOM_USERNAME', \"username\" + (Math.random() * 100))"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"soloyolo\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{RANDOM_USERNAME}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register - validation - missing required fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "    })",
+                  "",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"errors\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('errors');",
+                  "    });",
+                  "",
+                  "",
+                  "    utils.assertErrorStartsWith(\"username\", pm);",
+                  "    utils.assertErrorStartsWith(\"email\", pm);",
+                  "    utils.assertErrorStartsWith(\"password\", pm);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('RANDOM_USERNAME', \"username\" + (Math.random() * 100))"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register - validation - required fields blank",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (!(pm.environment.isIntegrationTest)) {",
+                  "    pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "    })",
+                  "",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"errors\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('errors');",
+                  "    });",
+                  "",
+                  "",
+                  "    utils.assertErrorStartsWith(\"username\", pm);",
+                  "    utils.assertErrorStartsWith(\"email\", pm);",
+                  "    utils.assertErrorStartsWith(\"password\", pm);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('RANDOM_USERNAME', \"username\" + (Math.random() * 100))"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\": \"\", \"password\":\"\", \"username\":\"\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"user\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('user')",
+                  "});",
+                  "",
+                  "var user = responseJSON.user || {};",
+                  "",
+                  "pm.test('user.email matches the EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.email).to.eql(email)",
+                  "});",
+                  "pm.test('user.usermame matches USERNAME variable', function() {",
+                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
+                  "    pm.expect(user.username).to.eql(username)",
+                  "});",
+                  "pm.test('User has \"bio\" property', function() {",
+                  "    pm.expect(user).to.have.property('bio')",
+                  "});",
+                  "pm.test('User has \"image\" property', function() {",
+                  "    pm.expect(user).to.have.property('image')",
+                  "});",
+                  "pm.test('User has \"token\" property', function() {",
+                  "    pm.expect(user).to.have.property('token')",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users/login",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Failed - error - user not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"someone@example.com\", \"password\":\"{{PASSWORD}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users/login",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Failed - error - incorrect password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"oops\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users/login",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login and Remember Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"user\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('user')",
+                  "});",
+                  "",
+                  "var user = responseJSON.user || {};",
+                  "",
+                  "pm.test('user.email matches the EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.email).to.eql(email)",
+                  "});",
+                  "pm.test('user.usermame matches USERNAME variable', function() {",
+                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
+                  "    pm.expect(user.username).to.eql(username)",
+                  "});",
+                  "pm.test('User has \"bio\" property', function() {",
+                  "    pm.expect(user).to.have.property('bio')",
+                  "});",
+                  "pm.test('User has \"image\" property', function() {",
+                  "    pm.expect(user).to.have.property('image')",
+                  "});",
+                  "pm.test('User has \"token\" property', function() {",
+                  "    pm.expect(user).to.have.property('token')",
+                  "});",
+                  "",
+                  "if(pm.test('User has \"token\" property')){",
+                  "    pm.globals.set('token', user.token);",
+                  "}",
+                  "",
+                  "pm.test('Global variable \"token\" has been set', function() {",
+                  "    pm.globals.get('token') === user.token",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/users/login",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Current User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"user\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('user')",
+                  "});",
+                  "",
+                  "var user = responseJSON.user || {};",
+                  "",
+                  "pm.test('user.email matches the EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.email).to.eql(email)",
+                  "});",
+                  "pm.test('user.usermame matches USERNAME variable', function() {",
+                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
+                  "    pm.expect(user.username).to.eql(username)",
+                  "});",
+                  "pm.test('User has \"bio\" property', function() {",
+                  "    pm.expect(user).to.have.property('bio')",
+                  "});",
+                  "pm.test('User has \"image\" property', function() {",
+                  "    pm.expect(user).to.have.property('image')",
+                  "});",
+                  "pm.test('User has \"token\" property that matches the token in the Authorization header', function() {",
+                  "    pm.expect(user.token).to.eql(pm.globals.get('token'))",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/user",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Current User - error - unauthenticated, missing authorization header",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/user",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Current User - error - unauthenticated, invalid token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token 123"
+              }
+            ],
+            "url": {
+              "raw": "{{APIURL}}/user",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response contains \"user\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('user')",
+                  "});",
+                  "",
+                  "var user = responseJSON.user || {};",
+                  "",
+                  "pm.test('\"email\" matches the UPDATED_EMAIL variable', function() {",
+                  "    const email = pm.globals.get('UPDATED_EMAIL')",
+                  "    pm.expect(user.email).to.eql(email)",
+                  "});",
+                  "pm.test('\"username\" matches UPDATED_USERNAME variable', function() {",
+                  "    const username = pm.globals.get('UPDATED_USERNAME')",
+                  "    pm.expect(user.username).to.eql(username)",
+                  "});",
+                  "pm.test('\"bio\" matches the UPDATED_BIO variable', function() {",
+                  "    pm.expect(user.bio).to.eql(pm.globals.get('UPDATED_BIO'))",
+                  "});",
+                  "pm.test('\"image\" matches the UPDATED_IMAGE variable', function() {",
+                  "    pm.expect(user.image).to.eql(pm.globals.get('UPDATED_IMAGE'))",
+                  "});",
+                  "pm.test('User has \"token\" property', function() {",
+                  "    pm.expect(user).to.have.property('token')",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
+                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
+                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
+                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
+                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"user\":{\n        \"username\":\"{{UPDATED_USERNAME}}\",\n        \"email\":\"{{UPDATED_EMAIL}}\",\n        \"password\":\"{{UPDATED_PASSWORD}}\",\n        \"bio\":\"{{UPDATED_BIO}}\",\n        \"image\":\"{{UPDATED_IMAGE}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/user",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User - validation - provided fields blank",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"username\", pm);",
+                  "utils.assertErrorStartsWith(\"email\", pm);",
+                  "utils.assertErrorStartsWith(\"bio\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
+                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
+                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
+                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
+                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"user\":{\n        \"username\":\"\",\n        \"email\":\"\",\n        \"password\":\"\",\n        \"bio\":\"\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/user",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User - validation - duplicate email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"email\", pm);",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
+                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
+                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
+                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
+                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"user\":{\n        \"email\":\"{{SECOND_EMAIL}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/user",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User - validation - duplicate username",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "pm.test('Response is HTTP 400', function() {",
+                  "        pm.expect(pm.response.status).to.eql('Bad Request')",
+                  "})",
+                  "",
+                  "pm.test('Response contains \"errors\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('errors');",
+                  "});",
+                  "",
+                  "",
+                  "utils.assertErrorStartsWith(\"username\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
+                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
+                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
+                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
+                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"user\":{\n        \"username\":\"{{SECOND_USERNAME}}\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/user",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User - error - unauthenticated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response is HTTP 401', function() {",
+                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"user\":{\"bio\":\"I no longer work at statefarm\"}}"
+            },
+            "url": {
+              "raw": "{{APIURL}}/user",
+              "host": [
+                "{{APIURL}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          "utils = {",
+          "    assertErrorStartsWith: function(fieldName, pm) {",
+          "        const response = pm.response.json();",
+          "        // Handle ProblemDetails format: errors is an array of {name, reason}",
+          "        const errors = response.errors || [];",
+          "        const hasFieldError = errors.some(err => err.name === fieldName || err.name.startsWith(fieldName));",
+          "        pm.test(`At least one error for field '${fieldName}'`, function () {",
+          "            pm.expect(hasFieldError).to.be.true;",
+          "        });",
+          "    }",
+          "}",
+          "",
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          "",
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "errorHelpersDefined",
+      "value": ""
+    },
+    {
+      "key": "customHelpersDefined",
+      "value": ""
+    }
+  ]
+}

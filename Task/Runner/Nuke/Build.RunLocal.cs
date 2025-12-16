@@ -28,6 +28,8 @@ public partial class Build
       ReportsTestE2eResultsDirectory.CreateOrCleanDirectory();
       ReportsTestE2eArtifactsDirectory.CreateOrCleanDirectory();
       ReportsTestPostmanDirectory.CreateOrCleanDirectory();
+      ReportsTestPostmanArticlesEmptyDirectory.CreateOrCleanDirectory();
+      ReportsTestPostmanAuthDirectory.CreateOrCleanDirectory();
 
       // Create or clean Logs directories
       LogsDirectory.CreateOrCleanDirectory();

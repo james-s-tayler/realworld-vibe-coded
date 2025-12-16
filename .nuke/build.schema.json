@@ -61,7 +61,8 @@
         "TestFlowPilot",
         "TestServer",
         "TestServerPostman",
-        "TestServerPostmanArticlesEmpty"
+        "TestServerPostmanArticlesEmpty",
+        "TestServerPostmanAuth"
       ]
     },
     "Verbosity": {
