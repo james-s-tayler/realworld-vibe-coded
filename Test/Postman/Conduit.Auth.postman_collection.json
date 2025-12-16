@@ -28,9 +28,9 @@
                   "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"usermame\" property matches USERNAME variable', function() {",
-                  "        const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME');",
-                  "        pm.expect(user.username).to.eql(username);",
+                  "    pm.test('\"usermame\" property matches EMAIL variable', function() {",
+                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
+                  "        pm.expect(user.username).to.eql(email);",
                   "    });",
                   "    pm.test('User has default \"bio\" property', function() {",
                   "        pm.expect(user.bio).to.eql('I work at statefarm');",
@@ -71,7 +71,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}}"
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -105,9 +105,9 @@
                   "        const email = pm.globals.get('SECOND_EMAIL');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"usermame\" property matches SECOND_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('SECOND_USERNAME');",
-                  "        pm.expect(user.username).to.eql(username);",
+                  "    pm.test('\"usermame\" property matches SECOND_EMAIL variable', function() {",
+                  "        const email = pm.globals.get('SECOND_EMAIL');",
+                  "        pm.expect(user.username).to.eql(email);",
                   "    });",
                   "}",
                   ""
@@ -120,8 +120,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"SECOND_EMAIL\", (Math.random() * 1000) + \"@example.com\")",
-                  "pm.globals.set(\"SECOND_USERNAME\", (Math.random() * 1000) + \"\")"
+                  "pm.globals.set(\"SECOND_EMAIL\", (Math.random() * 1000) + \"@example.com\")"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -142,7 +141,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{SECOND_USERNAME}}\"}}"
+              "raw": "{\"user\":{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -186,7 +185,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"RANDOM_EMAIL\", (Math.random() * 1000) + \"@example.com\")"
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -207,7 +206,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{RANDOM_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}}"
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -251,7 +250,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"RANDOM_USERNAME\", \"yolo\" + (Math.random() * 1000))"
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -272,7 +271,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{RANDOM_USERNAME}}\"}}"
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -311,16 +310,6 @@
                 "type": "text/javascript",
                 "packages": {}
               }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "pm.globals.set('RANDOM_USERNAME', \"username\" + (Math.random() * 100))"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
             }
           ],
           "request": {
@@ -337,7 +326,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"soloyolo\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{RANDOM_USERNAME}}\"}}"
+              "raw": "{\"user\":{\"email\":\"soloyolo\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -370,20 +359,9 @@
                   "    });",
                   "",
                   "",
-                  "    utils.assertErrorStartsWith(\"username\", pm);",
                   "    utils.assertErrorStartsWith(\"email\", pm);",
                   "    utils.assertErrorStartsWith(\"password\", pm);",
                   "}"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "pm.globals.set('RANDOM_USERNAME', \"username\" + (Math.random() * 100))"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -437,20 +415,9 @@
                   "    });",
                   "",
                   "",
-                  "    utils.assertErrorStartsWith(\"username\", pm);",
                   "    utils.assertErrorStartsWith(\"email\", pm);",
                   "    utils.assertErrorStartsWith(\"password\", pm);",
                   "}"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "pm.globals.set('RANDOM_USERNAME', \"username\" + (Math.random() * 100))"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -471,7 +438,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\": \"\", \"password\":\"\", \"username\":\"\"}}"
+              "raw": "{\"user\":{\"email\": \"\", \"password\":\"\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -504,9 +471,9 @@
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.email).to.eql(email)",
                   "});",
-                  "pm.test('user.usermame matches USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(user.username).to.eql(username)",
+                  "pm.test('user.usermame matches EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.username).to.eql(email)",
                   "});",
                   "pm.test('User has \"bio\" property', function() {",
                   "    pm.expect(user).to.have.property('bio')",
@@ -662,9 +629,9 @@
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.email).to.eql(email)",
                   "});",
-                  "pm.test('user.usermame matches USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(user.username).to.eql(username)",
+                  "pm.test('user.usermame matches EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.username).to.eql(email)",
                   "});",
                   "pm.test('User has \"bio\" property', function() {",
                   "    pm.expect(user).to.have.property('bio')",
@@ -748,9 +715,9 @@
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.email).to.eql(email)",
                   "});",
-                  "pm.test('user.usermame matches USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(user.username).to.eql(username)",
+                  "pm.test('user.usermame matches EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.username).to.eql(email)",
                   "});",
                   "pm.test('User has \"bio\" property', function() {",
                   "    pm.expect(user).to.have.property('bio')",

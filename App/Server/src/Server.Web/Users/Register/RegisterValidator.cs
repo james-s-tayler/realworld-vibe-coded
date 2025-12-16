@@ -19,11 +19,11 @@ public class RegisterValidator : Validator<RegisterRequest>
       .OverridePropertyName("email");
 
     RuleFor(x => x.User.Username)
-      .NotEmpty()
-      .WithMessage("is required.")
       .MinimumLength(User.UsernameMinLength)
+      .When(x => !string.IsNullOrEmpty(x.User.Username))
       .WithMessage($"must be at least {User.UsernameMinLength} characters.")
       .MaximumLength(User.UsernameMaxLength)
+      .When(x => !string.IsNullOrEmpty(x.User.Username))
       .WithMessage($"cannot exceed {User.UsernameMaxLength} characters.")
       .OverridePropertyName("username");
 
