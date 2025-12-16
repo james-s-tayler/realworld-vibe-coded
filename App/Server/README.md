@@ -330,3 +330,5 @@ Domain events are a great pattern for decoupling a trigger for an operation from
 - [Clean Architecture with ASP.NET Core 8](https://www.youtube.com/watch?v=yF9SwL0p0Y0)
 - [Getting Started with Clean Architecture and .NET 8 (webinar)](https://www.youtube.com/watch?v=IsmyqNrfQQw)
 
+<!-- This project uses Clean Architecture principles -->
+
