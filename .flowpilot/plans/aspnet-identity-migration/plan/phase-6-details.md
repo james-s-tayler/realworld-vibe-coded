@@ -2,121 +2,97 @@
 
 ### Phase Overview
 
-Update the frontend React application and Playwright E2E tests to use Identity endpoints with cookie-based authentication. Remove JWT token handling from the frontend, update API client to call /register and /login endpoints, and rely on automatic browser cookie management. Update E2E tests to work with the new authentication flows.
+Make the username parameter optional on the /api/users/register endpoint, defaulting it to the email value when not provided or null. Update the Auth postman collection to remove username from test data. This establishes a migration pathway for incrementally updating other collections, frontend, and E2E tests.
 
 ### Prerequisites
 
-- Phase 5 completed: Postman tests updated and passing with Identity
-- Backend fully supports cookie authentication
-- All backend tests passing with Identity
+- Phase 5 completed: Postman collections split into separate files
+- All collections passing independently
+- Backend still using JWT authentication via /api/users endpoints
 
 ### Implementation Steps
 
-1. **Update Frontend API Client - Authentication Module**
-   - Open `App/Client/src/api/auth.ts` (or similar authentication API file)
-   - Update registration function:
-     ```typescript
-     export const authApi = {
-       register: async (email: string, password: string) => {
-         const response = await apiRequest('/register', {
-           method: 'POST',
-           body: JSON.stringify({ email, password }),
-         });
-         return response; // Cookie automatically set by browser
-       },
-       // ... other methods
+1. **Update RegisterUserCommand**
+   - Open `App/Server/src/Server.UseCases/Users/Register/RegisterUserCommand.cs`
+   - Consider making Username optional or provide a default value strategy
+   - Document the behavior: when Username is null/empty, use Email as Username
+
+2. **Update UserData DTO**
+   - Open `App/Server/src/Server.Web/Users/Register/UserData.cs`
+   - Make Username property nullable: `public string? Username { get; set; }`
+   - This allows clients to omit the username field
+
+3. **Update RegisterValidator**
+   - Open `App/Server/src/Server.Web/Users/Register/RegisterValidator.cs`
+   - Update Username validation rules to be conditional (only validate if provided)
+   - Or remove username validation entirely if always defaulting to email
+
+4. **Update Register Endpoint Mapping**
+   - Open `App/Server/src/Server.Web/Users/Register/Register.cs`
+   - Update the mapping from UserData to RegisterUserCommand:
+     ```csharp
+     var command = new RegisterUserCommand(
+         req.User.Email,
+         req.User.Username ?? req.User.Email,  // Default to email if username not provided
+         req.User.Password
+     );
+     ```
+
+5. **Update RegisterUserHandler (if needed)**
+   - Open `App/Server/src/Server.UseCases/Users/Register/RegisterUserHandler.cs`
+   - Verify the handler correctly uses the username value (which may be email)
+   - No changes should be needed if the command is mapped correctly
+
+6. **Test Backend Changes**
+   - Run `./build.sh BuildServer` to ensure compilation succeeds
+   - Run `./build.sh TestServer` to ensure functional tests pass
+   - Tests may need updating if they expect username to be different from email
+
+7. **Update Auth Postman Collection**
+   - Open `Test/Postman/Conduit.Auth.postman_collection.json`
+   - Find all register requests
+   - Remove `username` field from request bodies:
+     ```json
+     {
+       "user": {
+         "email": "test@example.com",
+         "password": "password123"
+       }
      }
      ```
-   - Update login function similarly to use `/login` endpoint
-   - Remove JWT token extraction from responses
-   - Remove token storage in localStorage/sessionStorage
+   - Remove username from test assertions if any
 
-2. **Remove JWT Token Authorization Headers**
-   - Open `App/Client/src/api/client.ts` (or base API client)
-   - Remove code that adds `Authorization: Token <jwt>` header
-   - Remove token retrieval from storage
-   - Browser will automatically send cookies with requests
-   - Ensure `credentials: 'include'` is set on fetch requests:
-     ```typescript
-     fetch(url, {
-       ...options,
-       credentials: 'include', // Send cookies with requests
-     })
-     ```
+8. **Update Auth Collection Test Variables**
+   - Review any collection variables or environment variables related to username
+   - Update test setup to not include username
+   - Ensure tests expect username to equal email
 
-3. **Update AuthContext/AuthProvider**
-   - Open `App/Client/src/context/AuthContext.tsx` (or similar)
-   - Remove JWT token state management
-   - Update login/register methods to use new API endpoints
-   - Update logout method to call Identity's logout endpoint (if available) or just clear client state
-   - Remove token refresh logic (cookies handle this automatically)
+9. **Test Auth Collection**
+   - Run `./build.sh TestServerPostmanAuth`
+   - Verify all Auth tests pass without providing username
+   - Verify users are created with email as username
 
-4. **Update User State Management**
-   - After login/register, fetch user info from Identity's `/manage/info` endpoint
-   - Or use existing `/api/user` endpoint if it works with cookie auth
-   - Store user data in context/state as before, just without token
-   - Update getCurrentUser to rely on cookies for authentication
-
-5. **Remove Token from API Calls**
-   - Search frontend codebase for references to "Authorization" header or "Token"
-   - Remove all manual token header setting
-   - Verify all API calls use the base client that includes credentials
-   - Test that authenticated requests work with cookies only
-
-6. **Handle 401 Responses**
-   - Ensure frontend properly handles 401 Unauthorized responses
-   - Redirect to login page on 401 (user not authenticated)
-   - Don't try to refresh tokens - cookies are managed by server
-   - Clear user state on 401 and redirect to login
-
-7. **Update Playwright E2E Tests - Authentication Helpers**
-   - Open E2E test base classes or helper files (e.g., `Test/e2e/E2eTests/Common/BasePage.cs` or similar)
-   - **Note**: `ApiFixture` will need to be updated to support cookie-based authentication
-   - Update authentication methods:
-     - Change registration to use /register endpoint
-     - Change login to use /login endpoint
-     - Remove JWT token handling
-     - Playwright automatically handles cookies
-   - Update page object methods that were passing tokens
-
-8. **Update Playwright Test Cases**
-   - Open test files in `Test/e2e/E2eTests/`
-   - Update any test-specific authentication logic
-   - Remove token assertions from tests
-   - Add cookie assertions if needed (verify auth cookie is set)
-   - Verify authenticated tests still work with cookies
-
-9. **Test Frontend Locally**
-   - Run `./build.sh BuildClient` to build frontend
-   - Start the application and test in browser:
-     - Register a new user - verify it works
-     - Login - verify it works and no errors in console
-     - Navigate to protected pages - verify they work
-     - Logout - verify it clears auth state
-     - Check browser DevTools to see auth cookies
-
-10. **Run E2E Tests**
-    - Run `./build.sh TestE2e`
-    - Fix any failing tests
-    - Common issues:
-      - Timing issues with cookie setting
-      - Page navigation before auth completes
-      - Incorrect endpoint URLs
-      - Missing credentials: 'include' in requests
+10. **Verify Other Collections Still Pass**
+    - Run `./build.sh TestServerPostmanProfiles`
+    - Run `./build.sh TestServerPostmanFeedAndArticles`
+    - Run `./build.sh TestServerPostmanArticle`
+    - Verify they still pass (they may still be providing username, which is fine)
 
 ### Verification
 
 Run the following Nuke targets to verify this phase:
 
 ```bash
-./build.sh LintClientVerify
-./build.sh BuildClient
-./build.sh TestClient
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
+./build.sh TestServerPostmanArticlesEmpty
 ./build.sh TestServerPostman
 ./build.sh TestE2e
 ```
 
-All targets must pass. Frontend and E2E tests should now use cookie-based authentication. The entire system (backend, frontend, all tests) now uses Identity exclusively. Legacy JWT endpoints are still present but unused.
+All targets must pass. Auth collection should not provide username and should use email as username. Other collections may still provide username explicitly and should continue to work.

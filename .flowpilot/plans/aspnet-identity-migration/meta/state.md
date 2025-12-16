@@ -12,3 +12,12 @@
 - [ ] [phase_6] phase_6
 - [ ] [phase_7] phase_7
 - [ ] [phase_8] phase_8
+- [ ] [phase_9] phase_9
+- [ ] [phase_10] phase_10
+- [ ] [phase_11] phase_11
+- [ ] [phase_12] phase_12
+- [ ] [phase_13] phase_13
+- [ ] [phase_14] phase_14
+- [ ] [phase_15] phase_15
+- [ ] [phase_16] phase_16
+- [ ] [phase_17] phase_17

@@ -2,68 +2,63 @@
 
 ### Phase Overview
 
-Update the Postman collection to use Identity endpoints (/api/identity/register, /api/identity/login) and cookie-based authentication instead of JWT tokens. Configure Postman to automatically send and receive cookies, and update all authentication-related requests to match Identity's API structure.
+Split the monolithic Postman collection into individual collections for better maintainability and isolated testing. This allows each area (Auth, Profiles, Feed, Articles) to be tested independently and makes debugging easier.
 
 ### Prerequisites
 
-- Phase 4 completed: Functional tests updated and passing with Identity
-- Identity endpoints fully functional and tested
-- Dual authentication still active
+- Phase 4 completed: Backend fully migrated to ApplicationUser
+- All tests passing with JWT authentication via /api/users endpoints
+- Dual authentication (JWT and Identity) operational
 
 ### Implementation Steps
 
-1. **Locate Postman Collection**
-   - Find the Postman collection file (typically in `Test/postman/` directory)
-   - Open in Postman or a text editor
-   - Review current authentication flow (JWT-based)
+1. **Analyze Monolithic Collection Structure**
+   - Open the existing monolithic Postman collection
+   - Identify logical groupings: Auth, Profiles, Feed/Articles, Articles
+   - Note test dependencies and setup requirements for each group
+   - Document the order in which tests must run
 
-2. **Update Registration Requests**
-   - Find registration test requests (located in the Auth folder in the postman collection)
-   - Update to use Identity endpoint:
-     - Change URL from `/api/users/register` to `/api/identity/register`
-     - Update request body to match Identity's format:
-       ```json
-       {
-         "email": "user@example.com",
-         "password": "StrongPass123"
-       }
-       ```
-     - Remove any token extraction from response
-     - Verify Postman is configured to save cookies
+2. **Create Separate Collection Files**
+   - Create `Conduit.Auth.postman_collection.json` - authentication tests only
+   - Create `Conduit.Profiles.postman_collection.json` - profile-related tests
+   - Create `Conduit.FeedAndArticles.postman_collection.json` - feed and article list tests
+   - Create `Conduit.Article.postman_collection.json` - individual article operations
+   - Create `Conduit.ArticlesEmpty.postman_collection.json` - article tests with empty database
 
-3. **Update Login Requests**
-   - Find login test requests (POST /api/users/login)
-   - Update to use Identity endpoint:
-     - Change URL from `/api/users/login` to `/api/identity/login`
-     - Update request body:
-       ```json
-       {
-         "email": "user@example.com",
-         "password": "StrongPass123"
-       }
-       ```
-     - Remove token extraction from response body
+3. **Split Test Cases by Domain**
+   - Move all register/login tests to Auth collection
+   - Move profile viewing/following tests to Profiles collection
+   - Move feed and article listing tests to FeedAndArticles collection
+   - Move article CRUD and comment tests to Article collection
+   - Move empty state tests to ArticlesEmpty collection
 
-4. **Remove JWT Token Variables and Headers**
-   - Remove environment variables for JWT tokens
-   - Remove Authorization header with Token prefix from requests
-   - Remove any pre-request scripts that set JWT tokens
-   - Postman will automatically send cookies with subsequent requests
+4. **Replicate Test Setup in Each Collection**
+   - Each collection needs its own user registration/login for test setup
+   - Ensure pre-request scripts handle authentication appropriately
+   - Copy any shared variables or environment setup to each collection
+   - Ensure each collection can run independently
 
-5. **Configure Postman Cookie Settings**
-   - See documentation on using cookies in postman scripts https://learning.postman.com/docs/sending-requests/response-data/cookies/#script-with-cookies
-   - Ensure Postman collection is configured to handle cookies:
-     - In collection settings, verify "Automatically follow redirects" is off (we want 401/403, not redirects)
-     - Verify "Enable cookie jar" is on
-   - Test that cookies persist across requests in a collection run
-   - Ensure postman collection is configured to handle cookies
-   - Run `FOLDER=Auth ./build.sh TestServerPostman` to ensure the Auth related Postman tests are passing first before proceeding.
+5. **Update Nuke Build Targets**
+   - Add individual Nuke targets for each collection:
+     - `TestServerPostmanAuth`
+     - `TestServerPostmanProfiles`
+     - `TestServerPostmanFeed`
+     - `TestServerPostmanArticle`
+     - `TestServerPostmanArticlesEmpty`
+   - Update `TestServerPostman` to run all collections
+   - Add support for `FOLDER` environment variable to run specific collection
 
-6. **Update All Other Tests in Postman collection to use cookies**
-   - Review and update tests for articles, comments, profiles that require authentication
-   - Ensure they rely on cookies instead of JWT tokens
-   - No URL changes needed for non-auth endpoints
-   - Just ensure cookie authentication works
+6. **Create Docker Compose Files for Each Collection**
+   - Create `docker-compose.Auth.yml` for running Auth tests in docker
+   - Create similar files for other collections
+   - Ensure each compose file references correct collection file
+   - Test each collection can run in isolation via docker
+
+7. **Test Each Collection Independently**
+   - Run `./build.sh TestServerPostmanAuth` to test Auth collection
+   - Run each other collection independently
+   - Verify all collections pass
+   - Verify `./build.sh TestServerPostman` runs all collections
 
 ### Verification
 
@@ -73,8 +68,13 @@ Run the following Nuke targets to verify this phase:
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
+./build.sh TestServerPostmanArticlesEmpty
 ./build.sh TestServerPostman
 ./build.sh TestE2e
 ```
 
-All targets must pass. Postman collection should now use Identity endpoints with cookie authentication. E2E tests still use old /api/users/register and /api/users/login with JWT authentication and continue to pass.
+All targets must pass. Each collection must be runnable independently and all collections must pass when run together.
