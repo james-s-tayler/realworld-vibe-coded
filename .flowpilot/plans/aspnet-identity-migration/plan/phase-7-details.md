@@ -58,8 +58,8 @@ Update the Profiles postman collection to remove username dependency. When regis
 
 8. **Verify Other Collections Still Pass**
    - Run `FOLDER=Auth ./build.sh TestServerPostman` - should still pass
-   - Run `FOLDER=FeedAndArticles ./build.sh TestServerPostman` - should still pass
-   - Run `FOLDER=Article ./build.sh TestServerPostman` - should still pass
+   - Run `FOLDER=FeedAndArticles ./build.sh TestServerPostman` - should still pass (not yet updated)
+   - Run `FOLDER=Article ./build.sh TestServerPostman` - should still pass (not yet updated)
    - Other collections not yet updated, may still provide username
 
 ### Verification
