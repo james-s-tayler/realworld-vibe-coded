@@ -467,7 +467,6 @@ jobs:
         folder:
           - Article
           - FeedAndArticles
-          - Profiles
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -554,6 +553,8 @@ jobs:
             report_dir: ArticlesEmpty
           - collection: auth
             report_dir: Auth
+          - collection: profiles
+            report_dir: Profiles
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1

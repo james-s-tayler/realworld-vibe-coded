@@ -62,7 +62,8 @@
         "TestServer",
         "TestServerPostman",
         "TestServerPostmanArticlesEmpty",
-        "TestServerPostmanAuth"
+        "TestServerPostmanAuth",
+        "TestServerPostmanProfiles"
       ]
     },
     "Verbosity": {

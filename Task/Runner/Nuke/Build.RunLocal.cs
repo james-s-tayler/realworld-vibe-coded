@@ -30,6 +30,7 @@ public partial class Build
       ReportsTestPostmanDirectory.CreateOrCleanDirectory();
       ReportsTestPostmanArticlesEmptyDirectory.CreateOrCleanDirectory();
       ReportsTestPostmanAuthDirectory.CreateOrCleanDirectory();
+      ReportsTestPostmanProfilesDirectory.CreateOrCleanDirectory();
 
       // Create or clean Logs directories
       LogsDirectory.CreateOrCleanDirectory();
