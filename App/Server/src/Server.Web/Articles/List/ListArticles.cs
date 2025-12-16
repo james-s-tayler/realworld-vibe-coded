@@ -17,7 +17,7 @@ public class ListArticles(IMediator mediator, IUserContext userContext) : Endpoi
   {
     Get("/api/articles");
     AllowAnonymous();
-    AuthSchemes("Token", Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme);
     Summary(s =>
     {
       s.Summary = "List articles";
