@@ -42,7 +42,7 @@ Update all postman collections to ignore the token from /api/users/register resp
      ```
 
 2. **Test Auth Collection**
-   - Run `FOLDER=Auth ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanAuth`
    - Verify all tests pass with two-step flow
    - Fix any timing or ordering issues
 
@@ -53,7 +53,7 @@ Update all postman collections to ignore the token from /api/users/register resp
    - Add explicit login calls after register
 
 4. **Test Profiles Collection**
-   - Run `FOLDER=Profiles ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanProfiles`
    - Verify all tests pass
 
 5. **Update FeedAndArticles Postman Collection**
@@ -63,7 +63,7 @@ Update all postman collections to ignore the token from /api/users/register resp
    - Add explicit login calls after register
 
 6. **Test FeedAndArticles Collection**
-   - Run `FOLDER=FeedAndArticles ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanFeedAndArticles`
    - Verify all tests pass
 
 7. **Update Article Postman Collection**
@@ -73,7 +73,7 @@ Update all postman collections to ignore the token from /api/users/register resp
    - Add explicit login calls after register
 
 8. **Test Article Collection**
-   - Run `FOLDER=Article ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanArticle`
    - Verify all tests pass
 
 9. **Update ArticlesEmpty Postman Collection**
@@ -83,7 +83,7 @@ Update all postman collections to ignore the token from /api/users/register resp
    - Add explicit login calls after register (if any)
 
 10. **Test ArticlesEmpty Collection**
-    - Run `FOLDER=ArticlesEmpty ./build.sh TestServerPostman`
+    - Run `./build.sh TestServerPostmanArticlesEmpty`
     - Verify all tests pass
 
 11. **Verify All Collections Together**
@@ -99,11 +99,11 @@ Run the following Nuke targets to verify this phase:
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
-FOLDER=Auth ./build.sh TestServerPostman
-FOLDER=Profiles ./build.sh TestServerPostman
-FOLDER=FeedAndArticles ./build.sh TestServerPostman
-FOLDER=Article ./build.sh TestServerPostman
-FOLDER=ArticlesEmpty ./build.sh TestServerPostman
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
+./build.sh TestServerPostmanArticlesEmpty
 ./build.sh TestServerPostman
 ./build.sh TestE2e
 ```

@@ -52,7 +52,7 @@ Update the frontend and E2E tests to remove username from calls to /api/users/re
    - Verify registered user has username equal to email
 
 6. **Update E2E Test Helpers - Registration Methods**
-   - Open E2E test base classes or helper files (e.g., `Test/e2e/E2eTests/Common/AppFixture.cs`)
+   - Open E2E test base classes or helper files (e.g., `Test/e2e/E2eTests/ApiFixture.cs`)
    - Find methods that create users via API or UI
    - Update to not provide username parameter
    - Example API call:
@@ -62,7 +62,7 @@ Update the frontend and E2E tests to remove username from calls to /api/users/re
      ```
 
 7. **Update E2E Page Objects**
-   - Open page object files (e.g., `Test/e2e/E2eTests/Pages/RegisterPage.cs`)
+   - Open page object files (e.g., `Test/e2e/E2eTests/PageModels/RegisterPage.cs`)
    - Remove username parameter from registration methods
    - Update form filling to only fill email and password
    - Remove username field locators

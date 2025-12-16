@@ -21,7 +21,7 @@ Update the remaining postman collections (Profiles, FeedAndArticles, Article, Ar
    - Update any test assertions related to authentication
 
 2. **Test Profiles Collection**
-   - Run `FOLDER=Profiles ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanProfiles`
    - Verify all tests pass with Identity endpoints
    - Fix any failures
 
@@ -34,7 +34,7 @@ Update the remaining postman collections (Profiles, FeedAndArticles, Article, Ar
    - Update any test assertions related to authentication
 
 4. **Test FeedAndArticles Collection**
-   - Run `FOLDER=FeedAndArticles ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanFeedAndArticles`
    - Verify all tests pass with Identity endpoints
    - Fix any failures
 
@@ -48,7 +48,7 @@ Update the remaining postman collections (Profiles, FeedAndArticles, Article, Ar
    - This is the largest collection so may require more work
 
 6. **Test Article Collection**
-   - Run `FOLDER=Article ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanArticle`
    - Verify all tests pass with Identity endpoints
    - Fix any failures
 
@@ -61,7 +61,7 @@ Update the remaining postman collections (Profiles, FeedAndArticles, Article, Ar
    - Update any test assertions related to authentication (if any)
 
 8. **Test ArticlesEmpty Collection**
-   - Run `FOLDER=ArticlesEmpty ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanArticlesEmpty`
    - Verify all tests pass
    - Fix any failures
 
@@ -83,11 +83,11 @@ Run the following Nuke targets to verify this phase:
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
-FOLDER=Auth ./build.sh TestServerPostman
-FOLDER=Profiles ./build.sh TestServerPostman
-FOLDER=FeedAndArticles ./build.sh TestServerPostman
-FOLDER=Article ./build.sh TestServerPostman
-FOLDER=ArticlesEmpty ./build.sh TestServerPostman
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
+./build.sh TestServerPostmanArticlesEmpty
 ./build.sh TestServerPostman
 ./build.sh TestE2e
 ```

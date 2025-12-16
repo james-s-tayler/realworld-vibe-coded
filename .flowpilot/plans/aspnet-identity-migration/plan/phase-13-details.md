@@ -90,14 +90,14 @@ Configure the backend to support Identity's bearer token authentication scheme i
    - Ensure tests validate Identity endpoint responses correctly
 
 9. **Test Auth Collection with Identity Endpoints**
-   - Run `FOLDER=Auth ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanAuth`
    - Verify all Auth tests pass with Identity endpoints
    - Debug any failures related to endpoint differences
 
 10. **Verify Other Collections Still Pass**
-    - Run `FOLDER=Profiles ./build.sh TestServerPostman`
-    - Run `FOLDER=FeedAndArticles ./build.sh TestServerPostman`
-    - Run `FOLDER=Article ./build.sh TestServerPostman`
+    - Run `./build.sh TestServerPostmanProfiles`
+    - Run `./build.sh TestServerPostmanFeedAndArticles`
+    - Run `./build.sh TestServerPostmanArticle`
     - Other collections still use /api/users endpoints (not yet migrated)
     - They should still pass
 
@@ -109,11 +109,11 @@ Run the following Nuke targets to verify this phase:
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
-FOLDER=Auth ./build.sh TestServerPostman
-FOLDER=Profiles ./build.sh TestServerPostman
-FOLDER=FeedAndArticles ./build.sh TestServerPostman
-FOLDER=Article ./build.sh TestServerPostman
-FOLDER=ArticlesEmpty ./build.sh TestServerPostman
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
+./build.sh TestServerPostmanArticlesEmpty
 ./build.sh TestServerPostman
 ./build.sh TestE2e
 ```

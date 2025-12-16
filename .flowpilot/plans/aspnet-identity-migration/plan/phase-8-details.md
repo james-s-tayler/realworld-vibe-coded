@@ -51,16 +51,16 @@ Update the FeedAndArticles postman collection to remove username dependency. Whe
    - Update any hardcoded test data
 
 7. **Test FeedAndArticles Collection Independently**
-   - Run `FOLDER=FeedAndArticles ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanFeedAndArticles`
    - Verify all tests pass
    - Verify users are registered with email as username
    - Verify feed and article list operations work correctly
 
 8. **Verify Previously Updated Collections Still Pass**
-   - Run `FOLDER=Auth ./build.sh TestServerPostman` - should still pass
-   - Run `FOLDER=Profiles ./build.sh TestServerPostman` - should still pass
-   - Run `FOLDER=Article ./build.sh TestServerPostman` - not yet updated
-   - Run `FOLDER=ArticlesEmpty ./build.sh TestServerPostman` - not yet updated
+   - Run `./build.sh TestServerPostmanAuth` - should still pass
+   - Run `./build.sh TestServerPostmanProfiles` - should still pass
+   - Run `./build.sh TestServerPostmanArticle` - not yet updated
+   - Run `./build.sh TestServerPostmanArticlesEmpty` - not yet updated
 
 ### Verification
 
@@ -70,11 +70,11 @@ Run the following Nuke targets to verify this phase:
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
-FOLDER=Auth ./build.sh TestServerPostman
-FOLDER=Profiles ./build.sh TestServerPostman
-FOLDER=FeedAndArticles ./build.sh TestServerPostman
-FOLDER=Article ./build.sh TestServerPostman
-FOLDER=ArticlesEmpty ./build.sh TestServerPostman
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
+./build.sh TestServerPostmanArticlesEmpty
 ./build.sh TestServerPostman
 ./build.sh TestE2e
 ```

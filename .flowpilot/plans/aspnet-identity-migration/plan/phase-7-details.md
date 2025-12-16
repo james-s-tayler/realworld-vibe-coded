@@ -51,15 +51,15 @@ Update the Profiles postman collection to remove username dependency. When regis
    - Update any hardcoded test data
 
 7. **Test Profiles Collection Independently**
-   - Run `FOLDER=Profiles ./build.sh TestServerPostman`
+   - Run `./build.sh TestServerPostmanProfiles`
    - Verify all tests pass
    - Verify users are registered with email as username
    - Verify profile operations work correctly
 
 8. **Verify Other Collections Still Pass**
-   - Run `FOLDER=Auth ./build.sh TestServerPostman` - should still pass
-   - Run `FOLDER=FeedAndArticles ./build.sh TestServerPostman` - should still pass (not yet updated)
-   - Run `FOLDER=Article ./build.sh TestServerPostman` - should still pass (not yet updated)
+   - Run `./build.sh TestServerPostmanAuth` - should still pass
+   - Run `./build.sh TestServerPostmanFeedAndArticles` - should still pass (not yet updated)
+   - Run `./build.sh TestServerPostmanArticle` - should still pass (not yet updated)
    - Other collections not yet updated, may still provide username
 
 ### Verification
@@ -70,11 +70,11 @@ Run the following Nuke targets to verify this phase:
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
-FOLDER=Auth ./build.sh TestServerPostman
-FOLDER=Profiles ./build.sh TestServerPostman
-FOLDER=FeedAndArticles ./build.sh TestServerPostman
-FOLDER=Article ./build.sh TestServerPostman
-FOLDER=ArticlesEmpty ./build.sh TestServerPostman
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
+./build.sh TestServerPostmanArticlesEmpty
 ./build.sh TestServerPostman
 ./build.sh TestE2e
 ```

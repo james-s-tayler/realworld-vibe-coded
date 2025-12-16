@@ -63,7 +63,7 @@ Update the frontend and E2E tests to switch to calling /api/identity/register an
      - Verify no console errors
 
 6. **Update E2E Test Helpers - Authentication Methods**
-   - Open E2E test fixture files (e.g., `Test/e2e/E2eTests/Common/AppFixture.cs`)
+   - Open E2E test fixture files (e.g., `Test/e2e/E2eTests/ApiFixture.cs`)
    - Update CreateUserAndLogin to use Identity endpoints:
      ```csharp
      public async Task<string> CreateUserAndLogin(string username, string email, string password)

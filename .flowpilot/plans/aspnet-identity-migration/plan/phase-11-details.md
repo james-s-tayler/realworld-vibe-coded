@@ -55,7 +55,7 @@ Update the frontend and E2E tests to ignore the token in the /api/users/register
      - Verify authenticated requests work after registration
 
 5. **Update E2E Test Helpers - Registration Methods**
-   - Open E2E test fixture files (e.g., `Test/e2e/E2eTests/Common/AppFixture.cs`)
+   - Open E2E test fixture files (e.g., `Test/e2e/E2eTests/ApiFixture.cs`)
    - Update helper methods that register users:
      ```csharp
      public async Task<string> CreateUserAndLogin(string username, string email, string password)
@@ -73,7 +73,7 @@ Update the frontend and E2E tests to ignore the token in the /api/users/register
      ```
 
 6. **Update E2E Page Objects**
-   - Open registration page object (e.g., `Test/e2e/E2eTests/Pages/RegisterPage.cs`)
+   - Open registration page object (e.g., `Test/e2e/E2eTests/PageModels/RegisterPage.cs`)
    - If registration automatically logs in user, ensure page object reflects this
    - Update any methods that expect token from registration
 
