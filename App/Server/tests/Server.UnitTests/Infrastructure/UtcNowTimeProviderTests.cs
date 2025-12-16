@@ -17,9 +17,9 @@ public class UtcNowTimeProviderTests
     // Act
     var result = timeProvider.UtcNow;
 
-    // Assert - INTENTIONALLY BROKEN to test CI sticky comments
+    // Assert
     var after = DateTime.UtcNow;
     result.ShouldBeGreaterThanOrEqualTo(before);
-    result.ShouldBeLessThanOrEqualTo(after.AddHours(-1)); // This will always fail
+    result.ShouldBeLessThanOrEqualTo(after);
   }
 }

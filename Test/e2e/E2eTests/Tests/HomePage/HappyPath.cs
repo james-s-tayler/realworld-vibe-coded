@@ -24,8 +24,8 @@ public class HappyPath : AppPageTest
     // Act
     await Pages.HomePage.ClickGlobalFeedTabAsync();
 
-    // Assert - INTENTIONALLY BROKEN to test CI sticky comments
-    await Pages.HomePage.VerifyArticleVisibleAsync(article.Title + " - WRONG");
+    // Assert
+    await Pages.HomePage.VerifyArticleVisibleAsync(article.Title);
 
     await Pages.HomePage.ClickArticleAsync(article.Title);
     await Pages.ArticlePage.VerifyArticleTitleAsync(article.Title);
