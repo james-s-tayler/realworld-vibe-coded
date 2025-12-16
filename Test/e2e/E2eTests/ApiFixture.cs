@@ -26,7 +26,6 @@ public class ApiFixture : IAsyncLifetime
 
     // Configure HttpClientHandler to accept self-signed certificates in test environments
     var handler = new HttpClientHandler();
-
     // WARNING: Disables all SSL/TLS certificate validation for E2E tests.
     // This is safe ONLY in isolated test environments (e.g., E2E tests with self-signed dev certificates in Docker containers).
     // NEVER use this pattern in production code, as it allows any certificate (including expired, self-signed, or malicious).
