@@ -60,7 +60,6 @@
         "TestE2e",
         "TestFlowPilot",
         "TestServer",
-        "TestServerPostman",
         "TestServerPostmanArticle",
         "TestServerPostmanArticlesEmpty",
         "TestServerPostmanAuth",
@@ -139,10 +138,6 @@
   "allOf": [
     {
       "properties": {
-        "Folder": {
-          "type": "string",
-          "description": "Postman folder to test"
-        },
         "Force": {
           "type": "boolean",
           "description": "Force operation without confirmation"
