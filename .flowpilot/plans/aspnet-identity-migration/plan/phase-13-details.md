@@ -46,8 +46,8 @@ Configure the backend to support Identity's bearer token authentication scheme i
 
 4. **Test Identity Endpoints with Postman**
    - Manually test in Postman:
-     - POST /api/identity/register with { email, password }
-     - POST /api/identity/login with { email, password }
+     - POST /api/identity/register with `{ "email": "user@example.com", "password": "password123" }`
+     - POST /api/identity/login with `{ "email": "user@example.com", "password": "password123" }`
      - Verify login returns accessToken in response
      - Use accessToken with "Authorization: Bearer <token>" header
      - Make authenticated request to verify bearer token works

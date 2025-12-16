@@ -28,7 +28,7 @@ Add CSRF protection to the backend and switch the frontend to use cookie-based a
    - Configure middleware to validate antiforgery tokens
 
 2. **Create Logout Endpoint**
-   - Create new endpoint file: `App/Server/src/Server.Web/Users/Logout/Logout.cs`
+   - Create new endpoint file: `App/Server/src/Server.Web/Identity/Logout/Logout.cs`
    - Implement logout using SignInManager:
      ```csharp
      public class Logout : EndpointWithoutRequest
@@ -37,7 +37,7 @@ Add CSRF protection to the backend and switch the frontend to use cookie-based a
        
        public override void Configure()
        {
-         Post("/api/user/logout");
+         Post("/api/identity/logout");
          AllowAnonymous(); // Or require auth
        }
        
@@ -83,7 +83,7 @@ Add CSRF protection to the backend and switch the frontend to use cookie-based a
    - Open `App/Client/src/context/AuthContext.tsx`
    - Remove token state management
    - Update login to not return token
-   - Add logout method that calls /api/user/logout
+   - Add logout method that calls /api/identity/logout
    - After login, fetch user info from /api/user endpoint
 
 7. **Update Frontend to Handle CSRF Tokens**

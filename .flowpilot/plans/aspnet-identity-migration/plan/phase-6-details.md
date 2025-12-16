@@ -2,7 +2,7 @@
 
 ### Phase Overview
 
-Make the username parameter optional on the /api/users/register endpoint, defaulting it to the email value when not provided. Update the Auth postman collection to remove username from test data. This establishes a migration pathway for incrementally updating other collections, frontend, and E2E tests.
+Make the username parameter optional on the /api/users/register endpoint, defaulting it to the email value when not provided or null. Update the Auth postman collection to remove username from test data. This establishes a migration pathway for incrementally updating other collections, frontend, and E2E tests.
 
 ### Prerequisites
 
