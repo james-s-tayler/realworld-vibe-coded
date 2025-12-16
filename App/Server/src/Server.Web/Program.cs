@@ -12,6 +12,7 @@ var logger = Log.Logger = new LoggerConfiguration()
 
 logger.Information("Starting web host");
 
+
 builder.AddLoggerConfigs();
 
 var appLogger = new SerilogLoggerFactory(logger)
