@@ -516,7 +516,8 @@ jobs:
             const { parseNewmanReport } = require('./.github/scripts/newman-report-parser.js');
 
             try {
-              const commentBody = parseNewmanReport('Reports/Test/Postman/newman-report.json', context);
+              const folderName = '${{ matrix.folder }}';
+              const commentBody = parseNewmanReport('Reports/Test/Postman/newman-report.json', context, `(${folderName})`);
 
               if (!commentBody) {
                 console.log('No comment body generated, skipping PR comment');
