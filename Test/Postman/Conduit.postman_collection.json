@@ -35,7 +35,7 @@
                   "        pm.expect(user.username).to.eql(username);",
                   "    });",
                   "    pm.test('User has default \"bio\" property', function() {",
-                  "        pm.expect(user.bio).to.eql('I work at statefarm');",
+                  "        pm.expect(user.bio).to.eql('I work at statefarm - WRONG');",
                   "    });",
                   "    pm.test('User has \"image\" property', function() {",
                   "        pm.expect(user).to.have.property('image');",

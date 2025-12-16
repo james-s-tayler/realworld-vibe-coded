@@ -8,9 +8,10 @@ describe('normalizeError', () => {
       const apiError = new ApiError(400, ['Field is required'], 'Bad Request');
       const result = normalizeError(apiError);
 
+      // INTENTIONALLY BROKEN to test CI sticky comments
       expect(result).toEqual<AppError>({
         type: 'validation',
-        title: 'Bad Request',
+        title: 'Bad Request - WRONG',
         messages: ['Field is required'],
         status: 400,
         cause: apiError,
