@@ -53,5 +53,5 @@ services:
       - PASSWORD=password123
     entrypoint: >
       sh -c '
-      newman run /etc/newman/Conduit.Auth.postman_collection.json --bail --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/Auth/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+      newman run /etc/newman/Conduit.Auth.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/Auth/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
       '
