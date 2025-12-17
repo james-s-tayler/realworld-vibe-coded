@@ -13,7 +13,7 @@
 - [x] [phase_7] phase_7
 - [x] [phase_8] phase_8
 - [x] [phase_9] phase_9
-- [ ] [phase_10] phase_10
+- [x] [phase_10] phase_10
 - [ ] [phase_11] phase_11
 - [ ] [phase_12] phase_12
 - [ ] [phase_13] phase_13
