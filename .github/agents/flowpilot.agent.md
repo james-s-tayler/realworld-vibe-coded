@@ -121,5 +121,5 @@ As you work, you are expected to aggressively reality test via the following met
 - use the mslearn MCP server, the docs-mcp-server, and websearch to consult relevant documentation
 - use websearch to search for Stack overflow posts and Github Issues of the problem you're facing
 - use websearch to find and check the contents of release notes if you're having trouble with a specific library, as sometimes important things change between versions.
-- if you encounter a tricky bug you cant solve after a few attempts, do a debug analysis using `.flowpilot/template/debug-analysis.md` to help you break out of a local minima you might be stuck in.
+- if you encounter a tricky bug you can't solve after a few attempts, do a debug analysis using `.flowpilot/template/debug-analysis.md` to help you break out of a local minima you might be stuck in.
 - If a problem doesn't yield despite significant effort and you think there are several possible paths forward, but they differ from your initial instructions, run `flowpilot stuck` and follow the prompt
