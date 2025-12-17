@@ -31,7 +31,7 @@ public class HappyPath : AppPageTest
 
     // Assert
     await Pages.ArticlePage.VerifyArticleTitleAsync(articleTitle);
-    await Pages.ArticlePage.VerifyAuthorAsync(user.Username);
+    await Pages.ArticlePage.VerifyAuthorAsync(user.Email);
   }
 
   [Fact]

@@ -36,7 +36,7 @@ public class Permissions : AppPageTest
     await Pages.ArticlePage.GoToAsync(article.Slug);
 
     // Act
-    await Pages.ArticlePage.ClickFollowButtonWithoutWaitAsync(user.Username);
+    await Pages.ArticlePage.ClickFollowButtonWithoutWaitAsync(user.Email);
 
     // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");

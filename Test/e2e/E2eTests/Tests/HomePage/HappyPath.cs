@@ -78,7 +78,7 @@ public class HappyPath : AppPageTest
     var article = await Api.CreateArticleAsync(user1.Token);
 
     var user2 = await Api.CreateUserAsync();
-    await Api.FollowUserAsync(user2.Token, user1.Username);
+    await Api.FollowUserAsync(user2.Token, user1.Email);
 
     // Log in as user2 via UI
     await Pages.LoginPage.GoToAsync();
@@ -136,7 +136,7 @@ public class HappyPath : AppPageTest
     await Api.CreateArticlesAsync(user1.Token, TotalArticles);
 
     var user2 = await Api.CreateUserAsync();
-    await Api.FollowUserAsync(user2.Token, user1.Username);
+    await Api.FollowUserAsync(user2.Token, user1.Email);
 
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);

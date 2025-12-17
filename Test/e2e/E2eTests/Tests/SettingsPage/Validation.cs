@@ -23,7 +23,7 @@ public class Validation : AppPageTest
     await Pages.SettingsPage.GoToAsync();
 
     // Act
-    await Pages.SettingsPage.UpdateSettingsAndExpectErrorAsync(username: user2.Username);
+    await Pages.SettingsPage.UpdateSettingsAndExpectErrorAsync(username: user2.Email);
 
     // Assert
     await Pages.SettingsPage.VerifyErrorContainsTextAsync("Username already exists");

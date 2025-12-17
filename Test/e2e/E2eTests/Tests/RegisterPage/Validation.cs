@@ -31,16 +31,14 @@ public class Validation : AppPageTest
   public async Task Register_WithDuplicateUsername_DisplaysErrorMessage()
   {
     // Arrange
-    var timestamp = DateTime.UtcNow.Ticks;
-    var email2 = $"user2_{timestamp}@test.com";
     var password = "TestPassword123!";
 
     var existingUser = await Api.CreateUserAsync();
 
     await Pages.RegisterPage.GoToAsync();
 
-    // Act - Since username defaults to email, we use the existing user's username (email) as email
-    await Pages.RegisterPage.RegisterAndExpectErrorAsync(existingUser.Username, password);
+    // Act - Since username defaults to email, we use the existing user's email to trigger duplicate error
+    await Pages.RegisterPage.RegisterAndExpectErrorAsync(existingUser.Email, password);
 
     // Assert
     await Pages.RegisterPage.VerifyErrorContainsTextAsync("Email already exists");

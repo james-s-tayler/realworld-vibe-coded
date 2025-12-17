@@ -34,11 +34,11 @@ public class Permissions : AppPageTest
     var user = await Api.CreateUserAsync();
     await Api.CreateArticleAsync(user.Token);
 
-    await Pages.ProfilePage.GoToAsync(user.Username);
-    await Pages.ProfilePage.WaitForProfileToLoadAsync(user.Username);
+    await Pages.ProfilePage.GoToAsync(user.Email);
+    await Pages.ProfilePage.WaitForProfileToLoadAsync(user.Email);
 
     // Act
-    await Pages.ProfilePage.ClickFollowButtonWithoutWaitAsync(user.Username);
+    await Pages.ProfilePage.ClickFollowButtonWithoutWaitAsync(user.Email);
 
     // Assert
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");

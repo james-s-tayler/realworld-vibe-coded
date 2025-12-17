@@ -82,7 +82,6 @@ public class ApiFixture : IAsyncLifetime
     return new CreatedUser
     {
       Token = userResponse.User.Token,
-      Username = userResponse.User.Username,
       Email = email,
       Password = password,
     };
@@ -144,7 +143,6 @@ public class ApiFixture : IAsyncLifetime
     return new CreatedUser
     {
       Token = userResponse.User.Token,
-      Username = userResponse.User.Username,
       Email = email,
       Password = password,
     };

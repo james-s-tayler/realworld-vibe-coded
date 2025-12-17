@@ -26,7 +26,7 @@ public class Screenshots : AppPageTest
     await Api.FavoriteArticleAsync(user.Token, article.Slug);
 
     // Act - navigate to profile page and view favorited articles
-    await Pages.ProfilePage.GoToAsync(user.Username);
+    await Pages.ProfilePage.GoToAsync(user.Email);
     await Pages.ProfilePage.ClickFavoritedArticlesTabAsync();
 
     // Wait for the favorited article to be visible
@@ -39,6 +39,6 @@ public class Screenshots : AppPageTest
     await AssertScreenshotWidthNotExceedingViewportAsync(screenshotPath);
 
     // Assert we're on the profile page
-    await Expect(Page).ToHaveURLAsync(new Regex($"/profile/{user.Username}"));
+    await Expect(Page).ToHaveURLAsync(new Regex($"/profile/{user.Email}"));
   }
 }

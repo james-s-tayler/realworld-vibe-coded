@@ -22,6 +22,6 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
     // Assert
-    await Expect(Pages.HomePage.GetUserProfileLink(user.Username)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
+    await Expect(Pages.HomePage.GetUserProfileLink(user.Email)).ToBeVisibleAsync(new() { Timeout = DefaultTimeout });
   }
 }
