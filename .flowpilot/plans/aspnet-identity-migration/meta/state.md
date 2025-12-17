@@ -11,7 +11,7 @@
 - [x] [phase_5] phase_5
 - [x] [phase_6] phase_6
 - [x] [phase_7] phase_7
-- [ ] [phase_8] phase_8
+- [x] [phase_8] phase_8
 - [ ] [phase_9] phase_9
 - [ ] [phase_10] phase_10
 - [ ] [phase_11] phase_11
