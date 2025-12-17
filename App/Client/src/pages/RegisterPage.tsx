@@ -16,13 +16,12 @@ import './AuthPages.css';
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const registerApi = useCallback(
-    () => register(email, username, password),
-    [register, email, username, password]
+    () => register(email, password),
+    [register, email, password]
   );
 
   const { error, loading, execute, clearError } = useApiCall(registerApi, {
@@ -48,17 +47,6 @@ export const RegisterPage: React.FC = () => {
 
       <Form onSubmit={handleSubmit}>
         <Stack gap={6}>
-          <TextInput
-            id="username"
-            labelText="Username"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            minLength={USER_CONSTRAINTS.USERNAME_MIN_LENGTH}
-            maxLength={USER_CONSTRAINTS.USERNAME_MAX_LENGTH}
-          />
-
           <TextInput
             id="email"
             labelText="Email"
