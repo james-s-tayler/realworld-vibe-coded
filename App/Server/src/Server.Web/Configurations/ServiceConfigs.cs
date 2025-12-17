@@ -155,7 +155,8 @@ public static class ServiceConfigs
 
           return Task.CompletedTask;
         };
-      });
+      })
+      .AddBearerToken(IdentityConstants.BearerScheme);
 
     services.AddAuthorization();
     services.AddProblemDetails();

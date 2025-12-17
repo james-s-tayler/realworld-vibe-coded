@@ -16,8 +16,28 @@
               "script": {
                 "exec": [
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Registration successful (200 OK)', function() {",
-                  "        pm.expect(pm.response.code).to.eql(200);",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"user\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('user');",
+                  "    });",
+                  "",
+                  "    var user = responseJSON.user || {};",
+                  "",
+                  "    pm.test('\"email\" property matches EMAIL variable', function() {",
+                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
+                  "        pm.expect(user.email).to.eql(email);",
+                  "    });",
+                  "    pm.test('\"usermame\" property matches EMAIL variable', function() {",
+                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
+                  "        pm.expect(user.username).to.eql(email);",
+                  "    });",
+                  "    pm.test('User has default \"bio\" property', function() {",
+                  "        pm.expect(user.bio).to.eql('I work at statefarm');",
+                  "    });",
+                  "    pm.test('User has \"image\" property', function() {",
+                  "        pm.expect(user).to.have.property('image');",
+                  "        pm.expect(user.image).to.be.null;",
                   "    });",
                   "",
                   "    // Make explicit login request to get token",
@@ -26,14 +46,16 @@
                   "    const apiUrl = pm.globals.get('APIURL') || pm.environment.get('APIURL');",
                   "    ",
                   "    pm.sendRequest({",
-                  "        url: apiUrl + '/identity/login',",
+                  "        url: apiUrl + '/users/login',",
                   "        method: 'POST',",
                   "        header: { 'Content-Type': 'application/json' },",
                   "        body: {",
                   "            mode: 'raw',",
                   "            raw: JSON.stringify({",
-                  "                email: email,",
-                  "                password: password",
+                  "                user: {",
+                  "                    email: email,",
+                  "                    password: password",
+                  "                }",
                   "            })",
                   "        }",
                   "    }, function (err, response) {",
@@ -42,10 +64,17 @@
                   "            return;",
                   "        }",
                   "        var loginData = response.json();",
-                  "        if (loginData && loginData.accessToken) {",
-                  "            pm.globals.set('token', loginData.accessToken);",
+                  "        if (loginData && loginData.user && loginData.user.token) {",
+                  "            pm.globals.set('token', loginData.user.token);",
                   "            console.log('Token set from login for user:', email);",
                   "        }",
+                  "    });",
+                  "    pm.test('\"token\" property is not empty', function() {",
+                  "        pm.expect(user.token).to.not.be.empty",
+                  "    });",
+                  "    pm.test('\"token\" property is not same as password', function() {",
+                  "    const password = pm.globals.get('PASSWORD') || pm.environment.get('PASSWORD');",
+                  "    pm.expect(user.token).to.not.eql(password, 'The password must be hashed, and not stored in plain text');",
                   "    });",
                   "}",
                   ""
@@ -69,10 +98,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/users",
               "host": [
                 "{{APIURL}}"
               ],
@@ -91,8 +120,21 @@
               "script": {
                 "exec": [
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.test('Registration successful (200 OK)', function() {",
-                  "        pm.expect(pm.response.code).to.eql(200);",
+                  "    var responseJSON = JSON.parse(pm.response.text());",
+                  "",
+                  "    pm.test('Response contains \"user\" property', function() {",
+                  "        pm.expect(responseJSON).to.have.property('user');",
+                  "    });",
+                  "",
+                  "    var user = responseJSON.user || {};",
+                  "",
+                  "    pm.test('\"email\" property matches SECOND_EMAIL variable', function() {",
+                  "        const email = pm.globals.get('SECOND_EMAIL');",
+                  "        pm.expect(user.email).to.eql(email);",
+                  "    });",
+                  "    pm.test('\"usermame\" property matches SECOND_EMAIL variable', function() {",
+                  "        const email = pm.globals.get('SECOND_EMAIL');",
+                  "        pm.expect(user.username).to.eql(email);",
                   "    });",
                   "}",
                   ""
@@ -126,10 +168,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
+              "raw": "{\"user\":{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/users",
               "host": [
                 "{{APIURL}}"
               ],
@@ -191,10 +233,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/users",
               "host": [
                 "{{APIURL}}"
               ],
@@ -246,10 +288,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"soloyolo\", \"password\":\"{{PASSWORD}}\"}"
+              "raw": "{\"user\":{\"email\":\"soloyolo\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/users",
               "host": [
                 "{{APIURL}}"
               ],
@@ -305,7 +347,7 @@
               "raw": "{\"user\":{}}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/users",
               "host": [
                 "{{APIURL}}"
               ],
@@ -358,10 +400,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\": \"\", \"password\":\"\"}"
+              "raw": "{\"user\":{\"email\": \"\", \"password\":\"\"}}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/register",
+              "raw": "{{APIURL}}/users",
               "host": [
                 "{{APIURL}}"
               ],
@@ -381,17 +423,29 @@
                 "exec": [
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.test('Response contains \"accessToken\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('accessToken');",
+                  "pm.test('Response contains \"user\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('user')",
                   "});",
                   "",
-                  "pm.test('accessToken is not empty', function() {",
-                  "    pm.expect(responseJSON.accessToken).to.not.be.empty;",
-                  "});",
+                  "var user = responseJSON.user || {};",
                   "",
-                  "if (responseJSON.accessToken) {",
-                  "    pm.globals.set('token', responseJSON.accessToken);",
-                  "}",
+                  "pm.test('user.email matches the EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.email).to.eql(email)",
+                  "});",
+                  "pm.test('user.usermame matches EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.username).to.eql(email)",
+                  "});",
+                  "pm.test('User has \"bio\" property', function() {",
+                  "    pm.expect(user).to.have.property('bio')",
+                  "});",
+                  "pm.test('User has \"image\" property', function() {",
+                  "    pm.expect(user).to.have.property('image')",
+                  "});",
+                  "pm.test('User has \"token\" property', function() {",
+                  "    pm.expect(user).to.have.property('token')",
+                  "});",
                   ""
                 ],
                 "type": "text/javascript",
@@ -413,10 +467,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/users/login",
               "host": [
                 "{{APIURL}}"
               ],
@@ -458,10 +512,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"someone@example.com\", \"password\":\"{{PASSWORD}}\"}"
+              "raw": "{\"user\":{\"email\":\"someone@example.com\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/users/login",
               "host": [
                 "{{APIURL}}"
               ],
@@ -503,10 +557,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"oops\"}"
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"oops\"}}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/users/login",
               "host": [
                 "{{APIURL}}"
               ],
@@ -527,17 +581,37 @@
                 "exec": [
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.test('Response contains \"accessToken\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('accessToken');",
+                  "pm.test('Response contains \"user\" property', function() {",
+                  "    pm.expect(responseJSON).to.have.property('user')",
                   "});",
                   "",
-                  "pm.test('accessToken is not empty', function() {",
-                  "    pm.expect(responseJSON.accessToken).to.not.be.empty;",
+                  "var user = responseJSON.user || {};",
+                  "",
+                  "pm.test('user.email matches the EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.email).to.eql(email)",
+                  "});",
+                  "pm.test('user.usermame matches EMAIL variable', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.username).to.eql(email)",
+                  "});",
+                  "pm.test('User has \"bio\" property', function() {",
+                  "    pm.expect(user).to.have.property('bio')",
+                  "});",
+                  "pm.test('User has \"image\" property', function() {",
+                  "    pm.expect(user).to.have.property('image')",
+                  "});",
+                  "pm.test('User has \"token\" property', function() {",
+                  "    pm.expect(user).to.have.property('token')",
                   "});",
                   "",
-                  "if (responseJSON.accessToken) {",
-                  "    pm.globals.set('token', responseJSON.accessToken);",
+                  "if(pm.test('User has \"token\" property')){",
+                  "    pm.globals.set('token', user.token);",
                   "}",
+                  "",
+                  "pm.test('Global variable \"token\" has been set', function() {",
+                  "    pm.globals.get('token') === user.token",
+                  "});",
                   ""
                 ],
                 "type": "text/javascript",
@@ -569,10 +643,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/users/login",
               "host": [
                 "{{APIURL}}"
               ],
@@ -641,7 +715,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Token {{token}}"
               }
             ],
             "url": {
@@ -681,7 +755,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}",
+                "value": "Token {{token}}",
                 "disabled": true
               }
             ],
@@ -803,7 +877,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -877,7 +951,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -950,7 +1024,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -1022,7 +1096,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -1070,7 +1144,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}",
+                "value": "Token {{token}}",
                 "disabled": true
               }
             ],
