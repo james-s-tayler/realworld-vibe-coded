@@ -120,6 +120,7 @@ public static class ServiceConfigs
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddSignInManager<SignInManager<ApplicationUser>>()
+    .AddApiEndpoints() // Add Identity API endpoints support
     .AddDefaultTokenProviders();
 
     // Add cookie authentication for Identity (without setting as default scheme)
