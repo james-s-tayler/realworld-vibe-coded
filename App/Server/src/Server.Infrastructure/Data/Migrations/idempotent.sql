@@ -1303,29 +1303,6 @@ BEGIN
     VALUES (N'20251214103130_MigrateToApplicationUserOnly', N'9.0.7');
 END;
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251217042910_UpdateUsernameMaxLength'
-)
-BEGIN
-    DECLARE @var12 sysname;
-    SELECT @var12 = [d].[name]
-    FROM [sys].[default_constraints] [d]
-    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
-    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[AspNetUsers]') AND [c].[name] = N'UserName');
-    IF @var12 IS NOT NULL EXEC(N'ALTER TABLE [AspNetUsers] DROP CONSTRAINT [' + @var12 + '];');
-    ALTER TABLE [AspNetUsers] ALTER COLUMN [UserName] nvarchar(100) NULL;
-END;
-
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251217042910_UpdateUsernameMaxLength'
-)
-BEGIN
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251217042910_UpdateUsernameMaxLength', N'9.0.7');
-END;
-
 COMMIT;
 GO
 

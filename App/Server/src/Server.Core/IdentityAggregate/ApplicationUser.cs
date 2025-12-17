@@ -5,7 +5,6 @@ namespace Server.Core.IdentityAggregate;
 
 public class ApplicationUser : IdentityUser<Guid>
 {
-  public const int UsernameMaxLength = 100;
   public const int BioMaxLength = 1000;
   public const int ImageUrlMaxLength = 500;
 

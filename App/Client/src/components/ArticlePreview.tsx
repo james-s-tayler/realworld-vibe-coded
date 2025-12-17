@@ -4,6 +4,7 @@ import { Tag, Button } from '@carbon/react';
 import { FavoriteFilled, Favorite } from '@carbon/icons-react';
 import type { Article } from '../types/article';
 import { DEFAULT_PROFILE_IMAGE } from '../constants';
+import { truncateUsername } from '../utils/textUtils';
 import './ArticlePreview.css';
 
 interface ArticlePreviewProps {
@@ -44,7 +45,7 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({
             className="author-image"
           />
           <div className="author-details">
-            <span className="author-name">{article.author.username}</span>
+            <span className="author-name" title={article.author.username}>{truncateUsername(article.author.username)}</span>
             <span className="article-date">{formatDate(article.createdAt)}</span>
           </div>
         </Link>

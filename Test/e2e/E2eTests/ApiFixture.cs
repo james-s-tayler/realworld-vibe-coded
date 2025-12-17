@@ -90,18 +90,17 @@ public class ApiFixture : IAsyncLifetime
   /// <summary>
   /// Creates a user with all string fields at their maximum length via API.
   /// The fixture generates unique test data automatically.
-  /// Note: Email is set to match UsernameMaxLength (100 chars) since email becomes username.
-  /// This ensures the test validates actual max username constraint without causing UI overflow.
+  /// Note: Email is set to a reasonable length (100 chars) rather than max (255 chars)
+  /// to avoid UI layout issues when email is used as username.
   /// </summary>
   public async Task<CreatedUser> CreateUserWithMaxLengthsAsync()
   {
     var userId = Interlocked.Increment(ref _userCounter);
     var guidPart = Guid.NewGuid().ToString("N")[..8];
 
-    // Email: Match UsernameMaxLength (100 chars) since email becomes username
-    // This aligns with ApplicationUser.UsernameMaxLength constraint
+    // Email: Use reasonable length (100 chars) to avoid UI overflow when used as username
     const int emailDomainLength = 9; // @test.com
-    const int emailLength = 100; // Matches UsernameMaxLength
+    const int emailLength = 100; // Reasonable length instead of max 255
     const int emailLocalLength = emailLength - emailDomainLength; // 91 chars
 
     // Calculate how much padding we need for the email local part
