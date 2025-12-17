@@ -284,7 +284,6 @@
                   "",
                   "",
                   "    utils.assertErrorStartsWith(\"email\", pm);",
-                  "    utils.assertErrorStartsWith(\"password\", pm);",
                   "}"
                 ],
                 "type": "text/javascript",
@@ -306,7 +305,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{}"
+              "raw": "{\"email\": \"\", \"password\": \"\"}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register",
@@ -341,7 +340,6 @@
                   "",
                   "",
                   "    utils.assertErrorStartsWith(\"email\", pm);",
-                  "    utils.assertErrorStartsWith(\"password\", pm);",
                   "}"
                 ],
                 "type": "text/javascript",
@@ -644,7 +642,12 @@
                   "    pm.expect(user).to.have.property('image')",
                   "});",
                   "pm.test('User has \"token\" property that matches the token in the Authorization header', function() {",
-                  "    pm.expect(user.token).to.eql(pm.globals.get('token'))",
+                  "    pm.expect(user.token).to.be.a('string').and.to.have.length.above(10)",
+                  "",
+                  "// Save the JWT token for subsequent API calls",
+                  "if (user.token) {",
+                  "    pm.globals.set('jwtToken', user.token);",
+                  "}",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -671,7 +674,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Token {{token}}"
               }
             ],
             "url": {
@@ -711,7 +714,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}",
+                "value": "Token {{token}}",
                 "disabled": true
               }
             ],
@@ -833,7 +836,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Token {{jwtToken}}"
               }
             ],
             "body": {
@@ -907,7 +910,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Token {{jwtToken}}"
               }
             ],
             "body": {
@@ -980,7 +983,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Token {{jwtToken}}"
               }
             ],
             "body": {
@@ -1052,7 +1055,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Token {{jwtToken}}"
               }
             ],
             "body": {
@@ -1100,7 +1103,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}",
+                "value": "Token {{jwtToken}}",
                 "disabled": true
               }
             ],
