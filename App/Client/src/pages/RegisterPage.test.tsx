@@ -9,6 +9,7 @@ import { authApi } from '../api/auth'
 vi.mock('../api/auth', () => ({
   authApi: {
     register: vi.fn(),
+    login: vi.fn(),
     getCurrentUser: vi.fn(),
   },
 }))
@@ -65,7 +66,8 @@ describe('RegisterPage', () => {
       token: 'new-token',
     }
 
-    vi.mocked(authApi.register).mockResolvedValue({ user: mockUser })
+    vi.mocked(authApi.register).mockResolvedValue(undefined)
+    vi.mocked(authApi.login).mockResolvedValue({ user: mockUser })
 
     renderRegisterPage()
 
@@ -75,6 +77,7 @@ describe('RegisterPage', () => {
 
     await waitFor(() => {
       expect(authApi.register).toHaveBeenCalledWith('newuser@example.com', 'password123')
+      expect(authApi.login).toHaveBeenCalledWith('newuser@example.com', 'password123')
       expect(mockNavigate).toHaveBeenCalledWith('/')
     })
   })

@@ -39,9 +39,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const register = async (email: string, password: string) => {
-    const response = await authApi.register(email, password);
-    localStorage.setItem('token', response.user.token);
-    setUser(response.user);
+    await authApi.register(email, password);
+    // Now login to get the token
+    await login(email, password);
   };
 
   const logout = () => {
