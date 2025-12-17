@@ -77,7 +77,8 @@
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -134,7 +135,8 @@
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -199,7 +201,8 @@
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -254,7 +257,8 @@
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -310,7 +314,8 @@
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
@@ -366,7 +371,8 @@
                 "{{APIURL}}"
               ],
               "path": [
-                "users"
+                "identity",
+                "register"
               ]
             }
           },
