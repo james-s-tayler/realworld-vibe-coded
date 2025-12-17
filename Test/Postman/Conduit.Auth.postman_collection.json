@@ -26,7 +26,7 @@
                   "    const apiUrl = pm.globals.get('APIURL') || pm.environment.get('APIURL');",
                   "    ",
                   "    pm.sendRequest({",
-                  "        url: apiUrl + '/identity/login',",
+                  "        url: apiUrl + '/identity/login?useCookies=false',",
                   "        method: 'POST',",
                   "        header: { 'Content-Type': 'application/json' },",
                   "        body: {",
@@ -416,13 +416,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=false",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "false"
+                }
               ]
             }
           },
@@ -461,13 +467,19 @@
               "raw": "{\"email\":\"someone@example.com\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=false",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "false"
+                }
               ]
             }
           },
@@ -506,13 +518,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"oops\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=false",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "false"
+                }
               ]
             }
           },
@@ -572,13 +590,19 @@
               "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
             },
             "url": {
-              "raw": "{{APIURL}}/identity/login",
+              "raw": "{{APIURL}}/identity/login?useCookies=false",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
-                "users",
+                "identity",
                 "login"
+              ],
+              "query": [
+                {
+                  "key": "useCookies",
+                  "value": "false"
+                }
               ]
             }
           },
