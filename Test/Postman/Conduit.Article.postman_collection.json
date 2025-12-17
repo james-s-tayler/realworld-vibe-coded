@@ -28,9 +28,9 @@
                   "        const email = pm.globals.get('ARTICLES_USER_EMAIL');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"usermame\" property matches ARTICLES_USER_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('ARTICLES_USER_USERNAME');",
-                  "        pm.expect(user.username).to.eql(username);",
+                  "    pm.test('\"username\" property matches ARTICLES_USER_EMAIL variable', function() {",
+                  "        const email = pm.globals.get('ARTICLES_USER_EMAIL');",
+                  "        pm.expect(user.username).to.eql(email);",
                   "    });",
                   "}",
                   ""
@@ -43,8 +43,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"ARTICLES_USER_EMAIL\", (Math.random() * 1000) + \"@example.com\")",
-                  "pm.globals.set(\"ARTICLES_USER_USERNAME\", (Math.random() * 1000) + \"\")"
+                  "pm.globals.set(\"ARTICLES_USER_EMAIL\", (Math.random() * 1000) + \"@example.com\")"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -65,7 +64,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{ARTICLES_USER_USERNAME}}\"}}"
+              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -99,9 +98,9 @@
                   "        const email = pm.globals.get('ARTICLES_USER_EMAIL_2');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"usermame\" property matches ARTICLES_USER_USERNAME_2 variable', function() {",
-                  "        const username = pm.globals.get('ARTICLES_USER_USERNAME_2');",
-                  "        pm.expect(user.username).to.eql(username);",
+                  "    pm.test('\"username\" property matches ARTICLES_USER_EMAIL_2 variable', function() {",
+                  "        const email = pm.globals.get('ARTICLES_USER_EMAIL_2');",
+                  "        pm.expect(user.username).to.eql(email);",
                   "    });",
                   "}",
                   ""
@@ -114,8 +113,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"ARTICLES_USER_EMAIL_2\", (Math.random() * 1000) + \"@example.com\")",
-                  "pm.globals.set(\"ARTICLES_USER_USERNAME_2\", (Math.random() * 1000) + \"\")"
+                  "pm.globals.set(\"ARTICLES_USER_EMAIL_2\", (Math.random() * 1000) + \"@example.com\")"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -136,7 +134,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{ARTICLES_USER_USERNAME_2}}\"}}"
+              "raw": "{\"user\":{\"email\":\"{{ARTICLES_USER_EMAIL_2}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -331,13 +329,13 @@
               "raw": "{}"
             },
             "url": {
-              "raw": "{{APIURL}}/profiles/{{ARTICLES_USER_USERNAME}}/follow",
+              "raw": "{{APIURL}}/profiles/{{ARTICLES_USER_EMAIL}}/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "{{ARTICLES_USER_USERNAME}}",
+                "{{ARTICLES_USER_EMAIL}}",
                 "follow"
               ]
             }
@@ -419,9 +417,9 @@
                   "pm.test('Article contains \"author\" property', function() {",
                   "    pm.expect(article).to.have.property('author');",
                   "});",
-                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_EMAIL', function() {",
                   "    pm.expect(article.author).to.have.property('username');",
-                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL'))",
                   "})",
                   "pm.test('Author \"bio\" equals default', function() {",
                   "    pm.expect(article.author).to.have.property('bio');",
@@ -1078,9 +1076,9 @@
                   "pm.test('Article contains \"author\" property', function() {",
                   "    pm.expect(article).to.have.property('author');",
                   "});",
-                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_EMAIL', function() {",
                   "    pm.expect(article.author).to.have.property('username');",
-                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL'))",
                   "})",
                   "pm.test('Author \"bio\" equals default', function() {",
                   "    pm.expect(article.author).to.have.property('bio');",
@@ -1168,9 +1166,9 @@
                   "pm.test('Article contains \"author\" property', function() {",
                   "    pm.expect(article).to.have.property('author');",
                   "});",
-                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_EMAIL', function() {",
                   "    pm.expect(article.author).to.have.property('username');",
-                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL'))",
                   "})",
                   "pm.test('Author \"following\" equals true', function() {",
                   "    pm.expect(article.author).to.have.property('following');",
@@ -1288,9 +1286,9 @@
                   "pm.test('Article contains \"author\" property', function() {",
                   "    pm.expect(article).to.have.property('author');",
                   "});",
-                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_EMAIL', function() {",
                   "    pm.expect(article.author).to.have.property('username');",
-                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL'))",
                   "})",
                   "pm.test('Author \"bio\" equals default', function() {",
                   "    pm.expect(article.author).to.have.property('bio');",
@@ -1489,9 +1487,9 @@
                   "pm.test('Article contains \"author\" property', function() {",
                   "    pm.expect(article).to.have.property('author');",
                   "});",
-                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_EMAIL', function() {",
                   "    pm.expect(article.author).to.have.property('username');",
-                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL'))",
                   "})",
                   "pm.test('Author \"bio\" equals default', function() {",
                   "    pm.expect(article.author).to.have.property('bio');",
@@ -1631,9 +1629,9 @@
                   "pm.test('Article contains \"author\" property', function() {",
                   "    pm.expect(article).to.have.property('author');",
                   "});",
-                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_EMAIL', function() {",
                   "    pm.expect(article.author).to.have.property('username');",
-                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL'))",
                   "})",
                   "pm.test('Author \"bio\" equals default', function() {",
                   "    pm.expect(article.author).to.have.property('bio');",
@@ -1773,9 +1771,9 @@
                   "pm.test('Article contains \"author\" property', function() {",
                   "    pm.expect(article).to.have.property('author');",
                   "});",
-                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_EMAIL', function() {",
                   "    pm.expect(article.author).to.have.property('username');",
-                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL'))",
                   "})",
                   "pm.test('Author \"bio\" equals default', function() {",
                   "    pm.expect(article.author).to.have.property('bio');",
@@ -2016,9 +2014,9 @@
                   "pm.test('Article contains \"author\" property', function() {",
                   "    pm.expect(article).to.have.property('author');",
                   "});",
-                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME', function() {",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_EMAIL', function() {",
                   "    pm.expect(article.author).to.have.property('username');",
-                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'))",
+                  "    pm.expect(article.author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL'))",
                   "})",
                   "pm.test('Author \"bio\" equals default', function() {",
                   "    pm.expect(article.author).to.have.property('bio');",
@@ -2284,9 +2282,9 @@
                   "pm.test('Comment contains \"author\" property', function() {",
                   "    pm.expect(comment).to.have.property('author');",
                   "});",
-                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME_2', function() {",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_EMAIL_2', function() {",
                   "    pm.expect(comment.author).to.have.property('username');",
-                  "    pm.expect(comment.author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME_2'))",
+                  "    pm.expect(comment.author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL_2'))",
                   "})",
                   "pm.test('Author \"bio\" equals default', function() {",
                   "    pm.expect(comment.author).to.have.property('bio');",
@@ -3158,11 +3156,11 @@
                   "    pm.expect(comments[0]).to.have.property('author');",
                   "    pm.expect(comments[1]).to.have.property('author');",
                   "});",
-                  "pm.test('Author \"username\" equals ARTICLES_USER_USERNAME_2', function() {",
+                  "pm.test('Author \"username\" equals ARTICLES_USER_EMAIL_2', function() {",
                   "    pm.expect(comments[0].author).to.have.property('username');",
                   "    pm.expect(comments[1].author).to.have.property('username');",
-                  "    pm.expect(comments[0].author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME_2'));",
-                  "    pm.expect(comments[1].author.username).to.eql(pm.globals.get('ARTICLES_USER_USERNAME'));",
+                  "    pm.expect(comments[0].author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL_2'));",
+                  "    pm.expect(comments[1].author.username).to.eql(pm.globals.get('ARTICLES_USER_EMAIL'));",
                   "})",
                   "pm.test('Author \"bio\" equals default', function() {",
                   "    pm.expect(comments[0].author).to.have.property('bio');",
