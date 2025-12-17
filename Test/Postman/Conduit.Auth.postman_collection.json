@@ -643,12 +643,7 @@
                   "});",
                   "pm.test('User has \"token\" property that matches the token in the Authorization header', function() {",
                   "    pm.expect(user.token).to.be.a('string').and.to.have.length.above(10)",
-                  "",
-                  "// Save the JWT token for subsequent API calls",
-                  "if (user.token) {",
-                  "    pm.globals.set('jwtToken', user.token);",
-                  "}",
-                  "});"
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -674,7 +669,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Token {{token}}"
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -836,7 +831,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Token {{jwtToken}}"
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
@@ -910,7 +905,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Token {{jwtToken}}"
+                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -983,7 +978,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Token {{jwtToken}}"
+                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -1055,7 +1050,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Token {{jwtToken}}"
+                "value": "Token {{token}}"
               }
             ],
             "body": {
@@ -1103,7 +1098,7 @@
               },
               {
                 "key": "Authorization",
-                "value": "Token {{jwtToken}}",
+                "value": "Token {{token}}",
                 "disabled": true
               }
             ],
