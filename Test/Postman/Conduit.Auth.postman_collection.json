@@ -306,7 +306,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{}}"
+              "raw": "{}"
             },
             "url": {
               "raw": "{{APIURL}}/identity/register",
