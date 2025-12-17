@@ -115,7 +115,6 @@ As you work, you are expected to aggressively reality test via the following met
 - use the mslearn MCP server to check assumptions relating to Microsoft tools, libraries, frameworks, and dependencies
 - use the docs-mcp-server to check for correct usage of non-Microsoft tools, libraries, frameworks, and dependencies
 - use websearch to locate tutorials, how to guides, documentation and source code to compare against.
-- use websearch to search for Github Issues related to problem
 
 ### When You Get Stuck
 
