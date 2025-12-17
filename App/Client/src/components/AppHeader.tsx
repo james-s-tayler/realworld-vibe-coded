@@ -9,6 +9,7 @@ import {
 } from '@carbon/react';
 import { Edit } from '@carbon/icons-react';
 import { useAuth } from '../hooks/useAuth';
+import { truncateUsername } from '../utils/textUtils';
 import './AppHeader.css';
 
 export const AppHeader: React.FC = () => {
@@ -53,8 +54,9 @@ export const AppHeader: React.FC = () => {
                   as={Link}
                   to={`/profile/${user.username}`}
                   isActive={isActive(`/profile/${user.username}`)}
+                  title={user.username}
                 >
-                  {user.username}
+                  {truncateUsername(user.username)}
                 </HeaderMenuItem>
               </>
             ) : (

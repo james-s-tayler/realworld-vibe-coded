@@ -43,7 +43,6 @@ describe('RegisterPage', () => {
     renderRegisterPage()
     
     expect(screen.getByRole('heading', { name: /sign up/i })).toBeInTheDocument()
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument()
@@ -60,7 +59,7 @@ describe('RegisterPage', () => {
     const user = userEvent.setup()
     const mockUser = {
       email: 'newuser@example.com',
-      username: 'newuser',
+      username: 'newuser@example.com',
       bio: '',
       image: null,
       token: 'new-token',
@@ -70,13 +69,12 @@ describe('RegisterPage', () => {
 
     renderRegisterPage()
 
-    await user.type(screen.getByLabelText(/username/i), 'newuser')
     await user.type(screen.getByLabelText(/email/i), 'newuser@example.com')
     await user.type(screen.getByLabelText(/password/i), 'password123')
     await user.click(screen.getByRole('button', { name: /sign up/i }))
 
     await waitFor(() => {
-      expect(authApi.register).toHaveBeenCalledWith('newuser@example.com', 'newuser', 'password123')
+      expect(authApi.register).toHaveBeenCalledWith('newuser@example.com', 'password123')
       expect(mockNavigate).toHaveBeenCalledWith('/')
     })
   })
@@ -85,17 +83,16 @@ describe('RegisterPage', () => {
     const user = userEvent.setup()
     
     // Throw an error that normalizeError can handle
-    vi.mocked(authApi.register).mockRejectedValue(new Error('username has already been taken'))
+    vi.mocked(authApi.register).mockRejectedValue(new Error('email has already been taken'))
 
     renderRegisterPage()
 
-    await user.type(screen.getByLabelText(/username/i), 'existinguser')
     await user.type(screen.getByLabelText(/email/i), 'test@example.com')
     await user.type(screen.getByLabelText(/password/i), 'password123')
     await user.click(screen.getByRole('button', { name: /sign up/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/username has already been taken/i)).toBeInTheDocument()
+      expect(screen.getByText(/email has already been taken/i)).toBeInTheDocument()
     })
   })
 })

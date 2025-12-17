@@ -26,6 +26,7 @@ public class ApiFixture : IAsyncLifetime
 
     // Configure HttpClientHandler to accept self-signed certificates in test environments
     var handler = new HttpClientHandler();
+
     // WARNING: Disables all SSL/TLS certificate validation for E2E tests.
     // This is safe ONLY in isolated test environments (e.g., E2E tests with self-signed dev certificates in Docker containers).
     // NEVER use this pattern in production code, as it allows any certificate (including expired, self-signed, or malicious).
@@ -55,15 +56,13 @@ public class ApiFixture : IAsyncLifetime
   public async Task<CreatedUser> CreateUserAsync()
   {
     var userId = Interlocked.Increment(ref _userCounter);
-    var username = $"testuser{userId}_{Guid.NewGuid().ToString("N")[..8]}";
-    var email = $"{username}@test.com";
+    var email = $"testuser{userId}_{Guid.NewGuid().ToString("N")[..8]}@test.com";
     var password = "TestPassword123!";
 
     var registerRequest = new
     {
       user = new
       {
-        username,
         email,
         password,
       },
@@ -83,7 +82,6 @@ public class ApiFixture : IAsyncLifetime
     return new CreatedUser
     {
       Token = userResponse.User.Token,
-      Username = username,
       Email = email,
       Password = password,
     };
@@ -92,26 +90,25 @@ public class ApiFixture : IAsyncLifetime
   /// <summary>
   /// Creates a user with all string fields at their maximum length via API.
   /// The fixture generates unique test data automatically.
+  /// Note: Email is set to a reasonable length (100 chars) rather than max (255 chars)
+  /// to avoid UI layout issues when email is used as username.
   /// </summary>
   public async Task<CreatedUser> CreateUserWithMaxLengthsAsync()
   {
     var userId = Interlocked.Increment(ref _userCounter);
     var guidPart = Guid.NewGuid().ToString("N")[..8];
 
-    // Username: max 100 chars
-    var username = $"testuser{userId}_{guidPart}_{new string('x', 100 - $"testuser{userId}_{guidPart}_".Length)}";
-
-    // Email: max 255 chars (including the @domain part)
+    // Email: Use reasonable length (100 chars) to avoid UI overflow when used as username
     const int emailDomainLength = 9; // @test.com
-    const int emailMaxLength = 255;
-    const int emailLocalMaxLength = emailMaxLength - emailDomainLength; // 246 chars
+    const int emailLength = 100; // Reasonable length instead of max 255
+    const int emailLocalLength = emailLength - emailDomainLength; // 91 chars
 
     // Calculate how much padding we need for the email local part
-    var emailBasePart = $"{username}_";
-    var emailPaddingLength = Math.Max(0, emailLocalMaxLength - emailBasePart.Length);
+    var emailBasePart = $"testuser{userId}_{guidPart}_";
+    var emailPaddingLength = Math.Max(0, emailLocalLength - emailBasePart.Length);
     var emailLocalPart = emailPaddingLength > 0
         ? $"{emailBasePart}{new string('y', emailPaddingLength)}"
-        : emailBasePart[..emailLocalMaxLength]; // Truncate if needed
+        : emailBasePart[..emailLocalLength]; // Truncate if needed
 
     var email = $"{emailLocalPart}@test.com";
 
@@ -121,7 +118,6 @@ public class ApiFixture : IAsyncLifetime
     {
       user = new
       {
-        username,
         email,
         password,
       },
@@ -147,7 +143,6 @@ public class ApiFixture : IAsyncLifetime
     return new CreatedUser
     {
       Token = userResponse.User.Token,
-      Username = username,
       Email = email,
       Password = password,
     };

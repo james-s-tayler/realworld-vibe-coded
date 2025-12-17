@@ -27,8 +27,8 @@ public class HappyPath : AppPageTest
     await Pages.SettingsPage.UpdateAndSaveBioAsync(bioText);
 
     // Assert
-    await Pages.ProfilePage.GoToAsync(user.Username);
-    await Pages.ProfilePage.WaitForProfileToLoadAsync(user.Username);
+    await Pages.ProfilePage.GoToAsync(user.Email);
+    await Pages.ProfilePage.WaitForProfileToLoadAsync(user.Email);
 
     await Pages.ProfilePage.VerifyBioVisibleAsync(bioText);
   }

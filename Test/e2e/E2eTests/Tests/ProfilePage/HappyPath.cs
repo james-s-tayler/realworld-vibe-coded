@@ -25,10 +25,10 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
     // Act
-    await Pages.ProfilePage.GoToAsync(user1.Username);
+    await Pages.ProfilePage.GoToAsync(user1.Email);
 
     // Assert
-    await Pages.ProfilePage.VerifyProfileHeadingAsync(user1.Username);
+    await Pages.ProfilePage.VerifyProfileHeadingAsync(user1.Email);
     await Pages.ProfilePage.VerifyMyArticlesTabVisibleAsync();
   }
 
@@ -44,11 +44,11 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
-    await Pages.ProfilePage.GoToAsync(user1.Username);
+    await Pages.ProfilePage.GoToAsync(user1.Email);
 
     // Act + Assert
-    await Pages.ProfilePage.ClickFollowButtonAsync(user1.Username);
-    await Pages.ProfilePage.ClickUnfollowButtonAsync(user1.Username);
+    await Pages.ProfilePage.ClickFollowButtonAsync(user1.Email);
+    await Pages.ProfilePage.ClickUnfollowButtonAsync(user1.Email);
   }
 
   [Fact]
@@ -64,7 +64,7 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
 
-    await Pages.ProfilePage.GoToAsync(user2.Username);
+    await Pages.ProfilePage.GoToAsync(user2.Email);
 
     // Act
     await Pages.ProfilePage.ClickFavoritedArticlesTabAsync();
@@ -79,7 +79,7 @@ public class HappyPath : AppPageTest
     // Arrange
     var user = await Api.CreateUserAsync();
     await Api.CreateArticlesAsync(user.Token, TotalArticles);
-    await Pages.ProfilePage.GoToAsync(user.Username);
+    await Pages.ProfilePage.GoToAsync(user.Email);
     await Pages.ProfilePage.WaitForArticlesToLoadAsync();
     await Pages.ProfilePage.VerifyArticleCountAsync(20);
     await Pages.ProfilePage.VerifyPaginationVisibleAsync();

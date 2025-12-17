@@ -12,6 +12,7 @@ import { ApiError } from '../api/client';
 import type { Profile } from '../types/article';
 import type { Article } from '../types/article';
 import { DEFAULT_PROFILE_IMAGE } from '../constants';
+import { truncateUsername } from '../utils/textUtils';
 import './ProfilePage.css';
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -33,7 +34,7 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, on
             alt={profile.username}
             className="user-img"
           />
-          <h4>{profile.username}</h4>
+          <h4 title={profile.username}>{truncateUsername(profile.username)}</h4>
           <p>{profile.bio}</p>
           {isOwnProfile ? (
             <Link to="/settings">
@@ -47,7 +48,7 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, on
               size="sm"
               onClick={onFollow}
             >
-              {profile.following ? 'Unfollow' : 'Follow'} {profile.username}
+              {profile.following ? 'Unfollow' : 'Follow'} {truncateUsername(profile.username)}
             </Button>
           )}
         </div>

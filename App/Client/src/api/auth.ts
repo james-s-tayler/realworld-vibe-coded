@@ -19,11 +19,10 @@ export const authApi = {
 
   register: async (
     email: string,
-    username: string,
     password: string
   ): Promise<UserResponse> => {
     const request: RegisterRequest = {
-      user: { email, username, password },
+      user: { email, password },
     };
     return apiRequest<UserResponse>('/api/users', {
       method: 'POST',

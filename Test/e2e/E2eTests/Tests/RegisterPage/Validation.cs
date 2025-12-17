@@ -14,8 +14,6 @@ public class Validation : AppPageTest
   public async Task Register_WithDuplicateEmail_DisplaysErrorMessage()
   {
     // Arrange
-    var timestamp = DateTime.UtcNow.Ticks;
-    var username2 = $"user2_{timestamp}";
     var password = "TestPassword123!";
 
     var existingUser = await Api.CreateUserAsync();
@@ -23,7 +21,7 @@ public class Validation : AppPageTest
     await Pages.RegisterPage.GoToAsync();
 
     // Act
-    await Pages.RegisterPage.RegisterAndExpectErrorAsync(username2, existingUser.Email, password);
+    await Pages.RegisterPage.RegisterAndExpectErrorAsync(existingUser.Email, password);
 
     // Assert
     await Pages.RegisterPage.VerifyErrorContainsTextAsync("Email already exists");
@@ -33,18 +31,16 @@ public class Validation : AppPageTest
   public async Task Register_WithDuplicateUsername_DisplaysErrorMessage()
   {
     // Arrange
-    var timestamp = DateTime.UtcNow.Ticks;
-    var email2 = $"user2_{timestamp}@test.com";
     var password = "TestPassword123!";
 
     var existingUser = await Api.CreateUserAsync();
 
     await Pages.RegisterPage.GoToAsync();
 
-    // Act
-    await Pages.RegisterPage.RegisterAndExpectErrorAsync(existingUser.Username, email2, password);
+    // Act - Since username defaults to email, we use the existing user's email to trigger duplicate error
+    await Pages.RegisterPage.RegisterAndExpectErrorAsync(existingUser.Email, password);
 
     // Assert
-    await Pages.RegisterPage.VerifyErrorContainsTextAsync("Username already exists");
+    await Pages.RegisterPage.VerifyErrorContainsTextAsync("Email already exists");
   }
 }

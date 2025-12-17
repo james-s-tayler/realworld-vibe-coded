@@ -13,11 +13,6 @@ public class RegisterPage : BasePage
   }
 
   /// <summary>
-  /// Username input field.
-  /// </summary>
-  public ILocator UsernameInput => Page.GetByPlaceholder("Username");
-
-  /// <summary>
   /// Email input field.
   /// </summary>
   public ILocator EmailInput => Page.GetByPlaceholder("Email");
@@ -40,9 +35,8 @@ public class RegisterPage : BasePage
   /// <summary>
   /// Fills in the registration form.
   /// </summary>
-  public async Task FillRegistrationFormAsync(string username, string email, string password)
+  public async Task FillRegistrationFormAsync(string email, string password)
   {
-    await UsernameInput.FillAsync(username);
     await EmailInput.FillAsync(email);
     await PasswordInput.FillAsync(password);
   }
@@ -58,22 +52,23 @@ public class RegisterPage : BasePage
   /// <summary>
   /// Performs a complete registration action and waits for the API response.
   /// </summary>
-  /// <param name="username">Username for the new account.</param>
   /// <param name="email">Email for the new account.</param>
   /// <param name="password">Password for the new account.</param>
-  public async Task RegisterAsync(string username, string email, string password)
+  public async Task RegisterAsync(string email, string password)
   {
-    await FillRegistrationFormAsync(username, email, password);
+    await FillRegistrationFormAsync(email, password);
     await ClickSignUpButtonAsync();
-    await Expect(GetUserProfileLink(username)).ToBeVisibleAsync();
+
+    // Username will be the email, so we use email as the profile link
+    await Expect(GetUserProfileLink(email)).ToBeVisibleAsync();
   }
 
   /// <summary>
   /// Attempts to register and expects it to fail with an error.
   /// </summary>
-  public async Task RegisterAndExpectErrorAsync(string username, string email, string password)
+  public async Task RegisterAndExpectErrorAsync(string email, string password)
   {
-    await FillRegistrationFormAsync(username, email, password);
+    await FillRegistrationFormAsync(email, password);
     await ClickSignUpButtonAsync();
     await Expect(ErrorDisplay).ToBeVisibleAsync();
   }
