@@ -21,7 +21,16 @@ public class IdentityEmailSender(IEmailSender emailSender, ILogger<IdentityEmail
     var subject = "Confirm your email";
     var body = $"Please confirm your account by clicking this link: {confirmationLink}";
 
-    await _emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
+    try
+    {
+      await _emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogWarning(ex, "Failed to send confirmation email to {Email} for user {UserId}. Email sending is not critical for registration.", email, user.Id);
+
+      // Don't throw - email sending failures should not prevent user registration
+    }
   }
 
   public async Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink)
@@ -30,7 +39,16 @@ public class IdentityEmailSender(IEmailSender emailSender, ILogger<IdentityEmail
     var subject = "Reset your password";
     var body = $"Please reset your password by clicking this link: {resetLink}";
 
-    await _emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
+    try
+    {
+      await _emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogWarning(ex, "Failed to send password reset email to {Email} for user {UserId}", email, user.Id);
+
+      // Don't throw - let the calling code handle the result
+    }
   }
 
   public async Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode)
@@ -39,6 +57,15 @@ public class IdentityEmailSender(IEmailSender emailSender, ILogger<IdentityEmail
     var subject = "Reset your password";
     var body = $"Please reset your password using the following code: {resetCode}";
 
-    await _emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
+    try
+    {
+      await _emailSender.SendEmailAsync(email, DefaultFromAddress, subject, body);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogWarning(ex, "Failed to send password reset code to {Email} for user {UserId}", email, user.Id);
+
+      // Don't throw - let the calling code handle the result
+    }
   }
 }
