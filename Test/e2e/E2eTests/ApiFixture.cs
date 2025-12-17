@@ -68,20 +68,21 @@ public class ApiFixture : IAsyncLifetime
       },
     };
 
-    // Clone the client to avoid header conflicts
-    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/users")
+    // Register - no token expected
+    using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/users")
     {
       Content = JsonContent.Create(registerRequest, options: _jsonOptions),
     };
 
-    var response = await _httpClient.SendAsync(request);
-    response.EnsureSuccessStatusCode();
+    var registerResponse = await _httpClient.SendAsync(registerHttpRequest);
+    registerResponse.EnsureSuccessStatusCode();
 
-    var responseContent = await response.Content.ReadAsStringAsync();
-    var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, _jsonOptions)!;
+    // Now login to get the token
+    var token = await LoginAsync(email, password);
+
     return new CreatedUser
     {
-      Token = userResponse.User.Token,
+      Token = token,
       Email = email,
       Password = password,
     };
@@ -123,26 +124,27 @@ public class ApiFixture : IAsyncLifetime
       },
     };
 
-    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/users")
+    // Register - no token expected
+    using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/users")
     {
       Content = JsonContent.Create(registerRequest, options: _jsonOptions),
     };
 
-    var response = await _httpClient.SendAsync(request);
-    response.EnsureSuccessStatusCode();
+    var registerResponse = await _httpClient.SendAsync(registerHttpRequest);
+    registerResponse.EnsureSuccessStatusCode();
 
-    var responseContent = await response.Content.ReadAsStringAsync();
-    var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, _jsonOptions)!;
+    // Now login to get the token
+    var token = await LoginAsync(email, password);
 
     // Update user profile with max-length bio and image
     var bio = new string('B', 1000); // Bio: max 1000 chars
     var image = $"https://example.com/{new string('i', 476)}.jpg"; // Image URL: max 500 chars (20+476+4=500)
 
-    await UpdateUserProfileAsync(userResponse.User.Token, bio, image);
+    await UpdateUserProfileAsync(token, bio, image);
 
     return new CreatedUser
     {
-      Token = userResponse.User.Token,
+      Token = token,
       Email = email,
       Password = password,
     };

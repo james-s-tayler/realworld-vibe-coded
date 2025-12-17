@@ -20,14 +20,15 @@ export const authApi = {
   register: async (
     email: string,
     password: string
-  ): Promise<UserResponse> => {
+  ): Promise<void> => {
     const request: RegisterRequest = {
       user: { email, password },
     };
-    return apiRequest<UserResponse>('/api/users', {
+    await apiRequest<UserResponse>('/api/users', {
       method: 'POST',
       body: JSON.stringify(request),
     });
+    // No token extraction - will login separately
   },
 
   getCurrentUser: async (): Promise<UserResponse> => {
