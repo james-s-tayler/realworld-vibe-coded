@@ -28,9 +28,8 @@
                   "        const email = pm.globals.get('FEED_USER_EMAIL');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"usermame\" property matches FEED_USER_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('FEED_USER_USERNAME');",
-                  "        pm.expect(user.username).to.eql(username);",
+                  "    pm.test('\"username\" property matches email', function() {",
+                  "        pm.expect(user.username).to.eql(user.email);",
                   "    });",
                   "}",
                   ""
@@ -43,8 +42,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"FEED_USER_EMAIL\", (Math.random() * 1000) + \"@example.com\")",
-                  "pm.globals.set(\"FEED_USER_USERNAME\", (Math.random() * 1000) + \"\")"
+                  "pm.globals.set(\"FEED_USER_EMAIL\", (Math.random() * 1000) + \"@example.com\")"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -65,7 +63,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{FEED_USER_USERNAME}}\"}}"
+              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -99,9 +97,8 @@
                   "        const email = pm.globals.get('FEED_USER_EMAIL')+2;",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"usermame\" property matches FEED_USER_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('FEED_USER_USERNAME') + 2;",
-                  "        pm.expect(user.username).to.eql(username);",
+                  "    pm.test('\"username\" property matches email', function() {",
+                  "        pm.expect(user.username).to.eql(user.email);",
                   "    });",
                   "}",
                   ""
@@ -135,7 +132,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{FEED_USER_USERNAME}}2\"}}"
+              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -169,9 +166,8 @@
                   "        const email = pm.globals.get('FEED_USER_EMAIL')+3;",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"usermame\" property matches FEED_USER_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('FEED_USER_USERNAME') + 3;",
-                  "        pm.expect(user.username).to.eql(username);",
+                  "    pm.test('\"username\" property matches email', function() {",
+                  "        pm.expect(user.username).to.eql(user.email);",
                   "    });",
                   "}",
                   ""
@@ -205,7 +201,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{FEED_USER_USERNAME}}3\"}}"
+              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -239,9 +235,8 @@
                   "        const email = pm.globals.get('FEED_USER_EMAIL')+4;",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"usermame\" property matches FEED_USER_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('FEED_USER_USERNAME') + 4;",
-                  "        pm.expect(user.username).to.eql(username);",
+                  "    pm.test('\"username\" property matches email', function() {",
+                  "        pm.expect(user.username).to.eql(user.email);",
                   "    });",
                   "}",
                   ""
@@ -275,7 +270,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{FEED_USER_USERNAME}}4\"}}"
+              "raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -614,13 +609,13 @@
               "raw": "{}"
             },
             "url": {
-              "raw": "{{APIURL}}/profiles/{{FEED_USER_USERNAME}}2/follow",
+              "raw": "{{APIURL}}/profiles/{{FEED_USER_EMAIL}}2/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "{{FEED_USER_USERNAME}}2",
+                "{{FEED_USER_EMAIL}}2",
                 "follow"
               ]
             }
@@ -664,13 +659,13 @@
               "raw": "{}"
             },
             "url": {
-              "raw": "{{APIURL}}/profiles/{{FEED_USER_USERNAME}}3/follow",
+              "raw": "{{APIURL}}/profiles/{{FEED_USER_EMAIL}}3/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "{{FEED_USER_USERNAME}}3",
+                "{{FEED_USER_EMAIL}}3",
                 "follow"
               ]
             }
@@ -1945,8 +1940,8 @@
                   "});",
                   "",
                   "pm.test('articles are by expected author', function() {",
-                  "    pm.expect(articles[0].author.username).to.eql(pm.globals.get('FEED_USER_USERNAME')+2)",
-                  "    pm.expect(articles[1].author.username).to.eql(pm.globals.get('FEED_USER_USERNAME')+2)",
+                  "    pm.expect(articles[0].author.username).to.eql(pm.globals.get('FEED_USER_EMAIL')+2)",
+                  "    pm.expect(articles[1].author.username).to.eql(pm.globals.get('FEED_USER_EMAIL')+2)",
                   "})"
                 ],
                 "type": "text/javascript",
@@ -1977,7 +1972,7 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/articles?author={{FEED_USER_USERNAME}}2",
+              "raw": "{{APIURL}}/articles?author={{FEED_USER_EMAIL}}2",
               "host": [
                 "{{APIURL}}"
               ],
@@ -1987,7 +1982,7 @@
               "query": [
                 {
                   "key": "author",
-                  "value": "{{FEED_USER_USERNAME}}2"
+                  "value": "{{FEED_USER_EMAIL}}2"
                 }
               ]
             }
@@ -2349,7 +2344,7 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/articles?favorited={{FEED_USER_USERNAME}}3",
+              "raw": "{{APIURL}}/articles?favorited={{FEED_USER_EMAIL}}3",
               "host": [
                 "{{APIURL}}"
               ],
@@ -2359,7 +2354,7 @@
               "query": [
                 {
                   "key": "favorited",
-                  "value": "{{FEED_USER_USERNAME}}3"
+                  "value": "{{FEED_USER_EMAIL}}3"
                 }
               ]
             }
