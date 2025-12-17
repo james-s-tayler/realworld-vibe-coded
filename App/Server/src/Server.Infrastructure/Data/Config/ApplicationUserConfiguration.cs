@@ -6,6 +6,10 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 {
   public void Configure(EntityTypeBuilder<ApplicationUser> builder)
   {
+    // Override default ASP.NET Identity UserName max length
+    builder.Property(p => p.UserName)
+        .HasMaxLength(ApplicationUser.UsernameMaxLength);
+
     builder.Property(p => p.Bio)
         .HasMaxLength(ApplicationUser.BioMaxLength);
 
