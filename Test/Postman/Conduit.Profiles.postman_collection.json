@@ -28,9 +28,9 @@
                   "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"username\" property matches USERNAME variable', function() {",
-                  "        const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME');",
-                  "        pm.expect(user.username).to.eql(username);",
+                  "    pm.test('\"username\" property matches EMAIL variable (username defaults to email)', function() {",
+                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
+                  "        pm.expect(user.username).to.eql(email);",
                   "    });",
                   "    pm.test('User has default \"bio\" property', function() {",
                   "        pm.expect(user.bio).to.eql('I work at statefarm');",
@@ -71,7 +71,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{USERNAME}}\"}}"
+              "raw": "{\"user\":{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -104,9 +104,9 @@
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.email).to.eql(email)",
                   "});",
-                  "pm.test('user.username matches USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(user.username).to.eql(username)",
+                  "pm.test('user.username matches EMAIL variable (username defaults to email)', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(user.username).to.eql(email)",
                   "});",
                   "pm.test('User has \"bio\" property', function() {",
                   "    pm.expect(user).to.have.property('bio')",
@@ -191,9 +191,9 @@
                   "        const email = pm.globals.get('SECOND_EMAIL');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.test('\"username\" property matches SECOND_USERNAME variable', function() {",
-                  "        const username = pm.globals.get('SECOND_USERNAME');",
-                  "        pm.expect(user.username).to.eql(username);",
+                  "    pm.test('\"username\" property matches SECOND_EMAIL variable (username defaults to email)', function() {",
+                  "        const email = pm.globals.get('SECOND_EMAIL');",
+                  "        pm.expect(user.username).to.eql(email);",
                   "    });",
                   "}",
                   ""
@@ -206,8 +206,9 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"SECOND_EMAIL\", (Math.random() * 1000) + \"@example.com\")",
-                  "pm.globals.set(\"SECOND_USERNAME\", (Math.random() * 1000) + \"\")"
+                  "const secondEmail = (Math.random() * 1000) + \"@example.com\";",
+                  "pm.globals.set(\"SECOND_EMAIL\", secondEmail);",
+                  "pm.globals.set(\"SECOND_USERNAME\", secondEmail);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -228,7 +229,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"{{SECOND_USERNAME}}\"}}"
+              "raw": "{\"user\":{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -262,9 +263,9 @@
                   "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
                   "        pm.expect(user.email).to.eql(\"celeb_\" + email);",
                   "    });",
-                  "    pm.test('\"usermame\" property matches celeb_ + USERNAME variable', function() {",
-                  "        const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME');",
-                  "        pm.expect(user.username).to.eql(\"celeb_\" + username);",
+                  "    pm.test('\"username\" property matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+                  "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
+                  "        pm.expect(user.username).to.eql(\"celeb_\" + email);",
                   "    });",
                   "}"
                 ],
@@ -287,7 +288,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"user\":{\"email\":\"celeb_{{EMAIL}}\", \"password\":\"{{PASSWORD}}\", \"username\":\"celeb_{{USERNAME}}\"}}"
+              "raw": "{\"user\":{\"email\":\"celeb_{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
             },
             "url": {
               "raw": "{{APIURL}}/users",
@@ -339,13 +340,13 @@
               "raw": "{}"
             },
             "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}",
+                "celeb_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -367,9 +368,9 @@
                   "",
                   "var profile = responseJSON.profile || {};",
                   "",
-                  "pm.test('\"usermame\" matches celeb_ + USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + username)",
+                  "pm.test('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
                   "});",
                   "pm.test('Profile has \"bio\" property', function() {",
                   "    pm.expect(profile).to.have.property('bio')",
@@ -408,13 +409,13 @@
               "raw": "{}"
             },
             "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}",
+                "celeb_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -436,9 +437,9 @@
                   "",
                   "var profile = responseJSON.profile || {};",
                   "",
-                  "pm.test('\"usermame\" matches celeb_ + USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + username)",
+                  "pm.test('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
                   "});",
                   "pm.test('Profile has \"bio\" property', function() {",
                   "    pm.expect(profile).to.have.property('bio')",
@@ -477,13 +478,13 @@
               "raw": "{}"
             },
             "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}",
+                "celeb_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -527,13 +528,13 @@
               "raw": "{}"
             },
             "url": {
-              "raw": "{{APIURL}}/profiles/nonexistentuser_{{USERNAME}}/follow",
+              "raw": "{{APIURL}}/profiles/nonexistentuser_{{EMAIL}}/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "nonexistentuser_{{USERNAME}}",
+                "nonexistentuser_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -555,9 +556,9 @@
                   "",
                   "var profile = responseJSON.profile || {};",
                   "",
-                  "pm.test('\"usermame\" matches celeb_ + USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + username)",
+                  "pm.test('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
                   "});",
                   "pm.test('Profile has \"bio\" property', function() {",
                   "    pm.expect(profile).to.have.property('bio')",
@@ -588,13 +589,13 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}",
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}"
+                "celeb_{{EMAIL}}"
               ]
             }
           },
@@ -615,9 +616,9 @@
                   "",
                   "var profile = responseJSON.profile || {};",
                   "",
-                  "pm.test('\"usermame\" matches SECOND_USERNAME variable', function() {",
-                  "    const username = pm.globals.get('SECOND_USERNAME');",
-                  "    pm.expect(profile.username).to.eql(username)",
+                  "pm.test('\"username\" matches SECOND_EMAIL variable (username defaults to email)', function() {",
+                  "    const email = pm.globals.get('SECOND_EMAIL');",
+                  "    pm.expect(profile.username).to.eql(email)",
                   "});",
                   "pm.test('Profile has \"bio\" property', function() {",
                   "    pm.expect(profile).to.have.property('bio')",
@@ -648,13 +649,13 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/profiles/{{SECOND_USERNAME}}",
+              "raw": "{{APIURL}}/profiles/{{SECOND_EMAIL}}",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "{{SECOND_USERNAME}}"
+                "{{SECOND_EMAIL}}"
               ]
             }
           },
@@ -689,13 +690,13 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/profiles/nonexistant_{{USERNAME}}",
+              "raw": "{{APIURL}}/profiles/nonexistant_{{EMAIL}}",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "nonexistant_{{USERNAME}}"
+                "nonexistant_{{EMAIL}}"
               ]
             }
           },
@@ -757,9 +758,9 @@
                   "",
                   "var profile = responseJSON.profile || {};",
                   "",
-                  "pm.test('\"usermame\" matches celeb_ + USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + username)",
+                  "pm.test('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
                   "});",
                   "pm.test('Profile has \"bio\" property', function() {",
                   "    pm.expect(profile).to.have.property('bio')",
@@ -791,13 +792,13 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}",
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}"
+                "celeb_{{EMAIL}}"
               ]
             }
           },
@@ -833,13 +834,13 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}",
+                "celeb_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -861,9 +862,9 @@
                   "",
                   "var profile = responseJSON.profile || {};",
                   "",
-                  "pm.test('\"usermame\" matches celeb_ + USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + username)",
+                  "pm.test('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
                   "});",
                   "pm.test('Profile has \"bio\" property', function() {",
                   "    pm.expect(profile).to.have.property('bio')",
@@ -894,13 +895,13 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}",
+                "celeb_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -945,13 +946,13 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}/follow",
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}",
+                "celeb_{{EMAIL}}",
                 "follow"
               ]
             }
@@ -973,9 +974,9 @@
                   "",
                   "var profile = responseJSON.profile || {};",
                   "",
-                  "pm.test('\"usermame\" matches celeb_ + USERNAME variable', function() {",
-                  "    const username = pm.globals.get('USERNAME') || pm.environment.get('USERNAME')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + username)",
+                  "pm.test('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
                   "});",
                   "pm.test('Profile has \"bio\" property', function() {",
                   "    pm.expect(profile).to.have.property('bio')",
@@ -1006,13 +1007,13 @@
               }
             ],
             "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{USERNAME}}",
+              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}",
               "host": [
                 "{{APIURL}}"
               ],
               "path": [
                 "profiles",
-                "celeb_{{USERNAME}}"
+                "celeb_{{EMAIL}}"
               ]
             }
           },
