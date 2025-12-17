@@ -99,9 +99,27 @@ Plans are organized under the `.flowpilot` directory with the following structur
 2. **Document sources**: Record all references in `references.md`
 3. **Structure properly**: Follow the file and phase structure exactly
 4. **Verify requirements**: Ensure each phase ends with verification targets
-5. **Stop at decisions**: Don't proceed past major decision points without user input
-6. **Stay focused**: Don't include checklists, documentation, or timelines
+5. **Stay focused**: Don't include checklists, documentation, or timelines
 
 ---
 
-**Scope:** Migration planning only. This file guides the creation of migration plans, not the execution of the migrations themselves.
+## When Running `flowpilot next`
+
+When you have been instructed to run `flowpilot next` and are implementing a phase, you must work in small, iterative, reality tested steps. The longer a chain of inferences becomes without being reality tested, the higher the probability an inference in the chain is wrong, invalidating the rest of the chain, and thus wasting time and tokens. 
+
+As you work, you are expected to aggressively reality test via the following methods:
+
+- run nuke Lint*, Build* and Test* targets to confirm the validity of your work
+- check the Serilog and Audit.NET logs under Logs/** after running `nuke Test*` or `RunLocalPublish` targets
+- check the Reports/**/Artifacts directory after running `nuke Test*` targets
+- use the mslearn MCP server to check assumptions relating to Microsoft tools, libraries, frameworks, and dependencies
+- use the docs-mcp-server to check for correct usage of non-Microsoft tools, libraries, frameworks, and dependencies
+- use websearch to locate tutorials, how to guides, documentation and source code to compare against.
+
+### When You Get Stuck
+
+- use the mslearn MCP server, the docs-mcp-server, and websearch to consult relevant documentation
+- use websearch to search for Stack overflow posts and Github Issues of the problem you're facing
+- use websearch to find and check the contents of release notes if you're having trouble with a specific library, as sometimes important things change between versions.
+- if you encounter a tricky bug you can't solve after a few attempts, do a debug analysis using `.flowpilot/template/debug-analysis.md` to help you break out of a local minima you might be stuck in.
+- If a problem doesn't yield despite significant effort and you think there are several possible paths forward, but they differ from your initial instructions, run `flowpilot stuck` and follow the prompt
