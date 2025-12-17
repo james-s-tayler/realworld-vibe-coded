@@ -642,7 +642,7 @@
                   "    pm.expect(user).to.have.property('image')",
                   "});",
                   "pm.test('User has \"token\" property that matches the token in the Authorization header', function() {",
-                  "    pm.expect(user.token).to.be.a('string').and.to.have.length.above(10)",
+                  "    pm.expect(user.token).to.be.a('string').and.to.have.length.above(10)});",
                   ""
                 ],
                 "type": "text/javascript",
