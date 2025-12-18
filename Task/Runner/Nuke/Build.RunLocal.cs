@@ -42,6 +42,16 @@ public partial class Build
       LogsRunLocalPublishSerilogDirectory.CreateOrCleanDirectory();
       LogsTestE2eAuditDotNetDirectory.CreateOrCleanDirectory();
       LogsTestE2eSerilogDirectory.CreateOrCleanDirectory();
+      LogsTestServerPostmanAuthSerilogDirectory.CreateOrCleanDirectory();
+      LogsTestServerPostmanAuthAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsTestServerPostmanArticlesEmptySerilogDirectory.CreateOrCleanDirectory();
+      LogsTestServerPostmanArticlesEmptyAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsTestServerPostmanArticleSerilogDirectory.CreateOrCleanDirectory();
+      LogsTestServerPostmanArticleAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsTestServerPostmanFeedAndArticlesSerilogDirectory.CreateOrCleanDirectory();
+      LogsTestServerPostmanFeedAndArticlesAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsTestServerPostmanProfilesSerilogDirectory.CreateOrCleanDirectory();
+      LogsTestServerPostmanProfilesAuditDotNetDirectory.CreateOrCleanDirectory();
 
       Log.Information("✓ Directories cleaned and pre-created");
     });
