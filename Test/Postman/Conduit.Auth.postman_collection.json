@@ -17,8 +17,9 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "// Generate correlation ID for this request",
-                  "pm.collectionVariables.set('correlationId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ]
               }
             },
@@ -28,7 +29,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -143,7 +144,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -175,7 +176,9 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set(\"SECOND_EMAIL\", (Math.random() * 1000) + \"@example.com\")"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -224,7 +227,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -251,7 +254,9 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  ""
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -300,8 +305,9 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "// Generate correlation ID for this request",
-                  "pm.collectionVariables.set('correlationId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ]
               }
             },
@@ -311,7 +317,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -377,8 +383,9 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "// Generate correlation ID for this request",
-                  "pm.collectionVariables.set('correlationId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ]
               }
             },
@@ -388,7 +395,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -455,8 +462,9 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "// Generate correlation ID for this request",
-                  "pm.collectionVariables.set('correlationId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ]
               }
             },
@@ -466,7 +474,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -533,8 +541,9 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "// Generate correlation ID for this request",
-                  "pm.collectionVariables.set('correlationId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ]
               }
             },
@@ -544,7 +553,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -623,8 +632,9 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "// Generate correlation ID for this request",
-                  "pm.collectionVariables.set('correlationId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ]
               }
             },
@@ -634,7 +644,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -690,8 +700,9 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "// Generate correlation ID for this request",
-                  "pm.collectionVariables.set('correlationId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ]
               }
             },
@@ -701,7 +712,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -757,7 +768,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -804,7 +815,9 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  ""
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -854,7 +867,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -892,7 +905,9 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  ""
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -937,8 +952,9 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "// Generate correlation ID for this request",
-                  "pm.collectionVariables.set('correlationId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ]
               }
             },
@@ -948,7 +964,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -1000,8 +1016,9 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "// Generate correlation ID for this request",
-                  "pm.collectionVariables.set('correlationId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ]
               }
             },
@@ -1011,7 +1028,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -1062,7 +1079,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -1100,12 +1117,9 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
-                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
-                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
-                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
-                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
-                  ""
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1158,7 +1172,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -1185,12 +1199,9 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
-                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
-                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
-                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
-                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
-                  ""
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1243,7 +1254,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -1269,12 +1280,9 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
-                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
-                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
-                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
-                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
-                  ""
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1327,7 +1335,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
@@ -1352,12 +1360,9 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
-                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
-                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
-                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
-                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
-                  ""
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1410,8 +1415,9 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "// Generate correlation ID for this request",
-                  "pm.collectionVariables.set('correlationId', pm.variables.replaceIn('{{$randomUUID}}'));"
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
                 ]
               }
             },
@@ -1421,7 +1427,7 @@
                 "exec": [
                   "// Wrapper function to include correlation ID in test names",
                   "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.collectionVariables.get('correlationId') || 'unknown';",
+                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
                   "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
                   "};",
                   "",
