@@ -134,7 +134,7 @@ public partial class Build
           ["DOCKER_BUILDKIT"] = "1",
         };
 
-        // Set NEWMAN_BAIL env var if bail is enabled
+        // Set NEWMAN_BAIL env var if bail is enabled (only for the test run, not cleanup)
         if (Bail)
         {
           envVars["NEWMAN_BAIL"] = "true";
@@ -155,11 +155,15 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.ArticlesEmpty.yml down";
+          var downEnvVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1",
+          };
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
                 workingDirectory: RootDirectory,
-                environmentVariables: envVars);
+                environmentVariables: downEnvVars);
           downProcess.WaitForExit();
         }
 
@@ -203,7 +207,7 @@ public partial class Build
           ["DOCKER_BUILDKIT"] = "1",
         };
 
-        // Set NEWMAN_BAIL env var if bail is enabled
+        // Set NEWMAN_BAIL env var if bail is enabled (only for the test run, not cleanup)
         if (Bail)
         {
           envVars["NEWMAN_BAIL"] = "true";
@@ -224,11 +228,15 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.Auth.yml down";
+          var downEnvVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1",
+          };
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
                 workingDirectory: RootDirectory,
-                environmentVariables: envVars);
+                environmentVariables: downEnvVars);
           downProcess.WaitForExit();
         }
 
@@ -272,7 +280,7 @@ public partial class Build
           ["DOCKER_BUILDKIT"] = "1",
         };
 
-        // Set NEWMAN_BAIL env var if bail is enabled
+        // Set NEWMAN_BAIL env var if bail is enabled (only for the test run, not cleanup)
         if (Bail)
         {
           envVars["NEWMAN_BAIL"] = "true";
@@ -293,6 +301,10 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.Profiles.yml down";
+          var downEnvVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1",
+          };
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
@@ -341,7 +353,7 @@ public partial class Build
           ["DOCKER_BUILDKIT"] = "1",
         };
 
-        // Set NEWMAN_BAIL env var if bail is enabled
+        // Set NEWMAN_BAIL env var if bail is enabled (only for the test run, not cleanup)
         if (Bail)
         {
           envVars["NEWMAN_BAIL"] = "true";
@@ -362,6 +374,10 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.FeedAndArticles.yml down";
+          var downEnvVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1",
+          };
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
@@ -410,7 +426,7 @@ public partial class Build
           ["DOCKER_BUILDKIT"] = "1",
         };
 
-        // Set NEWMAN_BAIL env var if bail is enabled
+        // Set NEWMAN_BAIL env var if bail is enabled (only for the test run, not cleanup)
         if (Bail)
         {
           envVars["NEWMAN_BAIL"] = "true";
@@ -431,6 +447,10 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.Article.yml down";
+          var downEnvVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1",
+          };
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
