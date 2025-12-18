@@ -105,24 +105,7 @@ public partial class Build
 
   internal AbsolutePath LogsTestE2eAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "e2e" / "Server.Web" / "Audit.NET";
 
-  internal AbsolutePath LogsTestServerPostmanAuthSerilogDirectory => RootDirectory / "Logs" / "Test" / "Postman" / "Auth" / "Server.Web" / "Serilog";
+  internal AbsolutePath LogsTestServerPostman => RootDirectory / "Logs" / "Test" / "Postman";
 
-  internal AbsolutePath LogsTestServerPostmanAuthAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "Postman" / "Auth" / "Server.Web" / "Audit.NET";
-
-  internal AbsolutePath LogsTestServerPostmanArticlesEmptySerilogDirectory => RootDirectory / "Logs" / "Test" / "Postman" / "ArticlesEmpty" / "Server.Web" / "Serilog";
-
-  internal AbsolutePath LogsTestServerPostmanArticlesEmptyAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "Postman" / "ArticlesEmpty" / "Server.Web" / "Audit.NET";
-
-  internal AbsolutePath LogsTestServerPostmanArticleSerilogDirectory => RootDirectory / "Logs" / "Test" / "Postman" / "Article" / "Server.Web" / "Serilog";
-
-  internal AbsolutePath LogsTestServerPostmanArticleAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "Postman" / "Article" / "Server.Web" / "Audit.NET";
-
-  internal AbsolutePath LogsTestServerPostmanFeedAndArticlesSerilogDirectory => RootDirectory / "Logs" / "Test" / "Postman" / "FeedAndArticles" / "Server.Web" / "Serilog";
-
-  internal AbsolutePath LogsTestServerPostmanFeedAndArticlesAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "Postman" / "FeedAndArticles" / "Server.Web" / "Audit.NET";
-
-  internal AbsolutePath LogsTestServerPostmanProfilesSerilogDirectory => RootDirectory / "Logs" / "Test" / "Postman" / "Profiles" / "Server.Web" / "Serilog";
-
-  internal AbsolutePath LogsTestServerPostmanProfilesAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "Postman" / "Profiles" / "Server.Web" / "Audit.NET";
   #endregion
 }

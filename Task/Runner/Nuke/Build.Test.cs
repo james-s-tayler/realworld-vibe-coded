@@ -257,7 +257,7 @@ public partial class Build
     int exitCode = 0;
     try
     {
-      var args = $"compose -f Test/Postman/docker-compose.{collectionName}.yml up --build --abort-on-container-exit";
+      var args = $"compose -f Test/Postman/docker-compose.yml -f Test/Postman/docker-compose.{collectionName}.yml up --build --abort-on-container-exit";
       var process = ProcessTasks.StartProcess(
             "docker",
             args,
@@ -268,7 +268,7 @@ public partial class Build
     }
     finally
     {
-      var downArgs = $"compose -f Test/Postman/docker-compose.{collectionName}.yml down";
+      var downArgs = $"compose -f Test/Postman/docker-compose.yml -f Test/Postman/docker-compose.{collectionName}.yml down";
       var downEnvVars = new Dictionary<string, string>
       {
         ["DOCKER_BUILDKIT"] = "1",
@@ -282,7 +282,7 @@ public partial class Build
     }
 
     // Generate markdown report and summary from Newman JSON report
-    var newmanReportFile = ReportsTestPostmanDirectory / collectionName / "newman-report.json";
+    var newmanReportFile = ReportsTestPostmanDirectory / collectionName / "Results" / "newman-report.json";
     var reportFile = ReportsTestPostmanDirectory / collectionName / "Artifacts" / "Report.md";
     var reportSummaryFile = ReportsTestPostmanDirectory / collectionName / "Artifacts" / "ReportSummary.md";
 
@@ -301,7 +301,7 @@ public partial class Build
     // Explicitly fail the target if Docker Compose failed
     if (exitCode != 0)
     {
-      var debugInstructions = $"For a high-level summary of specific failures, see Reports/Test/Postman/{collectionName}/Artifacts/ReportSummary.md. Then view logs in Logs/Server.Web/Serilog to diagnose specific failures.";
+      var debugInstructions = $"For a high-level summary of specific failures, see Reports/Test/Postman/{collectionName}/Artifacts/ReportSummary.md. Then view logs in Logs/Test/Postman/{collectionName}/Server.Web/Serilog to diagnose specific failures.";
       Log.Error("Docker Compose exited with code: {ExitCode}", exitCode);
       Log.Error("Test failed. {DebugInstructions}", debugInstructions);
       throw new Exception($"Postman {collectionName} tests failed with exit code: {exitCode}. {debugInstructions}");
