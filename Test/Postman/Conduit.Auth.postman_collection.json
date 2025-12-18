@@ -1180,7 +1180,7 @@
           "// Note: Headers must be added to each request manually or via collection/folder headers",
           "// pm.request.headers.add() does not work reliably in collection-level scripts with Newman",
           "",
-          "const utils = {",
+          "utils = {",
           "    assertErrorStartsWith: function(fieldName, pm) {",
           "        const response = pm.response.json();",
           "        // Handle ProblemDetails format: errors is an array of {name, reason}",
