@@ -529,7 +529,7 @@ jobs:
         with:
           name: postman-test-reports-${{ matrix.collection }}${{ matrix.bail && '-bail' || '' }}
           path: |
-            Reports/Test/Postman/${{ matrix.report_dir }}/newman-report.json
+            Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts
           retention-days: 7
 
       - name: Upload Logs
@@ -541,38 +541,23 @@ jobs:
             Logs/
           retention-days: 7
 
-      - name: Parse test results and create PR comment
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Append full report link to ReportSummary.md
         if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        run: |
+          echo "" >> Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts/ReportSummary.md
+          echo "---" >> Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts/ReportSummary.md
+          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts/ReportSummary.md
+
+      - name: Comment test results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          script: |
-            const { parseNewmanReport } = require('./.github/scripts/newman-report-parser.js');
-            const { createOrUpdateStickyComment } = require('./.github/scripts/sticky-comment.js');
-
-            try {
-              const collectionName = '${{ matrix.collection }}';
-              const reportDir = '${{ matrix.report_dir }}';
-              const withBail = ${{ matrix.bail }};
-              const reportPath = `Reports/Test/Postman/${reportDir}/newman-report.json`;
-              const commentBody = parseNewmanReport(reportPath, context, `(${collectionName})`, withBail);
-
-              if (!commentBody) {
-                console.log('No comment body generated, skipping PR comment');
-                return;
-              }
-
-              // Use sticky comment with unique header per collection and bail status
-              const headerSuffix = withBail ? '-bail' : '';
-              await createOrUpdateStickyComment(
-                github,
-                context,
-                `postman-test-${collectionName}${headerSuffix}`,
-                commentBody
-              );
-
-            } catch (error) {
-              console.error('Error creating/updating PR comment:', error);
-            }
+          header: postman-test-${{ matrix.collection }}${{ matrix.bail && '-bail' || '' }}
+          path: Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts/ReportSummary.md
 
       - name: Fail job if tests failed
         if: steps.postman_tests.outputs.exit_code != '0'

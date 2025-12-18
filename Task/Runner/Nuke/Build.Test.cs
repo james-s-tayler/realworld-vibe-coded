@@ -167,19 +167,20 @@ public partial class Build
           downProcess.WaitForExit();
         }
 
-        // Generate markdown report summary from Newman JSON report
+        // Generate markdown report and summary from Newman JSON report
         var newmanReportFile = ReportsTestPostmanDirectory / "ArticlesEmpty" / "newman-report.json";
+        var reportFile = ReportsTestPostmanDirectory / "ArticlesEmpty" / "Artifacts" / "Report.md";
         var reportSummaryFile = ReportsTestPostmanDirectory / "ArticlesEmpty" / "Artifacts" / "ReportSummary.md";
 
         if (newmanReportFile.FileExists())
         {
           try
           {
-            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+            GenerateNewmanReport(newmanReportFile, reportFile, reportSummaryFile);
           }
           catch (Exception ex)
           {
-            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+            Log.Warning("Failed to generate Newman report: {Message}", ex.Message);
           }
         }
 
@@ -240,19 +241,20 @@ public partial class Build
           downProcess.WaitForExit();
         }
 
-        // Generate markdown report summary from Newman JSON report
+        // Generate markdown report and summary from Newman JSON report
         var newmanReportFile = ReportsTestPostmanDirectory / "Auth" / "newman-report.json";
+        var reportFile = ReportsTestPostmanDirectory / "Auth" / "Artifacts" / "Report.md";
         var reportSummaryFile = ReportsTestPostmanDirectory / "Auth" / "Artifacts" / "ReportSummary.md";
 
         if (newmanReportFile.FileExists())
         {
           try
           {
-            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+            GenerateNewmanReport(newmanReportFile, reportFile, reportSummaryFile);
           }
           catch (Exception ex)
           {
-            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+            Log.Warning("Failed to generate Newman report: {Message}", ex.Message);
           }
         }
 
@@ -313,19 +315,20 @@ public partial class Build
           downProcess.WaitForExit();
         }
 
-        // Generate markdown report summary from Newman JSON report
+        // Generate markdown report and summary from Newman JSON report
         var newmanReportFile = ReportsTestPostmanDirectory / "Profiles" / "newman-report.json";
+        var reportFile = ReportsTestPostmanDirectory / "Profiles" / "Artifacts" / "Report.md";
         var reportSummaryFile = ReportsTestPostmanDirectory / "Profiles" / "Artifacts" / "ReportSummary.md";
 
         if (newmanReportFile.FileExists())
         {
           try
           {
-            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+            GenerateNewmanReport(newmanReportFile, reportFile, reportSummaryFile);
           }
           catch (Exception ex)
           {
-            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+            Log.Warning("Failed to generate Newman report: {Message}", ex.Message);
           }
         }
 
@@ -386,19 +389,20 @@ public partial class Build
           downProcess.WaitForExit();
         }
 
-        // Generate markdown report summary from Newman JSON report
+        // Generate markdown report and summary from Newman JSON report
         var newmanReportFile = ReportsTestPostmanDirectory / "FeedAndArticles" / "newman-report.json";
+        var reportFile = ReportsTestPostmanDirectory / "FeedAndArticles" / "Artifacts" / "Report.md";
         var reportSummaryFile = ReportsTestPostmanDirectory / "FeedAndArticles" / "Artifacts" / "ReportSummary.md";
 
         if (newmanReportFile.FileExists())
         {
           try
           {
-            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+            GenerateNewmanReport(newmanReportFile, reportFile, reportSummaryFile);
           }
           catch (Exception ex)
           {
-            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+            Log.Warning("Failed to generate Newman report: {Message}", ex.Message);
           }
         }
 
@@ -459,19 +463,20 @@ public partial class Build
           downProcess.WaitForExit();
         }
 
-        // Generate markdown report summary from Newman JSON report
+        // Generate markdown report and summary from Newman JSON report
         var newmanReportFile = ReportsTestPostmanDirectory / "Article" / "newman-report.json";
+        var reportFile = ReportsTestPostmanDirectory / "Article" / "Artifacts" / "Report.md";
         var reportSummaryFile = ReportsTestPostmanDirectory / "Article" / "Artifacts" / "ReportSummary.md";
 
         if (newmanReportFile.FileExists())
         {
           try
           {
-            GenerateNewmanReportSummary(newmanReportFile, reportSummaryFile);
+            GenerateNewmanReport(newmanReportFile, reportFile, reportSummaryFile);
           }
           catch (Exception ex)
           {
-            Log.Warning("Failed to generate Newman report summary: {Message}", ex.Message);
+            Log.Warning("Failed to generate Newman report: {Message}", ex.Message);
           }
         }
 
@@ -593,11 +598,11 @@ public partial class Build
   }
 
   /// <summary>
-  /// Generates a markdown report summary from a Newman JSON report.
-  /// This provides a human-readable summary of test results including
-  /// test statistics and failure details.
+  /// Generates both full report and summary markdown files from a Newman JSON report.
+  /// The full report includes detailed test results for all executions.
+  /// The summary is a condensed version with just high-level stats and failures.
   /// </summary>
-  private void GenerateNewmanReportSummary(AbsolutePath newmanReportFile, AbsolutePath summaryFile)
+  private void GenerateNewmanReport(AbsolutePath newmanReportFile, AbsolutePath reportFile, AbsolutePath summaryFile)
   {
     if (!newmanReportFile.FileExists())
     {
@@ -606,6 +611,7 @@ public partial class Build
     }
 
     // Ensure the Artifacts directory exists
+    reportFile.Parent.CreateDirectory();
     summaryFile.Parent.CreateDirectory();
 
     var jsonContent = newmanReportFile.ReadAllText();
@@ -640,6 +646,7 @@ public partial class Build
     var statusIcon = failedTests == 0 ? "✅" : "❌";
     var statusText = failedTests == 0 ? "PASSED" : "FAILED";
 
+    // Generate the summary (header + stats + failures)
     var summaryLines = new List<string>
     {
       $"## {statusIcon} Postman API Tests {statusText}",
@@ -678,7 +685,91 @@ public partial class Build
       summaryLines.Add("**🎉 All tests passed!**");
     }
 
+    // Write summary file
     summaryFile.WriteAllLines(summaryLines);
     Log.Information("Generated Newman report summary to: {SummaryFile}", summaryFile);
+
+    // Generate full report with detailed execution information
+    var reportLines = new List<string>(summaryLines);
+    reportLines.Add(string.Empty);
+    reportLines.Add("---");
+    reportLines.Add(string.Empty);
+
+    // Add detailed execution information
+    if (run.TryGetProperty("executions", out var executions) && executions.GetArrayLength() > 0)
+    {
+      reportLines.Add("## 📋 Detailed Test Results");
+      reportLines.Add(string.Empty);
+
+      foreach (var execution in executions.EnumerateArray())
+      {
+        if (execution.TryGetProperty("item", out var item) && item.TryGetProperty("name", out var itemName))
+        {
+          var name = itemName.GetString() ?? "Unknown";
+          reportLines.Add($"### {name}");
+          reportLines.Add(string.Empty);
+
+          // Add request information
+          if (execution.TryGetProperty("request", out var request))
+          {
+            if (request.TryGetProperty("method", out var method) && request.TryGetProperty("url", out var url))
+            {
+              var methodStr = method.GetString() ?? "?";
+              var urlStr = url.ValueKind == JsonValueKind.String
+                ? url.GetString()
+                : (url.TryGetProperty("raw", out var rawUrl) ? rawUrl.GetString() : "Unknown");
+              reportLines.Add($"**Request**: `{methodStr} {urlStr}`");
+              reportLines.Add(string.Empty);
+            }
+          }
+
+          // Add response information
+          if (execution.TryGetProperty("response", out var response))
+          {
+            if (response.TryGetProperty("code", out var code) && response.TryGetProperty("status", out var status))
+            {
+              var codeInt = code.GetInt32();
+              var statusStr = status.GetString() ?? "?";
+              reportLines.Add($"**Response**: {codeInt} {statusStr}");
+              reportLines.Add(string.Empty);
+            }
+          }
+
+          // Add assertions
+          if (execution.TryGetProperty("assertions", out var executionAssertions) && executionAssertions.GetArrayLength() > 0)
+          {
+            reportLines.Add("**Assertions**:");
+            foreach (var assertion in executionAssertions.EnumerateArray())
+            {
+              var assertionName = assertion.TryGetProperty("assertion", out var aName) ? aName.GetString() : "Unknown";
+              var skipped = assertion.TryGetProperty("skipped", out var skip) && skip.GetBoolean();
+
+              if (skipped)
+              {
+                reportLines.Add($"- ⊘ {assertionName} (skipped)");
+              }
+              else if (assertion.TryGetProperty("error", out var assertionError) && assertionError.ValueKind != JsonValueKind.Null && assertionError.ValueKind != JsonValueKind.Undefined)
+              {
+                var errorMsg = assertionError.TryGetProperty("message", out var msg) ? msg.GetString() : "Unknown error";
+                reportLines.Add($"- ❌ {assertionName}: {errorMsg}");
+              }
+              else
+              {
+                reportLines.Add($"- ✅ {assertionName}");
+              }
+            }
+
+            reportLines.Add(string.Empty);
+          }
+
+          reportLines.Add("---");
+          reportLines.Add(string.Empty);
+        }
+      }
+    }
+
+    // Write full report file
+    reportFile.WriteAllLines(reportLines);
+    Log.Information("Generated full Newman report to: {ReportFile}", reportFile);
   }
 }
