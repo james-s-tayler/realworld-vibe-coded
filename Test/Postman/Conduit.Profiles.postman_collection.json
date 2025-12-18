@@ -1088,7 +1088,7 @@
         "exec": [
           "// Monkey-patch pm.test to prepend correlation ID",
           "if (!pm.collectionVariables.get('pmTestPatched')) {",
-          "    const originalTest = pm.test.bind({});",
+          "    const originalTest = pm.test;",
           "    pm.test = function(testName, testFunction) {",
           "        const correlationId = pm.collectionVariables.get('correlationId') || 'unknown';",
           "        const prefixedName = `[${correlationId}] ${testName}`;",
