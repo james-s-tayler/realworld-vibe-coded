@@ -15,6 +15,9 @@ public partial class Build
   [Parameter("Toggle special behavior for CI environment")]
   internal readonly bool SkipPublish;
 
+  [Parameter("Stop on first test failure (for Postman tests)")]
+  internal readonly bool Bail;
+
   internal Target TestServer => _ => _
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
@@ -129,6 +132,7 @@ public partial class Build
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
+          ["NEWMAN_BAIL"] = Bail ? "true" : "false",
         };
 
         int exitCode = 0;
@@ -192,6 +196,7 @@ public partial class Build
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
+          ["NEWMAN_BAIL"] = Bail ? "true" : "false",
         };
 
         int exitCode = 0;
@@ -255,6 +260,7 @@ public partial class Build
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
+          ["NEWMAN_BAIL"] = Bail ? "true" : "false",
         };
 
         int exitCode = 0;
@@ -318,6 +324,7 @@ public partial class Build
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
+          ["NEWMAN_BAIL"] = Bail ? "true" : "false",
         };
 
         int exitCode = 0;
@@ -381,6 +388,7 @@ public partial class Build
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
+          ["NEWMAN_BAIL"] = Bail ? "true" : "false",
         };
 
         int exitCode = 0;

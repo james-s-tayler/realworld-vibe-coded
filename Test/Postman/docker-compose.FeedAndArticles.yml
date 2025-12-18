@@ -51,7 +51,12 @@ services:
       - USERNAME=soloyolo
       - EMAIL=soloyolo@mail.com
       - PASSWORD=password123
+      - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
     entrypoint: >
       sh -c '
-      newman run /etc/newman/Conduit.FeedAndArticles.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/FeedAndArticles/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD"
+      BAIL_FLAG="";
+      if [ "$$NEWMAN_BAIL" = "true" ]; then
+        BAIL_FLAG="--bail";
+      fi;
+      newman run /etc/newman/Conduit.FeedAndArticles.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/FeedAndArticles/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD" $$BAIL_FLAG
       '

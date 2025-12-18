@@ -25,6 +25,8 @@ public class RegisterValidator : Validator<RegisterRequest>
       .MaximumLength(User.UsernameMaxLength)
       .When(x => !string.IsNullOrEmpty(x.User.Username))
       .WithMessage($"cannot exceed {User.UsernameMaxLength} characters.")
+      .Must(username => !username?.Contains("solo", StringComparison.OrdinalIgnoreCase) ?? true)
+      .WithMessage("cannot contain 'solo' (temporary validation for testing --bail)")
       .OverridePropertyName("username");
 
     RuleFor(x => x.User.Password)

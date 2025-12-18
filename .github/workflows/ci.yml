@@ -457,7 +457,7 @@ jobs:
         run: ./build.sh lint-client-verify
 
   test-server-postman:
-    name: test-server-postman-${{ matrix.collection }}
+    name: test-server-postman-${{ matrix.collection }}${{ matrix.bail && '-bail' || '' }}
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.test_postman == 'true' }}
@@ -467,14 +467,34 @@ jobs:
         include:
           - collection: articles-empty
             report_dir: ArticlesEmpty
+            bail: false
+          - collection: articles-empty
+            report_dir: ArticlesEmpty
+            bail: true
           - collection: auth
             report_dir: Auth
+            bail: false
+          - collection: auth
+            report_dir: Auth
+            bail: true
           - collection: profiles
             report_dir: Profiles
+            bail: false
+          - collection: profiles
+            report_dir: Profiles
+            bail: true
           - collection: feed-and-articles
             report_dir: FeedAndArticles
+            bail: false
+          - collection: feed-and-articles
+            report_dir: FeedAndArticles
+            bail: true
           - collection: article
             report_dir: Article
+            bail: false
+          - collection: article
+            report_dir: Article
+            bail: true
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -498,7 +518,7 @@ jobs:
         id: postman_tests
         run: |
           set +e  # Don't exit on error
-          ./build.sh test-server-postman-${{ matrix.collection }}
+          ./build.sh test-server-postman-${{ matrix.collection }} ${{ matrix.bail && '--bail true' || '' }}
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
@@ -507,9 +527,18 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()  # Upload even if tests failed
         with:
-          name: postman-test-reports-${{ matrix.collection }}
+          name: postman-test-reports-${{ matrix.collection }}${{ matrix.bail && '-bail' || '' }}
           path: |
             Reports/Test/Postman/${{ matrix.report_dir }}/newman-report.json
+          retention-days: 7
+
+      - name: Upload Logs
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
+        with:
+          name: postman-test-logs-${{ matrix.collection }}${{ matrix.bail && '-bail' || '' }}
+          path: |
+            Logs/
           retention-days: 7
 
       - name: Parse test results and create PR comment
