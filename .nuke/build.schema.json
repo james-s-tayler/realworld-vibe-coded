@@ -138,6 +138,10 @@
   "allOf": [
     {
       "properties": {
+        "Bail": {
+          "type": "boolean",
+          "description": "Stop on first test failure (for Postman tests)"
+        },
         "Force": {
           "type": "boolean",
           "description": "Force operation without confirmation"

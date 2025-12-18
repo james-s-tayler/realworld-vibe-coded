@@ -15,6 +15,9 @@ public partial class Build
   [Parameter("Toggle special behavior for CI environment")]
   internal readonly bool SkipPublish;
 
+  [Parameter("Stop on first test failure (for Postman tests)")]
+  internal readonly bool Bail;
+
   internal Target TestServer => _ => _
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
@@ -124,12 +127,18 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman ArticlesEmpty tests with Docker Compose");
+        Log.Information("Running Postman ArticlesEmpty tests with Docker Compose{BailSuffix}", Bail ? " (with --bail)" : string.Empty);
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
         };
+
+        // Set NEWMAN_BAIL env var if bail is enabled (only for the test run, not cleanup)
+        if (Bail)
+        {
+          envVars["NEWMAN_BAIL"] = "true";
+        }
 
         int exitCode = 0;
         try
@@ -146,11 +155,15 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.ArticlesEmpty.yml down";
+          var downEnvVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1",
+          };
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
                 workingDirectory: RootDirectory,
-                environmentVariables: envVars);
+                environmentVariables: downEnvVars);
           downProcess.WaitForExit();
         }
 
@@ -187,12 +200,18 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman Auth tests with Docker Compose");
+        Log.Information("Running Postman Auth tests with Docker Compose{BailSuffix}", Bail ? " (with --bail)" : string.Empty);
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
         };
+
+        // Set NEWMAN_BAIL env var if bail is enabled (only for the test run, not cleanup)
+        if (Bail)
+        {
+          envVars["NEWMAN_BAIL"] = "true";
+        }
 
         int exitCode = 0;
         try
@@ -209,11 +228,15 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.Auth.yml down";
+          var downEnvVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1",
+          };
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
                 workingDirectory: RootDirectory,
-                environmentVariables: envVars);
+                environmentVariables: downEnvVars);
           downProcess.WaitForExit();
         }
 
@@ -250,12 +273,18 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman Profiles tests with Docker Compose");
+        Log.Information("Running Postman Profiles tests with Docker Compose{BailSuffix}", Bail ? " (with --bail)" : string.Empty);
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
         };
+
+        // Set NEWMAN_BAIL env var if bail is enabled (only for the test run, not cleanup)
+        if (Bail)
+        {
+          envVars["NEWMAN_BAIL"] = "true";
+        }
 
         int exitCode = 0;
         try
@@ -272,6 +301,10 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.Profiles.yml down";
+          var downEnvVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1",
+          };
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
@@ -313,12 +346,18 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman FeedAndArticles tests with Docker Compose");
+        Log.Information("Running Postman FeedAndArticles tests with Docker Compose{BailSuffix}", Bail ? " (with --bail)" : string.Empty);
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
         };
+
+        // Set NEWMAN_BAIL env var if bail is enabled (only for the test run, not cleanup)
+        if (Bail)
+        {
+          envVars["NEWMAN_BAIL"] = "true";
+        }
 
         int exitCode = 0;
         try
@@ -335,6 +374,10 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.FeedAndArticles.yml down";
+          var downEnvVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1",
+          };
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
@@ -376,12 +419,18 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman Article tests with Docker Compose");
+        Log.Information("Running Postman Article tests with Docker Compose{BailSuffix}", Bail ? " (with --bail)" : string.Empty);
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
         };
+
+        // Set NEWMAN_BAIL env var if bail is enabled (only for the test run, not cleanup)
+        if (Bail)
+        {
+          envVars["NEWMAN_BAIL"] = "true";
+        }
 
         int exitCode = 0;
         try
@@ -398,6 +447,10 @@ public partial class Build
         finally
         {
           var downArgs = "compose -f Test/Postman/docker-compose.Article.yml down";
+          var downEnvVars = new Dictionary<string, string>
+          {
+            ["DOCKER_BUILDKIT"] = "1",
+          };
           var downProcess = ProcessTasks.StartProcess(
                 "docker",
                 downArgs,
