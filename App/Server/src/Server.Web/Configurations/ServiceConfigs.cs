@@ -113,6 +113,10 @@ public static class ServiceConfigs
       // User options
       options.User.RequireUniqueEmail = true;
 
+      // Allow email-like usernames (including '@' and '.') for backward compatibility with Postman tests
+      // Also allow '{}' for Postman template variables like {{SECOND_EMAIL}}
+      options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+{}";
+
       // Sign-in options (no email confirmation for now)
       options.SignIn.RequireConfirmedEmail = false;
       options.SignIn.RequireConfirmedPhoneNumber = false;

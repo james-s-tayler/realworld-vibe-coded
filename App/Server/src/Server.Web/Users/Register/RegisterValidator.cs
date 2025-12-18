@@ -20,10 +20,10 @@ public class RegisterValidator : Validator<RegisterRequest>
 
     RuleFor(x => x.User.Username)
       .MinimumLength(User.UsernameMinLength)
-      .When(x => !string.IsNullOrEmpty(x.User.Username))
+      .When(x => !string.IsNullOrWhiteSpace(x.User.Username))
       .WithMessage($"must be at least {User.UsernameMinLength} characters.")
       .MaximumLength(User.UsernameMaxLength)
-      .When(x => !string.IsNullOrEmpty(x.User.Username))
+      .When(x => !string.IsNullOrWhiteSpace(x.User.Username))
       .WithMessage($"cannot exceed {User.UsernameMaxLength} characters.")
       .OverridePropertyName("username");
 

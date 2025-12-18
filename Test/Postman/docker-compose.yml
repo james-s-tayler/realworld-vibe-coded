@@ -47,5 +47,11 @@ services:
       - APIURL=http://api:5000/api
       - USERNAME=soloyolo
       - EMAIL=soloyolo@mail.com
+      - SECOND_EMAIL=yolosolo@mail.com
       - PASSWORD=password123
+      - UPDATED_USERNAME=soloyolo_updated
+      - UPDATED_EMAIL=soloyolo_updated@mail.com
+      - UPDATED_PASSWORD=password456
+      - UPDATED_BIO=I work at statefarm updated
+      - UPDATED_IMAGE=https://example.com/avatar-updated.jpg
       - NEWMAN_BAIL=${NEWMAN_BAIL:-false}

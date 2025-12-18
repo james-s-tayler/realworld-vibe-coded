@@ -13,5 +13,5 @@ services:
       if [ "$$NEWMAN_BAIL" = "true" ]; then
         BAIL_FLAG="--bail";
       fi;
-      newman run /etc/newman/Conduit.FeedAndArticles.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/FeedAndArticles/Results/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "PASSWORD=$$PASSWORD" $$BAIL_FLAG
+      newman run /etc/newman/Conduit.FeedAndArticles.postman_collection.json --delay-request 25 --reporters cli,json --reporter-json-export /Reports/Test/Postman/FeedAndArticles/Results/newman-report.json --global-var "APIURL=$$APIURL" --global-var "USERNAME=$$USERNAME" --global-var "EMAIL=$$EMAIL" --global-var "SECOND_EMAIL=$$SECOND_EMAIL" --global-var "PASSWORD=$$PASSWORD" --global-var "UPDATED_USERNAME=$$UPDATED_USERNAME" --global-var "UPDATED_EMAIL=$$UPDATED_EMAIL" --global-var "UPDATED_PASSWORD=$$UPDATED_PASSWORD" --global-var "UPDATED_BIO=$$UPDATED_BIO" --global-var "UPDATED_IMAGE=$$UPDATED_IMAGE" $$BAIL_FLAG
       '

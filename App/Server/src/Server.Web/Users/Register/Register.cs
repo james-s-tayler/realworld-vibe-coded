@@ -36,7 +36,7 @@ public class Register(IMediator mediator) : Endpoint<RegisterRequest, RegisterRe
     CancellationToken cancellationToken)
   {
     // Default username to email if not provided
-    var username = string.IsNullOrEmpty(request.User.Username)
+    var username = string.IsNullOrWhiteSpace(request.User.Username)
       ? request.User.Email
       : request.User.Username;
 
