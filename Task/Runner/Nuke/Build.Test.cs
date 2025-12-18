@@ -127,13 +127,18 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman ArticlesEmpty tests with Docker Compose");
+        Log.Information("Running Postman ArticlesEmpty tests with Docker Compose{BailSuffix}", Bail ? " (with --bail)" : string.Empty);
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
-          ["NEWMAN_BAIL"] = Bail ? "true" : "false",
         };
+
+        // Set NEWMAN_BAIL env var if bail is enabled
+        if (Bail)
+        {
+          envVars["NEWMAN_BAIL"] = "true";
+        }
 
         int exitCode = 0;
         try
@@ -191,13 +196,18 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman Auth tests with Docker Compose");
+        Log.Information("Running Postman Auth tests with Docker Compose{BailSuffix}", Bail ? " (with --bail)" : string.Empty);
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
-          ["NEWMAN_BAIL"] = Bail ? "true" : "false",
         };
+
+        // Set NEWMAN_BAIL env var if bail is enabled
+        if (Bail)
+        {
+          envVars["NEWMAN_BAIL"] = "true";
+        }
 
         int exitCode = 0;
         try
@@ -255,13 +265,18 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman Profiles tests with Docker Compose");
+        Log.Information("Running Postman Profiles tests with Docker Compose{BailSuffix}", Bail ? " (with --bail)" : string.Empty);
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
-          ["NEWMAN_BAIL"] = Bail ? "true" : "false",
         };
+
+        // Set NEWMAN_BAIL env var if bail is enabled
+        if (Bail)
+        {
+          envVars["NEWMAN_BAIL"] = "true";
+        }
 
         int exitCode = 0;
         try
@@ -319,13 +334,18 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman FeedAndArticles tests with Docker Compose");
+        Log.Information("Running Postman FeedAndArticles tests with Docker Compose{BailSuffix}", Bail ? " (with --bail)" : string.Empty);
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
-          ["NEWMAN_BAIL"] = Bail ? "true" : "false",
         };
+
+        // Set NEWMAN_BAIL env var if bail is enabled
+        if (Bail)
+        {
+          envVars["NEWMAN_BAIL"] = "true";
+        }
 
         int exitCode = 0;
         try
@@ -383,13 +403,18 @@ public partial class Build
       .DependsOn(RunLocalCleanDirectories)
       .Executes(() =>
       {
-        Log.Information("Running Postman Article tests with Docker Compose");
+        Log.Information("Running Postman Article tests with Docker Compose{BailSuffix}", Bail ? " (with --bail)" : string.Empty);
 
         var envVars = new Dictionary<string, string>
         {
           ["DOCKER_BUILDKIT"] = "1",
-          ["NEWMAN_BAIL"] = Bail ? "true" : "false",
         };
+
+        // Set NEWMAN_BAIL env var if bail is enabled
+        if (Bail)
+        {
+          envVars["NEWMAN_BAIL"] = "true";
+        }
 
         int exitCode = 0;
         try
