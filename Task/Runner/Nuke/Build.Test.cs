@@ -418,7 +418,7 @@ public partial class Build
 
         var sourceName = source.ValueKind != JsonValueKind.Undefined && source.TryGetProperty("name", out var name)
           ? name.GetString()
-          : "Unknown";
+          : "Unknown1";
 
         var errorMessage = error.ValueKind != JsonValueKind.Undefined && error.TryGetProperty("message", out var msg)
           ? msg.GetString()
@@ -436,7 +436,10 @@ public partial class Build
         }
         else
         {
-          summaryLines.Add($"• **{sourceName}**: {cleanMessage}");
+          Log.Error("Error while processing newman-report.json no correlationId found for failure: {sourceName}: {cleanMessage}", sourceName, cleanMessage);
+          throw new Exception($"Error while processing newman-report.json no correlationId found for failure - {sourceName}: {cleanMessage}");
+
+          // summaryLines.Add($"• **{sourceName}**: {cleanMessage}");
         }
       }
     }
@@ -465,7 +468,7 @@ public partial class Build
       {
         if (execution.TryGetProperty("item", out var item) && item.TryGetProperty("name", out var itemName))
         {
-          var name = itemName.GetString() ?? "Unknown";
+          var name = itemName.GetString() ?? "Unknown2";
           reportLines.Add($"### {name}");
           reportLines.Add(string.Empty);
 
@@ -477,7 +480,7 @@ public partial class Build
               var methodStr = method.GetString() ?? "?";
               var urlStr = url.ValueKind == JsonValueKind.String
                 ? url.GetString()
-                : (url.TryGetProperty("raw", out var rawUrl) ? rawUrl.GetString() : "Unknown");
+                : (url.TryGetProperty("raw", out var rawUrl) ? rawUrl.GetString() : "Unknown3");
               reportLines.Add($"**Request**: `{methodStr} {urlStr}`");
               reportLines.Add(string.Empty);
             }
@@ -501,12 +504,12 @@ public partial class Build
             reportLines.Add("**Assertions**:");
             foreach (var assertion in executionAssertions.EnumerateArray())
             {
-              var assertionName = assertion.TryGetProperty("assertion", out var aName) ? aName.GetString() : "Unknown";
+              var assertionName = assertion.TryGetProperty("assertion", out var aName) ? aName.GetString() : "Unknown4";
               var skipped = assertion.TryGetProperty("skipped", out var skip) && skip.GetBoolean();
 
               // Extract correlation ID from assertion name if present
               var correlationId = ExtractCorrelationId(assertionName ?? string.Empty);
-              var cleanAssertionName = RemoveCorrelationId(assertionName ?? "Unknown");
+              var cleanAssertionName = RemoveCorrelationId(assertionName ?? "Unknown5");
 
               if (skipped)
               {
