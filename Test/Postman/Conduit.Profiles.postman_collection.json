@@ -1431,7 +1431,7 @@
           "        // Handle ProblemDetails format: errors is an array of {name, reason}",
           "        const errors = response.errors || [];",
           "        const hasFieldError = errors.some(err => err.name === fieldName || err.name.startsWith(fieldName));",
-          "        pm.test(`At least one error for field '${fieldName}'`, function () {",
+          "        pm.testWithCorrelation(`At least one error for field '${fieldName}'`, function () {",
           "            pm.expect(hasFieldError).to.be.true;",
           "        });",
           "    }",

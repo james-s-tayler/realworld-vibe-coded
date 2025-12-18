@@ -426,8 +426,15 @@ public partial class Build
             ? test.GetString()
             : "Unknown error");
 
-        // Extract correlation ID from error message if present (format: [correlation-id] message)
-        var correlationId = ExtractCorrelationId(errorMessage ?? string.Empty);
+        // Try to extract correlation ID from error.test (which contains the assertion name) or error.message
+        var testName = error.ValueKind != JsonValueKind.Undefined && error.TryGetProperty("test", out var errorTest)
+          ? errorTest.GetString()
+          : string.Empty;
+
+        var correlationId = !string.IsNullOrEmpty(testName)
+          ? ExtractCorrelationId(testName)
+          : ExtractCorrelationId(errorMessage ?? string.Empty);
+
         var cleanMessage = RemoveCorrelationId(errorMessage ?? string.Empty);
 
         if (!string.IsNullOrEmpty(correlationId))
@@ -478,9 +485,7 @@ public partial class Build
             if (request.TryGetProperty("method", out var method) && request.TryGetProperty("url", out var url))
             {
               var methodStr = method.GetString() ?? "?";
-              var urlStr = url.ValueKind == JsonValueKind.String
-                ? url.GetString()
-                : (url.TryGetProperty("raw", out var rawUrl) ? rawUrl.GetString() : "Unknown3");
+              var urlStr = ConstructUrlFromObject(url);
               reportLines.Add($"**Request**: `{methodStr} {urlStr}`");
               reportLines.Add(string.Empty);
             }
@@ -572,5 +577,43 @@ public partial class Build
     }
 
     return System.Text.RegularExpressions.Regex.Replace(testName, @"^\[([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\]\s*", string.Empty);
+  }
+
+  /// <summary>
+  /// Constructs a URL string from a Newman URL object
+  /// </summary>
+  private string ConstructUrlFromObject(JsonElement url)
+  {
+    // If it's already a string, return it
+    if (url.ValueKind == JsonValueKind.String)
+    {
+      return url.GetString() ?? "Unknown";
+    }
+
+    // Try to get raw URL first
+    if (url.TryGetProperty("raw", out var rawUrl) && rawUrl.ValueKind == JsonValueKind.String)
+    {
+      return rawUrl.GetString() ?? "Unknown";
+    }
+
+    // Construct URL from components
+    var protocol = url.TryGetProperty("protocol", out var proto) ? proto.GetString() : "http";
+    var host = url.TryGetProperty("host", out var hostArray) && hostArray.ValueKind == JsonValueKind.Array
+      ? string.Join(".", hostArray.EnumerateArray().Select(h => h.GetString() ?? string.Empty))
+      : "unknown";
+    var port = url.TryGetProperty("port", out var portVal) ? portVal.GetString() : string.Empty;
+    var path = url.TryGetProperty("path", out var pathArray) && pathArray.ValueKind == JsonValueKind.Array
+      ? "/" + string.Join("/", pathArray.EnumerateArray().Select(p => p.GetString() ?? string.Empty))
+      : string.Empty;
+
+    var urlStr = $"{protocol}://{host}";
+    if (!string.IsNullOrEmpty(port))
+    {
+      urlStr += $":{port}";
+    }
+
+    urlStr += path;
+
+    return urlStr;
   }
 }
