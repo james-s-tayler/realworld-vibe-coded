@@ -27,7 +27,7 @@ public partial class Build
       ReportsTestE2eDirectory.CreateOrCleanDirectory();
       ReportsTestE2eResultsDirectory.CreateOrCleanDirectory();
       ReportsTestE2eArtifactsDirectory.CreateOrCleanDirectory();
-
+      ReportsTestPostmanDirectory.CreateOrCleanDirectory();
       ReportsTestPostmanArticlesEmptyDirectory.CreateOrCleanDirectory();
       ReportsTestPostmanAuthDirectory.CreateOrCleanDirectory();
       ReportsTestPostmanProfilesDirectory.CreateOrCleanDirectory();
@@ -42,27 +42,6 @@ public partial class Build
       LogsRunLocalPublishSerilogDirectory.CreateOrCleanDirectory();
       LogsTestE2eAuditDotNetDirectory.CreateOrCleanDirectory();
       LogsTestE2eSerilogDirectory.CreateOrCleanDirectory();
-
-      // Create or clean Postman logs/reports
-      var postmanCollections = new List<string>
-      {
-        "Auth",
-        "ArticlesEmpty",
-        "Article",
-        "FeedAndArticles",
-        "Profiles",
-      };
-
-      LogsTestServerPostman.CreateOrCleanDirectory();
-      ReportsTestPostmanDirectory.CreateOrCleanDirectory();
-
-      foreach (var collection in postmanCollections)
-      {
-        (LogsTestServerPostman / collection / "Server.Web" / "Serilog").CreateOrCleanDirectory();
-        (LogsTestServerPostman / collection / "Server.Web" / "Audit.NET").CreateOrCleanDirectory();
-        (ReportsTestPostmanDirectory / collection / "Artifacts").CreateOrCleanDirectory();
-        (ReportsTestPostmanDirectory / collection / "Results").CreateOrCleanDirectory();
-      }
 
       Log.Information("✓ Directories cleaned and pre-created");
     });

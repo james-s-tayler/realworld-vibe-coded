@@ -104,8 +104,5 @@ public partial class Build
   internal AbsolutePath LogsTestE2eSerilogDirectory => RootDirectory / "Logs" / "Test" / "e2e" / "Server.Web" / "Serilog";
 
   internal AbsolutePath LogsTestE2eAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "e2e" / "Server.Web" / "Audit.NET";
-
-  internal AbsolutePath LogsTestServerPostman => RootDirectory / "Logs" / "Test" / "Postman";
-
   #endregion
 }

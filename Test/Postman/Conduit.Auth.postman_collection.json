@@ -12,48 +12,30 @@
           "name": "Register",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "if (!(pm.environment.isIntegrationTest)) {",
                   "    var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "    pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "    pm.test('Response contains \"user\" property', function() {",
                   "        pm.expect(responseJSON).to.have.property('user');",
                   "    });",
                   "",
                   "    var user = responseJSON.user || {};",
                   "",
-                  "    pm.testWithCorrelation('\"email\" property matches EMAIL variable', function() {",
+                  "    pm.test('\"email\" property matches EMAIL variable', function() {",
                   "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.testWithCorrelation('\"usermame\" property matches EMAIL variable', function() {",
+                  "    pm.test('\"usermame\" property matches EMAIL variable', function() {",
                   "        const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL');",
                   "        pm.expect(user.username).to.eql(email);",
                   "    });",
-                  "    pm.testWithCorrelation('User has default \"bio\" property', function() {",
+                  "    pm.test('User has default \"bio\" property', function() {",
                   "        pm.expect(user.bio).to.eql('I work at statefarm');",
                   "    });",
-                  "    pm.testWithCorrelation('User has \"image\" property', function() {",
+                  "    pm.test('User has \"image\" property', function() {",
                   "        pm.expect(user).to.have.property('image');",
                   "        pm.expect(user.image).to.be.null;",
                   "    });",
@@ -87,10 +69,10 @@
                   "            console.log('Token set from login for user:', email);",
                   "        }",
                   "    });",
-                  "    pm.testWithCorrelation('\"token\" property is not empty', function() {",
+                  "    pm.test('\"token\" property is not empty', function() {",
                   "        pm.expect(user.token).to.not.be.empty",
                   "    });",
-                  "    pm.testWithCorrelation('\"token\" property is not same as password', function() {",
+                  "    pm.test('\"token\" property is not same as password', function() {",
                   "    const password = pm.globals.get('PASSWORD') || pm.environment.get('PASSWORD');",
                   "    pm.expect(user.token).to.not.eql(password, 'The password must be hashed, and not stored in plain text');",
                   "    });",
@@ -112,11 +94,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -139,46 +116,38 @@
           "name": "Register (second user)",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "if (!(pm.environment.isIntegrationTest)) {",
                   "    var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "    pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "    pm.test('Response contains \"user\" property', function() {",
                   "        pm.expect(responseJSON).to.have.property('user');",
                   "    });",
                   "",
                   "    var user = responseJSON.user || {};",
                   "",
-                  "    pm.testWithCorrelation('\"email\" property matches SECOND_EMAIL variable', function() {",
+                  "    pm.test('\"email\" property matches SECOND_EMAIL variable', function() {",
                   "        const email = pm.globals.get('SECOND_EMAIL');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.testWithCorrelation('\"usermame\" property matches SECOND_EMAIL variable', function() {",
+                  "    pm.test('\"usermame\" property matches SECOND_EMAIL variable', function() {",
                   "        const email = pm.globals.get('SECOND_EMAIL');",
                   "        pm.expect(user.username).to.eql(email);",
                   "    });",
                   "}",
                   ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set(\"SECOND_EMAIL\", (Math.random() * 1000) + \"@example.com\")"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -195,11 +164,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -222,41 +186,33 @@
           "name": "Register - validation - duplicate email",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "    pm.test('Response is HTTP 400', function() {",
                   "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "    })",
                   "",
                   "    var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "    pm.testWithCorrelation('Response contains \"errors\" property', function() {",
+                  "    pm.test('Response contains \"errors\" property', function() {",
                   "        pm.expect(responseJSON).to.have.property('errors');",
                   "    });",
                   "",
                   "",
                   "    utils.assertErrorStartsWith(\"email\", pm);",
                   "}"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -273,11 +229,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -300,35 +251,17 @@
           "name": "Register - validation - not a valid email",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "    pm.test('Response is HTTP 400', function() {",
                   "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "    })",
                   "",
                   "    var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "    pm.testWithCorrelation('Response contains \"errors\" property', function() {",
+                  "    pm.test('Response contains \"errors\" property', function() {",
                   "        pm.expect(responseJSON).to.have.property('errors');",
                   "    });",
                   "",
@@ -351,11 +284,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -378,35 +306,17 @@
           "name": "Register - validation - missing required fields",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "    pm.test('Response is HTTP 400', function() {",
                   "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "    })",
                   "",
                   "    var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "    pm.testWithCorrelation('Response contains \"errors\" property', function() {",
+                  "    pm.test('Response contains \"errors\" property', function() {",
                   "        pm.expect(responseJSON).to.have.property('errors');",
                   "    });",
                   "",
@@ -430,11 +340,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -457,35 +362,17 @@
           "name": "Register - validation - required fields blank",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "if (!(pm.environment.isIntegrationTest)) {",
-                  "    pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "    pm.test('Response is HTTP 400', function() {",
                   "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "    })",
                   "",
                   "    var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "    pm.testWithCorrelation('Response contains \"errors\" property', function() {",
+                  "    pm.test('Response contains \"errors\" property', function() {",
                   "        pm.expect(responseJSON).to.have.property('errors');",
                   "    });",
                   "",
@@ -509,11 +396,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -536,50 +418,32 @@
           "name": "Login",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "pm.test('Response contains \"user\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('user')",
                   "});",
                   "",
                   "var user = responseJSON.user || {};",
                   "",
-                  "pm.testWithCorrelation('user.email matches the EMAIL variable', function() {",
+                  "pm.test('user.email matches the EMAIL variable', function() {",
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.email).to.eql(email)",
                   "});",
-                  "pm.testWithCorrelation('user.usermame matches EMAIL variable', function() {",
+                  "pm.test('user.usermame matches EMAIL variable', function() {",
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.username).to.eql(email)",
                   "});",
-                  "pm.testWithCorrelation('User has \"bio\" property', function() {",
+                  "pm.test('User has \"bio\" property', function() {",
                   "    pm.expect(user).to.have.property('bio')",
                   "});",
-                  "pm.testWithCorrelation('User has \"image\" property', function() {",
+                  "pm.test('User has \"image\" property', function() {",
                   "    pm.expect(user).to.have.property('image')",
                   "});",
-                  "pm.testWithCorrelation('User has \"token\" property', function() {",
+                  "pm.test('User has \"token\" property', function() {",
                   "    pm.expect(user).to.have.property('token')",
                   "});",
                   ""
@@ -599,11 +463,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -627,28 +486,10 @@
           "name": "Login Failed - error - user not found",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 401', function() {",
+                  "pm.test('Response is HTTP 401', function() {",
                   "    pm.expect(pm.response.status).to.eql('Unauthorized')",
                   "})"
                 ],
@@ -667,11 +508,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -695,28 +531,10 @@
           "name": "Login Failed - error - incorrect password",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 401', function() {",
+                  "pm.test('Response is HTTP 401', function() {",
                   "    pm.expect(pm.response.status).to.eql('Unauthorized')",
                   "})"
                 ],
@@ -735,11 +553,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -763,60 +576,52 @@
           "name": "Login and Remember Token",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "pm.test('Response contains \"user\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('user')",
                   "});",
                   "",
                   "var user = responseJSON.user || {};",
                   "",
-                  "pm.testWithCorrelation('user.email matches the EMAIL variable', function() {",
+                  "pm.test('user.email matches the EMAIL variable', function() {",
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.email).to.eql(email)",
                   "});",
-                  "pm.testWithCorrelation('user.usermame matches EMAIL variable', function() {",
+                  "pm.test('user.usermame matches EMAIL variable', function() {",
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.username).to.eql(email)",
                   "});",
-                  "pm.testWithCorrelation('User has \"bio\" property', function() {",
+                  "pm.test('User has \"bio\" property', function() {",
                   "    pm.expect(user).to.have.property('bio')",
                   "});",
-                  "pm.testWithCorrelation('User has \"image\" property', function() {",
+                  "pm.test('User has \"image\" property', function() {",
                   "    pm.expect(user).to.have.property('image')",
                   "});",
-                  "pm.testWithCorrelation('User has \"token\" property', function() {",
+                  "pm.test('User has \"token\" property', function() {",
                   "    pm.expect(user).to.have.property('token')",
                   "});",
                   "",
-                  "if(pm.testWithCorrelation('User has \"token\" property')){",
+                  "if(pm.test('User has \"token\" property')){",
                   "    pm.globals.set('token', user.token);",
                   "}",
                   "",
-                  "pm.testWithCorrelation('Global variable \"token\" has been set', function() {",
+                  "pm.test('Global variable \"token\" has been set', function() {",
                   "    pm.globals.get('token') === user.token",
                   "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -834,11 +639,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -862,52 +662,44 @@
           "name": "Current User",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "pm.test('Response contains \"user\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('user')",
                   "});",
                   "",
                   "var user = responseJSON.user || {};",
                   "",
-                  "pm.testWithCorrelation('user.email matches the EMAIL variable', function() {",
+                  "pm.test('user.email matches the EMAIL variable', function() {",
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.email).to.eql(email)",
                   "});",
-                  "pm.testWithCorrelation('user.usermame matches EMAIL variable', function() {",
+                  "pm.test('user.usermame matches EMAIL variable', function() {",
                   "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
                   "    pm.expect(user.username).to.eql(email)",
                   "});",
-                  "pm.testWithCorrelation('User has \"bio\" property', function() {",
+                  "pm.test('User has \"bio\" property', function() {",
                   "    pm.expect(user).to.have.property('bio')",
                   "});",
-                  "pm.testWithCorrelation('User has \"image\" property', function() {",
+                  "pm.test('User has \"image\" property', function() {",
                   "    pm.expect(user).to.have.property('image')",
                   "});",
-                  "pm.testWithCorrelation('User has \"token\" property that matches the token in the Authorization header', function() {",
+                  "pm.test('User has \"token\" property that matches the token in the Authorization header', function() {",
                   "    pm.expect(user.token).to.eql(pm.globals.get('token'))",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -924,11 +716,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -947,28 +734,10 @@
           "name": "Current User - error - unauthenticated, missing authorization header",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 401', function() {",
+                  "pm.test('Response is HTTP 401', function() {",
                   "    pm.expect(pm.response.status).to.eql('Unauthorized')",
                   "})"
                 ],
@@ -988,11 +757,6 @@
                 "key": "Authorization",
                 "value": "Token {{token}}",
                 "disabled": true
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -1011,28 +775,10 @@
           "name": "Current User - error - unauthenticated, invalid token",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 401', function() {",
+                  "pm.test('Response is HTTP 401', function() {",
                   "    pm.expect(pm.response.status).to.eql('Unauthorized')",
                   "})"
                 ],
@@ -1051,11 +797,6 @@
               {
                 "key": "Authorization",
                 "value": "Token 123"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -1074,52 +815,49 @@
           "name": "Update User",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "pm.test('Response contains \"user\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('user')",
                   "});",
                   "",
                   "var user = responseJSON.user || {};",
                   "",
-                  "pm.testWithCorrelation('\"email\" matches the UPDATED_EMAIL variable', function() {",
+                  "pm.test('\"email\" matches the UPDATED_EMAIL variable', function() {",
                   "    const email = pm.globals.get('UPDATED_EMAIL')",
                   "    pm.expect(user.email).to.eql(email)",
                   "});",
-                  "pm.testWithCorrelation('\"username\" matches UPDATED_USERNAME variable', function() {",
+                  "pm.test('\"username\" matches UPDATED_USERNAME variable', function() {",
                   "    const username = pm.globals.get('UPDATED_USERNAME')",
                   "    pm.expect(user.username).to.eql(username)",
                   "});",
-                  "pm.testWithCorrelation('\"bio\" matches the UPDATED_BIO variable', function() {",
+                  "pm.test('\"bio\" matches the UPDATED_BIO variable', function() {",
                   "    pm.expect(user.bio).to.eql(pm.globals.get('UPDATED_BIO'))",
                   "});",
-                  "pm.testWithCorrelation('\"image\" matches the UPDATED_IMAGE variable', function() {",
+                  "pm.test('\"image\" matches the UPDATED_IMAGE variable', function() {",
                   "    pm.expect(user.image).to.eql(pm.globals.get('UPDATED_IMAGE'))",
                   "});",
-                  "pm.testWithCorrelation('User has \"token\" property', function() {",
+                  "pm.test('User has \"token\" property', function() {",
                   "    pm.expect(user).to.have.property('token')",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
+                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
+                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
+                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
+                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1140,11 +878,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1167,34 +900,16 @@
           "name": "Update User - validation - provided fields blank",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "pm.test('Response is HTTP 400', function() {",
                   "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
-                  "pm.testWithCorrelation('Response contains \"errors\" property', function() {",
+                  "pm.test('Response contains \"errors\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('errors');",
                   "});",
                   "",
@@ -1202,6 +917,21 @@
                   "utils.assertErrorStartsWith(\"username\", pm);",
                   "utils.assertErrorStartsWith(\"email\", pm);",
                   "utils.assertErrorStartsWith(\"bio\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
+                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
+                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
+                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
+                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1222,11 +952,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1249,39 +974,36 @@
           "name": "Update User - validation - duplicate email",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "pm.test('Response is HTTP 400', function() {",
                   "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
-                  "pm.testWithCorrelation('Response contains \"errors\" property', function() {",
+                  "pm.test('Response contains \"errors\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('errors');",
                   "});",
                   "",
                   "",
                   "utils.assertErrorStartsWith(\"email\", pm);",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
+                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
+                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
+                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
+                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
                   ""
                 ],
                 "type": "text/javascript",
@@ -1303,11 +1025,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1330,39 +1047,36 @@
           "name": "Update User - validation - duplicate username",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "pm.test('Response is HTTP 400', function() {",
                   "        pm.expect(pm.response.status).to.eql('Bad Request')",
                   "})",
                   "",
-                  "pm.testWithCorrelation('Response contains \"errors\" property', function() {",
+                  "pm.test('Response contains \"errors\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('errors');",
                   "});",
                   "",
                   "",
                   "utils.assertErrorStartsWith(\"username\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('UPDATED_USERNAME', (Math.random() * 1000) + 'user')",
+                  "pm.globals.set('UPDATED_EMAIL', (Math.random() * 1000) + '@example.com')",
+                  "pm.globals.set('UPDATED_PASSWORD', 'password' + (Math.random() * 1000))",
+                  "pm.globals.set('UPDATED_BIO', 'I no longer work at statefarm')",
+                  "pm.globals.set('UPDATED_IMAGE', 'https://i.stack.imgur.com/xHWG8.jpg')",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1383,11 +1097,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1410,28 +1119,10 @@
           "name": "Update User - error - unauthenticated",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 401', function() {",
+                  "pm.test('Response is HTTP 401', function() {",
                   "    pm.expect(pm.response.status).to.eql('Unauthorized')",
                   "})"
                 ],
@@ -1455,11 +1146,6 @@
                 "key": "Authorization",
                 "value": "Token {{token}}",
                 "disabled": true
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1494,7 +1180,7 @@
           "        // Handle ProblemDetails format: errors is an array of {name, reason}",
           "        const errors = response.errors || [];",
           "        const hasFieldError = errors.some(err => err.name === fieldName || err.name.startsWith(fieldName));",
-          "        pm.testWithCorrelation(`At least one error for field '${fieldName}'`, function () {",
+          "        pm.test(`At least one error for field '${fieldName}'`, function () {",
           "            pm.expect(hasFieldError).to.be.true;",
           "        });",
           "    }",

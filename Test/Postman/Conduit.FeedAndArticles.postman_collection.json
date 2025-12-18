@@ -12,45 +12,37 @@
           "name": "Register Feed User - setup",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "if (!(pm.environment.isIntegrationTest)) {",
                   "    var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "    pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "    pm.test('Response contains \"user\" property', function() {",
                   "        pm.expect(responseJSON).to.have.property('user');",
                   "    });",
                   "",
                   "    var user = responseJSON.user || {};",
                   "",
-                  "    pm.testWithCorrelation('\"email\" property matches FEED_USER_EMAIL variable', function() {",
+                  "    pm.test('\"email\" property matches FEED_USER_EMAIL variable', function() {",
                   "        const email = pm.globals.get('FEED_USER_EMAIL');",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.testWithCorrelation('\"username\" property matches email', function() {",
+                  "    pm.test('\"username\" property matches email', function() {",
                   "        pm.expect(user.username).to.eql(user.email);",
                   "    });",
                   "}",
                   ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set(\"FEED_USER_EMAIL\", (Math.random() * 1000) + \"@example.com\")"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -67,11 +59,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -94,44 +81,36 @@
           "name": "Register Feed User 2 - setup",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "if (!(pm.environment.isIntegrationTest)) {",
                   "    var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "    pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "    pm.test('Response contains \"user\" property', function() {",
                   "        pm.expect(responseJSON).to.have.property('user');",
                   "    });",
                   "",
                   "    var user = responseJSON.user || {};",
                   "",
-                  "    pm.testWithCorrelation('\"email\" property matches FEED_USER_EMAIL variable', function() {",
+                  "    pm.test('\"email\" property matches FEED_USER_EMAIL variable', function() {",
                   "        const email = pm.globals.get('FEED_USER_EMAIL')+2;",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.testWithCorrelation('\"username\" property matches email', function() {",
+                  "    pm.test('\"username\" property matches email', function() {",
                   "        pm.expect(user.username).to.eql(user.email);",
                   "    });",
                   "}",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -149,11 +128,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -176,44 +150,36 @@
           "name": "Register Feed User 3 - setup",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "if (!(pm.environment.isIntegrationTest)) {",
                   "    var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "    pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "    pm.test('Response contains \"user\" property', function() {",
                   "        pm.expect(responseJSON).to.have.property('user');",
                   "    });",
                   "",
                   "    var user = responseJSON.user || {};",
                   "",
-                  "    pm.testWithCorrelation('\"email\" property matches FEED_USER_EMAIL variable', function() {",
+                  "    pm.test('\"email\" property matches FEED_USER_EMAIL variable', function() {",
                   "        const email = pm.globals.get('FEED_USER_EMAIL')+3;",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.testWithCorrelation('\"username\" property matches email', function() {",
+                  "    pm.test('\"username\" property matches email', function() {",
                   "        pm.expect(user.username).to.eql(user.email);",
                   "    });",
                   "}",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -231,11 +197,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -258,44 +219,36 @@
           "name": "Register Feed User 4 - setup",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "if (!(pm.environment.isIntegrationTest)) {",
                   "    var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "    pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "    pm.test('Response contains \"user\" property', function() {",
                   "        pm.expect(responseJSON).to.have.property('user');",
                   "    });",
                   "",
                   "    var user = responseJSON.user || {};",
                   "",
-                  "    pm.testWithCorrelation('\"email\" property matches FEED_USER_EMAIL variable', function() {",
+                  "    pm.test('\"email\" property matches FEED_USER_EMAIL variable', function() {",
                   "        const email = pm.globals.get('FEED_USER_EMAIL')+4;",
                   "        pm.expect(user.email).to.eql(email);",
                   "    });",
-                  "    pm.testWithCorrelation('\"username\" property matches email', function() {",
+                  "    pm.test('\"username\" property matches email', function() {",
                   "        pm.expect(user.username).to.eql(user.email);",
                   "    });",
                   "}",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -313,11 +266,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -340,46 +288,38 @@
           "name": "Login and Remember Token - setup",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "pm.test('Response contains \"user\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('user')",
                   "});",
                   "",
                   "var user = responseJSON.user || {};",
                   "",
-                  "pm.testWithCorrelation('User has \"token\" property', function() {",
+                  "pm.test('User has \"token\" property', function() {",
                   "    pm.expect(user).to.have.property('token')",
                   "});",
                   "",
-                  "if(pm.testWithCorrelation('User has \"token\" property')){",
+                  "if(pm.test('User has \"token\" property')){",
                   "    pm.globals.set('feed_user_token', user.token);",
                   "}",
                   "",
-                  "pm.testWithCorrelation('Global variable \"feed_user_token\" has been set', function() {",
+                  "pm.test('Global variable \"feed_user_token\" has been set', function() {",
                   "    pm.globals.get('feed_user_token') === user.token",
                   "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -397,11 +337,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -425,46 +360,38 @@
           "name": "Login and Remember Token 2 - setup",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "pm.test('Response contains \"user\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('user')",
                   "});",
                   "",
                   "var user = responseJSON.user || {};",
                   "",
-                  "pm.testWithCorrelation('User has \"token\" property', function() {",
+                  "pm.test('User has \"token\" property', function() {",
                   "    pm.expect(user).to.have.property('token')",
                   "});",
                   "",
-                  "if(pm.testWithCorrelation('User has \"token\" property')){",
+                  "if(pm.test('User has \"token\" property')){",
                   "    pm.globals.set('feed_user_token_2', user.token);",
                   "}",
                   "",
-                  "pm.testWithCorrelation('Global variable \"feed_user_token_2\" has been set', function() {",
+                  "pm.test('Global variable \"feed_user_token_2\" has been set', function() {",
                   "    pm.globals.get('feed_user_token_2') === user.token",
                   "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -482,11 +409,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -510,46 +432,38 @@
           "name": "Login and Remember Token 3 - setup",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "pm.test('Response contains \"user\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('user')",
                   "});",
                   "",
                   "var user = responseJSON.user || {};",
                   "",
-                  "pm.testWithCorrelation('User has \"token\" property', function() {",
+                  "pm.test('User has \"token\" property', function() {",
                   "    pm.expect(user).to.have.property('token')",
                   "});",
                   "",
-                  "if(pm.testWithCorrelation('User has \"token\" property')){",
+                  "if(pm.test('User has \"token\" property')){",
                   "    pm.globals.set('feed_user_token_3', user.token);",
                   "}",
                   "",
-                  "pm.testWithCorrelation('Global variable \"feed_user_token_3\" has been set', function() {",
+                  "pm.test('Global variable \"feed_user_token_3\" has been set', function() {",
                   "    pm.globals.get('feed_user_token_3') === user.token",
                   "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -567,11 +481,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -595,46 +504,38 @@
           "name": "Login and Remember Token 4 - setup",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('Response contains \"user\" property', function() {",
+                  "pm.test('Response contains \"user\" property', function() {",
                   "    pm.expect(responseJSON).to.have.property('user')",
                   "});",
                   "",
                   "var user = responseJSON.user || {};",
                   "",
-                  "pm.testWithCorrelation('User has \"token\" property', function() {",
+                  "pm.test('User has \"token\" property', function() {",
                   "    pm.expect(user).to.have.property('token')",
                   "});",
                   "",
-                  "if(pm.testWithCorrelation('User has \"token\" property')){",
+                  "if(pm.test('User has \"token\" property')){",
                   "    pm.globals.set('feed_user_token_4', user.token);",
                   "}",
                   "",
-                  "pm.testWithCorrelation('Global variable \"feed_user_token_4\" has been set', function() {",
+                  "pm.test('Global variable \"feed_user_token_4\" has been set', function() {",
                   "    pm.globals.get('feed_user_token_4') === user.token",
                   "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -652,11 +553,6 @@
               {
                 "key": "X-Requested-With",
                 "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -680,28 +576,10 @@
           "name": "Follow Profile - user 2",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK')",
                   "})"
                 ],
@@ -724,11 +602,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -753,28 +626,10 @@
           "name": "Follow Profile - user 3",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK')",
                   "})"
                 ],
@@ -797,11 +652,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -826,30 +676,28 @@
           "name": "Create Article - user 1",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 201', function() {",
+                  "pm.test('Response is HTTP 201', function() {",
                   "    pm.expect(pm.response.status).to.eql('Created')",
                   "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.globals.set('ARTICLE_TITLE', 'How to train your dragon')",
+                  "pm.globals.set('ARTICLE_SLUG', 'how-to-train-your-dragon')",
+                  "pm.globals.set('ARTICLE_DESCRIPTION', 'Ever wonder how?')",
+                  "pm.globals.set('ARTICLE_BODY', 'Very carefully.')",
+                  "pm.globals.set('REQUEST_DATE_TIME', new Date().toISOString())",
+                  "pm.globals.set('TAG_1', 'training')",
+                  "pm.globals.set('TAG_2', 'dragons')"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -870,11 +718,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -897,30 +740,22 @@
           "name": "Create Article - user 2",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 201', function() {",
+                  "pm.test('Response is HTTP 201', function() {",
                   "    pm.expect(pm.response.status).to.eql('Created')",
                   "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -941,11 +776,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token_2}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -968,30 +798,22 @@
           "name": "Create Article - user 3",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 201', function() {",
+                  "pm.test('Response is HTTP 201', function() {",
                   "    pm.expect(pm.response.status).to.eql('Created')",
                   "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1012,11 +834,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token_3}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1039,30 +856,22 @@
           "name": "Create Article - user 2_1",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 201', function() {",
+                  "pm.test('Response is HTTP 201', function() {",
                   "    pm.expect(pm.response.status).to.eql('Created')",
                   "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1083,11 +892,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token_2}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1110,30 +914,22 @@
           "name": "Create Article - user 4",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 201', function() {",
+                  "pm.test('Response is HTTP 201', function() {",
                   "    pm.expect(pm.response.status).to.eql('Created')",
                   "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1154,11 +950,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token_4}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1181,28 +972,10 @@
           "name": "Favorite Article",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK')",
                   "})"
                 ],
@@ -1225,11 +998,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1254,28 +1022,10 @@
           "name": "Favorite Article 2",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK')",
                   "})"
                 ],
@@ -1298,11 +1048,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token_3}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1327,28 +1072,10 @@
           "name": "Favorite Article 3",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK')",
                   "})"
                 ],
@@ -1371,11 +1098,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token_3}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "body": {
@@ -1400,48 +1122,40 @@
           "name": "Get Feed",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is 3', function() {",
+                  "pm.test('articlesCount is 3', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(3);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('feed contains articles feed_2,feed_3,feed_4', function() {",
+                  "pm.test('feed contains articles feed_2,feed_3,feed_4', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_4');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_3');",
                   "    pm.expect(articles[2].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_2');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1458,11 +1172,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -1482,47 +1191,39 @@
           "name": "Get Feed - limit 2",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is total count', function() {",
+                  "pm.test('articlesCount is total count', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.be.at.least(1);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('feed contains articles feed_4,feed_3', function() {",
+                  "pm.test('feed contains articles feed_4,feed_3', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_4');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_3');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1539,11 +1240,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -1569,46 +1265,38 @@
           "name": "Get Feed - limit 1, offset 1",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is total count', function() {",
+                  "pm.test('articlesCount is total count', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.be.at.least(1);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('feed contains articles feed_3', function() {",
+                  "pm.test('feed contains articles feed_3', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_3');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1625,11 +1313,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -1659,46 +1342,38 @@
           "name": "Get Feed - offset 2",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is total count', function() {",
+                  "pm.test('articlesCount is total count', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.be.at.least(1);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('feed contains articles feed_2', function() {",
+                  "pm.test('feed contains articles feed_2', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_2');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1715,11 +1390,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -1745,46 +1415,38 @@
           "name": "Get Feed - offset > feed length",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is total count 3', function() {",
+                  "pm.test('articlesCount is total count 3', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(3);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('articles array is empty when offset > total', function() {",
+                  "pm.test('articles array is empty when offset > total', function() {",
                   "    pm.expect(articles.length).to.eql(0);",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1801,11 +1463,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -1831,34 +1488,16 @@
           "name": "Get Feed - error - offset -1 && limit 0",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "pm.test('Response is HTTP 400', function() {",
                   "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"errors\"', function() {",
+                  "pm.test('response has property \"errors\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('errors');",
                   "});",
                   "",
@@ -1866,6 +1505,16 @@
                   "",
                   "utils.assertErrorStartsWith(\"limit\", pm);",
                   "utils.assertErrorStartsWith(\"offset\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1882,11 +1531,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -1916,30 +1560,22 @@
           "name": "Get Feed - error - unauthenticated",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 401', function() {",
+                  "pm.test('Response is HTTP 401', function() {",
                   "    pm.expect(pm.response.status).to.eql('Unauthorized');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1957,11 +1593,6 @@
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}",
                 "disabled": true
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -1981,50 +1612,42 @@
           "name": "Get Articles",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is 5', function() {",
+                  "pm.test('articlesCount is 5', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(5);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('most recent articles', function() {",
+                  "pm.test('most recent articles', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_5');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_4');",
                   "    pm.expect(articles[2].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_3');",
                   "    pm.expect(articles[3].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_2');",
                   "    pm.expect(articles[4].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_1');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2041,11 +1664,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2064,50 +1682,42 @@
           "name": "Get Articles - unauthenticated",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is 5', function() {",
+                  "pm.test('articlesCount is 5', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(5);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('most recent articles', function() {",
+                  "pm.test('most recent articles', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_5');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_4');",
                   "    pm.expect(articles[2].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_3');",
                   "    pm.expect(articles[3].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_2');",
                   "    pm.expect(articles[4].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_1');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2125,11 +1735,6 @@
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}",
                 "disabled": true
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2148,53 +1753,45 @@
           "name": "Get Articles - limit 4",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is total count 5', function() {",
+                  "pm.test('articlesCount is total count 5', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(5);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('articles array length is 4', function() {",
+                  "pm.test('articles array length is 4', function() {",
                   "    pm.expect(articles.length).to.eql(4);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('most recent articles', function() {",
+                  "pm.test('most recent articles', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_5');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_4');",
                   "    pm.expect(articles[2].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_3');",
                   "    pm.expect(articles[3].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_2');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2211,11 +1808,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2240,53 +1832,45 @@
           "name": "Get Articles - offset 1",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is total count 5', function() {",
+                  "pm.test('articlesCount is total count 5', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(5);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('articles array length is 4', function() {",
+                  "pm.test('articles array length is 4', function() {",
                   "    pm.expect(articles.length).to.eql(4);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('most recent articles', function() {",
+                  "pm.test('most recent articles', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_4');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_3');",
                   "    pm.expect(articles[2].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_2');",
                   "    pm.expect(articles[3].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_1');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2303,11 +1887,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2332,56 +1911,48 @@
           "name": "Get Articles - by author",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is 2 (filtered by author)', function() {",
+                  "pm.test('articlesCount is 2 (filtered by author)', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(2);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('articles array length is 2', function() {",
+                  "pm.test('articles array length is 2', function() {",
                   "    pm.expect(articles.length).to.eql(2);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('most recent articles', function() {",
+                  "pm.test('most recent articles', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_4');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_2');",
                   "});",
                   "",
-                  "pm.testWithCorrelation('articles are by expected author', function() {",
+                  "pm.test('articles are by expected author', function() {",
                   "    pm.expect(articles[0].author.username).to.eql(pm.globals.get('FEED_USER_EMAIL')+2)",
                   "    pm.expect(articles[1].author.username).to.eql(pm.globals.get('FEED_USER_EMAIL')+2)",
                   "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2398,11 +1969,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2427,42 +1993,34 @@
           "name": "Get Articles - by author no-such-author",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is 0', function() {",
+                  "pm.test('articlesCount is 0', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(0);",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2479,11 +2037,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2508,48 +2061,40 @@
           "name": "Get Articles - by tag TAG_1",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is 3', function() {",
+                  "pm.test('articlesCount is 3', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(3);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('most recent articles', function() {",
+                  "pm.test('most recent articles', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_3');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_2');",
                   "    pm.expect(articles[2].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_1');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2566,11 +2111,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2595,48 +2135,40 @@
           "name": "Get Articles - by tag TAG_2",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is 3', function() {",
+                  "pm.test('articlesCount is 3', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(3);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('most recent articles', function() {",
+                  "pm.test('most recent articles', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_5');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_4');",
                   "    pm.expect(articles[2].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_3');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2653,11 +2185,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2682,42 +2209,34 @@
           "name": "Get Articles - by tag NO_SUCH_TAG",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is 0', function() {",
+                  "pm.test('articlesCount is 0', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(0);",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2734,11 +2253,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2763,62 +2277,54 @@
           "name": "Get Articles - favorited by user 3",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is total count', function() {",
+                  "pm.test('articlesCount is total count', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.be.at.least(1);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('most recent articles', function() {",
+                  "pm.test('most recent articles', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_5');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_2');",
                   "});",
                   "",
-                  "pm.testWithCorrelation('only article _feed_2 is favorited by current user', function() {",
+                  "pm.test('only article _feed_2 is favorited by current user', function() {",
                   "    pm.expect(articles[0].favorited).to.be.false;",
                   "    pm.expect(articles[1].favorited).to.be.true;",
                   "});",
                   "",
-                  "pm.testWithCorrelation('current user is following author', function() {",
+                  "pm.test('current user is following author', function() {",
                   "    pm.expect(articles[0].author.following).to.be.false;",
                   "    pm.expect(articles[1].author.following).to.be.true;",
                   "});",
                   "",
-                  "pm.testWithCorrelation('correct favoritesCount on articles', function() {",
+                  "pm.test('correct favoritesCount on articles', function() {",
                   "    pm.expect(articles[0].favoritesCount).to.eql(1);",
                   "    pm.expect(articles[1].favoritesCount).to.eql(2);",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2835,11 +2341,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2864,42 +2365,34 @@
           "name": "Get Articles - favorited by no-such-user",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is 0', function() {",
+                  "pm.test('articlesCount is 0', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.eql(0);",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -2916,11 +2409,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -2945,47 +2433,39 @@
           "name": "Get Articles - limit 2 && offset 2",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 200', function() {",
+                  "pm.test('Response is HTTP 200', function() {",
                   "    pm.expect(pm.response.status).to.eql('OK');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"articles\"', function() {",
+                  "pm.test('response has property \"articles\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('articles');",
                   "});",
                   "",
                   "const articles = responseJSON.articles || {}",
                   "",
-                  "pm.testWithCorrelation('articlesCount is total count', function() {",
+                  "pm.test('articlesCount is total count', function() {",
                   "    pm.expect(responseJSON.articlesCount).to.be.at.least(1);",
                   "});",
                   "",
-                  "pm.testWithCorrelation('most recent articles', function() {",
+                  "pm.test('most recent articles', function() {",
                   "    pm.expect(articles[0].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_3');",
                   "    pm.expect(articles[1].slug).to.eql(pm.globals.get('ARTICLE_SLUG')+'_feed_2');",
                   "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -3002,11 +2482,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -3035,34 +2510,16 @@
           "name": "Get Articles - error - offset -1 && limit 0",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "pm.test('Response is HTTP 400', function() {",
                   "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"errors\"', function() {",
+                  "pm.test('response has property \"errors\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('errors');",
                   "});",
                   "",
@@ -3070,6 +2527,16 @@
                   "",
                   "utils.assertErrorStartsWith(\"offset\", pm);",
                   "utils.assertErrorStartsWith(\"limit\", pm);",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -3087,11 +2554,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -3120,34 +2582,16 @@
           "name": "Get Articles - error - offset / limit invalid",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "pm.test('Response is HTTP 400', function() {",
                   "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"errors\"', function() {",
+                  "pm.test('response has property \"errors\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('errors');",
                   "});",
                   "",
@@ -3155,6 +2599,16 @@
                   "",
                   "utils.assertErrorStartsWith(\"offset\", pm);",
                   "utils.assertErrorStartsWith(\"limit\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -3171,11 +2625,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -3204,40 +2653,32 @@
           "name": "Get Articles - error - tag invalid",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "pm.test('Response is HTTP 400', function() {",
                   "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"errors\"', function() {",
+                  "pm.test('response has property \"errors\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('errors');",
                   "});",
                   "",
                   "const errors = responseJSON.errors || {}",
                   "",
                   "utils.assertErrorStartsWith(\"tag\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -3254,11 +2695,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -3283,40 +2719,32 @@
           "name": "Get Articles - error - author invalid",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "pm.test('Response is HTTP 400', function() {",
                   "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"errors\"', function() {",
+                  "pm.test('response has property \"errors\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('errors');",
                   "});",
                   "",
                   "const errors = responseJSON.errors || {}",
                   "",
                   "utils.assertErrorStartsWith(\"author\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -3333,11 +2761,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -3362,40 +2785,32 @@
           "name": "Get Articles - error - favorited invalid",
           "event": [
             {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ]
-              }
-            },
-            {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 400', function() {",
+                  "pm.test('Response is HTTP 400', function() {",
                   "    pm.expect(pm.response.status).to.eql('Bad Request');",
                   "});",
                   "",
                   "var responseJSON = JSON.parse(pm.response.text());",
                   "",
-                  "pm.testWithCorrelation('response has property \"errors\"', function() {",
+                  "pm.test('response has property \"errors\"', function() {",
                   "    pm.expect(responseJSON).to.have.property('errors');",
                   "});",
                   "",
                   "const errors = responseJSON.errors || {}",
                   "",
                   "utils.assertErrorStartsWith(\"favorited\", pm);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -3412,11 +2827,6 @@
               {
                 "key": "Authorization",
                 "value": "Token {{feed_user_token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
               }
             ],
             "url": {
@@ -3453,7 +2863,7 @@
           "        // Handle ProblemDetails format: errors is an array of {name, reason}",
           "        const errors = response.errors || [];",
           "        const hasFieldError = errors.some(err => err.name === fieldName || err.name.startsWith(fieldName));",
-          "        pm.testWithCorrelation(`At least one error for field '${fieldName}'`, function () {",
+          "        pm.test(`At least one error for field '${fieldName}'`, function () {",
           "            pm.expect(hasFieldError).to.be.true;",
           "        });",
           "    }",
