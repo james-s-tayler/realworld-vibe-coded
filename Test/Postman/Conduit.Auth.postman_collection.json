@@ -139,6 +139,18 @@
           "name": "Register (second user)",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
@@ -167,18 +179,6 @@
                   "    });",
                   "}",
                   ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -222,6 +222,18 @@
           "name": "Register - validation - duplicate email",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
@@ -245,18 +257,6 @@
                   "",
                   "    utils.assertErrorStartsWith(\"email\", pm);",
                   "}"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -763,6 +763,18 @@
           "name": "Login and Remember Token",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
@@ -810,18 +822,6 @@
                 "type": "text/javascript",
                 "packages": {}
               }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
             }
           ],
           "request": {
@@ -862,6 +862,18 @@
           "name": "Current User",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
@@ -896,18 +908,6 @@
                   "pm.testWithCorrelation('User has \"token\" property that matches the token in the Authorization header', function() {",
                   "    pm.expect(user.token).to.eql(pm.globals.get('token'))",
                   "});"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1074,6 +1074,18 @@
           "name": "Update User",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
@@ -1108,18 +1120,6 @@
                   "pm.testWithCorrelation('User has \"token\" property', function() {",
                   "    pm.expect(user).to.have.property('token')",
                   "});"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1167,6 +1167,18 @@
           "name": "Update User - validation - provided fields blank",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
@@ -1190,18 +1202,6 @@
                   "utils.assertErrorStartsWith(\"username\", pm);",
                   "utils.assertErrorStartsWith(\"email\", pm);",
                   "utils.assertErrorStartsWith(\"bio\", pm);"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1249,6 +1249,18 @@
           "name": "Update User - validation - duplicate email",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
@@ -1271,18 +1283,6 @@
                   "",
                   "utils.assertErrorStartsWith(\"email\", pm);",
                   ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -1330,6 +1330,18 @@
           "name": "Update User - validation - duplicate username",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "// Generate unique correlation ID for this request",
+                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+                  "pm.variables.set('correlationId', correlationId);"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
@@ -1351,18 +1363,6 @@
                   "",
                   "",
                   "utils.assertErrorStartsWith(\"username\", pm);"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "// Generate unique correlation ID for this request",
-                  "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-                  "pm.variables.set('correlationId', correlationId);"
                 ],
                 "type": "text/javascript",
                 "packages": {}

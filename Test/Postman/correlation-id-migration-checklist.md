@@ -15,75 +15,75 @@ Each request needs:
 ## Conduit.Article.postman_collection.json (56 requests)
 
 ### Article Folder
-- [ ] Register Articles User - setup
-- [ ] Register Articles User 2 - setup
-- [ ] Login and Remember Token - setup
-- [ ] Login and Remember Token 2 - setup
-- [ ] Follow Profile
-- [ ] Create Article
-- [ ] Create Article without tags
-- [ ] Create Article - validation - missing required fields
-- [ ] Create Article - validation - required fields empty
-- [ ] Create Article - validation - invalid tag (comma)
-- [ ] Create Article - validation - invalid tag (empty)
-- [ ] Create Article - validation - duplicate slug
-- [ ] Create Article - error - unauthenticated
-- [ ] Get Tags
-- [ ] Get Article
-- [ ] Get Article - following author
-- [ ] Get Article - unauthenticated
-- [ ] Get Article - error - not found
-- [ ] Favorite Article
-- [ ] Favorite Article - already favorited
-- [ ] Favorite Article - error - unauthenticated
-- [ ] Favorite Article - error - not found
-- [ ] Unfavorite Article
-- [ ] Unfavorite Article - not already favorited
-- [ ] Unfavorite Article - error - unauthenticated
-- [ ] Unfavorite Article - error - not found
-- [ ] All Articles
-- [ ] All Articles - limit 2
-- [ ] All Articles - offset 2
-- [ ] Articles by Author
-- [ ] Articles by Author - limit 2
-- [ ] Articles by Author - not found
-- [ ] Articles Favorited by Username
-- [ ] Articles Favorited by Username - limit 2
-- [ ] Articles Favorited by Username - not found
-- [ ] Articles by Tag
-- [ ] Articles by Tag - limit 2
-- [ ] Articles by Tag - not found
-- [ ] Update Article
-- [ ] Update Article - validation - provided fields blank
-- [ ] Update Article - validation - duplicate slug
-- [ ] Update Article - error - unauthenticated
-- [ ] Update Article - error - not found
-- [ ] Update Article - error - not author
-- [ ] Delete Article
-- [ ] Delete Article - error - unauthenticated
-- [ ] Delete Article - error - not found
-- [ ] Delete Article - error - not author
-- [ ] Create Comment
-- [ ] Create Comment - validation - missing required fields
-- [ ] Create Comment - validation - required fields blank
-- [ ] Create Comment - error - unauthenticated
-- [ ] Get Comments
-- [ ] Get Comments - unauthenticated
-- [ ] Delete Comment
-- [ ] Delete Comment - error - unauthenticated
-- [ ] Delete Comment - error - not found
-- [ ] Delete Comment - error - not author
+- [x] Register Articles User - setup
+- [x] Register Articles User 2 - setup
+- [x] Login and Remember Token - setup
+- [x] Login and Remember Token 2 - setup
+- [x] Follow Profile
+- [x] Create Article
+- [x] Create Article without tags
+- [x] Create Article - validation - missing required fields
+- [x] Create Article - validation - required fields empty
+- [x] Create Article - validation - invalid tag (comma)
+- [x] Create Article - validation - invalid tag (empty)
+- [x] Create Article - validation - duplicate slug
+- [x] Create Article - error - unauthenticated
+- [x] Get Tags
+- [x] Get Article
+- [x] Get Article - following author
+- [x] Get Article - unauthenticated
+- [x] Get Article - error - not found
+- [x] Favorite Article
+- [x] Favorite Article - already favorited
+- [x] Favorite Article - error - unauthenticated
+- [x] Favorite Article - error - not found
+- [x] Unfavorite Article
+- [x] Unfavorite Article - not already favorited
+- [x] Unfavorite Article - error - unauthenticated
+- [x] Unfavorite Article - error - not found
+- [x] All Articles
+- [x] All Articles - limit 2
+- [x] All Articles - offset 2
+- [x] Articles by Author
+- [x] Articles by Author - limit 2
+- [x] Articles by Author - not found
+- [x] Articles Favorited by Username
+- [x] Articles Favorited by Username - limit 2
+- [x] Articles Favorited by Username - not found
+- [x] Articles by Tag
+- [x] Articles by Tag - limit 2
+- [x] Articles by Tag - not found
+- [x] Update Article
+- [x] Update Article - validation - provided fields blank
+- [x] Update Article - validation - duplicate slug
+- [x] Update Article - error - unauthenticated
+- [x] Update Article - error - not found
+- [x] Update Article - error - not author
+- [x] Delete Article
+- [x] Delete Article - error - unauthenticated
+- [x] Delete Article - error - not found
+- [x] Delete Article - error - not author
+- [x] Create Comment
+- [x] Create Comment - validation - missing required fields
+- [x] Create Comment - validation - required fields blank
+- [x] Create Comment - error - unauthenticated
+- [x] Get Comments
+- [x] Get Comments - unauthenticated
+- [x] Delete Comment
+- [x] Delete Comment - error - unauthenticated
+- [x] Delete Comment - error - not found
+- [x] Delete Comment - error - not author
 
 ---
 
 ## Conduit.ArticlesEmpty.postman_collection.json (5 requests)
 
 ### ArticlesEmpty Folder
-- [ ] All Articles
-- [ ] Articles by Author
-- [ ] Articles Favorited by Username
-- [ ] Articles by Tag
-- [ ] Get Tags
+- [x] All Articles
+- [x] Articles by Author
+- [x] Articles Favorited by Username
+- [x] Articles by Tag
+- [x] Get Tags
 
 ---
 
@@ -114,79 +114,79 @@ Each request needs:
 ## Conduit.FeedAndArticles.postman_collection.json (42 requests)
 
 ### FeedAndArticles Folder
-- [ ] Register Feed User - setup
-- [ ] Register Feed User 2 - setup
-- [ ] Register Feed User 3 - setup
-- [ ] Register Feed User 4 - setup
-- [ ] Login and Remember Token - setup
-- [ ] Login and Remember Token 2 - setup
-- [ ] Login and Remember Token 3 - setup
-- [ ] Login and Remember Token 4 - setup
-- [ ] Follow Profile - user 2
-- [ ] Follow Profile - user 3
-- [ ] Create Article - user 1
-- [ ] Create Article - user 2
-- [ ] Create Article - user 3
-- [ ] Create Article - user 2_1
-- [ ] Create Article - user 4
-- [ ] Favorite Article
-- [ ] Favorite Article 2
-- [ ] Favorite Article 3
-- [ ] Get Feed
-- [ ] Get Feed - limit 2
-- [ ] Get Feed - offset 1
-- [ ] Get Feed - error - unauthenticated
-- [ ] All Articles
-- [ ] All Articles - limit 1
-- [ ] All Articles - offset 1
-- [ ] All Articles - limit 1 offset 2
-- [ ] All Articles - filter by author
-- [ ] All Articles - filter by author - limit 1
-- [ ] All Articles - filter by favorited
-- [ ] All Articles - filter by favorited - limit 1
-- [ ] All Articles - filter by tag
-- [ ] All Articles - filter by tag - limit 1
-- [ ] All Articles - filter by author and tag
-- [ ] All Articles - filter by author and favorited
-- [ ] All Articles - filter by tag and favorited
-- [ ] All Articles - filter by author, tag and favorited
-- [ ] All Articles - unauthenticated
-- [ ] All Articles - filter by author - unauthenticated
-- [ ] All Articles - filter by favorited - unauthenticated
-- [ ] All Articles - filter by tag - unauthenticated
-- [ ] All Articles - filter by author and tag - unauthenticated
-- [ ] All Articles - filter by author and favorited - unauthenticated
+- [x] Register Feed User - setup
+- [x] Register Feed User 2 - setup
+- [x] Register Feed User 3 - setup
+- [x] Register Feed User 4 - setup
+- [x] Login and Remember Token - setup
+- [x] Login and Remember Token 2 - setup
+- [x] Login and Remember Token 3 - setup
+- [x] Login and Remember Token 4 - setup
+- [x] Follow Profile - user 2
+- [x] Follow Profile - user 3
+- [x] Create Article - user 1
+- [x] Create Article - user 2
+- [x] Create Article - user 3
+- [x] Create Article - user 2_1
+- [x] Create Article - user 4
+- [x] Favorite Article
+- [x] Favorite Article 2
+- [x] Favorite Article 3
+- [x] Get Feed
+- [x] Get Feed - limit 2
+- [x] Get Feed - offset 1
+- [x] Get Feed - error - unauthenticated
+- [x] All Articles
+- [x] All Articles - limit 1
+- [x] All Articles - offset 1
+- [x] All Articles - limit 1 offset 2
+- [x] All Articles - filter by author
+- [x] All Articles - filter by author - limit 1
+- [x] All Articles - filter by favorited
+- [x] All Articles - filter by favorited - limit 1
+- [x] All Articles - filter by tag
+- [x] All Articles - filter by tag - limit 1
+- [x] All Articles - filter by author and tag
+- [x] All Articles - filter by author and favorited
+- [x] All Articles - filter by tag and favorited
+- [x] All Articles - filter by author, tag and favorited
+- [x] All Articles - unauthenticated
+- [x] All Articles - filter by author - unauthenticated
+- [x] All Articles - filter by favorited - unauthenticated
+- [x] All Articles - filter by tag - unauthenticated
+- [x] All Articles - filter by author and tag - unauthenticated
+- [x] All Articles - filter by author and favorited - unauthenticated
 
 ---
 
 ## Conduit.Profiles.postman_collection.json (17 requests)
 
 ### Profiles Folder
-- [ ] Register
-- [ ] Login and Remember Token
-- [ ] Register (second user)
-- [ ] Register Celeb
-- [ ] Follow Profile - error - unauthenticated
-- [ ] Follow Profile
-- [ ] Follow Profile - already following
-- [ ] Follow Profile - validation - user doesn't exist
-- [ ] Profile - authenticated - following
-- [ ] Profile - authenticated - not following
-- [ ] Profile - error - 404 not found
-- [ ] Profile - validation - invalid username
-- [ ] Profile - unauthenticated
-- [ ] Unfollow Profile - error - unauthenticated
-- [ ] Unfollow Profile
-- [ ] Unfollow Profile - error - not already following
-- [ ] Profile - authenticated - unfollowed
+- [x] Register
+- [x] Login and Remember Token
+- [x] Register (second user)
+- [x] Register Celeb
+- [x] Follow Profile - error - unauthenticated
+- [x] Follow Profile
+- [x] Follow Profile - already following
+- [x] Follow Profile - validation - user doesn't exist
+- [x] Profile - authenticated - following
+- [x] Profile - authenticated - not following
+- [x] Profile - error - 404 not found
+- [x] Profile - validation - invalid username
+- [x] Profile - unauthenticated
+- [x] Unfollow Profile - error - unauthenticated
+- [x] Unfollow Profile
+- [x] Unfollow Profile - error - not already following
+- [x] Profile - authenticated - unfollowed
 
 ---
 
 ## Progress Summary
-- **Total:** 18/138 completed (13%)
-- **Article:** 0/56 completed
-- **ArticlesEmpty:** 0/5 completed
+- **Total:** 138/138 completed (100%) ✅
+- **Article:** 56/56 completed ✅
+- **ArticlesEmpty:** 5/5 completed ✅
 - **Auth:** 18/18 completed ✅
-- **FeedAndArticles:** 0/42 completed
-- **Profiles:** 0/17 completed
+- **FeedAndArticles:** 42/42 completed ✅
+- **Profiles:** 17/17 completed ✅
 
