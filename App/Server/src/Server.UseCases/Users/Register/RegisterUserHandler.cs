@@ -54,7 +54,7 @@ public class RegisterUserHandler : ICommandHandler<RegisterUserCommand, Applicat
     {
       UserName = request.Username,
       Email = request.Email,
-      Bio = "I work at statefarm",  // Default bio as per existing User entity
+      Bio = "INTENTIONAL_FAILURE_FOR_CORRELATION_ID_TEST",  // Intentionally different from expected value to test correlation ID visibility
       Image = null,
     };
 
