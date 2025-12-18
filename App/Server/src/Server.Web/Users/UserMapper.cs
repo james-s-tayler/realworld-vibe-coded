@@ -32,7 +32,7 @@ public class UserMapper : ResponseMapper<UserResponse, ApplicationUser>
     {
       Email = user.Email!,
       Username = user.UserName!,
-      Bio = "I work at statefarm",
+      Bio = user.Bio,
       Image = user.Image,
       Token = token,
     };
