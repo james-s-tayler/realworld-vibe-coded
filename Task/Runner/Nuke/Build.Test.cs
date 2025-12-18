@@ -677,7 +677,18 @@ public partial class Build
             ? test.GetString()
             : "Unknown error");
 
-        summaryLines.Add($"• **{sourceName}**: {errorMessage}");
+        // Extract correlation ID from error message if present (format: [correlation-id] message)
+        var correlationId = ExtractCorrelationId(errorMessage ?? string.Empty);
+        var cleanMessage = RemoveCorrelationId(errorMessage ?? string.Empty);
+
+        if (!string.IsNullOrEmpty(correlationId))
+        {
+          summaryLines.Add($"• **{sourceName}** `[CorrelationId: {correlationId}]`: {cleanMessage}");
+        }
+        else
+        {
+          summaryLines.Add($"• **{sourceName}**: {cleanMessage}");
+        }
       }
     }
     else
@@ -744,18 +755,29 @@ public partial class Build
               var assertionName = assertion.TryGetProperty("assertion", out var aName) ? aName.GetString() : "Unknown";
               var skipped = assertion.TryGetProperty("skipped", out var skip) && skip.GetBoolean();
 
+              // Extract correlation ID from assertion name if present
+              var correlationId = ExtractCorrelationId(assertionName ?? string.Empty);
+              var cleanAssertionName = RemoveCorrelationId(assertionName ?? "Unknown");
+
               if (skipped)
               {
-                reportLines.Add($"- ⊘ {assertionName} (skipped)");
+                reportLines.Add($"- ⊘ {cleanAssertionName} (skipped)");
               }
               else if (assertion.TryGetProperty("error", out var assertionError) && assertionError.ValueKind != JsonValueKind.Null && assertionError.ValueKind != JsonValueKind.Undefined)
               {
                 var errorMsg = assertionError.TryGetProperty("message", out var msg) ? msg.GetString() : "Unknown error";
-                reportLines.Add($"- ❌ {assertionName}: {errorMsg}");
+                if (!string.IsNullOrEmpty(correlationId))
+                {
+                  reportLines.Add($"- ❌ {cleanAssertionName} `[CorrelationId: {correlationId}]`: {errorMsg}");
+                }
+                else
+                {
+                  reportLines.Add($"- ❌ {cleanAssertionName}: {errorMsg}");
+                }
               }
               else
               {
-                reportLines.Add($"- ✅ {assertionName}");
+                reportLines.Add($"- ✅ {cleanAssertionName}");
               }
             }
 
@@ -771,5 +793,32 @@ public partial class Build
     // Write full report file
     reportFile.WriteAllLines(reportLines);
     Log.Information("Generated full Newman report to: {ReportFile}", reportFile);
+  }
+
+  /// <summary>
+  /// Extracts correlation ID from a test name in format: [correlation-id] test name
+  /// </summary>
+  private string ExtractCorrelationId(string testName)
+  {
+    if (string.IsNullOrEmpty(testName))
+    {
+      return string.Empty;
+    }
+
+    var match = System.Text.RegularExpressions.Regex.Match(testName, @"^\[([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\]");
+    return match.Success ? match.Groups[1].Value : string.Empty;
+  }
+
+  /// <summary>
+  /// Removes correlation ID prefix from a test name
+  /// </summary>
+  private string RemoveCorrelationId(string testName)
+  {
+    if (string.IsNullOrEmpty(testName))
+    {
+      return testName;
+    }
+
+    return System.Text.RegularExpressions.Regex.Replace(testName, @"^\[([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\]\s*", string.Empty);
   }
 }

@@ -4224,6 +4224,14 @@
         "type": "text/javascript",
         "packages": {},
         "exec": [
+          "// Generate and set correlation ID for this request",
+          "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+          "pm.collectionVariables.set('correlationId', correlationId);",
+          "pm.request.headers.add({",
+          "    key: 'X-Correlation-Id',",
+          "    value: correlationId",
+          "});",
+          "",
           "utils = {",
           "    assertErrorStartsWith: function(fieldName, pm) {",
           "        const response = pm.response.json();",
@@ -4246,6 +4254,17 @@
         "type": "text/javascript",
         "packages": {},
         "exec": [
+          "// Monkey-patch pm.test to prepend correlation ID",
+          "if (!pm.collectionVariables.get('pmTestPatched')) {",
+          "    const originalTest = pm.test.bind({});",
+          "    pm.test = function(testName, testFunction) {",
+          "        const correlationId = pm.collectionVariables.get('correlationId') || 'unknown';",
+          "        const prefixedName = `[${correlationId}] ${testName}`;",
+          "        return originalTest(prefixedName, testFunction);",
+          "    };",
+          "    pm.collectionVariables.set('pmTestPatched', 'true');",
+          "}",
+          "",
           "",
           ""
         ]
