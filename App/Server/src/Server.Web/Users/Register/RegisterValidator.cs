@@ -16,8 +16,6 @@ public class RegisterValidator : Validator<RegisterRequest>
       .WithMessage("is invalid.")
       .MaximumLength(User.EmailMaxLength)
       .WithMessage($"cannot exceed {User.EmailMaxLength} characters.")
-      .Must(email => !email?.Contains("solo", StringComparison.OrdinalIgnoreCase) ?? true)
-      .WithMessage("cannot contain 'solo' (temporary validation for testing --bail)")
       .OverridePropertyName("email");
 
     RuleFor(x => x.User.Username)
