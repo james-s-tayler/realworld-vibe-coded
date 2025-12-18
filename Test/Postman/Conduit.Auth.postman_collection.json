@@ -113,7 +113,7 @@
                 "value": "XMLHttpRequest"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -194,7 +194,7 @@
                 "value": "XMLHttpRequest"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -270,7 +270,7 @@
                 "value": "XMLHttpRequest"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -347,7 +347,7 @@
                 "value": "XMLHttpRequest"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -425,7 +425,7 @@
                 "value": "XMLHttpRequest"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -503,7 +503,7 @@
                 "value": "XMLHttpRequest"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -592,7 +592,7 @@
                 "value": "XMLHttpRequest"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -659,7 +659,7 @@
                 "value": "XMLHttpRequest"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -726,7 +726,7 @@
                 "value": "XMLHttpRequest"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -823,7 +823,7 @@
                 "value": "XMLHttpRequest"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -911,7 +911,7 @@
                 "value": "Token {{token}}"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -974,7 +974,7 @@
                 "disabled": true
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -1036,7 +1036,7 @@
                 "value": "Token 123"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -1128,7 +1128,7 @@
                 "value": "Token {{token}}"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -1213,7 +1213,7 @@
                 "value": "Token {{token}}"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -1297,7 +1297,7 @@
                 "value": "Token {{token}}"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -1380,7 +1380,7 @@
                 "value": "Token {{token}}"
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
@@ -1451,7 +1451,7 @@
                 "disabled": true
               },
               {
-                "key": "X-Correlation-Id",
+                "key": "x-correlation-id",
                 "value": "{{correlationId}}",
                 "type": "text"
               }
