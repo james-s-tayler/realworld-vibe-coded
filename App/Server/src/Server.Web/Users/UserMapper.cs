@@ -32,7 +32,7 @@ public class UserMapper : ResponseMapper<UserResponse, ApplicationUser>
     {
       Email = user.Email!,
       Username = user.UserName!,
-      Bio = user.Bio,
+      Bio = "CORRELATION_ID_TEST_FAILURE",  // Intentional change to test correlation ID visibility in failed tests
       Image = user.Image,
       Token = token,
     };

@@ -90,24 +90,24 @@ Each request needs:
 ## Conduit.Auth.postman_collection.json (18 requests)
 
 ### Auth Folder
-- [ ] Register
-- [ ] Register (second user)
-- [ ] Register - validation - duplicate email
-- [ ] Register - validation - not a valid email
-- [ ] Register - validation - missing required fields
-- [ ] Register - validation - required fields blank
-- [ ] Login
-- [ ] Login Failed - error - user not found
-- [ ] Login Failed - error - incorrect password
-- [ ] Login and Remember Token
-- [ ] Current User
-- [ ] Current User - error - unauthenticated, missing authorization header
-- [ ] Current User - error - unauthenticated, invalid token
-- [ ] Update User
-- [ ] Update User - validation - provided fields blank
-- [ ] Update User - validation - duplicate email
-- [ ] Update User - validation - duplicate username
-- [ ] Update User - error - unauthenticated
+- [x] Register
+- [x] Register (second user)
+- [x] Register - validation - duplicate email
+- [x] Register - validation - not a valid email
+- [x] Register - validation - missing required fields
+- [x] Register - validation - required fields blank
+- [x] Login
+- [x] Login Failed - error - user not found
+- [x] Login Failed - error - incorrect password
+- [x] Login and Remember Token
+- [x] Current User
+- [x] Current User - error - unauthenticated, missing authorization header
+- [x] Current User - error - unauthenticated, invalid token
+- [x] Update User
+- [x] Update User - validation - provided fields blank
+- [x] Update User - validation - duplicate email
+- [x] Update User - validation - duplicate username
+- [x] Update User - error - unauthenticated
 
 ---
 
@@ -183,10 +183,10 @@ Each request needs:
 ---
 
 ## Progress Summary
-- **Total:** 0/138 completed (0%)
+- **Total:** 18/138 completed (13%)
 - **Article:** 0/56 completed
 - **ArticlesEmpty:** 0/5 completed
-- **Auth:** 0/18 completed
+- **Auth:** 18/18 completed ✅
 - **FeedAndArticles:** 0/42 completed
 - **Profiles:** 0/17 completed
 
