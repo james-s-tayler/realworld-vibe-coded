@@ -30,7 +30,7 @@ public class UserMapper : ResponseMapper<UserResponse, ApplicationUser>
 
     return new UserResponse
     {
-      Email = user.Email!,
+      EmailAddress = user.Email!,
       Username = user.UserName!,
       Bio = user.Bio,
       Image = user.Image,
