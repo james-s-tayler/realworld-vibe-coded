@@ -1,0 +1,51 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourStrong@Passw0rd"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong@Passw0rd", "-Q", "SELECT 1", "-C"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+  api:
+    build:
+      context: ../../
+      dockerfile: Test/Postman/Dockerfile
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true"
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../../Logs:/app/Logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/swagger/index.html"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  newman:
+    image: postman/newman:alpine
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./:/etc/newman
+    environment:
+      - APIURL=http://api:5000/api
+      - USERNAME=soloyolo
+      - EMAIL=soloyolo@mail.com
+      - PASSWORD=password123
+      - NEWMAN_BAIL=${NEWMAN_BAIL:-false}
