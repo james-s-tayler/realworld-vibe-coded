@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "bb35a53d-5f54-4d00-83c6-c823bb9da4d9",
+		"_postman_id": "c5b8bbb5-b657-4779-8ba4-23c321ea12bf",
 		"name": "Conduit - Auth",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "8521556"
@@ -1087,7 +1087,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -1173,7 +1173,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -1258,7 +1258,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -1318,7 +1318,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}",
+								"value": "Bearer {{token}}",
 								"disabled": true
 							},
 							{
@@ -1357,10 +1357,25 @@
 					"utils = {",
 					"    assertErrorStartsWith: function(fieldName, pm) {",
 					"        const response = pm.response.json();",
-					"        // Handle ProblemDetails format: errors is an array of {name, reason}",
 					"        const errors = response.errors || [];",
-					"        const hasFieldError = errors.some(err => err.name === fieldName || err.name.startsWith(fieldName));",
-					"        pm.testWithCorrelation(`At least one error for field '${fieldName}'`, function () {",
+					"        ",
+					"        let hasFieldError = false;",
+					"        ",
+					"        // Handle Identity API ValidationProblemDetails format: errors is an object with keys",
+					"        if (typeof errors === 'object' && !Array.isArray(errors)) {",
+					"            // errors = { \"DuplicateEmail\": [\"message1\"], \"InvalidEmail\": [\"message2\"] }",
+					"            hasFieldError = Object.keys(errors).some(key => ",
+					"                key.toLowerCase().includes(fieldName.toLowerCase())",
+					"            );",
+					"        }",
+					"        // Handle legacy format: errors is an array of {name, reason}",
+					"        else if (Array.isArray(errors)) {",
+					"            hasFieldError = errors.some(err => ",
+					"                err.name === fieldName || err.name.startsWith(fieldName)",
+					"            );",
+					"        }",
+					"        ",
+					"        pm.test(`At least one error for field '${fieldName}'`, function () {",
 					"            pm.expect(hasFieldError).to.be.true;",
 					"        });",
 					"    }",
