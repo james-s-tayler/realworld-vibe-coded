@@ -467,14 +467,34 @@ jobs:
         include:
           - collection: articles-empty
             report_dir: ArticlesEmpty
+            bail: false
+          - collection: articles-empty
+            report_dir: ArticlesEmpty
+            bail: true
           - collection: auth
             report_dir: Auth
+            bail: false
+          - collection: auth
+            report_dir: Auth
+            bail: true
           - collection: profiles
             report_dir: Profiles
+            bail: false
+          - collection: profiles
+            report_dir: Profiles
+            bail: true
           - collection: feed-and-articles
             report_dir: FeedAndArticles
+            bail: false
+          - collection: feed-and-articles
+            report_dir: FeedAndArticles
+            bail: true
           - collection: article
             report_dir: Article
+            bail: false
+          - collection: article
+            report_dir: Article
+            bail: true
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -494,11 +514,11 @@ jobs:
       - name: Verify .NET version
         run: dotnet --info
 
-      - name: Test Server (Postman - ${{ matrix.collection }})
+      - name: Test Server (Postman - ${{ matrix.collection }}${{ matrix.bail && ' with --bail' || '' }})
         id: postman_tests
         run: |
           set +e  # Don't exit on error
-          ./build.sh test-server-postman-${{ matrix.collection }}
+          ./build.sh test-server-postman-${{ matrix.collection }} ${{ matrix.bail && '--bail true' || '' }}
           TEST_EXIT_CODE=$?
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0  # Always succeed so we can upload artifacts and comment
@@ -507,41 +527,37 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()  # Upload even if tests failed
         with:
-          name: postman-test-reports-${{ matrix.collection }}
+          name: postman-test-reports-${{ matrix.collection }}${{ matrix.bail && '-bail' || '' }}
           path: |
-            Reports/Test/Postman/${{ matrix.report_dir }}/newman-report.json
+            Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts
           retention-days: 7
 
-      - name: Parse test results and create PR comment
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+      - name: Upload Logs
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload even if tests failed
         with:
-          script: |
-            const { parseNewmanReport } = require('./.github/scripts/newman-report-parser.js');
-            const { createOrUpdateStickyComment } = require('./.github/scripts/sticky-comment.js');
+          name: postman-test-logs-${{ matrix.collection }}${{ matrix.bail && '-bail' || '' }}
+          path: |
+            Logs/
+          retention-days: 7
 
-            try {
-              const collectionName = '${{ matrix.collection }}';
-              const reportDir = '${{ matrix.report_dir }}';
-              const reportPath = `Reports/Test/Postman/${reportDir}/newman-report.json`;
-              const commentBody = parseNewmanReport(reportPath, context, `(${collectionName})`);
+      - name: Add full report to step summary
+        if: always()
+        run: cat Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts/Report.md >> $GITHUB_STEP_SUMMARY
 
-              if (!commentBody) {
-                console.log('No comment body generated, skipping PR comment');
-                return;
-              }
+      - name: Append full report link to ReportSummary.md
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          echo "" >> Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts/ReportSummary.md
+          echo "---" >> Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts/ReportSummary.md
+          echo "📄 **[View Full Test Report in Job Summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})**" >> Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts/ReportSummary.md
 
-              // Use sticky comment with unique header per collection
-              await createOrUpdateStickyComment(
-                github,
-                context,
-                `postman-test-${collectionName}`,
-                commentBody
-              );
-
-            } catch (error) {
-              console.error('Error creating/updating PR comment:', error);
-            }
+      - name: Comment test results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: postman-test-${{ matrix.collection }}${{ matrix.bail && '-bail' || '' }}
+          path: Reports/Test/Postman/${{ matrix.report_dir }}/Artifacts/ReportSummary.md
 
       - name: Fail job if tests failed
         if: steps.postman_tests.outputs.exit_code != '0'
