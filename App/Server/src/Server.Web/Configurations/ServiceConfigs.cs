@@ -123,6 +123,8 @@ public static class ServiceConfigs
     .AddApiEndpoints() // Add Identity API endpoints support
     .AddDefaultTokenProviders();
 
+    services.AddProblemDetails();
+
     // Add cookie authentication for Identity (without setting as default scheme)
     services.AddAuthentication()
       .AddCookie(IdentityConstants.ApplicationScheme, options =>
@@ -159,10 +161,10 @@ public static class ServiceConfigs
       })
       .AddBearerToken(IdentityConstants.BearerScheme);
 
+
     services.AddAuthorization();
     services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationMiddlewareResultHandler,
       Server.Web.Authorization.SuppressBearerChallengeAuthorizationMiddlewareResultHandler>();
-    services.AddProblemDetails();
     services.AddMemoryCache();
     services.AddHttpContextAccessor();
 
