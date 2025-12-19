@@ -15,7 +15,7 @@ public class UpdateUser(IMediator mediator, IUserContext userContext) : Endpoint
   public override void Configure()
   {
     Put(UpdateUserRequest.Route);
-    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme);
+    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
     Summary(s =>
     {
       s.Summary = "Update current user";
