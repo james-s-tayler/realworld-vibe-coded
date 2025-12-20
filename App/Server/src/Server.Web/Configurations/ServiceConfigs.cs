@@ -17,6 +17,8 @@ public static class ServiceConfigs
 {
   public static IServiceCollection AddServiceConfigs(this IServiceCollection services, Microsoft.Extensions.Logging.ILogger logger, WebApplicationBuilder builder)
   {
+    services.AddProblemDetails();
+
     services.AddInfrastructureServices(builder.Configuration, logger)
             .AddMediatrConfigs();
 
@@ -120,6 +122,7 @@ public static class ServiceConfigs
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddSignInManager<SignInManager<ApplicationUser>>()
+    .AddApiEndpoints() // Add Identity API endpoints support
     .AddDefaultTokenProviders();
 
     // Add cookie authentication for Identity (without setting as default scheme)
@@ -155,10 +158,13 @@ public static class ServiceConfigs
 
           return Task.CompletedTask;
         };
-      });
+      })
+      .AddBearerToken(IdentityConstants.BearerScheme);
+
 
     services.AddAuthorization();
-    services.AddProblemDetails();
+    services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationMiddlewareResultHandler,
+      Server.Web.Authorization.SuppressBearerChallengeAuthorizationMiddlewareResultHandler>();
     services.AddMemoryCache();
     services.AddHttpContextAccessor();
 
@@ -168,12 +174,7 @@ public static class ServiceConfigs
 
     if (builder.Environment.IsDevelopment())
     {
-      // Use a local test email server
-      // See: https://ardalis.com/configuring-a-local-test-email-server/
-      services.AddSingleton<IEmailSender, MimeKitEmailSender>();
-
-      // Otherwise use this:
-      // builder.Services.AddSingleton<IEmailSender, FakeEmailSender>();
+      builder.Services.AddSingleton<IEmailSender, FakeEmailSender>();
     }
     else
     {

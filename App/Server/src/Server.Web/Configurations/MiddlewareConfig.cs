@@ -60,7 +60,7 @@ public static class MiddlewareConfig
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.MapGroup("/api/identity").MapIdentityApi<ApplicationUser>();
+    app.MapGroup("/api/identity").MapIdentityApi<ApplicationUser>().AllowAnonymous();
 
     // Map health check endpoints
     // /health/live - Liveness probe (always returns healthy if app is running)

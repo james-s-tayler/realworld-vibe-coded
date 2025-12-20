@@ -15,7 +15,7 @@ public class Delete(IMediator mediator, IUserContext userContext) : Endpoint<Del
   public override void Configure()
   {
     Delete("/api/articles/{slug}");
-    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme);
+    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
     Summary(s =>
     {
       s.Summary = "Delete article";
