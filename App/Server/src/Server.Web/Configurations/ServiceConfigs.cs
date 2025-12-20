@@ -17,6 +17,8 @@ public static class ServiceConfigs
 {
   public static IServiceCollection AddServiceConfigs(this IServiceCollection services, Microsoft.Extensions.Logging.ILogger logger, WebApplicationBuilder builder)
   {
+    services.AddProblemDetails();
+
     services.AddInfrastructureServices(builder.Configuration, logger)
             .AddMediatrConfigs();
 
@@ -123,8 +125,6 @@ public static class ServiceConfigs
     .AddApiEndpoints() // Add Identity API endpoints support
     .AddDefaultTokenProviders();
 
-    services.AddProblemDetails();
-
     // Add cookie authentication for Identity (without setting as default scheme)
     services.AddAuthentication()
       .AddCookie(IdentityConstants.ApplicationScheme, options =>
@@ -174,12 +174,7 @@ public static class ServiceConfigs
 
     if (builder.Environment.IsDevelopment())
     {
-      // Use a local test email server
-      // See: https://ardalis.com/configuring-a-local-test-email-server/
-      services.AddSingleton<IEmailSender, MimeKitEmailSender>();
-
-      // Otherwise use this:
-      // builder.Services.AddSingleton<IEmailSender, FakeEmailSender>();
+      builder.Services.AddSingleton<IEmailSender, FakeEmailSender>();
     }
     else
     {
