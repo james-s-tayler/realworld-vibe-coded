@@ -13,7 +13,7 @@ COPY publish/ ./
 # Copy the HTTPS certificate from the cert-generator stage
 COPY --from=cert-generator /https/aspnetapp.pfx /https/aspnetapp.pfx
 
-# Install curl for health checks, unzip and wget for vsdbg installation
+# Install curl for health checks, unzip for vsdbg extraction, and wget for downloading vsdbg installer
 RUN apt-get update && apt-get install -y curl unzip wget && rm -rf /var/lib/apt/lists/*
 
 # Install vsdbg for remote debugging with Rider and other IDEs

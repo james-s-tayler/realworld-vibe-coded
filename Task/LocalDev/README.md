@@ -114,28 +114,32 @@ Now you can quickly attach by selecting this configuration from the run menu.
 ### Cannot attach debugger
 - Verify vsdbg is installed in the container:
   ```bash
-  # For hot-reload container
-  docker exec -it localdev-api-1 ls -la /vsdbg
+  # Find your container name first
+  docker ps
+  # Then check vsdbg (replace <container-name> with your actual container name)
+  docker exec -it <container-name> ls -la /vsdbg
+  # Or use docker-compose
+  docker-compose -f Task/LocalDev/docker-compose.dev-deps.yml -f Task/LocalDev/docker-compose.publish.yml exec api ls -la /vsdbg
   ```
 - Ensure the container is running with the dotnet process:
   ```bash
   docker ps
-  docker exec -it localdev-api-1 ps aux | grep -E 'dotnet|Server.Web'
+  docker-compose -f Task/LocalDev/docker-compose.dev-deps.yml -f Task/LocalDev/docker-compose.publish.yml exec api ps aux | grep -E 'dotnet|Server.Web'
   ```
 - Check Rider's Docker integration is properly configured
 - For published artifact debugging, the process name is `Server.Web` (not `dotnet`)
 
 ### Hot-reload not working
 - Ensure source code is properly mounted as a volume in docker-compose.yml
-- Check container logs: `docker logs localdev-api-1`
+- Check container logs: `docker-compose logs api`
 - Hot-reload only works with RunLocalServer (not RunLocalPublish)
 
 ### Published artifact issues
 - Ensure the build succeeded: check `publish/` directory for Server.Web executable
-- Check container logs: `docker logs localdev-api-1`
+- Check container logs: `docker-compose logs api`
 - Verify the HTTPS certificate is accessible in the container:
   ```bash
-  docker exec -it localdev-api-1 ls -la /https/aspnetapp.pfx
+  docker-compose -f Task/LocalDev/docker-compose.dev-deps.yml -f Task/LocalDev/docker-compose.publish.yml exec api ls -la /https/aspnetapp.pfx
   ```
 
 ## Additional Resources
