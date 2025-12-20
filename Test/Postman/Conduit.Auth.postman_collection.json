@@ -852,11 +852,6 @@
 								"value": "XMLHttpRequest"
 							},
 							{
-								"key": "Authorization",
-								"value": "Token {{token}}",
-								"disabled": true
-							},
-							{
 								"key": "x-correlation-id",
 								"value": "{{correlationId}}",
 								"type": "text"
@@ -1375,7 +1370,7 @@
 					"            );",
 					"        }",
 					"        ",
-					"        pm.test(`At least one error for field '${fieldName}'`, function () {",
+					"        pm.testWithCorrelation(`At least one error for field '${fieldName}'`, function () {",
 					"            pm.expect(hasFieldError).to.be.true;",
 					"        });",
 					"    }",
