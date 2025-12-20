@@ -17,6 +17,8 @@ COPY --from=cert-generator /https/aspnetapp.pfx /https/aspnetapp.pfx
 RUN apt-get update && apt-get install -y curl unzip wget && rm -rf /var/lib/apt/lists/*
 
 # Install vsdbg for remote debugging with Rider and other IDEs
+# Using 'latest' version as recommended by Microsoft for development containers
+# See: https://github.com/microsoft/vsdbg
 RUN wget -q https://aka.ms/getvsdbgsh && \
     sh getvsdbgsh -v latest -l /vsdbg && \
     rm getvsdbgsh

@@ -81,7 +81,7 @@ Both development modes (hot-reload and published artifact) include vsdbg (Visual
    - Select the running `api` container from the list
    
 4. After connecting:
-   - Find the `Server.Web` process in the process list (the process name may appear as the executable name)
+   - Find the `Server.Web` process in the process list
    - Click **Attach with .NET Core Debugger**
 
 5. Set breakpoints in your code and debug as usual
