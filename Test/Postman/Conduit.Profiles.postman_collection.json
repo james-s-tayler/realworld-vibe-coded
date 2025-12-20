@@ -81,7 +81,8 @@
 									""
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -95,6 +96,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -156,7 +162,8 @@
 									""
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
@@ -166,7 +173,8 @@
 									""
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -180,6 +188,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -227,7 +240,8 @@
 									""
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
@@ -239,7 +253,8 @@
 									"pm.globals.set(\"SECOND_USERNAME\", secondEmail);"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -253,6 +268,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -298,7 +318,8 @@
 									"}"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -312,6 +333,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -342,7 +368,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -361,6 +388,11 @@
 								"key": "Authorization",
 								"value": "Token {{token}}",
 								"disabled": true
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -412,7 +444,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -430,6 +463,11 @@
 							{
 								"key": "Authorization",
 								"value": "Token {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -481,7 +519,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -499,6 +538,11 @@
 							{
 								"key": "Authorization",
 								"value": "Token {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -531,7 +575,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -549,6 +594,11 @@
 							{
 								"key": "Authorization",
 								"value": "Token {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -600,7 +650,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -614,6 +665,11 @@
 							{
 								"key": "Authorization",
 								"value": "Token {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -660,7 +716,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -674,6 +731,11 @@
 							{
 								"key": "Authorization",
 								"value": "Token {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -701,7 +763,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -715,6 +778,11 @@
 							{
 								"key": "Authorization",
 								"value": "Token {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -742,7 +810,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -756,6 +825,11 @@
 							{
 								"key": "Authorization",
 								"value": "Token {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -802,7 +876,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -817,6 +892,11 @@
 								"key": "Authorization",
 								"value": "Token {{token}}",
 								"disabled": true
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -844,7 +924,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -859,6 +940,11 @@
 								"key": "Authorization",
 								"value": "Token {{token}}",
 								"disabled": true
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -906,7 +992,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -920,6 +1007,11 @@
 							{
 								"key": "Authorization",
 								"value": "Token {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -957,7 +1049,8 @@
 									"utils.assertErrorStartsWith(\"username\", pm);"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -971,6 +1064,11 @@
 							{
 								"key": "Authorization",
 								"value": "Token {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -1018,7 +1116,8 @@
 									"})"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -1032,6 +1131,11 @@
 							{
 								"key": "Authorization",
 								"value": "Token {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {

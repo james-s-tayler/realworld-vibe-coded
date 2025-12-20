@@ -27,7 +27,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -37,6 +38,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -69,7 +75,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -79,6 +86,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -117,7 +129,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -127,6 +140,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -165,7 +183,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -175,6 +194,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -213,7 +237,8 @@
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -223,6 +248,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
