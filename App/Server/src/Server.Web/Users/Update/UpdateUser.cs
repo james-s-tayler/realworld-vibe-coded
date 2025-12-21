@@ -10,12 +10,12 @@ namespace Server.Web.Users.Update;
 /// <remarks>
 /// Update the currently authenticated user's details.
 /// </remarks>
-public class UpdateUser(IMediator mediator, IUserContext userContext) : Endpoint<UpdateUserRequest, UpdateUserResponse, UserMapper>
+public class UpdateUser(IMediator mediator, IUserContext userContext) : Endpoint<UpdateUserRequest, UpdateUserResponse>
 {
   public override void Configure()
   {
     Put(UpdateUserRequest.Route);
-    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
+    AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
     Summary(s =>
     {
       s.Summary = "Update current user";
@@ -51,9 +51,15 @@ public class UpdateUser(IMediator mediator, IUserContext userContext) : Endpoint
 
     await Send.ResultMapperAsync(
       result,
-      userDto => new UpdateUserResponse
+      user => new UpdateUserResponse
       {
-        User = Map.FromEntity(userDto),
+        User = new UserResponse
+        {
+          Email = user.Email!,
+          Username = user.UserName!,
+          Bio = user.Bio ?? string.Empty,
+          Image = user.Image,
+        },
       },
       cancellationToken);
   }

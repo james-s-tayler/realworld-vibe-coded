@@ -10,12 +10,12 @@ namespace Server.Web.Users.GetCurrent;
 /// <remarks>
 /// Get the currently authenticated user details.
 /// </remarks>
-public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint<EmptyRequest, UserCurrentResponse, UserMapper>
+public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint<EmptyRequest, UserCurrentResponse>
 {
   public override void Configure()
   {
     Get("/api/user");
-    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
+    AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
     Summary(s =>
     {
       s.Summary = "Get current user";
@@ -31,9 +31,15 @@ public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint
 
     await Send.ResultMapperAsync(
       result,
-      userDto => new UserCurrentResponse
+      user => new UserCurrentResponse
       {
-        User = Map.FromEntity(userDto),
+        User = new UserResponse
+        {
+          Email = user.Email!,
+          Username = user.UserName!,
+          Bio = user.Bio ?? string.Empty,
+          Image = user.Image,
+        },
       },
       cancellationToken);
   }

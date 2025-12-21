@@ -104,38 +104,4 @@ public class UserContextTests
     // Assert
     username.ShouldBeNull();
   }
-
-  [Fact]
-  public void GetCurrentToken_WhenAuthorizationHeaderPresent_ShouldReturnToken()
-  {
-    // Arrange
-    var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
-    var httpContext = new DefaultHttpContext();
-    httpContext.Request.Headers["Authorization"] = "Token test-token-123";
-    httpContextAccessor.HttpContext.Returns(httpContext);
-
-    var userContext = new UserContext(httpContextAccessor);
-
-    // Act
-    var token = userContext.GetCurrentToken();
-
-    // Assert
-    token.ShouldBe("test-token-123");
-  }
-
-  [Fact]
-  public void GetCurrentToken_WhenNoHttpContext_ShouldReturnNull()
-  {
-    // Arrange
-    var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
-    httpContextAccessor.HttpContext.Returns((HttpContext?)null);
-
-    var userContext = new UserContext(httpContextAccessor);
-
-    // Act
-    var token = userContext.GetCurrentToken();
-
-    // Assert
-    token.ShouldBeNull();
-  }
 }

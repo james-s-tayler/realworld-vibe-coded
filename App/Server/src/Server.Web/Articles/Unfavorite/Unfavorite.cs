@@ -16,7 +16,7 @@ public class Unfavorite(IMediator mediator, IUserContext userContext) : Endpoint
   public override void Configure()
   {
     Delete("/api/articles/{slug}/favorite");
-    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
+    AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
     Summary(s =>
     {
       s.Summary = "Unfavorite article";

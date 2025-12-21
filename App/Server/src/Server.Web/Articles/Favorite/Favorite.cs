@@ -16,7 +16,7 @@ public class Favorite(IMediator mediator, IUserContext userContext) : Endpoint<F
   public override void Configure()
   {
     Post("/api/articles/{slug}/favorite");
-    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
+    AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
     Summary(s =>
     {
       s.Summary = "Favorite article";
