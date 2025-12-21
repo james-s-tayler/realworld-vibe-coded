@@ -33,14 +33,7 @@ public static class InfrastructureServiceExtensions
            .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
            .AddScoped<IUnitOfWork, UnitOfWork>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
-           .AddScoped<IJwtTokenGenerator, JwtTokenGenerator>()
            .AddScoped<IUserContext, UserContext>();
-
-    // Configure JWT settings
-    var jwtSettings = new JwtSettings();
-    config.GetSection("JwtSettings").Bind(jwtSettings);
-    services.AddSingleton(jwtSettings);
-
 
     logger.LogInformation("{Project} services registered", "Infrastructure");
 

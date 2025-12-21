@@ -2,7 +2,7 @@
 using Server.Core.UserAggregate;
 using Server.SharedKernel.DomainEvents;
 using Server.SharedKernel.MediatR;
-using Server.UseCases.Users.Register;
+using Server.UseCases.Users.GetCurrent;
 
 namespace Server.Web.Configurations;
 
@@ -13,7 +13,7 @@ public static class MediatrConfigs
     var mediatRAssemblies = new[]
       {
         Assembly.GetAssembly(typeof(User)), // Core
-        Assembly.GetAssembly(typeof(RegisterUserCommand)), // UseCases
+        Assembly.GetAssembly(typeof(GetCurrentUserQuery)), // UseCases
         Assembly.GetAssembly(typeof(Server.Web.DevOnly.UseCases.ThrowInUseCaseQuery)), // DevOnly
       };
 
