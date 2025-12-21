@@ -9,6 +9,4 @@ public class UserResponse
   public string Bio { get; set; } = default!;
 
   public string? Image { get; set; }
-
-  public string Token { get; set; } = default!;
 }

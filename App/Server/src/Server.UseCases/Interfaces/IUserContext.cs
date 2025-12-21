@@ -27,12 +27,6 @@ public interface IUserContext
   bool IsAuthenticated();
 
   /// <summary>
-  /// Gets the current JWT token from the Authorization header
-  /// </summary>
-  /// <returns>The JWT token if present, otherwise null</returns>
-  string? GetCurrentToken();
-
-  /// <summary>
   /// Gets the current authenticated user's username
   /// </summary>
   /// <returns>The username if authenticated, otherwise null</returns>

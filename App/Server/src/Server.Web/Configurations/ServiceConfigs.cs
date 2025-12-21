@@ -1,15 +1,10 @@
-﻿using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
 using Server.Core.IdentityAggregate;
 using Server.Infrastructure;
-using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Email;
 using Server.UseCases.Interfaces;
 using Server.Web.Infrastructure;
-using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace Server.Web.Configurations;
 
@@ -33,97 +28,10 @@ public static class ServiceConfigs
       });
     });
 
-    // Configure JWT Authentication
-    var jwtSettings = new JwtSettings();
-    builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
-
-    // Configure authentication with both Token and Bearer schemes for APIs
-    // Use a policy scheme to intelligently select between Token (custom JWT) and Identity Bearer
-    services.AddAuthentication(options =>
-    {
-      options.DefaultAuthenticateScheme = "TokenOrBearer";
-      options.DefaultChallengeScheme = "TokenOrBearer";
-      options.DefaultScheme = "TokenOrBearer";
-    })
-      .AddPolicyScheme("TokenOrBearer", "Token or Bearer", options =>
-      {
-        options.ForwardDefaultSelector = context =>
-        {
-          string? authorization = context.Request.Headers["Authorization"];
-          if (!string.IsNullOrEmpty(authorization))
-          {
-            if (authorization.StartsWith("Token ", StringComparison.OrdinalIgnoreCase))
-            {
-              return "Token";
-            }
-            else if (authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-            {
-              // Route to Identity Bearer scheme (from /api/identity endpoints)
-              return IdentityConstants.BearerScheme;
-            }
-          }
-
-          // Default to Identity Bearer if no prefix or unknown prefix
-          return IdentityConstants.BearerScheme;
-        };
-      })
-      .AddJwtBearer("Token", options =>
-      {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-          ValidateIssuerSigningKey = true,
-          IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
-          ValidateIssuer = true,
-          ValidIssuer = jwtSettings.Issuer,
-          ValidateAudience = true,
-          ValidAudience = jwtSettings.Audience,
-          ValidateLifetime = true,
-          ClockSkew = TimeSpan.Zero,
-        };
-
-        // Configure events to return JSON error responses for authentication failures
-        options.Events = new JwtBearerEvents
-        {
-          OnMessageReceived = context =>
-          {
-            string? authorization = context.Request.Headers["Authorization"];
-
-            if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Token ", StringComparison.OrdinalIgnoreCase))
-            {
-              context.Token = authorization.Substring("Token ".Length).Trim();
-            }
-
-            return Task.CompletedTask;
-          },
-          OnChallenge = async context =>
-          {
-            context.HandleResponse();
-            await context.HttpContext.Response.SendErrorsAsync(
-              new List<ValidationFailure>([
-                new ValidationFailure(
-                  context.Error ?? "authorization",
-                  context.ErrorDescription ?? "Unauthorized"),
-              ]),
-              StatusCodes.Status401Unauthorized);
-          },
-          OnForbidden = async context =>
-          {
-            await context.HttpContext.Response.SendErrorsAsync(
-              new List<ValidationFailure>([
-                new ValidationFailure(
-                  "authorization",
-                  context.Result?.Failure?.Message ?? "Forbidden"),
-              ]),
-              StatusCodes.Status403Forbidden);
-          },
-        };
-      });
-
-    // Configure ASP.NET Identity Core (without authentication defaults to avoid conflicts with JWT)
+    // Configure ASP.NET Identity Core
     services.AddIdentityCore<ApplicationUser>(options =>
     {
       // Password policy - relaxed to match legacy requirements for backward compatibility
-      // TODO: Tighten these requirements after migrating all tests and clients
       options.Password.RequireDigit = false;
       options.Password.RequireLowercase = false;
       options.Password.RequireUppercase = false;
@@ -145,14 +53,20 @@ public static class ServiceConfigs
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddSignInManager<SignInManager<ApplicationUser>>()
-    .AddApiEndpoints() // Add Identity API endpoints support
+    .AddApiEndpoints()
     .AddDefaultTokenProviders();
 
-    // Add cookie authentication for Identity (without setting as default scheme)
-    services.AddAuthentication()
-      .AddCookie(IdentityConstants.ApplicationScheme, options =>
+    // Configure authentication with Identity Bearer and Cookie schemes
+    services.AddAuthentication(options =>
+    {
+      options.DefaultAuthenticateScheme = IdentityConstants.BearerScheme;
+      options.DefaultChallengeScheme = IdentityConstants.BearerScheme;
+      options.DefaultScheme = IdentityConstants.BearerScheme;
+    })
+    .AddBearerToken(IdentityConstants.BearerScheme)
+    .AddCookie(IdentityConstants.ApplicationScheme, options =>
       {
-        // Cookie settings (Decision 4: SameSite.Lax)
+        // Cookie settings
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
@@ -181,8 +95,7 @@ public static class ServiceConfigs
 
           return Task.CompletedTask;
         };
-      })
-      .AddBearerToken(IdentityConstants.BearerScheme);
+      });
 
 
     // Configure CSRF protection for cookie-based authentication

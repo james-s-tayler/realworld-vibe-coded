@@ -16,7 +16,7 @@ public class Create(IMediator mediator, IUserContext userContext) : Endpoint<Cre
   public override void Configure()
   {
     Post("/api/articles");
-    AuthSchemes("Token", Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
+    AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
     Summary(s =>
     {
       s.Summary = "Create article";
