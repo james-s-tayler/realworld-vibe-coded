@@ -13,7 +13,7 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
     var email = $"current-{Guid.NewGuid()}@example.com";
     var password = "password123";
 
-    var (client, _, accessToken) = await app.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await app.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     var (response, result) = await client.GETAsync<GetCurrent, UserCurrentResponse>();
 
@@ -137,8 +137,8 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
       },
     };
 
-    // SRV007: CreateAuthenticatedClient is a test fixture helper method that creates an HttpClient with auth headers.
-    // This is not a raw HTTP call but a necessary test setup step.
+    // Note: CreateAuthenticatedClient configures HttpClient headers but the analyzer flags it.
+    // Suppression needed until analyzer is fixed to not flag helper methods.
 #pragma warning disable SRV007
     var client1Auth = app.CreateAuthenticatedClient(accessToken1);
 #pragma warning restore SRV007
