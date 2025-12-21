@@ -3,15 +3,12 @@
 namespace Server.FunctionalTests;
 
 /// <summary>
-/// Helper methods for interacting with Identity API endpoints
+/// Base fixture class that provides Identity API helper methods for test fixtures
 /// </summary>
-public static class IdentityApiHelpers
+public abstract class ApiFixtureBase<TProgram> : AppFixture<TProgram>
+  where TProgram : class
 {
-  /// <summary>
-  /// Register a new user via Identity API
-  /// </summary>
-  public static async Task<string> RegisterUserAsync(
-    HttpClient client,
+  public async Task<string> RegisterUserAsync(
     string email,
     string password,
     CancellationToken cancellationToken = default)
@@ -22,7 +19,7 @@ public static class IdentityApiHelpers
       password,
     };
 
-    var response = await client.PostAsJsonAsync(
+    var response = await Client.PostAsJsonAsync(
       "/api/identity/register",
       registerPayload,
       cancellationToken);
@@ -33,12 +30,7 @@ public static class IdentityApiHelpers
     return result?.AccessToken ?? throw new InvalidOperationException("Registration did not return an access token");
   }
 
-  /// <summary>
-  /// Register a user and return an authenticated HttpClient
-  /// </summary>
-  public static async Task<(HttpClient Client, string Email, string AccessToken)> RegisterUserAndCreateClientAsync(
-    HttpClient baseClient,
-    Func<Action<HttpClient>, HttpClient> createClientFunc,
+  public async Task<(HttpClient Client, string Email, string AccessToken)> RegisterUserAndCreateClientAsync(
     string? email = null,
     string? password = null,
     CancellationToken cancellationToken = default)
@@ -46,17 +38,13 @@ public static class IdentityApiHelpers
     email ??= $"user-{Guid.NewGuid()}@example.com";
     password ??= "Password123!";
 
-    var accessToken = await RegisterUserAsync(baseClient, email, password, cancellationToken);
-    var client = CreateAuthenticatedClient(createClientFunc, accessToken);
+    var accessToken = await RegisterUserAsync(email, password, cancellationToken);
+    var client = CreateAuthenticatedClient(accessToken);
 
     return (client, email, accessToken);
   }
 
-  /// <summary>
-  /// Login a user via Identity API
-  /// </summary>
-  public static async Task<string> LoginUserAsync(
-    HttpClient client,
+  public async Task<string> LoginUserAsync(
     string email,
     string password,
     CancellationToken cancellationToken = default)
@@ -67,7 +55,7 @@ public static class IdentityApiHelpers
       password,
     };
 
-    var response = await client.PostAsJsonAsync(
+    var response = await Client.PostAsJsonAsync(
       "/api/identity/login?useCookies=false",
       loginPayload,
       cancellationToken);
@@ -78,14 +66,9 @@ public static class IdentityApiHelpers
     return result?.AccessToken ?? throw new InvalidOperationException("Login did not return an access token");
   }
 
-  /// <summary>
-  /// Create an authenticated HttpClient with Bearer token
-  /// </summary>
-  public static HttpClient CreateAuthenticatedClient(
-    Func<Action<HttpClient>, HttpClient> createClientFunc,
-    string accessToken)
+  public HttpClient CreateAuthenticatedClient(string accessToken)
   {
-    return createClientFunc(c =>
+    return CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
     });

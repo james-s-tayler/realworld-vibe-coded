@@ -5,11 +5,11 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-// SRV007: IdentityApiHelpers uses raw HttpClient methods to call ASP.NET Core Identity API endpoints
-// which are not FastEndpoints. This is necessary and intentional. Suppress warnings for the entire test namespace.
+// SRV007: ApiFixtureBase uses raw HttpClient methods to call ASP.NET Core Identity API endpoints
+// which are not FastEndpoints. This is necessary and intentional.
 [assembly: SuppressMessage(
   "Server.Analyzers",
   "SRV007:Do not use raw HttpClient methods. Use FastEndpoints extension methods like POSTAsync, GETAsync, PUTAsync, DELETEAsync, or PATCHAsync instead for better test readability and consistency.",
-  Justification = "Identity API helpers call ASP.NET Core Identity API endpoints (MapIdentityApi) which are not FastEndpoints",
+  Justification = "ApiFixtureBase calls ASP.NET Core Identity API endpoints (MapIdentityApi) which are not FastEndpoints",
   Scope = "namespaceanddescendants",
   Target = "~N:Server.FunctionalTests")]

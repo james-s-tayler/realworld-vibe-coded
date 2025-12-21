@@ -4,7 +4,7 @@ using Testcontainers.MsSql;
 
 namespace Server.FunctionalTests.Articles.Fixture;
 
-public class ArticlesFixture : AppFixture<Program>
+public class ArticlesFixture : ApiFixtureBase<Program>
 {
   private MsSqlContainer _container = null!;
   private string _connectionString = null!;
@@ -80,10 +80,6 @@ public class ArticlesFixture : AppFixture<Program>
 
   protected override async ValueTask SetupAsync()
   {
-    // Schema is already created in PreSetupAsync
-    // SetupAsync still needs to run to create test data (users, clients, etc.)
-
-    // Identity API sets username to email by default
     ArticlesUser1Email = $"articlesuser1-{Guid.NewGuid()}@example.com";
     ArticlesUser1Username = ArticlesUser1Email;
     var articlesUser1Password = "Password123!";
@@ -92,20 +88,17 @@ public class ArticlesFixture : AppFixture<Program>
     ArticlesUser2Username = ArticlesUser2Email;
     var articlesUser2Password = "Password123!";
 
-    // Register and login via Identity API to get access tokens
-    var token1 = await IdentityApiHelpers.RegisterUserAsync(
-      Client,
+    var token1 = await RegisterUserAsync(
       ArticlesUser1Email,
       articlesUser1Password);
 
-    ArticlesUser1Client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => CreateClient(cfg), token1);
+    ArticlesUser1Client = CreateAuthenticatedClient(token1);
 
-    var token2 = await IdentityApiHelpers.RegisterUserAsync(
-      Client,
+    var token2 = await RegisterUserAsync(
       ArticlesUser2Email,
       articlesUser2Password);
 
-    ArticlesUser2Client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => CreateClient(cfg), token2);
+    ArticlesUser2Client = CreateAuthenticatedClient(token2);
   }
 
   protected override ValueTask TearDownAsync()

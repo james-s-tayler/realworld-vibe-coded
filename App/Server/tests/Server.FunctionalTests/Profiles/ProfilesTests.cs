@@ -15,7 +15,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var email = $"test-{Guid.NewGuid()}@example.com";
     var password = "Password123!";
 
-    await IdentityApiHelpers.RegisterUserAsync(app.Client, email, password, TestContext.Current.CancellationToken);
+    await app.RegisterUserAsync(email, password, TestContext.Current.CancellationToken);
 
     var request = new GetProfileRequest { Username = email };
     var (response, result) = await app.Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
@@ -34,10 +34,10 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
     var password = "Password123!";
 
-    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
-    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
+    var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+    await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
+    var client = app.CreateAuthenticatedClient(user1Token);
 
     var request = new GetProfileRequest { Username = user2Email };
     var (response, result) = await client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
@@ -56,10 +56,10 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
     var password = "Password123!";
 
-    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
-    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
+    var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+    await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
+    var client = app.CreateAuthenticatedClient(user1Token);
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -99,10 +99,10 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
     var password = "Password123!";
 
-    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
-    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
+    var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+    await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
+    var client = app.CreateAuthenticatedClient(user1Token);
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     var (response, result) = await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -121,10 +121,10 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
     var password = "Password123!";
 
-    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
-    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
+    var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+    await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
+    var client = app.CreateAuthenticatedClient(user1Token);
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -148,9 +148,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
   [Fact]
   public async Task FollowProfile_NonExistentUser_ReturnsNotFound()
   {
-    var (client, _, _) = await IdentityApiHelpers.RegisterUserAndCreateClientAsync(
-      app.Client,
-      cfg => app.CreateClient(cfg),
+    var (client, _, _) = await app.RegisterUserAndCreateClientAsync(
       cancellationToken: TestContext.Current.CancellationToken);
 
     var followRequest = new FollowProfileRequest { Username = "nonexistentuser999" };
@@ -167,10 +165,10 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
     var password = "Password123!";
 
-    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
-    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
+    var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+    await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
+    var client = app.CreateAuthenticatedClient(user1Token);
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -192,10 +190,10 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
     var password = "Password123!";
 
-    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
-    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
+    var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+    await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
+    var client = app.CreateAuthenticatedClient(user1Token);
 
     var unfollowRequest = new UnfollowProfileRequest { Username = user2Email };
     var (response, _) = await client.DELETEAsync<Unfollow, UnfollowProfileRequest, object>(unfollowRequest);
