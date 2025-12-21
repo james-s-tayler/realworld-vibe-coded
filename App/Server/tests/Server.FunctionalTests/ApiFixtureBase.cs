@@ -19,19 +19,20 @@ public abstract class ApiFixtureBase<TProgram> : AppFixture<TProgram>
       password,
     };
 
-    var response = await Client.PostAsJsonAsync(
+    // Step 1: Register the user (returns empty body with 200 OK on success)
+    var registerResponse = await Client.PostAsJsonAsync(
       "/api/identity/register",
       registerPayload,
       cancellationToken);
 
-    if (!response.IsSuccessStatusCode)
+    if (!registerResponse.IsSuccessStatusCode)
     {
-      var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-      throw new InvalidOperationException($"Registration failed with status {response.StatusCode}. Response: {errorContent}");
+      var errorContent = await registerResponse.Content.ReadAsStringAsync(cancellationToken);
+      throw new InvalidOperationException($"Registration failed with status {registerResponse.StatusCode}. Response: {errorContent}");
     }
 
-    var result = await response.Content.ReadFromJsonAsync<IdentityRegisterResponse>(cancellationToken);
-    return result?.AccessToken ?? throw new InvalidOperationException("Registration did not return an access token");
+    // Step 2: Login to get the access token (Identity API register doesn't return a token)
+    return await LoginUserAsync(email, password, cancellationToken);
   }
 
   public async Task<(HttpClient Client, string Email, string AccessToken)> RegisterUserAndCreateClientAsync(
@@ -77,8 +78,6 @@ public abstract class ApiFixtureBase<TProgram> : AppFixture<TProgram>
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
     });
   }
-
-  private record IdentityRegisterResponse(string AccessToken);
 
   private record IdentityLoginResponse(string AccessToken);
 }
