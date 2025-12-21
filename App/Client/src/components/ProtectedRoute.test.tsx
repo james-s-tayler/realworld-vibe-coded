@@ -8,6 +8,7 @@ import { authApi } from '../api/auth'
 vi.mock('../api/auth', () => ({
   authApi: {
     getCurrentUser: vi.fn(),
+    logout: vi.fn(),
   },
 }))
 

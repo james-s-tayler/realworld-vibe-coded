@@ -10,6 +10,7 @@ vi.mock('../api/auth', () => ({
   authApi: {
     register: vi.fn(),
     login: vi.fn(),
+    logout: vi.fn(),
     getCurrentUser: vi.fn(),
   },
 }))
@@ -36,8 +37,7 @@ function renderRegisterPage() {
 describe('RegisterPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    localStorage.clear()
-    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No token'))
+    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No session'))
   })
 
   it('renders registration form', () => {
@@ -67,7 +67,7 @@ describe('RegisterPage', () => {
     }
 
     vi.mocked(authApi.register).mockResolvedValue(undefined)
-    vi.mocked(authApi.login).mockResolvedValue('new-token')
+    vi.mocked(authApi.login).mockResolvedValue()
     vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
 
     renderRegisterPage()
