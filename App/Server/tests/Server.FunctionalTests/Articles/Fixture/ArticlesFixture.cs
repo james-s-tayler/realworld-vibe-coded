@@ -98,14 +98,14 @@ public class ArticlesFixture : AppFixture<Program>
       ArticlesUser1Email,
       articlesUser1Password);
 
-    ArticlesUser1Client = IdentityApiHelpers.CreateAuthenticatedClient(CreateClient, token1);
+    ArticlesUser1Client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => CreateClient(cfg), token1);
 
     var token2 = await IdentityApiHelpers.RegisterUserAsync(
       Client,
       ArticlesUser2Email,
       articlesUser2Password);
 
-    ArticlesUser2Client = IdentityApiHelpers.CreateAuthenticatedClient(CreateClient, token2);
+    ArticlesUser2Client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => CreateClient(cfg), token2);
   }
 
   protected override ValueTask TearDownAsync()

@@ -37,7 +37,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
     await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
 
     var request = new GetProfileRequest { Username = user2Email };
     var (response, result) = await client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
@@ -59,7 +59,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
     await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -102,7 +102,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
     await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     var (response, result) = await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -124,7 +124,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
     await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -150,7 +150,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
   {
     var (client, _, _) = await IdentityApiHelpers.RegisterUserAndCreateClientAsync(
       app.Client,
-      app.CreateClient,
+      cfg => app.CreateClient(cfg),
       cancellationToken: TestContext.Current.CancellationToken);
 
     var followRequest = new FollowProfileRequest { Username = "nonexistentuser999" };
@@ -170,7 +170,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
     await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -195,7 +195,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
     await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(cfg => app.CreateClient(cfg), user1Token);
 
     var unfollowRequest = new UnfollowProfileRequest { Username = user2Email };
     var (response, _) = await client.DELETEAsync<Unfollow, UnfollowProfileRequest, object>(unfollowRequest);
