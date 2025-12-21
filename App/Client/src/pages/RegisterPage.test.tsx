@@ -67,7 +67,8 @@ describe('RegisterPage', () => {
     }
 
     vi.mocked(authApi.register).mockResolvedValue(undefined)
-    vi.mocked(authApi.login).mockResolvedValue({ user: mockUser })
+    vi.mocked(authApi.login).mockResolvedValue('new-token')
+    vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
 
     renderRegisterPage()
 

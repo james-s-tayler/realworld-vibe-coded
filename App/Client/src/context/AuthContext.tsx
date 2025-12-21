@@ -33,8 +33,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await authApi.login(email, password);
-    localStorage.setItem('token', response.user.token);
+    const token = await authApi.login(email, password);
+    localStorage.setItem('token', token);
+    // Fetch user details after login
+    const response = await authApi.getCurrentUser();
     setUser(response.user);
   };
 
