@@ -95,11 +95,110 @@ Plans are organized under the `.flowpilot` directory with the following structur
 
 ## When Copilot Writes Migration Plans
 
-1. **Start with research**: Use mslearn mcp server and web search before writing any phases. Make sure all resources are leveraged thoroughly to search for relevant material.
-2. **Document sources**: Record all references in `references.md`
-3. **Structure properly**: Follow the file and phase structure exactly
-4. **Verify requirements**: Ensure each phase ends with verification targets
-5. **Stay focused**: Don't include checklists, documentation, or timelines
+### Research Phase (Critical)
+
+1. **Start with comprehensive research**: Use mslearn mcp server and web search BEFORE writing any analysis or phases
+   - Search for official documentation and migration guides
+   - Search for "common pitfalls" and "known issues"
+   - Search for "breaking changes" and version compatibility
+   - Search for community experiences and Stack Overflow issues
+   - Search for architectural patterns and best practices
+   
+2. **Document ALL findings** in `references.md`:
+   - Follow the enhanced template structure
+   - Complete the Research Checklist
+   - Document known issues and pitfalls explicitly
+   - Document alternative approaches and why they were rejected
+
+3. **Validate critical assumptions**:
+   - For high-risk technical approaches, search for proof-of-concept examples
+   - Look for GitHub repositories demonstrating the pattern
+   - Search for blog posts describing similar migrations
+   - Identify potential blockers BEFORE planning phases
+
+### System Analysis Phase (Critical)
+
+4. **Complete comprehensive system analysis** in `system-analysis.md`:
+   - Use the Analysis Checklist to ensure nothing is missed
+   - **Identify ALL handler/service dependencies** - This is where many plans fail
+   - Map the ripple effects of changes (changing X requires updating Y, Z, W...)
+   - Document cross-cutting concerns (logging, auditing, security)
+   - Analyze test infrastructure and maintenance requirements
+   - Use `grep` and `glob` tools to find all usages of components being migrated
+
+5. **Critical: Identify Ripple Effects**:
+   - If changing a database entity, find ALL handlers that use it
+   - If changing authentication, find ALL endpoints and tests affected
+   - If changing a core service, find ALL consumers
+   - Document these explicitly - hidden dependencies cause phase failures
+
+### Key Decisions Phase
+
+6. **Make informed decisions** in `key-decisions.md`:
+   - Complete the Critical Decision Checklist
+   - Reference specific findings from references.md and system-analysis.md
+   - For high-risk decisions, consider creating a proof-of-concept phase
+   - Document implementation notes and validation criteria
+   - **Think about test maintenance strategy** - often overlooked but critical
+
+### Phase Analysis Phase (Critical)
+
+7. **Plan phases with appropriate scope**:
+   - Follow Phase Planning Principles in the template
+   - Complete the Phase Scope Guidelines assessment
+   - **Complete the Ripple Effect Analysis** for each phase
+   - Target Small phases (5-10 steps) - avoid Large phases (20+ steps)
+   - High-risk changes should be split into multiple smaller phases
+   - Account for test maintenance in phase scope
+   
+8. **Validate phase plan**:
+   - Complete the Phase Validation Checklist
+   - Ensure each phase reaches a complete working state
+   - Verify rollback is possible at the end of each phase
+   - Check that no phase is too large or has too many ripple effects
+
+### Phase Details Phase
+
+9. **Write detailed phase instructions**:
+   - Follow the enhanced phase-n-details template
+   - Include Known Risks & Mitigations section
+   - Specify files affected in each step
+   - Include Reality Testing During Phase guidance
+   - Document Expected Working State After Phase
+   - Provide Rollback Plan for the phase
+   
+10. **Verification criteria must be explicit**:
+    - List specific Nuke targets to run
+    - Include manual verification steps
+    - Specify what should be true when phase is complete
+    - Don't assume - be explicit about success criteria
+
+### Common Pitfalls to Avoid
+
+**Research Phase Pitfalls:**
+- ❌ Searching only for "how to" without searching for "pitfalls" or "issues"
+- ❌ Missing breaking changes in library versions
+- ❌ Not researching compatibility with existing dependencies (e.g., Audit.NET + Identity)
+
+**System Analysis Pitfalls:**
+- ❌ Not identifying all handlers that use an entity being changed
+- ❌ Missing cross-cutting concerns (logging, auditing, validation)
+- ❌ Underestimating test maintenance effort
+- ❌ Not mapping ripple effects of changes
+
+**Phase Planning Pitfalls:**
+- ❌ Creating phases that are too large (20+ implementation steps)
+- ❌ Planning phases that don't reach a working state
+- ❌ Not accounting for test updates in phase scope
+- ❌ Missing hidden dependencies between components
+- ❌ Dual-write approaches without transaction analysis
+
+**Common Migration Mistakes:**
+- ❌ Assuming dual-write will work without testing transaction semantics
+- ❌ Not identifying all code that queries the entity being replaced
+- ❌ Underestimating the scope of changing authentication/authorization
+- ❌ Planning to change database schema and handlers in the same phase
+- ❌ Not having explicit phases for test infrastructure updates
 
 ---
 
