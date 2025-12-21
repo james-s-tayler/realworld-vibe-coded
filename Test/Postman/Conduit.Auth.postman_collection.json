@@ -771,6 +771,8 @@
 									"pm.testWithCorrelation('User has \"image\" property', function() {",
 									"    pm.expect(user).to.have.property('image')",
 									"});",
+									"pm.testWithCorrelation('User has \"token\" property that matches the token in the Authorization header', function() {",
+									"    pm.expect(user.token).to.be.a('string').and.to.have.length.above(10)});",
 									""
 								],
 								"type": "text/javascript",
@@ -954,6 +956,8 @@
 									"pm.testWithCorrelation('\"image\" matches the UPDATED_IMAGE variable', function() {",
 									"    pm.expect(user.image).to.eql(pm.globals.get('UPDATED_IMAGE'))",
 									"});",
+									"pm.testWithCorrelation('User has \"token\" property', function() {",
+									"    pm.expect(user).to.have.property('token')",
 									"});"
 								],
 								"type": "text/javascript",
