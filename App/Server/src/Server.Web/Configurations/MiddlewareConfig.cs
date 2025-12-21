@@ -59,6 +59,7 @@ public static class MiddlewareConfig
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseAntiforgery(); // Enable CSRF protection for cookie-based authentication
 
     app.MapGroup("/api/identity").MapIdentityApi<ApplicationUser>().AllowAnonymous();
 
