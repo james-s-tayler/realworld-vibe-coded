@@ -37,13 +37,36 @@ public static class ServiceConfigs
     var jwtSettings = new JwtSettings();
     builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
 
-    // Configure authentication with Token (JWT) as default scheme for APIs
+    // Configure authentication with both Token and Bearer schemes for APIs
+    // Use a policy scheme to intelligently select between Token (custom JWT) and Identity Bearer
     services.AddAuthentication(options =>
     {
-      options.DefaultAuthenticateScheme = "Token";
-      options.DefaultChallengeScheme = "Token";
-      options.DefaultScheme = "Token";
+      options.DefaultAuthenticateScheme = "TokenOrBearer";
+      options.DefaultChallengeScheme = "TokenOrBearer";
+      options.DefaultScheme = "TokenOrBearer";
     })
+      .AddPolicyScheme("TokenOrBearer", "Token or Bearer", options =>
+      {
+        options.ForwardDefaultSelector = context =>
+        {
+          string? authorization = context.Request.Headers["Authorization"];
+          if (!string.IsNullOrEmpty(authorization))
+          {
+            if (authorization.StartsWith("Token ", StringComparison.OrdinalIgnoreCase))
+            {
+              return "Token";
+            }
+            else if (authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+              // Route to Identity Bearer scheme (from /api/identity endpoints)
+              return IdentityConstants.BearerScheme;
+            }
+          }
+
+          // Default to Identity Bearer if no prefix or unknown prefix
+          return IdentityConstants.BearerScheme;
+        };
+      })
       .AddJwtBearer("Token", options =>
       {
         options.TokenValidationParameters = new TokenValidationParameters
