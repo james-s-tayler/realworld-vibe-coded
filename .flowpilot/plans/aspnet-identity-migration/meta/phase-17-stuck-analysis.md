@@ -98,7 +98,9 @@ How should we handle the Postman and E2E test failures given that the legacy JWT
 
 ### Option D: Revert Phase 17 Changes, Create Intermediate Phase
 
-**Description:** Revert the deletion of JWT endpoints. Create a new intermediate phase (17a) to migrate tests first, then complete the cleanup in phase 17b.
+**Description:** Revert all changes in the current branch. Split phase 17 and two distinct phases: phase 17 to migrate tests first, then phase 18 complete the cleanup in phase 17b.
+Delete tests that whose sole purpose is to test the old register and login endpoitns themselves, and for any other tests that was relying on those endpoints,
+update them to test use the new `/api/identity/register` and `/api/identity/login?useCookies=false` endpoints. In the cleanup phase, the user mapper should remove Token since it's not used.
 
 **Pros:**
 - Maintains test coverage throughout
@@ -116,21 +118,6 @@ How should we handle the Postman and E2E test failures given that the legacy JWT
 
 ---
 
-## Recommendation
+## Selection
 
-**Option C** is recommended for immediate progress, with a commitment to Option A as a follow-up phase.
-
-**Rationale:**
-1. **Code migration is complete**: The application now uses Identity exclusively - this is the primary goal
-2. **Phase 17 is cleanup**: Test migration is a separate concern that should have been phase 16's responsibility
-3. **Functional tests pass**: Core server functionality verified via TestServer
-4. **Risk is manageable**: Frontend still works with Identity endpoints (verified in phase 16)
-5. **Clear path forward**: Document the gap and create phase 18 for comprehensive test migration
-
-**Proposed Next Steps:**
-1. Update phase-17-details.md to note test migration is deferred
-2. Mark phase 17 as complete with documented limitations
-3. Create phase 18: "Migrate Postman and E2E tests to Identity endpoints"
-4. Proceed with confidence that core functionality is working
-
-**Alternative:** If test coverage is deemed critical before marking phase 17 complete, proceed with Option A immediately.
+**Option D** has been chosen, since the current phase hit a roadblock and the current changes can't be trusted.
