@@ -82,13 +82,11 @@ Describe what should be true when this phase is complete:
 - Database schema is in state Y
 - API endpoints respond as expected
 
-### Rollback Plan
+### If Phase Fails
 
 If this phase fails and cannot be completed:
-1. Revert files: List key files to revert
-2. Revert database: List migrations to rollback
-3. Dependencies: List packages to remove/restore
-4. Restore state: Description of how to restore previous working state
+1. Try to do a debug analysis using `debug-analysis.md` to help identify the root cause
+2. If the debug analysis doesn't resolve the issue, run `flowpilot stuck` to get assistance with re-planning
 
 ### Verification
 
