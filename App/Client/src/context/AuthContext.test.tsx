@@ -9,6 +9,7 @@ vi.mock('../api/auth', () => ({
   authApi: {
     login: vi.fn(),
     register: vi.fn(),
+    logout: vi.fn(),
     getCurrentUser: vi.fn(),
     updateUser: vi.fn(),
   },
@@ -40,7 +41,7 @@ describe('AuthContext', () => {
   })
 
   it('provides initial unauthenticated state', async () => {
-    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No token'))
+    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No session'))
     
     render(
       <AuthProvider>
@@ -53,7 +54,7 @@ describe('AuthContext', () => {
     })
   })
 
-  it('loads user from token on mount if token exists', async () => {
+  it('loads user on mount if session exists', async () => {
     const mockUser = {
       email: 'test@example.com',
       username: 'testuser',
@@ -62,7 +63,6 @@ describe('AuthContext', () => {
       token: 'test-token',
     }
 
-    localStorage.setItem('token', 'test-token')
     vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
 
     render(
@@ -76,9 +76,8 @@ describe('AuthContext', () => {
     })
   })
 
-  it('removes token from localStorage on auth failure', async () => {
-    localStorage.setItem('token', 'invalid-token')
-    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('Invalid token'))
+  it('handles auth failure gracefully', async () => {
+    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('Invalid session'))
 
     render(
       <AuthProvider>
@@ -88,7 +87,6 @@ describe('AuthContext', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Not logged in')).toBeInTheDocument()
-      expect(localStorage.getItem('token')).toBeNull()
     })
   })
 })

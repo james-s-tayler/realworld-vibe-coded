@@ -9,6 +9,7 @@ import { authApi } from '../api/auth'
 vi.mock('../api/auth', () => ({
   authApi: {
     login: vi.fn(),
+    logout: vi.fn(),
     getCurrentUser: vi.fn(),
   },
 }))
@@ -35,8 +36,7 @@ function renderLoginPage() {
 describe('LoginPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    localStorage.clear()
-    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No token'))
+    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No session'))
   })
 
   it('renders login form', () => {
@@ -65,7 +65,7 @@ describe('LoginPage', () => {
       token: 'test-token',
     }
 
-    vi.mocked(authApi.login).mockResolvedValue('test-token')
+    vi.mocked(authApi.login).mockResolvedValue()
     vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
 
     renderLoginPage()

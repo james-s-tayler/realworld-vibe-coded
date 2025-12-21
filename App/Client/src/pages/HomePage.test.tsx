@@ -10,6 +10,7 @@ import { tagsApi } from '../api/tags'
 vi.mock('../api/auth', () => ({
   authApi: {
     getCurrentUser: vi.fn(),
+    logout: vi.fn(),
   },
 }))
 

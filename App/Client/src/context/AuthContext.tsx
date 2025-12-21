@@ -14,27 +14,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      authApi
-        .getCurrentUser()
-        .then((response) => {
-          setUser(response.user);
-        })
-        .catch(() => {
-          localStorage.removeItem('token');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
+    // Try to fetch current user on mount (cookie-based auth)
+    authApi
+      .getCurrentUser()
+      .then((response) => {
+        setUser(response.user);
+      })
+      .catch(() => {
+        // No valid session - user is not authenticated
+        setUser(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const login = async (email: string, password: string) => {
-    const token = await authApi.login(email, password);
-    localStorage.setItem('token', token);
+    await authApi.login(email, password);
     // Fetch user details after login
     const response = await authApi.getCurrentUser();
     setUser(response.user);
@@ -42,12 +38,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (email: string, password: string) => {
     await authApi.register(email, password);
-    // Now login to get the token
+    // Now login to get the session cookie
     await login(email, password);
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
+  const logout = async () => {
+    await authApi.logout();
     setUser(null);
   };
 
@@ -59,7 +55,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     image?: string;
   }) => {
     const response = await authApi.updateUser(updates);
-    localStorage.setItem('token', response.user.token);
     setUser(response.user);
   };
 

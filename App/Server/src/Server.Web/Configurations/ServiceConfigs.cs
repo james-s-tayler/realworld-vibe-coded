@@ -185,6 +185,16 @@ public static class ServiceConfigs
       .AddBearerToken(IdentityConstants.BearerScheme);
 
 
+    // Configure CSRF protection for cookie-based authentication
+    services.AddAntiforgery(options =>
+    {
+      options.HeaderName = "X-XSRF-TOKEN";
+      options.Cookie.Name = "XSRF-TOKEN";
+      options.Cookie.HttpOnly = false; // Client needs to read it
+      options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+      options.Cookie.SameSite = SameSiteMode.Strict;
+    });
+
     services.AddAuthorization();
     services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationMiddlewareResultHandler,
       Server.Web.Authorization.SuppressBearerChallengeAuthorizationMiddlewareResultHandler>();

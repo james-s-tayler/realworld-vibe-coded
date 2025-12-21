@@ -7,14 +7,18 @@ global.fetch = vi.fn()
 describe('apiRequest', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    localStorage.clear()
+    // Clear cookies for tests
+    document.cookie.split(';').forEach(cookie => {
+      const name = cookie.split('=')[0].trim()
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+    })
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  it('makes a successful request', async () => {
+  it('makes a successful request with credentials', async () => {
     const mockData = { user: { username: 'test' } }
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
@@ -29,15 +33,17 @@ describe('apiRequest', () => {
       '/api/test',
       expect.objectContaining({
         headers: {},
+        credentials: 'include',
       })
     )
     expect(result).toEqual(mockData)
   })
 
-  it('includes authorization header when token exists', async () => {
-    localStorage.setItem('token', 'test-token')
+  it('includes CSRF token for mutating requests', async () => {
+    // Set CSRF token cookie
+    document.cookie = 'XSRF-TOKEN=test-csrf-token; path=/;'
     
-    const mockData = { user: { username: 'test' } }
+    const mockData = { success: true }
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
       headers: new Headers({ 'content-type': 'application/json' }),
@@ -45,14 +51,16 @@ describe('apiRequest', () => {
       json: async () => mockData,
     } as Response)
 
-    await apiRequest('/api/user')
+    await apiRequest('/api/articles', { method: 'POST', body: JSON.stringify({ title: 'Test' }) })
 
     expect(fetch).toHaveBeenCalledWith(
-      '/api/user',
+      '/api/articles',
       expect.objectContaining({
         headers: expect.objectContaining({
-          'Authorization': 'Bearer test-token',
+          'X-XSRF-TOKEN': 'test-csrf-token',
+          'Content-Type': 'application/json',
         }),
+        credentials: 'include',
       })
     )
   })

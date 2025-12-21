@@ -10,6 +10,7 @@ vi.mock('../api/auth', () => ({
   authApi: {
     getCurrentUser: vi.fn(),
     updateUser: vi.fn(),
+    logout: vi.fn(),
   },
 }))
 
@@ -43,8 +44,6 @@ function renderSettingsPage() {
 describe('SettingsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    localStorage.clear()
-    localStorage.setItem('token', 'test-token')
   })
 
   it('renders settings form with user data', async () => {
@@ -151,6 +150,7 @@ describe('SettingsPage', () => {
     const user = userEvent.setup()
     
     vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
+    vi.mocked(authApi.logout).mockResolvedValue()
 
     renderSettingsPage()
 
@@ -161,7 +161,7 @@ describe('SettingsPage', () => {
     await user.click(screen.getByRole('button', { name: /click here to logout/i }))
 
     await waitFor(() => {
-      expect(localStorage.getItem('token')).toBeNull()
+      expect(authApi.logout).toHaveBeenCalled()
       expect(mockNavigate).toHaveBeenCalledWith('/')
     })
   })
