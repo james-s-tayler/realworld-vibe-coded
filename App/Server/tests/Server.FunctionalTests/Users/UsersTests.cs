@@ -137,8 +137,8 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
       },
     };
 
-    // Note: CreateAuthenticatedClient configures HttpClient headers but the analyzer flags it.
-    // Suppression needed until analyzer is fixed to not flag helper methods.
+    // SRV007 analyzer bug: It flags CreateAuthenticatedClient even though it only configures headers.
+    // The analyzer allows CreateClient but not CreateAuthenticatedClient. Should be fixed in analyzer.
 #pragma warning disable SRV007
     var client1Auth = app.CreateAuthenticatedClient(accessToken1);
 #pragma warning restore SRV007
