@@ -1,9 +1,7 @@
-﻿using System.Net.Http.Headers;
-using Server.Web.Profiles;
+﻿using Server.Web.Profiles;
 using Server.Web.Profiles.Follow;
 using Server.Web.Profiles.Get;
 using Server.Web.Profiles.Unfollow;
-using Server.Web.Users.Register;
 
 namespace Server.FunctionalTests.Profiles;
 
@@ -13,124 +11,65 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
   [Fact]
   public async Task GetProfile_Unauthenticated_ReturnsProfile()
   {
-    var username = $"testuser-{Guid.NewGuid()}";
+    // Identity API sets username to email by default
     var email = $"test-{Guid.NewGuid()}@example.com";
+    var password = "Password123!";
 
-    var registerRequest = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = email,
-        Username = username,
-        Password = "password123",
-      },
-    };
+    await IdentityApiHelpers.RegisterUserAsync(app.Client, email, password, TestContext.Current.CancellationToken);
 
-    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
-
-    var request = new GetProfileRequest { Username = username };
+    var request = new GetProfileRequest { Username = email };
     var (response, result) = await app.Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(username);
+    result.Profile.Username.ShouldBe(email);
     result.Profile.Following.ShouldBeFalse();
   }
 
   [Fact]
   public async Task GetProfile_Authenticated_NotFollowing_ReturnsProfile()
   {
-    var user1Username = $"user1-{Guid.NewGuid()}";
+    // Identity API sets username to email by default
     var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Username = $"user2-{Guid.NewGuid()}";
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
+    var password = "Password123!";
 
-    var register1 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user1Email,
-        Username = user1Username,
-        Password = "password123",
-      },
-    };
+    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
+    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
-    var user1Token = result1.User.Token;
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
 
-    var register2 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user2Email,
-        Username = user2Username,
-        Password = "password123",
-      },
-    };
-
-    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
-
-    var client = app.CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
-    });
-
-    var request = new GetProfileRequest { Username = user2Username };
+    var request = new GetProfileRequest { Username = user2Email };
     var (response, result) = await client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(user2Username);
+    result.Profile.Username.ShouldBe(user2Email);
     result.Profile.Following.ShouldBeFalse();
   }
 
   [Fact]
   public async Task GetProfile_Authenticated_Following_ReturnsProfileWithFollowing()
   {
-    var user1Username = $"user1-{Guid.NewGuid()}";
+    // Identity API sets username to email by default
     var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Username = $"user2-{Guid.NewGuid()}";
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
+    var password = "Password123!";
 
-    var register1 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user1Email,
-        Username = user1Username,
-        Password = "password123",
-      },
-    };
+    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
+    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
-    var user1Token = result1.User.Token;
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
 
-    var register2 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user2Email,
-        Username = user2Username,
-        Password = "password123",
-      },
-    };
-
-    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
-
-    var client = app.CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
-    });
-
-    var followRequest = new FollowProfileRequest { Username = user2Username };
+    var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
-    var getRequest = new GetProfileRequest { Username = user2Username };
+    var getRequest = new GetProfileRequest { Username = user2Email };
     var (response, result) = await client.GETAsync<Get, GetProfileRequest, ProfileResponse>(getRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(user2Username);
+    result.Profile.Username.ShouldBe(user2Email);
     result.Profile.Following.ShouldBeTrue();
   }
 
@@ -155,89 +94,39 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
   [Fact]
   public async Task FollowProfile_WithAuthentication_ReturnsProfileWithFollowing()
   {
-    var user1Username = $"user1-{Guid.NewGuid()}";
+    // Identity API sets username to email by default
     var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Username = $"user2-{Guid.NewGuid()}";
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
+    var password = "Password123!";
 
-    var register1 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user1Email,
-        Username = user1Username,
-        Password = "password123",
-      },
-    };
+    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
+    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
-    var user1Token = result1.User.Token;
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
 
-    var register2 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user2Email,
-        Username = user2Username,
-        Password = "password123",
-      },
-    };
-
-    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
-
-    var client = app.CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
-    });
-
-    var followRequest = new FollowProfileRequest { Username = user2Username };
+    var followRequest = new FollowProfileRequest { Username = user2Email };
     var (response, result) = await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(user2Username);
+    result.Profile.Username.ShouldBe(user2Email);
     result.Profile.Following.ShouldBeTrue();
   }
 
   [Fact]
   public async Task FollowProfile_AlreadyFollowing_ReturnsProfileWithFollowing()
   {
-    var user1Username = $"user1-{Guid.NewGuid()}";
+    // Identity API sets username to email by default
     var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Username = $"user2-{Guid.NewGuid()}";
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
+    var password = "Password123!";
 
-    var register1 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user1Email,
-        Username = user1Username,
-        Password = "password123",
-      },
-    };
+    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
+    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
-    var user1Token = result1.User.Token;
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
 
-    var register2 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user2Email,
-        Username = user2Username,
-        Password = "password123",
-      },
-    };
-
-    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
-
-    var client = app.CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
-    });
-
-    var followRequest = new FollowProfileRequest { Username = user2Username };
+    var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
     var (response, result) = await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -259,26 +148,10 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
   [Fact]
   public async Task FollowProfile_NonExistentUser_ReturnsNotFound()
   {
-    var userEmail = $"user-{Guid.NewGuid()}@example.com";
-    var username = $"user-{Guid.NewGuid()}";
-
-    var registerRequest = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = userEmail,
-        Username = username,
-        Password = "password123",
-      },
-    };
-
-    var (_, result) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest);
-    var token = result.User.Token;
-
-    var client = app.CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
-    });
+    var (client, _, _) = await IdentityApiHelpers.RegisterUserAndCreateClientAsync(
+      app.Client,
+      app.CreateClient,
+      cancellationToken: TestContext.Current.CancellationToken);
 
     var followRequest = new FollowProfileRequest { Username = "nonexistentuser999" };
     var (response, _) = await client.POSTAsync<Follow, FollowProfileRequest, object>(followRequest);
@@ -289,92 +162,42 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
   [Fact]
   public async Task UnfollowProfile_WithAuthentication_ReturnsProfileWithoutFollowing()
   {
-    var user1Username = $"user1-{Guid.NewGuid()}";
+    // Identity API sets username to email by default
     var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Username = $"user2-{Guid.NewGuid()}";
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
+    var password = "Password123!";
 
-    var register1 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user1Email,
-        Username = user1Username,
-        Password = "password123",
-      },
-    };
+    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
+    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
-    var user1Token = result1.User.Token;
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
 
-    var register2 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user2Email,
-        Username = user2Username,
-        Password = "password123",
-      },
-    };
-
-    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
-
-    var client = app.CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
-    });
-
-    var followRequest = new FollowProfileRequest { Username = user2Username };
+    var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
-    var unfollowRequest = new UnfollowProfileRequest { Username = user2Username };
+    var unfollowRequest = new UnfollowProfileRequest { Username = user2Email };
     var (response, result) = await client.DELETEAsync<Unfollow, UnfollowProfileRequest, ProfileResponse>(unfollowRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(user2Username);
+    result.Profile.Username.ShouldBe(user2Email);
     result.Profile.Following.ShouldBeFalse();
   }
 
   [Fact]
   public async Task UnfollowProfile_NotFollowing_ReturnsErrorDetail()
   {
-    var user1Username = $"user1-{Guid.NewGuid()}";
+    // Identity API sets username to email by default
     var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Username = $"user2-{Guid.NewGuid()}";
     var user2Email = $"user2-{Guid.NewGuid()}@example.com";
+    var password = "Password123!";
 
-    var register1 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user1Email,
-        Username = user1Username,
-        Password = "password123",
-      },
-    };
+    var user1Token = await IdentityApiHelpers.RegisterUserAsync(app.Client, user1Email, password, TestContext.Current.CancellationToken);
+    await IdentityApiHelpers.RegisterUserAsync(app.Client, user2Email, password, TestContext.Current.CancellationToken);
 
-    var (_, result1) = await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register1);
-    var user1Token = result1.User.Token;
+    var client = IdentityApiHelpers.CreateAuthenticatedClient(app.CreateClient, user1Token);
 
-    var register2 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = user2Email,
-        Username = user2Username,
-        Password = "password123",
-      },
-    };
-
-    await app.Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(register2);
-
-    var client = app.CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", user1Token);
-    });
-
-    var unfollowRequest = new UnfollowProfileRequest { Username = user2Username };
+    var unfollowRequest = new UnfollowProfileRequest { Username = user2Email };
     var (response, _) = await client.DELETEAsync<Unfollow, UnfollowProfileRequest, object>(unfollowRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
