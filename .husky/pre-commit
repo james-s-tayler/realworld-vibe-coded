@@ -74,6 +74,12 @@ if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner
   echo "ℹ️  No changes detected in App/Server, App/Client, Task/Runner, Task/FlowPilot, or Test/e2e directories. Skipping linting."
 fi
 
-# flowpilot lint
+# Run flowpilot lint to ensure FlowPilot plan state is valid
+echo "🔧 Running flowpilot lint..."
+if ! flowpilot lint; then
+  echo "❌ FlowPilot lint failed. Please fix the FlowPilot plan state."
+  exit 1
+fi
+echo "✅ FlowPilot lint completed successfully."
 
 echo "🎉 Pre-commit hook completed successfully."

@@ -65,7 +65,8 @@ describe('LoginPage', () => {
       token: 'test-token',
     }
 
-    vi.mocked(authApi.login).mockResolvedValue({ user: mockUser })
+    vi.mocked(authApi.login).mockResolvedValue('test-token')
+    vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
 
     renderLoginPage()
 

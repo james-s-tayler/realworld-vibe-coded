@@ -51,7 +51,7 @@ describe('apiRequest', () => {
       '/api/user',
       expect.objectContaining({
         headers: expect.objectContaining({
-          'Authorization': 'Token test-token',
+          'Authorization': 'Bearer test-token',
         }),
       })
     )

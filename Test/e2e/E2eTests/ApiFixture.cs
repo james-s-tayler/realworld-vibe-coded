@@ -61,15 +61,12 @@ public class ApiFixture : IAsyncLifetime
 
     var registerRequest = new
     {
-      user = new
-      {
-        email,
-        password,
-      },
+      email,
+      password,
     };
 
-    // Register - no token expected
-    using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/users")
+    // Register via Identity - no token expected
+    using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/identity/register")
     {
       Content = JsonContent.Create(registerRequest, options: _jsonOptions),
     };
@@ -117,15 +114,12 @@ public class ApiFixture : IAsyncLifetime
 
     var registerRequest = new
     {
-      user = new
-      {
-        email,
-        password,
-      },
+      email,
+      password,
     };
 
-    // Register - no token expected
-    using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/users")
+    // Register via Identity - no token expected
+    using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/identity/register")
     {
       Content = JsonContent.Create(registerRequest, options: _jsonOptions),
     };
@@ -178,7 +172,7 @@ public class ApiFixture : IAsyncLifetime
     {
       Content = JsonContent.Create(articleRequest, options: _jsonOptions),
     };
-    request.Headers.Add("Authorization", $"Token {token}");
+    request.Headers.Add("Authorization", $"Bearer {token}");
 
     var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
@@ -217,7 +211,7 @@ public class ApiFixture : IAsyncLifetime
     {
       Content = JsonContent.Create(articleRequest, options: _jsonOptions),
     };
-    request.Headers.Add("Authorization", $"Token {token}");
+    request.Headers.Add("Authorization", $"Bearer {token}");
 
     var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
@@ -278,7 +272,7 @@ public class ApiFixture : IAsyncLifetime
     {
       Content = JsonContent.Create(commentRequest, options: _jsonOptions),
     };
-    request.Headers.Add("Authorization", $"Token {token}");
+    request.Headers.Add("Authorization", $"Bearer {token}");
 
     var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
@@ -300,7 +294,7 @@ public class ApiFixture : IAsyncLifetime
   public async Task FollowUserAsync(string followerToken, string usernameToFollow)
   {
     using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/profiles/{usernameToFollow}/follow");
-    request.Headers.Add("Authorization", $"Token {followerToken}");
+    request.Headers.Add("Authorization", $"Bearer {followerToken}");
 
     var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
@@ -312,7 +306,7 @@ public class ApiFixture : IAsyncLifetime
   public async Task FavoriteArticleAsync(string token, string articleSlug)
   {
     using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/articles/{articleSlug}/favorite");
-    request.Headers.Add("Authorization", $"Token {token}");
+    request.Headers.Add("Authorization", $"Bearer {token}");
 
     var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
@@ -325,14 +319,11 @@ public class ApiFixture : IAsyncLifetime
   {
     var loginRequest = new
     {
-      user = new
-      {
-        email,
-        password,
-      },
+      email,
+      password,
     };
 
-    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/users/login")
+    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/identity/login?useCookies=false")
     {
       Content = JsonContent.Create(loginRequest, options: _jsonOptions),
     };
@@ -341,8 +332,8 @@ public class ApiFixture : IAsyncLifetime
     response.EnsureSuccessStatusCode();
 
     var responseContent = await response.Content.ReadAsStringAsync();
-    var userResponse = JsonSerializer.Deserialize<UserResponse>(responseContent, _jsonOptions)!;
-    return userResponse.User.Token;
+    var loginResponse = JsonSerializer.Deserialize<IdentityLoginResponse>(responseContent, _jsonOptions)!;
+    return loginResponse.AccessToken;
   }
 
   /// <summary>
@@ -363,13 +354,19 @@ public class ApiFixture : IAsyncLifetime
     {
       Content = JsonContent.Create(updateRequest, options: _jsonOptions),
     };
-    request.Headers.Add("Authorization", $"Token {token}");
+    request.Headers.Add("Authorization", $"Bearer {token}");
 
     var response = await _httpClient.SendAsync(request);
     response.EnsureSuccessStatusCode();
   }
 
   // DTOs for API responses
+  private class IdentityLoginResponse
+  {
+    [JsonPropertyName("accessToken")]
+    public string AccessToken { get; set; } = string.Empty;
+  }
+
   private class UserResponse
   {
     [JsonPropertyName("user")]
