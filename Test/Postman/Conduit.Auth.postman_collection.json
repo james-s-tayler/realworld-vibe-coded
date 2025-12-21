@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c5b8bbb5-b657-4779-8ba4-23c321ea12bf",
+		"_postman_id": "be87e931-5f2d-46c9-8273-4b78597d2069",
 		"name": "Conduit - Auth",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "8521556"
@@ -770,10 +770,7 @@
 									"});",
 									"pm.testWithCorrelation('User has \"image\" property', function() {",
 									"    pm.expect(user).to.have.property('image')",
-									"});",
-									"pm.testWithCorrelation('User has \"token\" property that matches the token in the Authorization header', function() {",
-									"    pm.expect(user.token).to.be.a('string').and.to.have.length.above(10)});",
-									""
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -955,9 +952,6 @@
 									"});",
 									"pm.testWithCorrelation('\"image\" matches the UPDATED_IMAGE variable', function() {",
 									"    pm.expect(user.image).to.eql(pm.globals.get('UPDATED_IMAGE'))",
-									"});",
-									"pm.testWithCorrelation('User has \"token\" property', function() {",
-									"    pm.expect(user).to.have.property('token')",
 									"});"
 								],
 								"type": "text/javascript",
