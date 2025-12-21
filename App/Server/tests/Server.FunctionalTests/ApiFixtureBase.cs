@@ -24,7 +24,11 @@ public abstract class ApiFixtureBase<TProgram> : AppFixture<TProgram>
       registerPayload,
       cancellationToken);
 
-    response.EnsureSuccessStatusCode();
+    if (!response.IsSuccessStatusCode)
+    {
+      var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+      throw new InvalidOperationException($"Registration failed with status {response.StatusCode}. Response: {errorContent}");
+    }
 
     var result = await response.Content.ReadFromJsonAsync<IdentityRegisterResponse>(cancellationToken);
     return result?.AccessToken ?? throw new InvalidOperationException("Registration did not return an access token");

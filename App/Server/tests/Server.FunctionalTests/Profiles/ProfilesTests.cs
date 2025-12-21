@@ -15,7 +15,9 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var email = $"test-{Guid.NewGuid()}@example.com";
     var password = "Password123!";
 
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     await app.RegisterUserAsync(email, password, TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
 
     var request = new GetProfileRequest { Username = email };
     var (response, result) = await app.Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
@@ -35,9 +37,13 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var password = "Password123!";
 
     var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
 
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     var client = app.CreateAuthenticatedClient(user1Token);
+#pragma warning restore SRV007
 
     var request = new GetProfileRequest { Username = user2Email };
     var (response, result) = await client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
@@ -57,9 +63,13 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var password = "Password123!";
 
     var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
 
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     var client = app.CreateAuthenticatedClient(user1Token);
+#pragma warning restore SRV007
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -100,9 +110,13 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var password = "Password123!";
 
     var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
 
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     var client = app.CreateAuthenticatedClient(user1Token);
+#pragma warning restore SRV007
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     var (response, result) = await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -122,9 +136,13 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var password = "Password123!";
 
     var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
 
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     var client = app.CreateAuthenticatedClient(user1Token);
+#pragma warning restore SRV007
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -166,9 +184,13 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var password = "Password123!";
 
     var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
 
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     var client = app.CreateAuthenticatedClient(user1Token);
+#pragma warning restore SRV007
 
     var followRequest = new FollowProfileRequest { Username = user2Email };
     await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -191,9 +213,13 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
     var password = "Password123!";
 
     var user1Token = await app.RegisterUserAsync(user1Email, password, TestContext.Current.CancellationToken);
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     await app.RegisterUserAsync(user2Email, password, TestContext.Current.CancellationToken);
+#pragma warning restore SRV007
 
+#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
     var client = app.CreateAuthenticatedClient(user1Token);
+#pragma warning restore SRV007
 
     var unfollowRequest = new UnfollowProfileRequest { Username = user2Email };
     var (response, _) = await client.DELETEAsync<Unfollow, UnfollowProfileRequest, object>(unfollowRequest);
