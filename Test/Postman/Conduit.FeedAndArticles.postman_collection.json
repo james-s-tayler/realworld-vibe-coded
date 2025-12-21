@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "27f67184-85ae-4806-b78d-0e98ebf5a535",
+		"_postman_id": "6a52eff4-e2a9-469d-b99b-843df47c45aa",
 		"name": "Conduit - FeedAndArticles",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "8521556"
@@ -16,30 +16,15 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
-									"if (!(pm.environment.isIntegrationTest)) {",
-									"    var responseJSON = JSON.parse(pm.response.text());",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
 									"",
-									"    pm.testWithCorrelation('Response contains \"user\" property', function() {",
-									"        pm.expect(responseJSON).to.have.property('user');",
-									"    });",
-									"",
-									"    var user = responseJSON.user || {};",
-									"",
-									"    pm.testWithCorrelation('\"email\" property matches FEED_USER_EMAIL variable', function() {",
-									"        const email = pm.globals.get('FEED_USER_EMAIL');",
-									"        pm.expect(user.email).to.eql(email);",
-									"    });",
-									"    pm.testWithCorrelation('\"username\" property matches email', function() {",
-									"        pm.expect(user.username).to.eql(user.email);",
-									"    });",
-									"}",
-									""
+									"pm.testWithCorrelation('Registration successful (200 OK)', function() {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -77,15 +62,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+							"raw": "{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
 						},
 						"url": {
-							"raw": "{{APIURL}}/users",
+							"raw": "{{APIURL}}/identity/register",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
-								"users"
+								"identity",
+								"register"
 							]
 						}
 					},
@@ -98,30 +84,15 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
-									"if (!(pm.environment.isIntegrationTest)) {",
-									"    var responseJSON = JSON.parse(pm.response.text());",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
 									"",
-									"    pm.testWithCorrelation('Response contains \"user\" property', function() {",
-									"        pm.expect(responseJSON).to.have.property('user');",
-									"    });",
-									"",
-									"    var user = responseJSON.user || {};",
-									"",
-									"    pm.testWithCorrelation('\"email\" property matches FEED_USER_EMAIL variable', function() {",
-									"        const email = pm.globals.get('FEED_USER_EMAIL')+2;",
-									"        pm.expect(user.email).to.eql(email);",
-									"    });",
-									"    pm.testWithCorrelation('\"username\" property matches email', function() {",
-									"        pm.expect(user.username).to.eql(user.email);",
-									"    });",
-									"}",
-									""
+									"pm.testWithCorrelation('Registration successful (200 OK)', function() {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -159,15 +130,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\"}}"
+							"raw": "{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\"}"
 						},
 						"url": {
-							"raw": "{{APIURL}}/users",
+							"raw": "{{APIURL}}/identity/register",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
-								"users"
+								"identity",
+								"register"
 							]
 						}
 					},
@@ -180,30 +152,15 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
-									"if (!(pm.environment.isIntegrationTest)) {",
-									"    var responseJSON = JSON.parse(pm.response.text());",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
 									"",
-									"    pm.testWithCorrelation('Response contains \"user\" property', function() {",
-									"        pm.expect(responseJSON).to.have.property('user');",
-									"    });",
-									"",
-									"    var user = responseJSON.user || {};",
-									"",
-									"    pm.testWithCorrelation('\"email\" property matches FEED_USER_EMAIL variable', function() {",
-									"        const email = pm.globals.get('FEED_USER_EMAIL')+3;",
-									"        pm.expect(user.email).to.eql(email);",
-									"    });",
-									"    pm.testWithCorrelation('\"username\" property matches email', function() {",
-									"        pm.expect(user.username).to.eql(user.email);",
-									"    });",
-									"}",
-									""
+									"pm.testWithCorrelation('Registration successful (200 OK)', function() {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -241,15 +198,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\"}}"
+							"raw": "{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\"}"
 						},
 						"url": {
-							"raw": "{{APIURL}}/users",
+							"raw": "{{APIURL}}/identity/register",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
-								"users"
+								"identity",
+								"register"
 							]
 						}
 					},
@@ -262,29 +220,15 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
-									"if (!(pm.environment.isIntegrationTest)) {",
-									"    var responseJSON = JSON.parse(pm.response.text());",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
 									"",
-									"    pm.testWithCorrelation('Response contains \"user\" property', function() {",
-									"        pm.expect(responseJSON).to.have.property('user');",
-									"    });",
-									"",
-									"    var user = responseJSON.user || {};",
-									"",
-									"    pm.testWithCorrelation('\"email\" property matches FEED_USER_EMAIL variable', function() {",
-									"        const email = pm.globals.get('FEED_USER_EMAIL')+4;",
-									"        pm.expect(user.email).to.eql(email);",
-									"    });",
-									"    pm.testWithCorrelation('\"username\" property matches email', function() {",
-									"        pm.expect(user.username).to.eql(user.email);",
-									"    });",
-									"}",
+									"pm.testWithCorrelation('Registration successful (200 OK)', function() {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});",
 									""
 								],
 								"type": "text/javascript",
@@ -323,15 +267,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\"}}"
+							"raw": "{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\"}"
 						},
 						"url": {
-							"raw": "{{APIURL}}/users",
+							"raw": "{{APIURL}}/identity/register",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
-								"users"
+								"identity",
+								"register"
 							]
 						}
 					},
@@ -344,32 +289,31 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
 									"pm.testWithCorrelation('Response contains \"user\" property', function() {",
 									"    pm.expect(responseJSON).to.have.property('user')",
 									"});",
 									"",
-									"var user = responseJSON.user || {};",
+									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
-									"pm.testWithCorrelation('User has \"token\" property', function() {",
-									"    pm.expect(user).to.have.property('token')",
+									"pm.testWithCorrelation('Response contains \"accessToken\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('accessToken');",
 									"});",
 									"",
-									"if(pm.testWithCorrelation('User has \"token\" property')){",
-									"    pm.globals.set('feed_user_token', user.token);",
-									"}",
-									"",
-									"pm.testWithCorrelation('Global variable \"feed_user_token\" has been set', function() {",
-									"    pm.globals.get('feed_user_token') === user.token",
+									"pm.testWithCorrelation('accessToken is not empty', function() {",
+									"    pm.expect(responseJSON.accessToken).to.not.be.empty;",
 									"});",
-									""
+									"",
+									"if (responseJSON.accessToken) {",
+									"    pm.globals.set('feed_user_token', responseJSON.accessToken);",
+									"}"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -407,16 +351,22 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}}"
+							"raw": "{\"email\":\"{{FEED_USER_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
 						},
 						"url": {
-							"raw": "{{APIURL}}/users/login",
+							"raw": "{{APIURL}}/identity/login?useCookies=false",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
-								"users",
+								"identity",
 								"login"
+							],
+							"query": [
+								{
+									"key": "useCookies",
+									"value": "false"
+								}
 							]
 						}
 					},
@@ -429,32 +379,31 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
 									"pm.testWithCorrelation('Response contains \"user\" property', function() {",
 									"    pm.expect(responseJSON).to.have.property('user')",
 									"});",
 									"",
-									"var user = responseJSON.user || {};",
+									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
-									"pm.testWithCorrelation('User has \"token\" property', function() {",
-									"    pm.expect(user).to.have.property('token')",
+									"pm.testWithCorrelation('Response contains \"accessToken\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('accessToken');",
 									"});",
 									"",
-									"if(pm.testWithCorrelation('User has \"token\" property')){",
-									"    pm.globals.set('feed_user_token_2', user.token);",
-									"}",
-									"",
-									"pm.testWithCorrelation('Global variable \"feed_user_token_2\" has been set', function() {",
-									"    pm.globals.get('feed_user_token_2') === user.token",
+									"pm.testWithCorrelation('accessToken is not empty', function() {",
+									"    pm.expect(responseJSON.accessToken).to.not.be.empty;",
 									"});",
-									""
+									"",
+									"if (responseJSON.accessToken) {",
+									"    pm.globals.set('feed_user_token_2', responseJSON.accessToken);",
+									"}"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -492,16 +441,22 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\"}}"
+							"raw": "{\"email\":\"{{FEED_USER_EMAIL}}2\", \"password\":\"{{PASSWORD}}\"}"
 						},
 						"url": {
-							"raw": "{{APIURL}}/users/login",
+							"raw": "{{APIURL}}/identity/login?useCookies=false",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
-								"users",
+								"identity",
 								"login"
+							],
+							"query": [
+								{
+									"key": "useCookies",
+									"value": "false"
+								}
 							]
 						}
 					},
@@ -514,32 +469,31 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
 									"pm.testWithCorrelation('Response contains \"user\" property', function() {",
 									"    pm.expect(responseJSON).to.have.property('user')",
 									"});",
 									"",
-									"var user = responseJSON.user || {};",
+									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
-									"pm.testWithCorrelation('User has \"token\" property', function() {",
-									"    pm.expect(user).to.have.property('token')",
+									"pm.testWithCorrelation('Response contains \"accessToken\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('accessToken');",
 									"});",
 									"",
-									"if(pm.testWithCorrelation('User has \"token\" property')){",
-									"    pm.globals.set('feed_user_token_3', user.token);",
-									"}",
-									"",
-									"pm.testWithCorrelation('Global variable \"feed_user_token_3\" has been set', function() {",
-									"    pm.globals.get('feed_user_token_3') === user.token",
+									"pm.testWithCorrelation('accessToken is not empty', function() {",
+									"    pm.expect(responseJSON.accessToken).to.not.be.empty;",
 									"});",
-									""
+									"",
+									"if (responseJSON.accessToken) {",
+									"    pm.globals.set('feed_user_token_3', responseJSON.accessToken);",
+									"}"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -577,16 +531,22 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\"}}"
+							"raw": "{\"email\":\"{{FEED_USER_EMAIL}}3\", \"password\":\"{{PASSWORD}}\"}"
 						},
 						"url": {
-							"raw": "{{APIURL}}/users/login",
+							"raw": "{{APIURL}}/identity/login?useCookies=false",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
-								"users",
+								"identity",
 								"login"
+							],
+							"query": [
+								{
+									"key": "useCookies",
+									"value": "false"
+								}
 							]
 						}
 					},
@@ -599,31 +559,31 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
 									"pm.testWithCorrelation('Response contains \"user\" property', function() {",
 									"    pm.expect(responseJSON).to.have.property('user')",
 									"});",
 									"",
-									"var user = responseJSON.user || {};",
+									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
-									"pm.testWithCorrelation('User has \"token\" property', function() {",
-									"    pm.expect(user).to.have.property('token')",
+									"pm.testWithCorrelation('Response contains \"accessToken\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('accessToken');",
 									"});",
 									"",
-									"if(pm.testWithCorrelation('User has \"token\" property')){",
-									"    pm.globals.set('feed_user_token_4', user.token);",
+									"pm.testWithCorrelation('accessToken is not empty', function() {",
+									"    pm.expect(responseJSON.accessToken).to.not.be.empty;",
+									"});",
+									"",
+									"if (responseJSON.accessToken) {",
+									"    pm.globals.set('feed_user_token_4', responseJSON.accessToken);",
 									"}",
-									"",
-									"pm.testWithCorrelation('Global variable \"feed_user_token_4\" has been set', function() {",
-									"    pm.globals.get('feed_user_token_4') === user.token",
-									"});",
 									""
 								],
 								"type": "text/javascript",
@@ -662,16 +622,22 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"user\":{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\"}}"
+							"raw": "{\"email\":\"{{FEED_USER_EMAIL}}4\", \"password\":\"{{PASSWORD}}\"}"
 						},
 						"url": {
-							"raw": "{{APIURL}}/users/login",
+							"raw": "{{APIURL}}/identity/login?useCookies=false",
 							"host": [
 								"{{APIURL}}"
 							],
 							"path": [
-								"users",
+								"identity",
 								"login"
+							],
+							"query": [
+								{
+									"key": "useCookies",
+									"value": "false"
+								}
 							]
 						}
 					},
@@ -684,12 +650,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK')",
 									"})"
@@ -746,12 +712,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK')",
 									"})"
@@ -808,12 +774,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 201', function() {",
 									"    pm.expect(pm.response.status).to.eql('Created')",
 									"})"
@@ -885,12 +851,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 201', function() {",
 									"    pm.expect(pm.response.status).to.eql('Created')",
 									"})"
@@ -956,12 +922,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 201', function() {",
 									"    pm.expect(pm.response.status).to.eql('Created')",
 									"})"
@@ -1027,12 +993,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 201', function() {",
 									"    pm.expect(pm.response.status).to.eql('Created')",
 									"})"
@@ -1098,12 +1064,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 201', function() {",
 									"    pm.expect(pm.response.status).to.eql('Created')",
 									"})"
@@ -1169,12 +1135,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK')",
 									"})"
@@ -1231,12 +1197,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK')",
 									"})"
@@ -1293,12 +1259,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK')",
 									"})"
@@ -1355,12 +1321,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -1437,12 +1403,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -1524,12 +1490,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -1614,12 +1580,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -1700,12 +1666,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -1786,12 +1752,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 400', function() {",
 									"    pm.expect(pm.response.status).to.eql('Bad Request');",
 									"});",
@@ -1871,12 +1837,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 401', function() {",
 									"    pm.expect(pm.response.status).to.eql('Unauthorized');",
 									"});"
@@ -1936,12 +1902,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2019,12 +1985,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2103,12 +2069,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2195,12 +2161,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2287,12 +2253,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2382,12 +2348,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2463,12 +2429,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2550,12 +2516,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2637,12 +2603,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2718,12 +2684,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2819,12 +2785,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2900,12 +2866,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 200', function() {",
 									"    pm.expect(pm.response.status).to.eql('OK');",
 									"});",
@@ -2990,12 +2956,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 400', function() {",
 									"    pm.expect(pm.response.status).to.eql('Bad Request');",
 									"});",
@@ -3075,12 +3041,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 400', function() {",
 									"    pm.expect(pm.response.status).to.eql('Bad Request');",
 									"});",
@@ -3159,12 +3125,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 400', function() {",
 									"    pm.expect(pm.response.status).to.eql('Bad Request');",
 									"});",
@@ -3238,12 +3204,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 400', function() {",
 									"    pm.expect(pm.response.status).to.eql('Bad Request');",
 									"});",
@@ -3317,12 +3283,12 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-                                    "// Wrapper function to include correlation ID in test names",
-                                    "pm.testWithCorrelation = function(testName, testFunction) {",
-                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                                    "};",
-                                    "",
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
 									"pm.testWithCorrelation('Response is HTTP 400', function() {",
 									"    pm.expect(pm.response.status).to.eql('Bad Request');",
 									"});",
