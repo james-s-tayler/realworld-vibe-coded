@@ -1,12 +1,10 @@
-﻿using System.Net.Http.Headers;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
-using Server.Web.Users.Register;
 using Testcontainers.MsSql;
 
 namespace Server.FunctionalTests.Articles.Fixture;
 
-public class ArticlesFixture : AppFixture<Program>
+public class ArticlesFixture : ApiFixtureBase<Program>
 {
   private MsSqlContainer _container = null!;
   private string _connectionString = null!;
@@ -82,52 +80,25 @@ public class ArticlesFixture : AppFixture<Program>
 
   protected override async ValueTask SetupAsync()
   {
-    // Schema is already created in PreSetupAsync
-    // SetupAsync still needs to run to create test data (users, clients, etc.)
-
-    ArticlesUser1Username = $"articlesuser1-{Guid.NewGuid()}";
     ArticlesUser1Email = $"articlesuser1-{Guid.NewGuid()}@example.com";
-    var articlesUser1Password = "password123";
+    ArticlesUser1Username = ArticlesUser1Email;
+    var articlesUser1Password = "Password123!";
 
-    ArticlesUser2Username = $"articlesuser2-{Guid.NewGuid()}";
     ArticlesUser2Email = $"articlesuser2-{Guid.NewGuid()}@example.com";
-    var articlesUser2Password = "password123";
+    ArticlesUser2Username = ArticlesUser2Email;
+    var articlesUser2Password = "Password123!";
 
-    var registerRequest1 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = ArticlesUser1Email,
-        Username = ArticlesUser1Username,
-        Password = articlesUser1Password,
-      },
-    };
+    var token1 = await RegisterUserAsync(
+      ArticlesUser1Email,
+      articlesUser1Password);
 
-    var (_, registerResult1) = await Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest1);
-    var token1 = registerResult1.User.Token;
+    ArticlesUser1Client = CreateAuthenticatedClient(token1);
 
-    ArticlesUser1Client = CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token1);
-    });
+    var token2 = await RegisterUserAsync(
+      ArticlesUser2Email,
+      articlesUser2Password);
 
-    var registerRequest2 = new RegisterRequest
-    {
-      User = new UserData
-      {
-        Email = ArticlesUser2Email,
-        Username = ArticlesUser2Username,
-        Password = articlesUser2Password,
-      },
-    };
-
-    var (_, registerResult2) = await Client.POSTAsync<Register, RegisterRequest, RegisterResponse>(registerRequest2);
-    var token2 = registerResult2.User.Token;
-
-    ArticlesUser2Client = CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token2);
-    });
+    ArticlesUser2Client = CreateAuthenticatedClient(token2);
   }
 
   protected override ValueTask TearDownAsync()
