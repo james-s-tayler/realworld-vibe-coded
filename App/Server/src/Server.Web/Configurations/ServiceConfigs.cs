@@ -38,7 +38,7 @@ public static class ServiceConfigs
     builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
 
     // Configure authentication with both Token and Bearer schemes for APIs
-    // Use a policy scheme to intelligently select between Token, Bearer JWT, and Identity Bearer based on context
+    // Use a policy scheme to intelligently select between Token (custom JWT) and Identity Bearer
     services.AddAuthentication(options =>
     {
       options.DefaultAuthenticateScheme = "TokenOrBearer";
@@ -58,7 +58,7 @@ public static class ServiceConfigs
             }
             else if (authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-              // Try Identity Bearer scheme first (from /api/identity endpoints)
+              // Route to Identity Bearer scheme (from /api/identity endpoints)
               return IdentityConstants.BearerScheme;
             }
           }
@@ -95,46 +95,6 @@ public static class ServiceConfigs
 
             return Task.CompletedTask;
           },
-          OnChallenge = async context =>
-          {
-            context.HandleResponse();
-            await context.HttpContext.Response.SendErrorsAsync(
-              new List<ValidationFailure>([
-                new ValidationFailure(
-                  context.Error ?? "authorization",
-                  context.ErrorDescription ?? "Unauthorized"),
-              ]),
-              StatusCodes.Status401Unauthorized);
-          },
-          OnForbidden = async context =>
-          {
-            await context.HttpContext.Response.SendErrorsAsync(
-              new List<ValidationFailure>([
-                new ValidationFailure(
-                  "authorization",
-                  context.Result?.Failure?.Message ?? "Forbidden"),
-              ]),
-              StatusCodes.Status403Forbidden);
-          },
-        };
-      })
-      .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-      {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-          ValidateIssuerSigningKey = true,
-          IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
-          ValidateIssuer = true,
-          ValidIssuer = jwtSettings.Issuer,
-          ValidateAudience = true,
-          ValidAudience = jwtSettings.Audience,
-          ValidateLifetime = true,
-          ClockSkew = TimeSpan.Zero,
-        };
-
-        // Configure events to return JSON error responses for authentication failures
-        options.Events = new JwtBearerEvents
-        {
           OnChallenge = async context =>
           {
             context.HandleResponse();
