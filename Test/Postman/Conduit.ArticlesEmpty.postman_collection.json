@@ -16,18 +16,25 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+                                    "// Wrapper function to include correlation ID in test names",
+                                    "pm.testWithCorrelation = function(testName, testFunction) {",
+                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
+                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+                                    "};",
+                                    "",
 									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
-									"pm.test('response has property \"articles\"', function() {",
+									"pm.testWithCorrelation('response has property \"articles\"', function() {",
 									"    pm.expect(responseJSON).to.have.property('articles')",
 									"})",
 									"",
-									"pm.test('articlesCount is 0 when feed is empty', function() {",
+									"pm.testWithCorrelation('articlesCount is 0 when feed is empty', function() {",
 									"    responseJSON.articlesCount === 0",
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -37,6 +44,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -58,18 +70,25 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+                                    "// Wrapper function to include correlation ID in test names",
+                                    "pm.testWithCorrelation = function(testName, testFunction) {",
+                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
+                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+                                    "};",
+                                    "",
 									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
-									"pm.test('response has property \"articles\"', function() {",
+									"pm.testWithCorrelation('response has property \"articles\"', function() {",
 									"    pm.expect(responseJSON).to.have.property('articles')",
 									"})",
 									"",
-									"pm.test('articlesCount is 0 when feed is empty', function() {",
+									"pm.testWithCorrelation('articlesCount is 0 when feed is empty', function() {",
 									"    responseJSON.articlesCount === 0",
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -79,6 +98,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -106,18 +130,25 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+                                    "// Wrapper function to include correlation ID in test names",
+                                    "pm.testWithCorrelation = function(testName, testFunction) {",
+                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
+                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+                                    "};",
+                                    "",
 									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
-									"pm.test('response has property \"articles\"', function() {",
+									"pm.testWithCorrelation('response has property \"articles\"', function() {",
 									"    pm.expect(responseJSON).to.have.property('articles')",
 									"})",
 									"",
-									"pm.test('articlesCount is 0 when feed is empty', function() {",
+									"pm.testWithCorrelation('articlesCount is 0 when feed is empty', function() {",
 									"    responseJSON.articlesCount === 0",
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -127,6 +158,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -154,18 +190,25 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+                                    "// Wrapper function to include correlation ID in test names",
+                                    "pm.testWithCorrelation = function(testName, testFunction) {",
+                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
+                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+                                    "};",
+                                    "",
 									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
-									"pm.test('response has property \"articles\"', function() {",
+									"pm.testWithCorrelation('response has property \"articles\"', function() {",
 									"    pm.expect(responseJSON).to.have.property('articles')",
 									"})",
 									"",
-									"pm.test('articlesCount is 0 when feed is empty', function() {",
+									"pm.testWithCorrelation('articlesCount is 0 when feed is empty', function() {",
 									"    responseJSON.articlesCount === 0",
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -175,6 +218,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -202,18 +250,25 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+                                    "// Wrapper function to include correlation ID in test names",
+                                    "pm.testWithCorrelation = function(testName, testFunction) {",
+                                    "    const corrId = pm.variables.get('correlationId') || 'unknown';",
+                                    "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+                                    "};",
+                                    "",
 									"var responseJSON = JSON.parse(pm.response.text());",
 									"",
-									"pm.test('response has property \"tags\"', function() {",
+									"pm.testWithCorrelation('response has property \"tags\"', function() {",
 									"    pm.expect(responseJSON).to.have.property('tags')",
 									"})",
 									"",
-									"pm.test('No tags present', function() {",
+									"pm.testWithCorrelation('No tags present', function() {",
 									"    pm.expect(responseJSON.tags.length).to.eql(0);",
 									"});"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -223,6 +278,11 @@
 							{
 								"key": "X-Requested-With",
 								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
 							}
 						],
 						"url": {
@@ -269,7 +329,7 @@
 					"            );",
 					"        }",
 					"        ",
-					"        pm.test(`At least one error for field '${fieldName}'`, function () {",
+					"        pm.testWithCorrelation(`At least one error for field '${fieldName}'`, function () {",
 					"            pm.expect(hasFieldError).to.be.true;",
 					"        });",
 					"    }",
