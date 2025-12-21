@@ -81,11 +81,26 @@ export async function apiRequest<T>(
           `${err.name}: ${err.reason}`
         );
       } else if (typeof errorData.errors === 'object' && errorData.errors !== null) {
-        // Object format: {0: {name, reason}, 1: {name, reason}}
-        errors = Object.values(errorData.errors).map((err: unknown) => {
-          const error = err as { name: string; reason: string };
-          return `${error.name}: ${error.reason}`;
-        });
+        // Check if it's ValidationProblemDetails format (dictionary of field -> string[])
+        const errorValues = Object.values(errorData.errors);
+        if (errorValues.length > 0) {
+          const firstValue = errorValues[0];
+          if (Array.isArray(firstValue)) {
+            // ValidationProblemDetails format: { "Email": ["error1", "error2"] }
+            errors = errorValues.flatMap((fieldErrors) => fieldErrors as string[]);
+          } else if (typeof firstValue === 'object' && firstValue !== null && 'name' in firstValue && 'reason' in firstValue) {
+            // Custom format: {0: {name, reason}, 1: {name, reason}}
+            errors = errorValues.map((err: unknown) => {
+              const error = err as { name: string; reason: string };
+              return `${error.name}: ${error.reason}`;
+            });
+          } else {
+            // Fallback: convert to strings
+            errors = errorValues.map(val => String(val));
+          }
+        } else {
+          errors = [String(errorData.errors)];
+        }
       } else {
         errors = [String(errorData.errors)];
       }
