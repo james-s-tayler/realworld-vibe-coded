@@ -16,12 +16,20 @@ export class ApiError extends Error {
   }
 }
 
+// Helper function to get a cookie value by name
+function getCookie(name: string): string | null {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop()?.split(';').shift() ?? null;
+  }
+  return null;
+}
+
 export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem('token');
-  
   const headers: Record<string, string> = {};
 
   // Only add Content-Type header for requests with a body
@@ -33,13 +41,19 @@ export async function apiRequest<T>(
     Object.assign(headers, options.headers);
   }
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  // Add CSRF token for mutating requests (POST, PUT, DELETE, PATCH)
+  const method = options.method?.toUpperCase() || 'GET';
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+    const csrfToken = getCookie('XSRF-TOKEN');
+    if (csrfToken) {
+      headers['X-XSRF-TOKEN'] = csrfToken;
+    }
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
+    credentials: 'include', // Send cookies with every request
   });
 
   // Check if response has content before trying to parse JSON
