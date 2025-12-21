@@ -322,7 +322,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}",
+								"value": "Bearer {{token}}",
 								"disabled": true
 							},
 							{
@@ -404,7 +404,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -485,7 +485,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -547,7 +547,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -624,7 +624,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -696,7 +696,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -749,7 +749,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -802,7 +802,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -874,7 +874,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}",
+								"value": "Bearer {{token}}",
 								"disabled": true
 							},
 							{
@@ -928,7 +928,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}",
+								"value": "Bearer {{token}}",
 								"disabled": true
 							},
 							{
@@ -1002,7 +1002,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -1065,7 +1065,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
@@ -1138,7 +1138,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Token {{token}}"
+								"value": "Bearer {{token}}"
 							},
 							{
 								"key": "x-correlation-id",
