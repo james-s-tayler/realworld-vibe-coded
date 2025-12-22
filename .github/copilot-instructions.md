@@ -66,6 +66,8 @@ General functionality:
 | GET /api/tags | Get all tags | Multiple Tags | Allow Anonymous         |
 
 ## Contributing
+- Use the `RoslynMCP` MCP server's tools (ValidateFile and FindUsages) to validate
+    and analyze C# files in this repository when making changes.
 - You are not permitted to suppress warnings or errors in code unless explicitly instructed to do so.
 - You are not permitted to modify any Archunit rules unless explicitly instructed to do so.
 - Don't hardcode things or use magic strings.
@@ -74,7 +76,7 @@ General functionality:
 - Make sure the postman tests are passing before finishing.
 - DO NOT add or update any documentation unless asked to do so.
 - All the nuke targets that run tests produce reports under `Reports` folder. Make sure to check them if any test fails.
-- If you get stuck on an implementation detail related to a particular library use the docs-mcp-server to search for the relevant documentation.
+- If you get stuck on an implementation detail related to a particular library use the docfork mcp server to search for the relevant documentation.
 - If you modify the nuke build you MUST try and build it first before committing.
 - Server logs (Serilog and Audit.NET) are available in the `Logs` directory at the repository root. All docker-compose.yml configurations are set up to output logs there for debugging. Serilog logs are in `Logs/Server.Web/Serilog/` and Audit logs are in `Logs/Server.Web/Audit.NET/`.
 - When checking Audit.NET logs you need to check both the EntityFrameworkEvent and the DatabaseTransactionEvent correlated by CorrelationId and inspect the TransactionStatus to see whether it was Committed or RolledBack.
@@ -86,6 +88,7 @@ General functionality:
 - `/App/Client`: Contains the source code for the React-Vite-Typescript frontend.
 - `/App/Server`: Contains the source code for the .NET backend using the Ardalis Clean Architecture Template (without Aspire).
 - `/Infra`: Contains Bicep files for Azure infrastructure as code.
+- `/Logs`: Contains Serilog and Audit.NET logs for debugging.
 - `/Test`: Contains playwright, postman, and performance tests.
 - `/Task/Runner`: Contains Nuke build system files for linting, building, testing, and deployment tasks.
 - `/Task/LocalDev`: Contains the docker-compose files for local development environment setup.
@@ -108,7 +111,7 @@ General functionality:
 - xUnit for testing
 
 ## Testing
-- There is a comprehensive Postman collection that can be run through `./build.sh test-server-postman`. The Postman collection is also split into folders which have their own Nuke targets and can independently test areas of the system. The quality of the Postman suite is excellent. If the Postman suite is green, then the backend api has been implemented correctly.
+- There is a set of comprehensive Postman collection that can be run through `./build.sh test-server-postman-*`. The Postman collections have their own Nuke targets and can independently test areas of the system. The quality of the Postman suite is excellent. If the Postman suite is green, then the backend api has been implemented correctly.
 
 ## Infrastructure as Code
 - Bicep for Azure infrastructure as code
