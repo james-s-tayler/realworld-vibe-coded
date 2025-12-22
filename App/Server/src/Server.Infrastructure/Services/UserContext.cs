@@ -19,7 +19,7 @@ public class UserContext : IUserContext
 
   public string GetCorrelationId()
   {
-    return _httpContextAccessor.HttpContext.GetCorrelationId();
+    return _httpContextAccessor.HttpContext?.GetCorrelationId() ?? Guid.Empty.ToString();
   }
 
   /// <summary>
