@@ -53,6 +53,9 @@ jobs:
         run: |
           ./build.sh InstallGitHooks
 
+      - name: Ensure Task/McpServers directory exists
+        run: |
+          mkdir -p Task/McpServers
       - name: Clone Roslyn MCP server into Task/McpServers/RoslynMCP
         run: |
           git clone https://github.com/egorpavlikhin/roslyn-mcp.git Task/McpServers/RoslynMCP
