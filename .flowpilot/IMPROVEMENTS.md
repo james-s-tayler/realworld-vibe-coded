@@ -126,7 +126,7 @@ This document summarizes the analysis of the completed ASP.NET Identity migratio
 - **Known Risks & Mitigations**: Proactive risk identification per phase
 - **Reality Testing During Phase**: Guidance on testing incrementally
 - **Expected Working State After Phase**: Clear success criteria
-- **Rollback Plan**: How to revert if phase fails
+- **If Phase Fails**: Debug-first guidance (analyze and attempt fixes before considering rollback)
 - **Manual Verification Steps**: Not just automated tests
 
 **Impact:** Each phase is now self-documenting about its risk and scope. Encourages smaller, safer phases.

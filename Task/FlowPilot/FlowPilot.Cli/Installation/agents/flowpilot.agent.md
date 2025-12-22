@@ -168,7 +168,7 @@ Plans are organized under the `.flowpilot` directory with the following structur
    - Specify files affected in each step
    - Include Reality Testing During Phase guidance
    - Document Expected Working State After Phase
-   - Provide Rollback Plan for the phase
+   - Provide If Phase Fails guidance (debug-first approach)
    
 10. **Verification criteria must be explicit**:
     - List specific Nuke targets to run
