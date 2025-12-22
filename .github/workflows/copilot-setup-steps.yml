@@ -37,13 +37,13 @@ jobs:
         with:
           global-json-file: App/Server/global.json
 
-      - name: Install Playwright Chromium browser
-        run: |
-          npx playwright install chromium
+      #- name: Install Playwright Chromium browser
+      #  run: |
+      #    npx playwright install chromium
 
-      - name: Verify Playwright installation
-        run: |
-          npx playwright --version
+      #- name: Verify Playwright installation
+      #  run: |
+      #    npx playwright --version
 
       - name: Install Flowpilot
         run: |
