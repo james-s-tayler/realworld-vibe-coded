@@ -53,6 +53,10 @@ jobs:
         run: |
           ./build.sh InstallGitHooks
 
+      - name: Build Server solution for Roslyn analysis
+        run: |
+          dotnet build App/Server/Server.sln --configuration Debug
+
       - name: Build Roslyn MCP server
         run: |
           dotnet build Task/McpServers/roslyn-mcp/RoslynMCP/RoslynMCP.csproj --configuration Debug
