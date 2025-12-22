@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Serilog.Enrichers;
 using Server.UseCases.Interfaces;
 
 namespace Server.Infrastructure.Services;
@@ -18,17 +19,7 @@ public class UserContext : IUserContext
 
   public string GetCorrelationId()
   {
-    if (_httpContextAccessor.HttpContext == null)
-    {
-      return Guid.Empty.ToString();
-    }
-
-    if (!_httpContextAccessor.HttpContext.Items.ContainsKey("CorrelationId"))
-    {
-      _httpContextAccessor.HttpContext.Items["CorrelationId"] = Guid.NewGuid().ToString();
-    }
-
-    return _httpContextAccessor.HttpContext.Items["CorrelationId"] as string ?? Guid.Empty.ToString();
+    return _httpContextAccessor.HttpContext?.GetCorrelationId() ?? Guid.Empty.ToString();
   }
 
   /// <summary>
