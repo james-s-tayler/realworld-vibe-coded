@@ -52,3 +52,7 @@ jobs:
       - name: Install Git Hooks
         run: |
           ./build.sh InstallGitHooks
+
+      - name: Build Roslyn MCP server
+        run: |
+          dotnet build Task/McpServers/roslyn-mcp/RoslynMCP/RoslynMCP.csproj --configuration Release

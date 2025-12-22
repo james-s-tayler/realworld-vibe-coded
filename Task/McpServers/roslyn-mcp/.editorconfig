@@ -1,0 +1,19 @@
+root = true
+
+# This code was vendored into the project and has code that conflicts with the configured StyleCop rules.
+# This .editorconfig is designed to suppress those rules, so that I can compile the RoslynMCP server without code changes.
+
+[*]
+end_of_line = lf
+charset = utf-8
+
+# Optional: completely suppress analyzer diagnostics for this project
+dotnet_analyzer_diagnostic.severity = none
+
+# StylceCop: intentionally ignored Stylecop rules
+dotnet_diagnostic.SA0001.severity = none
+dotnet_diagnostic.CS8600.severity = none
+dotnet_diagnostic.CS8602.severity = none
+dotnet_diagnostic.CS8603.severity = none
+dotnet_diagnostic.CS8604.severity = none
+dotnet_diagnostic.CS8625.severity = none

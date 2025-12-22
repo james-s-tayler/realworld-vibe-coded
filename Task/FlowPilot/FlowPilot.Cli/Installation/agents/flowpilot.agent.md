@@ -106,7 +106,7 @@ Plans are organized under the `.flowpilot` directory with the following structur
    - Search for "breaking changes" and version compatibility
    - Search for community experiences and Stack Overflow issues
    - Search for architectural patterns and best practices
-   
+
 2. **Document ALL findings** in `references.md`:
    - Follow the enhanced template structure
    - Complete the Research Checklist
@@ -153,7 +153,7 @@ Plans are organized under the `.flowpilot` directory with the following structur
    - Target Small phases (5-10 steps) - avoid Large phases (20+ steps)
    - High-risk changes should be split into multiple smaller phases
    - Account for test maintenance in phase scope
-   
+
 8. **Validate phase plan**:
    - Complete the Phase Validation Checklist
    - Ensure each phase reaches a complete working state
@@ -169,7 +169,7 @@ Plans are organized under the `.flowpilot` directory with the following structur
    - Include Reality Testing During Phase guidance
    - Document Expected Working State After Phase
    - Provide If Phase Fails guidance (debug-first approach)
-   
+
 10. **Verification criteria must be explicit**:
     - List specific Nuke targets to run
     - Include manual verification steps
@@ -207,10 +207,12 @@ Plans are organized under the `.flowpilot` directory with the following structur
 
 ## When Running `flowpilot next`
 
-When you have been instructed to run `flowpilot next` and are implementing a phase, you must work in small, iterative, reality tested steps. The longer a chain of inferences becomes without being reality tested, the higher the probability an inference in the chain is wrong, invalidating the rest of the chain, and thus wasting time and tokens. 
+When you have been instructed to run `flowpilot next` and are implementing a phase, you must work in small, iterative, reality tested steps. The longer a chain of inferences becomes without being reality tested, the higher the probability an inference in the chain is wrong, invalidating the rest of the chain, and thus wasting time and tokens.
 
 As you work, you are expected to aggressively reality test via the following methods:
 
+- Use the `RoslynMCP` MCP server's tools (ValidateFile and FindUsages) to validate
+and analyze C# files in this repository when making changes.
 - run nuke Lint*, Build* and Test* targets to confirm the validity of your work
 - check the Serilog and Audit.NET logs under Logs/** after running `nuke Test*` or `RunLocalPublish` targets
 - check the Reports/**/Artifacts directory after running `nuke Test*` targets
