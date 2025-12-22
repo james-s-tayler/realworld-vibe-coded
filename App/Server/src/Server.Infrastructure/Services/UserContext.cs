@@ -23,12 +23,29 @@ public class UserContext : IUserContext
       return Guid.Empty.ToString();
     }
 
-    if (!_httpContextAccessor.HttpContext.Items.ContainsKey("CorrelationId"))
+    // First, check if correlation ID is in the request header (set by client or Serilog enricher)
+    if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("x-correlation-id", out var headerValue)
+        && !string.IsNullOrWhiteSpace(headerValue))
     {
-      _httpContextAccessor.HttpContext.Items["CorrelationId"] = Guid.NewGuid().ToString();
+      var correlationId = headerValue.ToString();
+
+      // Store it in Items for consistent access
+      _httpContextAccessor.HttpContext.Items["CorrelationId"] = correlationId;
+      return correlationId;
     }
 
-    return _httpContextAccessor.HttpContext.Items["CorrelationId"] as string ?? Guid.Empty.ToString();
+    // Second, check if we've already generated/stored one in Items
+    if (_httpContextAccessor.HttpContext.Items.TryGetValue("CorrelationId", out var itemValue)
+        && itemValue is string storedId
+        && !string.IsNullOrWhiteSpace(storedId))
+    {
+      return storedId;
+    }
+
+    // Finally, generate a new one and store it
+    var newCorrelationId = Guid.NewGuid().ToString();
+    _httpContextAccessor.HttpContext.Items["CorrelationId"] = newCorrelationId;
+    return newCorrelationId;
   }
 
   /// <summary>

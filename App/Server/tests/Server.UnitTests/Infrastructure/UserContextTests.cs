@@ -49,6 +49,160 @@ public class UserContextTests
   }
 
   [Fact]
+  public void GetCorrelationId_ShouldReturnHeaderValue_WhenHeaderIsPresent()
+  {
+    // Arrange
+    var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
+    var httpContext = new DefaultHttpContext();
+    var expectedCorrelationId = Guid.NewGuid().ToString();
+    httpContext.Request.Headers["x-correlation-id"] = expectedCorrelationId;
+    httpContextAccessor.HttpContext.Returns(httpContext);
+
+    var userContext = new UserContext(httpContextAccessor);
+
+    // Act
+    var correlationId = userContext.GetCorrelationId();
+
+    // Assert
+    correlationId.ShouldBe(expectedCorrelationId);
+  }
+
+  [Fact]
+  public void GetCorrelationId_ShouldStoreHeaderValueInItems_WhenHeaderIsPresent()
+  {
+    // Arrange
+    var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
+    var httpContext = new DefaultHttpContext();
+    var expectedCorrelationId = Guid.NewGuid().ToString();
+    httpContext.Request.Headers["x-correlation-id"] = expectedCorrelationId;
+    httpContextAccessor.HttpContext.Returns(httpContext);
+
+    var userContext = new UserContext(httpContextAccessor);
+
+    // Act
+    userContext.GetCorrelationId();
+
+    // Assert
+    httpContext.Items["CorrelationId"].ShouldBe(expectedCorrelationId);
+  }
+
+  [Fact]
+  public void GetCorrelationId_ShouldReturnItemsValue_WhenHeaderAbsentButItemsPresent()
+  {
+    // Arrange
+    var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
+    var httpContext = new DefaultHttpContext();
+    var expectedCorrelationId = Guid.NewGuid().ToString();
+    httpContext.Items["CorrelationId"] = expectedCorrelationId;
+    httpContextAccessor.HttpContext.Returns(httpContext);
+
+    var userContext = new UserContext(httpContextAccessor);
+
+    // Act
+    var correlationId = userContext.GetCorrelationId();
+
+    // Assert
+    correlationId.ShouldBe(expectedCorrelationId);
+  }
+
+  [Fact]
+  public void GetCorrelationId_ShouldGenerateNewGuid_WhenNeitherHeaderNorItemsPresent()
+  {
+    // Arrange
+    var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
+    var httpContext = new DefaultHttpContext();
+    httpContextAccessor.HttpContext.Returns(httpContext);
+
+    var userContext = new UserContext(httpContextAccessor);
+
+    // Act
+    var correlationId = userContext.GetCorrelationId();
+
+    // Assert
+    Guid.TryParse(correlationId, out var guid).ShouldBeTrue();
+    guid.ShouldNotBe(Guid.Empty);
+    httpContext.Items["CorrelationId"].ShouldBe(correlationId);
+  }
+
+  [Fact]
+  public void GetCorrelationId_ShouldReturnSameValue_OnMultipleCalls()
+  {
+    // Arrange
+    var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
+    var httpContext = new DefaultHttpContext();
+    httpContextAccessor.HttpContext.Returns(httpContext);
+
+    var userContext = new UserContext(httpContextAccessor);
+
+    // Act
+    var correlationId1 = userContext.GetCorrelationId();
+    var correlationId2 = userContext.GetCorrelationId();
+
+    // Assert
+    correlationId1.ShouldBe(correlationId2);
+  }
+
+  [Fact]
+  public void GetCorrelationId_ShouldPreferHeaderOverItems()
+  {
+    // Arrange
+    var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
+    var httpContext = new DefaultHttpContext();
+    var headerCorrelationId = Guid.NewGuid().ToString();
+    var itemsCorrelationId = Guid.NewGuid().ToString();
+    httpContext.Request.Headers["x-correlation-id"] = headerCorrelationId;
+    httpContext.Items["CorrelationId"] = itemsCorrelationId;
+    httpContextAccessor.HttpContext.Returns(httpContext);
+
+    var userContext = new UserContext(httpContextAccessor);
+
+    // Act
+    var correlationId = userContext.GetCorrelationId();
+
+    // Assert
+    correlationId.ShouldBe(headerCorrelationId);
+    httpContext.Items["CorrelationId"].ShouldBe(headerCorrelationId);
+  }
+
+  [Fact]
+  public void GetCorrelationId_ShouldGenerateNewGuid_WhenHeaderIsEmpty()
+  {
+    // Arrange
+    var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
+    var httpContext = new DefaultHttpContext();
+    httpContext.Request.Headers["x-correlation-id"] = string.Empty;
+    httpContextAccessor.HttpContext.Returns(httpContext);
+
+    var userContext = new UserContext(httpContextAccessor);
+
+    // Act
+    var correlationId = userContext.GetCorrelationId();
+
+    // Assert
+    Guid.TryParse(correlationId, out var guid).ShouldBeTrue();
+    guid.ShouldNotBe(Guid.Empty);
+  }
+
+  [Fact]
+  public void GetCorrelationId_ShouldGenerateNewGuid_WhenHeaderIsWhitespace()
+  {
+    // Arrange
+    var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
+    var httpContext = new DefaultHttpContext();
+    httpContext.Request.Headers["x-correlation-id"] = "   ";
+    httpContextAccessor.HttpContext.Returns(httpContext);
+
+    var userContext = new UserContext(httpContextAccessor);
+
+    // Act
+    var correlationId = userContext.GetCorrelationId();
+
+    // Assert
+    Guid.TryParse(correlationId, out var guid).ShouldBeTrue();
+    guid.ShouldNotBe(Guid.Empty);
+  }
+
+  [Fact]
   public void GetCurrentUsername_WhenUserAuthenticated_ShouldReturnUsername()
   {
     // Arrange
