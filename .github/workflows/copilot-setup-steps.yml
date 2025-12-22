@@ -37,13 +37,13 @@ jobs:
         with:
           global-json-file: App/Server/global.json
 
-      - name: Install Playwright Chromium browser
-        run: |
-          npx playwright install chromium
+      #- name: Install Playwright Chromium browser
+      #  run: |
+      #    npx playwright install chromium
 
-      - name: Verify Playwright installation
-        run: |
-          npx playwright --version
+      #- name: Verify Playwright installation
+      #  run: |
+      #    npx playwright --version
 
       - name: Install Flowpilot
         run: |
@@ -52,6 +52,10 @@ jobs:
       - name: Install Git Hooks
         run: |
           ./build.sh InstallGitHooks
+
+      - name: Build Server solution for Roslyn analysis
+        run: |
+          dotnet build App/Server/Server.sln --configuration Debug
 
       - name: Build Roslyn MCP server
         run: |
