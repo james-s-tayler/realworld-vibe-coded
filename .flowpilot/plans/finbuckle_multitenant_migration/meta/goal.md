@@ -10,6 +10,7 @@ You are updating an existing **ASP.NET Core monolith** that uses:
 Currently, multiple users can register accounts independently and **all users can see all data**.
 
 We want to transition this system towards **single-database, organization-based multi-tenancy** using **Finbuckle.Multitenant**.
+The nature of the platform is shifting to an internal company social network.
 
 ---
 
