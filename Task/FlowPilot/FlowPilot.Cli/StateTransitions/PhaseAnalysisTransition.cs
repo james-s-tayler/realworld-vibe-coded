@@ -32,7 +32,7 @@ public class PhaseAnalysisTransition : IStateTransition
     _logger.LogInformation(string.Empty);
     _logger.LogInformation("Instructions:");
     _logger.LogInformation("Update .flowpilot/plans/{PlanName}/meta/phase-analysis.md", context.PlanName);
-    _logger.LogInformation("Based on the contents of goal.md, system-analysis.md, and key-decisions.md,");
+    _logger.LogInformation("Based on the contents of goal.md, references.md, system-analysis.md, and key-decisions.md,");
     _logger.LogInformation("define the high-level phases for this plan.");
     _logger.LogInformation(string.Empty);
     _logger.LogWarning("A new branch is required to proceed past phase-analysis.");

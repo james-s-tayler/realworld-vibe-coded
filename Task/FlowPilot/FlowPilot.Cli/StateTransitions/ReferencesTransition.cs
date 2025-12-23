@@ -32,7 +32,7 @@ public class ReferencesTransition : IStateTransition
     _logger.LogInformation(string.Empty);
     _logger.LogInformation("Instructions:");
     _logger.LogInformation("Update .flowpilot/plans/{PlanName}/meta/references.md", context.PlanName);
-    _logger.LogInformation("Use the mslearn MCP server and web search to conduct thorough research");
+    _logger.LogInformation("Use docfork mcp server, the mslearn MCP server and web search to conduct thorough research");
     _logger.LogInformation("based on the goal stated in goal.md. Document your findings in references.md");
     _logger.LogInformation("to aid the implementation plan.");
   }
