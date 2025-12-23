@@ -1,5 +1,5 @@
 - [x] [state] FlowPilot plan initialized
-- [ ] [references] meta/references.md drafted with initial sources
+- [x] [references] meta/references.md drafted with initial sources
 - [ ] [system-analysis] meta/system-analysis.md describes relevant system parts
 - [ ] [key-decisions] meta/key-decisions.md lists decision points and options
 - [ ] [phase-analysis] meta/phase-analysis.md defines high-level phases
