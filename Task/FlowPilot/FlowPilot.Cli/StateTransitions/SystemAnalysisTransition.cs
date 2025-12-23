@@ -32,7 +32,7 @@ public class SystemAnalysisTransition : IStateTransition
     _logger.LogInformation(string.Empty);
     _logger.LogInformation("Instructions:");
     _logger.LogInformation("Update .flowpilot/plans/{PlanName}/meta/system-analysis.md", context.PlanName);
-    _logger.LogInformation("Analyze the current parts of the system that are relevant to the goal");
+    _logger.LogInformation("Use RoslynMCP mcp server (among other techniques) to analyze the current parts of the system that are relevant to the goal");
     _logger.LogInformation("stated in goal.md and record them in system-analysis.md.");
   }
 }
