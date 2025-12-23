@@ -92,6 +92,7 @@ Plans are organized under the `.flowpilot` directory with the following structur
 
 **Before starting to write the migration plan**, Copilot must conduct thorough research:
 
+0. **Use the docfork MCP server** to search dependency,library, and framework documentation for relevant patterns, best practices, and implementation guidance
 1. **Use the mslearn MCP server** to search Microsoft documentation for relevant patterns, best practices, and implementation guidance
 2. **Perform web searches** to gather additional context, community practices, and potential pitfalls
 3. **Document all findings** in `.flowpilot/plans/$plan_name/meta/references.md` following the template.
@@ -100,7 +101,7 @@ Plans are organized under the `.flowpilot` directory with the following structur
 
 ### Research Phase (Critical)
 
-1. **Start with comprehensive research**: Use mslearn mcp server and web search BEFORE writing any analysis or phases
+1. **Start with comprehensive research**: Use docfork mcp server, mslearn mcp server and web search BEFORE writing any analysis or phases
    - Search for official documentation and migration guides
    - Search for "common pitfalls" and "known issues"
    - Search for "breaking changes" and version compatibility
@@ -124,12 +125,13 @@ Plans are organized under the `.flowpilot` directory with the following structur
 4. **Complete comprehensive system analysis** in `system-analysis.md`:
    - Use the Analysis Checklist to ensure nothing is missed
    - **Identify ALL handler/service dependencies** - This is where many plans fail
-   - Map the ripple effects of changes (changing X requires updating Y, Z, W...)
+   - Map the ripple effects of changes (changing X requires updating Y, Z, W...) across backend, frontend, unit, integration, and e2e tests.
    - Document cross-cutting concerns (logging, auditing, security)
    - Analyze test infrastructure and maintenance requirements
-   - Use `grep` and `glob` tools to find all usages of components being migrated
+   - Use the `RoslynMCP` MCP server, `grep` and `glob` tools to find all usages of components being affected
 
 5. **Critical: Identify Ripple Effects**:
+   - Use the `RoslynMCP` MCP server to find and record affected dependencies
    - If changing a database entity, find ALL handlers that use it
    - If changing authentication, find ALL endpoints and tests affected
    - If changing a core service, find ALL consumers
@@ -153,6 +155,7 @@ Plans are organized under the `.flowpilot` directory with the following structur
    - Target Small phases (5-10 steps) - avoid Large phases (20+ steps)
    - High-risk changes should be split into multiple smaller phases
    - Account for test maintenance in phase scope
+   - Each phase is gated by a pull request, which means all the tests in the pipline need to pass 100% in order to merge the PR and move to the next phase.
 
 8. **Validate phase plan**:
    - Complete the Phase Validation Checklist
@@ -192,6 +195,7 @@ Plans are organized under the `.flowpilot` directory with the following structur
 **Phase Planning Pitfalls:**
 - ❌ Creating phases that are too large (20+ implementation steps)
 - ❌ Planning phases that don't reach a working state
+- ❌ Planning phases that that leave tests broken and unable to merge the PR due to failing CI
 - ❌ Not accounting for test updates in phase scope
 - ❌ Missing hidden dependencies between components
 - ❌ Dual-write approaches without transaction analysis
@@ -212,17 +216,17 @@ When you have been instructed to run `flowpilot next` and are implementing a pha
 As you work, you are expected to aggressively reality test via the following methods:
 
 - Use the `RoslynMCP` MCP server's tools (ValidateFile and FindUsages) to validate
-  and analyze C# files in this repository when making changes.
+and analyze C# files in this repository when making changes.
 - run nuke Lint*, Build* and Test* targets to confirm the validity of your work
 - check the Serilog and Audit.NET logs under Logs/** after running `nuke Test*` or `RunLocalPublish` targets
 - check the Reports/**/Artifacts directory after running `nuke Test*` targets
 - use the mslearn MCP server to check assumptions relating to Microsoft tools, libraries, frameworks, and dependencies
-- use the docs-mcp-server to check for correct usage of non-Microsoft tools, libraries, frameworks, and dependencies
+- use docfork mcp server to check for correct usage of non-Microsoft tools, libraries, frameworks, and dependencies
 - use websearch to locate tutorials, how to guides, documentation and source code to compare against.
 
 ### When You Get Stuck
 
-- use the mslearn MCP server, the docs-mcp-server, and websearch to consult relevant documentation
+- use the mslearn MCP server, use docfork mcp server, and websearch to consult relevant documentation
 - use websearch to search for Stack overflow posts and Github Issues of the problem you're facing
 - use websearch to find and check the contents of release notes if you're having trouble with a specific library, as sometimes important things change between versions.
 - if you encounter a tricky bug you can't solve after a few attempts, do a debug analysis using `.flowpilot/template/debug-analysis.md` to help you break out of a local minima you might be stuck in.
