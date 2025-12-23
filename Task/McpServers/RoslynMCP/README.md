@@ -76,6 +76,7 @@ Add the following to your Github Copilot Agent settings in your repo:
 {
   "mcpServers": {
     "RoslynMCP": {
+      "type": "local",
       "command": "dotnet",
       "args": [
         "run",
