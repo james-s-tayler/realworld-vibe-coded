@@ -1,72 +1,119 @@
-## phase_12
+## phase_12: Add Functional Tests for Multi-Tenancy and Cross-Tenant Isolation
 
 ### Phase Overview
 
-Brief description of what this phase accomplishes (1-2 sentences)
+Add comprehensive functional tests at the handler/repository level to verify tenant isolation. Test that query filters work correctly for articles, comments, tags. Verify create operations set TenantId correctly. Ensure users cannot access other tenants' data via API.
 
-**Scope Size:** Small/Medium/Large
-**Risk Level:** Low/Medium/High
-**Estimated Complexity:** Low/Medium/High
+**Scope Size:** Small (~8 steps)
+**Risk Level:** Low (additive test coverage)
+**Estimated Complexity:** Low
 
 ### Prerequisites
 
 What must be completed before starting this phase:
-- Prerequisite 1
-- Prerequisite 2
-- All tests from previous phase passing
+- Phase 11 completed (slug uniqueness tenant-scoped)
+- All tests passing
+- System fully multi-tenant with comprehensive E2E coverage
 
 ### Known Risks & Mitigations
 
-**Risk 1:** Description
-- **Likelihood:** High/Medium/Low
-- **Impact:** High/Medium/Low
-- **Mitigation:** How we plan to avoid or handle this
-- **Fallback:** What to do if the risk materializes
+**Risk 1:** May duplicate E2E test coverage
+- **Likelihood:** Medium
+- **Impact:** Low (test redundancy)
+- **Mitigation:** Focus functional tests on handler/repo level details that E2E tests don't cover
+- **Fallback:** Accept some overlap for defense-in-depth testing
 
-**Risk 2:** Description
-- **Likelihood:** High/Medium/Low
-- **Impact:** High/Medium/Low
-- **Mitigation:** How we plan to avoid or handle this
-- **Fallback:** What to do if the risk materializes
+**Risk 2:** Test fixtures may need complex tenant setup
+- **Likelihood:** Low (fixtures already use StaticStrategy from phase 8)
+- **Impact:** Low (test complexity)
+- **Mitigation:** Reuse existing fixture patterns from phase 8
+- **Fallback:** Simplify tests to use single tenant if multi-tenant setup too complex
 
 ### Implementation Steps
 
-**Part 1: Setup & Preparation**
+**Part 1: Create Multi-Tenancy Functional Test Class**
 
-1. **Step Title**
-   - Detailed action to take
-   - Expected outcome
-   - Files affected: `path/to/file1.cs`, `path/to/file2.cs`
+1. **Create MultiTenancyIsolationTests class**
+   - Create `App/Server/tests/Server.FunctionalTests/MultiTenancy/MultiTenancyIsolationTests.cs`
+   - Inherit from appropriate test base class
+   - Use existing fixture patterns for tenant setup
+   - Expected outcome: Test class structure ready
+   - Files affected: `App/Server/tests/Server.FunctionalTests/MultiTenancy/MultiTenancyIsolationTests.cs` (new)
+   - Reality check: Test class compiles
 
-2. **Step Title**
-   - Detailed action to take
-   - Expected outcome
+**Part 2: Add Query Filter Tests**
 
-**Part 2: Core Changes**
+2. **Test: Article queries filtered by tenant**
+   - Create articles for Tenant1 and Tenant2
+   - Set tenant context to Tenant1, query articles
+   - Verify only Tenant1 articles returned
+   - Expected outcome: Query filter test passes
+   - Files affected: `App/Server/tests/Server.FunctionalTests/MultiTenancy/MultiTenancyIsolationTests.cs`
+   - Reality check: Test passes
 
-3. **Step Title**
-   - Detailed action to take
-   - Expected outcome
-   - Reality check: How to verify this step worked
+3. **Test: Comment queries filtered by tenant**
+   - Create comments for articles in different tenants
+   - Query comments with Tenant1 context
+   - Verify only Tenant1 comments returned
+   - Expected outcome: Comment filter test passes
+   - Files affected: `App/Server/tests/Server.FunctionalTests/MultiTenancy/MultiTenancyIsolationTests.cs`
+   - Reality check: Test passes
 
-**Part 3: Testing & Validation**
+4. **Test: Tag queries filtered by tenant**
+   - Create tags in different tenants
+   - Query tags with Tenant1 context
+   - Verify only Tenant1 tags returned
+   - Expected outcome: Tag filter test passes
+   - Files affected: `App/Server/tests/Server.FunctionalTests/MultiTenancy/MultiTenancyIsolationTests.cs`
+   - Reality check: Test passes
 
-4. **Run tests incrementally**
-   - Run `./build.sh TestX` after each major change
-   - Fix issues immediately before proceeding
-   - Don't accumulate broken tests
+**Part 3: Add Create Operation Tests**
+
+5. **Test: Articles created with correct TenantId**
+   - Set tenant context to Tenant1
+   - Create article via CreateArticleHandler
+   - Verify article.TenantId == Tenant1.Id
+   - Expected outcome: TenantId assignment test passes
+   - Files affected: `App/Server/tests/Server.FunctionalTests/MultiTenancy/MultiTenancyIsolationTests.cs`
+   - Reality check: Test passes
+
+6. **Test: Comments created with correct TenantId**
+   - Set tenant context to Tenant1
+   - Create comment via CreateCommentHandler
+   - Verify comment.TenantId == Tenant1.Id
+   - Expected outcome: Comment TenantId test passes
+   - Files affected: `App/Server/tests/Server.FunctionalTests/MultiTenancy/MultiTenancyIsolationTests.cs`
+   - Reality check: Test passes
+
+**Part 4: Add Cross-Tenant Access Tests**
+
+7. **Test: Users cannot access other tenants' articles via API**
+   - Create article in Tenant1
+   - Attempt to access article with Tenant2 authentication
+   - Verify 404 Not Found or empty result (query filter blocks access)
+   - Expected outcome: Cross-tenant access blocked
+   - Files affected: `App/Server/tests/Server.FunctionalTests/MultiTenancy/MultiTenancyIsolationTests.cs`
+   - Reality check: Test passes
+
+**Part 5: Run Tests**
+
+8. **Run functional tests**
+   - Run: `./build.sh TestServer`
+   - Verify all new multi-tenancy functional tests pass
+   - Verify existing functional tests still pass
+   - Expected outcome: All 45+ functional tests pass
+   - Reality check: Functional test suite green
 
 ### Reality Testing During Phase
 
 Test incrementally as you work:
 
 ```bash
-# After backend changes
-./build.sh LintServerVerify
-./build.sh BuildServer
+# After each test added
 ./build.sh TestServer
 
-# After test changes
+# Full validation
+./build.sh TestServer
 ./build.sh TestServerPostman
 ./build.sh TestE2e
 ```
@@ -75,26 +122,29 @@ Don't wait until the end to test. Reality test after each major change.
 
 ### Expected Working State After Phase
 
-Describe what should be true when this phase is complete:
-- Application builds successfully
-- Specific feature X works as expected
-- All tests pass
-- Database schema is in state Y
-- API endpoints respond as expected
+When this phase is complete:
+- Functional tests verify tenant isolation at handler/repository level
+- Tests validate query filters work correctly for articles, comments, tags
+- Tests verify create operations set TenantId correctly
+- Tests ensure users cannot access other tenants' data
+- Comprehensive functional test coverage for multi-tenancy
+- All functional tests pass (45+ tests)
+- Complete test coverage (E2E + functional) for multi-tenant scenarios
+- Ready for final logging enhancements in phase 13
 
 ### If Phase Fails
 
 If this phase fails and cannot be completed:
-1. Try to do a debug analysis using `debug-analysis.md` to help identify the root cause
-2. If the debug analysis doesn't resolve the issue, run `flowpilot stuck` to get assistance with re-planning
+1. Review existing functional test patterns for authentication and tenant setup
+2. Check that StaticStrategy is configured correctly in test fixtures
+3. Use debug-analysis.md for complex test issues
+4. If stuck, run `flowpilot stuck`
 
 ### Verification
 
 Run the following Nuke targets to verify this phase:
 
 ```bash
-./build.sh LintAllVerify
-./build.sh BuildServer
 ./build.sh TestServer
 ./build.sh TestServerPostman
 ./build.sh TestE2e
@@ -103,7 +153,7 @@ Run the following Nuke targets to verify this phase:
 All targets must pass before proceeding to the next phase.
 
 **Manual Verification Steps:**
-1. Start the application and verify it runs
-2. Test specific functionality X manually
-3. Check logs for errors
-4. Verify database state is correct
+1. Review functional test reports in `Reports/Server/Artifacts/Tests/`
+2. Verify new multi-tenancy tests are present and passing
+3. Check test coverage metrics (if available)
+4. Verify no test flakiness in multi-tenancy tests

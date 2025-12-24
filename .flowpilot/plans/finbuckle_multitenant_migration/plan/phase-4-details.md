@@ -1,109 +1,210 @@
-## phase_4
+## phase_4: Add Organization Entity and EF Core Multi-Tenant Infrastructure
 
 ### Phase Overview
 
-Brief description of what this phase accomplishes (1-2 sentences)
+Add Organization entity to represent tenants. Migrate AppDbContext from AuditIdentityDbContext to MultiTenantIdentityDbContext inheritance. Configure Audit.NET to work with new DbContext using data provider approach. Add TenantId column to ApplicationUser with foreign key to Organizations table.
 
-**Scope Size:** Small/Medium/Large
-**Risk Level:** Low/Medium/High
-**Estimated Complexity:** Low/Medium/High
+**Scope Size:** Small (~10 steps)
+**Risk Level:** Medium (DbContext inheritance change is critical)
+**Estimated Complexity:** Medium
 
 ### Prerequisites
 
 What must be completed before starting this phase:
-- Prerequisite 1
-- Prerequisite 2
-- All tests from previous phase passing
+- Phase 3 completed (all endpoints require authentication)
+- All tests passing with authenticated access
+- Phase 1 POC validated that MultiTenantIdentityDbContext + Audit.NET work together
 
 ### Known Risks & Mitigations
 
-**Risk 1:** Description
-- **Likelihood:** High/Medium/Low
-- **Impact:** High/Medium/Low
-- **Mitigation:** How we plan to avoid or handle this
-- **Fallback:** What to do if the risk materializes
+**Risk 1:** DbContext inheritance change may break existing code
+- **Likelihood:** Medium
+- **Impact:** High (application won't start if DbContext fails)
+- **Mitigation:** Follow POC pattern from phase 1 exactly. Test immediately after changing inheritance.
+- **Fallback:** Revert to AuditIdentityDbContext, investigate POC findings, run `flowpilot stuck`
 
-**Risk 2:** Description
-- **Likelihood:** High/Medium/Low
-- **Impact:** High/Medium/Low
-- **Mitigation:** How we plan to avoid or handle this
-- **Fallback:** What to do if the risk materializes
+**Risk 2:** Audit.NET may not capture events correctly with new DbContext
+- **Likelihood:** Low (POC validated this)
+- **Impact:** High (compliance requirement)
+- **Mitigation:** Verify audit logs after implementation. Check both EntityFrameworkEvent and DatabaseTransactionEvent logs.
+- **Fallback:** Add custom audit event enricher if automatic capture fails
+
+**Risk 3:** EF migrations may fail or create incorrect schema
+- **Likelihood:** Low
+- **Impact:** Medium (database schema issues)
+- **Mitigation:** Review migration files before applying. Test with fresh database first.
+- **Fallback:** Remove migration, adjust entity configurations, regenerate
 
 ### Implementation Steps
 
-**Part 1: Setup & Preparation**
+**Part 1: Install Finbuckle Package**
 
-1. **Step Title**
-   - Detailed action to take
-   - Expected outcome
-   - Files affected: `path/to/file1.cs`, `path/to/file2.cs`
+1. **Add Finbuckle.MultiTenant NuGet package**
+   - Add package reference to Server.Infrastructure project: `Finbuckle.MultiTenant.EntityFrameworkCore` version 10.0+
+   - Run `dotnet restore`
+   - Expected outcome: Package installed without conflicts
+   - Files affected: `App/Server/src/Server.Infrastructure/Server.Infrastructure.csproj`
+   - Reality check: Build succeeds, no package conflicts
 
-2. **Step Title**
-   - Detailed action to take
-   - Expected outcome
+**Part 2: Create Organization Entity**
 
-**Part 2: Core Changes**
+2. **Create Organization entity class**
+   - Create `Organization.cs` in `App/Server/src/Server.Core/Entities/`
+   - Inherit from `EntityBase` to get Id, audit fields, change tracking
+   - Add properties: `Name` (string), `Identifier` (string, for Finbuckle), `Description` (string, optional)
+   - Expected outcome: Organization entity defined
+   - Files affected: `App/Server/src/Server.Core/Entities/Organization.cs` (new)
+   - Reality check: Code compiles
 
-3. **Step Title**
-   - Detailed action to take
-   - Expected outcome
-   - Reality check: How to verify this step worked
+3. **Create Organization entity configuration**
+   - Create `OrganizationConfiguration.cs` in `App/Server/src/Server.Infrastructure/Data/Config/`
+   - Implement `IEntityTypeConfiguration<Organization>`
+   - Configure required properties, max lengths, unique index on Identifier
+   - Example: `builder.Property(o => o.Identifier).IsRequired().HasMaxLength(50); builder.HasIndex(o => o.Identifier).IsUnique();`
+   - Expected outcome: Organization table configuration ready
+   - Files affected: `App/Server/src/Server.Infrastructure/Data/Config/OrganizationConfiguration.cs` (new)
+   - Reality check: Code compiles
 
-**Part 3: Testing & Validation**
+**Part 3: Update ApplicationUser Entity**
 
-4. **Run tests incrementally**
-   - Run `./build.sh TestX` after each major change
-   - Fix issues immediately before proceeding
-   - Don't accumulate broken tests
+4. **Add TenantId to ApplicationUser**
+   - Open `App/Server/src/Server.Core/Entities/ApplicationUser.cs`
+   - Add property: `public Guid? TenantId { get; set; }`
+   - Add navigation: `public Organization? Organization { get; set; }`
+   - Expected outcome: ApplicationUser has TenantId foreign key
+   - Files affected: `App/Server/src/Server.Core/Entities/ApplicationUser.cs`
+   - Reality check: Code compiles
+
+5. **Configure ApplicationUser TenantId relationship**
+   - Open or create `ApplicationUserConfiguration.cs` in `App/Server/src/Server.Infrastructure/Data/Config/`
+   - Configure foreign key: `builder.HasOne(u => u.Organization).WithMany().HasForeignKey(u => u.TenantId).OnDelete(DeleteBehavior.Restrict);`
+   - Add index on TenantId: `builder.HasIndex(u => u.TenantId);`
+   - Expected outcome: Relationship configured
+   - Files affected: `App/Server/src/Server.Infrastructure/Data/Config/ApplicationUserConfiguration.cs`
+   - Reality check: Code compiles
+
+**Part 4: Update AppDbContext**
+
+6. **Change AppDbContext inheritance to MultiTenantIdentityDbContext**
+   - Open `App/Server/src/Server.Infrastructure/Data/AppDbContext.cs`
+   - Change base class from `AuditIdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` to `MultiTenantIdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>`
+   - Remove AuditIdentityDbContext using statement, add Finbuckle using
+   - Expected outcome: AppDbContext inherits from MultiTenantIdentityDbContext
+   - Files affected: `App/Server/src/Server.Infrastructure/Data/AppDbContext.cs`
+   - Reality check: Code compiles
+
+7. **Configure Audit.NET with data provider**
+   - In AppDbContext, override `SaveChangesAsync`
+   - Configure Audit.EntityFramework data provider (follow POC pattern from phase 1)
+   - Add custom field to include TenantId from `IMultiTenantContextAccessor<TenantInfo>` (if available, null for now)
+   - Call `base.SaveChangesAsync()` to leverage Finbuckle's tenant association logic
+   - Expected outcome: Audit.NET configured via data provider
+   - Files affected: `App/Server/src/Server.Infrastructure/Data/AppDbContext.cs`
+   - Reality check: Build succeeds, SaveChangesAsync compiles
+
+8. **Add Organization DbSet**
+   - In AppDbContext, add: `public DbSet<Organization> Organizations => Set<Organization>();`
+   - Expected outcome: Organizations accessible via DbContext
+   - Files affected: `App/Server/src/Server.Infrastructure/Data/AppDbContext.cs`
+   - Reality check: Build succeeds
+
+**Part 5: Create and Apply EF Migration**
+
+9. **Create EF Core migration**
+   - Run: `dotnet ef migrations add AddOrganizationAndTenantId --project App/Server/src/Server.Infrastructure --startup-project App/Server/src/Server.Web`
+   - Review migration file to verify Organizations table and ApplicationUser.TenantId column are added
+   - Verify indexes created on TenantId and Identifier
+   - Expected outcome: Migration file created
+   - Files affected: `App/Server/src/Server.Infrastructure/Data/Migrations/*_AddOrganizationAndTenantId.cs` (new)
+   - Reality check: Migration file looks correct (no unexpected changes)
+
+10. **Apply migration to database**
+    - Run: `dotnet ef database update --project App/Server/src/Server.Infrastructure --startup-project App/Server/src/Server.Web`
+    - Verify Organizations table exists and ApplicationUser has TenantId column
+    - Expected outcome: Database schema updated
+    - Reality check: No migration errors, database updated successfully
+
+**Part 6: Update Functional Tests**
+
+11. **Update test fixtures to create Organizations**
+    - Modify test fixtures (ArticlesFixture, ProfilesFixture, etc.) to create Organization before creating test users
+    - Associate test users with Organization by setting TenantId
+    - Expected outcome: Test users have TenantId set
+    - Files affected: `App/Server/tests/Server.FunctionalTests/Fixtures/*.cs`
+    - Reality check: Test setup compiles
+
+12. **Run functional tests**
+    - Run: `./build.sh TestServer`
+    - Fix any tests that fail due to Organization requirement
+    - Expected outcome: All functional tests pass
+    - Reality check: 45 functional tests pass
 
 ### Reality Testing During Phase
 
 Test incrementally as you work:
 
 ```bash
-# After backend changes
+# After package install
+./build.sh BuildServer
+
+# After entity changes
 ./build.sh LintServerVerify
 ./build.sh BuildServer
-./build.sh TestServer
 
-# After test changes
-./build.sh TestServerPostman
-./build.sh TestE2e
+# After DbContext changes
+./build.sh BuildServer
+# Check for compilation errors
+
+# After migration
+dotnet ef database update
+# Verify database schema
+
+# After test updates
+./build.sh TestServer
 ```
 
 Don't wait until the end to test. Reality test after each major change.
 
 ### Expected Working State After Phase
 
-Describe what should be true when this phase is complete:
-- Application builds successfully
-- Specific feature X works as expected
-- All tests pass
-- Database schema is in state Y
-- API endpoints respond as expected
+When this phase is complete:
+- Organization entity exists in domain
+- ApplicationUser has TenantId foreign key to Organization
+- AppDbContext inherits from MultiTenantIdentityDbContext
+- Audit.NET configured via data provider, still captures events
+- EF Core migrations applied successfully
+- Database has Organizations table and ApplicationUser.TenantId column
+- Indexes created on TenantId columns
+- Functional tests pass with Organization creation in fixtures
+- Application still works as single-tenant (multi-tenant infrastructure in place but not enforced yet)
+- **No query filters active yet** (added in phase 5)
 
 ### If Phase Fails
 
 If this phase fails and cannot be completed:
-1. Try to do a debug analysis using `debug-analysis.md` to help identify the root cause
-2. If the debug analysis doesn't resolve the issue, run `flowpilot stuck` to get assistance with re-planning
+1. If DbContext inheritance fails, review phase 1 POC - compare implementation
+2. Use mslearn MCP server to search for MultiTenantIdentityDbContext configuration examples
+3. If Audit.NET stops working, check SaveChangesAsync - verify data provider configuration
+4. Check Audit.NET logs in `Logs/Server.Web/Audit.NET/` to confirm events still captured
+5. If migration fails, review entity configurations - ensure foreign keys correct
+6. Use debug-analysis.md for complex issues
+7. If stuck, run `flowpilot stuck`
 
 ### Verification
 
 Run the following Nuke targets to verify this phase:
 
 ```bash
-./build.sh LintAllVerify
+./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
-./build.sh TestServerPostman
-./build.sh TestE2e
 ```
 
 All targets must pass before proceeding to the next phase.
 
 **Manual Verification Steps:**
-1. Start the application and verify it runs
-2. Test specific functionality X manually
-3. Check logs for errors
-4. Verify database state is correct
+1. Inspect database schema - verify Organizations table and ApplicationUser.TenantId column exist
+2. Check indexes: `SELECT * FROM sqlite_master WHERE type='index' AND tbl_name IN ('Organizations', 'AspNetUsers');`
+3. Check Audit.NET logs in `Logs/Server.Web/Audit.NET/` after running tests - verify events still captured
+4. Start application: `./build.sh RunLocal` - should start without errors
+5. Test login flow manually - should work (TenantId is nullable, so users can exist without Organization for now)
