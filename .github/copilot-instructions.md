@@ -45,8 +45,8 @@ General functionality:
 
 | Endpoint | Description | Returns | Auth                    |
 |:---------|:------------|:-------|:------------------------|
-| POST /api/users/login | Authenticates a user | User and JWT token | Allow Anonymous         |
-| POST /api/users | Registers a new user | User and JWT token | Allow Anonymous         |
+| POST /api/identity/login | Authenticates a user | User and JWT token | Allow Anonymous         |
+| POST /api/identity/register | Registers a new user | User and JWT token | Allow Anonymous         |
 | GET /api/user | Returns the currently logged in user | User | Authentication Required |
 | PUT /api/user | Update user | User | Authentication Required |
 | GET /api/profiles/:username | Returns a profile | Profile | Authentication Optional |

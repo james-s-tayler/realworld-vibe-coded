@@ -2,5 +2,5 @@
 - [x] [references] meta/references.md drafted with initial sources
 - [x] [system-analysis] meta/system-analysis.md describes relevant system parts
 - [x] [key-decisions] meta/key-decisions.md lists decision points and options
-- [ ] [phase-analysis] meta/phase-analysis.md defines high-level phases
+- [x] [phase-analysis] meta/phase-analysis.md defines high-level phases
 - [ ] [phase-n-details] plan/phase-n-details.md files created for each defined phase

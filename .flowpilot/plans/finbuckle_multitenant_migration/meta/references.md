@@ -60,7 +60,7 @@ Before creating the migration plan, ensure comprehensive research in these areas
 - Can exclude specific endpoints from tenant resolution
 - Short-circuit options when tenant not resolved
 
-**Relevance:** Critical middleware ordering: UseMultiTenant() before UseAuthentication(). ClaimStrategy will read OrganizationId claim from authenticated user.
+**Relevance:** Critical middleware ordering: UseMultiTenant() before UseAuthentication(). ClaimStrategy will read TenantId claim from authenticated user.
 
 ### [ASP.NET Core - Claims Transformation](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/claims?view=aspnetcore-10.0)
 **Key Takeaways:**
@@ -70,7 +70,7 @@ Before creating the migration plan, ensure comprehensive research in these areas
 - Can pull additional data from database to enrich claims
 - Used to add custom claims like tenant identifiers to user principal
 
-**Relevance:** We'll implement IClaimsTransformation to add OrganizationId claim to user principal after sign-in, enabling ClaimStrategy to resolve tenant.
+**Relevance:** We'll implement IClaimsTransformation to add TenantId claim to user principal after sign-in, enabling ClaimStrategy to resolve tenant.
 
 ### [Entity Framework Core - Global Query Filters](https://learn.microsoft.com/en-us/ef/core/querying/filters)
 **Key Takeaways:**
@@ -92,7 +92,7 @@ Before creating the migration plan, ensure comprehensive research in these areas
 - DbContext pooling requires special handling for tenant state
 - Consider performance implications of discriminator columns on large tables
 
-**Relevance:** We're using shared database with discriminator column (OrganizationId). Need to handle DbContext pooling carefully or avoid it.
+**Relevance:** We're using shared database with discriminator column (TenantId). Need to handle DbContext pooling carefully or avoid it.
 
 ## Community Resources & Best Practices
 
@@ -110,7 +110,7 @@ Before creating the migration plan, ensure comprehensive research in these areas
 - UseAuthentication must come AFTER UseMultiTenant for ClaimStrategy
 - Claims won't exist until after login, so ClaimStrategy needs fallback or special handling for registration flows
 - Consider combining with other strategies (header, route) for pre-authentication scenarios
-- Use dedicated claim like "tenant_id" or "OrganizationId", avoid generic claims
+- Use dedicated claim like "tenant_id" or "TenantId", avoid generic claims
 - Cookies are cached efficiently, so middleware ordering doesn't create performance issues
 
 **Relevance:** Critical for our implementation. We need to handle the registration flow where new users create new organizations before authentication completes.
@@ -135,7 +135,7 @@ Before creating the migration plan, ensure comprehensive research in these areas
 **Mitigation:** 
 - We're not using social login, so redirect issues don't apply
 - We're not using Identity UI scaffolding, using custom React UI
-- Manually ensure OrganizationId is set correctly during registration
+- Manually ensure TenantId is set correctly during registration
 
 ### [TenantInfo Null in Tests](https://stackoverflow.com/questions/78275697/finbuckle-multitenant-tenantinfo-being-null-in-integration-test-under-webapplic)
 **Description:** Integration tests fail because TenantInfo is null when using WebApplicationFactory
@@ -174,10 +174,10 @@ Before creating the migration plan, ensure comprehensive research in these areas
 ### [Audit.NET Integration Considerations](https://github.com/Finbuckle/Finbuckle.MultiTenant)
 **Description:** Audit.NET doesn't natively understand multi-tenancy
 **Impact:** 
-- Audit logs may not automatically capture OrganizationId
+- Audit logs may not automatically capture TenantId
 - Need to manually include tenant context in audit events
 **Mitigation:** 
-- Configure Audit.NET to include OrganizationId from current tenant context
+- Configure Audit.NET to include TenantId from current tenant context
 - Ensure audit logs capture tenant identifier for all operations
 - Test audit logging thoroughly in multi-tenant scenarios
 

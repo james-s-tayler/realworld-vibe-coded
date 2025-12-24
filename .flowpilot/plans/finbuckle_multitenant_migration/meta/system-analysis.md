@@ -71,11 +71,11 @@ Complete each section to ensure comprehensive understanding:
 
 **Schema Changes Required:**
 - **Add Organization table**: Id (Guid), Name, Identifier (for Finbuckle), CreatedAt, UpdatedAt, CreatedBy, UpdatedBy, ChangeCheck
-- **Add OrganizationId to AspNetUsers**: Foreign key to Organizations table
-- **Add OrganizationId to Articles**: Foreign key for tenant isolation
-- **Add OrganizationId to Tags**: Foreign key for tenant isolation (tags are tenant-scoped)
-- **Add OrganizationId to Comments**: Foreign key for tenant isolation
-- **Create indexes on OrganizationId columns**: For query performance with filters
+- **Add TenantId to AspNetUsers**: Foreign key to Organizations table
+- **Add TenantId to Articles**: Foreign key for tenant isolation
+- **Add TenantId to Tags**: Foreign key for tenant isolation (tags are tenant-scoped)
+- **Add TenantId to Comments**: Foreign key for tenant isolation
+- **Create indexes on TenantId columns**: For query performance with filters
 - **UserFollowings remains unchanged**: Following relationships are within same organization (no cross-org following)
 - **Add TenantInfo store table** (if using EF Core store): For Finbuckle tenant configuration
 
@@ -89,8 +89,8 @@ Complete each section to ensure comprehensive understanding:
 **Current Endpoints:**
 | Endpoint | Method | Auth | Clients | Breaking Change? |
 |----------|--------|------|---------|------------------|
-| POST /api/users/login | POST | Anonymous | React SPA | No - login flow extended |
-| POST /api/users | POST | Anonymous | React SPA | Yes - Creates Organization |
+| POST /api/identity/login | POST | Anonymous | React SPA | No - login flow extended |
+| POST /api/identity/register | POST | Anonymous | React SPA | Yes - Creates Organization |
 | GET /api/user | GET | Required | React SPA | No - claims enhanced |
 | PUT /api/user | PUT | Required | React SPA | No |
 | GET /api/profiles/:username | GET | Optional | React SPA | No |
@@ -110,20 +110,20 @@ Complete each section to ensure comprehensive understanding:
 | GET /api/tags | GET | Anonymous | React SPA | No - filtered by tenant |
 
 **Breaking Changes:**
-- **Registration (POST /api/users)**: Will now create an Organization and assign user as Owner. Response unchanged, but semantics different.
-- **Data Visibility**: All list endpoints will be automatically filtered by OrganizationId via global query filters. No API contract changes, but behavior changes significantly.
+- **Registration (POST /api/identity/register)**: Will now create an Organization and assign user as Owner. Response unchanged, but semantics different.
+- **Data Visibility**: All list endpoints will be automatically filtered by TenantId via global query filters. No API contract changes, but behavior changes significantly.
 - **New Admin Endpoint (Future)**: Will need new endpoint for organization owners to invite/manage users (out of scope for initial phases).
 
 ### Cross-Cutting Concerns
 
 **Logging:**
 - **Current approach**: Serilog configured in Program.cs, logs to console and file
-- **Migration impact**: Need to include OrganizationId in log context for all operations. Use Serilog enrichers to add tenant context.
+- **Migration impact**: Need to include TenantId in log context for all operations. Use Serilog enrichers to add tenant context.
 - **Location**: `App/Server/src/Server.Web/Configurations/LoggerConfig.cs` (if exists) or in Program.cs
 
 **Auditing:**
 - **Current approach**: Audit.NET with AuditIdentityDbContext, captures EntityFramework changes
-- **Migration impact**: HIGH - Must ensure OrganizationId is captured in audit logs. May need custom audit configuration.
+- **Migration impact**: HIGH - Must ensure TenantId is captured in audit logs. May need custom audit configuration.
 - **Compatibility issues**: AuditIdentityDbContext vs MultiTenantIdentityDbContext - need to verify if both can coexist or if custom implementation needed
 - **Location**: `App/Server/src/Server.Infrastructure/Data/AppDbContext.cs` and `AuditConfiguration.cs`
 
@@ -131,8 +131,8 @@ Complete each section to ensure comprehensive understanding:
 - **Current authentication**: ASP.NET Identity with UserManager, SignInManager
 - **Current authorization**: Policy-based authorization (if used), AuthSchemes on FastEndpoints
 - **Migration changes**: 
-  - Add `OrganizationId` claim during sign-in via IClaimsTransformation
-  - Finbuckle ClaimStrategy reads OrganizationId claim to resolve tenant
+  - Add `TenantId` claim during sign-in via IClaimsTransformation
+  - Finbuckle ClaimStrategy reads TenantId claim to resolve tenant
   - Middleware ordering critical: UseMultiTenant() before UseAuthentication()
   - Authorization policies may need tenant-aware checks
 
@@ -173,7 +173,7 @@ Complete each section to ensure comprehensive understanding:
 **Critical Handler Dependencies:**
 | Handler/Service | Dependencies | Usage Count | Migration Complexity |
 |-----------------|--------------|------------|---------------------|
-| CreateArticleHandler | UserManager, IRepository<Article>, IRepository<Tag> | 1 endpoint | **MEDIUM** - Needs OrganizationId from tenant context |
+| CreateArticleHandler | UserManager, IRepository<Article>, IRepository<Tag> | 1 endpoint | **MEDIUM** - Needs TenantId from tenant context |
 | ListArticlesHandler | IReadRepository<Article> | 1 endpoint | **LOW** - Query filters auto-apply |
 | GetFeedHandler | UserManager, IReadRepository<Article> | 1 endpoint | **LOW** - Query filters auto-apply |
 | GetArticleHandler | IReadRepository<Article> | 1 endpoint | **LOW** - Query filters auto-apply |
@@ -181,7 +181,7 @@ Complete each section to ensure comprehensive understanding:
 | DeleteArticleHandler | IRepository<Article> | 1 endpoint | **MEDIUM** - Verify ownership within org |
 | FavoriteArticleHandler | UserManager, IRepository<Article> | 1 endpoint | **LOW** - Query filters auto-apply |
 | UnfavoriteArticleHandler | UserManager, IRepository<Article> | 1 endpoint | **LOW** - Query filters auto-apply |
-| CreateCommentHandler | UserManager, IRepository<Article> | 1 endpoint | **MEDIUM** - Needs OrganizationId from tenant context |
+| CreateCommentHandler | UserManager, IRepository<Article> | 1 endpoint | **MEDIUM** - Needs TenantId from tenant context |
 | GetCommentsHandler | IReadRepository<Article> | 1 endpoint | **LOW** - Query filters auto-apply |
 | DeleteCommentHandler | IRepository<Article> | 1 endpoint | **MEDIUM** - Verify ownership within org |
 | GetProfileHandler | UserManager | 1 endpoint | **LOW** - Users auto-filtered by tenant |
@@ -199,21 +199,21 @@ Complete each section to ensure comprehensive understanding:
   - Update functional tests to use StaticStrategy for tenant resolution
   - Update E2E tests to handle Organization table in database wipe scripts
   - Update Postman tests for changed registration semantics
-- **Adding OrganizationId to ApplicationUser** requires:
+- **Adding TenantId to ApplicationUser** requires:
   - Update ApplicationUserConfiguration in EF Core
   - Create migration for schema change
   - Update registration flow (Identity endpoints or custom)
-  - Update IClaimsTransformation to add OrganizationId claim
+  - Update IClaimsTransformation to add TenantId claim
   - Update all queries/handlers that load users (already using UserManager, should auto-filter)
-- **Adding OrganizationId to domain entities (Article, Tag, Comment)** requires:
-  - Update entity classes with OrganizationId property
+- **Adding TenantId to domain entities (Article, Tag, Comment)** requires:
+  - Update entity classes with TenantId property
   - Update entity configurations with IsMultiTenant() or [MultiTenant] attribute
   - Create migrations for schema changes
-  - Update handlers that create entities to set OrganizationId from tenant context
+  - Update handlers that create entities to set TenantId from tenant context
   - Update specifications (may not be needed if global query filters work)
 
 **Shared Utilities:**
-- **IUserContext** (Server.Infrastructure/Services/UserContext.cs): Gets current user ID from HttpContext. Will need to also provide OrganizationId.
+- **IUserContext** (Server.Infrastructure/Services/UserContext.cs): Gets current user ID from HttpContext. Will need to also provide TenantId.
 - **UserManager<ApplicationUser>**: Used by almost all handlers. Will auto-filter by tenant once Identity is configured.
 - **IRepository<T> / IReadRepository<T>**: Used by all handlers. Will auto-apply query filters once entities are marked as multi-tenant.
 - **Specifications**: 17 specification classes in Server.Core - most will auto-work with query filters, but some may need explicit tenant checks.
