@@ -103,7 +103,7 @@ This leverages Finbuckle's base class while adding Audit.NET as an orthogonal co
 **Cons:**
 - Loses some automatic audit configuration from AuditIdentityDbContext
 - Must manually configure Audit.EntityFramework data provider in SaveChangesAsync
-- Need to ensure OrganizationId is included in audit events manually
+- Need to ensure TenantId is included in audit events manually
 - Slightly more configuration code for Audit.NET setup
 
 **Impact:**
@@ -122,7 +122,7 @@ This leverages Finbuckle's base class while adding Audit.NET as an orthogonal co
 
 **Description:**
 Keep AppDbContext inheriting from `AuditIdentityDbContext` and manually add Finbuckle multi-tenancy features:
-- Manual query filters for OrganizationId
+- Manual query filters for TenantId
 - Manual tenant association in SaveChangesAsync
 - Manual unique index configuration including TenantId
 
@@ -142,7 +142,7 @@ Keep AppDbContext inheriting from `AuditIdentityDbContext` and manually add Finb
 
 **Impact:**
 - Code changes: ~300+ lines to replicate Finbuckle behaviors manually
-- Database changes: Same as other options (OrganizationId columns, indexes)
+- Database changes: Same as other options (TenantId columns, indexes)
 - Test changes: Need extensive tests to verify manual multi-tenancy implementation
 - Risk level: **VERY HIGH** - Reimplementing security-critical library functionality manually
 - Reversibility: **Easy** - Already using AuditIdentityDbContext, just remove manual code
@@ -161,13 +161,13 @@ Create minimal POC with Option B to verify:
 1. AppDbContext successfully inherits from MultiTenantIdentityDbContext
 2. Audit.NET data provider can be configured to audit EF operations
 3. Both multi-tenancy (query filters) and auditing (event capture) work together
-4. OrganizationId is captured in audit events
+4. TenantId is captured in audit events
 5. SaveChangesAsync successfully coordinates both concerns
 
 POC should include:
 - AppDbContext with MultiTenantIdentityDbContext inheritance
 - Audit.NET data provider configuration
-- Simple entity (Article) with OrganizationId
+- Simple entity (Article) with TenantId
 - Test that inserts entity and verifies both query filtering and audit log capture
 
 ### Choice
@@ -194,7 +194,7 @@ Critical guidance for implementing this decision:
 
 - **SaveChangesAsync override:** Must coordinate Finbuckle's tenant association (from base.SaveChangesAsync) with Audit.NET event capture. Call base.SaveChangesAsync and configure Audit.NET to capture the same transaction.
 
-- **OrganizationId in audit events:** Configure Audit.NET to include OrganizationId (from IMultiTenantContextAccessor) as custom field in all audit events. This ensures audit logs can be filtered by tenant.
+- **TenantId in audit events:** Configure Audit.NET to include TenantId (from IMultiTenantContextAccessor) as custom field in all audit events. This ensures audit logs can be filtered by tenant.
 
 - **Transaction semantics:** Verify that Audit.NET events are part of the same database transaction as the entity changes. Audit.NET should use the same DbContext transaction.
 
@@ -204,11 +204,11 @@ Critical guidance for implementing this decision:
 
 How to confirm this decision was correct:
 
-- **POC successful:** POC demonstrates that AppDbContext with MultiTenantIdentityDbContext inheritance and Audit.NET data provider successfully captures audited events with OrganizationId and enforces query filters. All three components (EF Core, Finbuckle, Audit.NET) work together without conflicts.
+- **POC successful:** POC demonstrates that AppDbContext with MultiTenantIdentityDbContext inheritance and Audit.NET data provider successfully captures audited events with TenantId and enforces query filters. All three components (EF Core, Finbuckle, Audit.NET) work together without conflicts.
 
 - **Tests pass:** All 45 existing functional tests pass after migrating to MultiTenantIdentityDbContext (with StaticStrategy in test setup). No regression in existing functionality.
 
-- **Audit logs contain tenant context:** Manual inspection of Audit.NET logs confirms that OrganizationId is present in all audited events after implementation. Logs can be filtered by tenant.
+- **Audit logs contain tenant context:** Manual inspection of Audit.NET logs confirms that TenantId is present in all audited events after implementation. Logs can be filtered by tenant.
 
 ---
 
@@ -222,7 +222,7 @@ How to confirm this decision was correct:
 - Clean Sqlite database used for development
 
 **Problem to solve:**
-- Need to add Organization table and OrganizationId columns to multiple tables
+- Need to add Organization table and TenantId columns to multiple tables
 - Need to establish foreign key relationships between entities and Organizations
 - Determine if existing data should be preserved or if clean slate is acceptable
 
@@ -257,7 +257,7 @@ Delete existing database and recreate from scratch with new multi-tenant schema.
 
 **Impact:**
 - Code changes: None (just schema changes in new migrations)
-- Database changes: Complete recreation with Organization table and OrganizationId columns
+- Database changes: Complete recreation with Organization table and TenantId columns
 - Test changes: Test fixtures need to create Organizations before users
 - Risk level: **LOW** - Requirements explicitly allow this
 - Reversibility: **HARD** - Cannot recover dropped data, but requirements don't require preservation
@@ -269,7 +269,7 @@ Delete existing database and recreate from scratch with new multi-tenant schema.
 ### Option B: Preserve Data with Default Organization
 
 **Description:**
-Keep existing data and migrate it to a default "Legacy" organization. Add OrganizationId columns with FK constraints and update all existing rows.
+Keep existing data and migrate it to a default "Legacy" organization. Add TenantId columns with FK constraints and update all existing rows.
 
 **Pros:**
 - Preserves any existing test data
@@ -325,7 +325,7 @@ Critical guidance for implementing this decision:
 
 - **Communication:** Notify developers that local databases will need to be dropped and recreated. Provide clear instructions in migration documentation.
 
-- **Migration approach:** Create new migrations from scratch or use `dotnet ef migrations remove` to clean out old migrations, then create fresh initial migration with Organization table and OrganizationId columns already included.
+- **Migration approach:** Create new migrations from scratch or use `dotnet ef migrations remove` to clean out old migrations, then create fresh initial migration with Organization table and TenantId columns already included.
 
 - **Test fixtures:** Update all test fixtures to create Organizations before creating users. E2E tests' database wipe scripts must include Organizations table.
 
@@ -339,7 +339,7 @@ How to confirm this decision was correct:
 
 - **Tests pass with fresh data:** All functional tests (45), E2E tests (51), and Postman collections (5) pass with fresh database and test data creation logic.
 
-- **No legacy data references:** Code has no references to handling missing OrganizationId or default organizations. All entities assume OrganizationId is always present.
+- **No legacy data references:** Code has no references to handling missing TenantId or default organizations. All entities assume TenantId is always present.
 
 ---
 
@@ -405,7 +405,7 @@ Break migration into 5-7 small phases, each leaving the codebase in a working, t
 ### Option B: Big Bang - All Changes in One Phase
 
 **Description:**
-Make all changes in a single large PR: add Organization entity, update all domain entities with OrganizationId, migrate AppDbContext, update all handlers, update all tests, update authentication.
+Make all changes in a single large PR: add Organization entity, update all domain entities with TenantId, migrate AppDbContext, update all handlers, update all tests, update authentication.
 
 **Pros:**
 - Fastest calendar time to completion
@@ -515,7 +515,7 @@ How to confirm this decision was correct:
 ### Option A: Incremental Test Updates (Update Tests with Each Phase)
 
 **Description:**
-Update tests incrementally as each migration phase affects them. When adding Organization entity in Phase 1, update test fixtures to create Organizations. When adding OrganizationId to Articles in Phase 2, update Article-related tests. Continue pattern through all phases.
+Update tests incrementally as each migration phase affects them. When adding Organization entity in Phase 1, update test fixtures to create Organizations. When adding TenantId to Articles in Phase 2, update Article-related tests. Continue pattern through all phases.
 
 **Pros:**
 - Tests stay synchronized with implementation changes
@@ -600,7 +600,7 @@ Critical guidance for implementing this decision:
 
 - **Test fixture updates:** When adding Organization entity, immediately update all test fixtures (ArticlesFixture, ProfilesFixture) to create Organizations and associate users. Use consistent pattern across all fixtures.
 
-- **Tenant context in tests:** Configure Finbuckle's StaticStrategy in test WebApplicationFactory setup to provide known tenant context. Each test should set a predictable OrganizationId (e.g., use a fixed Guid per test fixture).
+- **Tenant context in tests:** Configure Finbuckle's StaticStrategy in test WebApplicationFactory setup to provide known tenant context. Each test should set a predictable TenantId (e.g., use a fixed Guid per test fixture).
 
 - **Database wipe scripts:** Update E2E test database wipe scripts in same phase that adds Organization table. Scripts must drop Organizations table along with other tables to maintain clean test state.
 
@@ -633,7 +633,7 @@ How to confirm this decision was correct:
 - Must handle registration flow (new user creates new organization before authentication completes)
 
 **Constraints:**
-- Requirements specify: "Use ClaimStrategy as the primary tenant resolver. The tenant identifier claim should be: OrganizationId."
+- Requirements specify: "Use ClaimStrategy as the primary tenant resolver. The tenant identifier claim should be: TenantId."
 - Middleware ordering critical: UseMultiTenant() must come BEFORE UseAuthentication() for ClaimStrategy to work
 - Registration endpoint is anonymous (no authentication before organization created)
 - All other endpoints require authentication after registration
@@ -642,14 +642,14 @@ How to confirm this decision was correct:
 - Authentication middleware in Program.cs
 - UserManager and SignInManager for cookie auth
 - Token generation for bearer auth
-- IClaimsTransformation for adding OrganizationId claim
+- IClaimsTransformation for adding TenantId claim
 
 ### Options
 
 ### Option A: ClaimStrategy Only (Per Requirements)
 
 **Description:**
-Use Finbuckle's ClaimStrategy exclusively to read OrganizationId claim from authenticated user principal. Implement IClaimsTransformation to add OrganizationId claim during authentication. Registration endpoint bypasses tenant resolution (creates organization directly).
+Use Finbuckle's ClaimStrategy exclusively to read TenantId claim from authenticated user principal. Implement IClaimsTransformation to add TenantId claim during authentication. Registration endpoint bypasses tenant resolution (creates organization directly).
 
 **Pros:**
 - Follows requirements explicitly ("Use ClaimStrategy as the primary tenant resolver")
@@ -660,7 +660,7 @@ Use Finbuckle's ClaimStrategy exclusively to read OrganizationId claim from auth
 
 **Cons:**
 - Registration flow needs special handling (no claim available before authentication)
-- Must implement IClaimsTransformation to add OrganizationId claim
+- Must implement IClaimsTransformation to add TenantId claim
 - Requires careful middleware ordering (UseMultiTenant before UseAuthentication)
 - Anonymous endpoints cannot resolve tenant (but none need to per requirements)
 
@@ -671,7 +671,7 @@ Use Finbuckle's ClaimStrategy exclusively to read OrganizationId claim from auth
 - Reversibility: **EASY** - Can add additional strategies if needed without breaking existing
 
 **Supporting Research:**
-- Goal.md explicitly specifies: "Use ClaimStrategy as the primary tenant resolver. The tenant identifier claim should be: OrganizationId."
+- Goal.md explicitly specifies: "Use ClaimStrategy as the primary tenant resolver. The tenant identifier claim should be: TenantId."
 - References.md section "ClaimStrategy Best Practices Discussion" confirms this is standard pattern for authenticated multi-tenant apps
 - References.md section "Configuration and Usage" documents critical middleware ordering: UseMultiTenant() before UseAuthentication()
 
@@ -743,7 +743,7 @@ Use ClaimStrategy for authenticated endpoints. Use StaticStrategy with temporary
 
 **Rationale:**
 
-1. **Best fit for this system because:** Goal.md explicitly requires: "Use ClaimStrategy as the primary tenant resolver. The tenant identifier claim should be: OrganizationId." The system model is "user belongs to exactly one organization," which maps naturally to claim-based resolution. Registration endpoint doesn't need tenant context (it creates the organization directly).
+1. **Best fit for this system because:** Goal.md explicitly requires: "Use ClaimStrategy as the primary tenant resolver. The tenant identifier claim should be: TenantId." The system model is "user belongs to exactly one organization," which maps naturally to claim-based resolution. Registration endpoint doesn't need tenant context (it creates the organization directly).
 
 2. **Addresses key constraints:** ClaimStrategy works with both Cookie and Bearer token authentication schemes (both include user claims). Registration endpoint is anonymous and creates organization without needing tenant context. All post-registration endpoints are authenticated and have claim available.
 
@@ -751,29 +751,29 @@ Use ClaimStrategy for authenticated endpoints. Use StaticStrategy with temporary
 
 4. **Aligns with research:** References.md section "Alternative Approaches Considered" evaluates Header-Based and Route-Based resolution and concludes: "Decision: Rejected. ClaimStrategy is more secure and requires no client-side header management. The authenticated user's claim naturally carries the tenant identifier."
 
-5. **Practical considerations:** Registration flow creates organization, then authenticates user with OrganizationId claim. All subsequent requests use claim for tenant resolution. Simple, secure, and matches requirements.
+5. **Practical considerations:** Registration flow creates organization, then authenticates user with TenantId claim. All subsequent requests use claim for tenant resolution. Simple, secure, and matches requirements.
 
 ### Implementation Notes
 
 Critical guidance for implementing this decision:
 
-- **IClaimsTransformation implementation:** Create class that implements IClaimsTransformation to add OrganizationId claim after authentication. Query ApplicationUser's OrganizationId from UserManager and add to ClaimsPrincipal. Register as scoped service.
+- **IClaimsTransformation implementation:** Create class that implements IClaimsTransformation to add TenantId claim after authentication. Query ApplicationUser's TenantId from UserManager and add to ClaimsPrincipal. Register as scoped service.
 
 - **Middleware ordering:** Ensure Program.cs has: `app.UseMultiTenant()` BEFORE `app.UseAuthentication()`. This is critical for ClaimStrategy to read claims from authenticated user.
 
-- **Registration flow:** Registration endpoint creates ApplicationUser with OrganizationId set. SignInManager authenticates user. IClaimsTransformation runs automatically and adds OrganizationId claim. Subsequent requests use claim for tenant resolution.
+- **Registration flow:** Registration endpoint creates ApplicationUser with TenantId set. SignInManager authenticates user. IClaimsTransformation runs automatically and adds TenantId claim. Subsequent requests use claim for tenant resolution.
 
-- **Test configuration:** Update WebApplicationFactory to use StaticStrategy with known OrganizationId. Don't use ClaimStrategy in tests (requires full authentication flow).
+- **Test configuration:** Update WebApplicationFactory to use StaticStrategy with known TenantId. Don't use ClaimStrategy in tests (requires full authentication flow).
 
 ### Validation Criteria
 
 How to confirm this decision was correct:
 
-- **Tenant resolved for authenticated requests:** After user registers and authenticates, HttpContext.GetMultiTenantContext() returns TenantInfo with correct OrganizationId matching user's organization.
+- **Tenant resolved for authenticated requests:** After user registers and authenticates, HttpContext.GetMultiTenantContext() returns TenantInfo with correct TenantId matching user's organization.
 
-- **Queries automatically filtered:** After tenant resolution, EF Core queries for Articles, Comments, Tags automatically include WHERE OrganizationId = [current tenant]. Verified by inspecting generated SQL or query results.
+- **Queries automatically filtered:** After tenant resolution, EF Core queries for Articles, Comments, Tags automatically include WHERE TenantId = [current tenant]. Verified by inspecting generated SQL or query results.
 
-- **Registration flow works:** New user can register (POST /api/users), creating new Organization. Subsequent login returns token/cookie with OrganizationId claim. Future requests resolve tenant correctly.
+- **Registration flow works:** New user can register (POST /api/identity/register), creating new Organization. Subsequent login returns token/cookie with TenantId claim. Future requests resolve tenant correctly.
 
 ---
 
@@ -783,12 +783,12 @@ How to confirm this decision was correct:
 
 **Current state:**
 - SQLite database (development), SQL Server (production target)
-- No OrganizationId columns or indexes
+- No TenantId columns or indexes
 - Current queries are simple (single-tenant, no filtering)
 
 **Problem to solve:**
-- Global query filters will add WHERE OrganizationId = [tenant] to every query
-- Need indexes on OrganizationId columns to prevent performance degradation
+- Global query filters will add WHERE TenantId = [tenant] to every query
+- Need indexes on TenantId columns to prevent performance degradation
 - Determine indexing strategy for all tenant-scoped tables
 
 **Constraints:**
@@ -797,16 +797,16 @@ How to confirm this decision was correct:
 - Must support both development (SQLite) and production (SQL Server) scenarios
 
 **Related systems:**
-- All domain entities: Articles, Tags, Comments (will have OrganizationId)
-- AspNetUsers table (will have OrganizationId foreign key)
+- All domain entities: Articles, Tags, Comments (will have TenantId)
+- AspNetUsers table (will have TenantId foreign key)
 - All query specifications that search tenant-scoped entities
 
 ### Options
 
-### Option A: Single-Column Indexes on OrganizationId
+### Option A: Single-Column Indexes on TenantId
 
 **Description:**
-Add single-column index on OrganizationId for every tenant-scoped table (Articles, Tags, Comments, AspNetUsers). Simple approach that covers basic filtering.
+Add single-column index on TenantId for every tenant-scoped table (Articles, Tags, Comments, AspNetUsers). Simple approach that covers basic filtering.
 
 **Pros:**
 - Simple to implement and maintain
@@ -817,7 +817,7 @@ Add single-column index on OrganizationId for every tenant-scoped table (Article
 
 **Cons:**
 - May not be optimal for queries with multiple filter criteria
-- Doesn't help with queries that filter by both OrganizationId and another column (e.g., slug)
+- Doesn't help with queries that filter by both TenantId and another column (e.g., slug)
 - Potential for larger tables to still have performance issues
 
 **Impact:**
@@ -831,10 +831,10 @@ Add single-column index on OrganizationId for every tenant-scoped table (Article
 - References.md section "Query Filter Performance on Large Tables" notes: "Create indexes on TenantId columns for all tenant-scoped entities"
 - Standard database practice for discriminator columns
 
-### Option B: Composite Indexes on OrganizationId + Common Query Columns
+### Option B: Composite Indexes on TenantId + Common Query Columns
 
 **Description:**
-Add composite indexes on (OrganizationId, [other column]) for common query patterns. For example: (OrganizationId, Slug) for Articles, (OrganizationId, CreatedAt) for feed queries.
+Add composite indexes on (TenantId, [other column]) for common query patterns. For example: (TenantId, Slug) for Articles, (TenantId, CreatedAt) for feed queries.
 
 **Pros:**
 - Optimal performance for specific query patterns
@@ -864,7 +864,7 @@ Add composite indexes on (OrganizationId, [other column]) for common query patte
 ### Option C: Single-Column Indexes Now, Composite Later Based on Profiling
 
 **Description:**
-Start with single-column OrganizationId indexes (Option A). Profile query performance after migration. Add composite indexes later based on measured bottlenecks.
+Start with single-column TenantId indexes (Option A). Profile query performance after migration. Add composite indexes later based on measured bottlenecks.
 
 **Pros:**
 - Simple initial implementation (Option A benefits)
@@ -899,15 +899,15 @@ Start with single-column OrganizationId indexes (Option A). Profile query perfor
 
 ### Choice
 
-- [ ] Option A: Single-Column Indexes on OrganizationId
-- [ ] Option B: Composite Indexes on OrganizationId + Common Query Columns
+- [ ] Option A: Single-Column Indexes on TenantId
+- [ ] Option B: Composite Indexes on TenantId + Common Query Columns
 - [x] Option C: Single-Column Indexes Now, Composite Later Based on Profiling
 
 **Rationale:**
 
 1. **Best fit for this system because:** System-analysis.md indicates this is pre-production application with no current workload data. Starting with simple single-column indexes covers the primary use case (tenant filtering) without premature optimization. Can add composite indexes later based on actual query patterns from real usage.
 
-2. **Addresses key constraints:** Must prevent performance degradation from global query filters. Single-column OrganizationId indexes directly address this concern. SQLite (development) and SQL Server (production) both support this well.
+2. **Addresses key constraints:** Must prevent performance degradation from global query filters. Single-column TenantId indexes directly address this concern. SQLite (development) and SQL Server (production) both support this well.
 
 3. **Mitigates identified risks:** References.md warns about "Query Filter Performance on Large Tables" and recommends indexing TenantId columns. Option C does this while avoiding over-indexing risk. Can monitor query plans and add targeted composite indexes if bottlenecks identified.
 
@@ -919,11 +919,11 @@ Start with single-column OrganizationId indexes (Option A). Profile query perfor
 
 Critical guidance for implementing this decision:
 
-- **Index definition:** Use fluent API in entity configurations: `builder.HasIndex(e => e.OrganizationId).HasDatabaseName("IX_[Table]_OrganizationId")`
+- **Index definition:** Use fluent API in entity configurations: `builder.HasIndex(e => e.TenantId).HasDatabaseName("IX_[Table]_TenantId")`
 
 - **Index on all tenant-scoped entities:** Add index to: Articles, Tags, Comments, AspNetUsers. Do NOT add to join tables (ArticleTags, ArticleFavorites) unless profiling shows bottleneck.
 
-- **Monitor query plans:** After migration, use EF Core logging to log generated SQL. Check that queries use OrganizationId index. Look for table scans indicating missing indexes.
+- **Monitor query plans:** After migration, use EF Core logging to log generated SQL. Check that queries use TenantId index. Look for table scans indicating missing indexes.
 
 - **Profiling strategy:** Use SQL Server Management Studio (production) or SQLite query analyzer (development) to examine execution plans for common queries: list articles, get feed, search tags.
 
@@ -931,9 +931,9 @@ Critical guidance for implementing this decision:
 
 How to confirm this decision was correct:
 
-- **Indexes created:** Migration creates OrganizationId indexes on Articles, Tags, Comments, AspNetUsers tables. Verify with database inspection tools.
+- **Indexes created:** Migration creates TenantId indexes on Articles, Tags, Comments, AspNetUsers tables. Verify with database inspection tools.
 
-- **Queries use indexes:** EF Core generated SQL includes WHERE OrganizationId = [tenant] and database uses index (not table scan). Verify with query execution plans.
+- **Queries use indexes:** EF Core generated SQL includes WHERE TenantId = [tenant] and database uses index (not table scan). Verify with query execution plans.
 
 - **No performance degradation:** After migration, response times for list/search endpoints remain similar to pre-migration baseline (within 10-20%). Measure with Postman or functional tests.
 

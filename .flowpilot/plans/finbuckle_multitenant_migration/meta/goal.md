@@ -49,13 +49,13 @@ Implement multi-tenancy as follows:
     - Multi-tenancy is logical, enforced at the application layer.
 
 2. **Tenant Column / Filters**
-    - All domain entities that should be tenant-scoped must have a `OrganizationId` column.
+    - All domain entities that should be tenant-scoped must have a `TenantId` column.
     - EF Core should apply **global query filters** so queries are automatically filtered by the current tenant.
 
 3. **Finbuckle.Multitenant**
     - Use **Finbuckle.Multitenant** for tenant resolution and per-tenant EF behavior.
     - Use **`ClaimStrategy`** as the primary tenant resolver.
-    - The tenant identifier claim should be : `OrganizationId`.
+    - The tenant identifier claim should be : `TenantId`.
 
 4. **Auth Integration**
     - When a user signs in (cookie or issuing bearer tokens):
