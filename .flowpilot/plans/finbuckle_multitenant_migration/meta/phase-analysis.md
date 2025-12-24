@@ -23,6 +23,26 @@
 
 ### phase_1
 
+**Goal**: Create proof-of-concept validating MultiTenantIdentityDbContext + Audit.NET integration
+
+**Key Outcomes**:
+* POC demonstrates AppDbContext can inherit from MultiTenantIdentityDbContext while maintaining Audit.NET functionality
+* Verify query filters automatically apply to tenant-scoped entities
+* Confirm Audit.NET data provider captures TenantId in audit events
+* Validate both concerns work together without conflicts
+* Decision 1 from key-decisions.md is validated or adjusted based on POC findings
+
+**Working State Transition**: From current working state (AuditIdentityDbContext) to validated POC that proves MultiTenantIdentityDbContext + Audit.NET integration is viable. POC code is in separate branch/folder and does not affect main codebase. All existing tests continue to pass.
+
+**Scope Size:** Small (POC only, ~5-8 steps)
+**Risk Level:** Low (isolated POC, no production code changes)
+**Dependencies:** None (first phase)
+**Ripple Effects:** None yet (POC is isolated)
+
+---
+
+### phase_2
+
 **Goal**: Update frontend to remove all unauthenticated user access to data
 
 **Key Outcomes**:
@@ -37,7 +57,7 @@
 
 **Scope Size:** Small (~8 steps)
 **Risk Level:** Low (frontend-only changes, no backend impact)
-**Dependencies:** None (first phase)
+**Dependencies:** phase_1 completed
 **Ripple Effects:**
 - Frontend routing configuration
 - Home page component
@@ -47,7 +67,7 @@
 
 ---
 
-### phase_2
+### phase_3
 
 **Goal**: Update backend to require authentication on all endpoints and update Postman collections
 
@@ -63,7 +83,7 @@
 
 **Scope Size:** Small (~10 steps)
 **Risk Level:** Medium (breaking API change, affects all clients)
-**Dependencies:** phase_1 completed
+**Dependencies:** phase_2 completed
 **Ripple Effects:**
 - FastEndpoints configuration for all GET endpoints
 - Postman collections (~5 collections)
@@ -72,9 +92,41 @@
 
 ---
 
-### phase_3
+### phase_4
 
-**Goal**: Create proof-of-concept validating MultiTenantIdentityDbContext + Audit.NET integration
+**Goal**: Add Organization entity and EF Core infrastructure for multi-tenancy
+
+**Key Outcomes**:
+* Organization entity created with required properties (Id, Name, Identifier, audit fields)
+* AppDbContext migrated from AuditIdentityDbContext to MultiTenantIdentityDbContext inheritance
+* Audit.NET configured via data provider to work with new DbContext inheritance
+* TenantId added to ApplicationUser entity with foreign key relationship
+* EF Core migrations created for Organization table and ApplicationUser.TenantId column
+* Single-column indexes added to TenantId columns per Decision 6
+* All existing functional tests pass with updated fixtures
+
+**Working State Transition**: From POC validated to multi-tenant infrastructure in place. Organization table exists, users can have TenantId, but no data isolation yet enforced. Application still works as single-tenant while infrastructure is prepared. All tests pass with minimal fixture updates.
+
+**Scope Size:** Small (~10 steps)
+**Risk Level:** Medium (DbContext inheritance change is critical)
+**Dependencies:** phase_3 completed
+**Ripple Effects:** 
+- AppDbContext.cs (inheritance change, Audit.NET config)
+- ApplicationUser entity and configuration
+- Database migrations
+- Test fixtures (create Organizations for test users)
+- ~5 functional test files
+
+---
+
+### phase_5
+
+**Goal**: Add TenantId to domain entities and mark as multi-tenant
+
+**Key Outcomes**:
+* EntityBase class marked with `[MultiTenant]` attribute (Article, Tag, Comment inherit this automatically)
+* TenantId property added to EntityBase with EF configuration and index
+* EF Core migrations created for schema changes
 * Global query filters automatically apply to all tenant-scoped entities
 * Existing handlers and queries work without modification (filters auto-apply)
 * Functional tests updated for tenant-aware queries
@@ -288,6 +340,7 @@
 - Log verification (manual check of Logs/** directory)
 
 ---
+
 ## Phase Validation Checklist
 
 Before finalizing the phase analysis, verify:
@@ -303,34 +356,36 @@ Before finalizing the phase analysis, verify:
 
 **Validation Notes:**
 
-1. **Phase sizes**: All phases are Small (5-10 steps). Phase 2 was previously Medium but split appropriately. This ensures manageable scope and easy rollback.
+1. **Phase sizes**: All phases are Small (5-10 steps). This ensures manageable scope and easy rollback.
 
-2. **Working state transitions**: Each phase explicitly defines the transition from one working state to another. Phases 1-2 prepare the system for multi-tenancy by requiring authentication everywhere (prerequisite for query filters). Phases 3-13 progressively build multi-tenant functionality while keeping system in working state.
+2. **Working state transitions**: Each phase explicitly defines the transition from one working state to another. Phase 1 validates the POC first. Phases 2-3 prepare the system for multi-tenancy by requiring authentication everywhere (prerequisite for query filters). Phases 4-13 progressively build multi-tenant functionality while keeping system in working state.
 
 3. **High-risk decomposition**: 
-   - Authentication changes split into phases 1-2 (frontend first, then backend)
+   - POC validation done first in phase 1 (lowest risk, validates Decision 1)
+   - Authentication changes split into phases 2-3 (frontend first, then backend)
+   - The highest-risk item (DbContext + Audit.NET integration from Decision 1) is split into phase_1 (POC validation) and phase_4 (implementation)
    - Registration/login changes split into phases 6-7 (refactoring first, then behavior change)
-   - The highest-risk item (DbContext + Audit.NET integration from Decision 1) is split into phase_3 (POC validation) and phase_4 (implementation)
    - Tenant resolution (phase_8) kept small despite high risk
    - Test updates split into phases 10, 11, 12 instead of one large phase
 
 4. **Test maintenance**: Tests updated incrementally throughout:
-   - Phase 1: Frontend tests
-   - Phase 2: Backend functional tests, Postman, E2E tests  
+   - Phase 1: POC isolated, no test changes
+   - Phase 2: Frontend tests
+   - Phase 3: Backend functional tests, Postman, E2E tests  
    - Phases 4-9: Functional tests as fixtures/handlers affected
    - Phase 10: E2E multi-tenancy tests
    - Phase 11: Slug uniqueness tests
    - Phase 12: Functional multi-tenancy tests
    This follows Decision 4 (incremental test updates).
 
-5. **Rollback feasibility**: Each phase is independently committable. Phase 3 is isolated POC. Phases 4-13 use EF migrations which are reversible. No phase has destructive changes that prevent rollback.
+5. **Rollback feasibility**: Each phase is independently committable. Phase 1 is isolated POC. Phases 4-13 use EF migrations which are reversible. No phase has destructive changes that prevent rollback.
 
-6. **Dependencies**: Linear progression - each phase depends only on previous phase completing. Phase 3 validates Decision 1 before phase 4 proceeds. Phases 1-2 complete auth requirements before multi-tenant work begins.
+6. **Dependencies**: Linear progression - each phase depends only on previous phase completing. Phase 1 validates Decision 1 before phase 4 proceeds. Phases 2-3 complete auth requirements before multi-tenant work begins.
 
 7. **Risk progression**: 
-   - Starts with low-risk frontend changes (phase_1)
-   - Medium-risk backend auth changes (phase_2)
-   - Low-risk POC (phase_3)
+   - Starts with low-risk POC validation (phase_1)
+   - Low-risk frontend changes (phase_2)
+   - Medium-risk backend auth changes (phase_3)
    - Medium-risk infrastructure (phase_4)
    - Low-risk domain entities (phase_5)
    - Medium-risk auth refactoring (phase_6)
@@ -341,16 +396,17 @@ Before finalizing the phase analysis, verify:
    - Low-risk logging (phase_13)
 
 8. **Alignment with key decisions**:
-   - Decision 1 (DbContext strategy): Validated in phase_3, implemented in phase_4
+   - Decision 1 (DbContext strategy): Validated in phase_1, implemented in phase_4
    - Decision 2 (Data migration): Clean slate approach throughout all phases
    - Decision 3 (Incremental phases): 13 small phases as planned
-   - Decision 4 (Test strategy): Incremental updates in phases 1-2, 4-12
+   - Decision 4 (Test strategy): Incremental updates in phases 2-3, 4-12
    - Decision 5 (ClaimStrategy): Implemented in phase_8
    - Decision 6 (Indexing): Single-column indexes in phases 4-5
 
 9. **New phases rationale**:
-   - Phases 1-2 added to address requirement that unauthenticated data access must be removed before multi-tenancy (query filters would break unauthenticated browsing)
+   - Phase 1: POC moved to beginning per feedback to validate approach before any other changes
+   - Phases 2-3 added to address requirement that unauthenticated data access must be removed before multi-tenancy (query filters would break unauthenticated browsing)
    - Phase 6-7 split added per feedback to separate refactoring from behavior change in auth flows
    - Phase 10-12 split added per feedback to separate E2E, slug, and functional test updates
 
-10. **Postman maintenance**: Postman collections are maintained in phase 2 when backend auth requirements change. No additional Postman-specific multi-tenancy testing phases as per feedback (only necessary maintenance, not expanded coverage).
+10. **Postman maintenance**: Postman collections are maintained in phase 3 when backend auth requirements change. No additional Postman-specific multi-tenancy testing phases as per feedback (only necessary maintenance, not expanded coverage).
