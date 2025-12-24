@@ -33,11 +33,11 @@ What must be completed before starting this phase:
 
 **Part 1: Setup & Preparation**
 
-1. **Create POC branch or folder**
-   - Create a new branch named `poc/multitenant-audit-integration` or create folder `/tmp/multitenant-poc`
+1. **Create POC folder**
+   - Create folder `Task/PoC/FinbuckleMultitenantAuditNet` for the POC project
    - This keeps POC code isolated from production codebase
    - Expected outcome: Clean workspace for POC experimentation
-   - Files affected: Git branch or `/tmp/multitenant-poc/`
+   - Files affected: `Task/PoC/FinbuckleMultitenantAuditNet/`
 
 2. **Install Finbuckle.MultiTenant package**
    - Add NuGet package `Finbuckle.MultiTenant.EntityFrameworkCore` version 10.0+ to POC project
@@ -51,7 +51,7 @@ What must be completed before starting this phase:
    - Add simple tenant-scoped entity (e.g., `PocArticle` with TenantId)
    - Mark entity with `[MultiTenant]` attribute
    - Expected outcome: DbContext compiles successfully
-   - Files affected: `/tmp/multitenant-poc/PocDbContext.cs`, `/tmp/multitenant-poc/PocArticle.cs`
+   - Files affected: `Task/PoC/FinbuckleMultitenantAuditNet/PocDbContext.cs`, `Task/PoC/FinbuckleMultitenantAuditNet/PocArticle.cs`
    - Reality check: Code builds without errors
 
 4. **Configure Audit.NET data provider**
@@ -59,14 +59,14 @@ What must be completed before starting this phase:
    - Configure Audit.EntityFramework data provider (see references.md for pattern)
    - Add custom field to audit event to capture TenantId from `IMultiTenantContextAccessor`
    - Expected outcome: SaveChangesAsync calls both base implementation and Audit.NET
-   - Files affected: `/tmp/multitenant-poc/PocDbContext.cs`
+   - Files affected: `Task/PoC/FinbuckleMultitenantAuditNet/PocDbContext.cs`
    - Reality check: Code compiles, no runtime initialization errors
 
 5. **Configure Finbuckle with StaticStrategy for POC**
    - Add Finbuckle services with `AddMultiTenant<TenantInfo>().WithStaticStrategy("test-tenant-id")`
    - Use StaticStrategy to provide predictable tenant for POC testing
    - Expected outcome: Tenant resolution works in POC
-   - Files affected: `/tmp/multitenant-poc/Program.cs` or POC setup
+   - Files affected: `Task/PoC/FinbuckleMultitenantAuditNet/Program.cs` or POC setup
    - Reality check: IMultiTenantContextAccessor returns non-null TenantInfo
 
 **Part 3: Testing & Validation**
@@ -80,7 +80,7 @@ What must be completed before starting this phase:
      - Queries entity back with query filter applied
      - Checks Audit.NET log for captured event with TenantId
    - Expected outcome: Test passes, demonstrating both concerns work together
-   - Files affected: `/tmp/multitenant-poc/PocTests.cs`
+   - Files affected: `Task/PoC/FinbuckleMultitenantAuditNet/PocTests.cs`
    - Reality check: Test passes green
 
 7. **Validate query filters**
@@ -105,13 +105,13 @@ Test incrementally as you work:
 
 ```bash
 # After each code change
-dotnet build /tmp/multitenant-poc
+dotnet build Task/PoC/FinbuckleMultitenantAuditNet
 
 # After adding tests
-dotnet test /tmp/multitenant-poc
+dotnet test Task/PoC/FinbuckleMultitenantAuditNet
 
 # Inspect test output
-cat /tmp/multitenant-poc/test-output.log
+cat Task/PoC/FinbuckleMultitenantAuditNet/test-output.log
 ```
 
 Don't wait until the end to test. Reality test after each step.
@@ -141,14 +141,14 @@ Run the following commands to verify this phase:
 
 ```bash
 # POC must build
-cd /tmp/multitenant-poc
+cd Task/PoC/FinbuckleMultitenantAuditNet
 dotnet build
 
 # POC tests must pass
 dotnet test
 
 # Verify audit logs contain TenantId
-grep -r "TenantId" /tmp/multitenant-poc/audit-output/
+grep -r "TenantId" Task/PoC/FinbuckleMultitenantAuditNet/audit-output/
 ```
 
 **Existing codebase verification (must still pass):**
