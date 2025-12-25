@@ -139,7 +139,7 @@ Run the following Nuke targets to verify this phase:
 All targets must pass before proceeding to the next phase.
 
 **Manual Verification Steps:**
-1. Start application: `./build.sh RunLocal`
+1. Start application: `./build.sh RunLocalPublish`
 2. Register and login as User1
 3. Create article - check database, verify Article.TenantId matches User1's Organization.Id
 4. Create comment - check database, verify Comment.TenantId matches User1's Organization.Id

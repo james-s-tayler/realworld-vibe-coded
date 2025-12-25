@@ -170,7 +170,7 @@ Run the following Nuke targets to verify this phase:
 All targets must pass before proceeding to the next phase.
 
 **Manual Verification Steps:**
-1. Start application: `./build.sh RunLocal`
+1. Start application: `./build.sh RunLocalPublish`
 2. Register new user, login
 3. Add logging in a handler to check IMultiTenantContextAccessor - verify TenantInfo not null
 4. Check that TenantInfo.Id matches user's Organization.Id

@@ -153,7 +153,7 @@ Run the following Nuke targets to verify this phase:
 All targets must pass before proceeding to the next phase.
 
 **Manual Verification Steps:**
-1. Start application: `./build.sh RunLocal`
+1. Start application: `./build.sh RunLocalPublish`
 2. Use curl or Postman to test GET /api/articles without auth - expect 401
 3. Check server logs for no errors
 4. Verify all Postman collection targets pass

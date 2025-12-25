@@ -128,7 +128,7 @@ Run the following Nuke targets to verify this phase:
 All targets must pass before proceeding to the next phase.
 
 **Manual Verification Steps:**
-1. Start application: `./build.sh RunLocal`
+1. Start application: `./build.sh RunLocalPublish`
 2. Register User1, create article with slug "test-article"
 3. Register User2 (different org), create article with slug "test-article"
 4. Verify both articles created successfully

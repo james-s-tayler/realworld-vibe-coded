@@ -168,7 +168,7 @@ Run the following Nuke targets to verify this phase:
 All targets must pass before proceeding to the next phase.
 
 **Manual Verification Steps:**
-1. Start application: `./build.sh RunLocal`
+1. Start application: `./build.sh RunLocalPublish`
 2. Register new user via frontend
 3. Check database - verify Organization created and user has TenantId
 4. Check database - verify user has Owner role

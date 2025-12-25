@@ -62,7 +62,7 @@ What must be completed before starting this phase:
 **Part 3: Verify Logging**
 
 4. **Test logging with tenant context**
-   - Run application: `./build.sh RunLocal`
+   - Run application: `./build.sh RunLocalPublish`
    - Register and login as user
    - Perform actions that generate logs (create article, etc.)
    - Check logs in `Logs/Server.Web/Serilog/` directory
@@ -87,7 +87,7 @@ Test incrementally as you work:
 ./build.sh BuildServer
 
 # After Serilog configuration
-./build.sh RunLocal
+./build.sh RunLocalPublish
 # Check logs
 
 # Full validation
@@ -131,7 +131,7 @@ Run the following Nuke targets to verify this phase:
 All targets must pass. Migration is complete!
 
 **Manual Verification Steps:**
-1. Start application: `./build.sh RunLocal`
+1. Start application: `./build.sh RunLocalPublish`
 2. Register and login
 3. Create article, add comment
 4. Check Serilog logs: `cat Logs/Server.Web/Serilog/*.log | grep TenantId`

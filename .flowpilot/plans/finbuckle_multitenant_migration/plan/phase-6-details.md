@@ -23,11 +23,11 @@ What must be completed before starting this phase:
 - **Mitigation:** Use UserManager and SignInManager exactly as Identity endpoints do. Test thoroughly.
 - **Fallback:** If custom endpoints don't work, revert to Identity endpoints, investigate differences
 
-**Risk 2:** Existing tests may be tightly coupled to Identity endpoint URLs
-- **Likelihood:** Low
-- **Impact:** Medium (test failures)
-- **Mitigation:** Tests should use frontend API client which can be updated to new URLs
-- **Fallback:** Update test endpoint URLs to match new custom endpoints
+**Risk 2:** Existing tests should work without changes
+- **Likelihood:** High
+- **Impact:** Low (this is a pure refactoring)
+- **Mitigation:** Since this is a pure refactoring with no URL, behavior, or payload changes, existing tests should work without modification
+- **Fallback:** If tests fail, investigate differences in endpoint behavior
 
 ### Implementation Steps
 
@@ -84,20 +84,22 @@ What must be completed before starting this phase:
    - Files affected: `App/Server/src/Server.Web/Endpoints/Identity/LoginRequest.cs`, `LoginResponse.cs`
    - Reality check: DTOs compile
 
-**Part 3: Update Tests**
+**Part 3: Update Identity Endpoint Configuration**
 
-7. **Update functional tests to use new endpoints**
-   - Update test fixtures that call registration/login
-   - Change endpoint URLs from default Identity to custom endpoints
-   - Expected outcome: Tests call new endpoints
-   - Files affected: `App/Server/tests/Server.FunctionalTests/Fixtures/*.cs`
-   - Reality check: Tests compile
+7. **Update Identity endpoint mapping configuration**
+   - Find configuration that maps built-in Identity endpoints to `/api/identity` group
+   - Update to use custom FastEndpoints instead of built-in Identity endpoints
+   - Remove or disable the Identity endpoint mapping
+   - Expected outcome: Custom endpoints replace built-in Identity endpoints at same URLs
+   - Files affected: `App/Server/src/Server.Web/Program.cs` or endpoint configuration
+   - Reality check: Application builds, endpoints registered correctly
 
 8. **Run tests**
    - Run: `./build.sh TestServer`
+   - Run: `./build.sh TestServerPostmanAuth`
    - Verify all authentication tests pass with custom endpoints
    - Expected outcome: Tests pass, authentication works
-   - Reality check: 45 functional tests pass
+   - Reality check: Functional tests and Postman Auth tests pass
 
 ### Reality Testing During Phase
 
@@ -112,7 +114,7 @@ Test incrementally as you work:
 ./build.sh TestServer
 
 # Full validation
-./build.sh TestServerPostman
+./build.sh TestServerPostmanAuth
 ./build.sh TestE2e
 ```
 
@@ -123,10 +125,8 @@ Don't wait until the end to test. Reality test after each major change.
 When this phase is complete:
 - Custom /api/identity/register endpoint exists
 - Custom /api/identity/login endpoint exists
-- Both endpoints implement exact same behavior as Identity defaults
-- Functional tests pass using new endpoints
-- Postman collections pass (may need endpoint URL updates)
-- E2E tests pass (frontend uses new endpoints)
+- Both endpoints implement exact same behavior as Identity defaults at same URLs
+- Existing tests pass without modification (pure refactoring)
 - **No behavior changes** - pure refactoring
 - Ready for phase 7 (add Organization creation and claims transformation)
 
@@ -148,14 +148,14 @@ Run the following Nuke targets to verify this phase:
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
-./build.sh TestServerPostman
+./build.sh TestServerPostmanAuth
 ./build.sh TestE2e
 ```
 
 All targets must pass before proceeding to the next phase.
 
 **Manual Verification Steps:**
-1. Start application: `./build.sh RunLocal`
+1. Start application: `./build.sh RunLocalPublish`
 2. Test registration via Postman or frontend - should work identically to before
 3. Test login via Postman or frontend - should work identically to before
 4. Verify cookies are set correctly (check browser DevTools)

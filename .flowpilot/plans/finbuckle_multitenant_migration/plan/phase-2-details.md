@@ -148,7 +148,7 @@ Run the following Nuke targets to verify this phase:
 All targets must pass before proceeding to the next phase.
 
 **Manual Verification Steps:**
-1. Start the application (`./build.sh RunLocal`)
+1. Start the application (`./build.sh RunLocalPublish`)
 2. Navigate to `http://localhost:5173` without logging in
 3. Verify redirect to login page
 4. Try to access `/article/some-slug` directly - should redirect to login
