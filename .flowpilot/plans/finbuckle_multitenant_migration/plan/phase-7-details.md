@@ -41,8 +41,8 @@ What must be completed before starting this phase:
 
 2. **Create Organization during registration**
    - Before creating ApplicationUser, create Organization entity
-   - Set Organization.Name (use username or email prefix as default)
-   - Set Organization.Identifier (use Guid or sanitized name)
+   - Set Organization.Name (default to hardcoded value: "New Company")
+   - Set Organization.Identifier (use Guid for uniqueness)
    - Save Organization to database
    - Expected outcome: Organization created
    - Files affected: `App/Server/src/Server.Web/Endpoints/Identity/Register.cs`
@@ -124,8 +124,12 @@ Test incrementally as you work:
 # After claims transformation
 ./build.sh TestServer
 
-# Full validation
-./build.sh TestServerPostman
+# Full validation (run individual Postman targets)
+./build.sh TestServerPostmanArticlesEmpty
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
 ./build.sh TestE2e
 ```
 
@@ -161,7 +165,11 @@ Run the following Nuke targets to verify this phase:
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
-./build.sh TestServerPostman
+./build.sh TestServerPostmanArticlesEmpty
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
 ./build.sh TestE2e
 ```
 

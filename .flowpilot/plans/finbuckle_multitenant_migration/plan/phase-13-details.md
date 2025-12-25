@@ -124,7 +124,11 @@ Run the following Nuke targets to verify this phase:
 ./build.sh LintAllVerify
 ./build.sh BuildServer
 ./build.sh TestServer
-./build.sh TestServerPostman
+./build.sh TestServerPostmanArticlesEmpty
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
 ./build.sh TestE2e
 ```
 

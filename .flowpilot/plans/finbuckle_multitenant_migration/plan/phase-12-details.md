@@ -112,9 +112,13 @@ Test incrementally as you work:
 # After each test added
 ./build.sh TestServer
 
-# Full validation
+# Full validation (run individual Postman targets)
 ./build.sh TestServer
-./build.sh TestServerPostman
+./build.sh TestServerPostmanArticlesEmpty
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
 ./build.sh TestE2e
 ```
 
@@ -146,7 +150,11 @@ Run the following Nuke targets to verify this phase:
 
 ```bash
 ./build.sh TestServer
-./build.sh TestServerPostman
+./build.sh TestServerPostmanArticlesEmpty
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
 ./build.sh TestE2e
 ```
 
