@@ -11,11 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nuke.Common" Version="9.0.4" />
+    <PackageReference Include="Nuke.Common" Version="10.1.0" />
     <PackageReference Include="ReportGenerator" Version="5.4.16" />
-    <PackageReference Include="Microsoft.Build" Version="17.14.28" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.14.28" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
   </ItemGroup>
 
   <ItemGroup>
