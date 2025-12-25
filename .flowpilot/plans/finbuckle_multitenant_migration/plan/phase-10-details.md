@@ -1,11 +1,11 @@
-## phase_10: Add E2E Tests for Multi-Tenancy and Cross-Tenant Isolation
+## phase_10: Update E2E Test Infrastructure for Per-Test Organization Registration
 
 ### Phase Overview
 
-Add comprehensive E2E tests using Playwright to verify multi-tenancy semantics. Test that users in different organizations cannot see each other's data. Verify articles, comments, tags, and follow relationships are properly scoped to tenants. Update database wipe scripts to handle Organizations table.
+Update E2E test infrastructure to support parallel test execution by registering new organizations per-test instead of wiping the database. This enables tests to run in parallel without data interference while validating multi-tenancy semantics. Each test creates its own organization(s), ensuring complete isolation.
 
-**Scope Size:** Small (~8 steps)
-**Risk Level:** Low (additive test coverage)
+**Scope Size:** Small (~7 steps)
+**Risk Level:** Low (test infrastructure improvements, no production code changes)
 **Estimated Complexity:** Low
 
 ### Prerequisites
@@ -13,145 +13,155 @@ Add comprehensive E2E tests using Playwright to verify multi-tenancy semantics. 
 What must be completed before starting this phase:
 - Phase 9 completed (handlers set TenantId on entity creation)
 - System fully multi-tenant with data isolation
-- All existing tests passing
+- All existing E2E tests passing
 
 ### Known Risks & Mitigations
 
-**Risk 1:** E2E tests may be slow with multiple user registrations
+**Risk 1:** Existing tests may break if database wipe is removed
 - **Likelihood:** Medium
-- **Impact:** Low (test execution time)
-- **Mitigation:** Use efficient test patterns, minimize redundant setup
-- **Fallback:** Accept slower tests for comprehensive coverage
+- **Impact:** Medium (test failures)
+- **Mitigation:** Update existing tests incrementally, keep database wipe as fallback option initially
+- **Fallback:** Keep database wipe logic but opt-in to new per-test org registration pattern
 
-**Risk 2:** Database wipe scripts may not handle Organizations correctly
-- **Likelihood:** Medium
-- **Impact:** Medium (test isolation broken)
-- **Mitigation:** Add Organizations table to wipe scripts, ensure foreign keys handled correctly
-- **Fallback:** Drop and recreate entire database between tests
+**Risk 2:** Test performance may degrade with more registrations
+- **Likelihood:** Low
+- **Impact:** Low (slightly longer test execution)
+- **Mitigation:** Registration is fast, and parallelization will offset any slowdown
+- **Fallback:** Accept slight performance trade-off for better parallelization
 
 ### Implementation Steps
 
-**Part 1: Update Database Wipe Scripts**
+**Part 1: Add Helper Methods for Per-Test Organization Registration**
 
-1. **Add Organizations table to database wipe logic**
-   - Find database wipe scripts in E2E test setup
-   - Add Organizations table to list of tables to truncate
-   - Ensure foreign key constraints handled correctly (disable, truncate, re-enable)
-   - Expected outcome: Database wipe includes Organizations
+1. **Add RegisterNewOrganizationUser helper to BasePage or test base class**
+   - Add method that registers a new user with unique email/username (using GUID)
+   - Each registration creates a new organization automatically (via phase 7 logic)
+   - Return authentication token and user details
+   - Expected outcome: Helper method for creating isolated test users
+   - Files affected: `Test/e2e/E2eTests/Support/BasePage.cs` or `Test/e2e/E2eTests/AppPageTest.cs`
+   - Reality check: Method compiles and can be called from tests
+
+2. **Add helper for creating multiple orgs for cross-org isolation tests**
+   - Add method that creates N users, each in separate organizations
+   - Return collection of user contexts (auth tokens, user IDs, org IDs)
+   - Expected outcome: Easy setup for cross-tenant isolation tests
+   - Files affected: `Test/e2e/E2eTests/Support/BasePage.cs` or test base class
+   - Reality check: Method compiles and can create multiple orgs
+
+**Part 2: Update Existing Tests to Use Per-Test Org Registration**
+
+3. **Identify tests that can use per-test org registration pattern**
+   - Review existing E2E tests in `Test/e2e/E2eTests/`
+   - Identify tests that test single-org functionality (articles, comments, follows, etc.)
+   - List tests that need database wipe vs. per-test org registration
+   - Expected outcome: Clear categorization of test update strategy
+   - Files affected: None (analysis only)
+   - Reality check: List of tests to update is clear
+
+4. **Update article-related tests to use per-test org registration**
+   - Replace database wipe setup with RegisterNewOrganizationUser calls
+   - Each test creates its own user/org for test data
+   - Verify tests can run in parallel without interference
+   - Expected outcome: Article tests use per-test org pattern
+   - Files affected: `Test/e2e/E2eTests/Article/*.cs`
+   - Reality check: Run article tests with `./build.sh TestE2e` (filtered to Article tests)
+
+5. **Update authentication and profile tests to use per-test org registration**
+   - Replace database wipe with per-test org registration
+   - Ensure registration/login tests create new orgs per-test
+   - Expected outcome: Auth and profile tests use per-test org pattern
+   - Files affected: `Test/e2e/E2eTests/Auth/*.cs`, `Test/e2e/E2eTests/Profile/*.cs`
+   - Reality check: Run auth/profile tests with `./build.sh TestE2e` (filtered)
+
+**Part 3: Enable Parallel Test Execution**
+
+6. **Configure Playwright test runner for parallel execution**
+   - Update test configuration to enable parallel test execution
+   - Set appropriate worker count for CI/local environments
+   - Verify tests can run in parallel without failures
+   - Expected outcome: Tests can run in parallel
+   - Files affected: `Test/e2e/E2eTests/playwright.config.cs` or similar
+   - Reality check: Run full E2E suite with parallelization enabled
+
+7. **Remove or deprecate database wipe logic**
+   - Either remove database wipe entirely or mark as deprecated
+   - Document new per-test org registration pattern as preferred approach
+   - Expected outcome: Database wipe is no longer needed for test isolation
    - Files affected: `Test/e2e/E2eTests/Support/DatabaseHelper.cs` or similar
-   - Reality check: Database wipe succeeds without FK errors
-
-**Part 2: Create Multi-Tenancy Test Class**
-
-2. **Create MultiTenancyHappyPathTests class**
-   - Create `Test/e2e/E2eTests/MultiTenancy/MultiTenancyHappyPathTests.cs`
-   - Inherit from AppPageTest (E2E base class)
-   - Expected outcome: Test class structure ready
-   - Files affected: `Test/e2e/E2eTests/MultiTenancy/MultiTenancyHappyPathTests.cs` (new)
-   - Reality check: Test class compiles
-
-**Part 3: Add Cross-Tenant Isolation Tests**
-
-3. **Test: Users in different orgs cannot see each other's articles**
-   - Register User1, create Article1
-   - Register User2 (different org), list articles
-   - Verify User2 does not see Article1
-   - Expected outcome: Article isolation verified
-   - Files affected: `Test/e2e/E2eTests/MultiTenancy/MultiTenancyHappyPathTests.cs`
-   - Reality check: Test passes
-
-4. **Test: Users in different orgs cannot see each other's comments**
-   - User1 creates article with comment
-   - User2 views articles (shouldn't see User1's article)
-   - Verify User2 cannot see User1's comments
-   - Expected outcome: Comment isolation verified
-   - Files affected: `Test/e2e/E2eTests/MultiTenancy/MultiTenancyHappyPathTests.cs`
-   - Reality check: Test passes
-
-5. **Test: Users in same org can see each other's articles**
-   - This requires admin functionality to add users to org (may be future feature)
-   - For now, create manual test or skip (document as future test)
-   - Expected outcome: Test created or documented as TODO
-   - Files affected: `Test/e2e/E2eTests/MultiTenancy/MultiTenancyHappyPathTests.cs`
-   - Reality check: Test or TODO documented
-
-**Part 4: Add Tag and Profile Isolation Tests**
-
-6. **Test: Tags are scoped to organization**
-   - User1 creates article with tag "test"
-   - User2 creates article with tag "test"
-   - Verify each user only sees their own "test" tag (tags are tenant-scoped)
-   - Expected outcome: Tag isolation verified
-   - Files affected: `Test/e2e/E2eTests/MultiTenancy/MultiTenancyHappyPathTests.cs`
-   - Reality check: Test passes
-
-7. **Test: Follow relationships work within organization**
-   - User1 in Org1 cannot follow User2 in Org2 (users can't see cross-org profiles)
-   - Verify profile viewing is tenant-scoped
-   - Expected outcome: Profile isolation verified
-   - Files affected: `Test/e2e/E2eTests/MultiTenancy/MultiTenancyHappyPathTests.cs`
-   - Reality check: Test passes
-
-**Part 5: Run Tests**
-
-8. **Run E2E tests**
-   - Run: `./build.sh TestE2e`
-   - Verify all new multi-tenancy tests pass
-   - Verify existing E2E tests still pass
-   - Expected outcome: All 51+ E2E tests pass
-   - Reality check: E2E test suite green
+   - Reality check: Tests work without database wipe
 
 ### Reality Testing During Phase
 
-Test incrementally as you work:
-
+**After Step 2:**
 ```bash
-# After database wipe updates
-./build.sh TestE2e
-# Should not fail with FK errors
+# Verify helper methods work
+./build.sh LintServerVerify
+./build.sh BuildServer
+```
 
-# After each test added
-./build.sh TestE2e
-
-# Full validation
+**After Step 5:**
+```bash
+# Run updated tests to verify per-test org registration works
 ./build.sh TestE2e
 ```
 
-Don't wait until the end to test. Reality test after each major change.
+**After Step 6:**
+```bash
+# Verify parallel execution works
+./build.sh TestE2e
+# Check for race conditions or data interference
+```
+
+**After Step 7:**
+```bash
+# Run full E2E suite to ensure all tests pass
+./build.sh TestE2e
+```
 
 ### Expected Working State After Phase
 
-When this phase is complete:
-- Database wipe scripts handle Organizations table correctly
-- E2E tests verify cross-tenant isolation for articles, comments, tags
-- E2E tests verify profile/follow relationships respect tenant boundaries
-- Comprehensive E2E test coverage for multi-tenancy scenarios
-- Regression prevention for tenant isolation bugs
-- All E2E tests pass (51+ tests)
-- Ready for functional test coverage in phases 11-12
+- E2E tests create new organizations per-test instead of wiping database
+- Tests can run in parallel without data interference
+- Each test is isolated within its own organization(s)
+- Test execution time improves due to parallelization
+- Database wipe is no longer required for test isolation
+- All existing E2E tests pass with new infrastructure
 
 ### If Phase Fails
 
-If this phase fails and cannot be completed:
-1. Check database wipe scripts - ensure Organizations deleted without FK errors
-2. Verify E2E test page objects use authentication correctly
-3. Use Playwright trace viewer to debug test failures
-4. Check that registration creates separate organizations for different users
-5. Use debug-analysis.md for complex E2E issues
-6. If stuck, run `flowpilot stuck`
+**Debug First:**
+1. Check test output for specific failures
+2. Verify organization registration is working correctly in tests
+3. Inspect database to ensure organizations are being created
+4. Check for race conditions in parallel execution
+5. Review logs in `Logs/Test/e2e/` for errors
+
+**Common Issues:**
+- Tests failing due to database wipe removal: Incrementally update tests, keep wipe as fallback
+- Parallel execution causing race conditions: Reduce worker count or disable parallelization temporarily
+- Registration helpers not working: Verify phase 7 registration logic is correct
+
+**If stuck after several attempts:** Run `flowpilot stuck` for structured debugging guidance.
 
 ### Verification
 
 Run the following Nuke targets to verify this phase:
 
 ```bash
+./build.sh LintAllVerify
+./build.sh BuildServer
 ./build.sh TestE2e
 ```
 
-All targets must pass before proceeding to the next phase.
+**Success Criteria:**
+- All linting passes
+- Server builds successfully
+- All E2E tests pass with new per-test org registration pattern
+- Tests can run in parallel without failures
+- No database wipe required between tests
 
-**Manual Verification Steps:**
-1. Review E2E test reports in `Reports/E2e/Artifacts/`
-2. Verify new multi-tenancy tests are present
-3. Check test execution logs for any warnings
-4. Manually test cross-tenant isolation via UI if any E2E tests fail
+**Manual Verification (optional):**
+1. Run E2E tests with parallelization enabled
+2. Verify test execution time is reasonable
+3. Check that tests create separate organizations
+4. Confirm no data interference between parallel tests
