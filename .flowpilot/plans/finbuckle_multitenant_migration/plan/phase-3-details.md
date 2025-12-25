@@ -2,9 +2,9 @@
 
 ### Phase Overview
 
-Update all backend GET endpoints (articles, comments, profiles, tags) to require authentication. Remove support for anonymous/unauthenticated access. Update Postman collections and tests to expect 401 Unauthorized when accessed without auth tokens.
+Update all backend GET endpoints (articles, comments, profiles, tags) to require authentication. Remove support for anonymous/unauthenticated access. Update Postman collections and functional tests to expect 401 Unauthorized when accessed without auth tokens.
 
-**Scope Size:** Small (~10 steps)
+**Scope Size:** Small (~7 steps)
 **Risk Level:** Medium (breaking API change, affects all clients)
 **Estimated Complexity:** Medium
 
@@ -72,44 +72,22 @@ What must be completed before starting this phase:
 
 **Part 3: Update Postman Collections**
 
-6. **Update Postman collection auth configuration**
-   - Add Bearer token auth to Postman collection or folder level
-   - Use collection variable for token (e.g., `{{authToken}}`)
-   - Expected outcome: All requests in collection inherit auth
+6. **Update unauthenticated test expectations**
+   - Bearer token auth is already configured in existing Postman collections
+   - Find tests that currently test unauthenticated GET requests
+   - Update these tests to expect 401 Unauthorized instead of 200 OK
+   - Expected outcome: Tests that verify unauthenticated behavior now expect 401
    - Files affected: `Test/Postman/*.postman_collection.json`
-   - Reality check: Postman UI shows auth configured
+   - Reality check: Run individual Postman targets: `./build.sh TestServerPostmanArticlesEmpty`, `./build.sh TestServerPostmanAuth`, etc.
 
-7. **Update Postman pre-request scripts**
-   - Add pre-request script to login and capture token if not present
-   - Store token in collection variable for reuse
-   - Expected outcome: Postman tests can authenticate automatically
-   - Files affected: `Test/Postman/*.postman_collection.json` (pre-request scripts)
-   - Reality check: Run `./build.sh TestServerPostman`, collections pass
+**Part 4: Manual Testing**
 
-**Part 4: Update E2E Tests**
-
-8. **Verify E2E tests already authenticate**
-   - E2E tests should already login (from phase 2)
-   - Verify no E2E tests try to access GET endpoints anonymously
-   - Expected outcome: E2E tests work with auth-required backend
-   - Files affected: None (verification only)
-   - Reality check: Run `./build.sh TestE2e`, tests pass
-
-**Part 5: Manual Testing**
-
-9. **Test with Postman manually**
-   - Import updated Postman collections
-   - Run requests without auth - verify 401
-   - Run requests with auth - verify 200 OK
+7. **Test with Postman manually**
+   - Run individual Postman collection targets to verify auth behavior
+   - Test requests without auth should now return 401
+   - Test requests with auth should return 200 OK
    - Expected outcome: Manual confirmation of auth enforcement
    - Reality check: Anonymous requests return 401
-
-10. **Test with frontend**
-    - Start application with `./build.sh RunLocal`
-    - Login and browse articles - should work
-    - Logout and try to access data - frontend redirects to login
-    - Expected outcome: End-to-end flow works
-    - Reality check: No errors in browser console or server logs
 
 ### Reality Testing During Phase
 
@@ -123,10 +101,14 @@ Test incrementally as you work:
 # After functional test updates
 ./build.sh TestServer
 
-# After Postman updates
-./build.sh TestServerPostman
+# After Postman updates (test individual collections)
+./build.sh TestServerPostmanArticlesEmpty
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
 
-# After all changes
+# Verify E2E tests still pass (should already authenticate from phase 2)
 ./build.sh TestE2e
 ```
 
@@ -138,10 +120,9 @@ When this phase is complete:
 - All GET endpoints require authentication (Bearer or Cookie)
 - Anonymous requests to GET endpoints return 401 Unauthorized
 - Functional tests pass with authenticated clients
-- Postman collections pass with auth tokens
+- Postman collections pass with updated expectations for unauthenticated tests
 - E2E tests pass (already authenticate from phase 2)
-- Frontend works correctly with auth-required backend
-- Full stack now requires authentication for all data access
+- Backend now requires authentication for all data access
 - System ready for multi-tenancy (query filters won't break unauthenticated access)
 
 ### If Phase Fails
@@ -161,7 +142,11 @@ Run the following Nuke targets to verify this phase:
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 ./build.sh TestServer
-./build.sh TestServerPostman
+./build.sh TestServerPostmanArticlesEmpty
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
 ./build.sh TestE2e
 ```
 
@@ -170,6 +155,5 @@ All targets must pass before proceeding to the next phase.
 **Manual Verification Steps:**
 1. Start application: `./build.sh RunLocal`
 2. Use curl or Postman to test GET /api/articles without auth - expect 401
-3. Login via frontend, verify articles load correctly
-4. Check server logs for no errors
-5. Verify E2E tests create users and login successfully
+3. Check server logs for no errors
+4. Verify all Postman collection targets pass
