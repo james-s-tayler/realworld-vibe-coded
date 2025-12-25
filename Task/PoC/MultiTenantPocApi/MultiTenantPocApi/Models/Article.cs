@@ -1,20 +1,16 @@
 using Finbuckle.MultiTenant;
 
-namespace FinbuckleMultitenantAuditNet;
+namespace MultiTenantPocApi.Models;
 
 /// <summary>
-/// POC entity for testing tenant-scoped data.
+/// Article entity for POC - tenant-scoped data
 /// </summary>
 [MultiTenant]
-public class PocArticle
+public class Article
 {
     public Guid Id { get; set; }
-    
     public string Title { get; set; } = string.Empty;
-    
     public string Body { get; set; } = string.Empty;
-    
-    public string? TenantId { get; set; }
-    
+    public string? TenantId { get; set; } // Finbuckle manages this automatically
     public DateTime CreatedAt { get; set; }
 }
