@@ -149,8 +149,8 @@ All targets must pass before proceeding to the next phase.
 
 **Manual Verification Steps:**
 1. Start the application (`./build.sh RunLocalPublish`)
-2. Navigate to `http://localhost:5173` without logging in
-3. Verify redirect to login page
+2. Navigate to the backend HTTPS URL (the App/Server application serves static frontend assets, and SPA proxy forwards to vite dev server)
+3. Verify redirect to login page when accessing root without logging in
 4. Try to access `/article/some-slug` directly - should redirect to login
 5. Login and verify home page, articles, profiles are accessible
 6. Logout and verify redirect back to login page
