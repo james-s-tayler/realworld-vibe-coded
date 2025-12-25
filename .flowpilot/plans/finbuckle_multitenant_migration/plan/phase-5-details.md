@@ -52,27 +52,30 @@ What must be completed before starting this phase:
 
 **Part 2: Create and Apply EF Migration**
 
-3. **Create EF Core migration for TenantId columns**
+3. **Create EF Core migration and regenerate idempotent script**
    - Run: `dotnet ef migrations add AddTenantIdToEntities --project App/Server/src/Server.Infrastructure --startup-project App/Server/src/Server.Web`
+   - Regenerate idempotent script: `dotnet ef migrations script --idempotent --output App/Server/src/Server.Infrastructure/Data/Migrations/idempotent.sql --project App/Server/src/Server.Infrastructure --startup-project App/Server/src/Server.Web`
    - Review migration file - verify TenantId column added to Articles, Tags, Comments tables
    - Verify indexes created on TenantId columns
-   - Expected outcome: Migration file created
-   - Files affected: `App/Server/src/Server.Infrastructure/Data/Migrations/*_AddTenantIdToEntities.cs` (new)
-   - Reality check: Migration file shows TenantId columns for Article, Tag, Comment
+   - Expected outcome: Migration file and idempotent script created
+   - Files affected: `App/Server/src/Server.Infrastructure/Data/Migrations/*_AddTenantIdToEntities.cs` (new), `App/Server/src/Server.Infrastructure/Data/Migrations/idempotent.sql` (updated)
+   - Reality check: Migration file shows TenantId columns for Article, Tag, Comment, run `./build.sh DbMigrationsVerifyIdempotentScript` and `./build.sh DbMigrationsVerifyAll` to verify
 
-4. **Apply migration to database**
-   - Run: `dotnet ef database update --project App/Server/src/Server.Infrastructure --startup-project App/Server/src/Server.Web`
+4. **Verify migrations**
+   - Migrations run automatically on app startup
+   - Run: `./build.sh DbMigrationsVerifyAll` to verify migrations apply successfully
    - Verify Articles, Tags, Comments tables have TenantId column
    - Verify indexes exist
-   - Expected outcome: Database schema updated
-   - Reality check: No migration errors
+   - Expected outcome: Database schema updated, all migration verifications pass
+   - Reality check: DbMigrationsVerifyAll target passes
 
 **Part 3: Test Query Filters**
 
 5. **Verify query filters work**
    - Use RoslynMCP FindUsages to find handlers that query Article, Tag, Comment entities
-   - Inspect generated SQL (enable EF Core logging in appsettings.Development.json)
-   - Verify queries include `WHERE TenantId = [tenant]` clause
+   - Run individual Postman collection targets: `./build.sh TestServerPostmanArticlesEmpty`, `./build.sh TestServerPostmanAuth`, etc.
+   - Inspect generated SQL in logs at `Logs/Test/Postman/Server.Web/Serilog/` after running tests
+   - Verify queries include `WHERE TenantId = [tenant]` clause (check if EF Core SQL logging is already enabled)
    - Expected outcome: Query filters automatically apply
    - Reality check: SQL logs show WHERE TenantId clause
 
@@ -94,7 +97,12 @@ What must be completed before starting this phase:
    - Reality check: `./build.sh TestServer` succeeds
 
 8. **Run all tests**
-   - Run: `./build.sh TestServerPostman`
+   - Run individual Postman collection targets:
+     - `./build.sh TestServerPostmanArticlesEmpty`
+     - `./build.sh TestServerPostmanAuth`
+     - `./build.sh TestServerPostmanProfiles`
+     - `./build.sh TestServerPostmanFeedAndArticles`
+     - `./build.sh TestServerPostmanArticle`
    - Run: `./build.sh TestE2e`
    - Expected outcome: All tests pass
    - Reality check: CI-level confidence
@@ -108,14 +116,20 @@ Test incrementally as you work:
 ./build.sh LintServerVerify
 ./build.sh BuildServer
 
-# After migration
-dotnet ef database update
+# After migration and idempotent script
+./build.sh DbMigrationsVerifyIdempotentScript
+./build.sh DbMigrationsVerifyAll
+# Verify migrations apply successfully
 
 # After test updates
 ./build.sh TestServer
 
-# Full validation
-./build.sh TestServerPostman
+# Full validation (run individual Postman targets)
+./build.sh TestServerPostmanArticlesEmpty
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
 ./build.sh TestE2e
 ```
 
@@ -150,8 +164,13 @@ Run the following Nuke targets to verify this phase:
 ```bash
 ./build.sh LintServerVerify
 ./build.sh BuildServer
+./build.sh DbMigrationsVerifyAll
 ./build.sh TestServer
-./build.sh TestServerPostman
+./build.sh TestServerPostmanArticlesEmpty
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestServerPostmanArticle
 ./build.sh TestE2e
 ```
 
