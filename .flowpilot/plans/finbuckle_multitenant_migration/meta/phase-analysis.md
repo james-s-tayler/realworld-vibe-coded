@@ -1,25 +1,25 @@
 
-1. **Phase sizes**: All phases are Small (5-10 steps) except phase_7 which is Medium (12-15 steps) due to comprehensive test updates. This is acceptable as test updates are lower risk than infrastructure changes.
+1. **Phase sizes**: All phases are Small (5-10 steps). This is acceptable as smaller phases are easier to manage and revert.
 
-2. **Working state transitions**: Each phase explicitly defines the transition from one working state to another. Phase 1 is isolated POC. Phases 2-8 progressively build multi-tenant functionality while keeping system in working state.
+2. **Working state transitions**: Each phase explicitly defines the transition from one working state to another. Phase 1 is isolated POC. Phases 2-9 progressively build multi-tenant functionality while keeping system in working state. Phases 10-14 add comprehensive test coverage and logging.
 
-3. **High-risk decomposition**: The highest-risk item (DbContext + Audit.NET integration from Decision 1) is split into phase_1 (POC validation) and phase_2 (implementation). Phase_4 (tenant resolution with middleware ordering) is kept small to manage risk.
+3. **High-risk decomposition**: The highest-risk item (DbContext + Audit.NET integration from Decision 1) is split into phase_1 (POC validation) and phase_4 (implementation). Phase_8 (tenant resolution with middleware ordering) is kept small to manage risk.
 
-4. **Test maintenance**: Tests are updated incrementally throughout phases 2-7. Functional tests updated as fixtures are affected (phases 2-6). Comprehensive E2E and Postman updates in dedicated phase_7. This follows Decision 4 (incremental test updates).
+4. **Test maintenance**: Tests are updated incrementally throughout phases. Phase 10 updates E2E test infrastructure for per-test org registration. Phases 11-13 add comprehensive multi-tenant test coverage. This follows Decision 4 (incremental test updates).
 
-5. **Rollback feasibility**: Each phase is independently committable. Phase 1 is isolated POC. Phases 2-8 use EF migrations which are reversible. No phase has destructive changes that prevent rollback.
+5. **Rollback feasibility**: Each phase is independently committable. Phase 1 is isolated POC. Phases 2-9 use EF migrations which are reversible. Phases 10-14 are additive test/logging improvements. No phase has destructive changes that prevent rollback.
 
-6. **Dependencies**: Linear progression - each phase depends only on previous phase completing. No complex dependency graphs. Phase 1 validates Decision 1 before phase 2 proceeds.
+6. **Dependencies**: Linear progression - each phase depends only on previous phase completing. No complex dependency graphs. Phase 1 validates Decision 1 before proceeding.
 
-7. **Risk progression**: Starts with low-risk POC (phase_1), then infrastructure (phase_2), domain entities (phase_3), builds to high-risk tenant resolution (phase_4), then registration flow (phase_5), handler updates (phase_6), comprehensive tests (phase_7), and ends with low-risk logging (phase_8).
+7. **Risk progression**: Starts with low-risk POC (phase_1), then frontend changes (phase_2-3), infrastructure (phase_4-5), authentication changes (phase_6-7), tenant resolution (phase_8), handler updates (phase_9), test infrastructure and coverage (phases_10-13), and ends with low-risk logging (phase_14).
 
 8. **Alignment with key decisions**:
-   - Decision 1 (DbContext strategy): Validated in phase_1, implemented in phase_2
+   - Decision 1 (DbContext strategy): Validated in phase_1, implemented in phase_4
    - Decision 2 (Data migration): Clean slate approach throughout all phases
-   - Decision 3 (Incremental phases): 8 small phases as planned
-   - Decision 4 (Test strategy): Incremental updates in phases 2-7
-   - Decision 5 (ClaimStrategy): Implemented in phase_4
-   - Decision 6 (Indexing): Single-column indexes in phase_2 and phase_3
+   - Decision 3 (Incremental phases): 14 small phases as planned
+   - Decision 4 (Test strategy): Incremental updates in phases 2-13
+   - Decision 5 (ClaimStrategy): Implemented in phase_8
+   - Decision 6 (Indexing): Single-column indexes in phases 4 and 5
 
 ### phase_1
 
@@ -253,28 +253,52 @@
 
 ### phase_10
 
+**Goal**: Update E2E test infrastructure for per-test organization registration and parallel execution
+
+**Key Outcomes**:
+* E2E test infrastructure updated to register new organizations per-test
+* Tests no longer require database wipe between executions
+* Tests can run in parallel without data interference
+* Helper methods added for creating isolated test users/organizations
+* Existing E2E tests updated to use per-test org registration pattern
+* Test execution time improves due to parallelization
+
+**Working State Transition**: From E2E tests using database wipe for isolation to tests using per-test organization registration. Each test creates its own organization(s), enabling parallel execution. Database wipe is no longer required. Tests run faster and are more isolated.
+
+**Scope Size:** Small (~7 steps)
+**Risk Level:** Low (test infrastructure improvements, no production code changes)
+**Dependencies:** phase_9 completed
+**Ripple Effects:**
+- E2E test base classes (helper methods for org registration)
+- All existing E2E tests (update to use per-test org registration)
+- Test configuration (enable parallel execution)
+- Database wipe scripts (deprecated or removed)
+
+---
+
+### phase_11
+
 **Goal**: Add E2E tests for multi-tenancy semantics and cross-tenant isolation
 
 **Key Outcomes**:
 * E2E tests added verifying users in different organizations cannot see each other's data
 * E2E tests verify articles, comments, tags are properly scoped to tenant
 * E2E tests verify follow relationships work within organization boundaries
-* Database wipe scripts updated to handle Organizations table
+* Tests use per-test org registration from phase_10 for isolation
 * All new E2E tests pass
 
 **Working State Transition**: From fully functional multi-tenant system to system with comprehensive E2E test coverage for multi-tenancy. E2E tests validate data isolation across multiple organizations. Regression prevention for tenant isolation bugs is in place.
 
-**Scope Size:** Small (~8 steps)
+**Scope Size:** Small (~7 steps)
 **Risk Level:** Low (additive test coverage)
-**Dependencies:** phase_9 completed
+**Dependencies:** phase_10 completed
 **Ripple Effects:**
 - New E2E test files for multi-tenancy scenarios
-- Database wipe scripts
 - E2E test fixtures
 
 ---
 
-### phase_11
+### phase_12
 
 **Goal**: Update slug uniqueness validation and tests
 
@@ -288,7 +312,7 @@
 
 **Scope Size:** Small (~5 steps)
 **Risk Level:** Low (validation logic update)
-**Dependencies:** phase_10 completed
+**Dependencies:** phase_11 completed
 **Ripple Effects:**
 - Slug validation logic
 - Article creation validator
@@ -296,7 +320,7 @@
 
 ---
 
-### phase_12
+### phase_13
 
 **Goal**: Add functional tests for multi-tenancy semantics and cross-tenant isolation
 
@@ -311,14 +335,14 @@
 
 **Scope Size:** Small (~8 steps)
 **Risk Level:** Low (additive test coverage)
-**Dependencies:** phase_11 completed
+**Dependencies:** phase_12 completed
 **Ripple Effects:**
 - New functional test files for multi-tenancy scenarios
 - Test fixtures for multi-tenant test scenarios
 
 ---
 
-### phase_13
+### phase_14
 
 **Goal**: Add Serilog enricher for tenant context logging
 
@@ -333,7 +357,7 @@
 
 **Scope Size:** Small (~5 steps)
 **Risk Level:** Low (logging enrichment is additive)
-**Dependencies:** phase_12 completed
+**Dependencies:** phase_13 completed
 **Ripple Effects:**
 - Program.cs or LoggerConfig.cs (Serilog configuration)
 - Potentially custom Serilog enricher class
