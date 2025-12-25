@@ -1,6 +1,7 @@
 using Audit.Core;
 using Audit.EntityFramework;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -8,16 +9,18 @@ using Microsoft.EntityFrameworkCore;
 namespace FinbuckleMultitenantAuditNet;
 
 /// <summary>
-/// POC DbContext that validates multi-tenant patterns work with Audit.NET.
-/// For simplicity in this POC, we inherit from IdentityDbContext and manually
-/// configure multi-tenancy via the [MultiTenant] attribute on entities.
-/// This validates the core concept without needing full DI setup.
+/// POC DbContext that validates MultiTenantIdentityDbContext works with Audit.NET.
+/// This inherits from MultiTenantIdentityDbContext (Finbuckle) to validate the actual
+/// production approach, demonstrating that multi-tenant filtering and audit logging
+/// work together without conflicts.
+/// 
+/// Note: For testing, we use MultiTenantDbContext.Create factory method rather than
+/// constructor injection to avoid dependency injection setup complexity in the POC.
 /// </summary>
-public class PocDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
-    // For POC testing, we'll track the TenantId manually
-    public string? CurrentTenantId { get; set; }
-    
+    // Note: MultiTenantIdentityDbContext requires IMultiTenantContextAccessor in constructor,
+    // but for testing we'll use the factory method pattern
     public PocDbContext(DbContextOptions<PocDbContext> options)
         : base(options)
     {
@@ -27,10 +30,10 @@ public class PocDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        // Call base for Identity configuration
+        // Call base to get Finbuckle's automatic multi-tenant configuration
         base.OnModelCreating(builder);
         
-        // Configure PocArticle with multi-tenant query filter
+        // Configure PocArticle entity
         builder.Entity<PocArticle>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -40,27 +43,29 @@ public class PocDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
             
             // Index on TenantId for query performance
             entity.HasIndex(e => e.TenantId);
-            
-            // Global query filter for multi-tenancy (POC simulation)
-            // In production, Finbuckle would handle this automatically
-            entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
         });
+        
+        // Note: Finbuckle automatically applies [MultiTenant] to the PocArticle entity
+        // because of the [MultiTenant] attribute on the class, which adds the query filter
     }
     
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // For POC: Simple audit logging
-        // Log entities that are being modified
+        // For POC: Simple audit logging with tenant context
+        // In production, this would use Audit.NET's data provider pattern
         var modifiedEntries = ChangeTracker.Entries()
             .Where(e => e.State != EntityState.Unchanged)
             .ToList();
         
+        // Get current tenant info (Finbuckle provides this via TenantInfo property)
+        var currentTenantId = TenantInfo?.Id ?? "unknown";
+        
         foreach (var entry in modifiedEntries)
         {
-            Console.WriteLine($"[AUDIT] {entry.State} on {entry.Metadata.GetTableName()}, TenantId: {CurrentTenantId}");
+            Console.WriteLine($"[AUDIT] {entry.State} on {entry.Metadata.GetTableName()}, TenantId: {currentTenantId}");
         }
         
-        // Call base SaveChangesAsync 
+        // Call base SaveChangesAsync - Finbuckle automatically associates entities with TenantId
         var result = await base.SaveChangesAsync(cancellationToken);
         
         return result;

@@ -1,13 +1,14 @@
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinbuckleMultitenantAuditNet;
 
 /// <summary>
-/// POC tests to validate that multi-tenancy patterns work alongside audit logging.
+/// POC tests to validate that MultiTenantIdentityDbContext works alongside audit logging.
 /// These tests demonstrate:
-/// 1. Entities can be saved with TenantId
-/// 2. Query filters work to isolate data by tenant
-/// 3. Audit logging captures operations with TenantId context
+/// 1. Entities can be saved with TenantId using Finbuckle's automatic association
+/// 2. Query filters work to isolate data by tenant automatically via Finbuckle
+/// 3. Audit logging captures operations with TenantId context from TenantInfo
 /// </summary>
 public class PocTests
 {
@@ -19,16 +20,23 @@ public class PocTests
             .UseInMemoryDatabase(databaseName: "PocTest1")
             .Options;
         
-        using var context = new PocDbContext(options);
-        context.CurrentTenantId = "tenant-1";
+        var tenant = new PocTenantInfo 
+        { 
+            Id = "tenant-1", 
+            Identifier = "tenant-1", 
+            Name = "Tenant One" 
+        };
+        
+        // Use Finbuckle's factory method to create context with tenant
+        using var context = MultiTenantDbContext.Create(tenant, options);
         
         var article = new PocArticle
         {
             Id = Guid.NewGuid(),
             Title = "Test Article",
             Body = "Test Body",
-            TenantId = "tenant-1",
             CreatedAt = DateTime.UtcNow
+            // Note: TenantId is automatically set by Finbuckle on SaveChanges
         };
         
         // Act
@@ -51,37 +59,51 @@ public class PocTests
             .UseInMemoryDatabase(databaseName: "PocTest2")
             .Options;
         
-        // Add articles for different tenants
-        using (var context = new PocDbContext(options))
+        var tenant1 = new PocTenantInfo 
+        { 
+            Id = "tenant-1", 
+            Identifier = "tenant-1", 
+            Name = "Tenant One" 
+        };
+        
+        var tenant2 = new PocTenantInfo 
+        { 
+            Id = "tenant-2", 
+            Identifier = "tenant-2", 
+            Name = "Tenant Two" 
+        };
+        
+        // Add articles for different tenants using Finbuckle's factory
+        using (var context = MultiTenantDbContext.Create(tenant1, options))
         {
-            context.Articles.AddRange(
-                new PocArticle
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Tenant 1 Article",
-                    Body = "Body 1",
-                    TenantId = "tenant-1",
-                    CreatedAt = DateTime.UtcNow
-                },
-                new PocArticle
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "Tenant 2 Article",
-                    Body = "Body 2",
-                    TenantId = "tenant-2",
-                    CreatedAt = DateTime.UtcNow
-                }
-            );
+            context.Articles.Add(new PocArticle
+            {
+                Id = Guid.NewGuid(),
+                Title = "Tenant 1 Article",
+                Body = "Body 1",
+                CreatedAt = DateTime.UtcNow
+            });
+            await context.SaveChangesAsync();
+        }
+        
+        using (var context = MultiTenantDbContext.Create(tenant2, options))
+        {
+            context.Articles.Add(new PocArticle
+            {
+                Id = Guid.NewGuid(),
+                Title = "Tenant 2 Article",
+                Body = "Body 2",
+                CreatedAt = DateTime.UtcNow
+            });
             await context.SaveChangesAsync();
         }
         
         // Act - Query with tenant-1 context
-        using (var context = new PocDbContext(options))
+        using (var context = MultiTenantDbContext.Create(tenant1, options))
         {
-            context.CurrentTenantId = "tenant-1";
             var articles = await context.Articles.ToListAsync();
             
-            // Assert
+            // Assert - Finbuckle's automatic query filter restricts to tenant-1
             Assert.Single(articles);
             Assert.Equal("Tenant 1 Article", articles[0].Title);
             Assert.Equal("tenant-1", articles[0].TenantId);
@@ -96,27 +118,39 @@ public class PocTests
             .UseInMemoryDatabase(databaseName: "PocTest3")
             .Options;
         
+        var tenant1 = new PocTenantInfo 
+        { 
+            Id = "tenant-1", 
+            Identifier = "tenant-1", 
+            Name = "Tenant One" 
+        };
+        
+        var tenant2 = new PocTenantInfo 
+        { 
+            Id = "tenant-2", 
+            Identifier = "tenant-2", 
+            Name = "Tenant Two" 
+        };
+        
         // Add article for tenant-1
-        using (var context = new PocDbContext(options))
+        using (var context = MultiTenantDbContext.Create(tenant1, options))
         {
             context.Articles.Add(new PocArticle
             {
                 Id = Guid.NewGuid(),
                 Title = "Tenant 1 Article",
                 Body = "Body",
-                TenantId = "tenant-1",
                 CreatedAt = DateTime.UtcNow
             });
             await context.SaveChangesAsync();
         }
         
         // Act - Query with tenant-2 context
-        using (var context = new PocDbContext(options))
+        using (var context = MultiTenantDbContext.Create(tenant2, options))
         {
-            context.CurrentTenantId = "tenant-2";
             var articles = await context.Articles.ToListAsync();
             
-            // Assert - Should return empty because query filter restricts to tenant-2
+            // Assert - Finbuckle's query filter automatically restricts to tenant-2, so result is empty
             Assert.Empty(articles);
         }
     }
@@ -129,15 +163,20 @@ public class PocTests
             .UseInMemoryDatabase(databaseName: "PocTest4")
             .Options;
         
-        using var context = new PocDbContext(options);
-        context.CurrentTenantId = "tenant-audit-test";
+        var tenant = new PocTenantInfo 
+        { 
+            Id = "tenant-audit-test", 
+            Identifier = "tenant-audit-test", 
+            Name = "Audit Test Tenant" 
+        };
+        
+        using var context = MultiTenantDbContext.Create(tenant, options);
         
         var article = new PocArticle
         {
             Id = Guid.NewGuid(),
             Title = "Audit Test Article",
             Body = "Testing audit logging",
-            TenantId = "tenant-audit-test",
             CreatedAt = DateTime.UtcNow
         };
         
@@ -152,7 +191,7 @@ public class PocTests
             context.Articles.Add(article);
             await context.SaveChangesAsync();
             
-            // Assert
+            // Assert - Audit logging captures TenantId from TenantInfo
             var output = stringWriter.ToString();
             Assert.Contains("[AUDIT]", output);
             Assert.Contains("tenant-audit-test", output);
