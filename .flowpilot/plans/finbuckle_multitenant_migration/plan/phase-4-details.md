@@ -51,7 +51,7 @@ What must be completed before starting this phase:
 2. **Create Organization entity class**
    - Create `Organization.cs` in `App/Server/src/Server.Core/Entities/`
    - Inherit from `EntityBase` to get Id, audit fields, change tracking
-   - Add properties: `Name` (string), `Identifier` (string, for Finbuckle), `Description` (string, optional)
+   - Add properties: `Name` (string), `Identifier` (string, for Finbuckle)
    - Expected outcome: Organization entity defined
    - Files affected: `App/Server/src/Server.Core/Entities/Organization.cs` (new)
    - Reality check: Code compiles
@@ -110,19 +110,21 @@ What must be completed before starting this phase:
 
 **Part 5: Create and Apply EF Migration**
 
-9. **Create EF Core migration**
+9. **Create EF Core migration and regenerate idempotent script**
    - Run: `dotnet ef migrations add AddOrganizationAndTenantId --project App/Server/src/Server.Infrastructure --startup-project App/Server/src/Server.Web`
+   - Regenerate idempotent script: `dotnet ef migrations script --idempotent --output App/Server/src/Server.Infrastructure/Data/Migrations/idempotent.sql --project App/Server/src/Server.Infrastructure --startup-project App/Server/src/Server.Web`
    - Review migration file to verify Organizations table and ApplicationUser.TenantId column are added
    - Verify indexes created on TenantId and Identifier
-   - Expected outcome: Migration file created
-   - Files affected: `App/Server/src/Server.Infrastructure/Data/Migrations/*_AddOrganizationAndTenantId.cs` (new)
-   - Reality check: Migration file looks correct (no unexpected changes)
+   - Expected outcome: Migration file and idempotent script created
+   - Files affected: `App/Server/src/Server.Infrastructure/Data/Migrations/*_AddOrganizationAndTenantId.cs` (new), `App/Server/src/Server.Infrastructure/Data/Migrations/idempotent.sql` (updated)
+   - Reality check: Migration file looks correct (no unexpected changes), run `./build.sh DbMigrationsVerifyIdempotentScript` and `./build.sh DbMigrationsVerifyAll` to verify
 
-10. **Apply migration to database**
-    - Run: `dotnet ef database update --project App/Server/src/Server.Infrastructure --startup-project App/Server/src/Server.Web`
+10. **Verify migrations**
+    - Migrations run automatically on app startup
+    - Run: `./build.sh DbMigrationsVerifyAll` to verify migrations apply successfully
     - Verify Organizations table exists and ApplicationUser has TenantId column
-    - Expected outcome: Database schema updated
-    - Reality check: No migration errors, database updated successfully
+    - Expected outcome: Database schema updated, all migration verifications pass
+    - Reality check: DbMigrationsVerifyAll target passes
 
 **Part 6: Update Functional Tests**
 
@@ -155,9 +157,10 @@ Test incrementally as you work:
 ./build.sh BuildServer
 # Check for compilation errors
 
-# After migration
-dotnet ef database update
-# Verify database schema
+# After migration and idempotent script
+./build.sh DbMigrationsVerifyIdempotentScript
+./build.sh DbMigrationsVerifyAll
+# Verify migrations apply successfully
 
 # After test updates
 ./build.sh TestServer
@@ -185,7 +188,7 @@ If this phase fails and cannot be completed:
 1. If DbContext inheritance fails, review phase 1 POC - compare implementation
 2. Use mslearn MCP server to search for MultiTenantIdentityDbContext configuration examples
 3. If Audit.NET stops working, check SaveChangesAsync - verify data provider configuration
-4. Check Audit.NET logs in `Logs/Server.Web/Audit.NET/` to confirm events still captured
+4. Check Audit.NET logs in `Logs/` directory (e.g., `Logs/Test/e2e`, `Logs/Test/Postman`, `Logs/RunLocal`) to confirm events still captured
 5. If migration fails, review entity configurations - ensure foreign keys correct
 6. Use debug-analysis.md for complex issues
 7. If stuck, run `flowpilot stuck`
@@ -197,6 +200,7 @@ Run the following Nuke targets to verify this phase:
 ```bash
 ./build.sh LintServerVerify
 ./build.sh BuildServer
+./build.sh DbMigrationsVerifyAll
 ./build.sh TestServer
 ```
 
@@ -205,6 +209,6 @@ All targets must pass before proceeding to the next phase.
 **Manual Verification Steps:**
 1. Inspect database schema - verify Organizations table and ApplicationUser.TenantId column exist
 2. Check indexes: `SELECT * FROM sqlite_master WHERE type='index' AND tbl_name IN ('Organizations', 'AspNetUsers');`
-3. Check Audit.NET logs in `Logs/Server.Web/Audit.NET/` after running tests - verify events still captured
-4. Start application: `./build.sh RunLocal` - should start without errors
+3. Check Audit.NET logs in `Logs/` directory (specific subfolder depends on which executable generates the logs, e.g., `Logs/Test/e2e`, `Logs/RunLocal`) after running tests - verify events still captured
+4. Start application: `./build.sh RunLocalPublish` - should start without errors
 5. Test login flow manually - should work (TenantId is nullable, so users can exist without Organization for now)
