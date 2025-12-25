@@ -219,9 +219,13 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251006155541_InitialCreate', N'9.0.7');
+    VALUES (N'20251006155541_InitialCreate', N'10.0.0');
 END;
 
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
     WHERE [MigrationId] = N'20251014115046_RemoveContributorsTable'
@@ -236,9 +240,13 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251014115046_RemoveContributorsTable', N'9.0.7');
+    VALUES (N'20251014115046_RemoveContributorsTable', N'10.0.0');
 END;
 
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
     WHERE [MigrationId] = N'20251024025739_AddAuditColumnsToEntityBase'
@@ -293,9 +301,13 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251024025739_AddAuditColumnsToEntityBase', N'9.0.7');
+    VALUES (N'20251024025739_AddAuditColumnsToEntityBase', N'10.0.0');
 END;
 
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
     WHERE [MigrationId] = N'20251025102732_AddCreatedByAndUpdatedByColumns'
@@ -382,9 +394,13 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251025102732_AddCreatedByAndUpdatedByColumns', N'9.0.7');
+    VALUES (N'20251025102732_AddCreatedByAndUpdatedByColumns', N'10.0.0');
 END;
 
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
@@ -409,12 +425,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
 )
 BEGIN
-    DECLARE @var sysname;
-    SELECT @var = [d].[name]
+    DECLARE @var nvarchar(max);
+    SELECT @var = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Users]') AND [c].[name] = N'UpdatedBy');
-    IF @var IS NOT NULL EXEC(N'ALTER TABLE [Users] DROP CONSTRAINT [' + @var + '];');
+    IF @var IS NOT NULL EXEC(N'ALTER TABLE [Users] DROP CONSTRAINT ' + @var + ';');
     EXEC(N'UPDATE [Users] SET [UpdatedBy] = N'''' WHERE [UpdatedBy] IS NULL');
     ALTER TABLE [Users] ALTER COLUMN [UpdatedBy] nvarchar(256) NOT NULL;
     ALTER TABLE [Users] ADD DEFAULT N'' FOR [UpdatedBy];
@@ -425,12 +441,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
 )
 BEGIN
-    DECLARE @var1 sysname;
-    SELECT @var1 = [d].[name]
+    DECLARE @var1 nvarchar(max);
+    SELECT @var1 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Users]') AND [c].[name] = N'CreatedBy');
-    IF @var1 IS NOT NULL EXEC(N'ALTER TABLE [Users] DROP CONSTRAINT [' + @var1 + '];');
+    IF @var1 IS NOT NULL EXEC(N'ALTER TABLE [Users] DROP CONSTRAINT ' + @var1 + ';');
     EXEC(N'UPDATE [Users] SET [CreatedBy] = N'''' WHERE [CreatedBy] IS NULL');
     ALTER TABLE [Users] ALTER COLUMN [CreatedBy] nvarchar(256) NOT NULL;
     ALTER TABLE [Users] ADD DEFAULT N'' FOR [CreatedBy];
@@ -441,12 +457,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
 )
 BEGIN
-    DECLARE @var2 sysname;
-    SELECT @var2 = [d].[name]
+    DECLARE @var2 nvarchar(max);
+    SELECT @var2 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[UserFollowing]') AND [c].[name] = N'UpdatedBy');
-    IF @var2 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT [' + @var2 + '];');
+    IF @var2 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT ' + @var2 + ';');
     EXEC(N'UPDATE [UserFollowing] SET [UpdatedBy] = N'''' WHERE [UpdatedBy] IS NULL');
     ALTER TABLE [UserFollowing] ALTER COLUMN [UpdatedBy] nvarchar(256) NOT NULL;
     ALTER TABLE [UserFollowing] ADD DEFAULT N'' FOR [UpdatedBy];
@@ -457,12 +473,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
 )
 BEGIN
-    DECLARE @var3 sysname;
-    SELECT @var3 = [d].[name]
+    DECLARE @var3 nvarchar(max);
+    SELECT @var3 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[UserFollowing]') AND [c].[name] = N'CreatedBy');
-    IF @var3 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT [' + @var3 + '];');
+    IF @var3 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT ' + @var3 + ';');
     EXEC(N'UPDATE [UserFollowing] SET [CreatedBy] = N'''' WHERE [CreatedBy] IS NULL');
     ALTER TABLE [UserFollowing] ALTER COLUMN [CreatedBy] nvarchar(256) NOT NULL;
     ALTER TABLE [UserFollowing] ADD DEFAULT N'' FOR [CreatedBy];
@@ -473,12 +489,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
 )
 BEGIN
-    DECLARE @var4 sysname;
-    SELECT @var4 = [d].[name]
+    DECLARE @var4 nvarchar(max);
+    SELECT @var4 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Tags]') AND [c].[name] = N'UpdatedBy');
-    IF @var4 IS NOT NULL EXEC(N'ALTER TABLE [Tags] DROP CONSTRAINT [' + @var4 + '];');
+    IF @var4 IS NOT NULL EXEC(N'ALTER TABLE [Tags] DROP CONSTRAINT ' + @var4 + ';');
     EXEC(N'UPDATE [Tags] SET [UpdatedBy] = N'''' WHERE [UpdatedBy] IS NULL');
     ALTER TABLE [Tags] ALTER COLUMN [UpdatedBy] nvarchar(256) NOT NULL;
     ALTER TABLE [Tags] ADD DEFAULT N'' FOR [UpdatedBy];
@@ -489,12 +505,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
 )
 BEGIN
-    DECLARE @var5 sysname;
-    SELECT @var5 = [d].[name]
+    DECLARE @var5 nvarchar(max);
+    SELECT @var5 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Tags]') AND [c].[name] = N'CreatedBy');
-    IF @var5 IS NOT NULL EXEC(N'ALTER TABLE [Tags] DROP CONSTRAINT [' + @var5 + '];');
+    IF @var5 IS NOT NULL EXEC(N'ALTER TABLE [Tags] DROP CONSTRAINT ' + @var5 + ';');
     EXEC(N'UPDATE [Tags] SET [CreatedBy] = N'''' WHERE [CreatedBy] IS NULL');
     ALTER TABLE [Tags] ALTER COLUMN [CreatedBy] nvarchar(256) NOT NULL;
     ALTER TABLE [Tags] ADD DEFAULT N'' FOR [CreatedBy];
@@ -505,12 +521,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
 )
 BEGIN
-    DECLARE @var6 sysname;
-    SELECT @var6 = [d].[name]
+    DECLARE @var6 nvarchar(max);
+    SELECT @var6 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Comments]') AND [c].[name] = N'UpdatedBy');
-    IF @var6 IS NOT NULL EXEC(N'ALTER TABLE [Comments] DROP CONSTRAINT [' + @var6 + '];');
+    IF @var6 IS NOT NULL EXEC(N'ALTER TABLE [Comments] DROP CONSTRAINT ' + @var6 + ';');
     EXEC(N'UPDATE [Comments] SET [UpdatedBy] = N'''' WHERE [UpdatedBy] IS NULL');
     ALTER TABLE [Comments] ALTER COLUMN [UpdatedBy] nvarchar(256) NOT NULL;
     ALTER TABLE [Comments] ADD DEFAULT N'' FOR [UpdatedBy];
@@ -521,12 +537,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
 )
 BEGIN
-    DECLARE @var7 sysname;
-    SELECT @var7 = [d].[name]
+    DECLARE @var7 nvarchar(max);
+    SELECT @var7 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Comments]') AND [c].[name] = N'CreatedBy');
-    IF @var7 IS NOT NULL EXEC(N'ALTER TABLE [Comments] DROP CONSTRAINT [' + @var7 + '];');
+    IF @var7 IS NOT NULL EXEC(N'ALTER TABLE [Comments] DROP CONSTRAINT ' + @var7 + ';');
     EXEC(N'UPDATE [Comments] SET [CreatedBy] = N'''' WHERE [CreatedBy] IS NULL');
     ALTER TABLE [Comments] ALTER COLUMN [CreatedBy] nvarchar(256) NOT NULL;
     ALTER TABLE [Comments] ADD DEFAULT N'' FOR [CreatedBy];
@@ -537,12 +553,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
 )
 BEGIN
-    DECLARE @var8 sysname;
-    SELECT @var8 = [d].[name]
+    DECLARE @var8 nvarchar(max);
+    SELECT @var8 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Articles]') AND [c].[name] = N'UpdatedBy');
-    IF @var8 IS NOT NULL EXEC(N'ALTER TABLE [Articles] DROP CONSTRAINT [' + @var8 + '];');
+    IF @var8 IS NOT NULL EXEC(N'ALTER TABLE [Articles] DROP CONSTRAINT ' + @var8 + ';');
     EXEC(N'UPDATE [Articles] SET [UpdatedBy] = N'''' WHERE [UpdatedBy] IS NULL');
     ALTER TABLE [Articles] ALTER COLUMN [UpdatedBy] nvarchar(256) NOT NULL;
     ALTER TABLE [Articles] ADD DEFAULT N'' FOR [UpdatedBy];
@@ -553,12 +569,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251025144627_MakeCreatedByAndUpdatedByRequired'
 )
 BEGIN
-    DECLARE @var9 sysname;
-    SELECT @var9 = [d].[name]
+    DECLARE @var9 nvarchar(max);
+    SELECT @var9 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Articles]') AND [c].[name] = N'CreatedBy');
-    IF @var9 IS NOT NULL EXEC(N'ALTER TABLE [Articles] DROP CONSTRAINT [' + @var9 + '];');
+    IF @var9 IS NOT NULL EXEC(N'ALTER TABLE [Articles] DROP CONSTRAINT ' + @var9 + ';');
     EXEC(N'UPDATE [Articles] SET [CreatedBy] = N'''' WHERE [CreatedBy] IS NULL');
     ALTER TABLE [Articles] ALTER COLUMN [CreatedBy] nvarchar(256) NOT NULL;
     ALTER TABLE [Articles] ADD DEFAULT N'' FOR [CreatedBy];
@@ -570,9 +586,13 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251025144627_MakeCreatedByAndUpdatedByRequired', N'9.0.7');
+    VALUES (N'20251025144627_MakeCreatedByAndUpdatedByRequired', N'10.0.0');
 END;
 
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
     WHERE [MigrationId] = N'20251025184325_ChangeEntityIdsToGuid'
@@ -915,9 +935,13 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251025184325_ChangeEntityIdsToGuid', N'9.0.7');
+    VALUES (N'20251025184325_ChangeEntityIdsToGuid', N'10.0.0');
 END;
 
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
     WHERE [MigrationId] = N'20251211185450_AddIdentityTables'
@@ -1143,9 +1167,13 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251211185450_AddIdentityTables', N'9.0.7');
+    VALUES (N'20251211185450_AddIdentityTables', N'10.0.0');
 END;
 
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
     WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
@@ -1231,12 +1259,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
 )
 BEGIN
-    DECLARE @var10 sysname;
-    SELECT @var10 = [d].[name]
+    DECLARE @var10 nvarchar(max);
+    SELECT @var10 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[UserFollowing]') AND [c].[name] = N'ApplicationUserId');
-    IF @var10 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT [' + @var10 + '];');
+    IF @var10 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT ' + @var10 + ';');
     ALTER TABLE [UserFollowing] DROP COLUMN [ApplicationUserId];
 END;
 
@@ -1245,12 +1273,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251214103130_MigrateToApplicationUserOnly'
 )
 BEGIN
-    DECLARE @var11 sysname;
-    SELECT @var11 = [d].[name]
+    DECLARE @var11 nvarchar(max);
+    SELECT @var11 = QUOTENAME([d].[name])
     FROM [sys].[default_constraints] [d]
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[UserFollowing]') AND [c].[name] = N'ApplicationUserId1');
-    IF @var11 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT [' + @var11 + '];');
+    IF @var11 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT ' + @var11 + ';');
     ALTER TABLE [UserFollowing] DROP COLUMN [ApplicationUserId1];
 END;
 
@@ -1300,7 +1328,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251214103130_MigrateToApplicationUserOnly', N'9.0.7');
+    VALUES (N'20251214103130_MigrateToApplicationUserOnly', N'10.0.0');
 END;
 
 COMMIT;

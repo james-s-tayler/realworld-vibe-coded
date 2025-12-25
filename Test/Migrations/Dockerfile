@@ -6,6 +6,9 @@ WORKDIR /app
 # Copy the entire application
 COPY . .
 
+# Restore packages to ensure all dependencies are available
+RUN dotnet restore App/Server/Server.sln
+
 # Install dotnet-ef tool (version 10.* for .NET 10 compatibility)
 RUN dotnet tool install --global dotnet-ef --version 10.*
 
