@@ -1,0 +1,187 @@
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Server.Infrastructure.Data.Migrations;
+
+/// <inheritdoc />
+public partial class AddOrganizationAndTenantId : Migration
+{
+  /// <inheritdoc />
+  protected override void Up(MigrationBuilder migrationBuilder)
+  {
+    migrationBuilder.DropIndex(
+        name: "UserNameIndex",
+        table: "AspNetUsers");
+
+    migrationBuilder.DropIndex(
+        name: "RoleNameIndex",
+        table: "AspNetRoles");
+
+    migrationBuilder.AddColumn<string>(
+        name: "TenantId",
+        table: "AspNetUserTokens",
+        type: "nvarchar(max)",
+        nullable: false,
+        defaultValue: string.Empty);
+
+    migrationBuilder.AddColumn<string>(
+        name: "TenantId",
+        table: "AspNetUsers",
+        type: "nvarchar(50)",
+        nullable: false,
+        defaultValue: string.Empty);
+
+    migrationBuilder.AddColumn<string>(
+        name: "TenantId",
+        table: "AspNetUserRoles",
+        type: "nvarchar(max)",
+        nullable: false,
+        defaultValue: string.Empty);
+
+    migrationBuilder.AddColumn<string>(
+        name: "TenantId",
+        table: "AspNetUserLogins",
+        type: "nvarchar(max)",
+        nullable: false,
+        defaultValue: string.Empty);
+
+    migrationBuilder.AddColumn<string>(
+        name: "TenantId",
+        table: "AspNetUserClaims",
+        type: "nvarchar(max)",
+        nullable: false,
+        defaultValue: string.Empty);
+
+    migrationBuilder.AddColumn<string>(
+        name: "TenantId",
+        table: "AspNetRoles",
+        type: "nvarchar(450)",
+        nullable: false,
+        defaultValue: string.Empty);
+
+    migrationBuilder.AddColumn<string>(
+        name: "TenantId",
+        table: "AspNetRoleClaims",
+        type: "nvarchar(max)",
+        nullable: false,
+        defaultValue: string.Empty);
+
+    migrationBuilder.CreateTable(
+        name: "Organizations",
+        columns: table => new
+        {
+          Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+          Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+          Identifier = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+          ChangeCheck = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
+          CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+          UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+          CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+        },
+        constraints: table =>
+        {
+          table.PrimaryKey("PK_Organizations", x => x.Id);
+          table.UniqueConstraint("AK_Organizations_Identifier", x => x.Identifier);
+        });
+
+    migrationBuilder.CreateIndex(
+        name: "IX_AspNetUsers_TenantId",
+        table: "AspNetUsers",
+        column: "TenantId");
+
+    migrationBuilder.CreateIndex(
+        name: "UserNameIndex",
+        table: "AspNetUsers",
+        columns: new[] { "NormalizedUserName", "TenantId" },
+        unique: true,
+        filter: "[NormalizedUserName] IS NOT NULL");
+
+    migrationBuilder.CreateIndex(
+        name: "RoleNameIndex",
+        table: "AspNetRoles",
+        columns: new[] { "NormalizedName", "TenantId" },
+        unique: true,
+        filter: "[NormalizedName] IS NOT NULL");
+
+    migrationBuilder.CreateIndex(
+        name: "IX_Organizations_Identifier",
+        table: "Organizations",
+        column: "Identifier",
+        unique: true);
+
+    migrationBuilder.AddForeignKey(
+        name: "FK_AspNetUsers_Organizations_TenantId",
+        table: "AspNetUsers",
+        column: "TenantId",
+        principalTable: "Organizations",
+        principalColumn: "Identifier",
+        onDelete: ReferentialAction.Restrict);
+  }
+
+  /// <inheritdoc />
+  protected override void Down(MigrationBuilder migrationBuilder)
+  {
+    migrationBuilder.DropForeignKey(
+        name: "FK_AspNetUsers_Organizations_TenantId",
+        table: "AspNetUsers");
+
+    migrationBuilder.DropTable(
+        name: "Organizations");
+
+    migrationBuilder.DropIndex(
+        name: "IX_AspNetUsers_TenantId",
+        table: "AspNetUsers");
+
+    migrationBuilder.DropIndex(
+        name: "UserNameIndex",
+        table: "AspNetUsers");
+
+    migrationBuilder.DropIndex(
+        name: "RoleNameIndex",
+        table: "AspNetRoles");
+
+    migrationBuilder.DropColumn(
+        name: "TenantId",
+        table: "AspNetUserTokens");
+
+    migrationBuilder.DropColumn(
+        name: "TenantId",
+        table: "AspNetUsers");
+
+    migrationBuilder.DropColumn(
+        name: "TenantId",
+        table: "AspNetUserRoles");
+
+    migrationBuilder.DropColumn(
+        name: "TenantId",
+        table: "AspNetUserLogins");
+
+    migrationBuilder.DropColumn(
+        name: "TenantId",
+        table: "AspNetUserClaims");
+
+    migrationBuilder.DropColumn(
+        name: "TenantId",
+        table: "AspNetRoles");
+
+    migrationBuilder.DropColumn(
+        name: "TenantId",
+        table: "AspNetRoleClaims");
+
+    migrationBuilder.CreateIndex(
+        name: "UserNameIndex",
+        table: "AspNetUsers",
+        column: "NormalizedUserName",
+        unique: true,
+        filter: "[NormalizedUserName] IS NOT NULL");
+
+    migrationBuilder.CreateIndex(
+        name: "RoleNameIndex",
+        table: "AspNetRoles",
+        column: "NormalizedName",
+        unique: true,
+        filter: "[NormalizedName] IS NOT NULL");
+  }
+}

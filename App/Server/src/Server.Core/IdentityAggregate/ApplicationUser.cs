@@ -21,8 +21,6 @@ public class ApplicationUser : IdentityUser<Guid>
 
   public string? Image { get; set; }
 
-  public Guid? TenantId { get; set; }
-
   public Organization? Organization { get; set; }
 
   // Navigation properties for following relationships
