@@ -98,18 +98,8 @@ builder.Services.AddMultiTenant<TenantInfo>()
     // In production, use WithEFCoreStore() for database-backed tenant configuration
     .WithInMemoryStore(options =>
     {
-        options.Tenants.Add(new TenantInfo
-        {
-            Id = "tenant-1",
-            Identifier = "tenant-1",
-            Name = "Tenant One"
-        });
-        options.Tenants.Add(new TenantInfo
-        {
-            Id = "tenant-2",
-            Identifier = "tenant-2",
-            Name = "Tenant Two"
-        });
+        options.Tenants.Add(new TenantInfo("tenant-1", "tenant-1", "Tenant One"));
+        options.Tenants.Add(new TenantInfo("tenant-2", "tenant-2", "Tenant Two"));
     });
 
 // Add DbContext with Multi-Tenant support

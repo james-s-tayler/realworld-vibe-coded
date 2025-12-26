@@ -1,6 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Identity;
 using MultiTenantPocApi.Models;
+using MultiTenantPocApi.Services;
 
 namespace MultiTenantPocApi.Endpoints;
 
@@ -33,7 +34,8 @@ public class Login : Endpoint<LoginRequest, LoginResponse>
         var user = await UserManager.FindByEmailAsync(req.Email);
         if (user == null)
         {
-            await SendAsync(new LoginResponse(), 401, ct);
+            HttpContext.Response.StatusCode = 401;
+            await Send.StringAsync("Invalid email or password", cancellation: ct);
             return;
         }
 
@@ -41,15 +43,16 @@ public class Login : Endpoint<LoginRequest, LoginResponse>
 
         if (!result.Succeeded)
         {
-            await SendAsync(new LoginResponse(), 401, ct);
+            HttpContext.Response.StatusCode = 401;
+            await Send.StringAsync("Invalid email or password", cancellation: ct);
             return;
         }
 
-        // Get TenantId using reflection
-        var tenantIdProperty = user.GetType().GetProperty("TenantId");
-        var tenantId = tenantIdProperty?.GetValue(user) as string ?? string.Empty;
+        // Get TenantId from in-memory map (POC approach)
+        // In production: Query from database user claims or tenant membership table
+        var tenantId = TenantClaimsTransformation.GetUserTenant(user.Email!);
 
-        await SendOkAsync(new LoginResponse
+        await Send.OkAsync(new LoginResponse
         {
             UserId = user.Id,
             Email = user.Email!,

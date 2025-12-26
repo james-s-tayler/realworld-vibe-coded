@@ -1,55 +1,63 @@
+using System.Collections.Concurrent;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
-using MultiTenantPocApi.Models;
 
 namespace MultiTenantPocApi.Services;
 
 /// <summary>
 /// Adds TenantId claim to authenticated users for Finbuckle ClaimStrategy resolution
+/// For POC: Uses in-memory storage to map user email to tenantId
+/// In production: Store TenantId in database (user claims, separate tenant membership table, etc.)
 /// </summary>
 public class TenantClaimsTransformation : IClaimsTransformation
 {
-    private readonly UserManager<ApplicationUser> _userManager;
+    // POC: In-memory storage of user email -> tenantId mappings
+    // In production: Query this from database
+    private static readonly ConcurrentDictionary<string, string> _userTenantMap = new();
+    
     private readonly ILogger<TenantClaimsTransformation> _logger;
 
-    public TenantClaimsTransformation(
-        UserManager<ApplicationUser> userManager,
-        ILogger<TenantClaimsTransformation> logger)
+    public TenantClaimsTransformation(ILogger<TenantClaimsTransformation> logger)
     {
-        _userManager = userManager;
         _logger = logger;
     }
 
-    public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+    /// <summary>
+    /// Register a user's tenant association (called from Register endpoint)
+    /// </summary>
+    public static void RegisterUserTenant(string email, string tenantId)
+    {
+        _userTenantMap[email] = tenantId;
+    }
+
+    /// <summary>
+    /// Get a user's tenant association (called from Login endpoint)
+    /// </summary>
+    public static string GetUserTenant(string email)
+    {
+        return _userTenantMap.TryGetValue(email, out var tenantId) ? tenantId : string.Empty;
+    }
+
+    public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {
         // Check if TenantId claim already exists
         if (principal.HasClaim(c => c.Type == "TenantId"))
         {
-            return principal;
+            return Task.FromResult(principal);
         }
 
-        // Get user from principal
-        var user = await _userManager.GetUserAsync(principal);
-        if (user == null)
+        // Get user email from claims
+        var emailClaim = principal.FindFirst(ClaimTypes.Name) ?? principal.FindFirst(ClaimTypes.Email);
+        if (emailClaim == null)
         {
-            return principal;
+            return Task.FromResult(principal);
         }
 
-        // Get TenantId from user (Finbuckle adds this property via MultiTenantIdentityDbContext)
-        // Use reflection to get TenantId since it's added by Finbuckle dynamically
-        var tenantIdProperty = user.GetType().GetProperty("TenantId");
-        if (tenantIdProperty == null)
+        // Look up tenant ID from in-memory map
+        if (!_userTenantMap.TryGetValue(emailClaim.Value, out var tenantId))
         {
-            _logger.LogWarning("TenantId property not found on user {UserId}", user.Id);
-            return principal;
-        }
-
-        var tenantId = tenantIdProperty.GetValue(user) as string;
-        if (string.IsNullOrWhiteSpace(tenantId))
-        {
-            _logger.LogWarning("User {UserId} has null or empty TenantId", user.Id);
-            return principal;
+            _logger.LogWarning("No tenant mapping found for user {Email}", emailClaim.Value);
+            return Task.FromResult(principal);
         }
 
         // Add TenantId claim
@@ -57,9 +65,9 @@ public class TenantClaimsTransformation : IClaimsTransformation
         if (identity != null)
         {
             identity.AddClaim(new Claim("TenantId", tenantId));
-            _logger.LogInformation("Added TenantId claim '{TenantId}' for user {UserId}", tenantId, user.Id);
+            _logger.LogInformation("Added TenantId claim '{TenantId}' for user {Email}", tenantId, emailClaim.Value);
         }
 
-        return principal;
+        return Task.FromResult(principal);
     }
 }

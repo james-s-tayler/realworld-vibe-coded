@@ -1,6 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Identity;
 using MultiTenantPocApi.Models;
+using MultiTenantPocApi.Services;
 
 namespace MultiTenantPocApi.Endpoints;
 
@@ -38,26 +39,24 @@ public class Register : Endpoint<RegisterRequest, RegisterResponse>
             Email = req.Email
         };
 
-        // Set TenantId using reflection (Finbuckle adds this property dynamically)
-        var tenantIdProperty = user.GetType().GetProperty("TenantId");
-        if (tenantIdProperty != null)
-        {
-            tenantIdProperty.SetValue(user, req.TenantId);
-        }
+        // For POC: Don't set TenantId on user entity - Identity entities are not multi-tenant
+        // Instead, register the tenant association in TenantClaimsTransformation
+        TenantClaimsTransformation.RegisterUserTenant(req.Email, req.TenantId);
 
         var result = await UserManager.CreateAsync(user, req.Password);
 
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            await SendAsync(new RegisterResponse(), 400, ct);
+            HttpContext.Response.StatusCode = 400;
+            await Send.StringAsync(errors, cancellation: ct);
             return;
         }
 
         // Sign in the user (adds authentication cookie/claims)
         await SignInManager.SignInAsync(user, isPersistent: false);
 
-        await SendOkAsync(new RegisterResponse
+        await Send.OkAsync(new RegisterResponse
         {
             UserId = user.Id,
             Email = user.Email!,

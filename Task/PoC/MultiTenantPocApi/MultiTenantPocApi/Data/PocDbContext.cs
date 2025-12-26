@@ -64,30 +64,35 @@ public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser>
             // Note: No IsMultiTenant() call here - filter is inherited from EntityBase
         });
         
-        // NOTE: Identity entity types (ApplicationUser, IdentityRole, etc.) are automatically
-        // multi-tenant by default in MultiTenantIdentityDbContext in Finbuckle v10
-        // No need to explicitly call IsMultiTenant() on them
+        // IMPORTANT: Exclude Identity entities from multi-tenant filtering
+        // In Finbuckle v10, Identity entities are multi-tenant by default on MultiTenantIdentityDbContext
+        // BUT for POC registration flow without tenant context, we need to opt them out
+        modelBuilder.Entity<ApplicationUser>().IsNotMultiTenant();
+        modelBuilder.Entity<IdentityRole>().IsNotMultiTenant();
+        modelBuilder.Entity<IdentityUserClaim<string>>().IsNotMultiTenant();
+        modelBuilder.Entity<IdentityUserRole<string>>().IsNotMultiTenant();
+        modelBuilder.Entity<IdentityUserLogin<string>>().IsNotMultiTenant();
+        modelBuilder.Entity<IdentityRoleClaim<string>>().IsNotMultiTenant();
+        modelBuilder.Entity<IdentityUserToken<string>>().IsNotMultiTenant();
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // CRITICAL: Apply multi-tenant logic before saving
-        // This sets TenantId on all added/modified entities based on current tenant context
-        // TenantInfo property is populated by MultiTenantIdentityDbContext base class from IMultiTenantContextAccessor
+        // Log tenant context for debugging
         if (TenantInfo != null)
         {
-            // EnforceMultiTenant() sets TenantId on all added/modified entities
-            this.EnforceMultiTenant();
             Console.WriteLine($"[SaveChanges] Operating in tenant: {TenantInfo.Id} ({TenantInfo.Name})");
         }
         else
         {
-            Console.WriteLine("[SaveChanges] WARNING: No tenant context - skipping EnforceMultiTenant()");
+            Console.WriteLine("[SaveChanges] No tenant context - allowing operation (likely Identity operation)");
         }
         
         // Audit.NET integration - captures changes with tenant context
         // The [AuditDbContext] attribute handles the audit logging automatically
-
+        
+        // Let base class handle multi-tenant enforcement
+        // It will only apply to entities marked as multi-tenant (Article), not Identity entities (IsNotMultiTenant)
         var result = await base.SaveChangesAsync(cancellationToken);
         return result;
     }
