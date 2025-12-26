@@ -1,5 +1,5 @@
-# Use .NET 9 SDK image for building and testing
-FROM mcr.microsoft.com/dotnet/sdk:9.0
+# Use .NET 10 SDK image for building and testing
+FROM mcr.microsoft.com/dotnet/sdk:10.0
 
 WORKDIR /workspace
 

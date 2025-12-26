@@ -1,5 +1,5 @@
-# Use the official .NET 9 runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+# Use the official .NET 10 runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 
 WORKDIR /app
 

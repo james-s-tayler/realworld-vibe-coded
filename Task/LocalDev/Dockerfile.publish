@@ -1,9 +1,9 @@
 # Stage 1: Generate HTTPS certificate
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS cert-generator
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS cert-generator
 RUN mkdir -p /https && dotnet dev-certs https -ep /https/aspnetapp.pfx -p DevPassword123!
 
 # Stage 2: Runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 
 WORKDIR /app
 
