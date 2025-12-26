@@ -1337,7 +1337,7 @@ GO
 BEGIN TRANSACTION;
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     DROP INDEX [UserNameIndex] ON [AspNetUsers];
@@ -1345,7 +1345,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     DROP INDEX [RoleNameIndex] ON [AspNetRoles];
@@ -1353,7 +1353,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     ALTER TABLE [AspNetUserTokens] ADD [TenantId] nvarchar(max) NOT NULL DEFAULT N'';
@@ -1361,15 +1361,15 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
-    ALTER TABLE [AspNetUsers] ADD [TenantId] nvarchar(50) NOT NULL DEFAULT N'';
+    ALTER TABLE [AspNetUsers] ADD [TenantId] nvarchar(50) NULL;
 END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     ALTER TABLE [AspNetUserRoles] ADD [TenantId] nvarchar(max) NOT NULL DEFAULT N'';
@@ -1377,7 +1377,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     ALTER TABLE [AspNetUserLogins] ADD [TenantId] nvarchar(max) NOT NULL DEFAULT N'';
@@ -1385,7 +1385,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     ALTER TABLE [AspNetUserClaims] ADD [TenantId] nvarchar(max) NOT NULL DEFAULT N'';
@@ -1393,7 +1393,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     ALTER TABLE [AspNetRoles] ADD [TenantId] nvarchar(450) NOT NULL DEFAULT N'';
@@ -1401,7 +1401,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     ALTER TABLE [AspNetRoleClaims] ADD [TenantId] nvarchar(max) NOT NULL DEFAULT N'';
@@ -1409,7 +1409,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     CREATE TABLE [Organizations] (
@@ -1428,7 +1428,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     CREATE INDEX [IX_AspNetUsers_TenantId] ON [AspNetUsers] ([TenantId]);
@@ -1436,7 +1436,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     EXEC(N'CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName], [TenantId]) WHERE [NormalizedUserName] IS NOT NULL');
@@ -1444,7 +1444,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     EXEC(N'CREATE UNIQUE INDEX [RoleNameIndex] ON [AspNetRoles] ([NormalizedName], [TenantId]) WHERE [NormalizedName] IS NOT NULL');
@@ -1452,7 +1452,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     CREATE UNIQUE INDEX [IX_Organizations_Identifier] ON [Organizations] ([Identifier]);
@@ -1460,7 +1460,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     ALTER TABLE [AspNetUsers] ADD CONSTRAINT [FK_AspNetUsers_Organizations_TenantId] FOREIGN KEY ([TenantId]) REFERENCES [Organizations] ([Identifier]) ON DELETE NO ACTION;
@@ -1468,11 +1468,11 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251226164202_AddOrganizationAndTenantId'
+    WHERE [MigrationId] = N'20251226171553_AddOrganizationAndNullableTenantId'
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251226164202_AddOrganizationAndTenantId', N'10.0.1');
+    VALUES (N'20251226171553_AddOrganizationAndNullableTenantId', N'10.0.1');
 END;
 
 COMMIT;

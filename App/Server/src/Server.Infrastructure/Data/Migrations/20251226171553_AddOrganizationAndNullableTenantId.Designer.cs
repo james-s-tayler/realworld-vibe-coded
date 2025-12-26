@@ -12,8 +12,8 @@ using Server.Infrastructure.Data;
 namespace Server.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251226164202_AddOrganizationAndTenantId")]
-    partial class AddOrganizationAndTenantId
+    [Migration("20251226171553_AddOrganizationAndNullableTenantId")]
+    partial class AddOrganizationAndNullableTenantId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -386,7 +386,6 @@ namespace Server.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TenantId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -654,8 +653,7 @@ namespace Server.Infrastructure.Data.Migrations
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .HasPrincipalKey("Identifier")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Organization");
                 });

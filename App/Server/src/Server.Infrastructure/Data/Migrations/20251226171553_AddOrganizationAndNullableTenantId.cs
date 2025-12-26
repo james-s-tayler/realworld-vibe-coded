@@ -5,7 +5,7 @@
 namespace Server.Infrastructure.Data.Migrations;
 
 /// <inheritdoc />
-public partial class AddOrganizationAndTenantId : Migration
+public partial class AddOrganizationAndNullableTenantId : Migration
 {
   /// <inheritdoc />
   protected override void Up(MigrationBuilder migrationBuilder)
@@ -29,8 +29,7 @@ public partial class AddOrganizationAndTenantId : Migration
         name: "TenantId",
         table: "AspNetUsers",
         type: "nvarchar(50)",
-        nullable: false,
-        defaultValue: string.Empty);
+        nullable: true);
 
     migrationBuilder.AddColumn<string>(
         name: "TenantId",

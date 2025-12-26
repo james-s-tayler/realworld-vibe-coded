@@ -383,7 +383,6 @@ namespace Server.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TenantId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -651,8 +650,7 @@ namespace Server.Infrastructure.Data.Migrations
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .HasPrincipalKey("Identifier")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Organization");
                 });
