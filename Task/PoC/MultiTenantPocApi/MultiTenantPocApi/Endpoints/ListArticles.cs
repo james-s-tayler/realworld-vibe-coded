@@ -39,7 +39,7 @@ public class ListArticles : EndpointWithoutRequest<ArticlesListResponse>
             .OrderByDescending(a => a.CreatedAt)
             .ToListAsync(ct);
 
-        await SendAsync(new ArticlesListResponse
+        await SendOkAsync(new ArticlesListResponse
         {
             Articles = articles.Select(a => new ArticleResponse
             {
@@ -50,6 +50,6 @@ public class ListArticles : EndpointWithoutRequest<ArticlesListResponse>
                 CreatedAt = a.CreatedAt
             }).ToList(),
             ArticlesCount = articles.Count
-        }, cancellation: ct);
+        }, ct);
     }
 }

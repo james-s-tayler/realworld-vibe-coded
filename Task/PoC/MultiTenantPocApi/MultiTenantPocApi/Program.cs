@@ -6,98 +6,125 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MultiTenantPocApi.Data;
 using MultiTenantPocApi.Models;
+using Serilog;
+using Serilog.Events;
 
-var builder = WebApplication.CreateBuilder(args);
+// Configure Serilog early
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/poc-api-.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
-// Configure Audit.NET to log to console
-Audit.Core.Configuration.Setup()
-    .UseCustomProvider(new ConsoleAuditDataProvider());
+try
+{
+    Log.Information("Starting POC API");
 
-// Add FastEndpoints
-builder.Services.AddFastEndpoints();
-builder.Services.SwaggerDocument();
+    var builder = WebApplication.CreateBuilder(args);
 
-// Add Multi-Tenant support
-builder.Services.AddMultiTenant<PocTenantInfo>()
-    .WithInMemoryStore(options =>
+    // Use Serilog
+    builder.Host.UseSerilog();
+
+    // Configure Audit.NET to log to files
+    var auditLogsPath = Path.Combine(Directory.GetCurrentDirectory(), "Logs", "Audit.NET");
+    if (!Directory.Exists(auditLogsPath))
     {
-        // Configure two tenants for POC
-        options.Tenants.Add(new PocTenantInfo
+        Directory.CreateDirectory(auditLogsPath);
+    }
+
+    Audit.Core.Configuration.Setup()
+        .UseFileLogProvider(config => config
+            .Directory(auditLogsPath)
+            .FilenameBuilder(auditEvent =>
+                $"audit_{DateTime.UtcNow:yyyyMMdd_HHmmss_fff}_{Guid.NewGuid():N}.json"))
+        .WithCreationPolicy(EventCreationPolicy.InsertOnEnd)
+        .WithAction(action => action
+            .OnScopeCreated(scope =>
+            {
+                // Add tenant information to audit events
+                var httpContext = builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>()?.HttpContext;
+                if (httpContext != null)
+                {
+                    var tenantInfo = httpContext.GetMultiTenantContext<Finbuckle.MultiTenant.Abstractions.ITenantInfo>()?.TenantInfo;
+                    if (tenantInfo != null)
+                    {
+                        scope.SetCustomField("TenantId", tenantInfo.Id);
+                        scope.SetCustomField("TenantName", tenantInfo.Name);
+                    }
+                }
+            }));
+
+    // Add FastEndpoints
+    builder.Services.AddFastEndpoints();
+    builder.Services.SwaggerDocument();
+
+    // Add HttpContextAccessor for Audit.NET
+    builder.Services.AddHttpContextAccessor();
+
+    // Add Multi-Tenant support
+    builder.Services.AddMultiTenant<Finbuckle.MultiTenant.Abstractions.ITenantInfo>()
+        .WithInMemoryStore(options =>
         {
-            Id = "tenant-1",
-            Identifier = "tenant-1",
-            Name = "Tenant One"
-        });
-        options.Tenants.Add(new PocTenantInfo
-        {
-            Id = "tenant-2",
-            Identifier = "tenant-2",
-            Name = "Tenant Two"
-        });
-    })
-    .WithHeaderStrategy("X-Tenant-Id"); // Use header-based tenant resolution for POC
+            // Configure two tenants for POC
+            options.Tenants.Add(new Finbuckle.MultiTenant.Abstractions.TenantInfo
+            {
+                Id = "tenant-1",
+                Identifier = "tenant-1",
+                Name = "Tenant One"
+            });
+            options.Tenants.Add(new Finbuckle.MultiTenant.Abstractions.TenantInfo
+            {
+                Id = "tenant-2",
+                Identifier = "tenant-2",
+                Name = "Tenant Two"
+            });
+        })
+        .WithHeaderStrategy("X-Tenant-Id"); // Use header-based tenant resolution for POC
 
-// Add DbContext with Multi-Tenant support
-builder.Services.AddDbContext<PocDbContext>((serviceProvider, options) =>
+    // Add DbContext with Multi-Tenant support
+    builder.Services.AddDbContext<PocDbContext>((serviceProvider, options) =>
+    {
+        // Use in-memory database for POC
+        options.UseInMemoryDatabase("PocDb");
+    });
+
+    var app = builder.Build();
+
+    // Use Multi-Tenant middleware (must be before routing)
+    app.UseMultiTenant();
+
+    app.UseAuthorization();
+
+    // Use FastEndpoints
+    app.UseFastEndpoints();
+
+    // Use Swagger
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwaggerGen();
+    }
+
+    Log.Information("POC API Started");
+    Log.Information("Use X-Tenant-Id header to specify tenant (tenant-1 or tenant-2)");
+    Log.Information("Endpoints:");
+    Log.Information("  POST /api/articles - Create article");
+    Log.Information("  GET /api/articles - List articles (tenant-scoped)");
+    Log.Information("Logs:");
+    Log.Information("  Serilog: Logs/poc-api-*.log");
+    Log.Information("  Audit.NET: Logs/Audit.NET/*.json");
+
+    app.Run();
+}
+catch (Exception ex)
 {
-    // Use in-memory database for POC
-    options.UseInMemoryDatabase("PocDb");
-});
-
-// Add Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<PocDbContext>()
-    .AddDefaultTokenProviders();
-
-var app = builder.Build();
-
-// Use Multi-Tenant middleware (must be before routing)
-app.UseMultiTenant();
-
-app.UseAuthorization();
-
-// Use FastEndpoints
-app.UseFastEndpoints();
-
-// Use Swagger
-if (app.Environment.IsDevelopment())
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
 {
-    app.UseSwaggerGen();
+    Log.CloseAndFlush();
 }
 
-Console.WriteLine("POC API Started");
-Console.WriteLine("Use X-Tenant-Id header to specify tenant (tenant-1 or tenant-2)");
-Console.WriteLine("Endpoints:");
-Console.WriteLine("  POST /api/articles - Create article");
-Console.WriteLine("  GET /api/articles - List articles (tenant-scoped)");
-
-app.Run();
-
-// Custom audit data provider for console output
-public class ConsoleAuditDataProvider : AuditDataProvider
-{
-    public override object InsertEvent(AuditEvent auditEvent)
-    {
-        Console.WriteLine($"[AUDIT] {auditEvent.EventType} - Duration: {auditEvent.Duration}ms");
-        if (auditEvent.CustomFields.ContainsKey("TenantId"))
-        {
-            Console.WriteLine($"[AUDIT] TenantId: {auditEvent.CustomFields["TenantId"]}");
-        }
-        return Guid.NewGuid();
-    }
-
-    public override Task<object> InsertEventAsync(AuditEvent auditEvent, CancellationToken cancellationToken = default)
-    {
-        return Task.FromResult(InsertEvent(auditEvent));
-    }
-
-    public override void ReplaceEvent(object eventId, AuditEvent auditEvent)
-    {
-        // Not used
-    }
-
-    public override Task ReplaceEventAsync(object eventId, AuditEvent auditEvent, CancellationToken cancellationToken = default)
-    {
-        return Task.CompletedTask;
-    }
-}
+// Make Program class public for testing
+public partial class Program { }

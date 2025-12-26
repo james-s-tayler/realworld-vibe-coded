@@ -1,7 +1,8 @@
 using Audit.EntityFramework;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MultiTenantPocApi.Models;
 
@@ -10,27 +11,40 @@ namespace MultiTenantPocApi.Data;
 /// <summary>
 /// POC DbContext that demonstrates MultiTenant + Identity + Audit.NET integration
 /// Mimics the real App/Server/Infrastructure/Data/AppDbContext.cs structure
-/// Uses Finbuckle v10's MultiTenantIdentityDbContext with proper dependency injection
+/// Uses Finbuckle v10's MultiTenantDbContext with Identity support
 /// </summary>
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false)]
-public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser>
+public class PocDbContext : MultiTenantDbContext
 {
-    public PocDbContext(DbContextOptions<PocDbContext> options)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public PocDbContext(
+        DbContextOptions<PocDbContext> options,
+        IHttpContextAccessor httpContextAccessor)
         : base(options)
     {
-        // Workaround for v10 attached entity tracking issue
-        // Will be included in base class in future versions
-        EnforceMultiTenantOnTracking();
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public DbSet<Article> Articles => Set<Article>();
+    public DbSet<ApplicationUser> Users => Set<ApplicationUser>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Mark ApplicationUser as multi-tenant (Identity entities are multi-tenant by default in v10)
-        modelBuilder.Entity<ApplicationUser>().IsMultiTenant();
+        // Configure Identity entities
+        modelBuilder.Entity<ApplicationUser>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.IsMultiTenant();
+        });
+
+        modelBuilder.Entity<IdentityRole>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.IsMultiTenant();
+        });
 
         // Configure EntityBase as multi-tenant - all entities inheriting from it will be multi-tenant
         modelBuilder.Entity<EntityBase>(entity =>
@@ -54,13 +68,17 @@ public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser>
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        // Apply multi-tenant logic before saving
+        this.EnforceMultiTenant();
+        
         // Audit.NET integration - captures changes with tenant context
         // The [AuditDbContext] attribute handles the audit logging automatically
         
         // Log tenant context for demonstration
-        if (TenantInfo != null)
+        var tenantInfo = _httpContextAccessor?.HttpContext?.GetMultiTenantContext<Finbuckle.MultiTenant.Abstractions.ITenantInfo>()?.TenantInfo;
+        if (tenantInfo != null)
         {
-            Console.WriteLine($"[SaveChanges] Operating in tenant: {TenantInfo.Id} ({TenantInfo.Name})");
+            Console.WriteLine($"[SaveChanges] Operating in tenant: {tenantInfo.Id} ({tenantInfo.Name})");
         }
 
         var result = await base.SaveChangesAsync(cancellationToken);

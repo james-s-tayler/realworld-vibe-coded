@@ -49,20 +49,21 @@ public class CreateArticle : Endpoint<CreateArticleRequest, ArticleResponse>
             Id = Guid.NewGuid(),
             Title = req.Title,
             Body = req.Body,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
             // TenantId is automatically set by Finbuckle on SaveChanges
         };
 
         _db.Articles.Add(article);
         await _db.SaveChangesAsync(ct);
 
-        await SendAsync(new ArticleResponse
+        await SendOkAsync(new ArticleResponse
         {
             Id = article.Id,
             Title = article.Title,
             Body = article.Body,
             TenantId = article.TenantId ?? "unknown",
             CreatedAt = article.CreatedAt
-        }, cancellation: ct);
+        }, ct);
     }
 }
