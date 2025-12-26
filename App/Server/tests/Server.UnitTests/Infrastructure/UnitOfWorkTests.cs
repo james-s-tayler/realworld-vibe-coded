@@ -1,4 +1,5 @@
 ﻿using Audit.Core;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -230,7 +231,8 @@ public class UnitOfWorkTests
       .UseSqlite("DataSource=:memory:")
       .Options;
 
-    var context = new AppDbContext(null!, options, dispatcher: null);
+    var multiTenantContextAccessor = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
+    var context = new AppDbContext(multiTenantContextAccessor, options, dispatcher: null);
     await context.Database.OpenConnectionAsync();
     await context.Database.EnsureCreatedAsync();
 

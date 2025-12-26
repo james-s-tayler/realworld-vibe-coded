@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Finbuckle.MultiTenant.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
 using Testcontainers.MsSql;
 
@@ -37,7 +38,8 @@ public class EmptyArticlesFixture : ApiFixtureBase<Program>
     // AppDbContext constructor requires IDomainEventDispatcher but it's nullable,
     // so we can create it with a null DbContextOptions
     var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    using var db = new AppDbContext(null!, dbContextOptions, null);
+    var multiTenantContextAccessor = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
+    using var db = new AppDbContext(multiTenantContextAccessor, dbContextOptions, null);
     await db.Database.MigrateAsync();
   }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Finbuckle.MultiTenant.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Core.ArticleAggregate;
 using Server.Core.IdentityAggregate;
@@ -42,7 +43,8 @@ public class AuditableEntityInterceptorTests : IDisposable
 
     // Create the context manually with null dispatcher
     var dbContextOptions = _serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    _dbContext = new AppDbContext(null!, dbContextOptions, null);
+    var multiTenantContextAccessor = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
+    _dbContext = new AppDbContext(multiTenantContextAccessor, dbContextOptions, null);
   }
 
   [Fact]
