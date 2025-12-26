@@ -1,5 +1,5 @@
-# Use the official .NET 9 SDK image
-FROM mcr.microsoft.com/dotnet/sdk:9.0
+# Use the official .NET 10 SDK image
+FROM mcr.microsoft.com/dotnet/sdk:10.0
 WORKDIR /app
 
 # Copy everything

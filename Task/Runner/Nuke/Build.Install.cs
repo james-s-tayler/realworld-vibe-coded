@@ -77,7 +77,7 @@ public partial class Build
           DotNetToolUpdate(s => s
                 .SetPackageName("dotnet-ef")
                 .SetGlobal(true)
-                .SetVersion("9.*"));
+                .SetVersion("10.*"));
         }
         catch
         {

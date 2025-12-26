@@ -1,13 +1,16 @@
-# Use the official .NET 9 SDK image for EF tools
-FROM mcr.microsoft.com/dotnet/sdk:9.0
+# Use the official .NET 10 SDK image for EF tools
+FROM mcr.microsoft.com/dotnet/sdk:10.0
 
 WORKDIR /app
 
 # Copy the entire application
 COPY . .
 
-# Install dotnet-ef tool (version 9.* for .NET 9 compatibility)
-RUN dotnet tool install --global dotnet-ef --version 9.*
+# Restore packages to ensure all dependencies are available
+RUN dotnet restore App/Server/Server.sln
+
+# Install dotnet-ef tool (version 10.* for .NET 10 compatibility)
+RUN dotnet tool install --global dotnet-ef --version 10.*
 
 # Add dotnet tools to PATH
 ENV PATH="${PATH}:/root/.dotnet/tools"
