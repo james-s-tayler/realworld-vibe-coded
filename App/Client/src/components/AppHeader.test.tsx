@@ -27,8 +27,19 @@ describe('AppHeader', () => {
     expect(screen.getByText('conduit')).toBeInTheDocument();
   });
 
-  it('renders Home link', () => {
+  it('does not render Home link for unauthenticated users', () => {
     renderWithAuth(null);
+    expect(screen.queryByText('Home')).not.toBeInTheDocument();
+  });
+
+  it('renders Home link for authenticated users', () => {
+    renderWithAuth({ 
+      username: 'testuser', 
+      email: 'test@example.com', 
+      token: 'test-token',
+      bio: 'Test bio',
+      image: 'https://example.com/image.jpg'
+    });
     expect(screen.getByText('Home')).toBeInTheDocument();
   });
 

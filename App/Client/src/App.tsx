@@ -16,11 +16,32 @@ function App() {
       <AuthProvider>
         <AppHeader />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/profile/:username" element={<ProfilePage />} />
-          <Route path="/article/:slug" element={<ArticlePage />} />
+          <Route
+            path="/profile/:username"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/article/:slug"
+            element={
+              <ProtectedRoute>
+                <ArticlePage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/editor"
             element={

@@ -26,13 +26,15 @@ export const AppHeader: React.FC = () => {
             conduit
           </HeaderName>
           <HeaderNavigation aria-label="Main navigation">
-            <HeaderMenuItem
-              as={Link}
-              to="/"
-              isActive={isActive('/')}
-            >
-              Home
-            </HeaderMenuItem>
+            {user && (
+              <HeaderMenuItem
+                as={Link}
+                to="/"
+                isActive={isActive('/')}
+              >
+                Home
+              </HeaderMenuItem>
+            )}
             {user ? (
               <>
                 <HeaderMenuItem
