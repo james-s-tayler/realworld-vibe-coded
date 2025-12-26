@@ -1,4 +1,5 @@
-﻿using Server.Infrastructure.Authentication;
+﻿using Finbuckle.MultiTenant.Abstractions;
+using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
 using Server.Infrastructure.Services;
@@ -22,6 +23,11 @@ public static class InfrastructureServiceExtensions
     // Register the interceptor
     services.AddSingleton<ITimeProvider, UtcNowTimeProvider>();
     services.AddSingleton<AuditableEntityInterceptor>();
+
+    // Register a temporary null IMultiTenantContextAccessor for phase 4
+    // This will be replaced with actual tenant resolution in later phases
+    services.AddSingleton<IMultiTenantContextAccessor>(sp =>
+      new AsyncLocalMultiTenantContextAccessor<TenantInfo>());
 
     services.AddDbContext<AppDbContext>((serviceProvider, options) =>
     {

@@ -42,7 +42,7 @@ public class AuditableEntityInterceptorTests : IDisposable
 
     // Create the context manually with null dispatcher
     var dbContextOptions = _serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    _dbContext = new AppDbContext(dbContextOptions, null);
+    _dbContext = new AppDbContext(null!, dbContextOptions, null);
   }
 
   [Fact]

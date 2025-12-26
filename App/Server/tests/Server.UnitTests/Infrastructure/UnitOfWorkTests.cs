@@ -230,7 +230,7 @@ public class UnitOfWorkTests
       .UseSqlite("DataSource=:memory:")
       .Options;
 
-    var context = new AppDbContext(options, dispatcher: null);
+    var context = new AppDbContext(null!, options, dispatcher: null);
     await context.Database.OpenConnectionAsync();
     await context.Database.EnsureCreatedAsync();
 

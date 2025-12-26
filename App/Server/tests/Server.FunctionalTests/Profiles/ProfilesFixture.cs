@@ -30,7 +30,7 @@ public class ProfilesFixture : ApiFixtureBase<Program>
 
     using var serviceProvider = serviceCollection.BuildServiceProvider();
     var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    using var db = new AppDbContext(dbContextOptions, null);
+    using var db = new AppDbContext(null!, dbContextOptions, null);
     await db.Database.MigrateAsync();
   }
 
