@@ -9,25 +9,25 @@ namespace Server.Web.Articles.List;
 /// List articles
 /// </summary>
 /// <remarks>
-/// List articles globally. Optional filters for tag, author, favorited user. Authentication optional.
+/// List articles globally. Optional filters for tag, author, favorited user. Authentication required.
 /// </remarks>
 public class ListArticles(IMediator mediator, IUserContext userContext) : Endpoint<ListArticlesRequest, ArticlesResponse, ArticleMapper>
 {
   public override void Configure()
   {
     Get("/api/articles");
-    AllowAnonymous();
+    AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
     Summary(s =>
     {
       s.Summary = "List articles";
-      s.Description = "List articles globally. Optional filters for tag, author, favorited user. Authentication optional.";
+      s.Description = "List articles globally. Optional filters for tag, author, favorited user. Authentication required.";
     });
   }
 
   public override async Task HandleAsync(ListArticlesRequest request, CancellationToken cancellationToken)
   {
-    // Get current user ID if authenticated
-    var currentUserId = userContext.GetCurrentUserId();
+    // Get current user ID (authentication required)
+    var currentUserId = userContext.GetRequiredCurrentUserId();
 
     var result = await mediator.Send(
       new ListArticlesQuery(

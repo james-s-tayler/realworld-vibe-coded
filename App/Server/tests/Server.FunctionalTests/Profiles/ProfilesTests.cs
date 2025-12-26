@@ -9,7 +9,7 @@ namespace Server.FunctionalTests.Profiles;
 public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
 {
   [Fact]
-  public async Task GetProfile_Unauthenticated_ReturnsProfile()
+  public async Task GetProfile_Unauthenticated_ReturnsUnauthorized()
   {
     // Identity API sets username to email by default
     var email = $"test-{Guid.NewGuid()}@example.com";
@@ -20,12 +20,9 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
 #pragma warning restore SRV007
 
     var request = new GetProfileRequest { Username = email };
-    var (response, result) = await app.Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
+    var (response, _) = await app.Client.GETAsync<Get, GetProfileRequest, object>(request);
 
-    response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(email);
-    result.Profile.Following.ShouldBeFalse();
+    response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
 
   [Fact]
@@ -87,7 +84,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
   public async Task GetProfile_NonExistentUser_ReturnsNotFound()
   {
     var request = new GetProfileRequest { Username = "nonexistentuser999" };
-    var (response, _) = await app.Client.GETAsync<Get, GetProfileRequest, object>(request);
+    var (response, _) = await app.AuthenticatedClient.GETAsync<Get, GetProfileRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -96,7 +93,7 @@ public class ProfilesTests(ProfilesFixture app) : TestBase<ProfilesFixture>
   public async Task GetProfile_InvalidUsername_ReturnsNotFound()
   {
     var request = new GetProfileRequest { Username = "invalid user!" };
-    var (response, _) = await app.Client.GETAsync<Get, GetProfileRequest, object>(request);
+    var (response, _) = await app.AuthenticatedClient.GETAsync<Get, GetProfileRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }

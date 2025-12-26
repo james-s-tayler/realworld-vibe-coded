@@ -47,7 +47,7 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   }
 
   [Fact]
-  public async Task GetComments_WithoutAuthentication_ReturnsComments()
+  public async Task GetComments_WithoutAuthentication_ReturnsUnauthorized()
   {
     var createArticleRequest = new CreateArticleRequest
     {
@@ -72,11 +72,9 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
 
     await app.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
 
-    var (response, result) = await app.Client.GETAsync<Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
+    var (response, _) = await app.Client.GETAsync<Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = slug });
 
-    response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Comments.ShouldNotBeNull();
-    result.Comments.Count.ShouldBe(1);
+    response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
 
   [Fact]
@@ -95,7 +93,7 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
     var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
-    var (response, result) = await app.Client.GETAsync<Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
+    var (response, result) = await app.ArticlesUser1Client.GETAsync<Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Comments.ShouldNotBeNull();
@@ -105,7 +103,7 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   [Fact]
   public async Task GetComments_WithNonExistentArticle_ReturnsUnprocessableEntity()
   {
-    var (response, _) = await app.Client.GETAsync<Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = "no-such-article" });
+    var (response, _) = await app.ArticlesUser1Client.GETAsync<Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
   }

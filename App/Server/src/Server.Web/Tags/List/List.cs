@@ -8,18 +8,18 @@ namespace Server.Web.Tags.List;
 /// Get all tags
 /// </summary>
 /// <remarks>
-/// Get all tags used in articles. No authentication required.
+/// Get all tags used in articles. Authentication required.
 /// </remarks>
 public class List(IMediator mediator) : Endpoint<EmptyRequest, TagsResponse>
 {
   public override void Configure()
   {
     Get("/api/tags");
-    AllowAnonymous();
+    AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
     Summary(s =>
     {
       s.Summary = "Get all tags";
-      s.Description = "Get all tags used in articles. No authentication required.";
+      s.Description = "Get all tags used in articles. Authentication required.";
     });
   }
 
