@@ -1,11 +1,11 @@
 using Audit.Core;
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using Finbuckle.MultiTenant;
-using Microsoft.AspNetCore.Identity;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using Finbuckle.MultiTenant.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MultiTenantPocApi.Data;
-using MultiTenantPocApi.Models;
 using Serilog;
 using Serilog.Events;
 
@@ -47,7 +47,7 @@ try
                 var httpContext = builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>()?.HttpContext;
                 if (httpContext != null)
                 {
-                    var tenantInfo = httpContext.GetMultiTenantContext<Finbuckle.MultiTenant.Abstractions.ITenantInfo>()?.TenantInfo;
+                    var tenantInfo = httpContext.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
                     if (tenantInfo != null)
                     {
                         scope.SetCustomField("TenantId", tenantInfo.Id);
@@ -63,23 +63,13 @@ try
     // Add HttpContextAccessor for Audit.NET
     builder.Services.AddHttpContextAccessor();
 
-    // Add Multi-Tenant support
-    builder.Services.AddMultiTenant<Finbuckle.MultiTenant.Abstractions.ITenantInfo>()
+    // Add Multi-Tenant support - using TenantInfo record directly (v10 pattern)
+    builder.Services.AddMultiTenant<TenantInfo>()
         .WithInMemoryStore(options =>
         {
             // Configure two tenants for POC
-            options.Tenants.Add(new Finbuckle.MultiTenant.Abstractions.TenantInfo
-            {
-                Id = "tenant-1",
-                Identifier = "tenant-1",
-                Name = "Tenant One"
-            });
-            options.Tenants.Add(new Finbuckle.MultiTenant.Abstractions.TenantInfo
-            {
-                Id = "tenant-2",
-                Identifier = "tenant-2",
-                Name = "Tenant Two"
-            });
+            options.Tenants.Add(new TenantInfo("tenant-1", "tenant-1", "Tenant One"));
+            options.Tenants.Add(new TenantInfo("tenant-2", "tenant-2", "Tenant Two"));
         })
         .WithHeaderStrategy("X-Tenant-Id"); // Use header-based tenant resolution for POC
 
@@ -127,4 +117,6 @@ finally
 }
 
 // Make Program class public for testing
-public partial class Program { }
+public partial class Program
+{
+}

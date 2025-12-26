@@ -57,7 +57,7 @@ public class CreateArticle : Endpoint<CreateArticleRequest, ArticleResponse>
         _db.Articles.Add(article);
         await _db.SaveChangesAsync(ct);
 
-        await SendOkAsync(new ArticleResponse
+        await Send.OkAsync(new ArticleResponse
         {
             Id = article.Id,
             Title = article.Title,
