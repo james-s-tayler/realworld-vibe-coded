@@ -4,10 +4,12 @@ using Testcontainers.MsSql;
 
 namespace Server.FunctionalTests.Articles.Fixture;
 
-public class EmptyArticlesFixture : AppFixture<Program>
+public class EmptyArticlesFixture : ApiFixtureBase<Program>
 {
   private MsSqlContainer _container = null!;
   private string _connectionString = null!;
+
+  public HttpClient AuthenticatedClient { get; private set; } = null!;
 
   protected override async ValueTask PreSetupAsync()
   {
@@ -66,10 +68,13 @@ public class EmptyArticlesFixture : AppFixture<Program>
     });
   }
 
-  protected override ValueTask SetupAsync()
+  protected override async ValueTask SetupAsync()
   {
-    // No longer need to create schema here - it's done once in PreSetupAsync
-    return ValueTask.CompletedTask;
+    // Create an authenticated client for tests that need authentication
+    var email = $"testuser-{Guid.NewGuid()}@example.com";
+    var password = "Password123!";
+    var token = await RegisterUserAsync(email, password);
+    AuthenticatedClient = CreateAuthenticatedClient(token);
   }
 
   protected override ValueTask TearDownAsync()

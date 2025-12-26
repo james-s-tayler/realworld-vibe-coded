@@ -9,6 +9,8 @@ public class ProfilesFixture : ApiFixtureBase<Program>
   private MsSqlContainer _container = null!;
   private string _connectionString = null!;
 
+  public HttpClient AuthenticatedClient { get; private set; } = null!;
+
   protected override async ValueTask PreSetupAsync()
   {
     _container = new MsSqlBuilder()
@@ -59,9 +61,13 @@ public class ProfilesFixture : ApiFixtureBase<Program>
     });
   }
 
-  protected override ValueTask SetupAsync()
+  protected override async ValueTask SetupAsync()
   {
-    return ValueTask.CompletedTask;
+    // Create an authenticated client for tests that need authentication
+    var email = $"testuser-{Guid.NewGuid()}@example.com";
+    var password = "Password123!";
+    var token = await RegisterUserAsync(email, password);
+    AuthenticatedClient = CreateAuthenticatedClient(token);
   }
 
   protected override ValueTask TearDownAsync()
