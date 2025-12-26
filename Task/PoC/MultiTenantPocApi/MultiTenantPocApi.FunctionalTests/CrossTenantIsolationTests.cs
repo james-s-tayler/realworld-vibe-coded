@@ -5,9 +5,10 @@ namespace MultiTenantPocApi.FunctionalTests;
 /// <summary>
 /// Tests verifying cross-tenant isolation - the core multi-tenancy requirement
 /// These tests prove that data created in one tenant is NOT visible in another tenant
+/// Each test uses unique tenant IDs to ensure proper isolation without database resets
 /// </summary>
 [Collection("POC Sequential Tests")]
-public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>, IAsyncLifetime
+public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>
 {
     private readonly PocApiFixture _fixture;
 
@@ -16,21 +17,15 @@ public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>, IAsyncLif
         _fixture = fixture;
     }
 
-    // Clear database before each test to ensure test isolation
-    public async ValueTask InitializeAsync()
-    {
-        await _fixture.ClearDatabaseAsync();
-    }
-
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
-
     [Fact]
     public async Task CreateArticle_InTenant1_NotVisibleInTenant2()
     {
-        // Arrange
+        // Arrange - Use unique tenant IDs for this test
+        var tenant1Id = $"test-tenant-1a-{Guid.NewGuid():N}";
+        var tenant2Id = $"test-tenant-2a-{Guid.NewGuid():N}";
         
-        var tenant1Client = _fixture.CreateTenantClient("tenant-1");
-        var tenant2Client = _fixture.CreateTenantClient("tenant-2");
+        var tenant1Client = _fixture.CreateTenantClient(tenant1Id);
+        var tenant2Client = _fixture.CreateTenantClient(tenant2Id);
 
         var createRequest = new CreateArticleRequest
         {
@@ -44,7 +39,7 @@ public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>, IAsyncLif
         
         var createdArticle = await createResponse.Content.ReadFromJsonAsync<ArticleResponse>();
         createdArticle.ShouldNotBeNull();
-        createdArticle.TenantId.ShouldBe("tenant-1");
+        createdArticle.TenantId.ShouldBe(tenant1Id);
 
         // Act - Query articles in tenant-2
         var listResponse = await tenant2Client.GetAsync("/api/articles");
@@ -61,10 +56,12 @@ public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>, IAsyncLif
     [Fact]
     public async Task CreateArticle_InTenant2_NotVisibleInTenant1()
     {
-        // Arrange
+        // Arrange - Use unique tenant IDs for this test
+        var tenant1Id = $"test-tenant-1b-{Guid.NewGuid():N}";
+        var tenant2Id = $"test-tenant-2b-{Guid.NewGuid():N}";
         
-        var tenant1Client = _fixture.CreateTenantClient("tenant-1");
-        var tenant2Client = _fixture.CreateTenantClient("tenant-2");
+        var tenant1Client = _fixture.CreateTenantClient(tenant1Id);
+        var tenant2Client = _fixture.CreateTenantClient(tenant2Id);
 
         var createRequest = new CreateArticleRequest
         {
@@ -78,7 +75,7 @@ public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>, IAsyncLif
         
         var createdArticle = await createResponse.Content.ReadFromJsonAsync<ArticleResponse>();
         createdArticle.ShouldNotBeNull();
-        createdArticle.TenantId.ShouldBe("tenant-2");
+        createdArticle.TenantId.ShouldBe(tenant2Id);
 
         // Act - Query articles in tenant-1
         var listResponse = await tenant1Client.GetAsync("/api/articles");
@@ -95,10 +92,12 @@ public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>, IAsyncLif
     [Fact]
     public async Task CreateArticles_InBothTenants_EachTenantSeesOnlyTheirOwn()
     {
-        // Arrange
+        // Arrange - Use unique tenant IDs for this test
+        var tenant1Id = $"test-tenant-1c-{Guid.NewGuid():N}";
+        var tenant2Id = $"test-tenant-2c-{Guid.NewGuid():N}";
         
-        var tenant1Client = _fixture.CreateTenantClient("tenant-1");
-        var tenant2Client = _fixture.CreateTenantClient("tenant-2");
+        var tenant1Client = _fixture.CreateTenantClient(tenant1Id);
+        var tenant2Client = _fixture.CreateTenantClient(tenant2Id);
 
         // Act - Create 2 articles in tenant-1
         var tenant1Request1 = new CreateArticleRequest
@@ -146,13 +145,13 @@ public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>, IAsyncLif
         // Assert - Tenant-1 sees only 2 articles
         tenant1Articles.ShouldNotBeNull();
         tenant1Articles.ArticlesCount.ShouldBe(2);
-        tenant1Articles.Articles.ShouldAllBe(a => a.TenantId == "tenant-1");
+        tenant1Articles.Articles.ShouldAllBe(a => a.TenantId == tenant1Id);
         tenant1Articles.Articles.ShouldAllBe(a => a.Title.StartsWith("Tenant 1"));
 
         // Assert - Tenant-2 sees only 3 articles
         tenant2Articles.ShouldNotBeNull();
         tenant2Articles.ArticlesCount.ShouldBe(3);
-        tenant2Articles.Articles.ShouldAllBe(a => a.TenantId == "tenant-2");
+        tenant2Articles.Articles.ShouldAllBe(a => a.TenantId == tenant2Id);
         tenant2Articles.Articles.ShouldAllBe(a => a.Title.StartsWith("Tenant 2"));
     }
 
@@ -172,9 +171,10 @@ public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>, IAsyncLif
     [Fact]
     public async Task QueryArticles_SameTenantMultipleTimes_ReturnsConsistentResults()
     {
-        // Arrange
+        // Arrange - Use unique tenant ID for this test
+        var tenantId = $"test-tenant-1d-{Guid.NewGuid():N}";
         
-        var tenant1Client = _fixture.CreateTenantClient("tenant-1");
+        var tenant1Client = _fixture.CreateTenantClient(tenantId);
 
         var createRequest = new CreateArticleRequest
         {
@@ -204,5 +204,10 @@ public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>, IAsyncLif
 
         articles1.Articles[0].Id.ShouldBe(articles2.Articles[0].Id);
         articles2.Articles[0].Id.ShouldBe(articles3.Articles[0].Id);
+        
+        // Verify all articles have the correct tenant ID
+        articles1.Articles[0].TenantId.ShouldBe(tenantId);
+        articles2.Articles[0].TenantId.ShouldBe(tenantId);
+        articles3.Articles[0].TenantId.ShouldBe(tenantId);
     }
 }

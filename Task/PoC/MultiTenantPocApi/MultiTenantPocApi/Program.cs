@@ -56,13 +56,23 @@ builder.Services.AddHttpContextAccessor();
 
 // Add Multi-Tenant support - using TenantInfo record directly (v10 pattern)
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithInMemoryStore(options =>
+    // Strategy: Extract tenant ID from X-Tenant-Id header
+    .WithDelegateStrategy(context =>
     {
-        // Configure two tenants for POC
-        options.Tenants.Add(new TenantInfo("tenant-1", "tenant-1", "Tenant One"));
-        options.Tenants.Add(new TenantInfo("tenant-2", "tenant-2", "Tenant Two"));
+        if (context is HttpContext httpContext && 
+            httpContext.Request.Headers.TryGetValue("X-Tenant-Id", out var tenantIdValues))
+        {
+            var tenantId = tenantIdValues.FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(tenantId))
+            {
+                return Task.FromResult<string?>(tenantId);
+            }
+        }
+        return Task.FromResult<string?>(null);
     })
-    .WithHeaderStrategy("X-Tenant-Id"); // Use header-based tenant resolution for POC
+    // Store: Echo Store creates TenantInfo on-the-fly from tenant identifier (perfect for POC/testing)
+    // In production, use WithEFCoreStore() or WithConfigurationStore() for real tenant validation
+    .WithEchoStore();
 
 // Add DbContext with Multi-Tenant support
 builder.Services.AddDbContext<PocDbContext>((serviceProvider, options) =>
