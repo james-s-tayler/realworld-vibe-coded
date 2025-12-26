@@ -32,17 +32,23 @@ public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser>
         // Mark ApplicationUser as multi-tenant (Identity entities are multi-tenant by default in v10)
         modelBuilder.Entity<ApplicationUser>().IsMultiTenant();
 
-        // Configure Article entity
-        modelBuilder.Entity<Article>(entity =>
+        // Configure EntityBase as multi-tenant - all entities inheriting from it will be multi-tenant
+        modelBuilder.Entity<EntityBase>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
-            entity.Property(e => e.Body).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
             
-            // Mark as multi-tenant and add index
+            // Mark as multi-tenant - this applies to all entities inheriting from EntityBase
             entity.IsMultiTenant();
             entity.HasIndex(e => e.TenantId);
+        });
+
+        // Configure Article entity - inherits multitenant configuration from EntityBase
+        modelBuilder.Entity<Article>(entity =>
+        {
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Body).IsRequired();
         });
     }
 
