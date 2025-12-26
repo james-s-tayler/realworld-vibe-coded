@@ -1,6 +1,6 @@
 using Audit.EntityFramework;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -17,17 +17,20 @@ namespace MultiTenantPocApi.Data;
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false)]
 public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser>
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
+    // CRITICAL: In Finbuckle v10, MultiTenantIdentityDbContext constructor takes:
+    // - IMultiTenantContextAccessor (non-generic!) - provides access to current tenant via DI
+    // - DbContextOptions
     public PocDbContext(
-        IMultiTenantContextAccessor<TenantInfo> multiTenantContextAccessor,
-        DbContextOptions<PocDbContext> options,
-        IHttpContextAccessor httpContextAccessor)
+        IMultiTenantContextAccessor multiTenantContextAccessor,
+        DbContextOptions<PocDbContext> options)
         : base(multiTenantContextAccessor, options)
     {
-        _httpContextAccessor = httpContextAccessor;
-        // NOTE: EnforceMultiTenantOnTracking() removed from constructor because it throws when TenantInfo is null
-        // Instead, we'll rely on EnforceMultiTenant() in SaveChangesAsync to set TenantId
+        // v10 workaround: EnforceMultiTenantOnTracking() ensures attached entities respect tenant filters
+        // Call this ONLY if TenantInfo is available (otherwise it throws)
+        if (TenantInfo != null)
+        {
+            this.EnforceMultiTenantOnTracking();
+        }
     }
 
     public DbSet<Article> Articles => Set<Article>();
@@ -68,16 +71,14 @@ public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser>
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // Get current tenant context
-        var tenantInfo = _httpContextAccessor?.HttpContext?.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
-        
         // CRITICAL: Apply multi-tenant logic before saving
         // This sets TenantId on all added/modified entities based on current tenant context
-        // Only call EnforceMultiTenant() if we have a tenant context
-        if (tenantInfo != null)
+        // TenantInfo property is populated by MultiTenantIdentityDbContext base class from IMultiTenantContextAccessor
+        if (TenantInfo != null)
         {
+            // EnforceMultiTenant() sets TenantId on all added/modified entities
             this.EnforceMultiTenant();
-            Console.WriteLine($"[SaveChanges] Operating in tenant: {tenantInfo.Id} ({tenantInfo.Name})");
+            Console.WriteLine($"[SaveChanges] Operating in tenant: {TenantInfo.Id} ({TenantInfo.Name})");
         }
         else
         {

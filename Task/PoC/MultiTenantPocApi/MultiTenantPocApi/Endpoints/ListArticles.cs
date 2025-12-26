@@ -34,10 +34,19 @@ public class ListArticles : EndpointWithoutRequest<ArticlesListResponse>
 
     public override async Task HandleAsync(CancellationToken ct)
     {
+        // DEBUG: Log what TenantInfo the DbContext has
+        Console.WriteLine($"[ListArticles] DbContext.TenantInfo: {(_db.TenantInfo != null ? $"{_db.TenantInfo.Id} ({_db.TenantInfo.Name})" : "NULL")}");
+        
         // Finbuckle automatically applies tenant filter - only returns articles for current tenant
         var articles = await _db.Articles
             .OrderByDescending(a => a.CreatedAt)
             .ToListAsync(ct);
+
+        Console.WriteLine($"[ListArticles] Found {articles.Count} articles");
+        foreach (var art in articles)
+        {
+            Console.WriteLine($"  - {art.Title} (TenantId: {art.TenantId})");
+        }
 
         await Send.OkAsync(new ArticlesListResponse
         {

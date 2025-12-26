@@ -7,7 +7,7 @@ namespace MultiTenantPocApi.FunctionalTests;
 /// These tests prove that data created in one tenant is NOT visible in another tenant
 /// </summary>
 [Collection("POC Sequential Tests")]
-public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>
+public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>, IAsyncLifetime
 {
     private readonly PocApiFixture _fixture;
 
@@ -15,6 +15,14 @@ public class CrossTenantIsolationTests : IClassFixture<PocApiFixture>
     {
         _fixture = fixture;
     }
+
+    // Clear database before each test to ensure test isolation
+    public async ValueTask InitializeAsync()
+    {
+        await _fixture.ClearDatabaseAsync();
+    }
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
     public async Task CreateArticle_InTenant1_NotVisibleInTenant2()

@@ -1,4 +1,5 @@
 using FastEndpoints.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MultiTenantPocApi.Data;
 
@@ -19,5 +20,18 @@ public class PocApiFixture : AppFixture<Program>
         {
             client.DefaultRequestHeaders.Add("X-Tenant-Id", tenantId);
         });
+    }
+
+    /// <summary>
+    /// Clears all data from the database - call this between tests for isolation
+    /// </summary>
+    public async Task ClearDatabaseAsync()
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<PocDbContext>();
+        
+        // For in-memory database, the simplest way to clear is to delete and recreate
+        await db.Database.EnsureDeletedAsync();
+        await db.Database.EnsureCreatedAsync();
     }
 }
