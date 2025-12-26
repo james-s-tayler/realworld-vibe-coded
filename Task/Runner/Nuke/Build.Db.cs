@@ -131,6 +131,7 @@ public partial class Build
   internal Target DbMigrationsGenerateIdempotentScript => _ => _
     .Description("Generate idempotent SQL script from EF Core migrations")
     .DependsOn(InstallDotnetToolEf)
+    .DependsOn(BuildServer)
     .Executes(() =>
     {
       Log.Information("Generating idempotent SQL script from migrations...");
@@ -159,6 +160,7 @@ public partial class Build
   internal Target DbMigrationsVerifyIdempotentScript => _ => _
     .Description("Verify that the idempotent SQL script matches the current migrations")
     .DependsOn(InstallDotnetToolEf)
+    .DependsOn(BuildServer)
     .Executes(() =>
     {
       Log.Information("Verifying idempotent SQL script is up to date...");
