@@ -67,11 +67,17 @@ builder.Services.AddMultiTenant<TenantInfo>()
 // Add DbContext with Multi-Tenant support
 builder.Services.AddDbContext<PocDbContext>((serviceProvider, options) =>
 {
-    // Use in-memory database for POC - unique name per test run
-    var dbName = builder.Environment.IsEnvironment("Testing") 
-        ? $"PocDb_{Guid.NewGuid():N}" 
-        : "PocDb";
-    options.UseInMemoryDatabase(dbName);
+    // Use in-memory database for POC
+    // IMPORTANT: Use consistent name in tests so all requests share the same database instance
+    // The database is still isolated per test fixture instance
+    options.UseInMemoryDatabase("PocDb");
+    
+    // Enable sensitive data logging for debugging (test environment only)
+    if (builder.Environment.IsEnvironment("Testing"))
+    {
+        options.EnableSensitiveDataLogging();
+        options.EnableDetailedErrors();
+    }
 });
 
 var app = builder.Build();

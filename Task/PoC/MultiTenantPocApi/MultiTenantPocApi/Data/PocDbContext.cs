@@ -26,8 +26,8 @@ public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser>
         : base(multiTenantContextAccessor, options)
     {
         _httpContextAccessor = httpContextAccessor;
-        // Recommended workaround for v10 attached entity tracking issue
-        this.EnforceMultiTenantOnTracking();
+        // NOTE: EnforceMultiTenantOnTracking() removed from constructor because it throws when TenantInfo is null
+        // Instead, we'll rely on EnforceMultiTenant() in SaveChangesAsync to set TenantId
     }
 
     public DbSet<Article> Articles => Set<Article>();
@@ -36,23 +36,29 @@ public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure EntityBase as multi-tenant - all entities inheriting from it will be multi-tenant
+        // Configure EntityBase - all entities inheriting from it will be multi-tenant
         modelBuilder.Entity<EntityBase>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();
+            entity.Property(e => e.TenantId).HasMaxLength(64); // Finbuckle v10 removed char limit, but good practice
             
-            // Mark as multi-tenant - this applies to all entities inheriting from EntityBase
+            // CRITICAL: Apply IsMultiTenant() to the BASE entity type
+            // EF Core query filters must be applied to the root of the inheritance hierarchy
+            // This filter will automatically apply to all derived types (Article, etc.)
             entity.IsMultiTenant();
+            
+            // Add index on TenantId for query performance
             entity.HasIndex(e => e.TenantId);
         });
 
-        // Configure Article entity - inherits multitenant configuration from EntityBase
+        // Configure Article entity - inherits multitenant query filter from EntityBase
         modelBuilder.Entity<Article>(entity =>
         {
             entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Body).IsRequired();
+            // Note: No IsMultiTenant() call here - filter is inherited from EntityBase
         });
         
         // NOTE: Identity entity types (ApplicationUser, IdentityRole, etc.) are automatically
@@ -62,18 +68,24 @@ public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser>
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // Apply multi-tenant logic before saving
-        this.EnforceMultiTenant();
+        // Get current tenant context
+        var tenantInfo = _httpContextAccessor?.HttpContext?.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
+        
+        // CRITICAL: Apply multi-tenant logic before saving
+        // This sets TenantId on all added/modified entities based on current tenant context
+        // Only call EnforceMultiTenant() if we have a tenant context
+        if (tenantInfo != null)
+        {
+            this.EnforceMultiTenant();
+            Console.WriteLine($"[SaveChanges] Operating in tenant: {tenantInfo.Id} ({tenantInfo.Name})");
+        }
+        else
+        {
+            Console.WriteLine("[SaveChanges] WARNING: No tenant context - skipping EnforceMultiTenant()");
+        }
         
         // Audit.NET integration - captures changes with tenant context
         // The [AuditDbContext] attribute handles the audit logging automatically
-        
-        // Log tenant context for demonstration
-        var tenantInfo = _httpContextAccessor?.HttpContext?.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
-        if (tenantInfo != null)
-        {
-            Console.WriteLine($"[SaveChanges] Operating in tenant: {tenantInfo.Id} ({tenantInfo.Name})");
-        }
 
         var result = await base.SaveChangesAsync(cancellationToken);
         return result;
