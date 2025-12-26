@@ -1,7 +1,7 @@
 using Audit.EntityFramework;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MultiTenantPocApi.Models;
 
@@ -10,13 +10,17 @@ namespace MultiTenantPocApi.Data;
 /// <summary>
 /// POC DbContext that demonstrates MultiTenant + Identity + Audit.NET integration
 /// Mimics the real App/Server/Infrastructure/Data/AppDbContext.cs structure
+/// Uses Finbuckle v10's MultiTenantIdentityDbContext with proper dependency injection
 /// </summary>
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false)]
-public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser>
 {
     public PocDbContext(DbContextOptions<PocDbContext> options)
         : base(options)
     {
+        // Workaround for v10 attached entity tracking issue
+        // Will be included in base class in future versions
+        EnforceMultiTenantOnTracking();
     }
 
     public DbSet<Article> Articles => Set<Article>();
@@ -24,6 +28,9 @@ public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Mark ApplicationUser as multi-tenant (Identity entities are multi-tenant by default in v10)
+        modelBuilder.Entity<ApplicationUser>().IsMultiTenant();
 
         // Configure Article entity
         modelBuilder.Entity<Article>(entity =>
@@ -33,7 +40,8 @@ public class PocDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
             entity.Property(e => e.Body).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             
-            // Finbuckle automatically adds TenantId filtering via [MultiTenant] attribute
+            // Mark as multi-tenant and add index
+            entity.IsMultiTenant();
             entity.HasIndex(e => e.TenantId);
         });
     }

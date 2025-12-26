@@ -1,11 +1,12 @@
-using Finbuckle.MultiTenant;
-
 namespace MultiTenantPocApi.Models;
 
 /// <summary>
-/// Tenant information for POC
+/// Tenant information for POC  
+/// In v10, TenantInfo changed from a class to a record
 /// </summary>
-public class PocTenantInfo : TenantInfo
+public record PocTenantInfo
 {
-    // Inherits Id, Identifier, Name from TenantInfo
+    public required string Id { get; set; }
+    public required string Identifier { get; set; }
+    public required string Name { get; set; }
 }
