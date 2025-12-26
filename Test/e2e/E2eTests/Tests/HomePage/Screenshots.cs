@@ -25,7 +25,11 @@ public class Screenshots : AppPageTest
     // Favorite the article to ensure favorite count is displayed
     await Api.FavoriteArticleAsync(user.Token, article.Slug);
 
-    // Act - navigate to home page and view global feed
+    // Act - Log in to access the home page (now requires authentication)
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
+    // Navigate to home page and view global feed
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
 

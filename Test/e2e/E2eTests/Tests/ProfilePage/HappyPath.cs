@@ -79,6 +79,11 @@ public class HappyPath : AppPageTest
     // Arrange
     var user = await Api.CreateUserAsync();
     await Api.CreateArticlesAsync(user.Token, TotalArticles);
+
+    // Log in to access the profile page (now requires authentication)
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
     await Pages.ProfilePage.GoToAsync(user.Email);
     await Pages.ProfilePage.WaitForArticlesToLoadAsync();
     await Pages.ProfilePage.VerifyArticleCountAsync(20);

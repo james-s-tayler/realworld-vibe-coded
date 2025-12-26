@@ -11,36 +11,25 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
-  public async Task UnauthenticatedUser_RedirectsToLogin_WhenFavoritingArticleFromHomePage()
+  public async Task UnauthenticatedUser_RedirectsToLogin_WhenAccessingHomePage()
   {
-    // Arrange
-    var user = await Api.CreateUserAsync();
-    await Api.CreateArticleAsync(user.Token);
-
+    // Act - try to access home page without authentication
     await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickGlobalFeedTabAsync();
 
-    // Act
-    await Pages.HomePage.ClickFavoriteButtonOnPreviewAsync();
-
-    // Assert
+    // Assert - should redirect to login page
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
   }
 
   [Fact]
-  public async Task UnauthenticatedUser_RedirectsToLogin_WhenFollowingUser()
+  public async Task UnauthenticatedUser_RedirectsToLogin_WhenAccessingProfilePage()
   {
     // Arrange
     var user = await Api.CreateUserAsync();
-    await Api.CreateArticleAsync(user.Token);
 
+    // Act - try to access profile page without authentication
     await Pages.ProfilePage.GoToAsync(user.Email);
-    await Pages.ProfilePage.WaitForProfileToLoadAsync(user.Email);
 
-    // Act
-    await Pages.ProfilePage.ClickFollowButtonWithoutWaitAsync(user.Email);
-
-    // Assert
+    // Assert - should redirect to login page
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
   }
 }

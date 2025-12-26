@@ -25,7 +25,11 @@ public class Screenshots : AppPageTest
     // Favorite the article to ensure it appears in favorited tab
     await Api.FavoriteArticleAsync(user.Token, article.Slug);
 
-    // Act - navigate to profile page and view favorited articles
+    // Act - Log in to access the profile page (now requires authentication)
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
+    // Navigate to profile page and view favorited articles
     await Pages.ProfilePage.GoToAsync(user.Email);
     await Pages.ProfilePage.ClickFavoritedArticlesTabAsync();
 

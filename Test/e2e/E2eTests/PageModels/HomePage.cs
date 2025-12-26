@@ -169,6 +169,14 @@ public class HomePage : BasePage
   }
 
   /// <summary>
+  /// Verifies that the Your Feed tab is selected.
+  /// </summary>
+  public async Task VerifyYourFeedIsSelectedAsync()
+  {
+    await Expect(YourFeedTab).ToHaveAttributeAsync("aria-selected", "true");
+  }
+
+  /// <summary>
   /// Verifies that a specific number of article previews are displayed.
   /// </summary>
   public async Task VerifyArticleCountAsync(int expectedCount)
