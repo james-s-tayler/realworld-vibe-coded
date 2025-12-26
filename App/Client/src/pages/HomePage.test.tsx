@@ -82,25 +82,23 @@ describe('HomePage', () => {
     vi.mocked(tagsApi.getTags).mockResolvedValue(mockTags)
   })
 
-  it('renders welcome message for unauthenticated users', async () => {
-    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No token'))
+  it('renders welcome message for authenticated users', async () => {
+    const mockUser = {
+      email: 'test@example.com',
+      username: 'testuser',
+      bio: 'Test bio',
+      image: null,
+      token: 'test-token',
+    }
+
+    localStorage.setItem('token', 'test-token')
+    vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
     
     renderHomePage()
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /conduit/i })).toBeInTheDocument()
       expect(screen.getByText(/a place to share your/i)).toBeInTheDocument()
-    })
-  })
-
-  it('shows Global Feed tab for unauthenticated users', async () => {
-    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No token'))
-    
-    renderHomePage()
-
-    await waitFor(() => {
-      expect(screen.getByRole('tab', { name: /global feed/i })).toBeInTheDocument()
-      expect(screen.queryByRole('tab', { name: /your feed/i })).not.toBeInTheDocument()
     })
   })
 
@@ -144,7 +142,16 @@ describe('HomePage', () => {
   })
 
   it('shows Popular Tags sidebar', async () => {
-    vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No token'))
+    const mockUser = {
+      email: 'test@example.com',
+      username: 'testuser',
+      bio: 'Test bio',
+      image: null,
+      token: 'test-token',
+    }
+
+    localStorage.setItem('token', 'test-token')
+    vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
     
     renderHomePage()
 
@@ -155,7 +162,16 @@ describe('HomePage', () => {
 
   describe('Pagination', () => {
     it('calls listArticles with pagination parameters', async () => {
-      vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No token'))
+      const mockUser = {
+        email: 'test@example.com',
+        username: 'testuser',
+        bio: 'Test bio',
+        image: null,
+        token: 'test-token',
+      }
+
+      localStorage.setItem('token', 'test-token')
+      vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
       vi.mocked(articlesApi.listArticles).mockResolvedValue(createMockArticles(50))
 
       renderHomePage()
@@ -168,7 +184,16 @@ describe('HomePage', () => {
     })
 
     it('shows pagination when articles count is less than or equal to page size', async () => {
-      vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('No token'))
+      const mockUser = {
+        email: 'test@example.com',
+        username: 'testuser',
+        bio: 'Test bio',
+        image: null,
+        token: 'test-token',
+      }
+
+      localStorage.setItem('token', 'test-token')
+      vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
       vi.mocked(articlesApi.listArticles).mockResolvedValue(createMockArticles(20))
 
       renderHomePage()

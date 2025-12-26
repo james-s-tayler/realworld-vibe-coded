@@ -31,8 +31,7 @@ export const HomePage: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [tagsLoading, setTagsLoading] = useState(false);
-  // Default to "Your Feed" (index 0) for authenticated users, "Global Feed" (index 0) for unauthenticated
-  // Since unauthenticated users don't have "Your Feed" tab, index 0 is always correct initially
+  // Default to "Your Feed" (index 0)
   const [activeTab, setActiveTab] = useState(0);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -115,7 +114,7 @@ export const HomePage: React.FC = () => {
 
   const handleTagClick = (tag: string) => {
     setSelectedTag(tag);
-    setActiveTab(user ? 2 : 1);
+    setActiveTab(2);
     setCurrentPage(1);
   };
 
@@ -157,76 +156,48 @@ export const HomePage: React.FC = () => {
           onCloseButtonClick={() => setError(null)}
         />
       )}
-      {user ? (
-        <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
-          <TabList aria-label="Article feeds">
-            <Tab>Your Feed</Tab>
-            <Tab>Global Feed</Tab>
-            {selectedTag && <Tab>#{selectedTag}</Tab>}
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <ArticleList
-                articles={articles}
-                loading={loading}
-                onFavorite={handleFavorite}
-                onUnfavorite={handleUnfavorite}
+      <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
+        <TabList aria-label="Article feeds">
+          <Tab>Your Feed</Tab>
+          <Tab>Global Feed</Tab>
+          {selectedTag && <Tab>#{selectedTag}</Tab>}
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <ArticleList
+              articles={articles}
+              loading={loading}
+              onFavorite={handleFavorite}
+              onUnfavorite={handleUnfavorite}
+            />
+            {articlesCount > 0 && (
+              <Pagination
+                page={currentPage}
+                pageSize={pageSize}
+                pageSizes={PAGE_SIZE_OPTIONS}
+                totalItems={articlesCount}
+                onChange={handlePageChange}
               />
-              {articlesCount > 0 && (
-                <Pagination
-                  page={currentPage}
-                  pageSize={pageSize}
-                  pageSizes={PAGE_SIZE_OPTIONS}
-                  totalItems={articlesCount}
-                  onChange={handlePageChange}
-                />
-              )}
-            </TabPanel>
-            <TabPanel>
-              <ArticleList
-                articles={articles}
-                loading={loading}
-                onFavorite={handleFavorite}
-                onUnfavorite={handleUnfavorite}
-              />
-              {articlesCount > 0 && (
-                <Pagination
-                  page={currentPage}
-                  pageSize={pageSize}
-                  pageSizes={PAGE_SIZE_OPTIONS}
-                  totalItems={articlesCount}
-                  onChange={handlePageChange}
-                />
-              )}
-            </TabPanel>
-            {selectedTag && (
-              <TabPanel>
-                <ArticleList
-                  articles={articles}
-                  loading={loading}
-                  onFavorite={handleFavorite}
-                  onUnfavorite={handleUnfavorite}
-                />
-                {articlesCount > 0 && (
-                  <Pagination
-                    page={currentPage}
-                    pageSize={pageSize}
-                    pageSizes={PAGE_SIZE_OPTIONS}
-                    totalItems={articlesCount}
-                    onChange={handlePageChange}
-                  />
-                )}
-              </TabPanel>
             )}
-          </TabPanels>
-        </Tabs>
-      ) : (
-        <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
-          <TabList aria-label="Article feeds">
-            <Tab>Global Feed</Tab>
-            {selectedTag && <Tab>#{selectedTag}</Tab>}
-          </TabList>
-          <TabPanels>
+          </TabPanel>
+          <TabPanel>
+            <ArticleList
+              articles={articles}
+              loading={loading}
+              onFavorite={handleFavorite}
+              onUnfavorite={handleUnfavorite}
+            />
+            {articlesCount > 0 && (
+              <Pagination
+                page={currentPage}
+                pageSize={pageSize}
+                pageSizes={PAGE_SIZE_OPTIONS}
+                totalItems={articlesCount}
+                onChange={handlePageChange}
+              />
+            )}
+          </TabPanel>
+          {selectedTag && (
             <TabPanel>
               <ArticleList
                 articles={articles}
@@ -244,28 +215,9 @@ export const HomePage: React.FC = () => {
                 />
               )}
             </TabPanel>
-            {selectedTag && (
-              <TabPanel>
-                <ArticleList
-                  articles={articles}
-                  loading={loading}
-                  onFavorite={handleFavorite}
-                  onUnfavorite={handleUnfavorite}
-                />
-                {articlesCount > 0 && (
-                  <Pagination
-                    page={currentPage}
-                    pageSize={pageSize}
-                    pageSizes={PAGE_SIZE_OPTIONS}
-                    totalItems={articlesCount}
-                    onChange={handlePageChange}
-                  />
-                )}
-              </TabPanel>
-            )}
-          </TabPanels>
-        </Tabs>
-      )}
+          )}
+        </TabPanels>
+      </Tabs>
     </PageShell>
   );
 };

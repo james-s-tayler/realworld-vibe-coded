@@ -19,6 +19,9 @@ public class HappyPath : AppPageTest
     var user = await Api.CreateUserAsync();
     var article = await Api.CreateArticleAsync(user.Token);
 
+    // Log in to access the home page (now requires authentication)
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
     await Pages.HomePage.GoToAsync();
 
     // Act
@@ -32,18 +35,19 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
-  public async Task GlobalFeed_IsSelectedByDefaultForUnauthenticatedUser()
+  public async Task YourFeed_IsSelectedByDefaultForAuthenticatedUser()
   {
     // Arrange - create user and article via API
     var user = await Api.CreateUserAsync();
     var article = await Api.CreateArticleAsync(user.Token, new[] { "default-test" });
 
-    // Act
+    // Act - Login as the user
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
     await Pages.HomePage.GoToAsync();
 
-    // Assert
-    await Pages.HomePage.VerifyGlobalFeedIsSelectedAsync();
-    await Pages.HomePage.VerifyArticleVisibleAsync(article.Title);
+    // Assert - Your Feed should be selected by default for authenticated users
+    await Pages.HomePage.VerifyYourFeedIsSelectedAsync();
   }
 
   [Fact]
@@ -53,6 +57,9 @@ public class HappyPath : AppPageTest
     var user = await Api.CreateUserAsync();
     await Api.CreateArticlesAsync(user.Token, TotalArticles);
 
+    // Log in to access the home page (now requires authentication)
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
     await Pages.HomePage.VerifyArticleCountAsync(20);
@@ -100,6 +107,9 @@ public class HappyPath : AppPageTest
     var user = await Api.CreateUserAsync();
     var article = await Api.CreateArticleAsync(user.Token, new[] { testTag });
 
+    // Log in to access the home page (now requires authentication)
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
     await Pages.HomePage.GoToAsync();
     await Pages.HomePage.ClickGlobalFeedTabAsync();
 
@@ -118,6 +128,9 @@ public class HappyPath : AppPageTest
     var user = await Api.CreateUserAsync();
     await Api.CreateArticlesAsync(user.Token, 5);
 
+    // Log in to access the home page (now requires authentication)
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
     await Pages.HomePage.GoToAsync();
 
     // Act
