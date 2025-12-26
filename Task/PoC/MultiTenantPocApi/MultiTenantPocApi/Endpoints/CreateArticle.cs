@@ -39,7 +39,7 @@ public class CreateArticle : Endpoint<CreateArticleRequest, ArticleResponse>
     public override void Configure()
     {
         Post("/api/articles");
-        AllowAnonymous(); // For POC simplicity
+        // Require authentication - user must be logged in with TenantId claim
     }
 
     public override async Task HandleAsync(CreateArticleRequest req, CancellationToken ct)

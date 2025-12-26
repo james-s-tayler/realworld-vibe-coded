@@ -4,8 +4,12 @@ using FastEndpoints.Swagger;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MultiTenantPocApi.Data;
+using MultiTenantPocApi.Models;
+using MultiTenantPocApi.Services;
 using Serilog;
 using Serilog.Events;
 
@@ -54,25 +58,59 @@ builder.Services.AddAuthorization();
 // Add HttpContextAccessor for Audit.NET
 builder.Services.AddHttpContextAccessor();
 
+// Add ASP.NET Core Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        // Configure password requirements for POC (relaxed for testing)
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 6;
+    })
+    .AddEntityFrameworkStores<PocDbContext>()
+    .AddDefaultTokenProviders();
+
+// Configure cookie authentication
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.ExpireTimeSpan = TimeSpan.FromHours(24);
+    options.SlidingExpiration = true;
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = 401;
+        return Task.CompletedTask;
+    };
+});
+
+// Add Claims Transformation to add TenantId claim
+builder.Services.AddScoped<IClaimsTransformation, TenantClaimsTransformation>();
+
 // Add Multi-Tenant support - using TenantInfo record directly (v10 pattern)
 builder.Services.AddMultiTenant<TenantInfo>()
-    // Strategy: Extract tenant ID from X-Tenant-Id header
-    .WithDelegateStrategy(context =>
+    // Strategy: Use ClaimStrategy to read TenantId from authenticated user's claims
+    // This is the production pattern - tenant comes from user's identity
+    .WithClaimStrategy("TenantId")
+    // Store: InMemoryStore with predefined tenants for POC
+    // In production, use WithEFCoreStore() for database-backed tenant configuration
+    .WithInMemoryStore(options =>
     {
-        if (context is HttpContext httpContext && 
-            httpContext.Request.Headers.TryGetValue("X-Tenant-Id", out var tenantIdValues))
+        options.Tenants.Add(new TenantInfo
         {
-            var tenantId = tenantIdValues.FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(tenantId))
-            {
-                return Task.FromResult<string?>(tenantId);
-            }
-        }
-        return Task.FromResult<string?>(null);
-    })
-    // Store: Echo Store creates TenantInfo on-the-fly from tenant identifier (perfect for POC/testing)
-    // In production, use WithEFCoreStore() or WithConfigurationStore() for real tenant validation
-    .WithEchoStore();
+            Id = "tenant-1",
+            Identifier = "tenant-1",
+            Name = "Tenant One"
+        });
+        options.Tenants.Add(new TenantInfo
+        {
+            Id = "tenant-2",
+            Identifier = "tenant-2",
+            Name = "Tenant Two"
+        });
+    });
 
 // Add DbContext with Multi-Tenant support
 builder.Services.AddDbContext<PocDbContext>((serviceProvider, options) =>
@@ -92,9 +130,13 @@ builder.Services.AddDbContext<PocDbContext>((serviceProvider, options) =>
 
 var app = builder.Build();
 
-// Use Multi-Tenant middleware (must be before routing)
+// CRITICAL: Use Multi-Tenant middleware BEFORE authentication
+// This is required for ClaimStrategy to work - tenant resolution happens first,
+// then authentication adds claims (including TenantId via IClaimsTransformation)
 app.UseMultiTenant();
 
+// Use authentication and authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Use FastEndpoints
@@ -108,11 +150,16 @@ if (app.Environment.IsDevelopment())
 
 if (builder.Environment.EnvironmentName != "Testing")
 {
-    Log.Information("POC API Started");
-    Log.Information("Use X-Tenant-Id header to specify tenant (tenant-1 or tenant-2)");
+    Log.Information("POC API Started - Multi-Tenant with ClaimStrategy + Identity");
+    Log.Information("Authentication:");
+    Log.Information("  POST /api/auth/register - Register new user with TenantId");
+    Log.Information("  POST /api/auth/login - Login to get authentication cookie");
     Log.Information("Endpoints:");
-    Log.Information("  POST /api/articles - Create article");
-    Log.Information("  GET /api/articles - List articles (tenant-scoped)");
+    Log.Information("  POST /api/articles - Create article (requires authentication)");
+    Log.Information("  GET /api/articles - List articles (tenant-scoped, requires authentication)");
+    Log.Information("Tenants:");
+    Log.Information("  tenant-1 - Tenant One");
+    Log.Information("  tenant-2 - Tenant Two");
     Log.Information("Logs:");
     Log.Information("  Serilog: Logs/poc-api-*.log");
     Log.Information("  Audit.NET: Logs/Audit.NET/*.json");
