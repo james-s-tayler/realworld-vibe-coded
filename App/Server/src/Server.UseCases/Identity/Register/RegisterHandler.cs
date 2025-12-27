@@ -41,7 +41,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, ApplicationUser>
     {
       var errorDetails = result.Errors.Select(e => new ErrorDetail(e.Description)).ToArray();
       _logger.LogWarning("User registration failed for {Email}: {Errors}", request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
-      return Result<ApplicationUser>.Error(errorDetails);
+      return Result<ApplicationUser>.Invalid(errorDetails);
     }
 
     await _signInManager.SignInAsync(user, isPersistent: false);

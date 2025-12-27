@@ -1,3 +1,11 @@
-﻿namespace Server.UseCases.Identity.Login;
+﻿using System.Security.Claims;
 
-public record LoginResult(string AccessToken, int ExpiresIn, string RefreshToken);
+namespace Server.UseCases.Identity.Login;
+
+public record LoginResult(
+  string AccessToken,
+  int ExpiresIn,
+  string RefreshToken,
+  ClaimsPrincipal? Principal,
+  bool IsPersistent,
+  bool RequiresCookieAuth);
