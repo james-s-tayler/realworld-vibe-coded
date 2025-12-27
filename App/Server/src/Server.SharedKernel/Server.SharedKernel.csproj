@@ -4,6 +4,7 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" />
     <PackageReference Include="Ardalis.Specification" />
+    <PackageReference Include="Finbuckle.MultiTenant.Abstractions" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="MediatR.Contracts" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
