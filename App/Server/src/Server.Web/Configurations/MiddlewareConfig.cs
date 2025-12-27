@@ -60,9 +60,6 @@ public static class MiddlewareConfig
     app.UseAuthorization();
     app.UseAntiforgery(); // Enable CSRF protection for cookie-based authentication
 
-    // Custom Identity endpoints are registered via FastEndpoints
-    // (Register and Login endpoints in Identity/Register and Identity/Login folders)
-
     // Map health check endpoints
     // /health/live - Liveness probe (always returns healthy if app is running)
     // /health/ready - Readiness probe (checks database connection and schema)
