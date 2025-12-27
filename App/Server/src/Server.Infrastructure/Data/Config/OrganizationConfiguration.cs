@@ -14,6 +14,8 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
       .HasMaxLength(Organization.IdentifierMaxLength)
       .IsRequired();
 
+    builder.HasAlternateKey(x => x.Identifier);
+
     builder.HasIndex(x => x.Identifier)
       .IsUnique();
   }

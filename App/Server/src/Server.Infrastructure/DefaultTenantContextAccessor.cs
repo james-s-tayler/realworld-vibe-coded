@@ -2,11 +2,9 @@
 
 namespace Server.Infrastructure;
 
-/// <summary>
-/// Phase 4: Provides a default TenantInfo for all operations.
-/// This allows ApplicationUser operations without full tenant resolution.
-/// Will be replaced with actual tenant resolution strategies in Phase 5+.
-/// </summary>
+// Phase 4: Provides a default TenantInfo for all operations.
+// This allows ApplicationUser operations without full tenant resolution.
+// Will be replaced with actual tenant resolution strategies in Phase 5+.
 public class DefaultTenantContextAccessor : IMultiTenantContextAccessor
 {
   private readonly IMultiTenantContext _context;

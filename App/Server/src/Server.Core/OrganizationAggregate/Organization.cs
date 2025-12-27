@@ -13,9 +13,10 @@ public class Organization : EntityBase, IAggregateRoot
     Identifier = Guard.Against.NullOrEmpty(identifier);
   }
 
+  // For EF Core
   private Organization()
   {
-  } // For EF Core
+  }
 
   public string Name { get; private set; } = string.Empty;
 
