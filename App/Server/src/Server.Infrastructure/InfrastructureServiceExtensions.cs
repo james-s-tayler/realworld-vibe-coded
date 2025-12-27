@@ -2,9 +2,11 @@
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
+using Server.Infrastructure.Identity;
 using Server.Infrastructure.Services;
 using Server.SharedKernel.Interfaces;
 using Server.SharedKernel.Persistence;
+using Server.UseCases.Identity;
 using Server.UseCases.Interfaces;
 
 
@@ -39,7 +41,8 @@ public static class InfrastructureServiceExtensions
            .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
            .AddScoped<IUnitOfWork, UnitOfWork>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
-           .AddScoped<IUserContext, UserContext>();
+           .AddScoped<IUserContext, UserContext>()
+           .AddScoped<ITenantAssigner, TenantAssigner>();
 
 
     logger.LogInformation("{Project} services registered", "Infrastructure");
