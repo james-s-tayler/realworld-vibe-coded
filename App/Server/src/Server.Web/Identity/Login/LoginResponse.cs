@@ -1,8 +1,5 @@
 ﻿namespace Server.Web.Identity.Login;
 
-/// <summary>
-/// Response model for bearer token login
-/// </summary>
 public class LoginResponse
 {
   public string TokenType { get; set; } = "Bearer";

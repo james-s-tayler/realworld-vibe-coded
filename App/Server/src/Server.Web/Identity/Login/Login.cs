@@ -1,19 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.BearerToken;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using Server.Core.IdentityAggregate;
+﻿using Server.Infrastructure;
+using Server.UseCases.Identity.Login;
 
 namespace Server.Web.Identity.Login;
 
-/// <summary>
-/// Login endpoint that authenticates users via cookie or bearer token
-/// </summary>
-public class Login(
-  SignInManager<ApplicationUser> signInManager,
-  IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
-  TimeProvider timeProvider) : Endpoint<LoginRequest>
+public class Login(IMediator mediator) : Endpoint<LoginRequest>
 {
+  private const string UseCookiesQueryParam = "useCookies";
+  private const string UseSessionCookiesQueryParam = "useSessionCookies";
+
   public override void Configure()
   {
     Post("/api/identity/login");
@@ -22,74 +16,27 @@ public class Login(
 
   public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
   {
-    // Check query parameters to determine authentication scheme
-    var useCookies = HttpContext.Request.Query["useCookies"].ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-    var useSessionCookies = HttpContext.Request.Query["useSessionCookies"].ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
+    var useCookies = HttpContext.Request.Query[UseCookiesQueryParam].ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
+    var useSessionCookies = HttpContext.Request.Query[UseSessionCookiesQueryParam].ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
 
-    var useCookieScheme = useCookies || useSessionCookies;
-    var isPersistent = useCookies && !useSessionCookies;
+    var command = new LoginCommand(req.Email, req.Password, useCookies, useSessionCookies);
+    var result = await mediator.Send(command, ct);
 
-    // Set authentication scheme
-    signInManager.AuthenticationScheme = useCookieScheme
-      ? IdentityConstants.ApplicationScheme
-      : IdentityConstants.BearerScheme;
-
-    var result = await signInManager.PasswordSignInAsync(
-      req.Email,
-      req.Password,
-      isPersistent,
-      lockoutOnFailure: true);
-
-    if (!result.Succeeded)
+    if (result.Status == ResultStatus.NoContent)
     {
-      ThrowError(result.ToString(), StatusCodes.Status401Unauthorized);
-      return;
+      await Send.ResultValueAsync(result, ct);
     }
-
-    // If using cookies, sign in already set the cookie, return empty response
-    if (useCookieScheme)
+    else
     {
-      HttpContext.Response.StatusCode = StatusCodes.Status200OK;
-      return;
+      await Send.ResultMapperAsync(
+        result,
+        loginResult => new LoginResponse
+        {
+          AccessToken = loginResult.AccessToken,
+          ExpiresIn = loginResult.ExpiresIn,
+          RefreshToken = loginResult.RefreshToken,
+        },
+        ct);
     }
-
-    // If using bearer tokens, generate and return access token
-    var user = await signInManager.UserManager.FindByEmailAsync(req.Email);
-    if (user == null)
-    {
-      ThrowError("User not found.", StatusCodes.Status401Unauthorized);
-      return;
-    }
-
-    var principal = await signInManager.CreateUserPrincipalAsync(user);
-    var bearerOptions = bearerTokenOptions.Get(IdentityConstants.BearerScheme);
-
-    // Generate access token
-    var accessTokenExpiration = timeProvider.GetUtcNow() + bearerOptions.BearerTokenExpiration;
-    var accessToken = bearerOptions.BearerTokenProtector.Protect(CreateBearerTicket(principal, accessTokenExpiration));
-
-    // Generate refresh token
-    var refreshTokenExpiration = timeProvider.GetUtcNow() + bearerOptions.RefreshTokenExpiration;
-    var refreshToken = bearerOptions.RefreshTokenProtector.Protect(CreateBearerTicket(principal, refreshTokenExpiration));
-
-    var response = new LoginResponse
-    {
-      AccessToken = accessToken,
-      ExpiresIn = (int)bearerOptions.BearerTokenExpiration.TotalSeconds,
-      RefreshToken = refreshToken,
-    };
-
-    // Use ASP.NET Core's Results API to send JSON
-    await Results.Json(response).ExecuteAsync(HttpContext);
-  }
-
-  private static AuthenticationTicket CreateBearerTicket(System.Security.Claims.ClaimsPrincipal principal, DateTimeOffset expiration)
-  {
-    var properties = new AuthenticationProperties
-    {
-      ExpiresUtc = expiration,
-    };
-
-    return new AuthenticationTicket(principal, properties, IdentityConstants.BearerScheme);
   }
 }
