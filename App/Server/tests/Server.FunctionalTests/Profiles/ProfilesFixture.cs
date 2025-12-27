@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Finbuckle.MultiTenant.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
 using Testcontainers.MsSql;
 
@@ -30,7 +31,8 @@ public class ProfilesFixture : ApiFixtureBase<Program>
 
     using var serviceProvider = serviceCollection.BuildServiceProvider();
     var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    using var db = new AppDbContext(dbContextOptions, null);
+    var multiTenantContextAccessor = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
+    using var db = new AppDbContext(multiTenantContextAccessor, dbContextOptions, null);
     await db.Database.MigrateAsync();
   }
 

@@ -12,6 +12,21 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
     builder.Property(p => p.Image)
         .HasMaxLength(ApplicationUser.ImageUrlMaxLength);
 
+    // TenantId is added automatically by MultiTenantIdentityDbContext as a shadow property (string type)
+    // Configure it as nullable for phase 4 - users can exist without Organizations
+    builder.Property<string>("TenantId")
+        .IsRequired(false);
+
+    // Configure relationship to Organization using TenantId -> Organization.Identifier
+    builder.HasOne(u => u.Organization)
+        .WithMany()
+        .HasForeignKey("TenantId")
+        .HasPrincipalKey(o => o.Identifier)
+        .OnDelete(DeleteBehavior.Restrict)
+        .IsRequired(false);
+
+    builder.HasIndex("TenantId");
+
     // Note: Following/Followers relationships will use the existing UserFollowing table
     // These will be configured once we integrate ApplicationUser with the existing User relationships
   }

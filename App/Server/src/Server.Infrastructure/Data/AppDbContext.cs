@@ -1,7 +1,10 @@
 ﻿using Audit.EntityFramework;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Server.Core.ArticleAggregate;
 using Server.Core.IdentityAggregate;
+using Server.Core.OrganizationAggregate;
 using Server.Core.TagAggregate;
 using Server.Core.UserAggregate;
 using Server.SharedKernel.DomainEvents;
@@ -10,13 +13,14 @@ using Server.SharedKernel.Persistence;
 namespace Server.Infrastructure.Data;
 
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false)]
-public class AppDbContext : AuditIdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
   private readonly IDomainEventDispatcher? _dispatcher;
 
   public AppDbContext(
+    IMultiTenantContextAccessor multiTenantContextAccessor,
     DbContextOptions<AppDbContext> options,
-    IDomainEventDispatcher? dispatcher) : base(options)
+    IDomainEventDispatcher? dispatcher) : base(multiTenantContextAccessor, options)
   {
     _dispatcher = dispatcher;
   }
@@ -29,9 +33,12 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser, IdentityRole
 
   public DbSet<UserFollowing> UserFollowings => Set<UserFollowing>();
 
+  public DbSet<Organization> Organizations => Set<Organization>();
+
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
   {
-    int result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    // Call base SaveChangesAsync - Audit.NET will intercept via [AuditDbContext] attribute
+    var result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
     // ignore events if no dispatcher provided
     if (_dispatcher == null)
@@ -56,7 +63,11 @@ public class AppDbContext : AuditIdentityDbContext<ApplicationUser, IdentityRole
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     base.OnModelCreating(modelBuilder);
+
     modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+    // Note: Default Organization with empty Identifier is inserted via migration SQL
+    // to work around rowversion/ChangeCheck incompatibility with EF Core seed data
 
     // Configure properties for all entities inheriting from EntityBase
     foreach (var entityType in modelBuilder.Model.GetEntityTypes())

@@ -219,7 +219,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251006155541_InitialCreate', N'10.0.0');
+    VALUES (N'20251006155541_InitialCreate', N'10.0.1');
 END;
 
 COMMIT;
@@ -240,7 +240,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251014115046_RemoveContributorsTable', N'10.0.0');
+    VALUES (N'20251014115046_RemoveContributorsTable', N'10.0.1');
 END;
 
 COMMIT;
@@ -301,7 +301,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251024025739_AddAuditColumnsToEntityBase', N'10.0.0');
+    VALUES (N'20251024025739_AddAuditColumnsToEntityBase', N'10.0.1');
 END;
 
 COMMIT;
@@ -394,7 +394,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251025102732_AddCreatedByAndUpdatedByColumns', N'10.0.0');
+    VALUES (N'20251025102732_AddCreatedByAndUpdatedByColumns', N'10.0.1');
 END;
 
 COMMIT;
@@ -586,7 +586,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251025144627_MakeCreatedByAndUpdatedByRequired', N'10.0.0');
+    VALUES (N'20251025144627_MakeCreatedByAndUpdatedByRequired', N'10.0.1');
 END;
 
 COMMIT;
@@ -935,7 +935,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251025184325_ChangeEntityIdsToGuid', N'10.0.0');
+    VALUES (N'20251025184325_ChangeEntityIdsToGuid', N'10.0.1');
 END;
 
 COMMIT;
@@ -1167,7 +1167,7 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251211185450_AddIdentityTables', N'10.0.0');
+    VALUES (N'20251211185450_AddIdentityTables', N'10.0.1');
 END;
 
 COMMIT;
@@ -1328,7 +1328,160 @@ IF NOT EXISTS (
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251214103130_MigrateToApplicationUserOnly', N'10.0.0');
+    VALUES (N'20251214103130_MigrateToApplicationUserOnly', N'10.0.1');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    DROP INDEX [UserNameIndex] ON [AspNetUsers];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    DROP INDEX [RoleNameIndex] ON [AspNetRoles];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    ALTER TABLE [AspNetUserTokens] ADD [TenantId] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    ALTER TABLE [AspNetUsers] ADD [TenantId] nvarchar(50) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    ALTER TABLE [AspNetUserRoles] ADD [TenantId] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    ALTER TABLE [AspNetUserLogins] ADD [TenantId] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    ALTER TABLE [AspNetUserClaims] ADD [TenantId] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    ALTER TABLE [AspNetRoles] ADD [TenantId] nvarchar(450) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    ALTER TABLE [AspNetRoleClaims] ADD [TenantId] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    CREATE TABLE [Organizations] (
+        [Id] uniqueidentifier NOT NULL,
+        [Name] nvarchar(200) NOT NULL,
+        [Identifier] nvarchar(50) NOT NULL,
+        [ChangeCheck] rowversion NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NOT NULL,
+        [CreatedBy] nvarchar(256) NOT NULL,
+        [UpdatedBy] nvarchar(256) NOT NULL,
+        CONSTRAINT [PK_Organizations] PRIMARY KEY ([Id]),
+        CONSTRAINT [AK_Organizations_Identifier] UNIQUE ([Identifier])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    INSERT INTO Organizations (Id, Name, Identifier, CreatedAt, UpdatedAt, CreatedBy, UpdatedBy) 
+                      VALUES ('00000000-0000-0000-0000-000000000001', 'Default', '', '2025-01-01', '2025-01-01', 'System', 'System')
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    CREATE INDEX [IX_AspNetUsers_TenantId] ON [AspNetUsers] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName], [TenantId]) WHERE [NormalizedUserName] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [RoleNameIndex] ON [AspNetRoles] ([NormalizedName], [TenantId]) WHERE [NormalizedName] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Organizations_Identifier] ON [Organizations] ([Identifier]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    ALTER TABLE [AspNetUsers] ADD CONSTRAINT [FK_AspNetUsers_Organizations_TenantId] FOREIGN KEY ([TenantId]) REFERENCES [Organizations] ([Identifier]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227061254_AddOrganizationAndNullableTenantId'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20251227061254_AddOrganizationAndNullableTenantId', N'10.0.1');
 END;
 
 COMMIT;
