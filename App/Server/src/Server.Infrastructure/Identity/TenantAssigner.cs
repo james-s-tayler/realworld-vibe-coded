@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Finbuckle.MultiTenant;
+using Microsoft.AspNetCore.Identity;
 using Server.Core.IdentityAggregate;
 using Server.Infrastructure.Data;
 using Server.UseCases.Identity;
@@ -26,9 +27,22 @@ public class TenantAssigner : ITenantAssigner
       throw new InvalidOperationException($"User with ID {userId} not found");
     }
 
-    // Set TenantId shadow property
-    var entry = _dbContext.Entry(user);
-    entry.Property("TenantId").CurrentValue = tenantIdentifier;
-    await _dbContext.SaveChangesAsync(cancellationToken);
+    // Temporarily set TenantMisMatchMode to Overwrite to allow setting TenantId
+    // during registration when the context tenant is the default tenant
+    var originalMode = _dbContext.TenantMisMatchMode;
+    _dbContext.TenantMisMatchMode = TenantMisMatchMode.Overwrite;
+
+    try
+    {
+      // Set TenantId shadow property
+      var entry = _dbContext.Entry(user);
+      entry.Property("TenantId").CurrentValue = tenantIdentifier;
+      await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+    finally
+    {
+      // Restore original mode
+      _dbContext.TenantMisMatchMode = originalMode;
+    }
   }
 }

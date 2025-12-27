@@ -64,7 +64,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     await _organizationRepository.AddAsync(organization, cancellationToken);
     await _organizationRepository.SaveChangesAsync(cancellationToken);
 
-    // Create user - we'll set TenantId after creation
+    // Create user
     var user = new ApplicationUser
     {
       UserName = request.Email,
@@ -80,7 +80,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
       return Result<Unit>.Invalid(errorDetails);
     }
 
-    // Set TenantId shadow property
+    // Set TenantId shadow property using TenantAssigner (which handles TenantMismatchMode)
     await _tenantAssigner.SetTenantIdAsync(user.Id, organizationIdentifier, cancellationToken);
     _logger.LogInformation("Set TenantId {TenantId} for user {Email}", organizationIdentifier, request.Email);
 
