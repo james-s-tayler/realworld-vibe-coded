@@ -1,4 +1,4 @@
-﻿using Finbuckle.MultiTenant;
+﻿using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Server.Core.IdentityAggregate;
 using Server.Infrastructure.Data;
@@ -10,13 +10,16 @@ public class TenantAssigner : ITenantAssigner
 {
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly AppDbContext _dbContext;
+  private readonly IMultiTenantContextAccessor _multiTenantContextAccessor;
 
   public TenantAssigner(
     UserManager<ApplicationUser> userManager,
-    AppDbContext dbContext)
+    AppDbContext dbContext,
+    IMultiTenantContextAccessor multiTenantContextAccessor)
   {
     _userManager = userManager;
     _dbContext = dbContext;
+    _multiTenantContextAccessor = multiTenantContextAccessor;
   }
 
   public async Task SetTenantIdAsync(Guid userId, string tenantIdentifier, CancellationToken cancellationToken = default)
@@ -27,10 +30,25 @@ public class TenantAssigner : ITenantAssigner
       throw new InvalidOperationException($"User with ID {userId} not found");
     }
 
-    // Temporarily set TenantMisMatchMode to Overwrite to allow setting TenantId
-    // during registration when the context tenant is the default tenant
-    var originalMode = _dbContext.TenantMisMatchMode;
-    _dbContext.TenantMisMatchMode = TenantMisMatchMode.Overwrite;
+    // Temporarily set the tenant context to the organization's identifier
+    // This allows Finbuckle to accept the TenantId assignment
+    var originalContext = _multiTenantContextAccessor.MultiTenantContext;
+    var newTenantInfo = new TenantInfo(tenantIdentifier, tenantIdentifier, "Organization");
+    var newContext = new MultiTenantContext<TenantInfo>(newTenantInfo);
+
+    // Use reflection to set the context since AsyncLocalMultiTenantContextAccessor uses AsyncLocal
+    var contextAccessorType = _multiTenantContextAccessor.GetType();
+    var asyncLocalField = contextAccessorType.GetField("_asyncLocalContext", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+    if (asyncLocalField != null)
+    {
+      var asyncLocal = asyncLocalField.GetValue(_multiTenantContextAccessor);
+      if (asyncLocal != null)
+      {
+        var asyncLocalType = asyncLocal.GetType();
+        var valueProperty = asyncLocalType.GetProperty("Value");
+        valueProperty?.SetValue(asyncLocal, newContext);
+      }
+    }
 
     try
     {
@@ -41,8 +59,17 @@ public class TenantAssigner : ITenantAssigner
     }
     finally
     {
-      // Restore original mode
-      _dbContext.TenantMisMatchMode = originalMode;
+      // Restore original context
+      if (asyncLocalField != null)
+      {
+        var asyncLocal = asyncLocalField.GetValue(_multiTenantContextAccessor);
+        if (asyncLocal != null)
+        {
+          var asyncLocalType = asyncLocal.GetType();
+          var valueProperty = asyncLocalType.GetProperty("Value");
+          valueProperty?.SetValue(asyncLocal, originalContext);
+        }
+      }
     }
   }
 }
