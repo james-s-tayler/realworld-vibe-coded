@@ -24,7 +24,7 @@ public class Validation : AppPageTest
     await Pages.LoginPage.LoginAndExpectErrorAsync(unregisteredEmail, password);
 
     // Assert
-    await Pages.LoginPage.VerifyErrorContainsTextAsync("Failed");
+    await Pages.LoginPage.VerifyErrorContainsTextAsync("Invalid email or password");
   }
 
   [Fact]
@@ -40,6 +40,6 @@ public class Validation : AppPageTest
     await Pages.LoginPage.LoginAndExpectErrorAsync(existingUser.Email, incorrectPassword);
 
     // Assert
-    await Pages.LoginPage.VerifyErrorContainsTextAsync("Failed");
+    await Pages.LoginPage.VerifyErrorContainsTextAsync("Invalid email or password");
   }
 }

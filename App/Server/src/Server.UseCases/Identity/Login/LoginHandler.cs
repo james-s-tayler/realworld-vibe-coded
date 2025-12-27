@@ -38,7 +38,7 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     if (user == null)
     {
       _logger.LogWarning("Login failed for {Email}: User not found", request.Email);
-      return Result<LoginResult>.Unauthorized(new ErrorDetail("Invalid email or password."));
+      return Result<LoginResult>.Unauthorized(new ErrorDetail("email", "Invalid email or password."));
     }
 
     if (await _userManager.IsLockedOutAsync(user))
