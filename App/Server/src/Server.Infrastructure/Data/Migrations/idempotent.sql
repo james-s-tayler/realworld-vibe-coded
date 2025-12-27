@@ -1487,3 +1487,96 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    ALTER TABLE [UserFollowing] ADD [TenantId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    ALTER TABLE [Tags] ADD [TenantId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    ALTER TABLE [Organizations] ADD [TenantId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    ALTER TABLE [Comments] ADD [TenantId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    ALTER TABLE [Articles] ADD [TenantId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    CREATE INDEX [IX_UserFollowing_TenantId] ON [UserFollowing] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    CREATE INDEX [IX_Tags_TenantId] ON [Tags] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    CREATE INDEX [IX_Organizations_TenantId] ON [Organizations] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    CREATE INDEX [IX_Comments_TenantId] ON [Comments] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    CREATE INDEX [IX_Articles_TenantId] ON [Articles] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251227084843_AddTenantIdToEntities'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20251227084843_AddTenantIdToEntities', N'10.0.1');
+END;
+
+COMMIT;
+GO
+

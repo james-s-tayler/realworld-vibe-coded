@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Finbuckle.MultiTenant.Abstractions;
 using Server.SharedKernel.DomainEvents;
 
 namespace Server.SharedKernel.Persistence;
@@ -7,9 +8,15 @@ namespace Server.SharedKernel.Persistence;
 /// A base class for DDD Entities. Includes support for domain events dispatched post-persistence.
 /// All entities use Guid as their ID type.
 /// </summary>
+[MultiTenant]
 public abstract class EntityBase : HasDomainEventsBase, IAuditableEntity
 {
   public Guid Id { get; set; }
+
+  /// <summary>
+  /// Tenant identifier for multi-tenant data isolation
+  /// </summary>
+  public Guid? TenantId { get; set; }
 
   /// <summary>
   /// Row version for optimistic concurrency control
