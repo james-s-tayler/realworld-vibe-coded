@@ -1,6 +1,5 @@
 ﻿using Ardalis.ListStartupServices;
 using Microsoft.EntityFrameworkCore;
-using Server.Core.IdentityAggregate;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
 
@@ -61,7 +60,8 @@ public static class MiddlewareConfig
     app.UseAuthorization();
     app.UseAntiforgery(); // Enable CSRF protection for cookie-based authentication
 
-    app.MapGroup("/api/identity").MapIdentityApi<ApplicationUser>().AllowAnonymous();
+    // Custom Identity endpoints are registered via FastEndpoints
+    // (Register and Login endpoints in Identity/Register and Identity/Login folders)
 
     // Map health check endpoints
     // /health/live - Liveness probe (always returns healthy if app is running)
