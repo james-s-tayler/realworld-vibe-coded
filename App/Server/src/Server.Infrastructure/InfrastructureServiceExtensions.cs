@@ -24,10 +24,10 @@ public static class InfrastructureServiceExtensions
     services.AddSingleton<ITimeProvider, UtcNowTimeProvider>();
     services.AddSingleton<AuditableEntityInterceptor>();
 
-    // Register a temporary null IMultiTenantContextAccessor for phase 4
-    // This will be replaced with actual tenant resolution in later phases
-    services.AddSingleton<IMultiTenantContextAccessor>(sp =>
-      new AsyncLocalMultiTenantContextAccessor<TenantInfo>());
+    // Register a Phase 4 IMultiTenantContextAccessor that provides default TenantInfo
+    // This allows ApplicationUser operations without full tenant resolution
+    // Will be replaced with actual tenant resolution strategies in Phase 5+
+    services.AddSingleton<IMultiTenantContextAccessor, DefaultTenantContextAccessor>();
 
     services.AddDbContext<AppDbContext>((serviceProvider, options) =>
     {
