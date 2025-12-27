@@ -1,6 +1,5 @@
 ﻿using Audit.EntityFramework;
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Server.Core.ArticleAggregate;
@@ -65,16 +64,10 @@ public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
   {
     base.OnModelCreating(modelBuilder);
 
-    // For phase 4: Only ApplicationUser should be multi-tenant, disable for other Identity entities
-    // This allows users to be created without Organizations
-    modelBuilder.Entity<IdentityRole<Guid>>().IsNotMultiTenant();
-    modelBuilder.Entity<IdentityUserRole<Guid>>().IsNotMultiTenant();
-    modelBuilder.Entity<IdentityUserClaim<Guid>>().IsNotMultiTenant();
-    modelBuilder.Entity<IdentityUserLogin<Guid>>().IsNotMultiTenant();
-    modelBuilder.Entity<IdentityRoleClaim<Guid>>().IsNotMultiTenant();
-    modelBuilder.Entity<IdentityUserToken<Guid>>().IsNotMultiTenant();
-
     modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+    // Note: Default Organization with empty Identifier is inserted via migration SQL
+    // to work around rowversion/ChangeCheck incompatibility with EF Core seed data
 
     // Configure properties for all entities inheriting from EntityBase
     foreach (var entityType in modelBuilder.Model.GetEntityTypes())
