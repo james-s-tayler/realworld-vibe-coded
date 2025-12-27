@@ -85,7 +85,7 @@ public partial class Build
           DotNetToolInstall(s => s
                 .SetPackageName("dotnet-ef")
                 .SetGlobal(true)
-                .SetVersion("9.*"));
+                .SetVersion("10.*"));
         }
       });
 }

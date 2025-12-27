@@ -1,6 +1,5 @@
 ﻿using Ardalis.ListStartupServices;
 using Microsoft.EntityFrameworkCore;
-using Server.Core.IdentityAggregate;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
 
@@ -60,8 +59,6 @@ public static class MiddlewareConfig
     app.UseAuthentication();
     app.UseAuthorization();
     app.UseAntiforgery(); // Enable CSRF protection for cookie-based authentication
-
-    app.MapGroup("/api/identity").MapIdentityApi<ApplicationUser>().AllowAnonymous();
 
     // Map health check endpoints
     // /health/live - Liveness probe (always returns healthy if app is running)
