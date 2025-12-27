@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Server.Core.ArticleAggregate;
 using Server.Core.IdentityAggregate;
 using Server.Core.TagAggregate;
-using Server.Infrastructure;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
 using Server.SharedKernel.Interfaces;
@@ -43,7 +42,8 @@ public class AuditableEntityInterceptorTests : IDisposable
 
     // Create the context manually with null dispatcher
     var dbContextOptions = _serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    var multiTenantContextAccessor = new DefaultTenantContextAccessor();
+    var multiTenantContextAccessor = new TestMultiTenantContextAccessor();
+
 
     _dbContext = new AppDbContext(multiTenantContextAccessor, dbContextOptions, null);
   }
