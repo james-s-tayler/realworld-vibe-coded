@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Server.Core.IdentityAggregate;
 using Server.Infrastructure;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Email;
+using Server.Infrastructure.Identity;
 using Server.UseCases.Interfaces;
 using Server.Web.Infrastructure;
 
@@ -111,6 +113,10 @@ public static class ServiceConfigs
     services.AddAuthorization();
     services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationMiddlewareResultHandler,
       Server.Web.Authorization.SuppressBearerChallengeAuthorizationMiddlewareResultHandler>();
+
+    // Register Claims Transformation to add TenantId claim
+    services.AddScoped<IClaimsTransformation, TenantClaimsTransformation>();
+
     services.AddMemoryCache();
     services.AddHttpContextAccessor();
 
