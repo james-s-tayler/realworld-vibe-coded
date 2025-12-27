@@ -79,7 +79,8 @@ public class Login(
       RefreshToken = refreshToken,
     };
 
-    await HttpContext.Response.WriteAsJsonAsync(response, ct);
+    // Use ASP.NET Core's Results API to send JSON
+    await Results.Json(response).ExecuteAsync(HttpContext);
   }
 
   private static AuthenticationTicket CreateBearerTicket(System.Security.Claims.ClaimsPrincipal principal, DateTimeOffset expiration)
