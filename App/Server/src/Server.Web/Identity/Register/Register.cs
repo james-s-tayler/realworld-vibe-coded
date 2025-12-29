@@ -1,7 +1,10 @@
 ﻿using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Identity;
+using Server.Core.IdentityAggregate;
 using Server.Infrastructure;
+using Server.Infrastructure.Data;
 using Server.UseCases.Identity.Register;
 
 namespace Server.Web.Identity.Register;
@@ -16,10 +19,8 @@ public class Register(IMultiTenantStore<TenantInfo> tenantStore) : Endpoint<Regi
 
   public override async Task HandleAsync(RegisterRequest req, CancellationToken ct)
   {
-    // Create tenant BEFORE calling MediatR so scoped services see the tenant context
     var tenantId = Guid.NewGuid().ToString();
-    var tenantIdentifier = tenantId;
-    var tenant = new TenantInfo(tenantId, tenantIdentifier, req.Email);
+    var tenant = new TenantInfo(tenantId, tenantId, req.Email);
 
     var added = await tenantStore.AddAsync(tenant);
     if (!added)
@@ -34,15 +35,45 @@ public class Register(IMultiTenantStore<TenantInfo> tenantStore) : Endpoint<Regi
       return;
     }
 
-    // Set tenant context using Finbuckle's HttpContext extension
-    // This must happen BEFORE resolving any tenant-scoped services
     HttpContext.SetTenantInfo(tenant, resetServiceProviderScope: true);
 
-    // Resolve MediatR from the NEW service scope that has the tenant context
     var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
+    var userManager = HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = HttpContext.RequestServices.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var dbContext = HttpContext.RequestServices.GetRequiredService<AppDbContext>();
 
-    var command = new RegisterCommand(req.Email, req.Password, tenantId);
+    const string ownerRoleName = "Owner";
+    if (!await roleManager.RoleExistsAsync(ownerRoleName))
+    {
+      var roleResult = await roleManager.CreateAsync(new IdentityRole<Guid>(ownerRoleName));
+      if (!roleResult.Succeeded)
+      {
+        await HttpContext.Response.SendErrorsAsync(
+          new List<ValidationFailure>
+          {
+            new ValidationFailure("role", "Failed to create Owner role"),
+          },
+          statusCode: 500,
+          cancellation: ct);
+        return;
+      }
+    }
+
+    var command = new RegisterCommand(req.Email, req.Password);
     var result = await mediator.Send(command, ct);
+
+    if (result.IsSuccess)
+    {
+      var user = await userManager.FindByEmailAsync(req.Email);
+      if (user != null)
+      {
+        var entry = dbContext.Entry(user);
+        entry.Property("TenantId").CurrentValue = tenantId;
+        await dbContext.SaveChangesAsync(ct);
+
+        await userManager.AddToRoleAsync(user, ownerRoleName);
+      }
+    }
 
     await Send.ResultValueAsync(result, ct);
   }

@@ -55,24 +55,19 @@ public static class MiddlewareConfig
       }
     });
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
-    app.UseHttpsRedirection(); // Note this will drop Authorization headers
+    app.UseHttpsRedirection();
     app.UseAuthentication();
-
-    // Finbuckle MultiTenant middleware is automatically added via AddMultiTenant() configuration
     app.UseAuthorization();
     app.UseAntiforgery(); // Enable CSRF protection for cookie-based authentication
 
-    // Map health check endpoints
-    // /health/live - Liveness probe (always returns healthy if app is running)
-    // /health/ready - Readiness probe (checks database connection and schema)
     app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
     {
-      Predicate = _ => false, // No checks, just confirm app is alive
+      Predicate = _ => false,
     });
 
     app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
     {
-      Predicate = check => check.Tags.Contains("ready"), // Only run readiness checks (database)
+      Predicate = check => check.Tags.Contains("ready"),
     });
 
     await SeedDatabase(app);
@@ -87,11 +82,9 @@ public static class MiddlewareConfig
 
     try
     {
-      // Apply migrations for TenantStoreDbContext first (Finbuckle's tenant storage)
       var tenantStoreContext = services.GetRequiredService<TenantStoreDbContext>();
       await tenantStoreContext.Database.MigrateAsync();
 
-      // Then apply migrations for AppDbContext (main application database)
       var context = services.GetRequiredService<AppDbContext>();
       await context.Database.MigrateAsync();
       await SeedData.InitializeAsync(context);
