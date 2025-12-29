@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Server.Infrastructure.Data.Migrations.TenantStore;
+namespace Server.Infrastructure.Data.Migrations.TenantStoreDbContext;
 
 /// <inheritdoc />
 public partial class InitialTenantStore : Migration

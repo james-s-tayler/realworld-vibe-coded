@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Server.Infrastructure.Data.Migrations;
+namespace Server.Infrastructure.Data.Migrations.AppDbContext;
 
 /// <inheritdoc />
 public partial class AddCreatedByAndUpdatedByColumns : Migration

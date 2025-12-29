@@ -11,9 +11,9 @@ using Server.Infrastructure.Data;
 
 namespace Server.Infrastructure.Data.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
-    [Migration("20251014115046_RemoveContributorsTable")]
-    partial class RemoveContributorsTable
+    [DbContext(typeof(Server.Infrastructure.Data.AppDbContext))]
+    [Migration("20251025184325_ChangeEntityIdsToGuid")]
+    partial class ChangeEntityIdsToGuid
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,11 @@ namespace Server.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("ArticleTag", b =>
                 {
-                    b.Property<int>("ArticlesId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ArticlesId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TagsId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ArticlesId", "TagsId");
 
@@ -42,11 +42,11 @@ namespace Server.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("ArticleUser", b =>
                 {
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ArticleId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("FavoritedById")
-                        .HasColumnType("int");
+                    b.Property<Guid>("FavoritedById")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ArticleId", "FavoritedById");
 
@@ -57,21 +57,30 @@ namespace Server.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Server.Core.ArticleAggregate.Article", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("ChangeCheck")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -91,6 +100,11 @@ namespace Server.Infrastructure.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
@@ -103,27 +117,41 @@ namespace Server.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Server.Core.ArticleAggregate.Comment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("ArticleId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("ChangeCheck")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
@@ -136,16 +164,36 @@ namespace Server.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Server.Core.ArticleAggregate.Tag", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<byte[]>("ChangeCheck")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
@@ -157,16 +205,28 @@ namespace Server.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Server.Core.UserAggregate.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Bio")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<byte[]>("ChangeCheck")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -181,6 +241,14 @@ namespace Server.Infrastructure.Data.Migrations
                     b.Property<string>("Image")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -202,14 +270,33 @@ namespace Server.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Server.Core.UserAggregate.UserFollowing", b =>
                 {
-                    b.Property<int>("FollowerId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("FollowerId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("FollowedId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("FollowedId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                    b.Property<byte[]>("ChangeCheck")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("FollowerId", "FollowedId");
 

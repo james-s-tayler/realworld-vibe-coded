@@ -2,20 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Infrastructure.Data;
 
 #nullable disable
 
-namespace Server.Infrastructure.Data.Migrations.TenantStore
+namespace Server.Infrastructure.Data.Migrations.TenantStoreDbContext
 {
-    [DbContext(typeof(TenantStoreDbContext))]
-    [Migration("20251229033713_InitialTenantStore")]
-    partial class InitialTenantStore
+    [DbContext(typeof(Server.Infrastructure.Data.TenantStoreDbContext))]
+    partial class TenantStoreDbContextModelSnapshot : global::Microsoft.EntityFrameworkCore.Infrastructure.ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

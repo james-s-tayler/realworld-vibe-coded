@@ -134,25 +134,38 @@ public partial class Build
     .DependsOn(BuildServer)
     .Executes(() =>
     {
-      Log.Information("Generating idempotent SQL script from migrations...");
+      Log.Information("Generating idempotent SQL scripts from migrations...");
 
-      // Generate the idempotent script using dotnet ef
-      var args = $"ef migrations script --idempotent --project {ServerInfrastructureProject} --startup-project {ServerProject} --output {IdempotentScriptPath}";
+      // Generate idempotent script for AppDbContext
+      var appDbContextArgs = $"ef migrations script --idempotent --project {ServerInfrastructureProject} --startup-project {ServerProject} --context AppDbContext --output {IdempotentScriptPath}";
 
       try
       {
         ProcessTasks.StartProcess(
           "dotnet",
-          args,
+          appDbContextArgs,
           workingDirectory: RootDirectory,
           logOutput: true)
           .AssertZeroExitCode();
 
-        Log.Information("✓ Idempotent SQL script generated successfully at {ScriptPath}", IdempotentScriptPath);
+        Log.Information("✓ AppDbContext idempotent SQL script generated successfully at {ScriptPath}", IdempotentScriptPath);
+
+        // Generate idempotent script for TenantStoreDbContext
+        var tenantStoreScriptPath = RootDirectory / "App" / "Server" / "src" / "Server.Infrastructure" / "Data" / "Migrations" / "TenantStoreDbContext" / "idempotent.sql";
+        var tenantStoreArgs = $"ef migrations script --idempotent --project {ServerInfrastructureProject} --startup-project {ServerProject} --context TenantStoreDbContext --output {tenantStoreScriptPath}";
+
+        ProcessTasks.StartProcess(
+          "dotnet",
+          tenantStoreArgs,
+          workingDirectory: RootDirectory,
+          logOutput: true)
+          .AssertZeroExitCode();
+
+        Log.Information("✓ TenantStoreDbContext idempotent SQL script generated successfully at {ScriptPath}", tenantStoreScriptPath);
       }
       catch (Exception ex)
       {
-        Log.Error("Failed to generate idempotent SQL script: {Message}", ex.Message);
+        Log.Error("Failed to generate idempotent SQL scripts: {Message}", ex.Message);
         throw;
       }
     });
@@ -163,55 +176,91 @@ public partial class Build
     .DependsOn(BuildServer)
     .Executes(() =>
     {
-      Log.Information("Verifying idempotent SQL script is up to date...");
+      Log.Information("Verifying idempotent SQL scripts are up to date...");
 
-      // Check if the committed script exists
+      // Verify AppDbContext script
       if (!IdempotentScriptPath.FileExists())
       {
-        Log.Error("Idempotent SQL script not found at {ScriptPath}", IdempotentScriptPath);
+        Log.Error("AppDbContext idempotent SQL script not found at {ScriptPath}", IdempotentScriptPath);
         Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript' to generate the script and commit it to source control.");
-        throw new Exception("Idempotent SQL script not found in source control");
+        throw new Exception("AppDbContext idempotent SQL script not found in source control");
       }
 
-      // Read the committed script
-      var committedScript = IdempotentScriptPath.ReadAllText();
-
-      // Generate a new script to compare
-      var tempScriptPath = RootDirectory / "temp-idempotent.sql";
-      var args = $"ef migrations script --idempotent --project {ServerInfrastructureProject} --startup-project {ServerProject} --output {tempScriptPath}";
+      var committedAppScript = IdempotentScriptPath.ReadAllText();
+      var tempAppScriptPath = RootDirectory / "temp-idempotent-app.sql";
+      var appArgs = $"ef migrations script --idempotent --project {ServerInfrastructureProject} --startup-project {ServerProject} --context AppDbContext --output {tempAppScriptPath}";
 
       try
       {
         ProcessTasks.StartProcess(
           "dotnet",
-          args,
+          appArgs,
           workingDirectory: RootDirectory,
           logOutput: false,
           logInvocation: false)
           .AssertZeroExitCode();
 
-        var generatedScript = tempScriptPath.ReadAllText();
+        var generatedAppScript = tempAppScriptPath.ReadAllText();
+        tempAppScriptPath.DeleteFile();
 
-        // Clean up temp file
-        tempScriptPath.DeleteFile();
-
-        // Compare the scripts
-        if (committedScript != generatedScript)
+        if (committedAppScript != generatedAppScript)
         {
-          Log.Error("Idempotent SQL script is out of sync with current migrations!");
+          Log.Error("AppDbContext idempotent SQL script is out of sync with current migrations!");
           Log.Error("The committed script at {ScriptPath} does not match the script generated from current migrations.", IdempotentScriptPath);
           Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript' to regenerate the script and commit the changes to source control.");
-          throw new Exception("Idempotent SQL script is out of sync with migrations");
+          throw new Exception("AppDbContext idempotent SQL script is out of sync with migrations");
         }
 
-        Log.Information("✓ Idempotent SQL script is up to date with current migrations");
+        Log.Information("✓ AppDbContext idempotent SQL script is up to date with current migrations");
+
+        // Verify TenantStoreDbContext script
+        var tenantStoreScriptPath = RootDirectory / "App" / "Server" / "src" / "Server.Infrastructure" / "Data" / "Migrations" / "TenantStoreDbContext" / "idempotent.sql";
+
+        if (!tenantStoreScriptPath.FileExists())
+        {
+          Log.Error("TenantStoreDbContext idempotent SQL script not found at {ScriptPath}", tenantStoreScriptPath);
+          Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript' to generate the script and commit it to source control.");
+          throw new Exception("TenantStoreDbContext idempotent SQL script not found in source control");
+        }
+
+        var committedTenantScript = tenantStoreScriptPath.ReadAllText();
+        var tempTenantScriptPath = RootDirectory / "temp-idempotent-tenant.sql";
+        var tenantArgs = $"ef migrations script --idempotent --project {ServerInfrastructureProject} --startup-project {ServerProject} --context TenantStoreDbContext --output {tempTenantScriptPath}";
+
+        ProcessTasks.StartProcess(
+          "dotnet",
+          tenantArgs,
+          workingDirectory: RootDirectory,
+          logOutput: false,
+          logInvocation: false)
+          .AssertZeroExitCode();
+
+        var generatedTenantScript = tempTenantScriptPath.ReadAllText();
+        tempTenantScriptPath.DeleteFile();
+
+        if (committedTenantScript != generatedTenantScript)
+        {
+          Log.Error("TenantStoreDbContext idempotent SQL script is out of sync with current migrations!");
+          Log.Error("The committed script at {ScriptPath} does not match the script generated from current migrations.", tenantStoreScriptPath);
+          Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript' to regenerate the script and commit the changes to source control.");
+          throw new Exception("TenantStoreDbContext idempotent SQL script is out of sync with migrations");
+        }
+
+        Log.Information("✓ TenantStoreDbContext idempotent SQL script is up to date with current migrations");
+        Log.Information("✓ All idempotent SQL scripts are up to date with current migrations");
       }
       catch (Exception ex)
       {
-        // Clean up temp file if it exists
-        if (tempScriptPath.FileExists())
+        // Clean up temp files if they exist
+        if (tempAppScriptPath.FileExists())
         {
-          tempScriptPath.DeleteFile();
+          tempAppScriptPath.DeleteFile();
+        }
+
+        var tempTenantScriptPath = RootDirectory / "temp-idempotent-tenant.sql";
+        if (tempTenantScriptPath.FileExists())
+        {
+          tempTenantScriptPath.DeleteFile();
         }
 
         if (ex.Message.Contains("out of sync"))
@@ -219,7 +268,7 @@ public partial class Build
           throw;
         }
 
-        Log.Error("Failed to verify idempotent SQL script: {Message}", ex.Message);
+        Log.Error("Failed to verify idempotent SQL scripts: {Message}", ex.Message);
         throw;
       }
     });

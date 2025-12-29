@@ -8,10 +8,10 @@ using Server.Infrastructure.Data;
 
 #nullable disable
 
-namespace Server.Infrastructure.Data.Migrations
+namespace Server.Infrastructure.Data.Migrations.AppDbContext
 {
-    [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(Server.Infrastructure.Data.AppDbContext))]
+    partial class AppDbContextModelSnapshot : global::Microsoft.EntityFrameworkCore.Infrastructure.ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -393,6 +393,7 @@ namespace Server.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TenantId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("TwoFactorEnabled")

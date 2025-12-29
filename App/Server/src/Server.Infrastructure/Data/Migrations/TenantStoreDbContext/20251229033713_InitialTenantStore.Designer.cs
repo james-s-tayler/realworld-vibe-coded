@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Infrastructure.Data;
 
@@ -9,10 +10,12 @@ using Server.Infrastructure.Data;
 
 namespace Server.Infrastructure.Data.Migrations.TenantStore
 {
-    [DbContext(typeof(TenantStoreDbContext))]
-    partial class TenantStoreDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(Server.Infrastructure.Data.TenantStoreDbContext))]
+    [Migration("20251229033713_InitialTenantStore")]
+    partial class InitialTenantStore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

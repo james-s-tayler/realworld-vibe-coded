@@ -11,9 +11,9 @@ using Server.Infrastructure.Data;
 
 namespace Server.Infrastructure.Data.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
-    [Migration("20251229080618_RemoveTenantInfoFromAppDbContext")]
-    partial class RemoveTenantInfoFromAppDbContext
+    [DbContext(typeof(Server.Infrastructure.Data.AppDbContext))]
+    [Migration("20251227084843_AddTenantIdToEntities")]
+    partial class AddTenantIdToEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -396,7 +396,7 @@ namespace Server.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TenantId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -420,6 +420,57 @@ namespace Server.Infrastructure.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("Server.Core.OrganizationAggregate.Organization", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("ChangeCheck")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Identifier")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Identifier")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("Organizations");
                 });
 
             modelBuilder.Entity("Server.Core.TagAggregate.Tag", b =>
@@ -619,6 +670,17 @@ namespace Server.Infrastructure.Data.Migrations
                     b.Navigation("Article");
 
                     b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("Server.Core.IdentityAggregate.ApplicationUser", b =>
+                {
+                    b.HasOne("Server.Core.OrganizationAggregate.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .HasPrincipalKey("Identifier")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Organization");
                 });
 
             modelBuilder.Entity("Server.Core.UserAggregate.UserFollowing", b =>

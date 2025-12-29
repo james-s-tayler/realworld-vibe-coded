@@ -11,7 +11,7 @@ using Server.Infrastructure.Data;
 
 namespace Server.Infrastructure.Data.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(Server.Infrastructure.Data.AppDbContext))]
     [Migration("20251006155541_InitialCreate")]
     partial class InitialCreate
     {
