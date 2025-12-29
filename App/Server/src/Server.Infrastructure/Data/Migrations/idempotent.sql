@@ -1580,3 +1580,63 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251229020012_ReplaceOrganizationsWithTenantInfo'
+)
+BEGIN
+    ALTER TABLE [AspNetUsers] DROP CONSTRAINT [FK_AspNetUsers_Organizations_TenantId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251229020012_ReplaceOrganizationsWithTenantInfo'
+)
+BEGIN
+    DROP TABLE [Organizations];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251229020012_ReplaceOrganizationsWithTenantInfo'
+)
+BEGIN
+    DROP INDEX [IX_AspNetUsers_TenantId] ON [AspNetUsers];
+    DROP INDEX [UserNameIndex] ON [AspNetUsers];
+    DECLARE @var12 nvarchar(max);
+    SELECT @var12 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[AspNetUsers]') AND [c].[name] = N'TenantId');
+    IF @var12 IS NOT NULL EXEC(N'ALTER TABLE [AspNetUsers] DROP CONSTRAINT ' + @var12 + ';');
+    ALTER TABLE [AspNetUsers] ALTER COLUMN [TenantId] nvarchar(450) NULL;
+    CREATE INDEX [IX_AspNetUsers_TenantId] ON [AspNetUsers] ([TenantId]);
+    EXEC(N'CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName], [TenantId]) WHERE [NormalizedUserName] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251229020012_ReplaceOrganizationsWithTenantInfo'
+)
+BEGIN
+    CREATE TABLE [TenantInfo] (
+        [Id] nvarchar(450) NOT NULL,
+        [Identifier] nvarchar(max) NOT NULL,
+        [Name] nvarchar(max) NULL,
+        CONSTRAINT [PK_TenantInfo] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251229020012_ReplaceOrganizationsWithTenantInfo'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20251229020012_ReplaceOrganizationsWithTenantInfo', N'10.0.1');
+END;
+
+COMMIT;
+GO
+
