@@ -8,10 +8,10 @@ using Server.Infrastructure.Data;
 
 #nullable disable
 
-namespace Server.Infrastructure.Data.Migrations.TenantStore
+namespace Server.Infrastructure.Data.Migrations
 {
-    [DbContext(typeof(Server.Infrastructure.Data.TenantStoreDbContext))]
-    [Migration("20251229033713_InitialTenantStore")]
+    [DbContext(typeof(TenantStoreDbContext))]
+    [Migration("20251229125736_InitialTenantStore")]
     partial class InitialTenantStore
     {
         /// <inheritdoc />

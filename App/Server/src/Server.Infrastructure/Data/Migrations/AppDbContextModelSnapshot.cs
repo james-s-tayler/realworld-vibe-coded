@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Server.Infrastructure.Data;
+using Data = Server.Infrastructure.Data;
 
 #nullable disable
 
-namespace Server.Infrastructure.Data.Migrations.AppDbContext
+namespace Server.Infrastructure.Data.Migrations
 {
-    [DbContext(typeof(Server.Infrastructure.Data.AppDbContext))]
-    partial class AppDbContextModelSnapshot : global::Microsoft.EntityFrameworkCore.Infrastructure.ModelSnapshot
+    [DbContext(typeof(Data.AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

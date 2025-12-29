@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Server.Infrastructure.Data.Migrations.AppDbContext;
+namespace Server.Infrastructure.Data.Migrations;
 
 /// <inheritdoc />
 public partial class MakeCreatedByAndUpdatedByRequired : Migration

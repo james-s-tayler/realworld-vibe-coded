@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Server.Infrastructure.Data;
+using Data = Server.Infrastructure.Data;
 
 #nullable disable
 
-namespace Server.Infrastructure.Data.Migrations.AppDbContext
+namespace Server.Infrastructure.Data.Migrations
 {
-    [DbContext(typeof(Server.Infrastructure.Data.AppDbContext))]
-    [Migration("20251229123522_RemoveOrganizationsTable")]
+    [DbContext(typeof(Data.AppDbContext))]
+    [Migration("20251229125939_RemoveOrganizationsTable")]
     partial class RemoveOrganizationsTable
     {
         /// <inheritdoc />

@@ -7,10 +7,10 @@ using Server.Infrastructure.Data;
 
 #nullable disable
 
-namespace Server.Infrastructure.Data.Migrations.TenantStoreDbContext
+namespace Server.Infrastructure.Data.Migrations
 {
-    [DbContext(typeof(Server.Infrastructure.Data.TenantStoreDbContext))]
-    partial class TenantStoreDbContextModelSnapshot : global::Microsoft.EntityFrameworkCore.Infrastructure.ModelSnapshot
+    [DbContext(typeof(TenantStoreDbContext))]
+    partial class TenantStoreDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
