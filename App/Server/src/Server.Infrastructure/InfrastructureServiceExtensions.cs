@@ -1,4 +1,7 @@
 ﻿using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
+using Finbuckle.MultiTenant.Extensions;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
@@ -26,11 +29,15 @@ public static class InfrastructureServiceExtensions
     services.AddSingleton<ITimeProvider, UtcNowTimeProvider>();
     services.AddSingleton<AuditableEntityInterceptor>();
 
-    // Configure Finbuckle MultiTenant with Claim strategy
-    // This will automatically register IMultiTenantContextAccessor and IMultiTenantContextSetter
+    // Configure Finbuckle MultiTenant with Claim strategy and EFCore store
+    // This will automatically register IMultiTenantContextAccessor, IMultiTenantContextSetter, and IMultiTenantStore
+    // The TenantStoreDbContext uses the same connection string as the main database
+    services.AddDbContext<TenantStoreDbContext>(options =>
+      options.UseSqlServer(connectionString));
+
     services.AddMultiTenant<TenantInfo>()
       .WithClaimStrategy("TenantId")
-      .WithEFCoreStore<AppDbContext, TenantInfo>();
+      .WithEFCoreStore<TenantStoreDbContext, TenantInfo>();
 
     services.AddDbContext<AppDbContext>((serviceProvider, options) =>
     {

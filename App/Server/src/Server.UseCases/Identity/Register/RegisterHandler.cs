@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Finbuckle.MultiTenant.Abstractions;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
@@ -12,20 +13,23 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 {
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-  private readonly ITenantStore _tenantStore;
+  private readonly IMultiTenantStore<TenantInfo> _tenantStore;
+  private readonly IMultiTenantContextSetter _contextSetter;
   private readonly ITenantAssigner _tenantAssigner;
   private readonly ILogger<RegisterHandler> _logger;
 
   public RegisterHandler(
     UserManager<ApplicationUser> userManager,
     RoleManager<IdentityRole<Guid>> roleManager,
-    ITenantStore tenantStore,
+    IMultiTenantStore<TenantInfo> tenantStore,
+    IMultiTenantContextSetter contextSetter,
     ITenantAssigner tenantAssigner,
     ILogger<RegisterHandler> logger)
   {
     _userManager = userManager;
     _roleManager = roleManager;
     _tenantStore = tenantStore;
+    _contextSetter = contextSetter;
     _tenantAssigner = tenantAssigner;
     _logger = logger;
   }
@@ -43,12 +47,28 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 
     // Create TenantInfo for the new user's organization
     var tenantId = Guid.NewGuid().ToString();
+    var tenantIdentifier = tenantId; // Using tenant ID as the identifier for simplicity
 
     _logger.LogInformation("Creating tenant with ID {TenantId}", tenantId);
-    await _tenantStore.CreateTenantAsync(tenantId, "New Company", cancellationToken);
+    var tenant = new TenantInfo
+    {
+      Id = tenantId,
+      Identifier = tenantIdentifier,
+      Name = "New Company",
+    };
 
-    // Set tenant context temporarily so we can work with roles
-    await _tenantAssigner.SetTenantContextAsync(tenantId, cancellationToken);
+    var added = await _tenantStore.AddAsync(tenant);
+    if (!added)
+    {
+      _logger.LogError("Failed to add tenant to store");
+      return Result<Unit>.Error(new ErrorDetail("tenant", "Failed to create tenant"));
+    }
+
+    // Set tenant context using Finbuckle's standard IMultiTenantContextSetter
+    _contextSetter.MultiTenantContext = new MultiTenantContext<TenantInfo>
+    {
+      TenantInfo = tenant,
+    };
 
     // Ensure Owner role exists (now that tenant context is set)
     const string ownerRoleName = "Owner";

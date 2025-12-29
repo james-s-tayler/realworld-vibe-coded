@@ -32,10 +32,6 @@ public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
 
   public DbSet<UserFollowing> UserFollowings => Set<UserFollowing>();
 
-  // Use 'new' keyword to hide inherited TenantInfo property from MultiTenantIdentityDbContext
-  // This allows us to explicitly expose the TenantInfo table
-  public new DbSet<TenantInfo> TenantInfo => Set<TenantInfo>();
-
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
   {
     // Call base SaveChangesAsync - Audit.NET will intercept via [AuditDbContext] attribute
