@@ -95,6 +95,11 @@ public class UpdateUser(IMediator mediator, IUserContext userContext, UserManage
         request.User.Image),
       cancellationToken);
 
+    if (result.IsSuccess)
+    {
+      await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     await Send.ResultMapperAsync(
       result,
       user => new UpdateUserResponse
