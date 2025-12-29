@@ -33,7 +33,9 @@ public static class InfrastructureServiceExtensions
     // This will automatically register IMultiTenantContextAccessor, IMultiTenantContextSetter, and IMultiTenantStore
     // The TenantStoreDbContext uses the same connection string as the main database
     services.AddDbContext<TenantStoreDbContext>(options =>
-      options.UseSqlServer(connectionString));
+      options.UseSqlServer(connectionString, b =>
+        b.MigrationsAssembly("Server.Infrastructure")
+         .MigrationsHistoryTable("__EFMigrationsHistory_TenantStore")));
 
     services.AddMultiTenant<TenantInfo>()
       .WithClaimStrategy("TenantId")
