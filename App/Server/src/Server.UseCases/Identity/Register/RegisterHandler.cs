@@ -51,12 +51,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     var tenantIdentifier = tenantId; // Using tenant ID as the identifier for simplicity
 
     _logger.LogInformation("Creating tenant with ID {TenantId}", tenantId);
-    var tenant = new TenantInfo
-    {
-      Id = tenantId,
-      Identifier = tenantIdentifier,
-      Name = request.Email, // Use email as initial tenant name
-    };
+    var tenant = new TenantInfo(tenantId, tenantIdentifier, request.Email); // Use email as initial tenant name
 
     var added = await _tenantStore.TryAddAsync(tenant);
     if (!added)
