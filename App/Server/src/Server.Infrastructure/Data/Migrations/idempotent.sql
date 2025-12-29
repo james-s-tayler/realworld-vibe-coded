@@ -1583,20 +1583,23 @@ GO
 BEGIN TRANSACTION;
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251229020012_ReplaceOrganizationsWithTenantInfo'
+    WHERE [MigrationId] = N'20251229125939_RemoveOrganizationsTable'
 )
 BEGIN
-
-                IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_AspNetUsers_Organizations_TenantId')
-                BEGIN
-                    ALTER TABLE [AspNetUsers] DROP CONSTRAINT [FK_AspNetUsers_Organizations_TenantId];
-                END
-            
+    ALTER TABLE [AspNetUsers] DROP CONSTRAINT [FK_AspNetUsers_Organizations_TenantId];
 END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251229020012_ReplaceOrganizationsWithTenantInfo'
+    WHERE [MigrationId] = N'20251229125939_RemoveOrganizationsTable'
+)
+BEGIN
+    DELETE FROM Organizations WHERE Id = '00000000-0000-0000-0000-000000000001'
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251229125939_RemoveOrganizationsTable'
 )
 BEGIN
     DROP TABLE [Organizations];
@@ -1604,7 +1607,7 @@ END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251229020012_ReplaceOrganizationsWithTenantInfo'
+    WHERE [MigrationId] = N'20251229125939_RemoveOrganizationsTable'
 )
 BEGIN
     DROP INDEX [IX_AspNetUsers_TenantId] ON [AspNetUsers];
@@ -1615,70 +1618,20 @@ BEGIN
     INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
     WHERE ([d].[parent_object_id] = OBJECT_ID(N'[AspNetUsers]') AND [c].[name] = N'TenantId');
     IF @var12 IS NOT NULL EXEC(N'ALTER TABLE [AspNetUsers] DROP CONSTRAINT ' + @var12 + ';');
-    ALTER TABLE [AspNetUsers] ALTER COLUMN [TenantId] nvarchar(450) NULL;
+    EXEC(N'UPDATE [AspNetUsers] SET [TenantId] = N'''' WHERE [TenantId] IS NULL');
+    ALTER TABLE [AspNetUsers] ALTER COLUMN [TenantId] nvarchar(450) NOT NULL;
+    ALTER TABLE [AspNetUsers] ADD DEFAULT N'' FOR [TenantId];
     CREATE INDEX [IX_AspNetUsers_TenantId] ON [AspNetUsers] ([TenantId]);
     EXEC(N'CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName], [TenantId]) WHERE [NormalizedUserName] IS NOT NULL');
 END;
 
 IF NOT EXISTS (
     SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251229020012_ReplaceOrganizationsWithTenantInfo'
-)
-BEGIN
-    CREATE TABLE [TenantInfo] (
-        [Id] nvarchar(450) NOT NULL,
-        [Identifier] nvarchar(max) NOT NULL,
-        [Name] nvarchar(max) NULL,
-        CONSTRAINT [PK_TenantInfo] PRIMARY KEY ([Id])
-    );
-END;
-
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251229020012_ReplaceOrganizationsWithTenantInfo'
+    WHERE [MigrationId] = N'20251229125939_RemoveOrganizationsTable'
 )
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251229020012_ReplaceOrganizationsWithTenantInfo', N'10.0.1');
-END;
-
-COMMIT;
-GO
-
-BEGIN TRANSACTION;
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251229080618_RemoveTenantInfoFromAppDbContext'
-)
-BEGIN
-
-                IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_AspNetUsers_Organizations_TenantId')
-                BEGIN
-                    ALTER TABLE [AspNetUsers] DROP CONSTRAINT [FK_AspNetUsers_Organizations_TenantId];
-                END
-            
-END;
-
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251229080618_RemoveTenantInfoFromAppDbContext'
-)
-BEGIN
-
-                IF EXISTS (SELECT * FROM sys.objects WHERE name = 'TenantInfo' AND type = 'U')
-                BEGIN
-                    DROP TABLE [TenantInfo];
-                END
-            
-END;
-
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20251229080618_RemoveTenantInfoFromAppDbContext'
-)
-BEGIN
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20251229080618_RemoveTenantInfoFromAppDbContext', N'10.0.1');
+    VALUES (N'20251229125939_RemoveOrganizationsTable', N'10.0.1');
 END;
 
 COMMIT;
