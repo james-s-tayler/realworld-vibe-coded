@@ -33,39 +33,15 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationU
       return Result<ApplicationUser>.NotFound();
     }
 
-    // Check for duplicate email
+    // Update email if provided
     if (!string.IsNullOrEmpty(request.Email) && request.Email != user.Email)
     {
-      var existingUserByEmail = await _userManager.FindByEmailAsync(request.Email);
-
-      if (existingUserByEmail != null && existingUserByEmail.Id != user.Id)
-      {
-        _logger.LogWarning("Update failed: Email {Email} already exists", request.Email);
-        return Result<ApplicationUser>.Invalid(new ErrorDetail
-        {
-          Identifier = "email",
-          ErrorMessage = "Email already exists",
-        });
-      }
-
       user.Email = request.Email;
     }
 
-    // Check for duplicate username
+    // Update username if provided
     if (!string.IsNullOrEmpty(request.Username) && request.Username != user.UserName)
     {
-      var existingUserByUsername = await _userManager.FindByNameAsync(request.Username);
-
-      if (existingUserByUsername != null && existingUserByUsername.Id != user.Id)
-      {
-        _logger.LogWarning("Update failed: Username {Username} already exists", request.Username);
-        return Result<ApplicationUser>.Invalid(new ErrorDetail
-        {
-          Identifier = "username",
-          ErrorMessage = "Username already exists",
-        });
-      }
-
       user.UserName = request.Username;
     }
 

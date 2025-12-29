@@ -1,4 +1,8 @@
-﻿using Server.Infrastructure;
+﻿using FluentValidation.Results;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Server.Infrastructure;
+using Server.Infrastructure.Data;
 using Server.UseCases.Interfaces;
 using Server.UseCases.Users.Update;
 
@@ -10,7 +14,7 @@ namespace Server.Web.Users.Update;
 /// <remarks>
 /// Update the currently authenticated user's details.
 /// </remarks>
-public class UpdateUser(IMediator mediator, IUserContext userContext) : Endpoint<UpdateUserRequest, UpdateUserResponse>
+public class UpdateUser(IMediator mediator, IUserContext userContext, UserManager<Core.IdentityAggregate.ApplicationUser> userManager, AppDbContext dbContext) : Endpoint<UpdateUserRequest, UpdateUserResponse>
 {
   public override void Configure()
   {
@@ -38,6 +42,48 @@ public class UpdateUser(IMediator mediator, IUserContext userContext) : Endpoint
     CancellationToken cancellationToken)
   {
     var userId = userContext.GetRequiredCurrentUserId();
+
+    // Check for duplicate email before calling handler
+    if (!string.IsNullOrEmpty(request.User.Email))
+    {
+      var normalizedEmail = userManager.NormalizeEmail(request.User.Email);
+      var existingUserByEmail = await dbContext.Users
+        .IgnoreQueryFilters()
+        .FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail && u.Id != userId, cancellationToken);
+
+      if (existingUserByEmail != null)
+      {
+        await HttpContext.Response.SendErrorsAsync(
+          new List<ValidationFailure>
+          {
+            new ValidationFailure("email", "Email already exists"),
+          },
+          statusCode: 422,
+          cancellation: cancellationToken);
+        return;
+      }
+    }
+
+    // Check for duplicate username before calling handler
+    if (!string.IsNullOrEmpty(request.User.Username))
+    {
+      var normalizedUserName = userManager.NormalizeName(request.User.Username);
+      var existingUserByUsername = await dbContext.Users
+        .IgnoreQueryFilters()
+        .FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedUserName && u.Id != userId, cancellationToken);
+
+      if (existingUserByUsername != null)
+      {
+        await HttpContext.Response.SendErrorsAsync(
+          new List<ValidationFailure>
+          {
+            new ValidationFailure("username", "Username already exists"),
+          },
+          statusCode: 422,
+          cancellation: cancellationToken);
+        return;
+      }
+    }
 
     var result = await mediator.Send(
       new UpdateUserCommand(

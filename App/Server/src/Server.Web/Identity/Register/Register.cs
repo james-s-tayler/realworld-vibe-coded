@@ -2,6 +2,7 @@
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Server.Core.IdentityAggregate;
 using Server.Infrastructure;
 using Server.Infrastructure.Data;
@@ -41,6 +42,24 @@ public class Register(IMultiTenantStore<TenantInfo> tenantStore) : Endpoint<Regi
     var userManager = HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = HttpContext.RequestServices.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
     var dbContext = HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+
+    // Check for duplicate email before creating tenant
+    var normalizedEmail = userManager.NormalizeEmail(req.Email);
+    var existingUser = await dbContext.Users
+      .IgnoreQueryFilters()
+      .FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, ct);
+
+    if (existingUser != null)
+    {
+      await HttpContext.Response.SendErrorsAsync(
+        new List<ValidationFailure>
+        {
+          new ValidationFailure("email", "Email already exists"),
+        },
+        statusCode: 422,
+        cancellation: ct);
+      return;
+    }
 
     const string ownerRoleName = "Owner";
     if (!await roleManager.RoleExistsAsync(ownerRoleName))
