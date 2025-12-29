@@ -23,11 +23,12 @@ public class Register(IMediator mediator, IMultiTenantStore<TenantInfo> tenantSt
     var added = await tenantStore.AddAsync(tenant);
     if (!added)
     {
-      await SendErrorsAsync(
+      await HttpContext.Response.SendErrorsAsync(
         new Dictionary<string, List<string>>
         {
           { "tenant", new List<string> { "Failed to create tenant" } },
         },
+        422,
         ct);
       return;
     }
