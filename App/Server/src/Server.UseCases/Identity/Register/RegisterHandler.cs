@@ -41,7 +41,16 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
   {
     _logger.LogInformation("Registering new user with email {Email}", request.Email);
 
-    // Ensure Owner role exists
+    // Create TenantInfo for the new user's organization
+    var tenantId = Guid.NewGuid().ToString();
+
+    _logger.LogInformation("Creating tenant with ID {TenantId}", tenantId);
+    await _tenantStore.CreateTenantAsync(tenantId, "New Company", cancellationToken);
+
+    // Set tenant context temporarily so we can work with roles
+    await _tenantAssigner.SetTenantContextAsync(tenantId, cancellationToken);
+
+    // Ensure Owner role exists (now that tenant context is set)
     const string ownerRoleName = "Owner";
     if (!await _roleManager.RoleExistsAsync(ownerRoleName))
     {
@@ -53,12 +62,6 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
         return Result<Unit>.Error(new ErrorDetail("role", "Failed to create Owner role"));
       }
     }
-
-    // Create TenantInfo for the new user's organization
-    var tenantId = Guid.NewGuid().ToString();
-
-    _logger.LogInformation("Creating tenant with ID {TenantId}", tenantId);
-    await _tenantStore.CreateTenantAsync(tenantId, "New Company", cancellationToken);
 
     // Create user
     var user = new ApplicationUser

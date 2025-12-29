@@ -72,4 +72,28 @@ public class TenantAssigner : ITenantAssigner
       }
     }
   }
+
+  public Task SetTenantContextAsync(string tenantIdentifier, CancellationToken cancellationToken = default)
+  {
+    // Set the tenant context to the organization's identifier
+    // This allows role operations to work within the tenant scope
+    var newTenantInfo = new TenantInfo(tenantIdentifier, tenantIdentifier, "Organization");
+    var newContext = new MultiTenantContext<TenantInfo>(newTenantInfo);
+
+    // Use reflection to set the context since AsyncLocalMultiTenantContextAccessor uses AsyncLocal
+    var contextAccessorType = _multiTenantContextAccessor.GetType();
+    var asyncLocalField = contextAccessorType.GetField("_asyncLocalContext", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+    if (asyncLocalField != null)
+    {
+      var asyncLocal = asyncLocalField.GetValue(_multiTenantContextAccessor);
+      if (asyncLocal != null)
+      {
+        var asyncLocalType = asyncLocal.GetType();
+        var valueProperty = asyncLocalType.GetProperty("Value");
+        valueProperty?.SetValue(asyncLocal, newContext);
+      }
+    }
+
+    return Task.CompletedTask;
+  }
 }
