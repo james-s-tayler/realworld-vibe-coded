@@ -1,4 +1,5 @@
 ﻿using Ardalis.ListStartupServices;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
@@ -57,6 +58,7 @@ public static class MiddlewareConfig
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection();
     app.UseAuthentication();
+    app.UseMultiTenant();
     app.UseAuthorization();
     app.UseAntiforgery(); // Enable CSRF protection for cookie-based authentication
 

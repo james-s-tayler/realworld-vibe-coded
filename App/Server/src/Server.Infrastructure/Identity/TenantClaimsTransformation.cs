@@ -35,7 +35,8 @@ public class TenantClaimsTransformation : IClaimsTransformation
     }
 
     // Get user from database to access TenantId shadow property
-    var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+    // Use IgnoreQueryFilters() because tenant context is not yet established
+    var user = await _dbContext.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Id == userId);
     if (user == null)
     {
       return principal;
