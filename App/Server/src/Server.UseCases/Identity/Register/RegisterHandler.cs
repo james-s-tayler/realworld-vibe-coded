@@ -1,4 +1,5 @@
 ﻿using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -53,7 +54,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     _logger.LogInformation("Creating tenant with ID {TenantId}", tenantId);
     var tenant = new TenantInfo(tenantId, tenantIdentifier, request.Email); // Use email as initial tenant name
 
-    var added = await _tenantStore.TryAddAsync(tenant);
+    var added = await _tenantStore.AddAsync(tenant);
     if (!added)
     {
       _logger.LogError("Failed to add tenant to store");
@@ -69,7 +70,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
       return Result<Unit>.Error(new ErrorDetail("context", "HttpContext not available"));
     }
 
-    httpContext.TrySetTenantInfo(tenant, resetServiceProvider: true);
+    httpContext.SetTenantInfo(tenant, resetServiceProviderScope: true);
     _logger.LogInformation("Set tenant context in HttpContext for tenant {TenantId}", tenantId);
 
     // Ensure Owner role exists (tenant context is now properly set in HttpContext)
