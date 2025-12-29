@@ -1640,3 +1640,24 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251229080618_RemoveTenantInfoFromAppDbContext'
+)
+BEGIN
+    DROP TABLE [TenantInfo];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251229080618_RemoveTenantInfoFromAppDbContext'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20251229080618_RemoveTenantInfoFromAppDbContext', N'10.0.1');
+END;
+
+COMMIT;
+GO
+
