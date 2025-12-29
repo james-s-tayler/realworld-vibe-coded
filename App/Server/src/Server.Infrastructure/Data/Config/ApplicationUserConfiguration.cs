@@ -13,16 +13,9 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
         .HasMaxLength(ApplicationUser.ImageUrlMaxLength);
 
     // TenantId is added automatically by MultiTenantIdentityDbContext as a shadow property (string type)
-    // Configure it as nullable for phase 4 - users can exist without Organizations
+    // Configure it as nullable for now - users created during registration will have TenantId set
+    // TenantId references TenantInfo.Id for tenant isolation
     builder.Property<string>("TenantId")
-        .IsRequired(false);
-
-    // Configure relationship to Organization using TenantId -> Organization.Identifier
-    builder.HasOne(u => u.Organization)
-        .WithMany()
-        .HasForeignKey("TenantId")
-        .HasPrincipalKey(o => o.Identifier)
-        .OnDelete(DeleteBehavior.Restrict)
         .IsRequired(false);
 
     builder.HasIndex("TenantId");

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Server.Core.OrganizationAggregate;
 using Server.Core.UserAggregate;
 
 namespace Server.Core.IdentityAggregate;
@@ -20,8 +19,6 @@ public class ApplicationUser : IdentityUser<Guid>
   public string Bio { get; set; } = default!;
 
   public string? Image { get; set; }
-
-  public Organization? Organization { get; set; }
 
   // Navigation properties for following relationships
   public ICollection<UserFollowing> Following { get; set; } = new List<UserFollowing>();
