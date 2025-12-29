@@ -60,11 +60,8 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     }
 
     // Set tenant context using Finbuckle's standard IMultiTenantContextSetter
-    _contextSetter.MultiTenantContext = new MultiTenantContext<TenantInfo>
-    {
-      TenantInfo = tenant,
-      StoreInfo = new StoreInfo<TenantInfo> { Store = _tenantStore },
-    };
+    var storeInfo = new StoreInfo<TenantInfo> { Store = _tenantStore };
+    _contextSetter.MultiTenantContext = new MultiTenantContext<TenantInfo>(tenant, null, storeInfo);
 
     // Ensure Owner role exists (now that tenant context is set)
     const string ownerRoleName = "Owner";
