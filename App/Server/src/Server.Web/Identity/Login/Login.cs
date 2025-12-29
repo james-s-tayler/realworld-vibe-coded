@@ -1,6 +1,7 @@
 ﻿using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure;
 using Server.Infrastructure.Data;
@@ -9,7 +10,6 @@ using Server.UseCases.Identity.Login;
 namespace Server.Web.Identity.Login;
 
 public class Login(
-  IMediator mediator,
   IMultiTenantStore<TenantInfo> tenantStore,
   AppDbContext dbContext) : Endpoint<LoginRequest>
 {
@@ -35,7 +35,14 @@ public class Login(
       return;
     }
 
-    var tenant = await tenantStore.GetByIdAsync(user.TenantId);
+    var tenantId = dbContext.Entry(user).Property<string>("TenantId").CurrentValue;
+    if (string.IsNullOrEmpty(tenantId))
+    {
+      await HttpContext.Response.SendUnauthorizedAsync(ct);
+      return;
+    }
+
+    var tenant = await tenantStore.GetAsync(tenantId);
     if (tenant == null)
     {
       await HttpContext.Response.SendUnauthorizedAsync(ct);
