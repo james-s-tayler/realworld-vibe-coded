@@ -27,6 +27,7 @@ public class EmptyArticlesFixture : ApiFixtureBase<Program>
     // Create database schema once per assembly
     // Services is not available yet, so create a temporary service provider
     var serviceCollection = new ServiceCollection();
+    serviceCollection.AddSingleton<IMultiTenantContextAccessor<TenantInfo>>(new AsyncLocalMultiTenantContextAccessor<TenantInfo>());
     serviceCollection.AddDbContext<TenantStoreDbContext>(options =>
     {
       options.UseSqlServer(_connectionString);
@@ -45,9 +46,7 @@ public class EmptyArticlesFixture : ApiFixtureBase<Program>
     await tenantStoreDb.Database.MigrateAsync();
 
     // Then apply AppDbContext migrations
-    var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    var multiTenantContextAccessor = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-    using var db = new AppDbContext(multiTenantContextAccessor, dbContextOptions, null);
+    using var db = serviceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
   }
 
