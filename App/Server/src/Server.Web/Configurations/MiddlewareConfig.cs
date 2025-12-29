@@ -87,8 +87,12 @@ public static class MiddlewareConfig
 
     try
     {
-      var context = services.GetRequiredService<AppDbContext>();
+      // Apply migrations for TenantStoreDbContext first (Finbuckle's tenant storage)
+      var tenantStoreContext = services.GetRequiredService<TenantStoreDbContext>();
+      await tenantStoreContext.Database.MigrateAsync();
 
+      // Then apply migrations for AppDbContext (main application database)
+      var context = services.GetRequiredService<AppDbContext>();
       await context.Database.MigrateAsync();
       await SeedData.InitializeAsync(context);
     }
