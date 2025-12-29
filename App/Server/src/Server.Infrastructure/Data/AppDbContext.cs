@@ -4,7 +4,6 @@ using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Server.Core.ArticleAggregate;
 using Server.Core.IdentityAggregate;
-using Server.Core.OrganizationAggregate;
 using Server.Core.TagAggregate;
 using Server.Core.UserAggregate;
 using Server.SharedKernel.DomainEvents;
@@ -33,7 +32,9 @@ public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
 
   public DbSet<UserFollowing> UserFollowings => Set<UserFollowing>();
 
-  public DbSet<Organization> Organizations => Set<Organization>();
+  // Use 'new' keyword to hide inherited TenantInfo property from MultiTenantIdentityDbContext
+  // This allows us to explicitly expose the TenantInfo table
+  public new DbSet<TenantInfo> TenantInfo => Set<TenantInfo>();
 
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
   {

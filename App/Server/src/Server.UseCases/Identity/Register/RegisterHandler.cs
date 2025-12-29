@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
-using Server.Core.OrganizationAggregate;
 using Server.SharedKernel.MediatR;
-using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Identity.Register;
 
@@ -14,20 +12,20 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 {
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-  private readonly IRepository<Organization> _organizationRepository;
+  private readonly ITenantStore _tenantStore;
   private readonly ITenantAssigner _tenantAssigner;
   private readonly ILogger<RegisterHandler> _logger;
 
   public RegisterHandler(
     UserManager<ApplicationUser> userManager,
     RoleManager<IdentityRole<Guid>> roleManager,
-    IRepository<Organization> organizationRepository,
+    ITenantStore tenantStore,
     ITenantAssigner tenantAssigner,
     ILogger<RegisterHandler> logger)
   {
     _userManager = userManager;
     _roleManager = roleManager;
-    _organizationRepository = organizationRepository;
+    _tenantStore = tenantStore;
     _tenantAssigner = tenantAssigner;
     _logger = logger;
   }
@@ -56,13 +54,11 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
       }
     }
 
-    // Create Organization for the new user
-    var organizationIdentifier = Guid.NewGuid().ToString();
-    var organization = new Organization("New Company", organizationIdentifier);
+    // Create TenantInfo for the new user's organization
+    var tenantId = Guid.NewGuid().ToString();
 
-    _logger.LogInformation("Creating organization with identifier {Identifier}", organizationIdentifier);
-    await _organizationRepository.AddAsync(organization, cancellationToken);
-    await _organizationRepository.SaveChangesAsync(cancellationToken);
+    _logger.LogInformation("Creating tenant with ID {TenantId}", tenantId);
+    await _tenantStore.CreateTenantAsync(tenantId, "New Company", cancellationToken);
 
     // Create user
     var user = new ApplicationUser
@@ -81,8 +77,8 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     }
 
     // Set TenantId shadow property using TenantAssigner (which handles TenantMismatchMode)
-    await _tenantAssigner.SetTenantIdAsync(user.Id, organizationIdentifier, cancellationToken);
-    _logger.LogInformation("Set TenantId {TenantId} for user {Email}", organizationIdentifier, request.Email);
+    await _tenantAssigner.SetTenantIdAsync(user.Id, tenantId, cancellationToken);
+    _logger.LogInformation("Set TenantId {TenantId} for user {Email}", tenantId, request.Email);
 
     // Assign Owner role
     _logger.LogInformation("Assigning Owner role to user {Email}", request.Email);
@@ -94,7 +90,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
       return Result<Unit>.Error(new ErrorDetail("role", "Failed to assign Owner role"));
     }
 
-    _logger.LogInformation("User {Email} registered successfully with organization {OrganizationId}", request.Email, organization.Id);
+    _logger.LogInformation("User {Email} registered successfully with tenant {TenantId}", request.Email, tenantId);
     return Result<Unit>.Success(Unit.Value);
   }
 }

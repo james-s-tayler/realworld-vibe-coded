@@ -42,7 +42,8 @@ public static class InfrastructureServiceExtensions
            .AddScoped<IUnitOfWork, UnitOfWork>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
            .AddScoped<IUserContext, UserContext>()
-           .AddScoped<ITenantAssigner, TenantAssigner>();
+           .AddScoped<ITenantAssigner, TenantAssigner>()
+           .AddScoped<ITenantStore, TenantStore>();
 
 
     logger.LogInformation("{Project} services registered", "Infrastructure");
