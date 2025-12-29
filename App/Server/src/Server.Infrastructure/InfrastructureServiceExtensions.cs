@@ -26,10 +26,11 @@ public static class InfrastructureServiceExtensions
     services.AddSingleton<ITimeProvider, UtcNowTimeProvider>();
     services.AddSingleton<AuditableEntityInterceptor>();
 
-    // Register AsyncLocalMultiTenantContextAccessor for tenant context
-    // This provides an async-local tenant context that can be set per-request
-    // Registration flow and authenticated requests will populate this context
-    services.AddScoped<IMultiTenantContextAccessor>(sp => new AsyncLocalMultiTenantContextAccessor<TenantInfo>());
+    // Configure Finbuckle MultiTenant with Claim strategy
+    // This will automatically register IMultiTenantContextAccessor and IMultiTenantContextSetter
+    services.AddMultiTenant<TenantInfo>()
+      .WithClaimStrategy("TenantId")
+      .WithEFCoreStore<AppDbContext, TenantInfo>();
 
     services.AddDbContext<AppDbContext>((serviceProvider, options) =>
     {
