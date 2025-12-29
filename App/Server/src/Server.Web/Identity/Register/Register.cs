@@ -1,5 +1,6 @@
 ﻿using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using FluentValidation.Results;
 using Server.Infrastructure;
 using Server.UseCases.Identity.Register;
 
@@ -24,12 +25,12 @@ public class Register(IMediator mediator, IMultiTenantStore<TenantInfo> tenantSt
     if (!added)
     {
       await HttpContext.Response.SendErrorsAsync(
-        new Dictionary<string, List<string>>
+        new List<ValidationFailure>
         {
-          { "tenant", new List<string> { "Failed to create tenant" } },
+          new ValidationFailure("tenant", "Failed to create tenant"),
         },
-        422,
-        ct);
+        statusCode: 422,
+        cancellation: ct);
       return;
     }
 
