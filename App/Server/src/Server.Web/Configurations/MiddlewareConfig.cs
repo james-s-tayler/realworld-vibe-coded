@@ -57,7 +57,8 @@ public static class MiddlewareConfig
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
     app.UseAuthentication();
-    app.UseMultiTenant(); // Finbuckle MultiTenant middleware - resolves tenant from claims
+
+    // Finbuckle MultiTenant middleware is automatically added via AddMultiTenant() configuration
     app.UseAuthorization();
     app.UseAntiforgery(); // Enable CSRF protection for cookie-based authentication
 
