@@ -51,11 +51,12 @@ public class UsersFixture : ApiFixtureBase<Program>
   protected override void ConfigureServices(IServiceCollection services)
   {
     var toRemove = services.Where(d =>
-        d.ServiceType.ToString().Contains("AppDbContext") ||
-        d.ServiceType.ToString().Contains("TenantStoreDbContext") ||
-        d.ServiceType == typeof(DbContextOptions) ||
-        (d.ServiceType.IsGenericType &&
-         d.ServiceType.GetGenericTypeDefinition() == typeof(DbContextOptions<>)))
+        (d.ServiceType.ToString().Contains("AppDbContext") ||
+         d.ServiceType.ToString().Contains("TenantStoreDbContext") ||
+         d.ServiceType == typeof(DbContextOptions) ||
+         (d.ServiceType.IsGenericType &&
+          d.ServiceType.GetGenericTypeDefinition() == typeof(DbContextOptions<>))) &&
+        !d.ServiceType.ToString().Contains("MultiTenant"))
         .ToList();
 
     foreach (var desc in toRemove)
