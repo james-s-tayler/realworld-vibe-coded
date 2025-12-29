@@ -64,8 +64,6 @@ public class UsersFixture : ApiFixtureBase<Program>
       services.Remove(desc);
     }
 
-    services.AddSingleton<IMultiTenantContextAccessor<TenantInfo>>(new AsyncLocalMultiTenantContextAccessor<TenantInfo>());
-
     services.AddDbContext<TenantStoreDbContext>(options =>
     {
       options.UseSqlServer(_connectionString);
