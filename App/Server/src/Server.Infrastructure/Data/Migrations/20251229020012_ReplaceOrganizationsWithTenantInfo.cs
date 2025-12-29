@@ -10,9 +10,13 @@ public partial class ReplaceOrganizationsWithTenantInfo : Migration
   /// <inheritdoc />
   protected override void Up(MigrationBuilder migrationBuilder)
   {
-    migrationBuilder.DropForeignKey(
-        name: "FK_AspNetUsers_Organizations_TenantId",
-        table: "AspNetUsers");
+    // Drop the foreign key constraint - this is the one causing the error
+    migrationBuilder.Sql(@"
+            IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_AspNetUsers_Organizations_TenantId')
+            BEGIN
+                ALTER TABLE [AspNetUsers] DROP CONSTRAINT [FK_AspNetUsers_Organizations_TenantId];
+            END
+        ");
 
     migrationBuilder.DropTable(
         name: "Organizations");
