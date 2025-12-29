@@ -50,12 +50,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     var tenantIdentifier = tenantId; // Using tenant ID as the identifier for simplicity
 
     _logger.LogInformation("Creating tenant with ID {TenantId}", tenantId);
-    var tenant = new TenantInfo
-    {
-      Id = tenantId,
-      Identifier = tenantIdentifier,
-      Name = "New Company",
-    };
+    var tenant = new TenantInfo(tenantId, tenantIdentifier, "New Company");
 
     var added = await _tenantStore.AddAsync(tenant);
     if (!added)
@@ -68,6 +63,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     _contextSetter.MultiTenantContext = new MultiTenantContext<TenantInfo>
     {
       TenantInfo = tenant,
+      StoreInfo = new StoreInfo<TenantInfo> { Store = _tenantStore },
     };
 
     // Ensure Owner role exists (now that tenant context is set)
