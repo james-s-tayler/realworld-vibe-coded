@@ -56,7 +56,7 @@ public class Register(IMultiTenantStore<TenantInfo> tenantStore) : Endpoint<Regi
         {
           new ValidationFailure("email", "Email already exists"),
         },
-        statusCode: 422,
+        statusCode: 400,
         cancellation: ct);
       return;
     }

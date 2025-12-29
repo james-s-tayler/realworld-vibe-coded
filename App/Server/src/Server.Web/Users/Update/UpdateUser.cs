@@ -58,7 +58,7 @@ public class UpdateUser(IMediator mediator, IUserContext userContext, UserManage
           {
             new ValidationFailure("email", "Email already exists"),
           },
-          statusCode: 422,
+          statusCode: 400,
           cancellation: cancellationToken);
         return;
       }
@@ -79,7 +79,7 @@ public class UpdateUser(IMediator mediator, IUserContext userContext, UserManage
           {
             new ValidationFailure("username", "Username already exists"),
           },
-          statusCode: 422,
+          statusCode: 400,
           cancellation: cancellationToken);
         return;
       }
