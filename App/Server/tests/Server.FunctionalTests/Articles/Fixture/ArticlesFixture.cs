@@ -37,6 +37,11 @@ public class ArticlesFixture : ApiFixtureBase<Program>
     // Create database schema once per assembly
     // Services is not available yet, so create a temporary service provider
     var serviceCollection = new ServiceCollection();
+    serviceCollection.AddDbContext<TenantStoreDbContext>(options =>
+    {
+      options.UseSqlServer(_connectionString);
+      options.EnableSensitiveDataLogging();
+    });
     serviceCollection.AddDbContext<AppDbContext>(options =>
     {
       options.UseSqlServer(_connectionString);
@@ -45,8 +50,11 @@ public class ArticlesFixture : ApiFixtureBase<Program>
 
     await using var serviceProvider = serviceCollection.BuildServiceProvider();
 
-    // AppDbContext constructor requires IDomainEventDispatcher but it's nullable,
-    // so we can create it with a null DbContextOptions
+    // Apply TenantStore migrations first
+    await using var tenantStoreDb = serviceProvider.GetRequiredService<TenantStoreDbContext>();
+    await tenantStoreDb.Database.MigrateAsync();
+
+    // Then apply AppDbContext migrations
     var dbContextOptions = serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
     var multiTenantContextAccessor = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
     await using var db = new AppDbContext(multiTenantContextAccessor, dbContextOptions, null);
@@ -55,14 +63,9 @@ public class ArticlesFixture : ApiFixtureBase<Program>
 
   protected override void ConfigureServices(IServiceCollection services)
   {
-    var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-    if (descriptor != null)
-    {
-      services.Remove(descriptor);
-    }
-
     var toRemove = services.Where(d =>
         d.ServiceType.ToString().Contains("AppDbContext") ||
+        d.ServiceType.ToString().Contains("TenantStoreDbContext") ||
         d.ServiceType == typeof(DbContextOptions) ||
         (d.ServiceType.IsGenericType &&
          d.ServiceType.GetGenericTypeDefinition() == typeof(DbContextOptions<>)))
@@ -72,6 +75,12 @@ public class ArticlesFixture : ApiFixtureBase<Program>
     {
       services.Remove(desc);
     }
+
+    services.AddDbContext<TenantStoreDbContext>(options =>
+    {
+      options.UseSqlServer(_connectionString);
+      options.EnableSensitiveDataLogging();
+    });
 
     services.AddDbContext<AppDbContext>(options =>
     {
