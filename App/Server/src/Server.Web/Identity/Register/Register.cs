@@ -6,7 +6,7 @@ using Server.UseCases.Identity.Register;
 
 namespace Server.Web.Identity.Register;
 
-public class Register(IMediator mediator, IMultiTenantStore<TenantInfo> tenantStore) : Endpoint<RegisterRequest>
+public class Register(IMultiTenantStore<TenantInfo> tenantStore) : Endpoint<RegisterRequest>
 {
   public override void Configure()
   {
@@ -37,6 +37,9 @@ public class Register(IMediator mediator, IMultiTenantStore<TenantInfo> tenantSt
     // Set tenant context using Finbuckle's HttpContext extension
     // This must happen BEFORE resolving any tenant-scoped services
     HttpContext.SetTenantInfo(tenant, resetServiceProviderScope: true);
+
+    // Resolve MediatR from the NEW service scope that has the tenant context
+    var mediator = HttpContext.RequestServices.GetRequiredService<IMediator>();
 
     var command = new RegisterCommand(req.Email, req.Password, tenantId);
     var result = await mediator.Send(command, ct);
