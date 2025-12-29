@@ -1651,6 +1651,11 @@ BEGIN
                 BEGIN
                     ALTER TABLE [AspNetUsers] DROP CONSTRAINT [FK_AspNetUsers_TenantInfo_TenantId];
                 END
+                
+                IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_AspNetUsers_Organizations_TenantId')
+                BEGIN
+                    ALTER TABLE [AspNetUsers] DROP CONSTRAINT [FK_AspNetUsers_Organizations_TenantId];
+                END
             
 END;
 
@@ -1659,7 +1664,12 @@ IF NOT EXISTS (
     WHERE [MigrationId] = N'20251229080618_RemoveTenantInfoFromAppDbContext'
 )
 BEGIN
-    DROP TABLE [TenantInfo];
+
+                IF EXISTS (SELECT * FROM sys.objects WHERE name = 'TenantInfo' AND type = 'U')
+                BEGIN
+                    DROP TABLE [TenantInfo];
+                END
+            
 END;
 
 IF NOT EXISTS (
