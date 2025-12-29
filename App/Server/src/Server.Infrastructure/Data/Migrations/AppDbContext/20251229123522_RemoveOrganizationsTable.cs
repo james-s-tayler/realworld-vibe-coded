@@ -2,87 +2,86 @@
 
 #nullable disable
 
-namespace Server.Infrastructure.Data.Migrations.AppDbContext
+namespace Server.Infrastructure.Data.Migrations.AppDbContext;
+
+/// <inheritdoc />
+public partial class RemoveOrganizationsTable : Migration
 {
-    /// <inheritdoc />
-    public partial class RemoveOrganizationsTable : Migration
-    {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
+  /// <inheritdoc />
+  protected override void Up(MigrationBuilder migrationBuilder)
+  {
+    migrationBuilder.DropForeignKey(
+        name: "FK_AspNetUsers_Organizations_TenantId",
+        table: "AspNetUsers");
+
+    migrationBuilder.Sql("DELETE FROM Organizations WHERE Id = '00000000-0000-0000-0000-000000000001'");
+
+    migrationBuilder.DropTable(
+        name: "Organizations");
+
+    migrationBuilder.AlterColumn<string>(
+        name: "TenantId",
+        table: "AspNetUsers",
+        type: "nvarchar(450)",
+        nullable: false,
+        defaultValue: string.Empty,
+        oldClrType: typeof(string),
+        oldType: "nvarchar(450)",
+        oldNullable: true);
+  }
+
+  /// <inheritdoc />
+  protected override void Down(MigrationBuilder migrationBuilder)
+  {
+    migrationBuilder.AlterColumn<string>(
+        name: "TenantId",
+        table: "AspNetUsers",
+        type: "nvarchar(450)",
+        nullable: true,
+        oldClrType: typeof(string),
+        oldType: "nvarchar(450)");
+
+    migrationBuilder.CreateTable(
+        name: "Organizations",
+        columns: table => new
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_AspNetUsers_Organizations_TenantId",
-                table: "AspNetUsers");
-
-            migrationBuilder.Sql("DELETE FROM Organizations WHERE Id = '00000000-0000-0000-0000-000000000001'");
-
-            migrationBuilder.DropTable(
-                name: "Organizations");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "TenantId",
-                table: "AspNetUsers",
-                type: "nvarchar(450)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(450)",
-                oldNullable: true);
-        }
-
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
+          Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+          Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+          Identifier = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+          ChangeCheck = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
+          CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+          UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+          CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+          UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+          TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+        },
+        constraints: table =>
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "TenantId",
-                table: "AspNetUsers",
-                type: "nvarchar(450)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(450)");
+          table.PrimaryKey("PK_Organizations", x => x.Id);
+          table.UniqueConstraint("AK_Organizations_Identifier", x => x.Identifier);
+        });
 
-            migrationBuilder.CreateTable(
-                name: "Organizations",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Identifier = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ChangeCheck = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Organizations", x => x.Id);
-                    table.UniqueConstraint("AK_Organizations_Identifier", x => x.Identifier);
-                });
-
-            migrationBuilder.Sql(
-                @"INSERT INTO Organizations (Id, Name, Identifier, CreatedAt, UpdatedAt, CreatedBy, UpdatedBy) 
+    migrationBuilder.Sql(
+        @"INSERT INTO Organizations (Id, Name, Identifier, CreatedAt, UpdatedAt, CreatedBy, UpdatedBy) 
                   VALUES ('00000000-0000-0000-0000-000000000001', 'Default', '', '2025-01-01', '2025-01-01', 'System', 'System')");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Organizations_Identifier",
-                table: "Organizations",
-                column: "Identifier",
-                unique: true);
+    migrationBuilder.CreateIndex(
+        name: "IX_Organizations_Identifier",
+        table: "Organizations",
+        column: "Identifier",
+        unique: true);
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Organizations_TenantId",
-                table: "Organizations",
-                column: "TenantId");
+    migrationBuilder.CreateIndex(
+        name: "IX_Organizations_TenantId",
+        table: "Organizations",
+        column: "TenantId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUsers_Organizations_TenantId",
-                table: "AspNetUsers",
-                column: "TenantId",
-                principalTable: "Organizations",
-                principalColumn: "Identifier",
-                onDelete: ReferentialAction.Restrict);
-        }
-    }
+    migrationBuilder.AddForeignKey(
+        name: "FK_AspNetUsers_Organizations_TenantId",
+        table: "AspNetUsers",
+        column: "TenantId",
+        principalTable: "Organizations",
+        principalColumn: "Identifier",
+        onDelete: ReferentialAction.Restrict);
+  }
 }
