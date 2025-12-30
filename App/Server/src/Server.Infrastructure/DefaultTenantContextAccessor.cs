@@ -11,9 +11,9 @@ public class DefaultTenantContextAccessor : IMultiTenantContextAccessor
 
   public DefaultTenantContextAccessor()
   {
-    // Create default TenantInfo matching the default Organization from migration
+    // Create default TenantInfo
     // NOTE: Both Id and Identifier must be "" because MultiTenantIdentityDbContext uses Id
-    // for the TenantId column, and the foreign key points to Organizations.Identifier
+    // for the TenantId column
     var tenantInfo = new TenantInfo(string.Empty, string.Empty, "Default");
 
     _context = new MultiTenantContext<TenantInfo>(tenantInfo);
