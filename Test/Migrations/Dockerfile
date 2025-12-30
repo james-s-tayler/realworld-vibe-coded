@@ -1,22 +1,40 @@
-# Use the official .NET 10 SDK image for EF tools
-FROM mcr.microsoft.com/dotnet/sdk:10.0
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+RUN dotnet tool install --global dotnet-ef --version 10.*
 
 WORKDIR /app
 
-# Copy the entire application
+COPY App/Server/Directory.Build.props App/Server/
+COPY App/Server/Directory.Packages.props App/Server/
+COPY App/Server/analyzers/Server.Analyzers/Server.Analyzers.csproj App/Server/analyzers/Server.Analyzers/
+COPY App/Server/src/Server.Web.DevOnly/Server.Web.DevOnly.csproj App/Server/src/Server.Web.DevOnly/
+COPY App/Server/src/Server.SharedKernel/Server.SharedKernel.csproj App/Server/src/Server.SharedKernel/
+COPY App/Server/src/Server.Core/Server.Core.csproj App/Server/src/Server.Core/
+COPY App/Server/src/Server.Infrastructure/Server.Infrastructure.csproj App/Server/src/Server.Infrastructure/
+COPY App/Server/src/Server.Web/Server.Web.csproj App/Server/src/Server.Web/
+COPY App/Server/src/Server.UseCases/Server.UseCases.csproj App/Server/src/Server.UseCases/
+
+RUN --mount=type=cache,id=nuget-http,target=/root/.local/share/NuGet/v3-cache \
+    dotnet restore App/Server/src/Server.Web/Server.Web.csproj
+
 COPY . .
 
-# Restore packages to ensure all dependencies are available
-RUN dotnet restore App/Server/Server.sln
+RUN --mount=type=cache,id=nuget-http,target=/root/.local/share/NuGet/v3-cache \
+    dotnet build App/Server/src/Server.Web/Server.Web.csproj --no-restore
 
-# Install dotnet-ef tool (version 10.* for .NET 10 compatibility)
-RUN dotnet tool install --global dotnet-ef --version 10.*
+FROM build AS apply-migrations
+COPY Test/Migrations/run-apply-migrations.sh /app/run-script.sh
+RUN chmod +x /app/run-script.sh
+ENTRYPOINT ["/app/run-script.sh"]
 
-# Add dotnet tools to PATH
-ENV PATH="${PATH}:/root/.dotnet/tools"
+FROM build AS generate-idempotent
+COPY Test/Migrations/run-generate-idempotent.sh /app/run-script.sh
+RUN chmod +x /app/run-script.sh
+ENTRYPOINT ["/app/run-script.sh"]
 
-# Script to run migrations
-COPY Test/Migrations/run-migrations.sh /app/run-migrations.sh
-RUN chmod +x /app/run-migrations.sh
-
-ENTRYPOINT ["/app/run-migrations.sh"]
+FROM build AS verify-idempotent
+COPY Test/Migrations/run-verify-idempotent.sh /app/run-script.sh
+RUN chmod +x /app/run-script.sh
+ENTRYPOINT ["/app/run-script.sh"]
