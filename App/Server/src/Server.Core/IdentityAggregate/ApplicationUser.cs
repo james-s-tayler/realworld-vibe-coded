@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Finbuckle.MultiTenant.Abstractions;
+using Microsoft.AspNetCore.Identity;
 using Server.Core.UserAggregate;
 
 namespace Server.Core.IdentityAggregate;
 
+[MultiTenant]
 public class ApplicationUser : IdentityUser<Guid>
 {
   public const int EmailMaxLength = 255;
