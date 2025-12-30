@@ -31,7 +31,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 #pragma warning restore PV014
 
   {
-    _logger.LogInformation("Registering new user with email {Email} for tenant {TenantId}", request.Email, request.TenantId);
+    _logger.LogInformation("Registering new user with email {Email}", request.Email);
 
     var user = new ApplicationUser
     {
@@ -48,8 +48,11 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
       return Result<Unit>.Invalid(errorDetails);
     }
 
+    // Generate a unique tenant ID for this user
+    var tenantId = Guid.NewGuid().ToString();
+
     // Add the tenant claim to the user (ClaimsStrategy uses "__tenant__" by default)
-    var tenantClaim = new Claim("__tenant__", request.TenantId);
+    var tenantClaim = new Claim("__tenant__", tenantId);
     var claimResult = await _userManager.AddClaimAsync(user, tenantClaim);
 
     if (!claimResult.Succeeded)
@@ -61,7 +64,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
       return Result<Unit>.Invalid(errorDetails);
     }
 
-    _logger.LogInformation("User {Email} registered successfully with tenant {TenantId}", request.Email, request.TenantId);
+    _logger.LogInformation("User {Email} registered successfully with tenant {TenantId}", request.Email, tenantId);
 
     return Result<Unit>.Success(Unit.Value);
   }
