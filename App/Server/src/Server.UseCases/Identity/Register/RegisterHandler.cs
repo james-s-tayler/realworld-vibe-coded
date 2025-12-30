@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Security.Claims;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
@@ -30,7 +31,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 #pragma warning restore PV014
 
   {
-    _logger.LogInformation("Registering new user with email {Email}", request.Email);
+    _logger.LogInformation("Registering new user with email {Email} for tenant {TenantId}", request.Email, request.TenantId);
 
     var user = new ApplicationUser
     {
@@ -46,6 +47,21 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
       _logger.LogWarning("User registration failed for {Email}: {Errors}", request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
       return Result<Unit>.Invalid(errorDetails);
     }
+
+    // Add the tenant claim to the user (ClaimsStrategy uses "__tenant__" by default)
+    var tenantClaim = new Claim("__tenant__", request.TenantId);
+    var claimResult = await _userManager.AddClaimAsync(user, tenantClaim);
+
+    if (!claimResult.Succeeded)
+    {
+      // If adding the claim fails, we should delete the user to maintain consistency
+      await _userManager.DeleteAsync(user);
+      var errorDetails = claimResult.Errors.Select(e => new ErrorDetail("tenantId", e.Description)).ToArray();
+      _logger.LogError("Failed to add tenant claim for user {Email}, user registration rolled back", request.Email);
+      return Result<Unit>.Invalid(errorDetails);
+    }
+
+    _logger.LogInformation("User {Email} registered successfully with tenant {TenantId}", request.Email, request.TenantId);
 
     return Result<Unit>.Success(Unit.Value);
   }

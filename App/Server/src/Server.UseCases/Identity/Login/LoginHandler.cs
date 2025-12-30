@@ -63,6 +63,9 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
 
     await _userManager.ResetAccessFailedCountAsync(user);
 
+    // SignInManager.CreateUserPrincipalAsync automatically includes all user claims,
+    // including the __tenant__ claim we added during registration.
+    // The ClaimsStrategy middleware will use this claim to resolve the tenant.
     var useCookieScheme = request.UseCookies || request.UseSessionCookies;
     if (useCookieScheme)
     {

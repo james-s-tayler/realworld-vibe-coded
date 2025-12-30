@@ -17,5 +17,9 @@ public class RegisterRequestValidator : Validator<RegisterRequest>
     RuleFor(x => x.Password)
       .NotEmpty()
       .WithMessage("is required.");
+
+    RuleFor(x => x.TenantId)
+      .NotEmpty()
+      .WithMessage("is required.");
   }
 }
