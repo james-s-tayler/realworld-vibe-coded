@@ -134,19 +134,25 @@ public partial class Build
   internal Target DbMigrationsGenerateIdempotentScript => _ => _
     .Description("Generate idempotent SQL script from EF Core migrations")
     .DependsOn(InstallDotnetToolEf)
-    .DependsOn(BuildServer)
     .Executes(() =>
     {
       Log.Information("Generating idempotent SQL script from migrations...");
 
-      // Generate the idempotent script using dotnet ef
-      var args = $"ef migrations script --idempotent --project {ServerInfrastructureProject} --startup-project {ServerProject} --output {IdempotentScriptPath}";
+      var dockerfilePath = RootDirectory / "Test" / "Migrations" / "Dockerfile";
+      var outputDir = MigrationsDirectory;
 
       try
       {
         ProcessTasks.StartProcess(
-          "dotnet",
-          args,
+          "docker",
+          $"build --target generate-idempotent -f {dockerfilePath} -t migrations-generate {RootDirectory}",
+          workingDirectory: RootDirectory,
+          logOutput: true)
+          .AssertZeroExitCode();
+
+        ProcessTasks.StartProcess(
+          "docker",
+          $"run --rm -v {outputDir}:/output migrations-generate",
           workingDirectory: RootDirectory,
           logOutput: true)
           .AssertZeroExitCode();
@@ -198,12 +204,10 @@ public partial class Build
   internal Target DbMigrationsVerifyIdempotentScript => _ => _
     .Description("Verify that the idempotent SQL script matches the current migrations")
     .DependsOn(InstallDotnetToolEf)
-    .DependsOn(BuildServer)
     .Executes(() =>
     {
       Log.Information("Verifying idempotent SQL script is up to date...");
 
-      // Check if the committed script exists
       if (!IdempotentScriptPath.FileExists())
       {
         Log.Error("Idempotent SQL script not found at {ScriptPath}", IdempotentScriptPath);
@@ -211,53 +215,30 @@ public partial class Build
         throw new Exception("Idempotent SQL script not found in source control");
       }
 
-      // Read the committed script
-      var committedScript = IdempotentScriptPath.ReadAllText();
-
-      // Generate a new script to compare
-      var tempScriptPath = RootDirectory / "temp-idempotent.sql";
-      var args = $"ef migrations script --idempotent --project {ServerInfrastructureProject} --startup-project {ServerProject} --output {tempScriptPath}";
+      var dockerfilePath = RootDirectory / "Test" / "Migrations" / "Dockerfile";
+      var committedScriptDir = MigrationsDirectory;
 
       try
       {
         ProcessTasks.StartProcess(
-          "dotnet",
-          args,
+          "docker",
+          $"build --target verify-idempotent -f {dockerfilePath} -t migrations-verify {RootDirectory}",
           workingDirectory: RootDirectory,
-          logOutput: false,
-          logInvocation: false)
+          logOutput: true)
           .AssertZeroExitCode();
 
-        var generatedScript = tempScriptPath.ReadAllText();
-
-        // Clean up temp file
-        tempScriptPath.DeleteFile();
-
-        // Compare the scripts
-        if (committedScript != generatedScript)
-        {
-          Log.Error("Idempotent SQL script is out of sync with current migrations!");
-          Log.Error("The committed script at {ScriptPath} does not match the script generated from current migrations.", IdempotentScriptPath);
-          Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript' to regenerate the script and commit the changes to source control.");
-          throw new Exception("Idempotent SQL script is out of sync with migrations");
-        }
+        ProcessTasks.StartProcess(
+          "docker",
+          $"run --rm -v {committedScriptDir}:/committed migrations-verify",
+          workingDirectory: RootDirectory,
+          logOutput: true)
+          .AssertZeroExitCode();
 
         Log.Information("✓ Idempotent SQL script is up to date with current migrations");
       }
       catch (Exception ex)
       {
-        // Clean up temp file if it exists
-        if (tempScriptPath.FileExists())
-        {
-          tempScriptPath.DeleteFile();
-        }
-
-        if (ex.Message.Contains("out of sync"))
-        {
-          throw;
-        }
-
-        Log.Error("Failed to verify idempotent SQL script: {Message}", ex.Message);
+        Log.Error("Idempotent SQL script verification failed: {Message}", ex.Message);
         throw;
       }
     });

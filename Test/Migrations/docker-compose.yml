@@ -18,6 +18,7 @@ services:
     build:
       context: ../../
       dockerfile: Test/Migrations/Dockerfile
+      target: apply-migrations
     depends_on:
       sqlserver:
         condition: service_healthy

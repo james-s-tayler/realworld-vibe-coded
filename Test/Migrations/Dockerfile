@@ -1,13 +1,10 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
 RUN dotnet tool install --global dotnet-ef --version 10.*
 
 WORKDIR /app
-
-COPY Test/Migrations/run-migrations.sh /app/run-migrations.sh
-RUN chmod +x /app/run-migrations.sh
 
 COPY App/Server/Directory.Build.props App/Server/
 COPY App/Server/Directory.Packages.props App/Server/
@@ -27,4 +24,17 @@ COPY . .
 RUN --mount=type=cache,id=nuget-http,target=/root/.local/share/NuGet/v3-cache \
     dotnet build App/Server/src/Server.Web/Server.Web.csproj --no-restore
 
-ENTRYPOINT ["/app/run-migrations.sh"]
+FROM build AS apply-migrations
+COPY Test/Migrations/run-apply-migrations.sh /app/run-script.sh
+RUN chmod +x /app/run-script.sh
+ENTRYPOINT ["/app/run-script.sh"]
+
+FROM build AS generate-idempotent
+COPY Test/Migrations/run-generate-idempotent.sh /app/run-script.sh
+RUN chmod +x /app/run-script.sh
+ENTRYPOINT ["/app/run-script.sh"]
+
+FROM build AS verify-idempotent
+COPY Test/Migrations/run-verify-idempotent.sh /app/run-script.sh
+RUN chmod +x /app/run-script.sh
+ENTRYPOINT ["/app/run-script.sh"]
