@@ -12,12 +12,10 @@ namespace Server.Infrastructure.Data.Interceptors;
 public class AuditableEntityInterceptor : SaveChangesInterceptor
 {
   private readonly ITimeProvider _timeProvider;
-  private readonly IServiceProvider _serviceProvider;
 
-  public AuditableEntityInterceptor(ITimeProvider timeProvider, IServiceProvider serviceProvider)
+  public AuditableEntityInterceptor(ITimeProvider timeProvider)
   {
     _timeProvider = timeProvider;
-    _serviceProvider = serviceProvider;
   }
 
   public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)

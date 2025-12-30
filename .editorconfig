@@ -84,6 +84,10 @@ end_of_line = crlf
 dotnet_diagnostic.IDE0005.severity = error
 # Enforce formatting rules (whitespace, indentation, etc.)
 dotnet_diagnostic.IDE0055.severity = error
+# Detect unused private members (dead code)
+dotnet_diagnostic.IDE0051.severity = error
+# Detect unread private members
+dotnet_diagnostic.IDE0052.severity = error
 # StyleCop: Suppress file header requirements
 dotnet_diagnostic.SA1633.severity = none
 dotnet_diagnostic.SA0001.severity = none
