@@ -14,11 +14,6 @@ public abstract class EntityBase : HasDomainEventsBase, IAuditableEntity
   public Guid Id { get; set; }
 
   /// <summary>
-  /// Tenant identifier for multi-tenant data isolation
-  /// </summary>
-  public Guid? TenantId { get; set; }
-
-  /// <summary>
   /// Row version for optimistic concurrency control
   /// </summary>
   [Timestamp]

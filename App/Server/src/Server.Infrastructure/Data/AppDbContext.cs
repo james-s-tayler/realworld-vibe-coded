@@ -115,14 +115,6 @@ public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
             .IsRequired()
             .HasMaxLength(256);
         }
-
-        // Configure TenantId index for performance
-        var tenantIdProperty = entityType.FindProperty(nameof(EntityBase.TenantId));
-        if (tenantIdProperty != null)
-        {
-          modelBuilder.Entity(entityType.ClrType)
-            .HasIndex(nameof(EntityBase.TenantId));
-        }
       }
     }
   }
