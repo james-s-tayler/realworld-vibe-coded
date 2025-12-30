@@ -1,4 +1,6 @@
-﻿using Finbuckle.MultiTenant.Abstractions;
+﻿using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
+using Finbuckle.MultiTenant.Extensions;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
@@ -20,14 +22,22 @@ public static class InfrastructureServiceExtensions
     string? connectionString = config.GetConnectionString("DefaultConnection");
     Guard.Against.Null(connectionString);
 
+    string? tenantStoreConnectionString = config.GetConnectionString("TenantStoreConnection") ?? connectionString;
+
     // Register the interceptor
     services.AddSingleton<ITimeProvider, UtcNowTimeProvider>();
     services.AddSingleton<AuditableEntityInterceptor>();
 
-    // Register a Phase 4 IMultiTenantContextAccessor that provides default TenantInfo
-    // This allows ApplicationUser operations without full tenant resolution
-    // Will be replaced with actual tenant resolution strategies in Phase 5+
-    services.AddSingleton<IMultiTenantContextAccessor, DefaultTenantContextAccessor>();
+    // Configure Finbuckle.MultiTenant with ClaimsStrategy and EFCore store
+    services.AddMultiTenant<Server.Core.TenantAggregate.TenantInfo>()
+      .WithClaimStrategy()  // Use claims to resolve tenant (default claim type: "__tenant__")
+      .WithEFCoreStore<TenantStoreDbContext, Server.Core.TenantAggregate.TenantInfo>();
+
+    // Register TenantStoreDbContext (separate database for tenant information)
+    services.AddDbContext<TenantStoreDbContext>(options =>
+    {
+      options.UseSqlServer(tenantStoreConnectionString);
+    });
 
     services.AddDbContext<AppDbContext>((serviceProvider, options) =>
     {

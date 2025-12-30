@@ -1,4 +1,5 @@
 ﻿using Ardalis.ListStartupServices;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
@@ -31,6 +32,7 @@ public static class MiddlewareConfig
     }
 
     app.UseExceptionHandler();
+    app.UseMultiTenant(); // Must come before UseAuthentication for Claims strategy to work
     app.UseFastEndpoints(config =>
     {
       config.Errors.UseProblemDetails();

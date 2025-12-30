@@ -9,6 +9,8 @@
     <PackageReference Include="Azure.Identity" />
     <PackageReference Include="BCrypt.Net-Next" />
     <PackageReference Include="FastEndpoints" />
+    <PackageReference Include="Finbuckle.MultiTenant" />
+    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" />
     <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" />
     <PackageReference Include="Finbuckle.MultiTenant.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
