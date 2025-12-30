@@ -30,6 +30,7 @@
         "BuildRoslynMcp",
         "BuildServer",
         "BuildServerPublish",
+        "DbMigrationsAdd",
         "DbMigrationsGenerateIdempotentScript",
         "DbMigrationsVerifyAll",
         "DbMigrationsVerifyApply",
@@ -146,6 +147,10 @@
         "Force": {
           "type": "boolean",
           "description": "Force operation without confirmation"
+        },
+        "MigrationName": {
+          "type": "string",
+          "description": "Migration name for DbMigrationsAdd target"
         },
         "SkipPublish": {
           "type": "boolean",

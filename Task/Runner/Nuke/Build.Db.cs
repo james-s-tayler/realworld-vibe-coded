@@ -9,6 +9,9 @@ public partial class Build
   [Parameter("Force operation without confirmation")]
   internal readonly bool Force;
 
+  [Parameter("Migration name for DbMigrationsAdd target")]
+  internal readonly string? MigrationName;
+
   internal Target DbReset => _ => _
     .Description("Reset local SQL Server database by removing docker volume (confirm or --force to skip)")
     .Executes(() =>
@@ -153,6 +156,41 @@ public partial class Build
       catch (Exception ex)
       {
         Log.Error("Failed to generate idempotent SQL script: {Message}", ex.Message);
+        throw;
+      }
+    });
+
+  internal Target DbMigrationsAdd => _ => _
+    .Description("Add a new EF Core migration (requires --migration-name parameter)")
+    .DependsOn(InstallDotnetToolEf)
+    .Executes(() =>
+    {
+      if (string.IsNullOrWhiteSpace(MigrationName))
+      {
+        Log.Error("Migration name is required. Use --migration-name <name> parameter");
+        throw new Exception("Migration name is required. Use --migration-name <name> parameter");
+      }
+
+      Log.Information("Adding new migration: {MigrationName}", MigrationName);
+
+      // Add migration using dotnet ef
+      var args = $"ef migrations add {MigrationName} --project {ServerInfrastructureProject} --startup-project {ServerProject}";
+
+      try
+      {
+        ProcessTasks.StartProcess(
+          "dotnet",
+          args,
+          workingDirectory: RootDirectory,
+          logOutput: true)
+          .AssertZeroExitCode();
+
+        Log.Information("✓ Migration '{MigrationName}' added successfully", MigrationName);
+        Log.Information("Don't forget to run 'nuke DbMigrationsGenerateIdempotentScript' to update the idempotent script");
+      }
+      catch (Exception ex)
+      {
+        Log.Error("Failed to add migration: {Message}", ex.Message);
         throw;
       }
     });
