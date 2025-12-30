@@ -9,20 +9,17 @@ namespace FlowPilot.Cli.StateTransitions;
 /// </summary>
 public class PhaseDetailsTransition : IStateTransition
 {
-  private readonly PlanManager _planManager;
   private readonly IFileSystemService _fileSystem;
   private readonly TemplateService _templateService;
   private readonly StateParser _stateParser;
   private readonly ILogger<PhaseDetailsTransition> _logger;
 
   public PhaseDetailsTransition(
-    PlanManager planManager,
     IFileSystemService fileSystem,
     TemplateService templateService,
     StateParser stateParser,
     ILogger<PhaseDetailsTransition> logger)
   {
-    _planManager = planManager;
     _fileSystem = fileSystem;
     _templateService = templateService;
     _stateParser = stateParser;

@@ -27,6 +27,7 @@
         "BuildClient",
         "BuildFlowPilot",
         "BuildFlowPilotPublish",
+        "BuildRoslynMcp",
         "BuildServer",
         "BuildServerPublish",
         "DbMigrationsGenerateIdempotentScript",

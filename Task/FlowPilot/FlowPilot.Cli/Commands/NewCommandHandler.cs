@@ -8,22 +8,13 @@ namespace FlowPilot.Cli.Commands;
 /// </summary>
 public class NewCommandHandler : ICommand
 {
-  private readonly IFileSystemService _fileSystem;
-  private readonly TemplateService _templateService;
-  private readonly StateParser _stateParser;
   private readonly PlanManager _planManager;
   private readonly ILogger<NewCommandHandler> _logger;
 
   public NewCommandHandler(
-    IFileSystemService fileSystem,
-    TemplateService templateService,
-    StateParser stateParser,
     PlanManager planManager,
     ILogger<NewCommandHandler> logger)
   {
-    _fileSystem = fileSystem;
-    _templateService = templateService;
-    _stateParser = stateParser;
     _planManager = planManager;
     _logger = logger;
   }

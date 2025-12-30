@@ -76,6 +76,27 @@ jobs:
       - name: Build (Nuke build system)
         run: dotnet build Task/Runner/Nuke.sln
 
+  build-roslyn-mcp:
+    name: build-roslyn-mcp
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: App/Server/global.json
+
+      - name: Verify .NET version
+        run: dotnet --info
+
+      - name: Build RoslynMCP
+        run: ./build.sh build-roslyn-mcp
+
   flowpilot-lint:
     name: flowpilot-lint
     runs-on: ubuntu-latest

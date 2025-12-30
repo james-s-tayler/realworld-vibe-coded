@@ -68,4 +68,14 @@ public partial class Build
         .SetProcessWorkingDirectory(ClientDirectory)
         .SetCommand("build"));
     });
+
+  internal Target BuildRoslynMcp => _ => _
+    .Description("Build RoslynMCP server")
+    .Executes(() =>
+    {
+      Log.Information($"Building RoslynMCP project at {RoslynMcpProject}");
+      DotNetBuild(s => s
+        .SetProjectFile(RoslynMcpProject)
+        .SetConfiguration("Debug"));
+    });
 }

@@ -12,13 +12,11 @@ namespace FlowPilot.Cli.Linting;
 public class PullRequestMergeBoundary : ILintingRule
 {
   private readonly GitService _gitService;
-  private readonly IFileSystemService _fileSystem;
   private readonly ILogger<PullRequestMergeBoundary> _logger;
 
-  public PullRequestMergeBoundary(GitService gitService, IFileSystemService fileSystem, ILogger<PullRequestMergeBoundary> logger)
+  public PullRequestMergeBoundary(GitService gitService, ILogger<PullRequestMergeBoundary> logger)
   {
     _gitService = gitService;
-    _fileSystem = fileSystem;
     _logger = logger;
   }
 
