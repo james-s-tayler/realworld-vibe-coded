@@ -87,11 +87,11 @@ public static class MiddlewareConfig
 
     try
     {
-      // Seed TenantStore database first (contains tenant catalog)
+      // Run migrations for TenantStore database first (contains tenant catalog)
       var tenantStoreContext = services.GetRequiredService<TenantStoreDbContext>();
-      await TenantStoreSeedData.InitializeAsync(tenantStoreContext);
+      await tenantStoreContext.Database.MigrateAsync();
 
-      // Then seed application database (multi-tenant data)
+      // Then run migrations for application database (multi-tenant data)
       var context = services.GetRequiredService<AppDbContext>();
       await context.Database.MigrateAsync();
       await SeedData.InitializeAsync(context);

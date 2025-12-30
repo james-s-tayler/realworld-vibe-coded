@@ -3,7 +3,9 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
+using Server.Core.TenantInfoAggregate;
 using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Identity.Register;
 
@@ -12,13 +14,16 @@ namespace Server.UseCases.Identity.Register;
 public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 {
   private readonly UserManager<ApplicationUser> _userManager;
+  private readonly IRepository<TenantInfo> _tenantRepository;
   private readonly ILogger<RegisterHandler> _logger;
 
   public RegisterHandler(
     UserManager<ApplicationUser> userManager,
+    IRepository<TenantInfo> tenantRepository,
     ILogger<RegisterHandler> logger)
   {
     _userManager = userManager;
+    _tenantRepository = tenantRepository;
     _logger = logger;
   }
 
@@ -51,16 +56,28 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     // Generate a unique tenant ID for this user
     var tenantId = Guid.NewGuid().ToString();
 
+    // Create and persist the TenantInfo record to the tenant store
+    var tenantInfo = new TenantInfo(
+      id: tenantId,
+      identifier: tenantId, // Using the same value for identifier
+      name: $"Tenant {request.Email}");
+
+    await _tenantRepository.AddAsync(tenantInfo, cancellationToken);
+    await _tenantRepository.SaveChangesAsync(cancellationToken);
+
     // Add the tenant claim to the user (ClaimsStrategy uses "__tenant__" by default)
     var tenantClaim = new Claim("__tenant__", tenantId);
     var claimResult = await _userManager.AddClaimAsync(user, tenantClaim);
 
     if (!claimResult.Succeeded)
     {
-      // If adding the claim fails, we should delete the user to maintain consistency
+      // If adding the claim fails, we should delete the user and tenant to maintain consistency
+      await _tenantRepository.DeleteAsync(tenantInfo, cancellationToken);
+      await _tenantRepository.SaveChangesAsync(cancellationToken);
       await _userManager.DeleteAsync(user);
+
       var errorDetails = claimResult.Errors.Select(e => new ErrorDetail("tenantId", e.Description)).ToArray();
-      _logger.LogError("Failed to add tenant claim for user {Email}, user registration rolled back", request.Email);
+      _logger.LogError("Failed to add tenant claim for user {Email}, user and tenant registration rolled back", request.Email);
       return Result<Unit>.Invalid(errorDetails);
     }
 

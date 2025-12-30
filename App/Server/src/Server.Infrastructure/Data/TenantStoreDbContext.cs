@@ -1,5 +1,5 @@
 ﻿using Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
-using Server.Core.TenantAggregate;
+using Server.Core.TenantInfoAggregate;
 
 namespace Server.Infrastructure.Data;
 

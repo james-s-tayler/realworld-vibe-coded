@@ -29,9 +29,9 @@ public static class InfrastructureServiceExtensions
     services.AddSingleton<AuditableEntityInterceptor>();
 
     // Configure Finbuckle.MultiTenant with ClaimsStrategy and EFCore store
-    services.AddMultiTenant<Server.Core.TenantAggregate.TenantInfo>()
+    services.AddMultiTenant<Server.Core.TenantInfoAggregate.TenantInfo>()
       .WithClaimStrategy()  // Use claims to resolve tenant (default claim type: "__tenant__")
-      .WithEFCoreStore<TenantStoreDbContext, Server.Core.TenantAggregate.TenantInfo>();
+      .WithEFCoreStore<TenantStoreDbContext, Server.Core.TenantInfoAggregate.TenantInfo>();
 
     // Register TenantStoreDbContext (separate database for tenant information)
     services.AddDbContext<TenantStoreDbContext>(options =>
@@ -45,8 +45,11 @@ public static class InfrastructureServiceExtensions
       options.AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
     });
 
+    // Register repositories for both contexts
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
            .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
+           .AddScoped(typeof(IRepository<Server.Core.TenantInfoAggregate.TenantInfo>), typeof(TenantStoreRepository<Server.Core.TenantInfoAggregate.TenantInfo>))
+           .AddScoped(typeof(IReadRepository<Server.Core.TenantInfoAggregate.TenantInfo>), typeof(TenantStoreRepository<Server.Core.TenantInfoAggregate.TenantInfo>))
            .AddScoped<IUnitOfWork, UnitOfWork>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
            .AddScoped<IUserContext, UserContext>();

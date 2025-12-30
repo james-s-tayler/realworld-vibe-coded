@@ -1,10 +1,12 @@
-﻿namespace Server.Core.TenantAggregate;
+﻿using Server.SharedKernel.Persistence;
+
+namespace Server.Core.TenantInfoAggregate;
 
 /// <summary>
 /// Represents information about a tenant in the multi-tenant system.
 /// Derives from Finbuckle.MultiTenant.Abstractions.TenantInfo which provides Id, Identifier, and Name properties.
 /// </summary>
-public record TenantInfo : Finbuckle.MultiTenant.Abstractions.TenantInfo
+public record TenantInfo : Finbuckle.MultiTenant.Abstractions.TenantInfo, IAggregateRoot
 {
   /// <summary>
   /// Initializes a new instance of the TenantInfo record.

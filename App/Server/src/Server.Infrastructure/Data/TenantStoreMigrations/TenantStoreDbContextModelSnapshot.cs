@@ -19,7 +19,7 @@ namespace Server.Infrastructure.Data.TenantStoreMigrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Server.Core.TenantAggregate.TenantInfo", b =>
+            modelBuilder.Entity("Server.Core.TenantInfoAggregate.TenantInfo", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
