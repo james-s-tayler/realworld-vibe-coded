@@ -14,15 +14,18 @@ namespace Server.UseCases.Identity.Register;
 public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 {
   private readonly UserManager<ApplicationUser> _userManager;
+  private readonly SignInManager<ApplicationUser> _signInManager;
   private readonly IRepository<TenantInfo> _tenantRepository;
   private readonly ILogger<RegisterHandler> _logger;
 
   public RegisterHandler(
     UserManager<ApplicationUser> userManager,
+    SignInManager<ApplicationUser> signInManager,
     IRepository<TenantInfo> tenantRepository,
     ILogger<RegisterHandler> logger)
   {
     _userManager = userManager;
+    _signInManager = signInManager;
     _tenantRepository = tenantRepository;
     _logger = logger;
   }
@@ -80,6 +83,13 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
       _logger.LogError("Failed to add tenant claim for user {Email}, user and tenant registration rolled back", request.Email);
       return Result<Unit>.Invalid(errorDetails);
     }
+
+    // Temporarily sign in the user to establish tenant context
+    // This ensures the tenant is set in the MultiTenantContext for any subsequent operations
+    await _signInManager.SignInAsync(user, isPersistent: false);
+
+    // Sign out immediately after establishing context
+    await _signInManager.SignOutAsync();
 
     _logger.LogInformation("User {Email} registered successfully with tenant {TenantId}", request.Email, tenantId);
 
