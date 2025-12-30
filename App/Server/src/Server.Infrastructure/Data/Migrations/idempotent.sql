@@ -1627,3 +1627,104 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230063215_RemoveTenantIdFromEntityBase'
+)
+BEGIN
+    DROP INDEX [IX_UserFollowing_TenantId] ON [UserFollowing];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230063215_RemoveTenantIdFromEntityBase'
+)
+BEGIN
+    DROP INDEX [IX_Tags_TenantId] ON [Tags];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230063215_RemoveTenantIdFromEntityBase'
+)
+BEGIN
+    DROP INDEX [IX_Comments_TenantId] ON [Comments];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230063215_RemoveTenantIdFromEntityBase'
+)
+BEGIN
+    DROP INDEX [IX_Articles_TenantId] ON [Articles];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230063215_RemoveTenantIdFromEntityBase'
+)
+BEGIN
+    DECLARE @var13 nvarchar(max);
+    SELECT @var13 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[UserFollowing]') AND [c].[name] = N'TenantId');
+    IF @var13 IS NOT NULL EXEC(N'ALTER TABLE [UserFollowing] DROP CONSTRAINT ' + @var13 + ';');
+    ALTER TABLE [UserFollowing] DROP COLUMN [TenantId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230063215_RemoveTenantIdFromEntityBase'
+)
+BEGIN
+    DECLARE @var14 nvarchar(max);
+    SELECT @var14 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Tags]') AND [c].[name] = N'TenantId');
+    IF @var14 IS NOT NULL EXEC(N'ALTER TABLE [Tags] DROP CONSTRAINT ' + @var14 + ';');
+    ALTER TABLE [Tags] DROP COLUMN [TenantId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230063215_RemoveTenantIdFromEntityBase'
+)
+BEGIN
+    DECLARE @var15 nvarchar(max);
+    SELECT @var15 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Comments]') AND [c].[name] = N'TenantId');
+    IF @var15 IS NOT NULL EXEC(N'ALTER TABLE [Comments] DROP CONSTRAINT ' + @var15 + ';');
+    ALTER TABLE [Comments] DROP COLUMN [TenantId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230063215_RemoveTenantIdFromEntityBase'
+)
+BEGIN
+    DECLARE @var16 nvarchar(max);
+    SELECT @var16 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Articles]') AND [c].[name] = N'TenantId');
+    IF @var16 IS NOT NULL EXEC(N'ALTER TABLE [Articles] DROP CONSTRAINT ' + @var16 + ';');
+    ALTER TABLE [Articles] DROP COLUMN [TenantId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230063215_RemoveTenantIdFromEntityBase'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20251230063215_RemoveTenantIdFromEntityBase', N'10.0.1');
+END;
+
+COMMIT;
+GO
+

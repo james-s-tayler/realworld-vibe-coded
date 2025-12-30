@@ -19,6 +19,9 @@ task_flowpilot_changes=$(echo "$staged_files" | grep "^Task/FlowPilot/" | wc -l)
 # Check if there are any changes in Test/e2e
 e2e_test_changes=$(echo "$staged_files" | grep "^Test/e2e/" | wc -l)
 
+# Check if there are any changes in Server.Infrastructure/Data or Server.Core
+migration_changes=$(echo "$staged_files" | grep -E "^App/Server/src/Server\.(Infrastructure/Data|Core)/" | wc -l)
+
 # Run lint-server-fix if there are server changes
 if [ "$server_changes" -gt 0 ]; then
   echo "🔧 Server changes detected, running lint-server-verify..."
@@ -69,9 +72,19 @@ if [ "$e2e_test_changes" -gt 0 ]; then
   echo "✅ E2E tests completed successfully."
 fi
 
+# Run DbMigrationsVerifyAll if there are changes in Server.Infrastructure/Data or Server.Core
+if [ "$migration_changes" -gt 0 ]; then
+  echo "🔧 Database migration or Core entity changes detected, running DbMigrationsVerifyAll..."
+  if ! ./build.sh DbMigrationsVerifyAll; then
+    echo "❌ Database migrations verification failed. Run ./build.sh DbMigrationsGenerateIdempotentScript to regenerate the script."
+    exit 1
+  fi
+  echo "✅ Database migrations verification completed successfully."
+fi
+
 # If no relevant changes, skip linting
-if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ] && [ "$task_flowpilot_changes" -eq 0 ] && [ "$e2e_test_changes" -eq 0 ]; then
-  echo "ℹ️  No changes detected in App/Server, App/Client, Task/Runner, Task/FlowPilot, or Test/e2e directories. Skipping linting."
+if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ] && [ "$task_flowpilot_changes" -eq 0 ] && [ "$e2e_test_changes" -eq 0 ] && [ "$migration_changes" -eq 0 ]; then
+  echo "ℹ️  No changes detected in App/Server, App/Client, Task/Runner, Task/FlowPilot, Test/e2e, or database migration directories. Skipping linting."
 fi
 
 # Run flowpilot lint to ensure FlowPilot plan state is valid
