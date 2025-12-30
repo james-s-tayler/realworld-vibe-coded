@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Server.Core.UserAggregate;
+using Server.Core.IdentityAggregate;
 
 namespace Server.Web.Users.Update;
 
@@ -17,8 +17,8 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
         .WithMessage("is required.")
         .EmailAddress()
         .WithMessage("is invalid.")
-        .MaximumLength(User.EmailMaxLength)
-        .WithMessage($"cannot exceed {User.EmailMaxLength} characters.")
+        .MaximumLength(ApplicationUser.EmailMaxLength)
+        .WithMessage($"cannot exceed {ApplicationUser.EmailMaxLength} characters.")
         .OverridePropertyName("email");
     });
 
@@ -28,10 +28,10 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
       RuleFor(x => x.User.Username)
         .NotEmpty()
         .WithMessage("is required.")
-        .MinimumLength(User.UsernameMinLength)
-        .WithMessage($"must be at least {User.UsernameMinLength} characters.")
-        .MaximumLength(User.UsernameMaxLength)
-        .WithMessage($"cannot exceed {User.UsernameMaxLength} characters.")
+        .MinimumLength(ApplicationUser.UsernameMinLength)
+        .WithMessage($"must be at least {ApplicationUser.UsernameMinLength} characters.")
+        .MaximumLength(ApplicationUser.UsernameMaxLength)
+        .WithMessage($"cannot exceed {ApplicationUser.UsernameMaxLength} characters.")
         .OverridePropertyName("username");
     });
 
@@ -41,8 +41,8 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
       RuleFor(x => x.User.Password)
         .NotEmpty()
         .WithMessage("is required.")
-        .MinimumLength(User.PasswordMinLength)
-        .WithMessage($"must be at least {User.PasswordMinLength} characters.")
+        .MinimumLength(ApplicationUser.PasswordMinLength)
+        .WithMessage($"must be at least {ApplicationUser.PasswordMinLength} characters.")
         .OverridePropertyName("password");
     });
 
@@ -52,8 +52,8 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
       RuleFor(x => x.User.Bio)
         .NotEmpty()
         .WithMessage("is required.")
-        .MaximumLength(User.BioMaxLength)
-        .WithMessage($"cannot exceed {User.BioMaxLength} characters.")
+        .MaximumLength(ApplicationUser.BioMaxLength)
+        .WithMessage($"cannot exceed {ApplicationUser.BioMaxLength} characters.")
         .OverridePropertyName("bio");
     });
   }
