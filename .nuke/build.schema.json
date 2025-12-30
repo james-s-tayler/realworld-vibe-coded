@@ -144,6 +144,10 @@
           "type": "boolean",
           "description": "Stop on first test failure (for Postman tests)"
         },
+        "DbContext": {
+          "type": "string",
+          "description": "DbContext name for migrations (e.g., AppDbContext, TenantStoreDbContext)"
+        },
         "Force": {
           "type": "boolean",
           "description": "Force operation without confirmation"

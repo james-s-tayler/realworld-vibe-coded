@@ -1,6 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
+ARG DBCONTEXT=AppDbContext
+
 ENV PATH="${PATH}:/root/.dotnet/tools"
+ENV DBCONTEXT=${DBCONTEXT}
 
 RUN dotnet tool install --global dotnet-ef --version 10.*
 
