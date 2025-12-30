@@ -4,7 +4,6 @@ using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Server.Core.ArticleAggregate;
 using Server.Core.IdentityAggregate;
-using Server.Core.OrganizationAggregate;
 using Server.Core.TagAggregate;
 using Server.Core.UserAggregate;
 using Server.SharedKernel.DomainEvents;
@@ -32,8 +31,6 @@ public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
   public DbSet<Comment> Comments => Set<Comment>();
 
   public DbSet<UserFollowing> UserFollowings => Set<UserFollowing>();
-
-  public DbSet<Organization> Organizations => Set<Organization>();
 
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
   {
@@ -65,9 +62,6 @@ public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
     base.OnModelCreating(modelBuilder);
 
     modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
-    // Note: Default Organization with empty Identifier is inserted via migration SQL
-    // to work around rowversion/ChangeCheck incompatibility with EF Core seed data
 
     // Configure properties for all entities inheriting from EntityBase
     foreach (var entityType in modelBuilder.Model.GetEntityTypes())
