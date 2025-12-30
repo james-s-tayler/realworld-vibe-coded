@@ -48,6 +48,8 @@ public partial class Build
 
   internal AbsolutePath FlowPilotTestProject => FlowPilotDirectory / "FlowPilot.Tests" / "FlowPilot.Tests.csproj";
 
+  internal AbsolutePath RoslynMcpProject => RootDirectory / "Task" / "McpServers" / "roslyn-mcp" / "RoslynMCP" / "RoslynMCP.csproj";
+
   internal AbsolutePath LocalNuGetFeedDirectory => RootDirectory / ".local-nuget";
 
   #endregion
