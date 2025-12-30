@@ -1728,3 +1728,42 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230141653_MultitenantStuff'
+)
+BEGIN
+    DROP INDEX [IX_AspNetUsers_TenantId] ON [AspNetUsers];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230141653_MultitenantStuff'
+)
+BEGIN
+    DROP INDEX [UserNameIndex] ON [AspNetUsers];
+    DECLARE @var17 nvarchar(max);
+    SELECT @var17 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[AspNetUsers]') AND [c].[name] = N'TenantId');
+    IF @var17 IS NOT NULL EXEC(N'ALTER TABLE [AspNetUsers] DROP CONSTRAINT ' + @var17 + ';');
+    EXEC(N'UPDATE [AspNetUsers] SET [TenantId] = N'''' WHERE [TenantId] IS NULL');
+    ALTER TABLE [AspNetUsers] ALTER COLUMN [TenantId] nvarchar(450) NOT NULL;
+    ALTER TABLE [AspNetUsers] ADD DEFAULT N'' FOR [TenantId];
+    EXEC(N'CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName], [TenantId]) WHERE [NormalizedUserName] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20251230141653_MultitenantStuff'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20251230141653_MultitenantStuff', N'10.0.1');
+END;
+
+COMMIT;
+GO
+

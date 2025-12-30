@@ -20,6 +20,7 @@ public partial class Build
 
   internal Target LintServerFix => _ => _
       .Description("Fix backend formatting & analyzer issues automatically")
+      .After(DbMigrationsAdd)
       .Executes(() =>
       {
         Log.Information($"Running dotnet format (fix mode) on {ServerSolution}");
