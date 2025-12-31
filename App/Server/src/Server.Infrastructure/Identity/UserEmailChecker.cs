@@ -40,7 +40,6 @@ public class UserEmailChecker : IUserEmailChecker
   public async Task IncrementAccessFailedCountAsync<TUser>(TUser user, CancellationToken cancellationToken = default) where TUser : class
   {
     var entry = _dbContext.Entry(user);
-    var currentCount = entry.Property<int>("AccessFailedCount").CurrentValue;
 
     // Use ExecuteUpdateAsync to update directly in the database without tracking issues
     // ApplicationUser.Id is Guid, not string
@@ -49,7 +48,7 @@ public class UserEmailChecker : IUserEmailChecker
       .Where(u => EF.Property<Guid>(u, "Id") == userId)
       .ExecuteUpdateAsync(
         setters => setters
-          .SetProperty(u => EF.Property<int>(u, "AccessFailedCount"), currentCount + 1),
+          .SetProperty(u => EF.Property<int>(u, "AccessFailedCount"), u => EF.Property<int>(u, "AccessFailedCount") + 1),
         cancellationToken);
   }
 
