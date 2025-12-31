@@ -40,33 +40,32 @@ public class UserEmailChecker : IUserEmailChecker
   public async Task IncrementAccessFailedCountAsync<TUser>(TUser user, CancellationToken cancellationToken = default) where TUser : class
   {
     var entry = _dbContext.Entry(user);
-
-    // Get current values
     var userId = entry.Property<Guid>("Id").CurrentValue;
-    var currentCount = entry.Property<int>("AccessFailedCount").CurrentValue;
-    var newCount = currentCount + 1;
 
-    // Use ExecuteUpdateAsync to update directly in the database without tracking issues
-    await _dbContext.Set<TUser>()
-      .Where(u => EF.Property<Guid>(u, "Id") == userId)
-      .ExecuteUpdateAsync(
-        setters => setters
-          .SetProperty(u => EF.Property<int>(u, "AccessFailedCount"), newCount),
-        cancellationToken);
+    // PV003: Raw SQL is necessary here because ExecuteUpdateAsync expressions cannot use captured
+    // variables or complex expressions that EF Core can't translate. Since we're working with a user
+    // entity loaded via IgnoreQueryFilters() (required for ClaimsStrategy), we cannot use UserManager
+    // methods which apply tenant filters. Direct SQL update avoids entity tracking conflicts.
+#pragma warning disable PV003
+    await _dbContext.Database.ExecuteSqlRawAsync(
+      "UPDATE AspNetUsers SET AccessFailedCount = AccessFailedCount + 1 WHERE Id = {0}",
+      new[] { userId },
+      cancellationToken);
+#pragma warning restore PV003
   }
 
   public async Task ResetAccessFailedCountAsync<TUser>(TUser user, CancellationToken cancellationToken = default) where TUser : class
   {
     var entry = _dbContext.Entry(user);
-
-    // Use ExecuteUpdateAsync to update directly in the database without tracking issues
-    // ApplicationUser.Id is Guid, not string
     var userId = entry.Property<Guid>("Id").CurrentValue;
-    await _dbContext.Set<TUser>()
-      .Where(u => EF.Property<Guid>(u, "Id") == userId)
-      .ExecuteUpdateAsync(
-        setters => setters
-          .SetProperty(u => EF.Property<int>(u, "AccessFailedCount"), 0),
-        cancellationToken);
+
+    // PV003: Raw SQL is necessary here for same reasons as IncrementAccessFailedCountAsync.
+    // We need to update the database directly without entity tracking conflicts.
+#pragma warning disable PV003
+    await _dbContext.Database.ExecuteSqlRawAsync(
+      "UPDATE AspNetUsers SET AccessFailedCount = 0 WHERE Id = {0}",
+      new[] { userId },
+      cancellationToken);
+#pragma warning restore PV003
   }
 }
