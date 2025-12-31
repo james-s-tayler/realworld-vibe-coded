@@ -32,7 +32,7 @@ public static class MiddlewareConfig
     }
 
     app.UseExceptionHandler();
-    app.UseMultiTenant(); // Must come before UseAuthentication for Claims strategy to work
+    app.UseMultiTenant();
     app.UseFastEndpoints(config =>
     {
       config.Errors.UseProblemDetails();
@@ -75,26 +75,23 @@ public static class MiddlewareConfig
       Predicate = check => check.Tags.Contains("ready"), // Only run readiness checks (database)
     });
 
-    await SeedDatabase(app);
+    await RunMigrations(app);
 
     return app;
   }
 
-  private static async Task SeedDatabase(WebApplication app)
+  private static async Task RunMigrations(WebApplication app)
   {
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
 
     try
     {
-      // Run migrations for TenantStore database first (contains tenant catalog)
       var tenantStoreContext = services.GetRequiredService<TenantStoreDbContext>();
       await tenantStoreContext.Database.MigrateAsync();
 
-      // Then run migrations for application database (multi-tenant data)
       var context = services.GetRequiredService<AppDbContext>();
       await context.Database.MigrateAsync();
-      await SeedData.InitializeAsync(context);
     }
     catch (Exception ex)
     {

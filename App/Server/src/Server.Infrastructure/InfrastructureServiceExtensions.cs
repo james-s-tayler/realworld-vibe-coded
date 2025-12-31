@@ -30,7 +30,7 @@ public static class InfrastructureServiceExtensions
 
     // Configure Finbuckle.MultiTenant with ClaimsStrategy and EFCore store
     services.AddMultiTenant<Server.Core.TenantInfoAggregate.TenantInfo>()
-      .WithClaimStrategy()  // Use claims to resolve tenant (default claim type: "__tenant__")
+      .WithClaimStrategy()
       .WithEFCoreStore<TenantStoreDbContext, Server.Core.TenantInfoAggregate.TenantInfo>();
 
     // Register TenantStoreDbContext (separate database for tenant information)

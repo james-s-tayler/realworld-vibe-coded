@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <PackageReference Include="FastEndpoints" />
+    <PackageReference Include="Finbuckle.MultiTenant" />
+    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" />
     <PackageReference Include="MediatR" />
   </ItemGroup>
 
