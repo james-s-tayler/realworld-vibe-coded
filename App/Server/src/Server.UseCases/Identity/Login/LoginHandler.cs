@@ -18,8 +18,6 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
 {
   private readonly IUserEmailChecker _userEmailChecker;
   private readonly IRepository<TenantInfo> _tenantRepository;
-  private readonly UserManager<ApplicationUser> _userManager;
-  private readonly SignInManager<ApplicationUser> _signInManager;
   private readonly IOptionsMonitor<BearerTokenOptions> _bearerTokenOptions;
   private readonly TimeProvider _timeProvider;
   private readonly ILogger<LoginHandler> _logger;
@@ -28,8 +26,6 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
   public LoginHandler(
     IUserEmailChecker userEmailChecker,
     IRepository<TenantInfo> tenantRepository,
-    UserManager<ApplicationUser> userManager,
-    SignInManager<ApplicationUser> signInManager,
     IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
     TimeProvider timeProvider,
     ILogger<LoginHandler> logger,
@@ -37,8 +33,6 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
   {
     _userEmailChecker = userEmailChecker;
     _tenantRepository = tenantRepository;
-    _userManager = userManager;
-    _signInManager = signInManager;
     _bearerTokenOptions = bearerTokenOptions;
     _timeProvider = timeProvider;
     _logger = logger;
@@ -62,10 +56,11 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
 
     // Set tenant context before calling any UserManager/SignInManager methods
     // This is required so that EF Core queries for user claims work correctly
-    var tenantInfo = await _tenantRepository.GetByIdAsync(user.TenantId, cancellationToken);
+    var tenantId = _userEmailChecker.GetTenantId(user);
+    var tenantInfo = await _tenantRepository.GetByIdAsync(tenantId, cancellationToken);
     if (tenantInfo == null)
     {
-      _logger.LogError("Tenant {TenantId} not found for user {Email}", user.TenantId, request.Email);
+      _logger.LogError("Tenant {TenantId} not found for user {Email}", tenantId, request.Email);
       return Result<LoginResult>.CriticalError(new ErrorDetail("Tenant not found"));
     }
 

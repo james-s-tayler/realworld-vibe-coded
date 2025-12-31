@@ -30,4 +30,10 @@ public class UserEmailChecker : IUserEmailChecker
       .IgnoreQueryFilters()
       .FirstOrDefaultAsync(u => EF.Property<string>(u, "NormalizedEmail") == normalizedEmail, cancellationToken);
   }
+
+  public string GetTenantId<TUser>(TUser user) where TUser : class
+  {
+    var entry = _dbContext.Entry(user);
+    return entry.Property<string>("TenantId").CurrentValue;
+  }
 }

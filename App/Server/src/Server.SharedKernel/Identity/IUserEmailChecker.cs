@@ -22,4 +22,12 @@ public interface IUserEmailChecker
   /// <param name="cancellationToken">Cancellation token</param>
   /// <returns>The user if found, null otherwise</returns>
   Task<TUser?> FindByEmailAsync<TUser>(string email, CancellationToken cancellationToken = default) where TUser : class;
+
+  /// <summary>
+  /// Gets the TenantId shadow property value for a user.
+  /// </summary>
+  /// <typeparam name="TUser">The user type</typeparam>
+  /// <param name="user">The user entity</param>
+  /// <returns>The TenantId value from the shadow property</returns>
+  string GetTenantId<TUser>(TUser user) where TUser : class;
 }
