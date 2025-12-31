@@ -43,9 +43,10 @@ public class UserEmailChecker : IUserEmailChecker
     var currentCount = entry.Property<int>("AccessFailedCount").CurrentValue;
 
     // Use ExecuteUpdateAsync to update directly in the database without tracking issues
-    var userId = entry.Property<string>("Id").CurrentValue;
+    // ApplicationUser.Id is Guid, not string
+    var userId = entry.Property<Guid>("Id").CurrentValue;
     await _dbContext.Set<TUser>()
-      .Where(u => EF.Property<string>(u, "Id") == userId)
+      .Where(u => EF.Property<Guid>(u, "Id") == userId)
       .ExecuteUpdateAsync(
         setters => setters
           .SetProperty(u => EF.Property<int>(u, "AccessFailedCount"), currentCount + 1),
@@ -55,11 +56,12 @@ public class UserEmailChecker : IUserEmailChecker
   public async Task ResetAccessFailedCountAsync<TUser>(TUser user, CancellationToken cancellationToken = default) where TUser : class
   {
     var entry = _dbContext.Entry(user);
-    var userId = entry.Property<string>("Id").CurrentValue;
 
     // Use ExecuteUpdateAsync to update directly in the database without tracking issues
+    // ApplicationUser.Id is Guid, not string
+    var userId = entry.Property<Guid>("Id").CurrentValue;
     await _dbContext.Set<TUser>()
-      .Where(u => EF.Property<string>(u, "Id") == userId)
+      .Where(u => EF.Property<Guid>(u, "Id") == userId)
       .ExecuteUpdateAsync(
         setters => setters
           .SetProperty(u => EF.Property<int>(u, "AccessFailedCount"), 0),
