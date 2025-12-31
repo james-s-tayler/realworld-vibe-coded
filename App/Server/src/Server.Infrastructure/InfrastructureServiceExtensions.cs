@@ -31,8 +31,9 @@ public static class InfrastructureServiceExtensions
     services.AddSingleton<AuditableEntityInterceptor>();
 
     // Configure Finbuckle.MultiTenant with ClaimsStrategy and EFCore store
+    // Explicitly specify "__tenant__" as the claim type for ClaimsStrategy
     services.AddMultiTenant<Server.Core.TenantInfoAggregate.TenantInfo>()
-      .WithClaimStrategy()
+      .WithClaimStrategy("__tenant__")
       .WithEFCoreStore<TenantStoreDbContext, Server.Core.TenantInfoAggregate.TenantInfo>();
 
     // Register TenantStoreDbContext (separate database for tenant information)
