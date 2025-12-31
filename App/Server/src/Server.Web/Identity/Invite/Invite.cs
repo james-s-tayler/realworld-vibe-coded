@@ -8,7 +8,7 @@ public class Invite(IMediator mediator) : Endpoint<InviteRequest>
   public override void Configure()
   {
     Post("/api/identity/invite");
-    AuthSchemes("Token", "IdentityConstants.ApplicationScheme");
+    AuthSchemes("Identity.Bearer", "Identity.Application");
   }
 
   public override async Task HandleAsync(InviteRequest req, CancellationToken ct)
