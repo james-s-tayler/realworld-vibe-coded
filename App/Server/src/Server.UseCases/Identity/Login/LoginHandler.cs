@@ -70,6 +70,15 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     var userManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
     var signInManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<SignInManager<ApplicationUser>>();
 
+    // Reload the user using the new tenant-scoped UserManager
+    // The user from IUserEmailChecker was loaded with AsNoTracking, so we need to reload it
+    user = await userManager.FindByEmailAsync(request.Email);
+    if (user == null)
+    {
+      _logger.LogError("User {Email} not found after setting tenant context", request.Email);
+      return Result<LoginResult>.Unauthorized(new ErrorDetail("email", "Invalid email or password."));
+    }
+
     if (await userManager.IsLockedOutAsync(user))
     {
       _logger.LogWarning("Login failed for {Email}: Account is locked out", request.Email);
