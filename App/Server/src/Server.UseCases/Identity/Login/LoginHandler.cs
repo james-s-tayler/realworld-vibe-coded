@@ -106,6 +106,15 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
       var isPersistent = request.UseCookies && !request.UseSessionCookies;
       var principal = await signInManager.CreateUserPrincipalAsync(user);
 
+      // Ensure the __tenant__ claim is included in the principal for cookie authentication
+      // This is required for Finbuckle's ClaimsStrategy to work properly
+      var identity = principal.Identity as System.Security.Claims.ClaimsIdentity;
+      if (identity != null && !principal.HasClaim(c => c.Type == "__tenant__"))
+      {
+        identity.AddClaim(new System.Security.Claims.Claim("__tenant__", tenantId));
+        _logger.LogInformation("Added __tenant__ claim to principal for cookie authentication");
+      }
+
       _logger.LogInformation("User {Email} logged in with cookies", request.Email);
 
       return Result<LoginResult>.Success(new LoginResult(
@@ -118,6 +127,16 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     }
 
     var userPrincipal = await signInManager.CreateUserPrincipalAsync(user);
+
+    // Ensure the __tenant__ claim is included in the principal for bearer token authentication
+    // This is required for Finbuckle's ClaimsStrategy to work properly
+    var bearerIdentity = userPrincipal.Identity as System.Security.Claims.ClaimsIdentity;
+    if (bearerIdentity != null && !userPrincipal.HasClaim(c => c.Type == "__tenant__"))
+    {
+      bearerIdentity.AddClaim(new System.Security.Claims.Claim("__tenant__", tenantId));
+      _logger.LogInformation("Added __tenant__ claim to principal for bearer token authentication");
+    }
+
     var bearerOptions = _bearerTokenOptions.Get(IdentityConstants.BearerScheme);
 
     var accessTokenExpiration = _timeProvider.GetUtcNow() + bearerOptions.BearerTokenExpiration;
