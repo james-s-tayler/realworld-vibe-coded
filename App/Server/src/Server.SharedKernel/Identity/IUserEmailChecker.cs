@@ -30,4 +30,22 @@ public interface IUserEmailChecker
   /// <param name="user">The user entity</param>
   /// <returns>The TenantId value from the shadow property</returns>
   string GetTenantId<TUser>(TUser user) where TUser : class;
+
+  /// <summary>
+  /// Increments the access failed count for a user.
+  /// This method bypasses UserManager to avoid entity tracking conflicts.
+  /// </summary>
+  /// <typeparam name="TUser">The user type</typeparam>
+  /// <param name="user">The user entity</param>
+  /// <param name="cancellationToken">Cancellation token</param>
+  Task IncrementAccessFailedCountAsync<TUser>(TUser user, CancellationToken cancellationToken = default) where TUser : class;
+
+  /// <summary>
+  /// Resets the access failed count for a user to zero.
+  /// This method bypasses UserManager to avoid entity tracking conflicts.
+  /// </summary>
+  /// <typeparam name="TUser">The user type</typeparam>
+  /// <param name="user">The user entity</param>
+  /// <param name="cancellationToken">Cancellation token</param>
+  Task ResetAccessFailedCountAsync<TUser>(TUser user, CancellationToken cancellationToken = default) where TUser : class;
 }

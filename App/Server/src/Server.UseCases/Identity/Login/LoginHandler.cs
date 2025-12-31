@@ -70,7 +70,8 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     var userManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
     var signInManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<SignInManager<ApplicationUser>>();
 
-    if (await userManager.IsLockedOutAsync(user))
+    // Check lockout status directly from the user entity (already loaded)
+    if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.UtcNow)
     {
       _logger.LogWarning("Login failed for {Email}: Account is locked out", request.Email);
       return Result<LoginResult>.Unauthorized(new ErrorDetail("Account is locked out."));
@@ -79,18 +80,25 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     var isPasswordValid = await userManager.CheckPasswordAsync(user, request.Password);
     if (!isPasswordValid)
     {
-      await userManager.AccessFailedAsync(user);
+      // Handle access failed count directly via IUserEmailChecker instead of UserManager
+      // to avoid entity tracking conflicts with the already-loaded user entity
+      await _userEmailChecker.IncrementAccessFailedCountAsync(user, cancellationToken);
       _logger.LogWarning("Login failed for {Email}: Invalid password", request.Email);
       return Result<LoginResult>.Unauthorized(new ErrorDetail("Invalid email or password."));
     }
 
-    if (await userManager.GetTwoFactorEnabledAsync(user))
+    // Check two-factor status directly from the user entity
+    if (user.TwoFactorEnabled)
     {
       _logger.LogWarning("Login failed for {Email}: Two-factor authentication is required", request.Email);
       return Result<LoginResult>.Unauthorized(new ErrorDetail("Two-factor authentication is required."));
     }
 
-    await userManager.ResetAccessFailedCountAsync(user);
+    // Reset access failed count directly via IUserEmailChecker
+    if (user.AccessFailedCount > 0)
+    {
+      await _userEmailChecker.ResetAccessFailedCountAsync(user, cancellationToken);
+    }
 
     var useCookieScheme = request.UseCookies || request.UseSessionCookies;
     if (useCookieScheme)

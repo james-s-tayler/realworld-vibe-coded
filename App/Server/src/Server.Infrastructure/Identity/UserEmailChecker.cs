@@ -36,4 +36,33 @@ public class UserEmailChecker : IUserEmailChecker
     var entry = _dbContext.Entry(user);
     return entry.Property<string>("TenantId").CurrentValue;
   }
+
+  public async Task IncrementAccessFailedCountAsync<TUser>(TUser user, CancellationToken cancellationToken = default) where TUser : class
+  {
+    var entry = _dbContext.Entry(user);
+    var currentCount = entry.Property<int>("AccessFailedCount").CurrentValue;
+
+    // Use ExecuteUpdateAsync to update directly in the database without tracking issues
+    var userId = entry.Property<string>("Id").CurrentValue;
+    await _dbContext.Set<TUser>()
+      .Where(u => EF.Property<string>(u, "Id") == userId)
+      .ExecuteUpdateAsync(
+        setters => setters
+          .SetProperty(u => EF.Property<int>(u, "AccessFailedCount"), currentCount + 1),
+        cancellationToken);
+  }
+
+  public async Task ResetAccessFailedCountAsync<TUser>(TUser user, CancellationToken cancellationToken = default) where TUser : class
+  {
+    var entry = _dbContext.Entry(user);
+    var userId = entry.Property<string>("Id").CurrentValue;
+
+    // Use ExecuteUpdateAsync to update directly in the database without tracking issues
+    await _dbContext.Set<TUser>()
+      .Where(u => EF.Property<string>(u, "Id") == userId)
+      .ExecuteUpdateAsync(
+        setters => setters
+          .SetProperty(u => EF.Property<int>(u, "AccessFailedCount"), 0),
+        cancellationToken);
+  }
 }
