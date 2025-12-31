@@ -41,14 +41,17 @@ public class UserEmailChecker : IUserEmailChecker
   {
     var entry = _dbContext.Entry(user);
 
-    // Use ExecuteUpdateAsync to update directly in the database without tracking issues
-    // ApplicationUser.Id is Guid, not string
+    // Get current values
     var userId = entry.Property<Guid>("Id").CurrentValue;
+    var currentCount = entry.Property<int>("AccessFailedCount").CurrentValue;
+    var newCount = currentCount + 1;
+
+    // Use ExecuteUpdateAsync to update directly in the database without tracking issues
     await _dbContext.Set<TUser>()
       .Where(u => EF.Property<Guid>(u, "Id") == userId)
       .ExecuteUpdateAsync(
         setters => setters
-          .SetProperty(u => EF.Property<int>(u, "AccessFailedCount"), u => EF.Property<int>(u, "AccessFailedCount") + 1),
+          .SetProperty(u => EF.Property<int>(u, "AccessFailedCount"), newCount),
         cancellationToken);
   }
 
