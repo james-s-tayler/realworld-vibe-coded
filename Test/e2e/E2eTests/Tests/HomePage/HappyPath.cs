@@ -80,11 +80,11 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task YourFeed_ShowsArticlesFromFollowedUsers()
   {
-    // Arrange - create two users, article, and follow relationship via API
-    var user1 = await Api.CreateUserAsync();
+    // Arrange - create two users IN THE SAME TENANT, article, and follow relationship via API
+    var user1 = await Api.CreateUserAsync(); // Creates new tenant
     var article = await Api.CreateArticleAsync(user1.Token);
 
-    var user2 = await Api.CreateUserAsync();
+    var user2 = await Api.InviteUserAsync(user1.Token); // Invited to same tenant
     await Api.FollowUserAsync(user2.Token, user1.Email);
 
     // Log in as user2 via UI
@@ -145,10 +145,10 @@ public class HappyPath : AppPageTest
   public async Task YourFeed_DisplaysPaginationAndNavigatesCorrectly()
   {
     // Arrange
-    var user1 = await Api.CreateUserAsync();
+    var user1 = await Api.CreateUserAsync(); // Creates new tenant
     await Api.CreateArticlesAsync(user1.Token, TotalArticles);
 
-    var user2 = await Api.CreateUserAsync();
+    var user2 = await Api.InviteUserAsync(user1.Token); // Invited to same tenant
     await Api.FollowUserAsync(user2.Token, user1.Email);
 
     await Pages.LoginPage.GoToAsync();

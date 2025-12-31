@@ -48,8 +48,8 @@ public abstract class AppPageTest : PageTest
     // Initialize the Pages API
     Pages = new PageObjects(Page, BaseUrl);
 
-    // Wipe all test data BEFORE each test to ensure a clean slate
-    await WipeTestData();
+    // Multi-tenancy provides data isolation - no need to wipe data anymore
+    // Each test creates its own tenant via registration
 
     // Generate unique test user credentials
     TestUsername = GenerateUniqueUsername("articleuser");
@@ -67,8 +67,7 @@ public abstract class AppPageTest : PageTest
     // Stop Playwright tracing and save the trace file
     await StopTracingAsync();
 
-    // Also wipe after each test for cleanup (optional but helps with debugging)
-    await WipeTestData();
+    // Multi-tenancy provides data isolation - no need to wipe data anymore
     await base.DisposeAsync();
   }
 
@@ -159,29 +158,7 @@ public abstract class AppPageTest : PageTest
     return sanitized;
   }
 
-  /// <summary>
-  /// Wipes all users and user-generated content from the database.
-  /// Called after each test to ensure test isolation.
-  /// </summary>
-  private async Task WipeTestData()
-  {
-    try
-    {
-      var apiContext = await Playwright.APIRequest.NewContextAsync(new()
-      {
-        BaseURL = BaseUrl,
-        IgnoreHTTPSErrors = true,
-      });
 
-      await apiContext.DeleteAsync("/dev-only/test-data/wipe");
-      await apiContext.DisposeAsync();
-    }
-    catch (Exception ex)
-    {
-      // Log but don't fail the test if wipe fails.
-      Console.WriteLine($"Warning: Failed to wipe test data: {ex.Message}");
-    }
-  }
 
   /// <summary>
   /// Starts Playwright tracing for the current test.

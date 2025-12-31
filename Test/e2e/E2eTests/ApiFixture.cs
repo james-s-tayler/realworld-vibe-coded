@@ -52,6 +52,7 @@ public class ApiFixture : IAsyncLifetime
   /// <summary>
   /// Creates a user via API and returns the user credentials.
   /// The fixture generates unique test data automatically.
+  /// This creates a new tenant for the user via /api/identity/register.
   /// </summary>
   public async Task<CreatedUser> CreateUserAsync()
   {
@@ -65,7 +66,7 @@ public class ApiFixture : IAsyncLifetime
       password,
     };
 
-    // Register via Identity - no token expected
+    // Register via Identity - creates a new tenant
     using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/identity/register")
     {
       Content = JsonContent.Create(registerRequest, options: _jsonOptions),
@@ -73,6 +74,44 @@ public class ApiFixture : IAsyncLifetime
 
     var registerResponse = await _httpClient.SendAsync(registerHttpRequest);
     registerResponse.EnsureSuccessStatusCode();
+
+    // Now login to get the token
+    var token = await LoginAsync(email, password);
+
+    return new CreatedUser
+    {
+      Token = token,
+      Email = email,
+      Password = password,
+    };
+  }
+
+  /// <summary>
+  /// Invites a user to an existing tenant via API and returns the user credentials.
+  /// The invited user will belong to the same tenant as the inviting user.
+  /// This uses /api/identity/invite with the inviting user's token.
+  /// </summary>
+  public async Task<CreatedUser> InviteUserAsync(string inviterToken)
+  {
+    var userId = Interlocked.Increment(ref _userCounter);
+    var email = $"invited{userId}_{Guid.NewGuid().ToString("N")[..8]}@test.com";
+    var password = "TestPassword123!";
+
+    var inviteRequest = new
+    {
+      email,
+      password,
+    };
+
+    // Invite via authenticated endpoint - creates user in same tenant
+    using var inviteHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/identity/invite")
+    {
+      Content = JsonContent.Create(inviteRequest, options: _jsonOptions),
+    };
+    inviteHttpRequest.Headers.Add("Authorization", $"Bearer {inviterToken}");
+
+    var inviteResponse = await _httpClient.SendAsync(inviteHttpRequest);
+    inviteResponse.EnsureSuccessStatusCode();
 
     // Now login to get the token
     var token = await LoginAsync(email, password);
