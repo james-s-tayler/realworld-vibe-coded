@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Server.Core.IdentityAggregate;
+using Server.SharedKernel.Identity;
 using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Identity.Login;
 
 public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
 {
+  private readonly IUserEmailChecker _userEmailChecker;
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly SignInManager<ApplicationUser> _signInManager;
   private readonly IOptionsMonitor<BearerTokenOptions> _bearerTokenOptions;
@@ -17,12 +19,14 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
   private readonly ILogger<LoginHandler> _logger;
 
   public LoginHandler(
+    IUserEmailChecker userEmailChecker,
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
     TimeProvider timeProvider,
     ILogger<LoginHandler> logger)
   {
+    _userEmailChecker = userEmailChecker;
     _userManager = userManager;
     _signInManager = signInManager;
     _bearerTokenOptions = bearerTokenOptions;
@@ -34,7 +38,11 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
   {
     _logger.LogInformation("User {Email} attempting to log in", request.Email);
 
-    var user = await _userManager.FindByEmailAsync(request.Email);
+    // Find user by email across ALL tenants using IUserEmailChecker
+    // This bypasses Finbuckle's query filters, which is necessary because the ClaimsStrategy
+    // requires the user to be authenticated first before the tenant context can be resolved
+    var user = await _userEmailChecker.FindByEmailAsync<ApplicationUser>(request.Email, cancellationToken);
+
     if (user == null)
     {
       _logger.LogWarning("Login failed for {Email}: User not found", request.Email);
