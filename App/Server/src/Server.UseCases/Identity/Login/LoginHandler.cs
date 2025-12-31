@@ -1,37 +1,48 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Server.Core.IdentityAggregate;
+using Server.Core.TenantInfoAggregate;
 using Server.SharedKernel.Identity;
 using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Identity.Login;
 
 public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
 {
   private readonly IUserEmailChecker _userEmailChecker;
+  private readonly IRepository<TenantInfo> _tenantRepository;
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly SignInManager<ApplicationUser> _signInManager;
   private readonly IOptionsMonitor<BearerTokenOptions> _bearerTokenOptions;
   private readonly TimeProvider _timeProvider;
   private readonly ILogger<LoginHandler> _logger;
+  private readonly IHttpContextAccessor _httpContextAccessor;
 
   public LoginHandler(
     IUserEmailChecker userEmailChecker,
+    IRepository<TenantInfo> tenantRepository,
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
     TimeProvider timeProvider,
-    ILogger<LoginHandler> logger)
+    ILogger<LoginHandler> logger,
+    IHttpContextAccessor httpContextAccessor)
   {
     _userEmailChecker = userEmailChecker;
+    _tenantRepository = tenantRepository;
     _userManager = userManager;
     _signInManager = signInManager;
     _bearerTokenOptions = bearerTokenOptions;
     _timeProvider = timeProvider;
     _logger = logger;
+    _httpContextAccessor = httpContextAccessor;
   }
 
   public async Task<Result<LoginResult>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -49,33 +60,48 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
       return Result<LoginResult>.Unauthorized(new ErrorDetail("email", "Invalid email or password."));
     }
 
-    if (await _userManager.IsLockedOutAsync(user))
+    // Set tenant context before calling any UserManager/SignInManager methods
+    // This is required so that EF Core queries for user claims work correctly
+    var tenantInfo = await _tenantRepository.GetByIdAsync(user.TenantId, cancellationToken);
+    if (tenantInfo == null)
+    {
+      _logger.LogError("Tenant {TenantId} not found for user {Email}", user.TenantId, request.Email);
+      return Result<LoginResult>.CriticalError(new ErrorDetail("Tenant not found"));
+    }
+
+    _httpContextAccessor.HttpContext!.SetTenantInfo(tenantInfo, resetServiceProviderScope: true);
+
+    // Re-resolve UserManager and SignInManager after setting tenant context
+    var userManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+    var signInManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<SignInManager<ApplicationUser>>();
+
+    if (await userManager.IsLockedOutAsync(user))
     {
       _logger.LogWarning("Login failed for {Email}: Account is locked out", request.Email);
       return Result<LoginResult>.Unauthorized(new ErrorDetail("Account is locked out."));
     }
 
-    var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
+    var isPasswordValid = await userManager.CheckPasswordAsync(user, request.Password);
     if (!isPasswordValid)
     {
-      await _userManager.AccessFailedAsync(user);
+      await userManager.AccessFailedAsync(user);
       _logger.LogWarning("Login failed for {Email}: Invalid password", request.Email);
       return Result<LoginResult>.Unauthorized(new ErrorDetail("Invalid email or password."));
     }
 
-    if (await _userManager.GetTwoFactorEnabledAsync(user))
+    if (await userManager.GetTwoFactorEnabledAsync(user))
     {
       _logger.LogWarning("Login failed for {Email}: Two-factor authentication is required", request.Email);
       return Result<LoginResult>.Unauthorized(new ErrorDetail("Two-factor authentication is required."));
     }
 
-    await _userManager.ResetAccessFailedCountAsync(user);
+    await userManager.ResetAccessFailedCountAsync(user);
 
     var useCookieScheme = request.UseCookies || request.UseSessionCookies;
     if (useCookieScheme)
     {
       var isPersistent = request.UseCookies && !request.UseSessionCookies;
-      var principal = await _signInManager.CreateUserPrincipalAsync(user);
+      var principal = await signInManager.CreateUserPrincipalAsync(user);
 
       _logger.LogInformation("User {Email} logged in with cookies", request.Email);
 
@@ -88,7 +114,7 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
         RequiresCookieAuth: true));
     }
 
-    var userPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
+    var userPrincipal = await signInManager.CreateUserPrincipalAsync(user);
     var bearerOptions = _bearerTokenOptions.Get(IdentityConstants.BearerScheme);
 
     var accessTokenExpiration = _timeProvider.GetUtcNow() + bearerOptions.BearerTokenExpiration;
