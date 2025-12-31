@@ -49,8 +49,8 @@ public class UserEmailChecker : IUserEmailChecker
 #pragma warning disable PV003
     await _dbContext.Database.ExecuteSqlRawAsync(
       "UPDATE AspNetUsers SET AccessFailedCount = AccessFailedCount + 1 WHERE Id = {0}",
-      new[] { userId },
-      cancellationToken);
+      cancellationToken,
+      userId);
 #pragma warning restore PV003
   }
 
@@ -64,8 +64,8 @@ public class UserEmailChecker : IUserEmailChecker
 #pragma warning disable PV003
     await _dbContext.Database.ExecuteSqlRawAsync(
       "UPDATE AspNetUsers SET AccessFailedCount = 0 WHERE Id = {0}",
-      new[] { userId },
-      cancellationToken);
+      cancellationToken,
+      userId);
 #pragma warning restore PV003
   }
 }
