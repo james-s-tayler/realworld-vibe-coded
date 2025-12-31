@@ -13,9 +13,9 @@ public class Validation : AppPageTest
   [Fact]
   public async Task UpdateSettings_WithDuplicateUsername_DisplaysErrorMessage()
   {
-    // Arrange
-    var user1 = await Api.CreateUserAsync();
-    var user2 = await Api.CreateUserAsync();
+    // Arrange - create two users in the same tenant
+    var user1 = await Api.CreateUserAsync(); // Creates new tenant
+    var user2 = await Api.InviteUserAsync(user1.Token); // Invited to same tenant
 
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user1.Email, user1.Password);
@@ -32,9 +32,9 @@ public class Validation : AppPageTest
   [Fact]
   public async Task UpdateSettings_WithDuplicateEmail_DisplaysErrorMessage()
   {
-    // Arrange
-    var user1 = await Api.CreateUserAsync();
-    var user2 = await Api.CreateUserAsync();
+    // Arrange - create two users in the same tenant
+    var user1 = await Api.CreateUserAsync(); // Creates new tenant
+    var user2 = await Api.InviteUserAsync(user1.Token); // Invited to same tenant
 
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user1.Email, user1.Password);
