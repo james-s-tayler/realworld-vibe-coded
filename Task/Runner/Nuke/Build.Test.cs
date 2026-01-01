@@ -22,6 +22,7 @@ public partial class Build
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
       .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(RunLocalDependencies)
       .Executes(() =>
       {
         // Get all test projects in the solution
