@@ -52,6 +52,11 @@ public class DeleteTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task DeleteComment_ByWrongUser_ReturnsForbidden()
   {
+    // Arrange: Create two users in the same tenant
+    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
+    var user1 = tenant.Users[0];
+    var user2 = tenant.Users[1];
+
     var createArticleRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -62,7 +67,7 @@ public class DeleteTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createArticleResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await user1.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -73,13 +78,15 @@ public class DeleteTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var createCommentResponse = await Fixture.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    var createCommentResponse = await user1.Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
     var createCommentResult = await createCommentResponse.Content.ReadFromJsonAsync<CommentResponse>(cancellationToken: TestContext.Current.CancellationToken);
     createCommentResult.ShouldNotBeNull();
     var commentId = createCommentResult.Comment.Id;
 
-    var (response, _) = await Fixture.ArticlesUser2Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = commentId });
+    // Act: User2 tries to delete User1's comment
+    var (response, _) = await user2.Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = commentId });
 
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }
 
