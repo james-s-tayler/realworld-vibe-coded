@@ -10,8 +10,12 @@ using Create = Server.Web.Articles.Create.Create;
 namespace Server.FunctionalTests.Articles.Comments;
 
 [Collection("Articles Integration Tests")]
-public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
+public class GetTests : AppTestBase<ArticlesFixture>
 {
+  public GetTests(ArticlesFixture fixture) : base(fixture)
+  {
+  }
+
   [Fact]
   public async Task GetComments_WithAuthentication_ReturnsComments()
   {
@@ -25,7 +29,7 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -36,9 +40,9 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    await app.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    await Fixture.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
 
-    var (response, result) = await app.ArticlesUser1Client.GETAsync<Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
+    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Comments.ShouldNotBeNull();
@@ -59,7 +63,7 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -70,9 +74,9 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    await app.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    await Fixture.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
 
-    var (response, _) = await app.Client.GETAsync<Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = slug });
+    var (response, _) = await Fixture.Client.GETAsync<Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -90,10 +94,10 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
-    var (response, result) = await app.ArticlesUser1Client.GETAsync<Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
+    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Get, GetCommentsRequest, CommentsResponse>(new GetCommentsRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Comments.ShouldNotBeNull();
@@ -103,7 +107,7 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   [Fact]
   public async Task GetComments_WithNonExistentArticle_ReturnsUnprocessableEntity()
   {
-    var (response, _) = await app.ArticlesUser1Client.GETAsync<Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = "no-such-article" });
+    var (response, _) = await Fixture.ArticlesUser1Client.GETAsync<Get, GetCommentsRequest, object>(new GetCommentsRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
   }
@@ -121,7 +125,7 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -132,12 +136,12 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var createCommentResponse = await app.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    var createCommentResponse = await Fixture.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
     var createCommentResult = await createCommentResponse.Content.ReadFromJsonAsync<CommentResponse>(cancellationToken: TestContext.Current.CancellationToken);
     createCommentResult.ShouldNotBeNull();
     var commentId = createCommentResult.Comment.Id;
 
-    var (response, _) = await app.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = commentId });
+    var (response, _) = await Fixture.ArticlesUser1Client.DELETEAsync<Delete, DeleteCommentRequest, object>(new DeleteCommentRequest { Slug = slug, Id = commentId });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
   }
