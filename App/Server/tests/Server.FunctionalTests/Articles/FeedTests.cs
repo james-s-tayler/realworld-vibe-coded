@@ -110,7 +110,7 @@ public class FeedTests : AppTestBase<ArticlesFixture>
     var email = $"loner-{Guid.NewGuid()}@example.com";
     var password = "password123";
 
-    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     var feedRequest = new FeedRequest();
     var (response, result) = await client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);

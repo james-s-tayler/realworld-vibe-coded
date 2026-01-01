@@ -11,7 +11,7 @@ namespace Server.FunctionalTests;
 /// </summary>
 public abstract class ApiFixtureBase : AppFixture<Program>
 {
-  public async Task<string> RegisterUserAsync(
+  public async Task<string> RegisterTenantUserAsync(
     string email,
     string password,
     CancellationToken cancellationToken = default)
@@ -38,7 +38,7 @@ public abstract class ApiFixtureBase : AppFixture<Program>
     return await LoginUserAsync(email, password, cancellationToken);
   }
 
-  public async Task<(HttpClient Client, string Email, string AccessToken)> RegisterUserAndCreateClientAsync(
+  public async Task<(HttpClient Client, string Email, string AccessToken)> RegisterTenantAndCreateClientAsync(
     string? email = null,
     string? password = null,
     CancellationToken cancellationToken = default)
@@ -46,7 +46,7 @@ public abstract class ApiFixtureBase : AppFixture<Program>
     email ??= $"user-{Guid.NewGuid()}@example.com";
     password ??= "Password123!";
 
-    var accessToken = await RegisterUserAsync(email, password, cancellationToken);
+    var accessToken = await RegisterTenantUserAsync(email, password, cancellationToken);
 #pragma warning disable SRV007
     var client = CreateAuthenticatedClient(accessToken);
 #pragma warning restore SRV007

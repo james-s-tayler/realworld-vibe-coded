@@ -75,7 +75,7 @@ public class EmptyArticlesFixture : ApiFixtureBase
     // Create an authenticated client for tests that need authentication
     var email = $"testuser-{Guid.NewGuid()}@example.com";
     var password = "Password123!";
-    var token = await RegisterUserAsync(email, password);
+    var token = await RegisterTenantUserAsync(email, password);
     AuthenticatedClient = CreateAuthenticatedClient(token);
   }
 

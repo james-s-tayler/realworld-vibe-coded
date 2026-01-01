@@ -17,14 +17,14 @@ public class UsersTests : AppTestBase<UsersFixture>
     var email = $"current-{Guid.NewGuid()}@example.com";
     var password = "password123";
 
-    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     var (response, result) = await client.GETAsync<GetCurrent, UserCurrentResponse>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.User.ShouldNotBeNull();
     result.User.Email.ShouldBe(email);
-    result.User.Username.ShouldBe(email); // Username defaults to email
+    result.User.Username.ShouldBe(email);
   }
 
   [Fact]
@@ -54,7 +54,7 @@ public class UsersTests : AppTestBase<UsersFixture>
     var email = $"update-{Guid.NewGuid()}@example.com";
     var password = "password123";
 
-    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     var updateRequest = new UpdateUserRequest
     {
@@ -94,45 +94,31 @@ public class UsersTests : AppTestBase<UsersFixture>
   [Fact]
   public async Task UpdateUser_WithDuplicateEmail_ReturnsErrorDetail()
   {
-    var existingEmail = $"existing-{Guid.NewGuid()}@example.com";
+    // Arrange
+    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
 
-    // Register first user with existing email
-    await Fixture.RegisterUserAsync(existingEmail, "password123", TestContext.Current.CancellationToken);
-
-    // Register second user
-    var email2 = $"user2-{Guid.NewGuid()}@example.com";
-    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email2, "password123", TestContext.Current.CancellationToken);
-
-    // Try to update second user's email to the existing email
     var updateRequest = new UpdateUserRequest
     {
       User = new UpdateUserData
       {
-        Email = existingEmail,
+        Email = tenant.Users[0].Email,
       },
     };
 
-    var (response, _) = await client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
+    // Act
+    var (response, _) = await tenant.Users[1].Client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
 
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
   public async Task UpdateUser_WithDuplicateUsername_ReturnsErrorDetail()
   {
+    // Arrange
     var existingUsername = $"existing-{Guid.NewGuid()}";
+    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
 
-    // Register first user
-    var email1 = $"user1-{Guid.NewGuid()}@example.com";
-    await Fixture.RegisterUserAsync(email1, "password123", TestContext.Current.CancellationToken);
-
-    // Register second user
-    var email2 = $"user2-{Guid.NewGuid()}@example.com";
-    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email2, "password123", TestContext.Current.CancellationToken);
-
-    // Try to update second user's username to the existing one
-    // Note: Since Identity defaults username to email, we need to first update user1's username
-    var accessToken1 = await Fixture.LoginUserAsync(email1, "password123", TestContext.Current.CancellationToken);
     var updateRequest1 = new UpdateUserRequest
     {
       User = new UpdateUserData
@@ -141,14 +127,8 @@ public class UsersTests : AppTestBase<UsersFixture>
       },
     };
 
-    // SRV007 analyzer bug: It flags CreateAuthenticatedClient even though it only configures headers.
-    // The analyzer allows CreateClient but not CreateAuthenticatedClient. Should be fixed in analyzer.
-#pragma warning disable SRV007
-    var client1Auth = Fixture.CreateAuthenticatedClient(accessToken1);
-#pragma warning restore SRV007
-    await client1Auth.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest1);
+    await tenant.Users[0].Client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest1);
 
-    // Now try to set user2's username to the same
     var updateRequest = new UpdateUserRequest
     {
       User = new UpdateUserData
@@ -157,8 +137,10 @@ public class UsersTests : AppTestBase<UsersFixture>
       },
     };
 
-    var (response, _) = await client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
+    // Act
+    var (response, _) = await tenant.Users[1].Client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
 
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
@@ -168,7 +150,7 @@ public class UsersTests : AppTestBase<UsersFixture>
     var email = $"test-{Guid.NewGuid()}@example.com";
     var password = "password123";
 
-    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     var updateRequest = new UpdateUserRequest
     {
@@ -190,7 +172,7 @@ public class UsersTests : AppTestBase<UsersFixture>
     var oldPassword = "oldpassword123";
     var newPassword = "newpassword456";
 
-    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, oldPassword, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, oldPassword, TestContext.Current.CancellationToken);
 
     // Update password
     var updateRequest = new UpdateUserRequest
@@ -216,7 +198,7 @@ public class UsersTests : AppTestBase<UsersFixture>
     var newUsername = $"newuser-{Guid.NewGuid()}";
     var password = "password123";
 
-    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     // Update username
     var updateRequest = new UpdateUserRequest
