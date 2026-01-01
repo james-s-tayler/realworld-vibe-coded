@@ -54,6 +54,7 @@
         "LintServerVerify",
         "RunLocalCleanDirectories",
         "RunLocalClient",
+        "RunLocalDependencies",
         "RunLocalDocsMcpServerDown",
         "RunLocalDocsMcpServerUp",
         "RunLocalHotReload",
