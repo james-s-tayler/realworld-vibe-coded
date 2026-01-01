@@ -25,6 +25,9 @@ public partial class Build
       .DependsOn(RunLocalDependencies)
       .Executes(() =>
       {
+        // Give dependencies a chance to start-up (replace if proven flaky)
+        Thread.Sleep(TimeSpan.FromSeconds(3));
+
         // Get all test projects in the solution
         var testsDirectory = RootDirectory / "App" / "Server" / "tests";
         var testProjects = testsDirectory.GlobDirectories("*")
