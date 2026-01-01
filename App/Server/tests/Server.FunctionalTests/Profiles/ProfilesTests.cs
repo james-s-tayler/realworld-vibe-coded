@@ -32,55 +32,37 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   [Fact]
   public async Task GetProfile_Authenticated_NotFollowing_ReturnsProfile()
   {
-    // Identity API sets username to email by default
-    var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Email = $"user2-{Guid.NewGuid()}@example.com";
-    var password = "Password123!";
+    // Arrange
+    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
 
-    var user1Token = await Fixture.RegisterTenantUserAsync(user1Email, password, TestContext.Current.CancellationToken);
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    await Fixture.RegisterTenantUserAsync(user2Email, password, TestContext.Current.CancellationToken);
-#pragma warning restore SRV007
+    // Act
+    var request = new GetProfileRequest { Username = tenant.Users[1].Email };
+    var (response, result) = await tenant.Users[0].Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
 
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    var client = Fixture.CreateAuthenticatedClient(user1Token);
-#pragma warning restore SRV007
-
-    var request = new GetProfileRequest { Username = user2Email };
-    var (response, result) = await client.GETAsync<Get, GetProfileRequest, ProfileResponse>(request);
-
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(user2Email);
+    result.Profile.Username.ShouldBe(tenant.Users[1].Email);
     result.Profile.Following.ShouldBeFalse();
   }
 
   [Fact]
   public async Task GetProfile_Authenticated_Following_ReturnsProfileWithFollowing()
   {
-    // Identity API sets username to email by default
-    var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Email = $"user2-{Guid.NewGuid()}@example.com";
-    var password = "Password123!";
+    // Arrange
+    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
 
-    var user1Token = await Fixture.RegisterTenantUserAsync(user1Email, password, TestContext.Current.CancellationToken);
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    await Fixture.RegisterTenantUserAsync(user2Email, password, TestContext.Current.CancellationToken);
-#pragma warning restore SRV007
+    var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
+    await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    var client = Fixture.CreateAuthenticatedClient(user1Token);
-#pragma warning restore SRV007
+    // Act
+    var getRequest = new GetProfileRequest { Username = tenant.Users[1].Email };
+    var (response, result) = await tenant.Users[0].Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(getRequest);
 
-    var followRequest = new FollowProfileRequest { Username = user2Email };
-    await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
-
-    var getRequest = new GetProfileRequest { Username = user2Email };
-    var (response, result) = await client.GETAsync<Get, GetProfileRequest, ProfileResponse>(getRequest);
-
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(user2Email);
+    result.Profile.Username.ShouldBe(tenant.Users[1].Email);
     result.Profile.Following.ShouldBeTrue();
   }
 
@@ -105,51 +87,33 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   [Fact]
   public async Task FollowProfile_WithAuthentication_ReturnsProfileWithFollowing()
   {
-    // Identity API sets username to email by default
-    var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Email = $"user2-{Guid.NewGuid()}@example.com";
-    var password = "Password123!";
+    // Arrange
+    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
 
-    var user1Token = await Fixture.RegisterTenantUserAsync(user1Email, password, TestContext.Current.CancellationToken);
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    await Fixture.RegisterTenantUserAsync(user2Email, password, TestContext.Current.CancellationToken);
-#pragma warning restore SRV007
+    // Act
+    var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
+    var (response, result) = await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    var client = Fixture.CreateAuthenticatedClient(user1Token);
-#pragma warning restore SRV007
-
-    var followRequest = new FollowProfileRequest { Username = user2Email };
-    var (response, result) = await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
-
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(user2Email);
+    result.Profile.Username.ShouldBe(tenant.Users[1].Email);
     result.Profile.Following.ShouldBeTrue();
   }
 
   [Fact]
   public async Task FollowProfile_AlreadyFollowing_ReturnsProfileWithFollowing()
   {
-    // Identity API sets username to email by default
-    var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Email = $"user2-{Guid.NewGuid()}@example.com";
-    var password = "Password123!";
+    // Arrange
+    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
 
-    var user1Token = await Fixture.RegisterTenantUserAsync(user1Email, password, TestContext.Current.CancellationToken);
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    await Fixture.RegisterTenantUserAsync(user2Email, password, TestContext.Current.CancellationToken);
-#pragma warning restore SRV007
+    var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
+    await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    var client = Fixture.CreateAuthenticatedClient(user1Token);
-#pragma warning restore SRV007
+    // Act
+    var (response, result) = await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
-    var followRequest = new FollowProfileRequest { Username = user2Email };
-    await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
-
-    var (response, result) = await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
-
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
     result.Profile.Following.ShouldBeTrue();
@@ -179,52 +143,34 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   [Fact]
   public async Task UnfollowProfile_WithAuthentication_ReturnsProfileWithoutFollowing()
   {
-    // Identity API sets username to email by default
-    var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Email = $"user2-{Guid.NewGuid()}@example.com";
-    var password = "Password123!";
+    // Arrange
+    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
 
-    var user1Token = await Fixture.RegisterTenantUserAsync(user1Email, password, TestContext.Current.CancellationToken);
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    await Fixture.RegisterTenantUserAsync(user2Email, password, TestContext.Current.CancellationToken);
-#pragma warning restore SRV007
+    var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
+    await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    var client = Fixture.CreateAuthenticatedClient(user1Token);
-#pragma warning restore SRV007
+    // Act
+    var unfollowRequest = new UnfollowProfileRequest { Username = tenant.Users[1].Email };
+    var (response, result) = await tenant.Users[0].Client.DELETEAsync<Unfollow, UnfollowProfileRequest, ProfileResponse>(unfollowRequest);
 
-    var followRequest = new FollowProfileRequest { Username = user2Email };
-    await client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
-
-    var unfollowRequest = new UnfollowProfileRequest { Username = user2Email };
-    var (response, result) = await client.DELETEAsync<Unfollow, UnfollowProfileRequest, ProfileResponse>(unfollowRequest);
-
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(user2Email);
+    result.Profile.Username.ShouldBe(tenant.Users[1].Email);
     result.Profile.Following.ShouldBeFalse();
   }
 
   [Fact]
   public async Task UnfollowProfile_NotFollowing_ReturnsErrorDetail()
   {
-    // Identity API sets username to email by default
-    var user1Email = $"user1-{Guid.NewGuid()}@example.com";
-    var user2Email = $"user2-{Guid.NewGuid()}@example.com";
-    var password = "Password123!";
+    // Arrange
+    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
 
-    var user1Token = await Fixture.RegisterTenantUserAsync(user1Email, password, TestContext.Current.CancellationToken);
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    await Fixture.RegisterTenantUserAsync(user2Email, password, TestContext.Current.CancellationToken);
-#pragma warning restore SRV007
+    // Act
+    var unfollowRequest = new UnfollowProfileRequest { Username = tenant.Users[1].Email };
+    var (response, _) = await tenant.Users[0].Client.DELETEAsync<Unfollow, UnfollowProfileRequest, object>(unfollowRequest);
 
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    var client = Fixture.CreateAuthenticatedClient(user1Token);
-#pragma warning restore SRV007
-
-    var unfollowRequest = new UnfollowProfileRequest { Username = user2Email };
-    var (response, _) = await client.DELETEAsync<Unfollow, UnfollowProfileRequest, object>(unfollowRequest);
-
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
