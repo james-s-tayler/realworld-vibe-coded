@@ -11,4 +11,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Microsoft.Data.SqlClient">
+      <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.data.sqlclient\6.1.1\ref\net9.0\Microsoft.Data.SqlClient.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

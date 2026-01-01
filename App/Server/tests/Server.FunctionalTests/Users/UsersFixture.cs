@@ -5,7 +5,7 @@ using Testcontainers.MsSql;
 
 namespace Server.FunctionalTests.Users;
 
-public class UsersFixture : ApiFixtureBase<Program>
+public class UsersFixture : ApiFixtureBase
 {
   private MsSqlContainer _container = null!;
   private string _connectionString = null!;

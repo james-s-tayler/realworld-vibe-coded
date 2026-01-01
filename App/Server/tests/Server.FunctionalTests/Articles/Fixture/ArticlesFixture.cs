@@ -1,14 +1,9 @@
-﻿using Finbuckle.MultiTenant.Abstractions;
-using Microsoft.EntityFrameworkCore;
-using Server.Infrastructure.Data;
-using Testcontainers.MsSql;
+﻿namespace Server.FunctionalTests.Articles.Fixture;
 
-namespace Server.FunctionalTests.Articles.Fixture;
-
-public class ArticlesFixture : ApiFixtureBase<Program>
+public class ArticlesFixture : ApiFixtureBase
 {
-  private MsSqlContainer _container = null!;
-  private string _connectionString = null!;
+  /*private MsSqlContainer _container = null!;
+  private string _connectionString = null!;*/
 
   public HttpClient ArticlesUser1Client { get; private set; } = null!;
 
@@ -22,7 +17,7 @@ public class ArticlesFixture : ApiFixtureBase<Program>
 
   public string ArticlesUser2Email { get; private set; } = null!;
 
-  protected override async ValueTask PreSetupAsync()
+  /*protected override async ValueTask PreSetupAsync()
   {
     // PreSetupAsync is called once per test assembly, before the WAF/SUT is created.
     // This ensures a single container and schema for all tests using this fixture.
@@ -51,9 +46,9 @@ public class ArticlesFixture : ApiFixtureBase<Program>
     var multiTenantContextAccessor = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
     await using var db = new AppDbContext(multiTenantContextAccessor, dbContextOptions, null);
     await db.Database.MigrateAsync();
-  }
+  }*/
 
-  protected override void ConfigureServices(IServiceCollection services)
+  /*protected override void ConfigureServices(IServiceCollection services)
   {
     var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
     if (descriptor != null)
@@ -78,7 +73,7 @@ public class ArticlesFixture : ApiFixtureBase<Program>
       options.UseSqlServer(_connectionString);
       options.EnableSensitiveDataLogging();
     });
-  }
+  }*/
 
   protected override async ValueTask SetupAsync()
   {
