@@ -3,11 +3,6 @@ services:
     build:
       context: ../../
       dockerfile: Task/LocalDev/Dockerfile.publish
-    depends_on:
-      sqlserver:
-        condition: service_healthy
-      seq:
-        condition: service_started
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: https://+:5001;http://+:5000
@@ -28,3 +23,10 @@ services:
       timeout: 5s
       retries: 20
       start_period: 10s
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
+    name: app-network

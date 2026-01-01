@@ -118,43 +118,34 @@ public partial class Build
 
   internal Target RunLocalPublish => _ => _
     .Description("Run backend locally using Docker Compose with published artifact")
+    .DependsOn(RunLocalDependencies)
     .DependsOn(BuildServerPublish)
-    .DependsOn(DbResetForce)
     .DependsOn(RunLocalCleanDirectories)
     .Executes(() =>
     {
       Log.Information("Starting local development environment with Docker Compose (published artifact)...");
 
-      var devDepsComposeFile = TaskLocalDevDirectory / "docker-compose.dev-deps.yml";
       var publishComposeFile = TaskLocalDevDirectory / "docker-compose.publish.yml";
-
-      ConsoleCancelEventHandler? handler = null;
-      handler = (_, e) =>
-      {
-        // Don't let NUKE abort the build on Ctrl+C; let docker handle it.
-        e.Cancel = true;
-        Log.Warning("Ctrl+C received; waiting for Docker to stop containers...");
-      };
-      Console.CancelKeyPress += handler;
 
       var envVars = new Dictionary<string, string>
       {
         ["DOCKER_BUILDKIT"] = "1",
       };
 
-      try
-      {
-        // Run docker-compose to start dev dependencies and API with published artifact
-        Log.Information("Running Docker Compose for local development with published artifact...");
-        var args = $"compose -f {devDepsComposeFile} -f {publishComposeFile} up --build";
-        var process = ProcessTasks.StartProcess(
-              "docker",
-              args,
-              workingDirectory: RootDirectory,
-              environmentVariables: envVars);
-        process.WaitForExit();
-      }
-      finally
+      // try
+      // {
+      // Run docker-compose to start dev dependencies and API with published artifact
+      Log.Information("Running Docker Compose for local development with published artifact...");
+      var args = $"compose -f {publishComposeFile} -p app up --build";
+      var process = ProcessTasks.StartProcess(
+            "docker",
+            args,
+            workingDirectory: RootDirectory,
+            environmentVariables: envVars);
+      process.WaitForExit();
+
+      // }
+      /*finally
       {
         Console.CancelKeyPress -= handler;
 
@@ -169,6 +160,40 @@ public partial class Build
               logInvocation: false);
         downProcess.WaitForExit();
         Log.Information("✓ Docker Compose resources cleaned up");
+      }*/
+    });
+
+  internal Target RunLocalDependencies => _ => _
+    .Description("Run dev dependencies")
+
+    // .DependsOn(DbResetForce)
+    .Executes(() =>
+    {
+      Log.Information("Starting dev dependencies");
+
+      var devDepsComposeFile = TaskLocalDevDirectory / "docker-compose.dev-deps.yml";
+
+      var envVars = new Dictionary<string, string>
+      {
+        ["DOCKER_BUILDKIT"] = "1",
+      };
+
+      try
+      {
+        // Run docker-compose to start dev dependencies and API with published artifact
+        Log.Information("Running Docker Compose for local development with published artifact...");
+        var args = $"compose -f {devDepsComposeFile} -p dev-dependencies up -d";
+        var process = ProcessTasks.StartProcess(
+          "docker",
+          args,
+          workingDirectory: RootDirectory,
+          environmentVariables: envVars);
+        process.WaitForExit();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "An error occurred while trying to start dev dependencies: {Message}", ex.Message);
+        throw;
       }
     });
 
