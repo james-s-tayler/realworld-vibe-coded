@@ -1,7 +1,4 @@
-﻿using Finbuckle.MultiTenant.AspNetCore.Extensions;
-using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
-using Finbuckle.MultiTenant.Extensions;
-using Server.Infrastructure.Authentication;
+﻿using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
 using Server.Infrastructure.Identity;
@@ -29,12 +26,6 @@ public static class InfrastructureServiceExtensions
     // Register the interceptor
     services.AddSingleton<ITimeProvider, UtcNowTimeProvider>();
     services.AddSingleton<AuditableEntityInterceptor>();
-
-    // Configure Finbuckle.MultiTenant with ClaimsStrategy and EFCore store
-    // Explicitly specify "__tenant__" as the claim type for ClaimsStrategy
-    services.AddMultiTenant<Server.Core.TenantInfoAggregate.TenantInfo>()
-      .WithClaimStrategy("__tenant__")
-      .WithEFCoreStore<TenantStoreDbContext, Server.Core.TenantInfoAggregate.TenantInfo>();
 
     // Register TenantStoreDbContext (separate database for tenant information)
     services.AddDbContext<TenantStoreDbContext>(options =>

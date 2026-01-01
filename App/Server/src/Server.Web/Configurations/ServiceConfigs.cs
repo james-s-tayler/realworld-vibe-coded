@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
+using Finbuckle.MultiTenant.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Server.Core.IdentityAggregate;
+using Server.Core.TenantInfoAggregate;
 using Server.Infrastructure;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Email;
@@ -56,47 +60,14 @@ public static class ServiceConfigs
     .AddApiEndpoints()
     .AddDefaultTokenProviders();
 
-    // Configure authentication with Identity Bearer and Cookie schemes
     services.AddAuthentication(options =>
     {
-      options.DefaultAuthenticateScheme = IdentityConstants.BearerScheme;
-      options.DefaultChallengeScheme = IdentityConstants.BearerScheme;
-      options.DefaultScheme = IdentityConstants.BearerScheme;
+      options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+      options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+      options.DefaultScheme = IdentityConstants.ApplicationScheme;
     })
     .AddBearerToken(IdentityConstants.BearerScheme)
-    .AddCookie(IdentityConstants.ApplicationScheme, options =>
-      {
-        // Cookie settings
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.Name = "ConduitAuth";
-
-        // Expiration and sliding
-        options.ExpireTimeSpan = TimeSpan.FromDays(7);
-        options.SlidingExpiration = true;
-
-        // API-friendly: Return 401/403 instead of redirecting
-        options.Events.OnRedirectToLogin = context =>
-        {
-          if (!context.Response.HasStarted)
-          {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-          }
-
-          return Task.CompletedTask;
-        };
-        options.Events.OnRedirectToAccessDenied = context =>
-        {
-          if (!context.Response.HasStarted)
-          {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-          }
-
-          return Task.CompletedTask;
-        };
-      });
-
+    .AddCookie(IdentityConstants.ApplicationScheme);
 
     // Configure CSRF protection for cookie-based authentication
     services.AddAntiforgery(options =>
@@ -127,7 +98,12 @@ public static class ServiceConfigs
       services.AddSingleton<IEmailSender, MimeKitEmailSender>();
     }
 
-    services.AddSingleton<Microsoft.AspNetCore.Identity.IEmailSender<ApplicationUser>, Server.Infrastructure.Email.IdentityEmailSender>();
+    services.AddSingleton<IEmailSender<ApplicationUser>, IdentityEmailSender>();
+
+    services.AddMultiTenant<TenantInfo>()
+      .WithClaimStrategy("__tenant__", IdentityConstants.ApplicationScheme)
+      .WithClaimStrategy("__tenant__", IdentityConstants.BearerScheme)
+      .WithEFCoreStore<TenantStoreDbContext, TenantInfo>();
 
     logger.LogInformation("{Project} services registered", "Mediatr and Email Sender");
 

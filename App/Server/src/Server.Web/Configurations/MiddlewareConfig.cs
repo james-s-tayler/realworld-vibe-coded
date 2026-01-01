@@ -57,8 +57,8 @@ public static class MiddlewareConfig
     });
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
+    app.UseMultiTenant();
     app.UseAuthentication();
-    app.UseMultiTenant(); // Must be after UseAuthentication() for ClaimsStrategy to work
     app.UseAuthorization();
     app.UseAntiforgery(); // Enable CSRF protection for cookie-based authentication
 

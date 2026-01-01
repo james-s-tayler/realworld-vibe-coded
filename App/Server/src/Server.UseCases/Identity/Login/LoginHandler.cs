@@ -104,16 +104,8 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     if (useCookieScheme)
     {
       var isPersistent = request.UseCookies && !request.UseSessionCookies;
-      var principal = await signInManager.CreateUserPrincipalAsync(user);
 
-      // Ensure the __tenant__ claim is included in the principal for cookie authentication
-      // This is required for Finbuckle's ClaimsStrategy to work properly
-      var identity = principal.Identity as System.Security.Claims.ClaimsIdentity;
-      if (identity != null && !principal.HasClaim(c => c.Type == "__tenant__"))
-      {
-        identity.AddClaim(new System.Security.Claims.Claim("__tenant__", tenantId));
-        _logger.LogInformation("Added __tenant__ claim to principal for cookie authentication");
-      }
+      await signInManager.SignInAsync(user, isPersistent, IdentityConstants.ApplicationScheme);
 
       _logger.LogInformation("User {Email} logged in with cookies", request.Email);
 
@@ -121,7 +113,7 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
         AccessToken: string.Empty,
         ExpiresIn: 0,
         RefreshToken: string.Empty,
-        Principal: principal,
+        Principal: null,
         IsPersistent: isPersistent,
         RequiresCookieAuth: true));
     }

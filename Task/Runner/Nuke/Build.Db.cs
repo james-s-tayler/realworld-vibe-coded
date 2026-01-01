@@ -66,7 +66,7 @@ public partial class Build
   {
     var composeFile = TaskLocalDevDirectory / "docker-compose.dev-deps.yml";
 
-    if (DoesDockerVolumeExist("localdev_sqlserver-data"))
+    if (DoesDockerVolumeExist("dev-dependencies_sqlserver-data"))
     {
       Log.Information("Detected SQL Server docker volume. Removing volume to reset database...");
       RemoveSqlServerVolume(composeFile);
@@ -97,12 +97,12 @@ public partial class Build
     {
       // Stop any running containers first
       Log.Information("Stopping SQL Server container if running...");
-      DockerTasks.Docker($"compose -f {composeFile} down", workingDirectory: RootDirectory);
+      DockerTasks.Docker($"compose -f {composeFile} -p dev-dependencies down", workingDirectory: RootDirectory);
 
       // Remove the volume
       Log.Information("Removing SQL Server docker volume...");
       DockerTasks.DockerVolumeRm(_ => _
-        .SetVolumes("localdev_sqlserver-data"));
+        .SetVolumes("dev-dependencies_sqlserver-data"));
 
       Log.Information("✓ SQL Server database reset complete - docker volume removed");
     }
