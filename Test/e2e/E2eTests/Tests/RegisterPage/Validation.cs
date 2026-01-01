@@ -24,7 +24,7 @@ public class Validation : AppPageTest
     await Pages.RegisterPage.RegisterAndExpectErrorAsync(existingUser.Email, password);
 
     // Assert
-    await Pages.RegisterPage.VerifyErrorContainsTextAsync("is already taken");
+    await Pages.RegisterPage.VerifyErrorContainsTextAsync("A user has already been registered with that email");
   }
 
   [Fact]
@@ -41,6 +41,6 @@ public class Validation : AppPageTest
     await Pages.RegisterPage.RegisterAndExpectErrorAsync(existingUser.Email, password);
 
     // Assert
-    await Pages.RegisterPage.VerifyErrorContainsTextAsync("is already taken");
+    await Pages.RegisterPage.VerifyErrorContainsTextAsync("A user has already been registered with that email");
   }
 }
