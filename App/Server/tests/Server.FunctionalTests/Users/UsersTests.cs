@@ -5,15 +5,19 @@ using Server.Web.Users.Update;
 namespace Server.FunctionalTests.Users;
 
 [Collection("Users Integration Tests")]
-public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
+public class UsersTests : AppTestBase<UsersFixture>
 {
+  public UsersTests(UsersFixture fixture) : base(fixture)
+  {
+  }
+
   [Fact]
   public async Task GetCurrentUser_WithValidToken_ReturnsUser()
   {
     var email = $"current-{Guid.NewGuid()}@example.com";
     var password = "password123";
 
-    var (client, _, _) = await app.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     var (response, result) = await client.GETAsync<GetCurrent, UserCurrentResponse>();
 
@@ -26,7 +30,7 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
   [Fact]
   public async Task GetCurrentUser_WithoutToken_ReturnsUnauthorized()
   {
-    var (response, _) = await app.Client.GETAsync<GetCurrent, object>();
+    var (response, _) = await Fixture.Client.GETAsync<GetCurrent, object>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -34,7 +38,7 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
   [Fact]
   public async Task GetCurrentUser_WithInvalidToken_ReturnsUnauthorized()
   {
-    var client = app.CreateClient(c =>
+    var client = Fixture.CreateClient(c =>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "invalid-token");
     });
@@ -50,7 +54,7 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
     var email = $"update-{Guid.NewGuid()}@example.com";
     var password = "password123";
 
-    var (client, _, _) = await app.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     var updateRequest = new UpdateUserRequest
     {
@@ -82,7 +86,7 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
       },
     };
 
-    var (response, _) = await app.Client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
+    var (response, _) = await Fixture.Client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -93,11 +97,11 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
     var existingEmail = $"existing-{Guid.NewGuid()}@example.com";
 
     // Register first user with existing email
-    await app.RegisterUserAsync(existingEmail, "password123", TestContext.Current.CancellationToken);
+    await Fixture.RegisterUserAsync(existingEmail, "password123", TestContext.Current.CancellationToken);
 
     // Register second user
     var email2 = $"user2-{Guid.NewGuid()}@example.com";
-    var (client, _, _) = await app.RegisterUserAndCreateClientAsync(email2, "password123", TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email2, "password123", TestContext.Current.CancellationToken);
 
     // Try to update second user's email to the existing email
     var updateRequest = new UpdateUserRequest
@@ -120,15 +124,15 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
 
     // Register first user
     var email1 = $"user1-{Guid.NewGuid()}@example.com";
-    await app.RegisterUserAsync(email1, "password123", TestContext.Current.CancellationToken);
+    await Fixture.RegisterUserAsync(email1, "password123", TestContext.Current.CancellationToken);
 
     // Register second user
     var email2 = $"user2-{Guid.NewGuid()}@example.com";
-    var (client, _, _) = await app.RegisterUserAndCreateClientAsync(email2, "password123", TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email2, "password123", TestContext.Current.CancellationToken);
 
     // Try to update second user's username to the existing one
     // Note: Since Identity defaults username to email, we need to first update user1's username
-    var accessToken1 = await app.LoginUserAsync(email1, "password123", TestContext.Current.CancellationToken);
+    var accessToken1 = await Fixture.LoginUserAsync(email1, "password123", TestContext.Current.CancellationToken);
     var updateRequest1 = new UpdateUserRequest
     {
       User = new UpdateUserData
@@ -140,7 +144,7 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
     // SRV007 analyzer bug: It flags CreateAuthenticatedClient even though it only configures headers.
     // The analyzer allows CreateClient but not CreateAuthenticatedClient. Should be fixed in analyzer.
 #pragma warning disable SRV007
-    var client1Auth = app.CreateAuthenticatedClient(accessToken1);
+    var client1Auth = Fixture.CreateAuthenticatedClient(accessToken1);
 #pragma warning restore SRV007
     await client1Auth.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest1);
 
@@ -164,7 +168,7 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
     var email = $"test-{Guid.NewGuid()}@example.com";
     var password = "password123";
 
-    var (client, _, _) = await app.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     var updateRequest = new UpdateUserRequest
     {
@@ -186,7 +190,7 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
     var oldPassword = "oldpassword123";
     var newPassword = "newpassword456";
 
-    var (client, _, _) = await app.RegisterUserAndCreateClientAsync(email, oldPassword, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, oldPassword, TestContext.Current.CancellationToken);
 
     // Update password
     var updateRequest = new UpdateUserRequest
@@ -201,7 +205,7 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
     // Try to login with new password
-    var newAccessToken = await app.LoginUserAsync(email, newPassword, TestContext.Current.CancellationToken);
+    var newAccessToken = await Fixture.LoginUserAsync(email, newPassword, TestContext.Current.CancellationToken);
     newAccessToken.ShouldNotBeNullOrEmpty();
   }
 
@@ -212,7 +216,7 @@ public class UsersTests(UsersFixture app) : TestBase<UsersFixture>
     var newUsername = $"newuser-{Guid.NewGuid()}";
     var password = "password123";
 
-    var (client, _, _) = await app.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     // Update username
     var updateRequest = new UpdateUserRequest
