@@ -9,12 +9,16 @@ using Server.Web.Tags.List;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Empty Articles Integration Tests")]
-public class EmptyArticlesTests(EmptyArticlesFixture app) : TestBase<EmptyArticlesFixture>
+public class EmptyArticlesTests : AppTestBase<EmptyArticlesFixture>
 {
+  public EmptyArticlesTests(EmptyArticlesFixture fixture) : base(fixture)
+  {
+  }
+
   [Fact]
   public async Task AllArticles_WhenEmpty_ReturnsEmptyList()
   {
-    var (response, result) = await app.AuthenticatedClient.GETAsync<ListArticles, ArticlesResponse>();
+    var (response, result) = await Fixture.AuthenticatedClient.GETAsync<ListArticles, ArticlesResponse>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -26,7 +30,7 @@ public class EmptyArticlesTests(EmptyArticlesFixture app) : TestBase<EmptyArticl
   public async Task ArticlesByAuthor_WhenEmpty_ReturnsEmptyList()
   {
     var request = new ListArticlesRequest();
-    var (response, result) = await app.AuthenticatedClient.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?author=johnjacob", request);
+    var (response, result) = await Fixture.AuthenticatedClient.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?author=johnjacob", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -38,7 +42,7 @@ public class EmptyArticlesTests(EmptyArticlesFixture app) : TestBase<EmptyArticl
   public async Task ArticlesFavoritedByUsername_WhenEmpty_ReturnsEmptyList()
   {
     var request = new ListArticlesRequest();
-    var (response, result) = await app.AuthenticatedClient.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?favorited=testuser", request);
+    var (response, result) = await Fixture.AuthenticatedClient.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?favorited=testuser", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -50,7 +54,7 @@ public class EmptyArticlesTests(EmptyArticlesFixture app) : TestBase<EmptyArticl
   public async Task ArticlesByTag_WhenEmpty_ReturnsEmptyList()
   {
     var request = new ListArticlesRequest();
-    var (response, result) = await app.AuthenticatedClient.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?tag=dragons", request);
+    var (response, result) = await Fixture.AuthenticatedClient.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?tag=dragons", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -61,7 +65,7 @@ public class EmptyArticlesTests(EmptyArticlesFixture app) : TestBase<EmptyArticl
   [Fact]
   public async Task GetTags_WhenEmpty_ReturnsEmptyList()
   {
-    var (response, result) = await app.AuthenticatedClient.GETAsync<List, TagsResponse>();
+    var (response, result) = await Fixture.AuthenticatedClient.GETAsync<List, TagsResponse>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Tags.ShouldNotBeNull();
