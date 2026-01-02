@@ -34,9 +34,8 @@ builder.Services.AddFastEndpoints(o =>
                     s.AddAuth(Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme, new()
                     {
                       Type = NSwag.OpenApiSecuritySchemeType.Http,
-                      Scheme = "bearer",
-                      BearerFormat = "JWT",
-                      Description = "JWT Authorization header using the Bearer scheme. Enter your token in the text input below.",
+                      Scheme = "Bearer",
+                      Description = "ASP.NET Identity bearer token authentication. Enter your token in the text input below.",
                     });
                   };
                 });
