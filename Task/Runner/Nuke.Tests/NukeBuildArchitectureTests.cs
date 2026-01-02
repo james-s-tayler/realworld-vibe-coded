@@ -47,6 +47,7 @@ namespace BuildTests
           .OrShould().HaveNameStartingWith("RunLocal")
           .OrShould().HaveNameStartingWith("Db")
           .OrShould().HaveNameStartingWith("Install")
+          .OrShould().HaveNameStartingWith("Paths")
           .Because("this is the established naming convention for Nuke build targets");
 
       nukeTargetsShouldFollowNamingConventions.Check(Architecture);

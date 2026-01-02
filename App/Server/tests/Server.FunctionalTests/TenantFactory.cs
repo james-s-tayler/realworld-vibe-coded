@@ -72,6 +72,11 @@ public static class TenantFactory
       Client = fixture.CreateClient(c =>
       {
         c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+        if (TestContext.Current.Test != null)
+        {
+          c.DefaultRequestHeaders.Add("x-correlation-id", TestContext.Current.Test.TestDisplayName);
+        }
       }),
     };
   }

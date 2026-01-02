@@ -95,8 +95,10 @@ public abstract class ApiFixtureBase : AppFixture<Program>
 
   protected override IHost ConfigureAppHost(IHostBuilder builder)
   {
-    builder.UseSerilog((_, serviceProvider, loggerConfiguration) =>
-      loggerConfiguration.WriteTo.XUnit3TestOutput(
+    builder.UseSerilog((ctx, serviceProvider, loggerConfiguration) =>
+      loggerConfiguration
+          .ReadFrom.Configuration(ctx.Configuration)
+          .WriteTo.XUnit3TestOutput(
         serviceProvider.GetRequiredService<XUnit3TestOutputSink>()));
 
     return base.ConfigureAppHost(builder);

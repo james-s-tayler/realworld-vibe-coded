@@ -109,13 +109,15 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
 
       _logger.LogInformation("User {Email} logged in with cookies", request.Email);
 
-      return Result<LoginResult>.Success(new LoginResult(
-        AccessToken: string.Empty,
-        ExpiresIn: 0,
-        RefreshToken: string.Empty,
-        Principal: null,
-        IsPersistent: isPersistent,
-        RequiresCookieAuth: true));
+      return Result<LoginResult>.Success(new LoginResult
+      {
+        AccessToken = string.Empty,
+        ExpiresIn = 0,
+        RefreshToken = string.Empty,
+        Principal = null,
+        IsPersistent = isPersistent,
+        RequiresCookieAuth = true,
+      });
     }
 
     var userPrincipal = await signInManager.CreateUserPrincipalAsync(user);
@@ -137,13 +139,15 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     var refreshTokenExpiration = _timeProvider.GetUtcNow() + bearerOptions.RefreshTokenExpiration;
     var refreshToken = bearerOptions.RefreshTokenProtector.Protect(CreateBearerTicket(userPrincipal, refreshTokenExpiration));
 
-    var loginResult = new LoginResult(
-      AccessToken: accessToken,
-      ExpiresIn: (int)bearerOptions.BearerTokenExpiration.TotalSeconds,
-      RefreshToken: refreshToken,
-      Principal: null,
-      IsPersistent: false,
-      RequiresCookieAuth: false);
+    var loginResult = new LoginResult
+    {
+      AccessToken = accessToken,
+      ExpiresIn = (int)bearerOptions.BearerTokenExpiration.TotalSeconds,
+      RefreshToken = refreshToken,
+      Principal = null,
+      IsPersistent = false,
+      RequiresCookieAuth = false,
+    };
 
     _logger.LogInformation("User {Email} logged in with bearer token", request.Email);
 

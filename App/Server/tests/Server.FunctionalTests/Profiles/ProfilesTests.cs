@@ -15,17 +15,14 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   [Fact]
   public async Task GetProfile_Unauthenticated_ReturnsUnauthorized()
   {
-    // Identity API sets username to email by default
-    var email = $"test-{Guid.NewGuid()}@example.com";
-    var password = "Password123!";
+    // Arrange
+    var tenant = await Fixture.RegisterTenantAsync(TestContext.Current.CancellationToken);
+    var request = new GetProfileRequest { Username = tenant.Users[0].Email };
 
-#pragma warning disable SRV007 // Calling ApiFixtureBase helper that internally uses HttpClient for Identity API
-    await Fixture.RegisterTenantUserAsync(email, password, TestContext.Current.CancellationToken);
-#pragma warning restore SRV007
-
-    var request = new GetProfileRequest { Username = email };
+    // Act
     var (response, _) = await Fixture.Client.GETAsync<Get, GetProfileRequest, object>(request);
 
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
 
@@ -57,7 +54,7 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
 
     // Act
     var getRequest = new GetProfileRequest { Username = tenant.Users[1].Email };
-    var (response, result) = await tenant.Users[0].Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(getRequest);
+    var (response, result) = await tenant.Users.First().Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(getRequest);
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -69,18 +66,28 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   [Fact]
   public async Task GetProfile_NonExistentUser_ReturnsNotFound()
   {
+    // Arrange
+    var tenant = await Fixture.RegisterTenantAsync(TestContext.Current.CancellationToken);
     var request = new GetProfileRequest { Username = "nonexistentuser999" };
-    var (response, _) = await Fixture.AuthenticatedClient.GETAsync<Get, GetProfileRequest, object>(request);
 
+    // Act
+    var (response, _) = await tenant.Users.First().Client.GETAsync<Get, GetProfileRequest, object>(request);
+
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
 
   [Fact]
   public async Task GetProfile_InvalidUsername_ReturnsNotFound()
   {
+    // Arrange
+    var tenant = await Fixture.RegisterTenantAsync(TestContext.Current.CancellationToken);
     var request = new GetProfileRequest { Username = "invalid user!" };
-    var (response, _) = await Fixture.AuthenticatedClient.GETAsync<Get, GetProfileRequest, object>(request);
 
+    // Act
+    var (response, _) = await tenant.Users.First().Client.GETAsync<Get, GetProfileRequest, object>(request);
+
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
 
@@ -122,21 +129,27 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   [Fact]
   public async Task FollowProfile_WithoutAuthentication_ReturnsUnauthorized()
   {
+    // Arrange
     var followRequest = new FollowProfileRequest { Username = "someuser" };
+
+    // Act
     var (response, _) = await Fixture.Client.POSTAsync<Follow, FollowProfileRequest, object>(followRequest);
 
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
 
   [Fact]
   public async Task FollowProfile_NonExistentUser_ReturnsNotFound()
   {
-    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(
-      cancellationToken: TestContext.Current.CancellationToken);
-
+    // Arrange
+    var tenant = await Fixture.RegisterTenantAsync(TestContext.Current.CancellationToken);
     var followRequest = new FollowProfileRequest { Username = "nonexistentuser999" };
-    var (response, _) = await client.POSTAsync<Follow, FollowProfileRequest, object>(followRequest);
 
+    // Act
+    var (response, _) = await tenant.Users.First().Client.POSTAsync<Follow, FollowProfileRequest, object>(followRequest);
+
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
 

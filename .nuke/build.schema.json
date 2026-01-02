@@ -52,7 +52,7 @@
         "LintNukeVerify",
         "LintServerFix",
         "LintServerVerify",
-        "RunLocalCleanDirectories",
+        "PathsCleanDirectories",
         "RunLocalClient",
         "RunLocalDependencies",
         "RunLocalDocsMcpServerDown",

@@ -21,7 +21,7 @@ public partial class Build
   internal Target TestServer => _ => _
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .DependsOn(RunLocalDependencies)
       .Executes(() =>
       {
@@ -84,7 +84,7 @@ public partial class Build
       .Description("Run client tests")
       .DependsOn(InstallClient)
       .DependsOn(InstallDotnetToolLiquidReports)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         Log.Information("Running client tests in {ClientDirectory}", ClientDirectory);
@@ -128,7 +128,7 @@ public partial class Build
       .Description("Run postman tests for ArticlesEmpty collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         RunPostmanCollection("ArticlesEmpty");
@@ -138,7 +138,7 @@ public partial class Build
       .Description("Run postman tests for Auth collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         RunPostmanCollection("Auth");
@@ -148,7 +148,7 @@ public partial class Build
       .Description("Run postman tests for Profiles collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         RunPostmanCollection("Profiles");
@@ -158,7 +158,7 @@ public partial class Build
       .Description("Run postman tests for FeedAndArticles collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         RunPostmanCollection("FeedAndArticles");
@@ -168,7 +168,7 @@ public partial class Build
       .Description("Run postman tests for Article collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         RunPostmanCollection("Article");
@@ -180,7 +180,7 @@ public partial class Build
     .DependsOn(BuildServerPublish)
     .DependsOn(DbResetForce)
     .DependsOn(InstallDotnetToolLiquidReports)
-    .DependsOn(RunLocalCleanDirectories)
+    .DependsOn(PathsCleanDirectories)
     .Executes(() =>
     {
       Log.Information("Running E2E tests with Docker Compose");
