@@ -8,10 +8,9 @@ using Create = Server.Web.Articles.Create.Create;
 
 namespace Server.FunctionalTests.Articles.Comments;
 
-[Collection("Articles Integration Tests")]
-public class GetTests : AppTestBase<ApiFixture>
+public class GetTests : AppTestBase
 {
-  public GetTests(ApiFixture fixture) : base(fixture)
+  public GetTests(ApiFixture apiFixture, ITestOutputHelper output) : base(apiFixture, output)
   {
   }
 

@@ -5,9 +5,10 @@ using Server.Web.DevOnly.UseCases;
 
 namespace Server.FunctionalTests.ErrorTest;
 
-[Collection("Error Test Integration Tests")]
-public class ErrorHandlingTests(ErrorTestFixture app)
+public class ErrorHandlingTests(ApiFixture apiFixture)
 {
+  private readonly ApiFixture _app = apiFixture;
+
   [InlineData($"/{DevOnly.ROUTE}/{TestAuth.ROUTE}/throw-unauthorized", 401, 0, "authorization", "Unauthorized")]
   [InlineData($"/{DevOnly.ROUTE}/{TestError.ROUTE}/validation-error-validator", 400, 0, "name", "can't be blank")]
   [InlineData($"/{DevOnly.ROUTE}/{TestError.ROUTE}/validation-error-validator", 400, 1, "email", "must be a valid email address")]
@@ -23,7 +24,7 @@ public class ErrorHandlingTests(ErrorTestFixture app)
     // SRV007: Using raw HttpClient.GetAsync is necessary here to test various error endpoints
     // that are specifically designed for error handling tests and don't have typed request/response DTOs.
 #pragma warning disable SRV007
-    var endpointResponse = await app.Client.GetAsync(route, TestContext.Current.CancellationToken);
+    var endpointResponse = await _app.Client.GetAsync(route, TestContext.Current.CancellationToken);
 #pragma warning restore SRV007
 
     // Assert - All should return problem details in the same structure
@@ -51,7 +52,7 @@ public class ErrorHandlingTests(ErrorTestFixture app)
     // SRV007: Using raw HttpClient.GetAsync is necessary here to test nested exception endpoint
     // that is specifically designed for error handling tests and doesn't have typed request/response DTOs.
 #pragma warning disable SRV007
-    var endpointResponse = await app.Client.GetAsync(route, TestContext.Current.CancellationToken);
+    var endpointResponse = await _app.Client.GetAsync(route, TestContext.Current.CancellationToken);
 #pragma warning restore SRV007
 
     // Assert - Should return 500 with all nested exception messages
@@ -89,7 +90,7 @@ public class ErrorHandlingTests(ErrorTestFixture app)
     // SRV007: Using raw HttpClient.GetAsync is necessary here to test nested exception endpoint
     // that is specifically designed for error handling tests and doesn't have typed request/response DTOs.
 #pragma warning disable SRV007
-    var endpointResponse = await app.Client.GetAsync(route, TestContext.Current.CancellationToken);
+    var endpointResponse = await _app.Client.GetAsync(route, TestContext.Current.CancellationToken);
 #pragma warning restore SRV007
 
     // Assert - Should return 500 with all nested exception messages
@@ -126,7 +127,7 @@ public class ErrorHandlingTests(ErrorTestFixture app)
     // SRV007: Using raw HttpClient.PostAsJsonAsync is necessary here to test deserialization error
     // handling with malformed JSON ("{"). FastEndpoints POSTAsync would not allow sending invalid JSON.
 #pragma warning disable SRV007
-    var endpointResponse = await app.Client.PostAsJsonAsync(route, "{", TestContext.Current.CancellationToken);
+    var endpointResponse = await _app.Client.PostAsJsonAsync(route, "{", TestContext.Current.CancellationToken);
 #pragma warning restore SRV007
 
     // Assert - All should return problem details in the same structure

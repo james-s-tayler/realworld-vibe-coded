@@ -7,10 +7,9 @@ using Server.Web.Tags.List;
 
 namespace Server.FunctionalTests.Articles;
 
-[Collection("Empty Articles Integration Tests")]
-public class EmptyArticlesTests : AppTestBase<ApiFixture>
+public class EmptyArticlesTests : AppTestBase
 {
-  public EmptyArticlesTests(ApiFixture fixture) : base(fixture)
+  public EmptyArticlesTests(ApiFixture apiFixture, ITestOutputHelper output) : base(apiFixture, output)
   {
   }
 

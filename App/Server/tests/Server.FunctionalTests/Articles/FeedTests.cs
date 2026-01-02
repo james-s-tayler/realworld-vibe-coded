@@ -6,10 +6,9 @@ using Server.Web.Profiles.Follow;
 
 namespace Server.FunctionalTests.Articles;
 
-[Collection("Articles Integration Tests")]
-public class FeedTests : AppTestBase<ApiFixture>
+public class FeedTests : AppTestBase
 {
-  public FeedTests(ApiFixture fixture) : base(fixture)
+  public FeedTests(ApiFixture apiFixture, ITestOutputHelper output) : base(apiFixture, output)
   {
   }
 
