@@ -1,6 +1,5 @@
 ﻿#pragma warning disable xUnit1051
 
-using Server.FunctionalTests.Articles.Fixture;
 using Server.UseCases.Articles;
 using Server.UseCases.Tags;
 using Server.Web.Articles.List;
@@ -9,9 +8,9 @@ using Server.Web.Tags.List;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Empty Articles Integration Tests")]
-public class EmptyArticlesTests : AppTestBase<EmptyArticlesFixture>
+public class EmptyArticlesTests : AppTestBase<ApiFixture>
 {
-  public EmptyArticlesTests(EmptyArticlesFixture fixture) : base(fixture)
+  public EmptyArticlesTests(ApiFixture fixture) : base(fixture)
   {
   }
 

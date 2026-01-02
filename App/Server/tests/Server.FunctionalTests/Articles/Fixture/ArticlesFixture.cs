@@ -1,6 +1,6 @@
 ﻿namespace Server.FunctionalTests.Articles.Fixture;
 
-public class ArticlesFixture : ApiFixtureBase
+public class ArticlesFixture : ApiFixture, IApiFixture
 {
   public HttpClient ArticlesUser1Client { get; private set; } = null!;
 

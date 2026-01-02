@@ -5,9 +5,9 @@ using Server.Web.Users.Update;
 namespace Server.FunctionalTests.Users;
 
 [Collection("Users Integration Tests")]
-public class UsersTests : AppTestBase<UsersFixture>
+public class UsersTests : AppTestBase<ApiFixture>
 {
-  public UsersTests(UsersFixture fixture) : base(fixture)
+  public UsersTests(ApiFixture fixture) : base(fixture)
   {
   }
 

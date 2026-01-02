@@ -6,9 +6,9 @@ using Serilog.Sinks.XUnit3;
 namespace Server.FunctionalTests;
 
 /// <summary>
-/// Base fixture class that provides Identity API helper methods for test fixtures
+/// Fixture class that provides Identity API helper methods for functional tests
 /// </summary>
-public abstract class ApiFixtureBase : AppFixture<Program>
+public class ApiFixture : AppFixture<Program>, IApiFixture
 {
   public async Task<string> LoginUserAsync(
     string email,
