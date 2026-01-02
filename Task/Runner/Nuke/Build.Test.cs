@@ -15,7 +15,7 @@ public partial class Build
   [Parameter("Toggle special behavior for CI environment")]
   internal readonly bool SkipPublish;
 
-  [Parameter("Stop on first test failure (for Postman tests)")]
+  [Parameter("Stop tests on first test failure")]
   internal readonly bool Bail;
 
   internal Target TestServer => _ => _
@@ -52,7 +52,11 @@ public partial class Build
                   .SetLoggers($"trx;LogFileName={logFileName}")
                   .SetResultsDirectory(ReportsServerResultsDirectory)
                   .SetSettingsFile(RootDirectory / "App" / "Server" / "coverlet.runsettings")
-                  .AddProcessAdditionalArguments("--collect:\"XPlat Code Coverage\""));
+                  .AddProcessAdditionalArguments(
+                    "--collect:\"XPlat Code Coverage\"",
+                    "--",
+                    $"xUnit.StopOnFail={(Bail ? "true" : "false")}"
+                  ));
           }
           catch (ProcessException)
           {
