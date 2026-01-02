@@ -10,28 +10,6 @@ namespace Server.FunctionalTests;
 /// </summary>
 public class ApiFixture : AppFixture<Program>, IApiFixture
 {
-  public async Task<string> LoginUserAsync(
-    string email,
-    string password,
-    CancellationToken cancellationToken = default)
-  {
-    var loginPayload = new
-    {
-      email,
-      password,
-    };
-
-    var response = await Client.PostAsJsonAsync(
-      "/api/identity/login?useCookies=false",
-      loginPayload,
-      cancellationToken);
-
-    response.EnsureSuccessStatusCode();
-
-    var result = await response.Content.ReadFromJsonAsync<IdentityLoginResponse>(cancellationToken);
-    return result?.AccessToken ?? throw new InvalidOperationException("Login did not return an access token");
-  }
-
   public void SetTestOutputHelper(ITestOutputHelper testOutputHelper) =>
     Services.GetRequiredService<XUnit3TestOutputSink>().TestOutputHelper = testOutputHelper;
 
@@ -51,6 +29,4 @@ public class ApiFixture : AppFixture<Program>, IApiFixture
 
     return base.ConfigureAppHost(builder);
   }
-
-  private record IdentityLoginResponse(string AccessToken);
 }
