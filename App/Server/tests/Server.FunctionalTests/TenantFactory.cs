@@ -1,4 +1,7 @@
 ﻿using System.Net.Http.Headers;
+using Server.Web.Identity.Invite;
+using Server.Web.Identity.Login;
+using Server.Web.Identity.Register;
 
 namespace Server.FunctionalTests;
 
@@ -44,16 +47,13 @@ public static class TenantFactory
     string email,
     string password)
   {
-    var registerPayload = new
+    var registerRequest = new RegisterRequest
     {
-      email,
-      password,
+      Email = email,
+      Password = password,
     };
 
-    var registerResponse = await fixture.Client.PostAsJsonAsync(
-      "/api/identity/register",
-      registerPayload,
-      TestContext.Current.CancellationToken);
+    var (registerResponse, _) = await fixture.Client.POSTAsync<Register, RegisterRequest, object>(registerRequest);
 
     if (!registerResponse.IsSuccessStatusCode)
     {
@@ -84,21 +84,18 @@ public static class TenantFactory
     string email,
     string password)
   {
-    var invitePayload = new
+    var inviteRequest = new InviteRequest
     {
-      email,
-      password,
+      Email = email,
+      Password = password,
     };
 
-    var registerResponse = await owner.Client.PostAsJsonAsync(
-      "/api/identity/invite",
-      invitePayload,
-      TestContext.Current.CancellationToken);
+    var (inviteResponse, _) = await owner.Client.POSTAsync<Invite, InviteRequest, object>(inviteRequest);
 
-    if (!registerResponse.IsSuccessStatusCode)
+    if (!inviteResponse.IsSuccessStatusCode)
     {
-      var errorContent = await registerResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-      throw new InvalidOperationException($"Registration failed with status {registerResponse.StatusCode}. Response: {errorContent}");
+      var errorContent = await inviteResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+      throw new InvalidOperationException($"Invite failed with status {inviteResponse.StatusCode}. Response: {errorContent}");
     }
 
     var accessToken = await fixture.LoginUserAsync(email, password);
@@ -118,22 +115,16 @@ public static class TenantFactory
     string email,
     string password)
   {
-    var loginPayload = new
+    var loginRequest = new LoginRequest
     {
-      email,
-      password,
+      Email = email,
+      Password = password,
     };
 
-    var response = await fixture.Client.PostAsJsonAsync(
-      "/api/identity/login?useCookies=false",
-      loginPayload,
-      TestContext.Current.CancellationToken);
+    var (response, result) = await fixture.Client.POSTAsync<LoginRequest, LoginResponse>("/api/identity/login?useCookies=false", loginRequest);
 
     response.EnsureSuccessStatusCode();
 
-    var result = await response.Content.ReadFromJsonAsync<IdentityLoginResponse>(TestContext.Current.CancellationToken);
-    return result?.AccessToken ?? throw new InvalidOperationException("Login did not return an access token");
+    return result.AccessToken ?? throw new InvalidOperationException("Login did not return an access token");
   }
-
-  private record IdentityLoginResponse(string AccessToken);
 }

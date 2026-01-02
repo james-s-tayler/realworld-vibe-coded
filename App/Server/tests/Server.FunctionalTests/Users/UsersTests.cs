@@ -179,25 +179,19 @@ public class UsersTests : AppTestBase<ApiFixture>
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
     // Try to login with new password
-    var loginPayload = new
+    var loginRequest = new Server.Web.Identity.Login.LoginRequest
     {
-      email = user.Email,
-      password = newPassword,
+      Email = user.Email,
+      Password = newPassword,
     };
 
-    var loginResponse = await Fixture.Client.PostAsJsonAsync(
-      "/api/identity/login?useCookies=false",
-      loginPayload,
-      TestContext.Current.CancellationToken);
+    var (loginResponse, loginResult) = await Fixture.Client.POSTAsync<Server.Web.Identity.Login.LoginRequest, Server.Web.Identity.Login.LoginResponse>("/api/identity/login?useCookies=false", loginRequest);
 
     loginResponse.EnsureSuccessStatusCode();
 
-    var loginResult = await loginResponse.Content.ReadFromJsonAsync<IdentityLoginResponse>(TestContext.Current.CancellationToken);
-    var newAccessToken = loginResult?.AccessToken ?? throw new InvalidOperationException("Login did not return an access token");
+    var newAccessToken = loginResult.AccessToken ?? throw new InvalidOperationException("Login did not return an access token");
     newAccessToken.ShouldNotBeNullOrEmpty();
   }
-
-  private record IdentityLoginResponse(string AccessToken);
 
   [Fact]
   public async Task UpdateUser_WithUsernameChange_UpdatesUsername()
