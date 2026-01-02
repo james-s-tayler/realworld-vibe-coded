@@ -28,6 +28,16 @@ builder.Services.AddFastEndpoints(o =>
                 .SwaggerDocument(o =>
                 {
                   o.ShortSchemaNames = true;
+                  o.EnableJWTBearerAuth = false;
+                  o.DocumentSettings = s =>
+                  {
+                    s.AddAuth(Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme, new()
+                    {
+                      Type = NSwag.OpenApiSecuritySchemeType.Http,
+                      Scheme = "Bearer",
+                      Description = "ASP.NET Identity bearer token authentication. Enter your token in the text input below.",
+                    });
+                  };
                 });
 
 // Configure JSON serialization options
