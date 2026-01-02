@@ -4,7 +4,6 @@
 /// Tests for multitenancy data isolation and duplicate handling.
 /// These tests verify that tenants are properly isolated and that duplicates are allowed across tenants.
 /// </summary>
-[Collection("E2E Tests")]
 public class MultitenancyTests : AppPageTest
 {
   public MultitenancyTests(ApiFixture apiFixture) : base(apiFixture)

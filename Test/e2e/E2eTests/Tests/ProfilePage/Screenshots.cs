@@ -3,7 +3,6 @@
 /// <summary>
 /// Screenshot tests for the Profile page (/profile/:username) with favorited articles.
 /// </summary>
-[Collection("E2E Tests")]
 public class Screenshots : AppPageTest
 {
   public Screenshots(ApiFixture apiFixture) : base(apiFixture)

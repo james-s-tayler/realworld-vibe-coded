@@ -5,7 +5,7 @@ using SixLabors.ImageSharp;
 
 namespace E2eTests;
 
-public abstract class AppPageTest : PageTest
+public abstract class AppPageTest : PageTest, IClassFixture<ApiFixture>
 {
   protected const int DefaultTimeout = 10000;
   protected string BaseUrl = null!;

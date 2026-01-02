@@ -3,7 +3,6 @@
 /// <summary>
 /// Permission tests for the Article page (/article/:slug).
 /// </summary>
-[Collection("E2E Tests")]
 public class Permissions : AppPageTest
 {
   public Permissions(ApiFixture apiFixture) : base(apiFixture)

@@ -3,7 +3,6 @@
 /// <summary>
 /// Validation tests for the Registration page (/register).
 /// </summary>
-[Collection("E2E Tests")]
 public class Validation : AppPageTest
 {
   public Validation(ApiFixture apiFixture) : base(apiFixture)
