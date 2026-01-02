@@ -99,6 +99,9 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task UpdateArticle_ByWrongUser_ReturnsForbidden()
   {
+    // Arrange
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -109,7 +112,7 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await tenant.Users[0].Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -121,8 +124,10 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await Fixture.ArticlesUser2Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
+    // Act
+    var (response, _) = await tenant.Users[1].Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }
 

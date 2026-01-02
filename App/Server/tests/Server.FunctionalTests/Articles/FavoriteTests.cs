@@ -65,6 +65,9 @@ public class FavoriteTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task FavoriteArticle_ByDifferentUser_IncreasesFavoritesCount()
   {
+    // Arrange
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -75,13 +78,15 @@ public class FavoriteTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await tenant.Users[0].Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await Fixture.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    // Act
+    await tenant.Users[0].Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
-    var (response, result) = await Fixture.ArticlesUser2Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    var (response, result) = await tenant.Users[1].Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(true);
     result.Article.FavoritesCount.ShouldBe(2);
