@@ -3,7 +3,6 @@
 /// <summary>
 /// Permission tests for the Home page (/).
 /// </summary>
-[Collection("E2E Tests")]
 public class Permissions : AppPageTest
 {
   public Permissions(ApiFixture apiFixture) : base(apiFixture)

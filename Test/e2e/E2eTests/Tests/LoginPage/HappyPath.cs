@@ -3,7 +3,6 @@
 /// <summary>
 /// Happy path tests for the Login page (/login).
 /// </summary>
-[Collection("E2E Tests")]
 public class HappyPath : AppPageTest
 {
   public HappyPath(ApiFixture apiFixture) : base(apiFixture)

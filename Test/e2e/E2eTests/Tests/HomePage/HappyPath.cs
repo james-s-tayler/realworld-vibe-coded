@@ -3,7 +3,6 @@
 /// <summary>
 /// Happy path tests for the Home page (/) including feeds and pagination.
 /// </summary>
-[Collection("E2E Tests")]
 public class HappyPath : AppPageTest
 {
   private const int TotalArticles = 50;

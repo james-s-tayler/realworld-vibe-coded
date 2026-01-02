@@ -3,7 +3,6 @@
 /// <summary>
 /// Screenshot tests for the Article page (/article/:slug) with max-length content.
 /// </summary>
-[Collection("E2E Tests")]
 public class Screenshots : AppPageTest
 {
   public Screenshots(ApiFixture apiFixture) : base(apiFixture)

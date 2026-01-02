@@ -3,7 +3,6 @@
 /// <summary>
 /// Screenshot tests for the Home page (/) with global feed.
 /// </summary>
-[Collection("E2E Tests")]
 public class Screenshots : AppPageTest
 {
   public Screenshots(ApiFixture apiFixture) : base(apiFixture)
