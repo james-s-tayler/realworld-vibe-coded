@@ -1,20 +1,22 @@
-﻿using Server.FunctionalTests.Articles.Fixture;
-using Server.UseCases.Articles;
+﻿using Server.UseCases.Articles;
 using Server.Web.Articles.Create;
 using Server.Web.Articles.Update;
 
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class UpdateTests : AppTestBase<ArticlesFixture>
+public class UpdateTests : AppTestBase<ApiFixture>
 {
-  public UpdateTests(ArticlesFixture fixture) : base(fixture)
+  public UpdateTests(ApiFixture fixture) : base(fixture)
   {
   }
 
   [Fact]
   public async Task UpdateArticle_WithValidData_ReturnsUpdatedArticle()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -25,7 +27,7 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await user.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -39,7 +41,7 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (response, result) = await Fixture.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, ArticleResponse>(updateRequest);
+    var (response, result) = await user.Client.PUTAsync<Update, UpdateArticleRequest, ArticleResponse>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -52,6 +54,9 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task UpdateArticle_WithoutAuthentication_ReturnsUnauthorized()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -62,7 +67,7 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await user.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -82,6 +87,9 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task UpdateArticle_WithNonExistentArticle_ReturnsNotFound()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var updateRequest = new UpdateArticleRequest
     {
       Slug = "no-such-article",
@@ -91,7 +99,7 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await Fixture.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
+    var (response, _) = await user.Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -134,6 +142,9 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task UpdateArticle_WithAllFieldsEmpty_ReturnsErrorDetail()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -144,7 +155,7 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await user.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var updateRequest = new UpdateArticleRequest
@@ -158,7 +169,7 @@ public class UpdateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await Fixture.ArticlesUser1Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
+    var (response, _) = await user.Client.PUTAsync<Update, UpdateArticleRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }

@@ -1,20 +1,22 @@
-﻿using Server.FunctionalTests.Articles.Fixture;
-using Server.UseCases.Articles;
+﻿using Server.UseCases.Articles;
 using Server.Web.Articles.Create;
 using Server.Web.Articles.Favorite;
 
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class FavoriteTests : AppTestBase<ArticlesFixture>
+public class FavoriteTests : AppTestBase<ApiFixture>
 {
-  public FavoriteTests(ArticlesFixture fixture) : base(fixture)
+  public FavoriteTests(ApiFixture fixture) : base(fixture)
   {
   }
 
   [Fact]
   public async Task FavoriteArticle_WithAuthentication_ReturnsArticleWithFavorite()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -25,10 +27,10 @@ public class FavoriteTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await user.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await Fixture.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    var (response, result) = await user.Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
@@ -40,6 +42,9 @@ public class FavoriteTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task FavoriteArticle_AlreadyFavorited_ReturnsArticleWithFavorite()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -50,12 +55,12 @@ public class FavoriteTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await user.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    await Fixture.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    await user.Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
-    var (response, result) = await Fixture.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
+    var (response, result) = await user.Client.POSTAsync<Favorite, FavoriteArticleRequest, ArticleResponse>(new FavoriteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.Favorited.ShouldBe(true);
@@ -95,6 +100,9 @@ public class FavoriteTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task FavoriteArticle_WithoutAuthentication_ReturnsUnauthorized()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -105,7 +113,7 @@ public class FavoriteTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await user.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var (response, _) = await Fixture.Client.POSTAsync<Favorite, FavoriteArticleRequest, object>(new FavoriteArticleRequest { Slug = slug });
@@ -116,7 +124,10 @@ public class FavoriteTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task FavoriteArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Favorite, FavoriteArticleRequest, object>(new FavoriteArticleRequest { Slug = "no-such-article" });
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
+    var (response, _) = await user.Client.POSTAsync<Favorite, FavoriteArticleRequest, object>(new FavoriteArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
