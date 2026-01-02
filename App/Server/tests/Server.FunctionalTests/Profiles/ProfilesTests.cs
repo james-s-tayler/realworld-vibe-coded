@@ -5,10 +5,9 @@ using Server.Web.Profiles.Unfollow;
 
 namespace Server.FunctionalTests.Profiles;
 
-[Collection("Profiles Integration Tests")]
-public class ProfilesTests : AppTestBase<ApiFixture>
+public class ProfilesTests : AppTestBase
 {
-  public ProfilesTests(ApiFixture fixture) : base(fixture)
+  public ProfilesTests(ApiFixture apiFixture, ITestOutputHelper output) : base(apiFixture, output)
   {
   }
 

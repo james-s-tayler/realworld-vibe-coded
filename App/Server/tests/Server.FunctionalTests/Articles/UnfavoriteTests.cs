@@ -5,10 +5,9 @@ using Server.Web.Articles.Unfavorite;
 
 namespace Server.FunctionalTests.Articles;
 
-[Collection("Articles Integration Tests")]
-public class UnfavoriteTests : AppTestBase<ApiFixture>
+public class UnfavoriteTests : AppTestBase
 {
-  public UnfavoriteTests(ApiFixture fixture) : base(fixture)
+  public UnfavoriteTests(ApiFixture apiFixture, ITestOutputHelper output) : base(apiFixture, output)
   {
   }
 

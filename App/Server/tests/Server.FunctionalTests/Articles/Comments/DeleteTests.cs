@@ -7,10 +7,9 @@ using Create = Server.Web.Articles.Create.Create;
 
 namespace Server.FunctionalTests.Articles.Comments;
 
-[Collection("Articles Integration Tests")]
-public class DeleteTests : AppTestBase<ApiFixture>
+public class DeleteTests : AppTestBase
 {
-  public DeleteTests(ApiFixture fixture) : base(fixture)
+  public DeleteTests(ApiFixture apiFixture, ITestOutputHelper output) : base(apiFixture, output)
   {
   }
 

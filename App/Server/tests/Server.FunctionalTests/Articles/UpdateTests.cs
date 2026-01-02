@@ -4,10 +4,9 @@ using Server.Web.Articles.Update;
 
 namespace Server.FunctionalTests.Articles;
 
-[Collection("Articles Integration Tests")]
-public class UpdateTests : AppTestBase<ApiFixture>
+public class UpdateTests : AppTestBase
 {
-  public UpdateTests(ApiFixture fixture) : base(fixture)
+  public UpdateTests(ApiFixture apiFixture, ITestOutputHelper output) : base(apiFixture, output)
   {
   }
 

@@ -4,10 +4,9 @@ using Server.Web.Articles.Delete;
 
 namespace Server.FunctionalTests.Articles;
 
-[Collection("Articles Integration Tests")]
-public class DeleteTests : AppTestBase<ApiFixture>
+public class DeleteTests : AppTestBase
 {
-  public DeleteTests(ApiFixture fixture) : base(fixture)
+  public DeleteTests(ApiFixture apiFixture, ITestOutputHelper output) : base(apiFixture, output)
   {
   }
 

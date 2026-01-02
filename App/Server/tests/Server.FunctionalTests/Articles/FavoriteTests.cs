@@ -4,10 +4,9 @@ using Server.Web.Articles.Favorite;
 
 namespace Server.FunctionalTests.Articles;
 
-[Collection("Articles Integration Tests")]
-public class FavoriteTests : AppTestBase<ApiFixture>
+public class FavoriteTests : AppTestBase
 {
-  public FavoriteTests(ApiFixture fixture) : base(fixture)
+  public FavoriteTests(ApiFixture apiFixture, ITestOutputHelper output) : base(apiFixture, output)
   {
   }
 

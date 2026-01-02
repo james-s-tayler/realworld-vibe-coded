@@ -1,12 +1,15 @@
 ﻿namespace Server.FunctionalTests;
 
-public abstract class AppTestBase<TAppFixture> : TestBase<TAppFixture> where TAppFixture : AppFixture<Program>, IApiFixture
+public abstract class AppTestBase
 {
-  protected TAppFixture Fixture { get; private set; }
+  protected ApiFixture Fixture { get; }
 
-  protected AppTestBase(TAppFixture fixture)
+  protected ITestOutputHelper Output { get; }
+
+  protected AppTestBase(ApiFixture apiFixture, ITestOutputHelper output)
   {
-    fixture.SetTestOutputHelper(Output);
-    Fixture = fixture;
+    Output = output;
+    apiFixture.SetTestOutputHelper(Output);
+    Fixture = apiFixture;
   }
 }
