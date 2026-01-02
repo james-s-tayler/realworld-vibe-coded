@@ -28,7 +28,17 @@ builder.Services.AddFastEndpoints(o =>
                 .SwaggerDocument(o =>
                 {
                   o.ShortSchemaNames = true;
-                  o.EnableJWTBearerAuth = true;
+                  o.DocumentSettings = s =>
+                  {
+                    // Add Bearer token auth (matches IdentityConstants.BearerScheme)
+                    s.AddAuth(Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme, new()
+                    {
+                      Type = NSwag.OpenApiSecuritySchemeType.Http,
+                      Scheme = "bearer",
+                      BearerFormat = "JWT",
+                      Description = "JWT Authorization header using the Bearer scheme. Enter your token in the text input below.",
+                    });
+                  };
                 });
 
 // Configure JSON serialization options
