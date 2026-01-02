@@ -96,7 +96,8 @@ public static class MiddlewareConfig
     catch (Exception ex)
     {
       var logger = services.GetRequiredService<ILogger<Program>>();
-      logger.LogError(ex, "An error occurred seeding the DB. {exceptionMessage}", ex.Message);
+      logger.LogError(ex, "An error occurred migrating the DB. {exceptionMessage}", ex.Message);
+      throw;
     }
   }
 }
