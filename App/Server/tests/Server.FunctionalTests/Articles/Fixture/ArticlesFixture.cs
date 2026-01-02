@@ -16,24 +16,16 @@ public class ArticlesFixture : ApiFixtureBase
 
   protected override async ValueTask SetupAsync()
   {
-    ArticlesUser1Email = $"articlesuser1-{Guid.NewGuid()}@example.com";
-    ArticlesUser1Username = ArticlesUser1Email;
-    var articlesUser1Password = "Password123!";
+    var tenant = await this.RegisterTenantWithUsersAsync(2);
 
-    ArticlesUser2Email = $"articlesuser2-{Guid.NewGuid()}@example.com";
-    ArticlesUser2Username = ArticlesUser2Email;
-    var articlesUser2Password = "Password123!";
+    var user1 = tenant.Users[0];
+    ArticlesUser1Email = user1.Email;
+    ArticlesUser1Username = user1.Email;
+    ArticlesUser1Client = user1.Client;
 
-    var token1 = await RegisterTenantUserAsync(
-      ArticlesUser1Email,
-      articlesUser1Password);
-
-    ArticlesUser1Client = CreateAuthenticatedClient(token1);
-
-    var token2 = await RegisterTenantUserAsync(
-      ArticlesUser2Email,
-      articlesUser2Password);
-
-    ArticlesUser2Client = CreateAuthenticatedClient(token2);
+    var user2 = tenant.Users[1];
+    ArticlesUser2Email = user2.Email;
+    ArticlesUser2Username = user2.Email;
+    ArticlesUser2Client = user2.Client;
   }
 }

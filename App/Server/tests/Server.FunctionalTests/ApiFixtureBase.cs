@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Sinks.XUnit3;
@@ -11,49 +10,6 @@ namespace Server.FunctionalTests;
 /// </summary>
 public abstract class ApiFixtureBase : AppFixture<Program>
 {
-  public async Task<string> RegisterTenantUserAsync(
-    string email,
-    string password,
-    CancellationToken cancellationToken = default)
-  {
-    var registerPayload = new
-    {
-      email,
-      password,
-    };
-
-    // Step 1: Register the user (returns empty body with 200 OK on success)
-    var registerResponse = await Client.PostAsJsonAsync(
-      "/api/identity/register",
-      registerPayload,
-      cancellationToken);
-
-    if (!registerResponse.IsSuccessStatusCode)
-    {
-      var errorContent = await registerResponse.Content.ReadAsStringAsync(cancellationToken);
-      throw new InvalidOperationException($"Registration failed with status {registerResponse.StatusCode}. Response: {errorContent}");
-    }
-
-    // Step 2: Login to get the access token (Identity API register doesn't return a token)
-    return await LoginUserAsync(email, password, cancellationToken);
-  }
-
-  public async Task<(HttpClient Client, string Email, string AccessToken)> RegisterTenantAndCreateClientAsync(
-    string? email = null,
-    string? password = null,
-    CancellationToken cancellationToken = default)
-  {
-    email ??= $"user-{Guid.NewGuid()}@example.com";
-    password ??= "Password123!";
-
-    var accessToken = await RegisterTenantUserAsync(email, password, cancellationToken);
-#pragma warning disable SRV007
-    var client = CreateAuthenticatedClient(accessToken);
-#pragma warning restore SRV007
-
-    return (client, email, accessToken);
-  }
-
   public async Task<string> LoginUserAsync(
     string email,
     string password,
@@ -74,14 +30,6 @@ public abstract class ApiFixtureBase : AppFixture<Program>
 
     var result = await response.Content.ReadFromJsonAsync<IdentityLoginResponse>(cancellationToken);
     return result?.AccessToken ?? throw new InvalidOperationException("Login did not return an access token");
-  }
-
-  public HttpClient CreateAuthenticatedClient(string accessToken)
-  {
-    return CreateClient(c =>
-    {
-      c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-    });
   }
 
   public void SetTestOutputHelper(ITestOutputHelper testOutputHelper) =>

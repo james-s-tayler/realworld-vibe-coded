@@ -14,17 +14,15 @@ public class UsersTests : AppTestBase<UsersFixture>
   [Fact]
   public async Task GetCurrentUser_WithValidToken_ReturnsUser()
   {
-    var email = $"current-{Guid.NewGuid()}@example.com";
-    var password = "password123";
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
 
-    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
-
-    var (response, result) = await client.GETAsync<GetCurrent, UserCurrentResponse>();
+    var (response, result) = await user.Client.GETAsync<GetCurrent, UserCurrentResponse>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.User.ShouldNotBeNull();
-    result.User.Email.ShouldBe(email);
-    result.User.Username.ShouldBe(email);
+    result.User.Email.ShouldBe(user.Email);
+    result.User.Username.ShouldBe(user.Email);
   }
 
   [Fact]
@@ -51,10 +49,8 @@ public class UsersTests : AppTestBase<UsersFixture>
   [Fact]
   public async Task UpdateUser_WithValidData_ReturnsUpdatedUser()
   {
-    var email = $"update-{Guid.NewGuid()}@example.com";
-    var password = "password123";
-
-    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
 
     var updateRequest = new UpdateUserRequest
     {
@@ -66,7 +62,7 @@ public class UsersTests : AppTestBase<UsersFixture>
       },
     };
 
-    var (response, result) = await client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
+    var (response, result) = await user.Client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.User.ShouldNotBeNull();
@@ -147,10 +143,8 @@ public class UsersTests : AppTestBase<UsersFixture>
   [Fact]
   public async Task UpdateUser_WithBlankFields_ReturnsErrorDetail()
   {
-    var email = $"test-{Guid.NewGuid()}@example.com";
-    var password = "password123";
-
-    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
 
     var updateRequest = new UpdateUserRequest
     {
@@ -160,7 +154,7 @@ public class UsersTests : AppTestBase<UsersFixture>
       },
     };
 
-    var (response, _) = await client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
+    var (response, _) = await user.Client.PUTAsync<UpdateUser, UpdateUserRequest, object>(updateRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -168,11 +162,9 @@ public class UsersTests : AppTestBase<UsersFixture>
   [Fact]
   public async Task UpdateUser_WithNewPassword_CanLoginWithNewPassword()
   {
-    var email = $"password-test-{Guid.NewGuid()}@example.com";
-    var oldPassword = "oldpassword123";
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
     var newPassword = "newpassword456";
-
-    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, oldPassword, TestContext.Current.CancellationToken);
 
     // Update password
     var updateRequest = new UpdateUserRequest
@@ -183,22 +175,20 @@ public class UsersTests : AppTestBase<UsersFixture>
       },
     };
 
-    var (response, result) = await client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
+    var (response, result) = await user.Client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
     // Try to login with new password
-    var newAccessToken = await Fixture.LoginUserAsync(email, newPassword, TestContext.Current.CancellationToken);
+    var newAccessToken = await Fixture.LoginUserAsync(user.Email, newPassword, TestContext.Current.CancellationToken);
     newAccessToken.ShouldNotBeNullOrEmpty();
   }
 
   [Fact]
   public async Task UpdateUser_WithUsernameChange_UpdatesUsername()
   {
-    var email = $"username-test-{Guid.NewGuid()}@example.com";
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
     var newUsername = $"newuser-{Guid.NewGuid()}";
-    var password = "password123";
-
-    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     // Update username
     var updateRequest = new UpdateUserRequest
@@ -209,7 +199,7 @@ public class UsersTests : AppTestBase<UsersFixture>
       },
     };
 
-    var (response, result) = await client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
+    var (response, result) = await user.Client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.User.Username.ShouldBe(newUsername);
   }

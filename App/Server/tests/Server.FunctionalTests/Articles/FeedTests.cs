@@ -107,13 +107,10 @@ public class FeedTests : AppTestBase<ArticlesFixture>
   public async Task GetFeed_WhenNotFollowingAnyone_ReturnsEmptyList()
   {
     // Create a new user who doesn't follow anyone
-    var email = $"loner-{Guid.NewGuid()}@example.com";
-    var password = "password123";
-
-    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantAsync();
 
     var feedRequest = new FeedRequest();
-    var (response, result) = await client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await tenant.Users[0].Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
