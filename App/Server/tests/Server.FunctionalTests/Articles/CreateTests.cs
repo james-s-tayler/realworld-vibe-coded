@@ -1,19 +1,21 @@
-﻿using Server.FunctionalTests.Articles.Fixture;
-using Server.UseCases.Articles;
+﻿using Server.UseCases.Articles;
 using Server.Web.Articles.Create;
 
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class CreateTests : AppTestBase<ArticlesFixture>
+public class CreateTests : AppTestBase<ApiFixture>
 {
-  public CreateTests(ArticlesFixture fixture) : base(fixture)
+  public CreateTests(ApiFixture fixture) : base(fixture)
   {
   }
 
   [Fact]
   public async Task CreateArticle_WithValidData_ReturnsArticle()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var request = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -25,7 +27,7 @@ public class CreateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (response, result) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
+    var (response, result) = await user.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Created);
     result.Article.ShouldNotBeNull();
@@ -36,7 +38,7 @@ public class CreateTests : AppTestBase<ArticlesFixture>
     result.Article.TagList.ShouldContain("test");
     result.Article.TagList.ShouldContain("article");
     result.Article.Author.ShouldNotBeNull();
-    result.Article.Author.Username.ShouldBe(Fixture.ArticlesUser1Username);
+    result.Article.Author.Username.ShouldBe(user.Email);
     result.Article.Favorited.ShouldBe(false);
     result.Article.FavoritesCount.ShouldBe(0);
   }
@@ -44,6 +46,9 @@ public class CreateTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task CreateArticle_WithoutTags_ReturnsArticle()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var request = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -54,7 +59,7 @@ public class CreateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (response, result) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
+    var (response, result) = await user.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Created);
     result.Article.ShouldNotBeNull();
@@ -65,12 +70,15 @@ public class CreateTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task CreateArticle_WithMissingRequiredFields_ReturnsErrorDetail()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var request = new CreateArticleRequest
     {
       Article = new ArticleData(),
     };
 
-    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
+    var (response, _) = await user.Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -78,6 +86,9 @@ public class CreateTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task CreateArticle_WithEmptyRequiredFields_ReturnsErrorDetail()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var request = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -88,7 +99,7 @@ public class CreateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
+    var (response, _) = await user.Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -96,6 +107,9 @@ public class CreateTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task CreateArticle_WithInvalidTagContainingComma_ReturnsErrorDetail()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var request = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -107,7 +121,7 @@ public class CreateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
+    var (response, _) = await user.Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -115,6 +129,9 @@ public class CreateTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task CreateArticle_WithEmptyTag_ReturnsErrorDetail()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var request = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -126,7 +143,7 @@ public class CreateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
+    var (response, _) = await user.Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -134,6 +151,9 @@ public class CreateTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task CreateArticle_WithDuplicateSlug_ReturnsErrorDetail()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var request1 = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -144,7 +164,7 @@ public class CreateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request1);
+    await user.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request1);
 
     var request2 = new CreateArticleRequest
     {
@@ -156,7 +176,7 @@ public class CreateTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request2);
+    var (response, _) = await user.Client.POSTAsync<Create, CreateArticleRequest, object>(request2);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }

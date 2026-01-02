@@ -1,14 +1,13 @@
-﻿using Server.FunctionalTests.Articles.Fixture;
-using Server.UseCases.Articles;
+﻿using Server.UseCases.Articles;
 using Server.Web.Articles.Create;
 using Server.Web.Articles.Get;
 
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class GetTests : AppTestBase<ArticlesFixture>
+public class GetTests : AppTestBase<ApiFixture>
 {
-  public GetTests(ArticlesFixture fixture) : base(fixture)
+  public GetTests(ApiFixture fixture) : base(fixture)
   {
   }
 
@@ -44,6 +43,9 @@ public class GetTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task GetArticle_WithoutAuthentication_ReturnsUnauthorized()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -54,7 +56,7 @@ public class GetTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await user.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
     var (response, _) = await Fixture.Client.GETAsync<Get, GetArticleRequest, object>(new GetArticleRequest { Slug = slug });
@@ -65,7 +67,10 @@ public class GetTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task GetArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var (response, _) = await Fixture.ArticlesUser1Client.GETAsync<Get, GetArticleRequest, object>(new GetArticleRequest { Slug = "no-such-article" });
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
+    var (response, _) = await user.Client.GETAsync<Get, GetArticleRequest, object>(new GetArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }

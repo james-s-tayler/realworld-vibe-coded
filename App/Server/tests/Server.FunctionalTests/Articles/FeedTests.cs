@@ -1,5 +1,4 @@
-﻿using Server.FunctionalTests.Articles.Fixture;
-using Server.UseCases.Articles;
+﻿using Server.UseCases.Articles;
 using Server.Web.Articles.Create;
 using Server.Web.Articles.Feed;
 using Server.Web.Profiles;
@@ -8,9 +7,9 @@ using Server.Web.Profiles.Follow;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class FeedTests : AppTestBase<ArticlesFixture>
+public class FeedTests : AppTestBase<ApiFixture>
 {
-  public FeedTests(ArticlesFixture fixture) : base(fixture)
+  public FeedTests(ApiFixture fixture) : base(fixture)
   {
   }
 
@@ -26,9 +25,13 @@ public class FeedTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task GetFeed_WithAuthentication_ReturnsArticlesFeed()
   {
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+    var user1 = tenant.Users[0];
+    var user2 = tenant.Users[1];
+
     // User1 follows User2
-    var followRequest = new FollowProfileRequest { Username = Fixture.ArticlesUser2Username };
-    await Fixture.ArticlesUser1Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
+    var followRequest = new FollowProfileRequest { Username = user2.Email };
+    await user1.Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
     // User2 creates an article
     var createArticleRequest = new CreateArticleRequest
@@ -42,11 +45,11 @@ public class FeedTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    await Fixture.ArticlesUser2Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    await user2.Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
 
     // User1 gets feed
     var feedRequest = new FeedRequest();
-    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await user1.Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -55,8 +58,11 @@ public class FeedTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task GetFeed_WithLimit_ReturnsLimitedArticles()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var feedRequest = new FeedRequest { Limit = 2 };
-    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -66,8 +72,11 @@ public class FeedTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task GetFeed_WithOffset_SkipsArticles()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var feedRequest = new FeedRequest { Offset = 1 };
-    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -76,8 +85,11 @@ public class FeedTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task GetFeed_WithLimitAndOffset_ReturnsPaginatedResults()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var feedRequest = new FeedRequest { Limit = 2, Offset = 1 };
-    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -87,8 +99,11 @@ public class FeedTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task GetFeed_WithInvalidPagination_ReturnsErrorDetail()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var feedRequest = new FeedRequest { Limit = 0, Offset = -1 };
-    var (response, _) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, object>(feedRequest);
+    var (response, _) = await user.Client.GETAsync<Feed, FeedRequest, object>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -96,8 +111,11 @@ public class FeedTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task GetFeed_OffsetGreaterThanResults_ReturnsEmptyList()
   {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
     var feedRequest = new FeedRequest { Offset = 100 };
-    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
