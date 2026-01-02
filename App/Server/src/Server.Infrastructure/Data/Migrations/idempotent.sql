@@ -1767,3 +1767,40 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102071220_MakeSlugUniquePerTenant'
+)
+BEGIN
+    DROP INDEX [IX_Articles_Slug] ON [Articles];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102071220_MakeSlugUniquePerTenant'
+)
+BEGIN
+    ALTER TABLE [Articles] ADD [TenantId] nvarchar(64) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102071220_MakeSlugUniquePerTenant'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Articles_Slug_TenantId] ON [Articles] ([Slug], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102071220_MakeSlugUniquePerTenant'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260102071220_MakeSlugUniquePerTenant', N'10.0.1');
+END;
+
+COMMIT;
+GO
+

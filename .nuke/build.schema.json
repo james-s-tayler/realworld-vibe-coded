@@ -143,7 +143,7 @@
       "properties": {
         "Bail": {
           "type": "boolean",
-          "description": "Stop on first test failure (for Postman tests)"
+          "description": "Stop tests on first test failure"
         },
         "DbContext": {
           "type": "string",
