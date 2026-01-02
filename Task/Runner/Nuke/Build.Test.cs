@@ -75,8 +75,11 @@ public partial class Build
 
         if (failures.Any())
         {
+          var debugInstructions = $"For a details of specific failures, see {reportFile}. Then view logs via `cat {LogsTestServerSerilogDirectory}/*.json | grep 'Test_Name_Goes_Here'`";
+
           var failedProjects = string.Join(", ", failures);
-          throw new Exception($"Some test projects failed: {failedProjects}");
+          Log.Error("Some test projects failed: {FailedProjects}. {DebugInstructions}", failedProjects, debugInstructions);
+          throw new Exception($"Some test projects failed: {failedProjects}. {debugInstructions}");
         }
       });
 
