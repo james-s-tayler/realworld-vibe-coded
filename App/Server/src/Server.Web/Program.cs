@@ -28,9 +28,9 @@ builder.Services.AddFastEndpoints(o =>
                 .SwaggerDocument(o =>
                 {
                   o.ShortSchemaNames = true;
+                  o.EnableJWTBearerAuth = false;
                   o.DocumentSettings = s =>
                   {
-                    // Add Bearer token auth (matches IdentityConstants.BearerScheme)
                     s.AddAuth(Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme, new()
                     {
                       Type = NSwag.OpenApiSecuritySchemeType.Http,
