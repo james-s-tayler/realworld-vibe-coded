@@ -5,16 +5,14 @@ namespace Server.FunctionalTests;
 public static class TenantFactory
 {
   public static async Task<RegisteredTenant> RegisterTenantAsync(
-    this AppFixture<Program> fixture,
-    CancellationToken cancellationToken)
+    this AppFixture<Program> fixture)
   {
-    return await fixture.RegisterTenantWithUsersAsync(1, cancellationToken);
+    return await fixture.RegisterTenantWithUsersAsync(1);
   }
 
   public static async Task<RegisteredTenant> RegisterTenantWithUsersAsync(
     this AppFixture<Program> fixture,
-    int numUsers,
-    CancellationToken cancellationToken)
+    int numUsers)
   {
     if (numUsers < 1)
     {
@@ -30,11 +28,11 @@ public static class TenantFactory
 
       if (i == 0)
       {
-        tenant.Users.Add(await fixture.RegisterTenantUserAsync(email, password, cancellationToken));
+        tenant.Users.Add(await fixture.RegisterTenantUserAsync(email, password));
       }
       else
       {
-        tenant.Users.Add(await fixture.InviteUserAsync(tenant.GetTenantOwner(), email, password, cancellationToken));
+        tenant.Users.Add(await fixture.InviteUserAsync(tenant.GetTenantOwner(), email, password));
       }
     }
 
@@ -44,8 +42,7 @@ public static class TenantFactory
   private static async Task<RegisteredUser> RegisterTenantUserAsync(
     this AppFixture<Program> fixture,
     string email,
-    string password,
-    CancellationToken cancellationToken)
+    string password)
   {
     var registerPayload = new
     {
@@ -56,15 +53,15 @@ public static class TenantFactory
     var registerResponse = await fixture.Client.PostAsJsonAsync(
       "/api/identity/register",
       registerPayload,
-      cancellationToken);
+      TestContext.Current.CancellationToken);
 
     if (!registerResponse.IsSuccessStatusCode)
     {
-      var errorContent = await registerResponse.Content.ReadAsStringAsync(cancellationToken);
+      var errorContent = await registerResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
       throw new InvalidOperationException($"Registration failed with status {registerResponse.StatusCode}. Response: {errorContent}");
     }
 
-    var accessToken = await fixture.LoginUserAsync(email, password, cancellationToken);
+    var accessToken = await fixture.LoginUserAsync(email, password);
 
     return new RegisteredUser
     {
@@ -85,8 +82,7 @@ public static class TenantFactory
     this AppFixture<Program> fixture,
     RegisteredUser owner,
     string email,
-    string password,
-    CancellationToken cancellationToken)
+    string password)
   {
     var invitePayload = new
     {
@@ -97,15 +93,15 @@ public static class TenantFactory
     var registerResponse = await owner.Client.PostAsJsonAsync(
       "/api/identity/invite",
       invitePayload,
-      cancellationToken);
+      TestContext.Current.CancellationToken);
 
     if (!registerResponse.IsSuccessStatusCode)
     {
-      var errorContent = await registerResponse.Content.ReadAsStringAsync(cancellationToken);
+      var errorContent = await registerResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
       throw new InvalidOperationException($"Registration failed with status {registerResponse.StatusCode}. Response: {errorContent}");
     }
 
-    var accessToken = await fixture.LoginUserAsync(email, password, cancellationToken);
+    var accessToken = await fixture.LoginUserAsync(email, password);
 
     return new RegisteredUser
     {
@@ -120,8 +116,7 @@ public static class TenantFactory
   private static async Task<string> LoginUserAsync(
     this AppFixture<Program> fixture,
     string email,
-    string password,
-    CancellationToken cancellationToken = default)
+    string password)
   {
     var loginPayload = new
     {
@@ -132,11 +127,11 @@ public static class TenantFactory
     var response = await fixture.Client.PostAsJsonAsync(
       "/api/identity/login?useCookies=false",
       loginPayload,
-      cancellationToken);
+      TestContext.Current.CancellationToken);
 
     response.EnsureSuccessStatusCode();
 
-    var result = await response.Content.ReadFromJsonAsync<IdentityLoginResponse>(cancellationToken);
+    var result = await response.Content.ReadFromJsonAsync<IdentityLoginResponse>(TestContext.Current.CancellationToken);
     return result?.AccessToken ?? throw new InvalidOperationException("Login did not return an access token");
   }
 

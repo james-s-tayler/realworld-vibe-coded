@@ -16,7 +16,7 @@ public class GetTests : AppTestBase<ArticlesFixture>
   public async Task GetArticle_WithAuthentication_ReturnsArticle()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantAsync(TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantAsync();
 
     var createRequest = new CreateArticleRequest
     {

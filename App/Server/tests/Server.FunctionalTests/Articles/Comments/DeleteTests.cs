@@ -53,7 +53,7 @@ public class DeleteTests : AppTestBase<ArticlesFixture>
   public async Task DeleteComment_ByWrongUser_ReturnsForbidden()
   {
     // Arrange: Create two users in the same tenant
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
     var user1 = tenant.Users[0];
     var user2 = tenant.Users[1];
 
