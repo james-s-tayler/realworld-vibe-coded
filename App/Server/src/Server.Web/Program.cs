@@ -28,6 +28,7 @@ builder.Services.AddFastEndpoints(o =>
                 .SwaggerDocument(o =>
                 {
                   o.ShortSchemaNames = true;
+                  o.EnableJWTBearerAuth = true;
                 });
 
 // Configure JSON serialization options
