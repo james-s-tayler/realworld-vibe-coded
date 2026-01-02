@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Destructurama.Attributed" />
     <PackageReference Include="FastEndpoints" />
     <PackageReference Include="MediatR" />
   </ItemGroup>
@@ -8,12 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Server.Core\Server.Core.csproj" />
     <ProjectReference Include="..\Server.SharedKernel\Server.SharedKernel.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Destructurama.Attributed">
-      <HintPath>..\..\..\..\..\..\.nuget\packages\destructurama.attributed\5.1.0\lib\netstandard2.0\Destructurama.Attributed.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
