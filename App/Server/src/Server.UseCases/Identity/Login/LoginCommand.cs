@@ -5,12 +5,12 @@ namespace Server.UseCases.Identity.Login;
 
 public class LoginCommand : IQuery<LoginResult>
 {
-  public required string Email { get; set; }
+  public required string Email { get; init; }
 
   [NotLogged]
-  public required string Password { get; set; }
+  public required string Password { get; init; }
 
-  public bool UseCookies { get; set; }
+  public bool UseCookies { get; init; }
 
-  public bool UseSessionCookies { get; set; }
+  public bool UseSessionCookies { get; init; }
 }
