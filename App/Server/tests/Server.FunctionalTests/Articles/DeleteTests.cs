@@ -6,8 +6,12 @@ using Server.Web.Articles.Delete;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class DeleteTests(ArticlesFixture app) : TestBase<ArticlesFixture>
+public class DeleteTests : AppTestBase<ArticlesFixture>
 {
+  public DeleteTests(ArticlesFixture fixture) : base(fixture)
+  {
+  }
+
   [Fact]
   public async Task DeleteArticle_WithAuthentication_ReturnsNoContent()
   {
@@ -21,10 +25,10 @@ public class DeleteTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, _) = await app.ArticlesUser1Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
+    var (response, _) = await Fixture.ArticlesUser1Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
   }
@@ -32,7 +36,7 @@ public class DeleteTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   [Fact]
   public async Task DeleteArticle_WithNonExistentArticle_ReturnsNotFound()
   {
-    var (response, _) = await app.ArticlesUser1Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = "no-such-article" });
+    var (response, _) = await Fixture.ArticlesUser1Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -50,10 +54,10 @@ public class DeleteTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, _) = await app.Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
+    var (response, _) = await Fixture.Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -61,6 +65,9 @@ public class DeleteTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   [Fact]
   public async Task DeleteArticle_ByWrongUser_ReturnsForbidden()
   {
+    // Arrange
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -71,11 +78,13 @@ public class DeleteTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await tenant.Users[0].Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, _) = await app.ArticlesUser2Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
+    // Act
+    var (response, _) = await tenant.Users[1].Client.DELETEAsync<Delete, DeleteArticleRequest, object>(new DeleteArticleRequest { Slug = slug });
 
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }
 }

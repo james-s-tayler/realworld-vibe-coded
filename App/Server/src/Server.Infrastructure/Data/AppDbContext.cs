@@ -1,5 +1,7 @@
-﻿using Audit.EntityFramework;
+﻿using System.Text;
+using Audit.EntityFramework;
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Server.Core.ArticleAggregate;
@@ -115,7 +117,41 @@ public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
             .IsRequired()
             .HasMaxLength(256);
         }
+
+        // Configure MultiTenancy
+        if (entityType.IsOwned())
+        {
+          continue;
+        }
+
+        modelBuilder.Entity(entityType.ClrType)
+          .IsMultiTenant()
+          .AdjustIndexes();
       }
+    }
+
+    // Guardrail: owned types must NOT declare unique indexes since this is a multi-tenant database.
+    var ownedUnique = modelBuilder.Model.GetEntityTypes()
+      .Where(et => et.IsOwned())
+      .SelectMany(et => et.GetIndexes()
+        .Where(i => i.IsUnique)
+        .Select(i => new { Owned = et, Index = i }))
+      .ToList();
+
+    if (ownedUnique.Count > 0)
+    {
+      var sb = new StringBuilder();
+      sb.AppendLine("Unique indexes on owned types are not supported by the multi-tenant convention.");
+      sb.AppendLine("Move the uniqueness to the owner, or model it as a real entity (recommended).");
+      sb.AppendLine();
+
+      foreach (var x in ownedUnique)
+      {
+        var props = string.Join(", ", x.Index.Properties.Select(p => p.Name));
+        sb.AppendLine($"- {x.Owned.DisplayName()}: UNIQUE ({props})");
+      }
+
+      throw new InvalidOperationException(sb.ToString());
     }
   }
 }

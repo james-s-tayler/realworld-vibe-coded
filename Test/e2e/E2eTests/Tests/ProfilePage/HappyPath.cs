@@ -16,10 +16,10 @@ public class HappyPath : AppPageTest
   public async Task UserCanViewOtherUsersProfile()
   {
     // Arrange
-    var user1 = await Api.CreateUserAsync();
+    var user1 = await Api.CreateUserAsync(); // Creates new tenant
     await Api.CreateArticleAsync(user1.Token);
 
-    var user2 = await Api.CreateUserAsync();
+    var user2 = await Api.InviteUserAsync(user1.Token); // Invited to same tenant
 
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
@@ -36,10 +36,10 @@ public class HappyPath : AppPageTest
   public async Task UserCanFollowAndUnfollowOtherUser()
   {
     // Arrange
-    var user1 = await Api.CreateUserAsync();
+    var user1 = await Api.CreateUserAsync(); // Creates new tenant
     await Api.CreateArticleAsync(user1.Token);
 
-    var user2 = await Api.CreateUserAsync();
+    var user2 = await Api.InviteUserAsync(user1.Token); // Invited to same tenant
 
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
@@ -55,10 +55,10 @@ public class HappyPath : AppPageTest
   public async Task UserCanViewFavoritedArticlesOnProfile()
   {
     // Arrange
-    var user1 = await Api.CreateUserAsync();
+    var user1 = await Api.CreateUserAsync(); // Creates new tenant
     var article = await Api.CreateArticleAsync(user1.Token);
 
-    var user2 = await Api.CreateUserAsync();
+    var user2 = await Api.InviteUserAsync(user1.Token); // Invited to same tenant
     await Api.FavoriteArticleAsync(user2.Token, article.Slug);
 
     await Pages.LoginPage.GoToAsync();

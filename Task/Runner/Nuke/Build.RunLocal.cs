@@ -15,56 +15,10 @@ public partial class Build
 
   internal AbsolutePath NgrokPidFile => PidDirectory / "ngrok.pid";
 
-  internal Target RunLocalCleanDirectories => _ => _
-    .Description("Pre-create directories that Docker containers need to prevent root permission issues")
-    .Executes(() =>
-    {
-      // Create or clean Reports directories
-      ReportsServerDirectory.CreateOrCleanDirectory();
-      ReportsClientDirectory.CreateOrCleanDirectory();
-      ReportsClientResultsDirectory.CreateOrCleanDirectory();
-      ReportsClientArtifactsDirectory.CreateOrCleanDirectory();
-      ReportsTestE2eDirectory.CreateOrCleanDirectory();
-      ReportsTestE2eResultsDirectory.CreateOrCleanDirectory();
-      ReportsTestE2eArtifactsDirectory.CreateOrCleanDirectory();
-
-      // Create or clean Logs directories
-      LogsDirectory.CreateOrCleanDirectory();
-      LogsRunLocalHotReloadAuditDotNetDirectory.CreateOrCleanDirectory();
-      LogsRunLocalHotReloadSerilogDirectory.CreateOrCleanDirectory();
-      LogsRunLocalPublishAuditDotNetDirectory.CreateOrCleanDirectory();
-      LogsRunLocalPublishSerilogDirectory.CreateOrCleanDirectory();
-      LogsTestE2eAuditDotNetDirectory.CreateOrCleanDirectory();
-      LogsTestE2eSerilogDirectory.CreateOrCleanDirectory();
-
-      var postmanCollections = new List<string>
-      {
-        "Auth",
-        "ArticlesEmpty",
-        "Article",
-        "FeedAndArticles",
-        "Profiles",
-      };
-
-      LogsTestServerPostman.CreateOrCleanDirectory();
-      ReportsTestPostmanDirectory.CreateOrCleanDirectory();
-
-      foreach (var collection in postmanCollections)
-      {
-        (LogsTestServerPostman / collection / "Server.Web" / "Serilog").CreateOrCleanDirectory();
-        (LogsTestServerPostman / collection / "Server.Web" / "Audit.NET").CreateOrCleanDirectory();
-        (ReportsTestPostmanDirectory / collection / "Artifacts").CreateOrCleanDirectory();
-        (ReportsTestPostmanDirectory / collection / "Results").CreateOrCleanDirectory();
-      }
-
-      Log.Information("✓ Directories cleaned and pre-created");
-    });
-
-
   internal Target RunLocalHotReload => _ => _
     .Description("Run backend locally using Docker Compose with SQL Server and hot-reload")
     .DependsOn(DbResetForce)
-    .DependsOn(RunLocalCleanDirectories)
+    .DependsOn(PathsCleanDirectories)
     .Executes(() =>
     {
       Log.Information("Starting local development environment with Docker Compose (hot-reload)...");
@@ -120,7 +74,7 @@ public partial class Build
     .Description("Run backend locally using Docker Compose with published artifact")
     .DependsOn(RunLocalDependencies)
     .DependsOn(BuildServerPublish)
-    .DependsOn(RunLocalCleanDirectories)
+    .DependsOn(PathsCleanDirectories)
     .Executes(() =>
     {
       Log.Information("Starting local development environment with Docker Compose (published artifact)...");

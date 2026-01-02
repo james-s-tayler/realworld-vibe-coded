@@ -1767,3 +1767,208 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102071220_MakeSlugUniquePerTenant'
+)
+BEGIN
+    DROP INDEX [IX_Articles_Slug] ON [Articles];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102071220_MakeSlugUniquePerTenant'
+)
+BEGIN
+    ALTER TABLE [Articles] ADD [TenantId] nvarchar(64) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102071220_MakeSlugUniquePerTenant'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Articles_Slug_TenantId] ON [Articles] ([Slug], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102071220_MakeSlugUniquePerTenant'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260102071220_MakeSlugUniquePerTenant', N'10.0.1');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102082136_DropSlugGlobalIndex'
+)
+BEGIN
+    DROP INDEX [IX_Articles_Slug_TenantId] ON [Articles];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102082136_DropSlugGlobalIndex'
+)
+BEGIN
+    DECLARE @var18 nvarchar(max);
+    SELECT @var18 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Articles]') AND [c].[name] = N'TenantId');
+    IF @var18 IS NOT NULL EXEC(N'ALTER TABLE [Articles] DROP CONSTRAINT ' + @var18 + ';');
+    ALTER TABLE [Articles] DROP COLUMN [TenantId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102082136_DropSlugGlobalIndex'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260102082136_DropSlugGlobalIndex', N'10.0.1');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    DROP INDEX [IX_UserFollowing_FollowedId] ON [UserFollowing];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    DROP INDEX [IX_Tags_Name] ON [Tags];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    DROP INDEX [IX_Comments_ArticleId] ON [Comments];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    DROP INDEX [IX_Comments_AuthorId] ON [Comments];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    DROP INDEX [IX_Articles_AuthorId] ON [Articles];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    ALTER TABLE [UserFollowing] ADD [TenantId] nvarchar(450) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    ALTER TABLE [Tags] ADD [TenantId] nvarchar(450) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    ALTER TABLE [Comments] ADD [TenantId] nvarchar(450) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    ALTER TABLE [Articles] ADD [TenantId] nvarchar(450) NOT NULL DEFAULT N'';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    CREATE INDEX [IX_UserFollowing_FollowedId] ON [UserFollowing] ([FollowedId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Tags_Name] ON [Tags] ([Name], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    CREATE INDEX [IX_Comments_ArticleId] ON [Comments] ([ArticleId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    CREATE INDEX [IX_Comments_AuthorId] ON [Comments] ([AuthorId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    CREATE INDEX [IX_Articles_AuthorId] ON [Articles] ([AuthorId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Articles_Slug] ON [Articles] ([Slug], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260102094419_AddPerTenantIndexes'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260102094419_AddPerTenantIndexes', N'10.0.1');
+END;
+
+COMMIT;
+GO
+

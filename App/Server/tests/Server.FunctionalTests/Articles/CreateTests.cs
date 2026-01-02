@@ -5,8 +5,12 @@ using Server.Web.Articles.Create;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
+public class CreateTests : AppTestBase<ArticlesFixture>
 {
+  public CreateTests(ArticlesFixture fixture) : base(fixture)
+  {
+  }
+
   [Fact]
   public async Task CreateArticle_WithValidData_ReturnsArticle()
   {
@@ -21,7 +25,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (response, result) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
+    var (response, result) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Created);
     result.Article.ShouldNotBeNull();
@@ -32,7 +36,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
     result.Article.TagList.ShouldContain("test");
     result.Article.TagList.ShouldContain("article");
     result.Article.Author.ShouldNotBeNull();
-    result.Article.Author.Username.ShouldBe(app.ArticlesUser1Username);
+    result.Article.Author.Username.ShouldBe(Fixture.ArticlesUser1Username);
     result.Article.Favorited.ShouldBe(false);
     result.Article.FavoritesCount.ShouldBe(0);
   }
@@ -50,7 +54,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (response, result) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
+    var (response, result) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Created);
     result.Article.ShouldNotBeNull();
@@ -66,7 +70,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       Article = new ArticleData(),
     };
 
-    var (response, _) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
+    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -84,7 +88,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
+    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -103,7 +107,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
+    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -122,7 +126,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
+    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -140,7 +144,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request1);
+    await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request1);
 
     var request2 = new CreateArticleRequest
     {
@@ -152,7 +156,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request2);
+    var (response, _) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, object>(request2);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -170,7 +174,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (response, _) = await app.Client.POSTAsync<Create, CreateArticleRequest, object>(request);
+    var (response, _) = await Fixture.Client.POSTAsync<Create, CreateArticleRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }

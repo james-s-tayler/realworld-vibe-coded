@@ -15,15 +15,19 @@ public partial class Build
   [Parameter("Toggle special behavior for CI environment")]
   internal readonly bool SkipPublish;
 
-  [Parameter("Stop on first test failure (for Postman tests)")]
+  [Parameter("Stop tests on first test failure")]
   internal readonly bool Bail;
 
   internal Target TestServer => _ => _
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
+      .DependsOn(RunLocalDependencies)
       .Executes(() =>
       {
+        // Give dependencies a chance to start-up (replace if proven flaky)
+        Thread.Sleep(TimeSpan.FromSeconds(3));
+
         // Get all test projects in the solution
         var testsDirectory = RootDirectory / "App" / "Server" / "tests";
         var testProjects = testsDirectory.GlobDirectories("*")
@@ -48,7 +52,11 @@ public partial class Build
                   .SetLoggers($"trx;LogFileName={logFileName}")
                   .SetResultsDirectory(ReportsServerResultsDirectory)
                   .SetSettingsFile(RootDirectory / "App" / "Server" / "coverlet.runsettings")
-                  .AddProcessAdditionalArguments("--collect:\"XPlat Code Coverage\""));
+                  .AddProcessAdditionalArguments(
+                    "--collect:\"XPlat Code Coverage\"",
+                    "--",
+                    $"xUnit.StopOnFail={(Bail ? "true" : "false")}"
+                  ));
           }
           catch (ProcessException)
           {
@@ -71,8 +79,11 @@ public partial class Build
 
         if (failures.Any())
         {
+          var debugInstructions = $"For a details of specific failures, see {reportFile}. Then view logs via `cat {LogsTestServerSerilogDirectory}/*.json | grep 'Test_Name_Goes_Here'`";
+
           var failedProjects = string.Join(", ", failures);
-          throw new Exception($"Some test projects failed: {failedProjects}");
+          Log.Error("Some test projects failed: {FailedProjects}. {DebugInstructions}", failedProjects, debugInstructions);
+          throw new Exception($"Some test projects failed: {failedProjects}. {debugInstructions}");
         }
       });
 
@@ -80,7 +91,7 @@ public partial class Build
       .Description("Run client tests")
       .DependsOn(InstallClient)
       .DependsOn(InstallDotnetToolLiquidReports)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         Log.Information("Running client tests in {ClientDirectory}", ClientDirectory);
@@ -124,7 +135,7 @@ public partial class Build
       .Description("Run postman tests for ArticlesEmpty collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         RunPostmanCollection("ArticlesEmpty");
@@ -134,7 +145,7 @@ public partial class Build
       .Description("Run postman tests for Auth collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         RunPostmanCollection("Auth");
@@ -144,7 +155,7 @@ public partial class Build
       .Description("Run postman tests for Profiles collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         RunPostmanCollection("Profiles");
@@ -154,7 +165,7 @@ public partial class Build
       .Description("Run postman tests for FeedAndArticles collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         RunPostmanCollection("FeedAndArticles");
@@ -164,7 +175,7 @@ public partial class Build
       .Description("Run postman tests for Article collection using Docker Compose")
       .DependsOn(BuildServerPublish)
       .DependsOn(DbResetForce)
-      .DependsOn(RunLocalCleanDirectories)
+      .DependsOn(PathsCleanDirectories)
       .Executes(() =>
       {
         RunPostmanCollection("Article");
@@ -176,7 +187,7 @@ public partial class Build
     .DependsOn(BuildServerPublish)
     .DependsOn(DbResetForce)
     .DependsOn(InstallDotnetToolLiquidReports)
-    .DependsOn(RunLocalCleanDirectories)
+    .DependsOn(PathsCleanDirectories)
     .Executes(() =>
     {
       Log.Information("Running E2E tests with Docker Compose");

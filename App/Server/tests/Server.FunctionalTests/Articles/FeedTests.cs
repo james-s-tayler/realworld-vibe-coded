@@ -8,13 +8,17 @@ using Server.Web.Profiles.Follow;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class FeedTests(ArticlesFixture app) : TestBase<ArticlesFixture>
+public class FeedTests : AppTestBase<ArticlesFixture>
 {
+  public FeedTests(ArticlesFixture fixture) : base(fixture)
+  {
+  }
+
   [Fact]
   public async Task GetFeed_WithoutAuthentication_ReturnsUnauthorized()
   {
     var feedRequest = new FeedRequest();
-    var (response, _) = await app.Client.GETAsync<Feed, FeedRequest, object>(feedRequest);
+    var (response, _) = await Fixture.Client.GETAsync<Feed, FeedRequest, object>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -23,8 +27,8 @@ public class FeedTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   public async Task GetFeed_WithAuthentication_ReturnsArticlesFeed()
   {
     // User1 follows User2
-    var followRequest = new FollowProfileRequest { Username = app.ArticlesUser2Username };
-    await app.ArticlesUser1Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
+    var followRequest = new FollowProfileRequest { Username = Fixture.ArticlesUser2Username };
+    await Fixture.ArticlesUser1Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
 
     // User2 creates an article
     var createArticleRequest = new CreateArticleRequest
@@ -38,11 +42,11 @@ public class FeedTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    await app.ArticlesUser2Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    await Fixture.ArticlesUser2Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
 
     // User1 gets feed
     var feedRequest = new FeedRequest();
-    var (response, result) = await app.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -52,7 +56,7 @@ public class FeedTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   public async Task GetFeed_WithLimit_ReturnsLimitedArticles()
   {
     var feedRequest = new FeedRequest { Limit = 2 };
-    var (response, result) = await app.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -63,7 +67,7 @@ public class FeedTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   public async Task GetFeed_WithOffset_SkipsArticles()
   {
     var feedRequest = new FeedRequest { Offset = 1 };
-    var (response, result) = await app.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -73,7 +77,7 @@ public class FeedTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   public async Task GetFeed_WithLimitAndOffset_ReturnsPaginatedResults()
   {
     var feedRequest = new FeedRequest { Limit = 2, Offset = 1 };
-    var (response, result) = await app.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -84,7 +88,7 @@ public class FeedTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   public async Task GetFeed_WithInvalidPagination_ReturnsErrorDetail()
   {
     var feedRequest = new FeedRequest { Limit = 0, Offset = -1 };
-    var (response, _) = await app.ArticlesUser1Client.GETAsync<Feed, FeedRequest, object>(feedRequest);
+    var (response, _) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, object>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -93,7 +97,7 @@ public class FeedTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   public async Task GetFeed_OffsetGreaterThanResults_ReturnsEmptyList()
   {
     var feedRequest = new FeedRequest { Offset = 100 };
-    var (response, result) = await app.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Articles.ShouldNotBeNull();
@@ -106,7 +110,7 @@ public class FeedTests(ArticlesFixture app) : TestBase<ArticlesFixture>
     var email = $"loner-{Guid.NewGuid()}@example.com";
     var password = "password123";
 
-    var (client, _, _) = await app.RegisterUserAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
+    var (client, _, _) = await Fixture.RegisterTenantAndCreateClientAsync(email, password, TestContext.Current.CancellationToken);
 
     var feedRequest = new FeedRequest();
     var (response, result) = await client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);

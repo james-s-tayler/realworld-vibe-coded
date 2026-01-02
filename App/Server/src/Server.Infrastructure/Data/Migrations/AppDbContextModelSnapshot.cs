@@ -256,6 +256,10 @@ namespace Server.Infrastructure.Data.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -271,12 +275,16 @@ namespace Server.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
+                    b.HasIndex("AuthorId", "TenantId")
+                        .HasDatabaseName("IX_Articles_AuthorId");
 
-                    b.HasIndex("Slug")
-                        .IsUnique();
+                    b.HasIndex("Slug", "TenantId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Articles_Slug");
 
                     b.ToTable("Articles");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("Server.Core.ArticleAggregate.Comment", b =>
@@ -310,6 +318,10 @@ namespace Server.Infrastructure.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -320,11 +332,15 @@ namespace Server.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ArticleId");
+                    b.HasIndex("ArticleId", "TenantId")
+                        .HasDatabaseName("IX_Comments_ArticleId");
 
-                    b.HasIndex("AuthorId");
+                    b.HasIndex("AuthorId", "TenantId")
+                        .HasDatabaseName("IX_Comments_AuthorId");
 
                     b.ToTable("Comments");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("Server.Core.IdentityAggregate.ApplicationUser", b =>
@@ -433,6 +449,10 @@ namespace Server.Infrastructure.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -443,10 +463,13 @@ namespace Server.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("Name", "TenantId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Tags_Name");
 
                     b.ToTable("Tags");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("Server.Core.UserAggregate.UserFollowing", b =>
@@ -471,6 +494,10 @@ namespace Server.Infrastructure.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -481,9 +508,12 @@ namespace Server.Infrastructure.Data.Migrations
 
                     b.HasKey("FollowerId", "FollowedId");
 
-                    b.HasIndex("FollowedId");
+                    b.HasIndex("FollowedId", "TenantId")
+                        .HasDatabaseName("IX_UserFollowing_FollowedId");
 
                     b.ToTable("UserFollowing", (string)null);
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("ApplicationUserArticle", b =>

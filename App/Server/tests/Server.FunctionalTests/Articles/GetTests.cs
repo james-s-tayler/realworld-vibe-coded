@@ -6,11 +6,18 @@ using Server.Web.Articles.Get;
 namespace Server.FunctionalTests.Articles;
 
 [Collection("Articles Integration Tests")]
-public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
+public class GetTests : AppTestBase<ArticlesFixture>
 {
+  public GetTests(ArticlesFixture fixture) : base(fixture)
+  {
+  }
+
   [Fact]
   public async Task GetArticle_WithAuthentication_ReturnsArticle()
   {
+    // Arrange
+    var tenant = await Fixture.RegisterTenantAsync();
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -21,11 +28,13 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (response1, createResult) = await tenant.Users[0].Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await app.ArticlesUser1Client.GETAsync<Get, GetArticleRequest, ArticleResponse>(new GetArticleRequest { Slug = slug });
+    // Act
+    var (response, result) = await tenant.Users[0].Client.GETAsync<Get, GetArticleRequest, ArticleResponse>(new GetArticleRequest { Slug = slug });
 
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
     result.Article.Slug.ShouldBe(slug);
@@ -45,10 +54,10 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, _) = await app.Client.GETAsync<Get, GetArticleRequest, object>(new GetArticleRequest { Slug = slug });
+    var (response, _) = await Fixture.Client.GETAsync<Get, GetArticleRequest, object>(new GetArticleRequest { Slug = slug });
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -56,7 +65,7 @@ public class GetTests(ArticlesFixture app) : TestBase<ArticlesFixture>
   [Fact]
   public async Task GetArticle_WithNonExistentSlug_ReturnsNotFound()
   {
-    var (response, _) = await app.ArticlesUser1Client.GETAsync<Get, GetArticleRequest, object>(new GetArticleRequest { Slug = "no-such-article" });
+    var (response, _) = await Fixture.ArticlesUser1Client.GETAsync<Get, GetArticleRequest, object>(new GetArticleRequest { Slug = "no-such-article" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }

@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Finbuckle.MultiTenant.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Core.ArticleAggregate;
 using Server.Core.IdentityAggregate;
 using Server.Core.TagAggregate;
-using Server.Infrastructure;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
 using Server.SharedKernel.Interfaces;
@@ -43,7 +43,11 @@ public class AuditableEntityInterceptorTests : IDisposable
 
     // Create the context manually with null dispatcher
     var dbContextOptions = _serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>();
-    var multiTenantContextAccessor = new DefaultTenantContextAccessor();
+
+    // Create a simple test tenant context accessor with empty tenant
+    var tenantInfo = new Finbuckle.MultiTenant.Abstractions.TenantInfo(string.Empty, string.Empty, "Test");
+    var multiTenantContext = new MultiTenantContext<Finbuckle.MultiTenant.Abstractions.TenantInfo>(tenantInfo);
+    var multiTenantContextAccessor = new TestMultiTenantContextAccessor(multiTenantContext);
 
     _dbContext = new AppDbContext(multiTenantContextAccessor, dbContextOptions, null);
   }

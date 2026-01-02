@@ -8,8 +8,12 @@ using Create = Server.Web.Articles.Create.Create;
 namespace Server.FunctionalTests.Articles.Comments;
 
 [Collection("Articles Integration Tests")]
-public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
+public class CreateTests : AppTestBase<ArticlesFixture>
 {
+  public CreateTests(ArticlesFixture fixture) : base(fixture)
+  {
+  }
+
   [Fact]
   public async Task CreateComment_WithValidData_ReturnsComment()
   {
@@ -23,7 +27,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -34,7 +38,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var response = await app.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    var response = await Fixture.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
     var result = await response.Content.ReadFromJsonAsync<CommentResponse>(cancellationToken: TestContext.Current.CancellationToken);
     result.ShouldNotBeNull();
 
@@ -42,7 +46,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
     result.Comment.ShouldNotBeNull();
     result.Comment.Body.ShouldBe("This is a test comment");
     result.Comment.Author.ShouldNotBeNull();
-    result.Comment.Author.Username.ShouldBe(app.ArticlesUser1Username);
+    result.Comment.Author.Username.ShouldBe(Fixture.ArticlesUser1Username);
   }
 
   [Fact]
@@ -58,7 +62,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -69,7 +73,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var response = await app.Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    var response = await Fixture.Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
@@ -85,7 +89,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var response = await app.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/no-such-article/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    var response = await Fixture.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/no-such-article/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
   }
@@ -103,7 +107,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -111,7 +115,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       Comment = new CreateCommentDto(),
     };
 
-    var response = await app.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    var response = await Fixture.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
@@ -129,7 +133,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var (_, createArticleResult) = await app.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
+    var (_, createArticleResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createArticleRequest);
     var slug = createArticleResult.Article.Slug;
 
     var createCommentRequest = new CreateCommentRequest
@@ -140,7 +144,7 @@ public class CreateTests(ArticlesFixture app) : TestBase<ArticlesFixture>
       },
     };
 
-    var response = await app.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
+    var response = await Fixture.ArticlesUser1Client.PostAsJsonAsync($"/api/articles/{slug}/comments", createCommentRequest, cancellationToken: TestContext.Current.CancellationToken);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }

@@ -60,3 +60,7 @@ jobs:
       - name: Build Roslyn MCP server
         run: |
           dotnet build Task/McpServers/roslyn-mcp/RoslynMCP/RoslynMCP.csproj --configuration Debug
+
+      - name: Run Dev Dependencies
+        run: |
+          ./build.sh RunLocalDependencies

@@ -44,16 +44,16 @@ public class LoggingBehavior<TRequest, T> : IPipelineBehavior<TRequest, Result<T
     if (logLevel == LogLevel.Information)
     {
       _logger.LogInformation(
-        "Handled {RequestName} in {ms} ms status: {ResultStatus}",
+        "Handled {RequestName} in {ms} ms status: {@ResultStatus}",
         typeof(TRequest).Name,
         sw.ElapsedMilliseconds,
-        response);
+        response.Status);
     }
     else
     {
       _logger.Log(
         logLevel,
-        "Handled {RequestName} in {ms} ms with status: {ResultStatus} and result: {@Result}",
+        "Handled {RequestName} in {ms} ms with status: {@ResultStatus} and result: {@Result}",
         typeof(TRequest).Name,
         sw.ElapsedMilliseconds,
         response.Status,

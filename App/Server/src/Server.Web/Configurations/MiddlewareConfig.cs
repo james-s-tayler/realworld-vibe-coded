@@ -1,4 +1,5 @@
 ﻿using Ardalis.ListStartupServices;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
@@ -56,6 +57,7 @@ public static class MiddlewareConfig
     });
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
+    app.UseMultiTenant();
     app.UseAuthentication();
     app.UseAuthorization();
     app.UseAntiforgery(); // Enable CSRF protection for cookie-based authentication
@@ -73,27 +75,29 @@ public static class MiddlewareConfig
       Predicate = check => check.Tags.Contains("ready"), // Only run readiness checks (database)
     });
 
-    await SeedDatabase(app);
+    await RunMigrations(app);
 
     return app;
   }
 
-  private static async Task SeedDatabase(WebApplication app)
+  private static async Task RunMigrations(WebApplication app)
   {
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
 
     try
     {
-      var context = services.GetRequiredService<AppDbContext>();
+      var tenantStoreContext = services.GetRequiredService<TenantStoreDbContext>();
+      await tenantStoreContext.Database.MigrateAsync();
 
+      var context = services.GetRequiredService<AppDbContext>();
       await context.Database.MigrateAsync();
-      await SeedData.InitializeAsync(context);
     }
     catch (Exception ex)
     {
       var logger = services.GetRequiredService<ILogger<Program>>();
-      logger.LogError(ex, "An error occurred seeding the DB. {exceptionMessage}", ex.Message);
+      logger.LogError(ex, "An error occurred migrating the DB. {exceptionMessage}", ex.Message);
+      throw;
     }
   }
 }

@@ -18,7 +18,7 @@ public partial class Build
   internal Target TestFlowPilot => _ => _
     .Description("Run FlowPilot tests")
     .DependsOn(BuildFlowPilot)
-    .DependsOn(RunLocalCleanDirectories)
+    .DependsOn(PathsCleanDirectories)
     .Executes(() =>
     {
       Log.Information($"Running FlowPilot tests");

@@ -1,4 +1,6 @@
-﻿using Nuke.Common.IO;
+﻿using Nuke.Common;
+using Nuke.Common.IO;
+using Serilog;
 
 public partial class Build
 {
@@ -15,6 +17,10 @@ public partial class Build
   internal AbsolutePath MigrationsDirectory => RootDirectory / "App" / "Server" / "src" / "Server.Infrastructure" / "Data" / "Migrations";
 
   internal AbsolutePath IdempotentScriptPath => MigrationsDirectory / "idempotent.sql";
+
+  internal AbsolutePath TenantStoreMigrationsDirectory => RootDirectory / "App" / "Server" / "src" / "Server.Infrastructure" / "Data" / "TenantStoreMigrations";
+
+  internal AbsolutePath TenantStoreIdempotentScriptPath => TenantStoreMigrationsDirectory / "idempotent.sql";
 
   #endregion
 
@@ -107,6 +113,57 @@ public partial class Build
 
   internal AbsolutePath LogsTestE2eAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "e2e" / "Server.Web" / "Audit.NET";
 
+  internal AbsolutePath LogsTestServerSerilogDirectory => RootDirectory / "Logs" / "Test" / "Server" / "Server.Web" / "Serilog";
+
+  internal AbsolutePath LogsTestServerAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "Server" / "Server.Web" / "Audit.NET";
+
   internal AbsolutePath LogsTestServerPostman => RootDirectory / "Logs" / "Test" / "Postman";
   #endregion
+
+  internal Target PathsCleanDirectories => _ => _
+    .Description("Pre-create directories that Docker containers need to prevent root permission issues")
+    .Executes(() =>
+    {
+      // Create or clean Reports directories
+      ReportsServerDirectory.CreateOrCleanDirectory();
+      ReportsClientDirectory.CreateOrCleanDirectory();
+      ReportsClientResultsDirectory.CreateOrCleanDirectory();
+      ReportsClientArtifactsDirectory.CreateOrCleanDirectory();
+      ReportsTestE2eDirectory.CreateOrCleanDirectory();
+      ReportsTestE2eResultsDirectory.CreateOrCleanDirectory();
+      ReportsTestE2eArtifactsDirectory.CreateOrCleanDirectory();
+
+      // Create or clean Logs directories
+      LogsDirectory.CreateOrCleanDirectory();
+      LogsRunLocalHotReloadAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsRunLocalHotReloadSerilogDirectory.CreateOrCleanDirectory();
+      LogsRunLocalPublishAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsRunLocalPublishSerilogDirectory.CreateOrCleanDirectory();
+      LogsTestE2eAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsTestE2eSerilogDirectory.CreateOrCleanDirectory();
+      LogsTestServerSerilogDirectory.CreateOrCleanDirectory();
+      LogsTestServerAuditDotNetDirectory.CreateOrCleanDirectory();
+
+      var postmanCollections = new List<string>
+      {
+        "Auth",
+        "ArticlesEmpty",
+        "Article",
+        "FeedAndArticles",
+        "Profiles",
+      };
+
+      LogsTestServerPostman.CreateOrCleanDirectory();
+      ReportsTestPostmanDirectory.CreateOrCleanDirectory();
+
+      foreach (var collection in postmanCollections)
+      {
+        (LogsTestServerPostman / collection / "Server.Web" / "Serilog").CreateOrCleanDirectory();
+        (LogsTestServerPostman / collection / "Server.Web" / "Audit.NET").CreateOrCleanDirectory();
+        (ReportsTestPostmanDirectory / collection / "Artifacts").CreateOrCleanDirectory();
+        (ReportsTestPostmanDirectory / collection / "Results").CreateOrCleanDirectory();
+      }
+
+      Log.Information("✓ Directories cleaned and pre-created");
+    });
 }

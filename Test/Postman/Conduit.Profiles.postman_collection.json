@@ -1,1208 +1,1218 @@
 {
-  "info": {
-    "_postman_id": "df2e8050-efe2-46fa-ac10-41c6852e5ce4",
-    "name": "Conduit - Profiles",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "8521556"
-  },
-  "item": [
-    {
-      "name": "Profiles",
-      "item": [
-        {
-          "name": "Register",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Registration successful (200 OK)', function() {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "});",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
-            },
-            "url": {
-              "raw": "{{APIURL}}/identity/register",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "register"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Login and Remember Token",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "",
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.testWithCorrelation('Response contains \"accessToken\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('accessToken');",
-                  "});",
-                  "",
-                  "pm.testWithCorrelation('accessToken is not empty', function() {",
-                  "    pm.expect(responseJSON.accessToken).to.not.be.empty;",
-                  "});",
-                  "",
-                  "if (responseJSON.accessToken) {",
-                  "    pm.globals.set('token', responseJSON.accessToken);",
-                  "}",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
-            },
-            "url": {
-              "raw": "{{APIURL}}/identity/login?useCookies=false",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "login"
-              ],
-              "query": [
-                {
-                  "key": "useCookies",
-                  "value": "false"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Register (second user)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Registration successful (200 OK)', function() {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "});",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "const secondEmail = (Math.random() * 1000) + \"@example.com\";",
-                  "pm.globals.set(\"SECOND_EMAIL\", secondEmail);",
-                  "pm.globals.set(\"SECOND_USERNAME\", secondEmail);"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
-            },
-            "url": {
-              "raw": "{{APIURL}}/identity/register",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "register"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Register Celeb",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Registration successful (200 OK)', function() {",
-                  "    pm.expect(pm.response.code).to.eql(200);",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"celeb_{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
-            },
-            "url": {
-              "raw": "{{APIURL}}/identity/register",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "identity",
-                "register"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Follow Profile - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 401', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "disabled": true
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{}"
-            },
-            "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "celeb_{{EMAIL}}",
-                "follow"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Follow Profile",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.testWithCorrelation('Response contains \"profile\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('profile')",
-                  "});",
-                  "",
-                  "var profile = responseJSON.profile || {};",
-                  "",
-                  "pm.testWithCorrelation('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
-                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"bio\" property', function() {",
-                  "    pm.expect(profile).to.have.property('bio')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"image\" property', function() {",
-                  "    pm.expect(profile).to.have.property('image')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"following\" property', function() {",
-                  "    pm.expect(profile).to.have.property('following')",
-                  "    pm.expect(profile.following).to.eql(true)",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{}"
-            },
-            "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "celeb_{{EMAIL}}",
-                "follow"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Follow Profile - already following",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.testWithCorrelation('Response contains \"profile\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('profile')",
-                  "});",
-                  "",
-                  "var profile = responseJSON.profile || {};",
-                  "",
-                  "pm.testWithCorrelation('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
-                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"bio\" property', function() {",
-                  "    pm.expect(profile).to.have.property('bio')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"image\" property', function() {",
-                  "    pm.expect(profile).to.have.property('image')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"following\" property', function() {",
-                  "    pm.expect(profile).to.have.property('following')",
-                  "    pm.expect(profile.following).to.eql(true)",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{}"
-            },
-            "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "celeb_{{EMAIL}}",
-                "follow"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Follow Profile - validation - user doesn't exist",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 404', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Not Found')",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{}"
-            },
-            "url": {
-              "raw": "{{APIURL}}/profiles/nonexistentuser_{{EMAIL}}/follow",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "nonexistentuser_{{EMAIL}}",
-                "follow"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Profile - authenticated - following",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.testWithCorrelation('Response contains \"profile\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('profile')",
-                  "});",
-                  "",
-                  "var profile = responseJSON.profile || {};",
-                  "",
-                  "pm.testWithCorrelation('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
-                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"bio\" property', function() {",
-                  "    pm.expect(profile).to.have.property('bio')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"image\" property', function() {",
-                  "    pm.expect(profile).to.have.property('image')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"following\" property equal true', function() {",
-                  "    pm.expect(profile).to.have.property('following')",
-                  "    pm.expect(profile.following).to.eql(true)",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "celeb_{{EMAIL}}"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Profile - authenticated - not following",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.testWithCorrelation('Response contains \"profile\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('profile')",
-                  "});",
-                  "",
-                  "var profile = responseJSON.profile || {};",
-                  "",
-                  "pm.testWithCorrelation('\"username\" matches SECOND_EMAIL variable (username defaults to email)', function() {",
-                  "    const email = pm.globals.get('SECOND_EMAIL');",
-                  "    pm.expect(profile.username).to.eql(email)",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"bio\" property', function() {",
-                  "    pm.expect(profile).to.have.property('bio')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"image\" property', function() {",
-                  "    pm.expect(profile).to.have.property('image')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"following\" property equal false', function() {",
-                  "    pm.expect(profile).to.have.property('following')",
-                  "    pm.expect(profile.following).to.eql(false)",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{APIURL}}/profiles/{{SECOND_EMAIL}}",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "{{SECOND_EMAIL}}"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Profile - error - 404 not found",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 404', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Not Found')",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{APIURL}}/profiles/nonexistant_{{EMAIL}}",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "nonexistant_{{EMAIL}}"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Profile - validation - invalid username",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 404', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Not Found')",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{APIURL}}/profiles/",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                ""
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Profile - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is 401 Unauthorized', function() {",
-                  "    pm.expect(pm.response.code).to.eql(401);",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "disabled": true
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "celeb_{{EMAIL}}"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Unfollow Profile - error - unauthenticated",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 401', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Unauthorized')",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "disabled": true
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "celeb_{{EMAIL}}",
-                "follow"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Unfollow Profile",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.testWithCorrelation('Response contains \"profile\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('profile')",
-                  "});",
-                  "",
-                  "var profile = responseJSON.profile || {};",
-                  "",
-                  "pm.testWithCorrelation('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
-                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"bio\" property', function() {",
-                  "    pm.expect(profile).to.have.property('bio')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"image\" property', function() {",
-                  "    pm.expect(profile).to.have.property('image')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"following\" property', function() {",
-                  "    pm.expect(profile).to.have.property('following')",
-                  "    pm.expect(profile.following).to.eql(false)",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "celeb_{{EMAIL}}",
-                "follow"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Unfollow Profile - error - not already following",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "pm.testWithCorrelation('Response is HTTP 400', function() {",
-                  "    pm.expect(pm.response.status).to.eql('Bad Request')",
-                  "})",
-                  "",
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.testWithCorrelation('Response contains \"errors\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('errors')",
-                  "});",
-                  "",
-                  "",
-                  "utils.assertErrorStartsWith(\"username\", pm);"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "celeb_{{EMAIL}}",
-                "follow"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Profile - authenticated - unfollowed",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Wrapper function to include correlation ID in test names",
-                  "pm.testWithCorrelation = function(testName, testFunction) {",
-                  "    const corrId = pm.variables.get('correlationId') || 'unknown';",
-                  "    return pm.test(`[${corrId}] ${testName}`, testFunction);",
-                  "};",
-                  "",
-                  "var responseJSON = JSON.parse(pm.response.text());",
-                  "",
-                  "pm.testWithCorrelation('Response contains \"profile\" property', function() {",
-                  "    pm.expect(responseJSON).to.have.property('profile')",
-                  "});",
-                  "",
-                  "var profile = responseJSON.profile || {};",
-                  "",
-                  "pm.testWithCorrelation('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
-                  "    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
-                  "    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"bio\" property', function() {",
-                  "    pm.expect(profile).to.have.property('bio')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"image\" property', function() {",
-                  "    pm.expect(profile).to.have.property('image')",
-                  "});",
-                  "pm.testWithCorrelation('Profile has \"following\" property equal false', function() {",
-                  "    pm.expect(profile).to.have.property('following')",
-                  "    pm.expect(profile.following).to.eql(false)",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "X-Requested-With",
-                "value": "XMLHttpRequest"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "{{correlationId}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}",
-              "host": [
-                "{{APIURL}}"
-              ],
-              "path": [
-                "profiles",
-                "celeb_{{EMAIL}}"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    }
-  ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          "utils = {",
-          "    assertErrorStartsWith: function(fieldName, pm) {",
-          "        const response = pm.response.json();",
-          "        const errors = response.errors || [];",
-          "        ",
-          "        let hasFieldError = false;",
-          "        ",
-          "        // Handle Identity API ValidationProblemDetails format: errors is an object with keys",
-          "        if (typeof errors === 'object' && !Array.isArray(errors)) {",
-          "            // errors = { \"DuplicateEmail\": [\"message1\"], \"InvalidEmail\": [\"message2\"] }",
-          "            hasFieldError = Object.keys(errors).some(key => ",
-          "                key.toLowerCase().includes(fieldName.toLowerCase())",
-          "            );",
-          "        }",
-          "        // Handle legacy format: errors is an array of {name, reason}",
-          "        else if (Array.isArray(errors)) {",
-          "            hasFieldError = errors.some(err => ",
-          "                err.name === fieldName || err.name.startsWith(fieldName)",
-          "            );",
-          "        }",
-          "        ",
-          "        pm.testWithCorrelation(`At least one error for field '${fieldName}'`, function () {",
-          "            pm.expect(hasFieldError).to.be.true;",
-          "        });",
-          "    }",
-          "}",
-          "",
-          "",
-          "// Generate unique correlation ID for this request",
-          "const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
-          "pm.variables.set('correlationId', correlationId);"
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          "",
-          ""
-        ]
-      }
-    }
-  ],
-  "variable": [
-    {
-      "key": "errorHelpersDefined",
-      "value": ""
-    },
-    {
-      "key": "customHelpersDefined",
-      "value": ""
-    }
-  ]
+	"info": {
+		"_postman_id": "2919b529-d307-499a-ab13-4fc4532ec4f0",
+		"name": "Conduit - Profiles",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8521556"
+	},
+	"item": [
+		{
+			"name": "Profiles",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"pm.testWithCorrelation('Registration successful (200 OK)', function() {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
+						},
+						"url": {
+							"raw": "{{APIURL}}/identity/register",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"identity",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login and Remember Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"var responseJSON = JSON.parse(pm.response.text());",
+									"",
+									"",
+									"var responseJSON = JSON.parse(pm.response.text());",
+									"",
+									"pm.testWithCorrelation('Response contains \"accessToken\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('accessToken');",
+									"});",
+									"",
+									"pm.testWithCorrelation('accessToken is not empty', function() {",
+									"    pm.expect(responseJSON.accessToken).to.not.be.empty;",
+									"});",
+									"",
+									"if (responseJSON.accessToken) {",
+									"    pm.globals.set('token', responseJSON.accessToken);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
+						},
+						"url": {
+							"raw": "{{APIURL}}/identity/login?useCookies=false",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"identity",
+								"login"
+							],
+							"query": [
+								{
+									"key": "useCookies",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register (second user)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"pm.testWithCorrelation('Registration successful (200 OK)', function() {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const secondEmail = (Math.random() * 1000) + \"@example.com\";",
+									"pm.globals.set(\"SECOND_EMAIL\", secondEmail);",
+									"pm.globals.set(\"SECOND_USERNAME\", secondEmail);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"{{SECOND_EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
+						},
+						"url": {
+							"raw": "{{APIURL}}/identity/invite",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"identity",
+								"invite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Celeb",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"pm.testWithCorrelation('Registration successful (200 OK)', function() {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"celeb_{{EMAIL}}\", \"password\":\"{{PASSWORD}}\"}"
+						},
+						"url": {
+							"raw": "{{APIURL}}/identity/invite",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"identity",
+								"invite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Follow Profile - error - unauthenticated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"pm.testWithCorrelation('Response is HTTP 401', function() {",
+									"    pm.expect(pm.response.status).to.eql('Unauthorized')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"disabled": true
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"celeb_{{EMAIL}}",
+								"follow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Follow Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"var responseJSON = JSON.parse(pm.response.text());",
+									"",
+									"pm.testWithCorrelation('Response contains \"profile\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('profile')",
+									"});",
+									"",
+									"var profile = responseJSON.profile || {};",
+									"",
+									"pm.testWithCorrelation('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+									"    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+									"    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
+									"});",
+									"pm.testWithCorrelation('Profile has \"bio\" property', function() {",
+									"    pm.expect(profile).to.have.property('bio')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"image\" property', function() {",
+									"    pm.expect(profile).to.have.property('image')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"following\" property', function() {",
+									"    pm.expect(profile).to.have.property('following')",
+									"    pm.expect(profile.following).to.eql(true)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"celeb_{{EMAIL}}",
+								"follow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Follow Profile - already following",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"var responseJSON = JSON.parse(pm.response.text());",
+									"",
+									"pm.testWithCorrelation('Response contains \"profile\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('profile')",
+									"});",
+									"",
+									"var profile = responseJSON.profile || {};",
+									"",
+									"pm.testWithCorrelation('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+									"    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+									"    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
+									"});",
+									"pm.testWithCorrelation('Profile has \"bio\" property', function() {",
+									"    pm.expect(profile).to.have.property('bio')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"image\" property', function() {",
+									"    pm.expect(profile).to.have.property('image')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"following\" property', function() {",
+									"    pm.expect(profile).to.have.property('following')",
+									"    pm.expect(profile.following).to.eql(true)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"celeb_{{EMAIL}}",
+								"follow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Follow Profile - validation - user doesn't exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"pm.testWithCorrelation('Response is HTTP 404', function() {",
+									"    pm.expect(pm.response.status).to.eql('Not Found')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{APIURL}}/profiles/nonexistentuser_{{EMAIL}}/follow",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"nonexistentuser_{{EMAIL}}",
+								"follow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile - authenticated - following",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"var responseJSON = JSON.parse(pm.response.text());",
+									"",
+									"pm.testWithCorrelation('Response contains \"profile\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('profile')",
+									"});",
+									"",
+									"var profile = responseJSON.profile || {};",
+									"",
+									"pm.testWithCorrelation('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+									"    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+									"    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
+									"});",
+									"pm.testWithCorrelation('Profile has \"bio\" property', function() {",
+									"    pm.expect(profile).to.have.property('bio')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"image\" property', function() {",
+									"    pm.expect(profile).to.have.property('image')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"following\" property equal true', function() {",
+									"    pm.expect(profile).to.have.property('following')",
+									"    pm.expect(profile.following).to.eql(true)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"celeb_{{EMAIL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile - authenticated - not following",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"var responseJSON = JSON.parse(pm.response.text());",
+									"",
+									"pm.testWithCorrelation('Response contains \"profile\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('profile')",
+									"});",
+									"",
+									"var profile = responseJSON.profile || {};",
+									"",
+									"pm.testWithCorrelation('\"username\" matches SECOND_EMAIL variable (username defaults to email)', function() {",
+									"    const email = pm.globals.get('SECOND_EMAIL');",
+									"    pm.expect(profile.username).to.eql(email)",
+									"});",
+									"pm.testWithCorrelation('Profile has \"bio\" property', function() {",
+									"    pm.expect(profile).to.have.property('bio')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"image\" property', function() {",
+									"    pm.expect(profile).to.have.property('image')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"following\" property equal false', function() {",
+									"    pm.expect(profile).to.have.property('following')",
+									"    pm.expect(profile.following).to.eql(false)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/profiles/{{SECOND_EMAIL}}",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"{{SECOND_EMAIL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile - error - 404 not found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"pm.testWithCorrelation('Response is HTTP 404', function() {",
+									"    pm.expect(pm.response.status).to.eql('Not Found')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/profiles/nonexistant_{{EMAIL}}",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"nonexistant_{{EMAIL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile - validation - invalid username",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"pm.testWithCorrelation('Response is HTTP 404', function() {",
+									"    pm.expect(pm.response.status).to.eql('Not Found')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/profiles/",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile - unauthenticated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"pm.testWithCorrelation('Response is 401 Unauthorized', function() {",
+									"    pm.expect(pm.response.code).to.eql(401);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"disabled": true
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"celeb_{{EMAIL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unfollow Profile - error - unauthenticated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"pm.testWithCorrelation('Response is HTTP 401', function() {",
+									"    pm.expect(pm.response.status).to.eql('Unauthorized')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"disabled": true
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"celeb_{{EMAIL}}",
+								"follow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unfollow Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"var responseJSON = JSON.parse(pm.response.text());",
+									"",
+									"pm.testWithCorrelation('Response contains \"profile\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('profile')",
+									"});",
+									"",
+									"var profile = responseJSON.profile || {};",
+									"",
+									"pm.testWithCorrelation('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+									"    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+									"    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
+									"});",
+									"pm.testWithCorrelation('Profile has \"bio\" property', function() {",
+									"    pm.expect(profile).to.have.property('bio')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"image\" property', function() {",
+									"    pm.expect(profile).to.have.property('image')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"following\" property', function() {",
+									"    pm.expect(profile).to.have.property('following')",
+									"    pm.expect(profile.following).to.eql(false)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"celeb_{{EMAIL}}",
+								"follow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unfollow Profile - error - not already following",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"pm.testWithCorrelation('Response is HTTP 400', function() {",
+									"    pm.expect(pm.response.status).to.eql('Bad Request')",
+									"})",
+									"",
+									"var responseJSON = JSON.parse(pm.response.text());",
+									"",
+									"pm.testWithCorrelation('Response contains \"errors\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('errors')",
+									"});",
+									"",
+									"",
+									"utils.assertErrorStartsWith(\"username\", pm);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}/follow",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"celeb_{{EMAIL}}",
+								"follow"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile - authenticated - unfollowed",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Wrapper function to include correlation ID in test names",
+									"pm.testWithCorrelation = function(testName, testFunction) {",
+									"    const corrId = pm.variables.get('correlationId') || 'unknown';",
+									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
+									"};",
+									"",
+									"var responseJSON = JSON.parse(pm.response.text());",
+									"",
+									"pm.testWithCorrelation('Response contains \"profile\" property', function() {",
+									"    pm.expect(responseJSON).to.have.property('profile')",
+									"});",
+									"",
+									"var profile = responseJSON.profile || {};",
+									"",
+									"pm.testWithCorrelation('\"username\" matches celeb_ + EMAIL variable (username defaults to email)', function() {",
+									"    const email = pm.globals.get('EMAIL') || pm.environment.get('EMAIL')",
+									"    pm.expect(profile.username).to.eql(\"celeb_\" + email)",
+									"});",
+									"pm.testWithCorrelation('Profile has \"bio\" property', function() {",
+									"    pm.expect(profile).to.have.property('bio')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"image\" property', function() {",
+									"    pm.expect(profile).to.have.property('image')",
+									"});",
+									"pm.testWithCorrelation('Profile has \"following\" property equal false', function() {",
+									"    pm.expect(profile).to.have.property('following')",
+									"    pm.expect(profile.following).to.eql(false)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Requested-With",
+								"value": "XMLHttpRequest"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-correlation-id",
+								"value": "{{correlationId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{APIURL}}/profiles/celeb_{{EMAIL}}",
+							"host": [
+								"{{APIURL}}"
+							],
+							"path": [
+								"profiles",
+								"celeb_{{EMAIL}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"utils = {",
+					"    assertErrorStartsWith: function(fieldName, pm) {",
+					"        const response = pm.response.json();",
+					"        const errors = response.errors || [];",
+					"        ",
+					"        let hasFieldError = false;",
+					"        ",
+					"        // Handle Identity API ValidationProblemDetails format: errors is an object with keys",
+					"        if (typeof errors === 'object' && !Array.isArray(errors)) {",
+					"            // errors = { \"DuplicateEmail\": [\"message1\"], \"InvalidEmail\": [\"message2\"] }",
+					"            hasFieldError = Object.keys(errors).some(key => ",
+					"                key.toLowerCase().includes(fieldName.toLowerCase())",
+					"            );",
+					"        }",
+					"        // Handle legacy format: errors is an array of {name, reason}",
+					"        else if (Array.isArray(errors)) {",
+					"            hasFieldError = errors.some(err => ",
+					"                err.name === fieldName || err.name.startsWith(fieldName)",
+					"            );",
+					"        }",
+					"        ",
+					"        pm.testWithCorrelation(`At least one error for field '${fieldName}'`, function () {",
+					"            pm.expect(hasFieldError).to.be.true;",
+					"        });",
+					"    }",
+					"}",
+					"",
+					"",
+					"// Generate unique correlation ID for this request",
+					"const correlationId = pm.variables.replaceIn('{{$randomUUID}}');",
+					"pm.variables.set('correlationId', correlationId);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"",
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "errorHelpersDefined",
+			"value": ""
+		},
+		{
+			"key": "customHelpersDefined",
+			"value": ""
+		}
+	]
 }

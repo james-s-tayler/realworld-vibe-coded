@@ -1,14 +1,17 @@
 ﻿using System.Net.Http.Headers;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Sinks.XUnit3;
 
 namespace Server.FunctionalTests;
 
 /// <summary>
 /// Base fixture class that provides Identity API helper methods for test fixtures
 /// </summary>
-public abstract class ApiFixtureBase<TProgram> : AppFixture<TProgram>
-  where TProgram : class
+public abstract class ApiFixtureBase : AppFixture<Program>
 {
-  public async Task<string> RegisterUserAsync(
+  public async Task<string> RegisterTenantUserAsync(
     string email,
     string password,
     CancellationToken cancellationToken = default)
@@ -35,7 +38,7 @@ public abstract class ApiFixtureBase<TProgram> : AppFixture<TProgram>
     return await LoginUserAsync(email, password, cancellationToken);
   }
 
-  public async Task<(HttpClient Client, string Email, string AccessToken)> RegisterUserAndCreateClientAsync(
+  public async Task<(HttpClient Client, string Email, string AccessToken)> RegisterTenantAndCreateClientAsync(
     string? email = null,
     string? password = null,
     CancellationToken cancellationToken = default)
@@ -43,8 +46,10 @@ public abstract class ApiFixtureBase<TProgram> : AppFixture<TProgram>
     email ??= $"user-{Guid.NewGuid()}@example.com";
     password ??= "Password123!";
 
-    var accessToken = await RegisterUserAsync(email, password, cancellationToken);
+    var accessToken = await RegisterTenantUserAsync(email, password, cancellationToken);
+#pragma warning disable SRV007
     var client = CreateAuthenticatedClient(accessToken);
+#pragma warning restore SRV007
 
     return (client, email, accessToken);
   }
@@ -77,6 +82,26 @@ public abstract class ApiFixtureBase<TProgram> : AppFixture<TProgram>
     {
       c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
     });
+  }
+
+  public void SetTestOutputHelper(ITestOutputHelper testOutputHelper) =>
+    Services.GetRequiredService<XUnit3TestOutputSink>().TestOutputHelper = testOutputHelper;
+
+  protected override void ConfigureServices(IServiceCollection services)
+  {
+    services.AddSingleton(Options.Create(new XUnit3TestOutputSinkOptions()));
+    services.AddSingleton<XUnit3TestOutputSink>();
+  }
+
+  protected override IHost ConfigureAppHost(IHostBuilder builder)
+  {
+    builder.UseSerilog((ctx, serviceProvider, loggerConfiguration) =>
+      loggerConfiguration
+          .ReadFrom.Configuration(ctx.Configuration)
+          .WriteTo.XUnit3TestOutput(
+        serviceProvider.GetRequiredService<XUnit3TestOutputSink>()));
+
+    return base.ConfigureAppHost(builder);
   }
 
   private record IdentityLoginResponse(string AccessToken);
