@@ -21,15 +21,10 @@ public class ArticleConfiguration : IEntityTypeConfiguration<Article>
       .HasMaxLength(Article.SlugMaxLength)
       .IsRequired();
 
-    // TenantId is a shadow property added by Finbuckle.MultiTenant
-    // We need to explicitly configure it before using it in an index
-    builder.Property<string>("TenantId")
-      .IsRequired()
-      .HasMaxLength(64);
-
-    // Slug must be unique per tenant, not globally
-    builder.HasIndex("Slug", "TenantId")
+    /*
+    builder.HasIndex(x => x.Slug)
       .IsUnique();
+      */
 
     // One-to-many relationship with User (Author)
     builder.HasOne(x => x.Author)

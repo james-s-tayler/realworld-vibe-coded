@@ -1,4 +1,6 @@
-﻿using Server.Infrastructure.Authentication;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
+using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
 using Server.Infrastructure.Identity;
@@ -15,13 +17,13 @@ public static class InfrastructureServiceExtensions
 {
   public static IServiceCollection AddInfrastructureServices(
     this IServiceCollection services,
-    ConfigurationManager config,
+    WebApplicationBuilder builder,
     ILogger logger)
   {
-    string? connectionString = config.GetConnectionString("DefaultConnection");
+    string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     Guard.Against.Null(connectionString);
 
-    string? tenantStoreConnectionString = config.GetConnectionString("TenantStoreConnection") ?? connectionString;
+    string? tenantStoreConnectionString = builder.Configuration.GetConnectionString("TenantStoreConnection") ?? connectionString;
 
     // Register the interceptor
     services.AddSingleton<ITimeProvider, UtcNowTimeProvider>();
@@ -31,12 +33,24 @@ public static class InfrastructureServiceExtensions
     services.AddDbContext<TenantStoreDbContext>(options =>
     {
       options.UseSqlServer(tenantStoreConnectionString);
+
+      if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing"))
+      {
+        options.EnableSensitiveDataLogging();
+        options.EnableDetailedErrors();
+      }
     });
 
     services.AddDbContext<AppDbContext>((serviceProvider, options) =>
     {
       options.UseSqlServer(connectionString);
       options.AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
+
+      if (builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing"))
+      {
+        options.EnableSensitiveDataLogging();
+        options.EnableDetailedErrors();
+      }
     });
 
     // Register repositories for both contexts

@@ -18,7 +18,7 @@ public static class ServiceConfigs
   {
     services.AddProblemDetails();
 
-    services.AddInfrastructureServices(builder.Configuration, logger)
+    services.AddInfrastructureServices(builder, logger)
             .AddMediatrConfigs();
 
     // Configure CORS to allow any origin

@@ -162,6 +162,7 @@ public partial class Build
   internal Target DbMigrationsGenerateIdempotentScript => _ => _
     .Description("Generate idempotent SQL script from EF Core migrations (use --db-context to specify context)")
     .DependsOn(InstallDotnetToolEf)
+    .DependsOn(LintServerFix)
     .Executes(() =>
     {
       var contextName = DbContext ?? "AppDbContext";
