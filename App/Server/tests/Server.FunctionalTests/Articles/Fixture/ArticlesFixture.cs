@@ -1,4 +1,8 @@
-﻿namespace Server.FunctionalTests.Articles.Fixture;
+﻿using Finbuckle.MultiTenant.Abstractions;
+using Microsoft.EntityFrameworkCore;
+using Server.Infrastructure.Data;
+
+namespace Server.FunctionalTests.Articles.Fixture;
 
 public class ArticlesFixture : ApiFixtureBase
 {
@@ -16,6 +20,12 @@ public class ArticlesFixture : ApiFixtureBase
 
   protected override async ValueTask SetupAsync()
   {
+    // Apply migrations to ensure database schema is up to date
+    var dbContextOptions = Services.GetRequiredService<DbContextOptions<AppDbContext>>();
+    var multiTenantContextAccessor = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
+    using var db = new AppDbContext(multiTenantContextAccessor, dbContextOptions, null);
+    await db.Database.MigrateAsync();
+
     ArticlesUser1Email = $"articlesuser1-{Guid.NewGuid()}@example.com";
     ArticlesUser1Username = ArticlesUser1Email;
     var articlesUser1Password = "Password123!";
