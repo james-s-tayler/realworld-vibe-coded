@@ -15,6 +15,9 @@ public class GetTests : AppTestBase<ArticlesFixture>
   [Fact]
   public async Task GetArticle_WithAuthentication_ReturnsArticle()
   {
+    // Arrange
+    var tenant = await Fixture.RegisterTenantAsync(TestContext.Current.CancellationToken);
+
     var createRequest = new CreateArticleRequest
     {
       Article = new ArticleData
@@ -25,11 +28,13 @@ public class GetTests : AppTestBase<ArticlesFixture>
       },
     };
 
-    var (_, createResult) = await Fixture.ArticlesUser1Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
+    var (response1, createResult) = await tenant.Users[0].Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(createRequest);
     var slug = createResult.Article.Slug;
 
-    var (response, result) = await Fixture.ArticlesUser1Client.GETAsync<Get, GetArticleRequest, ArticleResponse>(new GetArticleRequest { Slug = slug });
+    // Act
+    var (response, result) = await tenant.Users[0].Client.GETAsync<Get, GetArticleRequest, ArticleResponse>(new GetArticleRequest { Slug = slug });
 
+    // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Article.ShouldNotBeNull();
     result.Article.Slug.ShouldBe(slug);

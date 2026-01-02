@@ -33,7 +33,7 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   public async Task GetProfile_Authenticated_NotFollowing_ReturnsProfile()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2, TestContext.Current.CancellationToken);
 
     // Act
     var request = new GetProfileRequest { Username = tenant.Users[1].Email };
@@ -50,7 +50,7 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   public async Task GetProfile_Authenticated_Following_ReturnsProfileWithFollowing()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2, TestContext.Current.CancellationToken);
 
     var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
     await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -88,7 +88,7 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   public async Task FollowProfile_WithAuthentication_ReturnsProfileWithFollowing()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2, TestContext.Current.CancellationToken);
 
     // Act
     var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
@@ -105,7 +105,7 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   public async Task FollowProfile_AlreadyFollowing_ReturnsProfileWithFollowing()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2, TestContext.Current.CancellationToken);
 
     var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
     await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -144,7 +144,7 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   public async Task UnfollowProfile_WithAuthentication_ReturnsProfileWithoutFollowing()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2, TestContext.Current.CancellationToken);
 
     var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
     await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
@@ -164,7 +164,7 @@ public class ProfilesTests : AppTestBase<ProfilesFixture>
   public async Task UnfollowProfile_NotFollowing_ReturnsErrorDetail()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2, TestContext.Current.CancellationToken);
 
     // Act
     var unfollowRequest = new UnfollowProfileRequest { Username = tenant.Users[1].Email };

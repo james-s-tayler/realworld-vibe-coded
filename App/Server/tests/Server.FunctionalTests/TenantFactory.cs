@@ -4,14 +4,14 @@ namespace Server.FunctionalTests;
 
 public static class TenantFactory
 {
-  public static async Task<RegisteredTenant> RegisterTenant(
+  public static async Task<RegisteredTenant> RegisterTenantAsync(
     this AppFixture<Program> fixture,
     CancellationToken cancellationToken)
   {
-    return await fixture.RegisterTenantWithUsers(1, cancellationToken);
+    return await fixture.RegisterTenantWithUsersAsync(1, cancellationToken);
   }
 
-  public static async Task<RegisteredTenant> RegisterTenantWithUsers(
+  public static async Task<RegisteredTenant> RegisterTenantWithUsersAsync(
     this AppFixture<Program> fixture,
     int numUsers,
     CancellationToken cancellationToken)

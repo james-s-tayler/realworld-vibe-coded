@@ -95,7 +95,7 @@ public class UsersTests : AppTestBase<UsersFixture>
   public async Task UpdateUser_WithDuplicateEmail_ReturnsErrorDetail()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2, TestContext.Current.CancellationToken);
 
     var updateRequest = new UpdateUserRequest
     {
@@ -117,7 +117,7 @@ public class UsersTests : AppTestBase<UsersFixture>
   {
     // Arrange
     var existingUsername = $"existing-{Guid.NewGuid()}";
-    var tenant = await Fixture.RegisterTenantWithUsers(2, TestContext.Current.CancellationToken);
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2, TestContext.Current.CancellationToken);
 
     var updateRequest1 = new UpdateUserRequest
     {
