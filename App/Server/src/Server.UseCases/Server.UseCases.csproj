@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Destructurama.Attributed" />
     <PackageReference Include="FastEndpoints" />
     <PackageReference Include="Finbuckle.MultiTenant" />
     <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" />

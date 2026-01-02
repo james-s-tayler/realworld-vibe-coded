@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
-using Ardalis.GuardClauses;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Server.SharedKernel.Result;
@@ -26,27 +24,52 @@ public class LoggingBehavior<TRequest, T> : IPipelineBehavior<TRequest, Result<T
 
   public async Task<Result<T>> Handle(TRequest request, RequestHandlerDelegate<Result<T>> next, CancellationToken cancellationToken)
   {
-    Guard.Against.Null(request);
-    if (_logger.IsEnabled(LogLevel.Information))
+    if (_logger.IsEnabled(LogLevel.Debug))
+    {
+      _logger.LogDebug("Handling {RequestName}: {@Request}", typeof(TRequest).Name, request);
+    }
+    else
     {
       _logger.LogInformation("Handling {RequestName}", typeof(TRequest).Name);
-
-      // Reflection! Could be a performance concern
-      Type myType = request.GetType();
-      IList<PropertyInfo> props = new List<PropertyInfo>(myType.GetProperties());
-      foreach (PropertyInfo prop in props)
-      {
-        object? propValue = prop?.GetValue(request, null);
-        _logger.LogInformation("Property {Property} : {@Value}", prop?.Name, propValue);
-      }
     }
 
     var sw = Stopwatch.StartNew();
 
-    var response = await next();
+    var response = await next(cancellationToken);
 
-    _logger.LogInformation("Handled {RequestName} with {Response} in {ms} ms", typeof(TRequest).Name, response, sw.ElapsedMilliseconds);
     sw.Stop();
+
+    var logLevel = GetLogLevel(response);
+
+    if (logLevel == LogLevel.Information)
+    {
+      _logger.LogInformation(
+        "Handled {RequestName} in {ms} ms status: {ResultStatus}",
+        typeof(TRequest).Name,
+        sw.ElapsedMilliseconds,
+        response);
+    }
+    else
+    {
+      _logger.Log(
+        logLevel,
+        "Handled {RequestName} in {ms} ms with status: {ResultStatus} and result: {@Result}",
+        typeof(TRequest).Name,
+        sw.ElapsedMilliseconds,
+        response.Status,
+        response);
+    }
+
     return response;
+  }
+
+  private LogLevel GetLogLevel(Result<T> result)
+  {
+    if (result.IsSuccess)
+    {
+      return _logger.IsEnabled(LogLevel.Debug) ? LogLevel.Debug : LogLevel.Information;
+    }
+
+    return result.Status == ResultStatus.Invalid ? LogLevel.Warning : LogLevel.Error;
   }
 }
