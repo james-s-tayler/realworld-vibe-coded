@@ -21,10 +21,8 @@ public class ArticleConfiguration : IEntityTypeConfiguration<Article>
       .HasMaxLength(Article.SlugMaxLength)
       .IsRequired();
 
-    /*
     builder.HasIndex(x => x.Slug)
       .IsUnique();
-      */
 
     // One-to-many relationship with User (Author)
     builder.HasOne(x => x.Author)
