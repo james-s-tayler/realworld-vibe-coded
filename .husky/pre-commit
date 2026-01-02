@@ -62,14 +62,11 @@ if [ "$task_flowpilot_changes" -gt 0 ]; then
   echo "✅ FlowPilot tests completed successfully."
 fi
 
-# Run TestE2e if there are e2e test changes
+# E2E tests are intentionally not run in pre-commit hook (too time-consuming)
+# Run them manually with: ./build.sh TestE2e
 if [ "$e2e_test_changes" -gt 0 ]; then
-  echo "🔧 Test/e2e changes detected, running TestE2e..."
-  if ! ./build.sh TestE2e; then
-    echo "❌ E2E tests failed."
-    exit 1
-  fi
-  echo "✅ E2E tests completed successfully."
+  echo "ℹ️  Test/e2e changes detected. E2E tests are not run in pre-commit hook."
+  echo "   Run them manually with: ./build.sh TestE2e"
 fi
 
 # Run DbMigrationsVerifyAll if there are changes in Server.Infrastructure/Data or Server.Core
