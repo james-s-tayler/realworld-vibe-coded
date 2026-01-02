@@ -1,6 +1,13 @@
-﻿using MediatR;
+﻿using Destructurama.Attributed;
+using MediatR;
 using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Identity.Register;
 
-public record RegisterCommand(string Email, string Password) : ICommand<Unit>;
+public class RegisterCommand : ICommand<Unit>
+{
+  public required string Email { get; init; }
+
+  [NotLogged]
+  public required string Password { get; init; }
+}

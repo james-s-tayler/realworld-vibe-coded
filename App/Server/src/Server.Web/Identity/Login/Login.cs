@@ -21,7 +21,13 @@ public class Login(IMediator mediator) : Endpoint<LoginRequest>
     var useCookies = HttpContext.Request.Query[UseCookiesQueryParam].ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
     var useSessionCookies = HttpContext.Request.Query[UseSessionCookiesQueryParam].ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
 
-    var command = new LoginCommand(req.Email, req.Password, useCookies, useSessionCookies);
+    var command = new LoginCommand
+    {
+      Email = req.Email,
+      Password = req.Password,
+      UseCookies = useCookies,
+      UseSessionCookies = useSessionCookies,
+    };
     var result = await mediator.Send(command, ct);
 
     if (!result.IsSuccess)

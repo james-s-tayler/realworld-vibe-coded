@@ -1,5 +1,16 @@
-﻿using Server.SharedKernel.MediatR;
+﻿using Destructurama.Attributed;
+using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Identity.Login;
 
-public record LoginCommand(string Email, string Password, bool UseCookies, bool UseSessionCookies) : IQuery<LoginResult>;
+public class LoginCommand : IQuery<LoginResult>
+{
+  public required string Email { get; init; }
+
+  [NotLogged]
+  public required string Password { get; init; }
+
+  public bool UseCookies { get; init; }
+
+  public bool UseSessionCookies { get; init; }
+}

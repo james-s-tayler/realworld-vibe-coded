@@ -13,7 +13,11 @@ public class Register(IMediator mediator) : Endpoint<RegisterRequest>
 
   public override async Task HandleAsync(RegisterRequest req, CancellationToken ct)
   {
-    var command = new RegisterCommand(req.Email, req.Password);
+    var command = new RegisterCommand
+    {
+      Email = req.Email,
+      Password = req.Password,
+    };
     var result = await mediator.Send(command, ct);
 
     await Send.ResultValueAsync(result, ct);
