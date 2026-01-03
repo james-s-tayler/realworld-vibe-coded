@@ -86,6 +86,6 @@ public class HappyPath : AppPageTest
     await Pages.UsersPage.GetUserProfileLink(updatedUser2.Username).ClickAsync();
 
     // Assert - Verify we're on user2's profile page
-    await Expect(Pages.UsersPage).ToHaveURLAsync($"{BaseUrl}/profile/{updatedUser2.Username}");
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/profile/{updatedUser2.Username}");
   }
 }
