@@ -78,6 +78,18 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
 
     _logger.LogInformation("Created new user with email {Email}", request.Email);
 
+    _logger.LogInformation("Assigning AUTHOR role to invited user");
+
+    var authorRoleResult = await userManager.AddToRoleAsync(user, ApplicationRoles.Author);
+    if (!authorRoleResult.Succeeded)
+    {
+      var errorDetails = authorRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
+      _logger.LogError("Failed to add AUTHOR role for user {Email}", request.Email);
+      return Result<Unit>.Invalid(errorDetails);
+    }
+
+    _logger.LogInformation("Assigned AUTHOR role to invited user");
+
     // Add tenant claim
     var tenantClaim = new Claim("__tenant__", tenantId);
     _logger.LogInformation("Adding claim to invited user __tenant__: {@Claim}", tenantClaim);
@@ -94,6 +106,6 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
 
     _logger.LogInformation("User {Email} invited successfully to tenant {TenantId}", request.Email, tenantId);
 
-    return Result<Unit>.Success(Unit.Value);
+    return Result<Unit>.NoContent();
   }
 }

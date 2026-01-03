@@ -80,6 +80,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     // the service needs to be re-resolved here because of the call to SetTenantInfo -
     // if we try constructor injection, we'll get a copy of the dependency without the tenant info and the global query filters will fail
     var userManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
     var result = await userManager.CreateAsync(user, request.Password);
 
@@ -91,6 +92,42 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     }
 
     _logger.LogInformation("Registered new user");
+
+    var rolesToCreate = new[] { ApplicationRoles.Owner, ApplicationRoles.Admin, ApplicationRoles.Author, ApplicationRoles.Moderator };
+    foreach (var roleName in rolesToCreate)
+    {
+      if (!await roleManager.RoleExistsAsync(roleName))
+      {
+        _logger.LogInformation("Creating role {RoleName}", roleName);
+        var roleResult = await roleManager.CreateAsync(new IdentityRole<Guid>(roleName));
+        if (!roleResult.Succeeded)
+        {
+          var errorDetails = roleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
+          _logger.LogError("Failed to create role {RoleName} for tenant {TenantId}", roleName, tenantId);
+          return Result<Unit>.Invalid(errorDetails);
+        }
+      }
+    }
+
+    _logger.LogInformation("Assigning OWNER and ADMIN roles to new user");
+
+    var ownerRoleResult = await userManager.AddToRoleAsync(user, ApplicationRoles.Owner);
+    if (!ownerRoleResult.Succeeded)
+    {
+      var errorDetails = ownerRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
+      _logger.LogError("Failed to add OWNER role for user {Email}", request.Email);
+      return Result<Unit>.Invalid(errorDetails);
+    }
+
+    var adminRoleResult = await userManager.AddToRoleAsync(user, ApplicationRoles.Admin);
+    if (!adminRoleResult.Succeeded)
+    {
+      var errorDetails = adminRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
+      _logger.LogError("Failed to add ADMIN role for user {Email}", request.Email);
+      return Result<Unit>.Invalid(errorDetails);
+    }
+
+    _logger.LogInformation("Assigned OWNER and ADMIN roles to new user");
 
     var tenantClaim = new Claim("__tenant__", tenantId);
 
@@ -109,6 +146,6 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 
     _logger.LogInformation("User {Email} registered successfully with tenant {TenantId}", request.Email, tenantId);
 
-    return Result<Unit>.Success(Unit.Value);
+    return Result<Unit>.NoContent();
   }
 }
