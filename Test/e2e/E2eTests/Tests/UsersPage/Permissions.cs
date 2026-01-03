@@ -1,4 +1,6 @@
-﻿namespace E2eTests.Tests.UsersPage;
+﻿using Microsoft.Playwright;
+
+namespace E2eTests.Tests.UsersPage;
 
 /// <summary>
 /// Permission tests for the Users page (/users).
