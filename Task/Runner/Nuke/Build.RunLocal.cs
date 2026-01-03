@@ -71,6 +71,7 @@ public partial class Build
 
   internal Target RunLocalDependencies => _ => _
     .Description("Run dev dependencies")
+    .DependsOn(InstallDockerNetwork)
     .Executes(() =>
     {
       Log.Information("Starting dev dependencies");

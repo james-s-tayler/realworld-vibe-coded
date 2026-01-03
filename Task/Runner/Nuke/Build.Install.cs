@@ -96,16 +96,23 @@ public partial class Build
     .Description($"Creates {Constants.Docker.Networks.AppNetwork} docker network which is a shared global network")
     .Executes(() =>
     {
-      var networks = DockerTasks.DockerNetworkLs(
-        options => options.SetQuiet(true));
+      var name = Constants.Docker.Networks.AppNetwork;
 
-      if (networks.Any(output => output.Text.Contains(Constants.Docker.Networks.AppNetwork)))
+      var existing = DockerTasks.DockerNetworkLs(s => s
+          .SetFilter($"name=^{name}$")
+          .SetFormat("{{.Name}}"))
+        .Select(x => x.Text?.Trim())
+        .Where(x => !string.IsNullOrWhiteSpace(x))
+        .ToArray();
+
+      if (existing.Contains(name, StringComparer.Ordinal))
       {
-        Log.Information("{AppNetwork} already exists", Constants.Docker.Networks.AppNetwork);
+        Log.Information("Docker network '{AppNetwork}' already exists - not creating", name);
+        return;
       }
-      else
-      {
-        Log.Information("{AppNetwork} does not exist", Constants.Docker.Networks.AppNetwork);
-      }
+
+      Log.Information("Docker network '{AppNetwork}' does not exist - creating", name);
+
+      DockerTasks.DockerNetworkCreate(s => s.SetNetwork(name));
     });
 }
