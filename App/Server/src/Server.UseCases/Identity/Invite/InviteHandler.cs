@@ -78,6 +78,17 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
 
     _logger.LogInformation("Created new user with email {Email}", request.Email);
 
+    _logger.LogDebug("Assigning {RoleName} role to invited user", ApplicationRoles.Author);
+
+    var authorRoleResult = await userManager.AddToRoleAsync(user, ApplicationRoles.Author);
+    if (!authorRoleResult.Succeeded)
+    {
+      var errorDetails = authorRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
+      return Result<Unit>.Error(errorDetails);
+    }
+
+    _logger.LogDebug("Assigned {RoleName} role to invited user", ApplicationRoles.Author);
+
     // Add tenant claim
     var tenantClaim = new Claim("__tenant__", tenantId);
     _logger.LogInformation("Adding claim to invited user __tenant__: {@Claim}", tenantClaim);
@@ -94,6 +105,6 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
 
     _logger.LogInformation("User {Email} invited successfully to tenant {TenantId}", request.Email, tenantId);
 
-    return Result<Unit>.Success(Unit.Value);
+    return Result<Unit>.NoContent();
   }
 }

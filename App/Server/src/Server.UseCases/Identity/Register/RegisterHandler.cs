@@ -80,6 +80,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     // the service needs to be re-resolved here because of the call to SetTenantInfo -
     // if we try constructor injection, we'll get a copy of the dependency without the tenant info and the global query filters will fail
     var userManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
     var result = await userManager.CreateAsync(user, request.Password);
 
@@ -91,6 +92,39 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     }
 
     _logger.LogInformation("Registered new user");
+
+    var rolesToCreate = new[] { ApplicationRoles.Owner, ApplicationRoles.Admin, ApplicationRoles.Author, ApplicationRoles.Moderator };
+    foreach (var roleName in rolesToCreate)
+    {
+      if (!await roleManager.RoleExistsAsync(roleName))
+      {
+        _logger.LogInformation("Creating role {RoleName}", roleName);
+        var roleResult = await roleManager.CreateAsync(new IdentityRole<Guid>(roleName));
+        if (!roleResult.Succeeded)
+        {
+          var errorDetails = roleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
+          return Result<Unit>.Error(errorDetails);
+        }
+      }
+    }
+
+    _logger.LogDebug("Assigning {OwnerRole} and {AdminRole} roles to new user", ApplicationRoles.Owner, ApplicationRoles.Admin);
+
+    var ownerRoleResult = await userManager.AddToRoleAsync(user, ApplicationRoles.Owner);
+    if (!ownerRoleResult.Succeeded)
+    {
+      var errorDetails = ownerRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
+      return Result<Unit>.Error(errorDetails);
+    }
+
+    var adminRoleResult = await userManager.AddToRoleAsync(user, ApplicationRoles.Admin);
+    if (!adminRoleResult.Succeeded)
+    {
+      var errorDetails = adminRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
+      return Result<Unit>.Error(errorDetails);
+    }
+
+    _logger.LogDebug("Assigned {OwnerRole} and {AdminRole} roles to new user", ApplicationRoles.Owner, ApplicationRoles.Admin);
 
     var tenantClaim = new Claim("__tenant__", tenantId);
 
@@ -109,6 +143,6 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 
     _logger.LogInformation("User {Email} registered successfully with tenant {TenantId}", request.Email, tenantId);
 
-    return Result<Unit>.Success(Unit.Value);
+    return Result<Unit>.NoContent();
   }
 }
