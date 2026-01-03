@@ -1,4 +1,4 @@
-namespace E2eTests.Tests.UsersPage;
+﻿namespace E2eTests.Tests.UsersPage;
 
 /// <summary>
 /// Happy path tests for the Users page (/users).

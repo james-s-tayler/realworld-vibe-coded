@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { Add } from '@carbon/icons-react';
 import { PageShell } from '../components/PageShell';
-import { usersApi, User } from '../api/users';
+import { usersApi, type User } from '../api/users';
 import { ApiError } from '../api/client';
 import './UsersPage.css';
 

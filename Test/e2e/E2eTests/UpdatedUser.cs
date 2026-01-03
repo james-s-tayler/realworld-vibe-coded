@@ -1,4 +1,4 @@
-namespace E2eTests;
+﻿namespace E2eTests;
 
 public class UpdatedUser
 {
