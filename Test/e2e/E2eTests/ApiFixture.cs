@@ -386,69 +386,6 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
-  /// Updates a user with optional fields and returns the updated user info.
-  /// </summary>
-  public async Task<UpdatedUser> UpdateUserAsync(
-    string token,
-    string? email = null,
-    string? username = null,
-    string? password = null,
-    string? bio = null,
-    string? image = null)
-  {
-    var userUpdate = new Dictionary<string, object?>();
-    if (email != null)
-    {
-      userUpdate["email"] = email;
-    }
-
-    if (username != null)
-    {
-      userUpdate["username"] = username;
-    }
-
-    if (password != null)
-    {
-      userUpdate["password"] = password;
-    }
-
-    if (bio != null)
-    {
-      userUpdate["bio"] = bio;
-    }
-
-    if (image != null)
-    {
-      userUpdate["image"] = image;
-    }
-
-    var updateRequest = new
-    {
-      user = userUpdate,
-    };
-
-    using var request = new HttpRequestMessage(HttpMethod.Put, "/api/user")
-    {
-      Content = JsonContent.Create(updateRequest, options: _jsonOptions),
-    };
-    request.Headers.Add("Authorization", $"Bearer {token}");
-
-    var response = await _httpClient.SendAsync(request);
-    response.EnsureSuccessStatusCode();
-
-    var responseContent = await response.Content.ReadAsStringAsync();
-    var userResponse = JsonSerializer.Deserialize<UserResponseWrapper>(responseContent, _jsonOptions)!;
-
-    return new UpdatedUser
-    {
-      Email = userResponse.User.Email,
-      Username = userResponse.User.Username,
-      Bio = userResponse.User.Bio,
-      Image = userResponse.User.Image,
-    };
-  }
-
-  /// <summary>
   /// Updates a user's profile (bio and image).
   /// </summary>
   private async Task UpdateUserProfileAsync(string token, string bio, string image)
