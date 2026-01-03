@@ -45,13 +45,15 @@ export const AppHeader: React.FC = () => {
                   <Edit size={16} style={{ marginRight: '4px' }} />
                   New Article
                 </HeaderMenuItem>
-                <HeaderMenuItem
-                  as={Link}
-                  to="/users"
-                  isActive={isActive('/users')}
-                >
-                  Users
-                </HeaderMenuItem>
+                {user.roles && user.roles.includes('ADMIN') && (
+                  <HeaderMenuItem
+                    as={Link}
+                    to="/users"
+                    isActive={isActive('/users')}
+                  >
+                    Users
+                  </HeaderMenuItem>
+                )}
                 <HeaderMenuItem
                   as={Link}
                   to="/settings"

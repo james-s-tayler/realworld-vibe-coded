@@ -3,8 +3,9 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { AppHeader } from './AppHeader';
 import { AuthContext } from '../context/AuthContext';
+import type { User } from '../types/user';
 
-const renderWithAuth = (user: { username: string; email: string; token: string; bio: string; image: string } | null) => {
+const renderWithAuth = (user: User | null) => {
   return render(
     <AuthContext.Provider value={{ 
       user, 
@@ -36,9 +37,9 @@ describe('AppHeader', () => {
     renderWithAuth({ 
       username: 'testuser', 
       email: 'test@example.com', 
-      token: 'test-token',
       bio: 'Test bio',
-      image: 'https://example.com/image.jpg'
+      image: 'https://example.com/image.jpg',
+      roles: ['AUTHOR']
     });
     expect(screen.getByText('Home')).toBeInTheDocument();
   });
@@ -53,9 +54,9 @@ describe('AppHeader', () => {
     renderWithAuth({ 
       username: 'testuser', 
       email: 'test@example.com', 
-      token: 'test-token',
       bio: 'Test bio',
-      image: 'https://example.com/image.jpg'
+      image: 'https://example.com/image.jpg',
+      roles: ['AUTHOR']
     });
     expect(screen.getByText('New Article')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
@@ -65,10 +66,43 @@ describe('AppHeader', () => {
     renderWithAuth({ 
       username: 'testuser', 
       email: 'test@example.com', 
-      token: 'test-token',
       bio: 'Test bio',
-      image: 'https://example.com/image.jpg'
+      image: 'https://example.com/image.jpg',
+      roles: ['AUTHOR']
     });
     expect(screen.getByText('testuser')).toBeInTheDocument();
+  });
+
+  it('renders Users link for ADMIN users', () => {
+    renderWithAuth({ 
+      username: 'admin', 
+      email: 'admin@example.com', 
+      bio: 'Admin bio',
+      image: 'https://example.com/image.jpg',
+      roles: ['ADMIN', 'AUTHOR']
+    });
+    expect(screen.getByText('Users')).toBeInTheDocument();
+  });
+
+  it('does not render Users link for non-ADMIN users', () => {
+    renderWithAuth({ 
+      username: 'testuser', 
+      email: 'test@example.com', 
+      bio: 'Test bio',
+      image: 'https://example.com/image.jpg',
+      roles: ['AUTHOR']
+    });
+    expect(screen.queryByText('Users')).not.toBeInTheDocument();
+  });
+
+  it('does not render Users link when user has no roles', () => {
+    renderWithAuth({ 
+      username: 'testuser', 
+      email: 'test@example.com', 
+      bio: 'Test bio',
+      image: 'https://example.com/image.jpg',
+      roles: []
+    });
+    expect(screen.queryByText('Users')).not.toBeInTheDocument();
   });
 });

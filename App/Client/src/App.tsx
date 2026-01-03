@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { RoleProtectedRoute } from './components/RoleProtectedRoute';
 import { AppHeader } from './components/AppHeader';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
@@ -10,6 +11,7 @@ import { ArticlePage } from './pages/ArticlePage';
 import { EditorPage } from './pages/EditorPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { UsersPage } from './pages/UsersPage';
+import { ForbiddenPage } from './pages/ForbiddenPage';
 
 function App() {
   return (
@@ -70,11 +72,12 @@ function App() {
           <Route
             path="/users"
             element={
-              <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={['ADMIN']}>
                 <UsersPage />
-              </ProtectedRoute>
+              </RoleProtectedRoute>
             }
           />
+          <Route path="/forbidden" element={<ForbiddenPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
