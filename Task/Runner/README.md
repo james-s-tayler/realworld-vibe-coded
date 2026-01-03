@@ -29,24 +29,24 @@ build.cmd                 # Cross-platform build script (Windows)
 
 ## Available Targets
 
-| Nuke Target | Description |
-|-------------|-------------|
-| `build-server` | Build the .NET backend |
-| `build-server-publish` | Publish backend for linux-x64 in Release configuration |
-| `build-client` | Build the frontend (placeholder) |
-| `test-server` | Run backend unit/integration tests |
-| `test-server-postman` | Run Postman API tests |
-| `test-e2e` | Run E2E Playwright tests |
-| `lint-server-verify` | Verify backend formatting & analyzers (no changes). Fails if issues found |
-| `lint-server-fix` | Fix backend formatting & analyzer issues automatically |
-| `lint-client-verify` | Verify client code formatting and style |
-| `lint-client-fix` | Fix client code formatting and style issues automatically |
-| `lint-nuke-verify` | Verify Nuke build targets for documentation and naming conventions |
-| `lint-nuke-fix` | Fix Nuke build formatting and style issues automatically |
-| `run-local-server` | Run backend locally |
-| `run-local-client` | Run frontend locally (placeholder) |
-| `db-reset` | Reset local SQL Server database by removing docker volume (with confirmation) |
-| `db-reset-force` | Reset local SQL Server database without confirmation by removing docker volume |
+| Nuke Target                | Description                                                                                                                                |
+|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| `build-server`             | Build the .NET backend                                                                                                                     |
+| `build-server-publish`     | Publish backend for linux-x64 in Release configuration                                                                                     |
+| `build-client`             | Build the frontend (placeholder)                                                                                                           |
+| `test-server`              | Run backend unit/integration tests                                                                                                         |
+| `test-server-postman-auth` | Run Postman API tests - auth collection                                                                                                    |
+| `test-e2e`                 | Run E2E Playwright tests                                                                                                                   |
+| `lint-server-verify`       | Verify backend formatting & analyzers (no changes). Fails if issues found                                                                  |
+| `lint-server-fix`          | Fix backend formatting & analyzer issues automatically                                                                                     |
+| `lint-client-verify`       | Verify client code formatting and style                                                                                                    |
+| `lint-client-fix`          | Fix client code formatting and style issues automatically                                                                                  |
+| `lint-nuke-verify`         | Verify Nuke build targets for documentation and naming conventions                                                                         |
+| `lint-nuke-fix`            | Fix Nuke build formatting and style issues automatically                                                                                   |
+| `run-local-server`         | Run backend locally                                                                                                                        |
+| `run-local-client`         | Run frontend locally (placeholder)                                                                                                         |
+| `db-reset`                 | Reset local SQL Server database by removing docker volume (with confirmation)                                                              |
+| `db-reset-force`           | Reset local SQL Server database without confirmation by removing docker volume                                                             |
 | `db-migrations-test-apply` | Test EF Core migrations by applying them to a throwaway SQL Server database in Docker (also detects pending model changes via EF Core 9.0) |
 
 ### Target Naming Conventions
@@ -88,14 +88,11 @@ These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` t
 # Fix Nuke build formatting issues
 ./build.sh lint-nuke-fix
 
-# Run Postman tests with specific folder
-./build.sh test-server-postman --folder Auth
+# Run Postman tests with specific collection
+./build.sh test-server-postman-auth
 
 # Reset SQL Server database
 ./build.sh db-reset-force
-
-# Start SQL Server locally for development
-docker compose -f Task/LocalDev/docker-compose.yml up -d sqlserver
 ```
 
 ### Database Reset
@@ -103,7 +100,7 @@ docker compose -f Task/LocalDev/docker-compose.yml up -d sqlserver
 The `db-reset` and `db-reset-force` targets reset the SQL Server database used for local development:
 
 **How it works:**
-- Detects if the SQL Server docker volume (`localdev_sqlserver-data`) exists
+- Detects if the SQL Server docker volume exists
 - Stops any running SQL Server containers via docker-compose
 - Removes the docker volume completely
 - This provides a clean slate - all data and schema are removed
@@ -121,16 +118,12 @@ The `db-reset` and `db-reset-force` targets reset the SQL Server database used f
 ```bash
 # Reset will stop containers and remove the volume
 ./build.sh db-reset-force
-
-# Start SQL Server again with a clean database
-docker compose -f Task/LocalDev/docker-compose.yml up -d sqlserver
 ```
 
 ### Windows
 
 ```cmd
 rem Use build.cmd instead of build.sh
-build.cmd show-help
 build.cmd build-server
 ```
 

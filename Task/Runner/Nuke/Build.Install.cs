@@ -1,11 +1,14 @@
-﻿using Nuke.Common;
+﻿using Nuke;
+using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
+using Nuke.Common.Tools.Docker;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
 using Serilog;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
+
 
 public partial class Build
 {
@@ -88,4 +91,28 @@ public partial class Build
                 .SetVersion("10.*"));
         }
       });
+
+  internal Target InstallDockerNetwork => _ => _
+    .Description($"Creates {Constants.Docker.Networks.AppNetwork} docker network which is a shared global network")
+    .Executes(() =>
+    {
+      var name = Constants.Docker.Networks.AppNetwork;
+
+      var existing = DockerTasks.DockerNetworkLs(s => s
+          .SetFilter($"name=^{name}$")
+          .SetFormat("{{.Name}}"))
+        .Select(x => x.Text?.Trim())
+        .Where(x => !string.IsNullOrWhiteSpace(x))
+        .ToArray();
+
+      if (existing.Contains(name, StringComparer.Ordinal))
+      {
+        Log.Information("Docker network '{AppNetwork}' already exists - not creating", name);
+        return;
+      }
+
+      Log.Information("Docker network '{AppNetwork}' does not exist - creating", name);
+
+      DockerTasks.DockerNetworkCreate(s => s.SetNetwork(name));
+    });
 }
