@@ -1,0 +1,45 @@
+﻿using Server.Infrastructure;
+using Server.UseCases.Users.List;
+
+namespace Server.Web.Users.List;
+
+/// <summary>
+/// List all users
+/// </summary>
+/// <remarks>
+/// List all users in the system. Authentication required.
+/// </remarks>
+public class ListUsers(IMediator mediator) : Endpoint<EmptyRequest, UsersResponse>
+{
+  public override void Configure()
+  {
+    Get("/api/users");
+    AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
+    Summary(s =>
+    {
+      s.Summary = "List all users";
+      s.Description = "List all users in the system. Authentication required.";
+    });
+  }
+
+  public override async Task HandleAsync(EmptyRequest req, CancellationToken cancellationToken)
+  {
+    var result = await mediator.Send(new ListUsersQuery(), cancellationToken);
+
+    await Send.ResultMapperAsync(
+      result,
+      users =>
+      {
+        var userDtos = users.Select(u => new UserDto
+        {
+          Email = u.Email!,
+          Username = u.UserName!,
+          Bio = u.Bio,
+          Image = u.Image,
+        }).ToList();
+
+        return new UsersResponse { Users = userDtos };
+      },
+      cancellationToken);
+  }
+}

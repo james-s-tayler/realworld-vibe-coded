@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Server.Web.Users.GetCurrent;
+using Server.Web.Users.List;
 using Server.Web.Users.Update;
 
 namespace Server.FunctionalTests.Users;
@@ -211,5 +212,37 @@ public class UsersTests : AppTestBase
     var (response, result) = await user.Client.PUTAsync<UpdateUser, UpdateUserRequest, UpdateUserResponse>(updateRequest);
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.User.Username.ShouldBe(newUsername);
+  }
+
+  [Fact]
+  public async Task ListUsers_WithAuthentication_ReturnsAllUsers()
+  {
+    // Arrange - create multiple users
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(3);
+    var user = tenant.Users[0];
+
+    // Act
+    var (response, result) = await user.Client.GETAsync<ListUsers, UsersResponse>();
+
+    // Assert
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.Users.ShouldNotBeNull();
+    result.Users.Count.ShouldBeGreaterThanOrEqualTo(3);
+
+    // Verify all created users are in the response
+    foreach (var createdUser in tenant.Users)
+    {
+      result.Users.ShouldContain(u => u.Email == createdUser.Email);
+    }
+  }
+
+  [Fact]
+  public async Task ListUsers_WithoutAuthentication_ReturnsUnauthorized()
+  {
+    // Act
+    var (response, _) = await Fixture.Client.GETAsync<ListUsers, object>();
+
+    // Assert
+    response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
 }
