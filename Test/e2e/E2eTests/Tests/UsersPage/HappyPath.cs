@@ -68,7 +68,7 @@ public class HappyPath : AppPageTest
     var user1 = await Api.CreateUserAsync();
     var user2 = await Api.CreateUserAsync();
 
-    // Update user2 with a specific username
+    // Update user2 with a specific username so we can find them easily
     var updatedUser2 = await Api.UpdateUserAsync(user2.Token, username: $"testuser-{Guid.NewGuid().ToString("N")[..8]}");
 
     // Log in as user1
@@ -79,10 +79,13 @@ public class HappyPath : AppPageTest
     await Pages.UsersPage.GoToAsync();
     await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
 
-    // Act - Click on user2's profile link
-    await Pages.UsersPage.ClickUserProfileLinkAsync(updatedUser2.Username);
+    // Wait for user2 to appear in the table (by username)
+    await Expect(Pages.UsersPage.GetUserRowByUsername(updatedUser2.Username)).ToBeVisibleAsync();
+
+    // Act - Click on user2's profile link (link text is the username)
+    await Pages.UsersPage.GetUserProfileLink(updatedUser2.Username).ClickAsync();
 
     // Assert - Verify we're on user2's profile page
-    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/profile/{updatedUser2.Username}");
+    await Expect(Pages.UsersPage).ToHaveURLAsync($"{BaseUrl}/profile/{updatedUser2.Username}");
   }
 }

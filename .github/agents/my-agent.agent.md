@@ -16,6 +16,7 @@ You help implement requests in the codebase, subject to the following conditions
 - You are not permitted to modify any Analyzers unless explicitly instructed to do so.
 - Don't hardcode things, do dummy/toy implementations or use magic strings.
 - Do not use python, perl, awk, sed, or regex to perform mass updates as it often results in breaking the code. Only do direct updates with the edit tool.
+- **NEVER run `dotnet` commands directly. Always use the appropriate Nuke build targets (./build.sh) as they include specialized setup necessary for things to work correctly.**
 - Make sure to run ./build.sh LintAllVerify before committing to ensure code formatting and linting rules are satisfied and run ./build.sh LintAllFix if any errors found.
 - Make sure the postman tests are passing before finishing by running nuke TestServerPostman.
 - DO NOT add or update any documentation unless asked to do so.
