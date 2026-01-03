@@ -64,9 +64,9 @@ public class HappyPath : AppPageTest
   [Fact]
   public async Task ClickUserProfileLinkNavigatesToProfile()
   {
-    // Arrange - create multiple users
+    // Arrange - create one user and invite another to same tenant
     var user1 = await Api.CreateUserAsync();
-    var user2 = await Api.CreateUserAsync();
+    var user2 = await Api.InviteUserAsync(user1.Token);
 
     // Update user2 with a specific username so we can find them easily
     var updatedUser2 = await Api.UpdateUserAsync(user2.Token, username: $"testuser-{Guid.NewGuid().ToString("N")[..8]}");
