@@ -103,31 +103,28 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
         if (!roleResult.Succeeded)
         {
           var errorDetails = roleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
-          _logger.LogError("Failed to create role {RoleName} for tenant {TenantId}", roleName, tenantId);
-          return Result<Unit>.Invalid(errorDetails);
+          return Result<Unit>.Error(errorDetails);
         }
       }
     }
 
-    _logger.LogInformation("Assigning OWNER and ADMIN roles to new user");
+    _logger.LogDebug("Assigning {OwnerRole} and {AdminRole} roles to new user", ApplicationRoles.Owner, ApplicationRoles.Admin);
 
     var ownerRoleResult = await userManager.AddToRoleAsync(user, ApplicationRoles.Owner);
     if (!ownerRoleResult.Succeeded)
     {
       var errorDetails = ownerRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
-      _logger.LogError("Failed to add OWNER role for user {Email}", request.Email);
-      return Result<Unit>.Invalid(errorDetails);
+      return Result<Unit>.Error(errorDetails);
     }
 
     var adminRoleResult = await userManager.AddToRoleAsync(user, ApplicationRoles.Admin);
     if (!adminRoleResult.Succeeded)
     {
       var errorDetails = adminRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
-      _logger.LogError("Failed to add ADMIN role for user {Email}", request.Email);
-      return Result<Unit>.Invalid(errorDetails);
+      return Result<Unit>.Error(errorDetails);
     }
 
-    _logger.LogInformation("Assigned OWNER and ADMIN roles to new user");
+    _logger.LogDebug("Assigned {OwnerRole} and {AdminRole} roles to new user", ApplicationRoles.Owner, ApplicationRoles.Admin);
 
     var tenantClaim = new Claim("__tenant__", tenantId);
 
