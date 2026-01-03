@@ -24,7 +24,6 @@ import './UsersPage.css';
 const headers = [
   { key: 'username', header: 'Username' },
   { key: 'email', header: 'Email' },
-  { key: 'bio', header: 'Bio' },
 ];
 
 export const UsersPage: React.FC = () => {
@@ -87,7 +86,6 @@ export const UsersPage: React.FC = () => {
     id: user.email,
     username: user.username,
     email: user.email,
-    bio: user.bio || '',
   }));
 
   return (

@@ -28,7 +28,6 @@ public class Screenshots : AppPageTest
     // Assert all table column headers are visible
     await Expect(Page.GetByText("Username", new() { Exact = true })).ToBeVisibleAsync();
     await Expect(Page.GetByText("Email", new() { Exact = true })).ToBeVisibleAsync();
-    await Expect(Page.GetByText("Bio", new() { Exact = true })).ToBeVisibleAsync();
 
     // Assert user1's data is visible in the table
     await Expect(Pages.UsersPage.GetUserRowByUsername(user1.Email)).ToBeVisibleAsync();
