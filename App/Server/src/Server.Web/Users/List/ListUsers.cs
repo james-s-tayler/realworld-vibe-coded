@@ -28,18 +28,7 @@ public class ListUsers(IMediator mediator) : Endpoint<EmptyRequest, UsersRespons
 
     await Send.ResultMapperAsync(
       result,
-      users =>
-      {
-        var userDtos = users.Select(u => new UserDto
-        {
-          Email = u.Email!,
-          Username = u.UserName!,
-          Bio = u.Bio,
-          Image = u.Image,
-        }).ToList();
-
-        return new UsersResponse { Users = userDtos };
-      },
+      users => new UsersResponse { Users = UserMapper.ToDto(users) },
       cancellationToken);
   }
 }

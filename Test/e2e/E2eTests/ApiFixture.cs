@@ -95,6 +95,16 @@ public class ApiFixture : IAsyncLifetime
   {
     var userId = Interlocked.Increment(ref _userCounter);
     var email = $"invited{userId}_{Guid.NewGuid().ToString("N")[..8]}@test.com";
+    return await InviteUserAsync(inviterToken, email);
+  }
+
+  /// <summary>
+  /// Invites a user with a specific email to an existing tenant via API and returns the user credentials.
+  /// The invited user will belong to the same tenant as the inviting user.
+  /// This uses /api/identity/invite with the inviting user's token.
+  /// </summary>
+  public async Task<CreatedUser> InviteUserAsync(string inviterToken, string email)
+  {
     var password = "TestPassword123!";
 
     var inviteRequest = new

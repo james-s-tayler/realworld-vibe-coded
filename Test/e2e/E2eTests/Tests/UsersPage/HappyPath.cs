@@ -66,10 +66,8 @@ public class HappyPath : AppPageTest
   {
     // Arrange - create one user and invite another to same tenant
     var user1 = await Api.CreateUserAsync();
-    var user2 = await Api.InviteUserAsync(user1.Token);
-
-    // Update user2 with a specific username so we can find them easily
-    var updatedUser2 = await Api.UpdateUserAsync(user2.Token, username: $"testuser-{Guid.NewGuid().ToString("N")[..8]}");
+    var user2Email = $"testuser-{Guid.NewGuid().ToString("N")[..8]}@test.com";
+    var user2 = await Api.InviteUserAsync(user1.Token, user2Email);
 
     // Log in as user1
     await Pages.LoginPage.GoToAsync();
@@ -79,13 +77,13 @@ public class HappyPath : AppPageTest
     await Pages.UsersPage.GoToAsync();
     await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
 
-    // Wait for user2 to appear in the table (by username)
-    await Expect(Pages.UsersPage.GetUserRowByUsername(updatedUser2.Username)).ToBeVisibleAsync();
+    // Wait for user2 to appear in the table (by username which is the email)
+    await Expect(Pages.UsersPage.GetUserRowByUsername(user2.Email)).ToBeVisibleAsync();
 
-    // Act - Click on user2's profile link (link text is the username)
-    await Pages.UsersPage.GetUserProfileLink(updatedUser2.Username).ClickAsync();
+    // Act - Click on user2's profile link (link text is the username/email)
+    await Pages.UsersPage.GetUserProfileLink(user2.Email).ClickAsync();
 
     // Assert - Verify we're on user2's profile page
-    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/profile/{updatedUser2.Username}");
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/profile/{user2.Email}");
   }
 }

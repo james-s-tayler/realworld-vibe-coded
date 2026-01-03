@@ -14,8 +14,8 @@ public class Screenshots : AppPageTest
   {
     // Arrange - create one user and invite two others to same tenant
     var user1 = await Api.CreateUserWithMaxLengthsAsync();
-    var user2 = await Api.InviteUserAsync(user1.Token);
-    var user3 = await Api.InviteUserAsync(user1.Token);
+    await Api.InviteUserAsync(user1.Token);
+    await Api.InviteUserAsync(user1.Token);
 
     // Act - Log in and navigate to users page
     await Pages.LoginPage.GoToAsync();
