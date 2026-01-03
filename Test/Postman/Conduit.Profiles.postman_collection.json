@@ -22,8 +22,8 @@
 									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
 									"};",
 									"",
-									"pm.testWithCorrelation('Registration successful (200 OK)', function() {",
-									"    pm.expect(pm.response.code).to.eql(200);",
+									"pm.testWithCorrelation('Registration successful (204 No Content)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
 									"});",
 									""
 								],
@@ -168,8 +168,8 @@
 									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
 									"};",
 									"",
-									"pm.testWithCorrelation('Registration successful (200 OK)', function() {",
-									"    pm.expect(pm.response.code).to.eql(200);",
+									"pm.testWithCorrelation('Registration successful (204 No Content)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
 									"});",
 									""
 								],
@@ -244,8 +244,8 @@
 									"    return pm.test(`[${corrId}] ${testName}`, testFunction);",
 									"};",
 									"",
-									"pm.testWithCorrelation('Registration successful (200 OK)', function() {",
-									"    pm.expect(pm.response.code).to.eql(200);",
+									"pm.testWithCorrelation('Registration successful (204 No Content)', function() {",
+									"    pm.expect(pm.response.code).to.eql(204);",
 									"});"
 								],
 								"type": "text/javascript",
