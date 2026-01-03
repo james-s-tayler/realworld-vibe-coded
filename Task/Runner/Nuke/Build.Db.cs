@@ -3,6 +3,7 @@ using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.Docker;
 using Serilog;
+using Constants = Nuke.Constants;
 
 public partial class Build
 {
@@ -64,12 +65,10 @@ public partial class Build
 
   internal void ResetDatabase()
   {
-    var composeFile = TaskLocalDevDirectory / "docker-compose.dev-deps.yml";
-
-    if (DoesDockerVolumeExist("dev-dependencies_sqlserver-data"))
+    if (DoesDockerVolumeExist(Constants.Docker.Volumes.SqlServer))
     {
       Log.Information("Detected SQL Server docker volume. Removing volume to reset database...");
-      RemoveSqlServerVolume(composeFile);
+      RemoveSqlServerVolume();
     }
     else
     {
@@ -81,8 +80,7 @@ public partial class Build
   {
     try
     {
-      DockerTasks.DockerVolumeInspect(_ => _
-        .SetVolumes(volumeName));
+      DockerTasks.DockerVolumeInspect(_ => _.SetVolumes(volumeName));
       return true;
     }
     catch
@@ -91,18 +89,17 @@ public partial class Build
     }
   }
 
-  internal void RemoveSqlServerVolume(string composeFile)
+  internal void RemoveSqlServerVolume()
   {
     try
     {
       // Stop any running containers first
       Log.Information("Stopping SQL Server container if running...");
-      DockerTasks.Docker($"compose -f {composeFile} -p dev-dependencies down", workingDirectory: RootDirectory);
+      DockerTasks.Docker($"compose -f {DockerComposeDependencies} -p {Constants.Docker.Projects.DevDependencies} down", workingDirectory: RootDirectory);
 
       // Remove the volume
       Log.Information("Removing SQL Server docker volume...");
-      DockerTasks.DockerVolumeRm(_ => _
-        .SetVolumes("dev-dependencies_sqlserver-data"));
+      DockerTasks.DockerVolumeRm(_ => _.SetVolumes(Constants.Docker.Volumes.SqlServer));
 
       Log.Information("✓ SQL Server database reset complete - docker volume removed");
     }
@@ -162,7 +159,6 @@ public partial class Build
   internal Target DbMigrationsGenerateIdempotentScript => _ => _
     .Description("Generate idempotent SQL script from EF Core migrations (use --db-context to specify context)")
     .DependsOn(InstallDotnetToolEf)
-    .DependsOn(LintServerFix)
     .Executes(() =>
     {
       var contextName = DbContext ?? "AppDbContext";
@@ -202,6 +198,7 @@ public partial class Build
   internal Target DbMigrationsAdd => _ => _
     .Description("Add a new EF Core migration (requires --migration-name and --db-context parameters)")
     .DependsOn(InstallDotnetToolEf)
+    .Triggers(LintServerFix)
     .Executes(() =>
     {
       if (string.IsNullOrWhiteSpace(MigrationName))

@@ -46,6 +46,8 @@ public partial class Build
 
   internal AbsolutePath TaskLocalDevDirectory => RootDirectory / "Task" / "LocalDev";
 
+  internal AbsolutePath DockerComposeDependencies => TaskLocalDevDirectory / "docker-compose.dev-deps.yml";
+
   internal AbsolutePath FlowPilotDirectory => RootDirectory / "Task" / "FlowPilot";
 
   internal AbsolutePath FlowPilotSolution => FlowPilotDirectory / "FlowPilot.sln";
