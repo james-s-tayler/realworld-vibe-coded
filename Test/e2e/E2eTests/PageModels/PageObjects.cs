@@ -56,6 +56,11 @@ public class PageObjects
   public SettingsPage SettingsPage => new(_page, $"{_baseUrl}/settings");
 
   /// <summary>
+  /// Gets the Users page instance.
+  /// </summary>
+  public UsersPage UsersPage => new(_page, _baseUrl);
+
+  /// <summary>
   /// Gets the Swagger page instance.
   /// </summary>
   public SwaggerPage SwaggerPage => new(_page, $"{_baseUrl}/swagger/index.html");

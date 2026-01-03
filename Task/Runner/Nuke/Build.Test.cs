@@ -185,7 +185,6 @@ public partial class Build
   {
     _.Description("Run E2E Playwright tests using Docker Compose")
     .DependsOn(BuildServerPublish)
-    .DependsOn(DbResetForce)
     .DependsOn(InstallDotnetToolLiquidReports)
     .DependsOn(PathsCleanDirectories)
     .Executes(() =>

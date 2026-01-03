@@ -47,6 +47,13 @@ export const AppHeader: React.FC = () => {
                 </HeaderMenuItem>
                 <HeaderMenuItem
                   as={Link}
+                  to="/users"
+                  isActive={isActive('/users')}
+                >
+                  Users
+                </HeaderMenuItem>
+                <HeaderMenuItem
+                  as={Link}
                   to="/settings"
                   isActive={isActive('/settings')}
                 >

@@ -18,11 +18,53 @@ applyTo: "App/Server/**"
 
 Keep endpoints **thin**: bind/authorize → delegate to a MediatR command/query → map to response.
 
+### FastEndpoints Mappers
+
+FastEndpoints provides a first-class mapper pattern for converting domain entities to response DTOs. Use `ResponseMapper<TResponse, TEntity>` to define mappers:
+
+```csharp
+/// <summary>
+/// FastEndpoints mapper for ApplicationUser to UsersResponse DTO
+/// </summary>
+public class UserMapper : ResponseMapper<UsersResponse, List<ApplicationUser>>
+{
+  public override Task<UsersResponse> FromEntityAsync(List<ApplicationUser> users, CancellationToken ct)
+  {
+    var userDtos = users.Select(user => new UserDto
+    {
+      Email = user.Email!,
+      Username = user.UserName!,
+      Bio = user.Bio,
+      Image = user.Image,
+    }).ToList();
+
+    return Task.FromResult(new UsersResponse { Users = userDtos });
+  }
+}
+```
+
+**Using mappers in endpoints:**
+1. Specify the mapper as the third type parameter: `Endpoint<TRequest, TResponse, TMapper>`
+2. Use `Map.FromEntityAsync()` in the handler to invoke the mapper
+3. Mappers can resolve dependencies via `Resolve<T>()` for complex mapping logic (e.g., current user context)
+
+Example endpoint:
+```csharp
+public class ListUsers(IMediator mediator) : Endpoint<EmptyRequest, UsersResponse, UserMapper>
+{
+  public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
+  {
+    var result = await mediator.Send(new ListUsersQuery(), ct);
+    await Send.ResultMapperAsync(result, async (users, ct) => await Map.FromEntityAsync(users, ct), ct);
+  }
+}
+```
+
 ## CQRS with MediatR
 
 Business rules live in handlers. Keep them framework-agnostic where possible.
 
-## Persistence (EF Core + SQLite)
+## Persistence (EF Core + SQL Server)
 
 * Prefer explicit configurations in `DbContext`/`EntityTypeConfiguration` classes (keys, indexes, required fields, max lengths, relationships, cascade behavior).
 * Use `HasConversion` for value objects. Keep slugs unique with a unique index.
@@ -38,7 +80,7 @@ Business rules live in handlers. Keep them framework-agnostic where possible.
 
 * Prefer integration tests covering the full stack (endpoint → MediatR → EF Core).
 * Use xUnit; follow AAA pattern (Arrange, Act, Assert).
-* Use an in-memory SQLite database for tests; reset between cases.
+* Tests run against a SQL Server instance managed by `docker-compose.dev-deps.yml` which is started automatically by the Nuke build system.
 
 ## Performance & Security
 

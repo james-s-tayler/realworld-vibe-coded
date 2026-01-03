@@ -55,6 +55,11 @@ public abstract class BasePage(IPage page, string baseUrl)
   public ILocator SettingsLink => Page.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true });
 
   /// <summary>
+  /// Navigation header link - Users.
+  /// </summary>
+  public ILocator UsersLink => Page.GetByRole(AriaRole.Link, new() { Name = "Users", Exact = true });
+
+  /// <summary>
   /// Gets the user profile link in the navigation header.
   /// </summary>
   public ILocator GetUserProfileLink(string username) =>
@@ -98,6 +103,14 @@ public abstract class BasePage(IPage page, string baseUrl)
   public async Task ClickSettingsAsync()
   {
     await Navigate(SettingsLink, $"{BaseUrl}/settings");
+  }
+
+  /// <summary>
+  /// Clicks the Users link in the header.
+  /// </summary>
+  public async Task ClickUsersAsync()
+  {
+    await Navigate(UsersLink, $"{BaseUrl}/users");
   }
 
   /// <summary>
