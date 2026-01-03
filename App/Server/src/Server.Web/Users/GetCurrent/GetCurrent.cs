@@ -1,6 +1,7 @@
 ﻿using Server.Infrastructure;
 using Server.UseCases.Interfaces;
 using Server.UseCases.Users.GetCurrent;
+using Server.UseCases.Users.GetUserRoles;
 
 namespace Server.Web.Users.GetCurrent;
 
@@ -31,15 +32,20 @@ public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint
 
     await Send.ResultMapperAsync(
       result,
-      user => new UserCurrentResponse
+      async (user, ct) =>
       {
-        User = new UserResponse
+        var rolesResult = await mediator.Send(new GetUserRolesQuery(user.Id.ToString()), ct);
+        return new UserCurrentResponse
         {
-          Email = user.Email!,
-          Username = user.UserName!,
-          Bio = user.Bio ?? string.Empty,
-          Image = user.Image,
-        },
+          User = new UserResponse
+          {
+            Email = user.Email!,
+            Username = user.UserName!,
+            Bio = user.Bio ?? string.Empty,
+            Image = user.Image,
+            Roles = rolesResult.Value ?? [],
+          },
+        };
       },
       cancellationToken);
   }

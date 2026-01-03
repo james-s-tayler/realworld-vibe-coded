@@ -23,6 +23,8 @@ public class UsersTests : AppTestBase
     result.User.ShouldNotBeNull();
     result.User.Email.ShouldBe(user.Email);
     result.User.Username.ShouldBe(user.Email);
+    result.User.Roles.ShouldNotBeNull();
+    result.User.Roles.ShouldContain("ADMIN");
   }
 
   [Fact]
@@ -234,6 +236,17 @@ public class UsersTests : AppTestBase
     {
       result.Users.ShouldContain(u => u.Email == createdUser.Email);
     }
+
+    // Verify roles are included
+    result.Users.ForEach(u =>
+    {
+      u.Roles.ShouldNotBeNull();
+      u.Roles.ShouldNotBeEmpty();
+    });
+
+    // Verify first user (tenant owner) has ADMIN role
+    var ownerDto = result.Users.First(u => u.Email == tenant.Users[0].Email);
+    ownerDto.Roles.ShouldContain("ADMIN");
   }
 
   [Fact]

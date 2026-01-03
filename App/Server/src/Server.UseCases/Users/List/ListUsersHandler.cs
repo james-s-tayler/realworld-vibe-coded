@@ -5,7 +5,7 @@ using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Users.List;
 
-public class ListUsersHandler : IQueryHandler<ListUsersQuery, List<ApplicationUser>>
+public class ListUsersHandler : IQueryHandler<ListUsersQuery, List<UserWithRoles>>
 {
   private readonly UserManager<ApplicationUser> _userManager;
 
@@ -14,13 +14,21 @@ public class ListUsersHandler : IQueryHandler<ListUsersQuery, List<ApplicationUs
     _userManager = userManager;
   }
 
-  public async Task<Result<List<ApplicationUser>>> Handle(ListUsersQuery request, CancellationToken cancellationToken)
+  public async Task<Result<List<UserWithRoles>>> Handle(ListUsersQuery request, CancellationToken cancellationToken)
   {
     var users = await _userManager.Users
       .AsNoTracking()
       .OrderBy(u => u.UserName)
       .ToListAsync(cancellationToken);
 
-    return Result<List<ApplicationUser>>.Success(users);
+    var usersWithRoles = new List<UserWithRoles>();
+
+    foreach (var user in users)
+    {
+      var roles = await _userManager.GetRolesAsync(user);
+      usersWithRoles.Add(new UserWithRoles(user, roles.ToList()));
+    }
+
+    return Result<List<UserWithRoles>>.Success(usersWithRoles);
   }
 }

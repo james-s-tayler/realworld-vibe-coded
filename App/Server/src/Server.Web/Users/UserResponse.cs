@@ -9,4 +9,6 @@ public class UserResponse
   public string Bio { get; set; } = default!;
 
   public string? Image { get; set; }
+
+  public List<string> Roles { get; set; } = [];
 }
