@@ -3,23 +3,21 @@
 namespace Server.Web.Users.List;
 
 /// <summary>
-/// Mapper for ApplicationUser to UserDto
+/// FastEndpoints mapper for List of ApplicationUser to UsersResponse DTO
+/// Maps list of users to response DTO with user information
 /// </summary>
-public static class UserMapper
+public class UserMapper : ResponseMapper<UsersResponse, List<ApplicationUser>>
 {
-  public static UserDto ToDto(ApplicationUser user)
+  public override Task<UsersResponse> FromEntityAsync(List<ApplicationUser> users, CancellationToken ct)
   {
-    return new UserDto
+    var userDtos = users.Select(user => new UserDto
     {
       Email = user.Email!,
       Username = user.UserName!,
       Bio = user.Bio,
       Image = user.Image,
-    };
-  }
+    }).ToList();
 
-  public static List<UserDto> ToDto(List<ApplicationUser> users)
-  {
-    return users.Select(ToDto).ToList();
+    return Task.FromResult(new UsersResponse { Users = userDtos });
   }
 }

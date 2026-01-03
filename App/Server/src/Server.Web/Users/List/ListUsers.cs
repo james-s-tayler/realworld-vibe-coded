@@ -9,7 +9,7 @@ namespace Server.Web.Users.List;
 /// <remarks>
 /// List all users in the system. Authentication required.
 /// </remarks>
-public class ListUsers(IMediator mediator) : Endpoint<EmptyRequest, UsersResponse>
+public class ListUsers(IMediator mediator) : Endpoint<EmptyRequest, UsersResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -26,9 +26,6 @@ public class ListUsers(IMediator mediator) : Endpoint<EmptyRequest, UsersRespons
   {
     var result = await mediator.Send(new ListUsersQuery(), cancellationToken);
 
-    await Send.ResultMapperAsync(
-      result,
-      users => new UsersResponse { Users = UserMapper.ToDto(users) },
-      cancellationToken);
+    await Send.ResultMapperAsync(result, async (users, ct) => await Map.FromEntityAsync(users, ct), cancellationToken);
   }
 }
