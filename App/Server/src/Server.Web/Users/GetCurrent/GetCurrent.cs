@@ -35,6 +35,22 @@ public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint
       async (user, ct) =>
       {
         var rolesResult = await mediator.Send(new GetUserRolesQuery(user.Id.ToString()), ct);
+
+        if (!rolesResult.IsSuccess)
+        {
+          return new UserCurrentResponse
+          {
+            User = new UserResponse
+            {
+              Email = user.Email!,
+              Username = user.UserName!,
+              Bio = user.Bio ?? string.Empty,
+              Image = user.Image,
+              Roles = [],
+            },
+          };
+        }
+
         return new UserCurrentResponse
         {
           User = new UserResponse

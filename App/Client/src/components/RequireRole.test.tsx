@@ -30,10 +30,41 @@ describe('RequireRole', () => {
       username: 'admin',
       bio: 'Admin user',
       image: null,
+      token: 'test-token',
       roles: ['ADMIN', 'AUTHOR'],
     };
 
     renderWithAuth(user, ['ADMIN']);
+
+    expect(screen.getByText('Protected Content')).toBeInTheDocument();
+  });
+
+  it('renders children when user has required role and no fallback provided', () => {
+    const user: User = {
+      email: 'admin@test.com',
+      username: 'admin',
+      bio: 'Admin user',
+      image: null,
+      token: 'test-token',
+      roles: ['ADMIN', 'AUTHOR'],
+    };
+
+    render(
+      <AuthContext.Provider
+        value={{
+          user,
+          loading: false,
+          login: vi.fn(),
+          register: vi.fn(),
+          logout: vi.fn(),
+          updateUser: vi.fn(),
+        }}
+      >
+        <RequireRole roles={['ADMIN']}>
+          <div>Protected Content</div>
+        </RequireRole>
+      </AuthContext.Provider>
+    );
 
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
   });
@@ -44,6 +75,7 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
+      token: 'test-token',
       roles: ['AUTHOR'],
     };
 
@@ -58,6 +90,7 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
+      token: 'test-token',
       roles: ['AUTHOR'],
     };
 
@@ -73,6 +106,7 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
+      token: 'test-token',
       roles: ['AUTHOR'],
     };
 
@@ -93,6 +127,7 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'User with no roles',
       image: null,
+      token: 'test-token',
       roles: [],
     };
 

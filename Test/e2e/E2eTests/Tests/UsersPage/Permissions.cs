@@ -2,10 +2,6 @@
 
 namespace E2eTests.Tests.UsersPage;
 
-/// <summary>
-/// Permission tests for the Users page (/users).
-/// Tests role-based access control for ADMIN features.
-/// </summary>
 public class Permissions : AppPageTest
 {
   public Permissions(ApiFixture apiFixture) : base(apiFixture)

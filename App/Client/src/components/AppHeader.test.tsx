@@ -39,6 +39,7 @@ describe('AppHeader', () => {
       email: 'test@example.com', 
       bio: 'Test bio',
       image: 'https://example.com/image.jpg',
+      token: 'test-token',
       roles: ['AUTHOR']
     });
     expect(screen.getByText('Home')).toBeInTheDocument();
@@ -56,6 +57,7 @@ describe('AppHeader', () => {
       email: 'test@example.com', 
       bio: 'Test bio',
       image: 'https://example.com/image.jpg',
+      token: 'test-token',
       roles: ['AUTHOR']
     });
     expect(screen.getByText('New Article')).toBeInTheDocument();
@@ -68,6 +70,7 @@ describe('AppHeader', () => {
       email: 'test@example.com', 
       bio: 'Test bio',
       image: 'https://example.com/image.jpg',
+      token: 'test-token',
       roles: ['AUTHOR']
     });
     expect(screen.getByText('testuser')).toBeInTheDocument();
@@ -79,6 +82,7 @@ describe('AppHeader', () => {
       email: 'admin@example.com', 
       bio: 'Admin bio',
       image: 'https://example.com/image.jpg',
+      token: 'test-token',
       roles: ['ADMIN', 'AUTHOR']
     });
     expect(screen.getByText('Users')).toBeInTheDocument();
@@ -90,6 +94,7 @@ describe('AppHeader', () => {
       email: 'test@example.com', 
       bio: 'Test bio',
       image: 'https://example.com/image.jpg',
+      token: 'test-token',
       roles: ['AUTHOR']
     });
     expect(screen.queryByText('Users')).not.toBeInTheDocument();
@@ -101,6 +106,7 @@ describe('AppHeader', () => {
       email: 'test@example.com', 
       bio: 'Test bio',
       image: 'https://example.com/image.jpg',
+      token: 'test-token',
       roles: []
     });
     expect(screen.queryByText('Users')).not.toBeInTheDocument();
