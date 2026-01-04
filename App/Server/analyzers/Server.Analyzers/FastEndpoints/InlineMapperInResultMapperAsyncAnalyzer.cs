@@ -120,7 +120,7 @@ namespace Server.Analyzers.FastEndpoints
       var baseType = classSymbol.BaseType;
       while (baseType != null)
       {
-        if (baseType.Name.StartsWith("Endpoint") &&
+        if (baseType.Name == "Endpoint" &&
             baseType.ContainingNamespace?.ToDisplayString() == "FastEndpoints")
         {
           return true;
