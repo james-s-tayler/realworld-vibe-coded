@@ -63,6 +63,70 @@ Reserved for internal analyzers.
 
 ---
 
+### SRV018: InlineMapperInResultMapperAsyncAnalyzer
+**Description:** Enforces the use of dedicated FastEndpoints.ResponseMapper classes instead of inline lambda mappers with `Send.ResultMapperAsync`.
+
+**Severity:** Error
+
+**Rationale:** Endpoints using `Send.ResultMapperAsync` with inline lambda mappers should be refactored to use the three-parameter `Endpoint<TRequest, TResponse, TMapper>` pattern with a dedicated `ResponseMapper` class. This ensures consistent mapper architecture, enables mapper reusability, and maintains separation of concerns.
+
+**Fix:** Define the endpoint with three type parameters `Endpoint<TRequest, TResponse, TMapper>` where `TMapper` is a `FastEndpoints.ResponseMapper<TResponse, TEntity>` class, then use `Map.FromEntityAsync()` in the endpoint handler.
+
+**Example:**
+```csharp
+// ❌ Bad - Inline mapper with ResultMapperAsync
+public class GetCurrent : Endpoint<EmptyRequest, UserCurrentResponse>
+{
+  public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
+  {
+    var result = await mediator.Send(query, ct);
+    await Send.ResultMapperAsync(
+      result,
+      user => new UserCurrentResponse
+      {
+        User = new UserResponse
+        {
+          Email = user.Email!,
+          Username = user.UserName!,
+          Bio = user.Bio ?? string.Empty,
+          Image = user.Image,
+        },
+      },
+      ct);
+  }
+}
+
+// ✅ Good - Dedicated mapper class with three-parameter Endpoint
+public class GetCurrent : Endpoint<EmptyRequest, UserCurrentResponse, UserMapper>
+{
+  public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
+  {
+    var result = await mediator.Send(query, ct);
+    await Send.ResultMapperAsync(result, async (user, ct) => await Map.FromEntityAsync(user, ct), ct);
+  }
+}
+
+public class UserMapper : ResponseMapper<UserCurrentResponse, ApplicationUser>
+{
+  public override Task<UserCurrentResponse> FromEntityAsync(ApplicationUser user, CancellationToken ct)
+  {
+    var response = new UserCurrentResponse
+    {
+      User = new UserResponse
+      {
+        Email = user.Email!,
+        Username = user.UserName!,
+        Bio = user.Bio ?? string.Empty,
+        Image = user.Image,
+      },
+    };
+    return Task.FromResult(response);
+  }
+}
+```
+
+---
+
 ### SRV009: ResponseMapperGetAwaiterAnalyzer
 **Description:** Bans usage of `GetAwaiter().GetResult()` in FastEndpoints.ResponseMapper classes.
 
