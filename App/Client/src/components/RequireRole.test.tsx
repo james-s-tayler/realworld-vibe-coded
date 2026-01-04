@@ -30,7 +30,6 @@ describe('RequireRole', () => {
       username: 'admin',
       bio: 'Admin user',
       image: null,
-      token: 'test-token',
       roles: ['ADMIN', 'AUTHOR'],
     };
 
@@ -45,7 +44,6 @@ describe('RequireRole', () => {
       username: 'admin',
       bio: 'Admin user',
       image: null,
-      token: 'test-token',
       roles: ['ADMIN', 'AUTHOR'],
     };
 
@@ -75,7 +73,6 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
-      token: 'test-token',
       roles: ['AUTHOR'],
     };
 
@@ -90,7 +87,6 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
-      token: 'test-token',
       roles: ['AUTHOR'],
     };
 
@@ -106,7 +102,6 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
-      token: 'test-token',
       roles: ['AUTHOR'],
     };
 
@@ -127,7 +122,6 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'User with no roles',
       image: null,
-      token: 'test-token',
       roles: [],
     };
 

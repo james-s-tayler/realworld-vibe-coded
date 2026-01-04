@@ -26,7 +26,6 @@ describe('useHasRole', () => {
       username: 'admin',
       bio: 'Admin user',
       image: null,
-      token: 'test-token',
       roles: ['ADMIN', 'AUTHOR'],
     };
 
@@ -43,7 +42,6 @@ describe('useHasRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
-      token: 'test-token',
       roles: ['AUTHOR'],
     };
 
@@ -60,7 +58,6 @@ describe('useHasRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
-      token: 'test-token',
       roles: ['AUTHOR'],
     };
 
@@ -85,7 +82,6 @@ describe('useHasRole', () => {
       username: 'user',
       bio: 'User with no roles',
       image: null,
-      token: 'test-token',
       roles: [],
     };
 
