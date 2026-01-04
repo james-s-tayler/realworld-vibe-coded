@@ -102,7 +102,7 @@ public class GetCurrent : Endpoint<EmptyRequest, UserCurrentResponse, UserMapper
   public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
   {
     var result = await mediator.Send(query, ct);
-    await Send.ResultMapperAsync(result, async (user, ct) => await Map.FromEntityAsync(user, ct), ct);
+    await Send.ResultMapperAsync(result, Map.FromEntityAsync, ct);
   }
 }
 
