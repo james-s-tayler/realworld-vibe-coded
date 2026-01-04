@@ -1,0 +1,12 @@
+.forbidden-page {
+  text-align: center;
+  padding: 2rem;
+}
+
+.forbidden-page h1 {
+  margin-bottom: 1rem;
+}
+
+.forbidden-page p {
+  margin-bottom: 1rem;
+}

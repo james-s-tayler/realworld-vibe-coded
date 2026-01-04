@@ -1,4 +1,4 @@
-﻿using Server.Core.IdentityAggregate;
+﻿using Server.UseCases.Users.Dtos;
 
 namespace Server.Web.Users.GetCurrent;
 
@@ -6,18 +6,19 @@ namespace Server.Web.Users.GetCurrent;
 /// FastEndpoints mapper for ApplicationUser to UserCurrentResponse DTO
 /// Maps the current authenticated user to response DTO
 /// </summary>
-public class UserCurrentMapper : ResponseMapper<UserCurrentResponse, ApplicationUser>
+public class UserCurrentMapper : ResponseMapper<UserCurrentResponse, UserWithRolesDto>
 {
-  public override Task<UserCurrentResponse> FromEntityAsync(ApplicationUser user, CancellationToken ct)
+  public override Task<UserCurrentResponse> FromEntityAsync(UserWithRolesDto user, CancellationToken ct)
   {
     var response = new UserCurrentResponse
     {
       User = new UserResponse
       {
-        Email = user.Email!,
-        Username = user.UserName!,
-        Bio = user.Bio ?? string.Empty,
+        Email = user.Email,
+        Username = user.Username,
+        Bio = user.Bio,
         Image = user.Image,
+        Roles = user.Roles,
       },
     };
 

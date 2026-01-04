@@ -1,38 +1,37 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using Server.Core.IdentityAggregate;
+﻿using Microsoft.Extensions.Logging;
 using Server.SharedKernel.MediatR;
+using Server.UseCases.Interfaces;
+using Server.UseCases.Users.Dtos;
 
 namespace Server.UseCases.Users.GetCurrent;
 
-public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, ApplicationUser>
+public class GetCurrentUserHandler : IQueryHandler<GetCurrentUserQuery, UserWithRolesDto>
 {
-  private readonly UserManager<ApplicationUser> _userManager;
+  private readonly IQueryApplicationUsers _queryApplicationUsers;
   private readonly ILogger<GetCurrentUserHandler> _logger;
 
   public GetCurrentUserHandler(
-    UserManager<ApplicationUser> userManager,
+    IQueryApplicationUsers queryApplicationUsers,
     ILogger<GetCurrentUserHandler> logger)
   {
-    _userManager = userManager;
+    _queryApplicationUsers = queryApplicationUsers;
     _logger = logger;
   }
 
-  public async Task<Result<ApplicationUser>> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
+  public async Task<Result<UserWithRolesDto>> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
   {
     _logger.LogInformation("Getting current user for ID {UserId}", request.UserId);
 
-    // Look up ApplicationUser by ID
-    var appUser = await _userManager.FindByIdAsync(request.UserId.ToString());
+    var userDto = await _queryApplicationUsers.GetCurrentUserWithRoles(request.UserId, cancellationToken);
 
-    if (appUser == null)
+    if (userDto == null)
     {
       _logger.LogWarning("User with ID {UserId} not found", request.UserId);
-      return Result<ApplicationUser>.NotFound();
+      return Result<UserWithRolesDto>.NotFound();
     }
 
-    _logger.LogInformation("Retrieved current user {Username}", appUser.UserName);
+    _logger.LogInformation("Retrieved current user {Username}", userDto.Username);
 
-    return Result<ApplicationUser>.Success(appUser);
+    return Result<UserWithRolesDto>.Success(userDto);
   }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Server.Infrastructure.Authentication;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Data.Interceptors;
+using Server.Infrastructure.Data.Queries;
 using Server.Infrastructure.Identity;
 using Server.Infrastructure.Services;
 using Server.SharedKernel.Identity;
@@ -61,7 +62,8 @@ public static class InfrastructureServiceExtensions
            .AddScoped<IUnitOfWork, UnitOfWork>()
            .AddScoped<IPasswordHasher, BcryptPasswordHasher>()
            .AddScoped<IUserContext, UserContext>()
-           .AddScoped<IUserEmailChecker, UserEmailChecker>();
+           .AddScoped<IUserEmailChecker, UserEmailChecker>()
+           .AddScoped<IQueryApplicationUsers, ApplicationUsersQuery>();
 
 
     logger.LogInformation("{Project} services registered", "Infrastructure");

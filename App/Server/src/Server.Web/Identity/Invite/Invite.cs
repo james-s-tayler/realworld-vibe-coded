@@ -9,7 +9,7 @@ public class Invite(IMediator mediator) : Endpoint<InviteRequest>
   {
     Post("/api/identity/invite");
     AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
-    Roles(Server.Core.IdentityAggregate.ApplicationRoles.Admin);
+    Roles(Server.Core.IdentityAggregate.DefaultRoles.Admin);
   }
 
   public override async Task HandleAsync(InviteRequest req, CancellationToken ct)

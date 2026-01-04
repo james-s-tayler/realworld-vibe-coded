@@ -1,6 +1,6 @@
-﻿using Server.Core.IdentityAggregate;
-using Server.SharedKernel.MediatR;
+﻿using Server.SharedKernel.MediatR;
+using Server.UseCases.Users.Dtos;
 
 namespace Server.UseCases.Users.List;
 
-public record ListUsersQuery() : IQuery<List<ApplicationUser>>;
+public record ListUsersQuery() : IQuery<List<UserWithRolesDto>>;

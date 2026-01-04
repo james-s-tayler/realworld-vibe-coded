@@ -1,21 +1,18 @@
-﻿using Server.Core.IdentityAggregate;
+﻿using Server.UseCases.Users.Dtos;
 
 namespace Server.Web.Users.List;
 
-/// <summary>
-/// FastEndpoints mapper for List of ApplicationUser to UsersResponse DTO
-/// Maps list of users to response DTO with user information
-/// </summary>
-public class UserMapper : ResponseMapper<UsersResponse, List<ApplicationUser>>
+public class UserMapper : ResponseMapper<UsersResponse, List<UserWithRolesDto>>
 {
-  public override Task<UsersResponse> FromEntityAsync(List<ApplicationUser> users, CancellationToken ct)
+  public override Task<UsersResponse> FromEntityAsync(List<UserWithRolesDto> users, CancellationToken ct)
   {
     var userDtos = users.Select(user => new UserDto
     {
-      Email = user.Email!,
-      Username = user.UserName!,
+      Email = user.Email,
+      Username = user.Username,
       Bio = user.Bio,
       Image = user.Image,
+      Roles = user.Roles,
     }).ToList();
 
     return Task.FromResult(new UsersResponse { Users = userDtos });

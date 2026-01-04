@@ -24,6 +24,7 @@ import './UsersPage.css';
 const headers = [
   { key: 'username', header: 'Username' },
   { key: 'email', header: 'Email' },
+  { key: 'roles', header: 'Role(s)' },
 ];
 
 export const UsersPage: React.FC = () => {
@@ -86,6 +87,7 @@ export const UsersPage: React.FC = () => {
     id: user.email,
     username: user.username,
     email: user.email,
+    roles: user.roles?.join(', ') || '',
   }));
 
   return (

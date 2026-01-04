@@ -19,8 +19,8 @@ describe('UsersPage', () => {
 
   it('renders users table', async () => {
     const mockUsers = [
-      { email: 'user1@test.com', username: 'user1', bio: 'Bio 1', image: null },
-      { email: 'user2@test.com', username: 'user2', bio: 'Bio 2', image: null },
+      { email: 'user1@test.com', username: 'user1', bio: 'Bio 1', image: null, roles: ['AUTHOR'] },
+      { email: 'user2@test.com', username: 'user2', bio: 'Bio 2', image: null, roles: ['ADMIN'] },
     ];
 
     vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockUsers });
@@ -36,6 +36,8 @@ describe('UsersPage', () => {
       expect(screen.getByText('user2')).toBeInTheDocument();
       expect(screen.getByText('user1@test.com')).toBeInTheDocument();
       expect(screen.getByText('user2@test.com')).toBeInTheDocument();
+      expect(screen.getByText('AUTHOR')).toBeInTheDocument();
+      expect(screen.getByText('ADMIN')).toBeInTheDocument();
     });
   });
 
@@ -92,11 +94,11 @@ describe('UsersPage', () => {
   it('invites user and refreshes list', async () => {
     const user = userEvent.setup();
     const initialUsers = [
-      { email: 'user1@test.com', username: 'user1', bio: 'Bio 1', image: null },
+      { email: 'user1@test.com', username: 'user1', bio: 'Bio 1', image: null, roles: ['AUTHOR'] },
     ];
     const updatedUsers = [
       ...initialUsers,
-      { email: 'user2@test.com', username: 'user2', bio: 'Bio 2', image: null },
+      { email: 'user2@test.com', username: 'user2', bio: 'Bio 2', image: null, roles: ['AUTHOR'] },
     ];
 
     vi.mocked(usersApi.listUsers)

@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using Server.Core.IdentityAggregate;
 using Server.Web.Users.GetCurrent;
 using Server.Web.Users.List;
 using Server.Web.Users.Update;
@@ -23,6 +24,11 @@ public class UsersTests : AppTestBase
     result.User.ShouldNotBeNull();
     result.User.Email.ShouldBe(user.Email);
     result.User.Username.ShouldBe(user.Email);
+    result.User.Roles.ShouldNotBeNull();
+    result.User.Roles.ShouldContain(DefaultRoles.Owner);
+    result.User.Roles.ShouldContain(DefaultRoles.Admin);
+    result.User.Roles.ShouldContain(DefaultRoles.Author);
+    result.User.Roles.ShouldContain(DefaultRoles.Moderator);
   }
 
   [Fact]
@@ -234,6 +240,20 @@ public class UsersTests : AppTestBase
     {
       result.Users.ShouldContain(u => u.Email == createdUser.Email);
     }
+
+    // Verify roles are included
+    result.Users.ForEach(u =>
+    {
+      u.Roles.ShouldNotBeNull();
+      u.Roles.ShouldNotBeEmpty();
+    });
+
+    // Verify first user (tenant owner) has ADMIN role
+    var ownerDto = result.Users.First(u => u.Email == tenant.Users[0].Email);
+    ownerDto.Roles.ShouldContain(DefaultRoles.Admin);
+    ownerDto.Roles.ShouldContain(DefaultRoles.Owner);
+    ownerDto.Roles.ShouldContain(DefaultRoles.Author);
+    ownerDto.Roles.ShouldContain(DefaultRoles.Moderator);
   }
 
   [Fact]

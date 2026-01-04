@@ -9,4 +9,6 @@ public class UserDto
   public string Bio { get; set; } = string.Empty;
 
   public string? Image { get; set; }
+
+  public List<string> Roles { get; set; } = [];
 }

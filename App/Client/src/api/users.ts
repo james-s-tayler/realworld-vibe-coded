@@ -5,6 +5,7 @@ export interface User {
   username: string;
   bio: string;
   image: string | null;
+  roles: string[];
 }
 
 export interface UsersResponse {
