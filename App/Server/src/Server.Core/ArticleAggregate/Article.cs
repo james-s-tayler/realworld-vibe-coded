@@ -1,4 +1,5 @@
-﻿using Server.Core.IdentityAggregate;
+﻿using Server.Core.AuthorAggregate;
+using Server.Core.IdentityAggregate;
 using Server.Core.TagAggregate;
 using Server.SharedKernel.Persistence;
 
@@ -10,7 +11,7 @@ public class Article : EntityBase, IAggregateRoot
   public const int DescriptionMaxLength = 500;
   public const int SlugMaxLength = 250;
 
-  public Article(string title, string description, string body, ApplicationUser author)
+  public Article(string title, string description, string body, Author author)
   {
     Title = Guard.Against.NullOrEmpty(title);
     Description = Guard.Against.NullOrEmpty(description);
@@ -37,7 +38,7 @@ public class Article : EntityBase, IAggregateRoot
 
   public Guid AuthorId { get; private set; }
 
-  public ApplicationUser Author { get; private set; } = default!;
+  public Author Author { get; private set; } = default!;
 
   public List<Tag> Tags { get; private set; } = new();
 

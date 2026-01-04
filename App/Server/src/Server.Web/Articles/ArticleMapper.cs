@@ -47,8 +47,8 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
       isFavorited,
       article.FavoritesCount,
       new AuthorDto(
-        article.Author.UserName!,
-        article.Author.Bio ?? string.Empty,
+        article.Author.Username,
+        article.Author.Bio,
         article.Author.Image,
         isFollowing
       )

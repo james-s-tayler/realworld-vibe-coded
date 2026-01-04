@@ -24,7 +24,7 @@ public class ArticleConfiguration : IEntityTypeConfiguration<Article>
     builder.HasIndex(x => x.Slug)
       .IsUnique();
 
-    // One-to-many relationship with User (Author)
+    // One-to-many relationship with Author
     builder.HasOne(x => x.Author)
       .WithMany()
       .HasForeignKey(x => x.AuthorId)

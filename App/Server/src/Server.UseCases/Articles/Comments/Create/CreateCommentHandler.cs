@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications.Articles;
+using Server.Core.AuthorAggregate;
+using Server.Core.AuthorAggregate.Specifications;
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
@@ -13,15 +15,18 @@ namespace Server.UseCases.Articles.Comments.Create;
 public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, CommentResponse>
 {
   private readonly IRepository<Article> _articleRepository;
+  private readonly IRepository<Author> _authorRepository;
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly ILogger<CreateCommentHandler> _logger;
 
   public CreateCommentHandler(
     IRepository<Article> articleRepository,
+    IRepository<Author> authorRepository,
     UserManager<ApplicationUser> userManager,
     ILogger<CreateCommentHandler> logger)
   {
     _articleRepository = articleRepository;
+    _authorRepository = authorRepository;
     _userManager = userManager;
     _logger = logger;
   }
@@ -42,8 +47,18 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
       return Result<CommentResponse>.ErrorMissingRequiredEntity(typeof(ApplicationUser), request.AuthorId);
     }
 
+    // Get or create the author
+    var author = await _authorRepository.FirstOrDefaultAsync(
+      new AuthorByUserIdSpec(request.AuthorId), cancellationToken);
+
+    if (author == null)
+    {
+      author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
+      await _authorRepository.AddAsync(author, cancellationToken);
+    }
+
     // Create the comment
-    var comment = new Comment(request.Body, user, article);
+    var comment = new Comment(request.Body, author, article);
 
     // Add it to the article
     article.Comments.Add(comment);

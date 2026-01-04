@@ -16,7 +16,7 @@ public class CountArticlesSpec : Specification<Article>
 
     if (!string.IsNullOrEmpty(author))
     {
-      Query.Where(x => x.Author.UserName == author);
+      Query.Where(x => x.Author.Username == author);
     }
 
     if (!string.IsNullOrEmpty(favorited))

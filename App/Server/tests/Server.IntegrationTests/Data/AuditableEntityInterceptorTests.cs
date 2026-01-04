@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Server.Core.ArticleAggregate;
+using Server.Core.AuthorAggregate;
 using Server.Core.IdentityAggregate;
 using Server.Core.TagAggregate;
 using Server.Infrastructure.Data;
@@ -59,8 +60,12 @@ public class AuditableEntityInterceptorTests : IDisposable
     var fixedTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(fixedTime);
 
-    var author = CreateTestUser("author@example.com", "author");
-    _dbContext.Users.Add(author);
+    var user = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
+    _dbContext.Authors.Add(author);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     var article = new Article(
@@ -86,8 +91,12 @@ public class AuditableEntityInterceptorTests : IDisposable
     var createTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
-    var author = CreateTestUser("author@example.com", "author");
-    _dbContext.Users.Add(author);
+    var user = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
+    _dbContext.Authors.Add(author);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     var article = new Article(
@@ -122,8 +131,12 @@ public class AuditableEntityInterceptorTests : IDisposable
     var createTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
-    var author = CreateTestUser("author@example.com", "author");
-    _dbContext.Users.Add(author);
+    var user = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
+    _dbContext.Authors.Add(author);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     var article = new Article(
@@ -160,8 +173,12 @@ public class AuditableEntityInterceptorTests : IDisposable
     var fixedTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(fixedTime);
 
-    var author = CreateTestUser("author@example.com", "author");
-    _dbContext.Users.Add(author);
+    var user = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
+    _dbContext.Authors.Add(author);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     var article1 = new Article("Article 1", "Description 1", "Body 1", author);
@@ -189,8 +206,12 @@ public class AuditableEntityInterceptorTests : IDisposable
     var createTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
-    var author = CreateTestUser("author@example.com", "author");
-    _dbContext.Users.Add(author);
+    var user = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
+    _dbContext.Authors.Add(author);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     var article = new Article("Test Article", "Description", "Body", author);
@@ -226,8 +247,12 @@ public class AuditableEntityInterceptorTests : IDisposable
     var fixedTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(fixedTime);
 
-    var author = CreateTestUser("author@example.com", "author");
-    _dbContext.Users.Add(author);
+    var user = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
+    _dbContext.Authors.Add(author);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     var article = new Article("Test Article", "Description", "Body", author);
@@ -252,8 +277,12 @@ public class AuditableEntityInterceptorTests : IDisposable
     var createTime = DateTime.Parse("2025-10-25 12:00:00").ToUniversalTime();
     _timeProvider.SetTime(createTime);
 
-    var author = CreateTestUser("author@example.com", "author");
-    _dbContext.Users.Add(author);
+    var user = CreateTestUser("author@example.com", "author");
+    _dbContext.Users.Add(user);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
+    _dbContext.Authors.Add(author);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     var article = new Article("Test Article", "Description", "Body", author);

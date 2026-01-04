@@ -1972,3 +1972,102 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260104161203_AddAuthorEntity'
+)
+BEGIN
+    ALTER TABLE [Articles] DROP CONSTRAINT [FK_Articles_AspNetUsers_AuthorId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260104161203_AddAuthorEntity'
+)
+BEGIN
+    ALTER TABLE [Comments] DROP CONSTRAINT [FK_Comments_AspNetUsers_AuthorId];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260104161203_AddAuthorEntity'
+)
+BEGIN
+    CREATE TABLE [Authors] (
+        [Id] uniqueidentifier NOT NULL,
+        [Username] nvarchar(100) NOT NULL,
+        [Bio] nvarchar(1000) NOT NULL,
+        [Image] nvarchar(500) NULL,
+        [TenantId] nvarchar(450) NOT NULL,
+        [ChangeCheck] rowversion NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NOT NULL,
+        [CreatedBy] nvarchar(256) NOT NULL,
+        [UpdatedBy] nvarchar(256) NOT NULL,
+        CONSTRAINT [PK_Authors] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260104161203_AddAuthorEntity'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Authors_Username] ON [Authors] ([Username], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260104161203_AddAuthorEntity'
+)
+BEGIN
+
+          INSERT INTO Authors (Id, Username, Bio, Image, TenantId, CreatedAt, UpdatedAt, CreatedBy, UpdatedBy)
+          SELECT 
+            u.Id,
+            u.UserName,
+            ISNULL(u.Bio, ''),
+            u.Image,
+            u.TenantId,
+            GETUTCDATE(),
+            GETUTCDATE(),
+            'SYSTEM_MIGRATION',
+            'SYSTEM_MIGRATION'
+          FROM AspNetUsers u
+          WHERE EXISTS (
+            SELECT 1 FROM Articles a WHERE a.AuthorId = u.Id
+            UNION
+            SELECT 1 FROM Comments c WHERE c.AuthorId = u.Id
+          )
+        
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260104161203_AddAuthorEntity'
+)
+BEGIN
+    ALTER TABLE [Articles] ADD CONSTRAINT [FK_Articles_Authors_AuthorId] FOREIGN KEY ([AuthorId]) REFERENCES [Authors] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260104161203_AddAuthorEntity'
+)
+BEGIN
+    ALTER TABLE [Comments] ADD CONSTRAINT [FK_Comments_Authors_AuthorId] FOREIGN KEY ([AuthorId]) REFERENCES [Authors] ([Id]) ON DELETE NO ACTION;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260104161203_AddAuthorEntity'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260104161203_AddAuthorEntity', N'10.0.1');
+END;
+
+COMMIT;
+GO
+
