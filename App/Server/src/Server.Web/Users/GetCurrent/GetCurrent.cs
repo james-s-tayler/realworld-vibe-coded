@@ -4,7 +4,13 @@ using Server.UseCases.Users.GetCurrent;
 
 namespace Server.Web.Users.GetCurrent;
 
-public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint<EmptyRequest, UserCurrentResponse>
+/// <summary>
+/// Get current user
+/// </summary>
+/// <remarks>
+/// Get the currently authenticated user details.
+/// </remarks>
+public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint<EmptyRequest, UserCurrentResponse, UserCurrentMapper>
 {
   public override void Configure()
   {
@@ -23,22 +29,6 @@ public class GetCurrent(IMediator mediator, IUserContext userContext) : Endpoint
 
     var result = await mediator.Send(new GetCurrentUserQuery(userId), cancellationToken);
 
-    await Send.ResultMapperAsync(
-      result,
-      async (userDto, ct) =>
-      {
-        return new UserCurrentResponse
-        {
-          User = new UserResponse
-          {
-            Email = userDto.Email,
-            Username = userDto.Username,
-            Bio = userDto.Bio,
-            Image = userDto.Image,
-            Roles = userDto.Roles,
-          },
-        };
-      },
-      cancellationToken);
+    await Send.ResultMapperAsync(result, Map.FromEntityAsync, cancellationToken);
   }
 }
