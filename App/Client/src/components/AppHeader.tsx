@@ -9,6 +9,7 @@ import {
 } from '@carbon/react';
 import { Edit } from '@carbon/icons-react';
 import { useAuth } from '../hooks/useAuth';
+import { RequireRole } from './RequireRole';
 import { truncateUsername } from '../utils/textUtils';
 import './AppHeader.css';
 
@@ -45,7 +46,7 @@ export const AppHeader: React.FC = () => {
                   <Edit size={16} style={{ marginRight: '4px' }} />
                   New Article
                 </HeaderMenuItem>
-                {user.roles && user.roles.includes('ADMIN') && (
+                <RequireRole roles={['ADMIN']}>
                   <HeaderMenuItem
                     as={Link}
                     to="/users"
@@ -53,7 +54,7 @@ export const AppHeader: React.FC = () => {
                   >
                     Users
                   </HeaderMenuItem>
-                )}
+                </RequireRole>
                 <HeaderMenuItem
                   as={Link}
                   to="/settings"

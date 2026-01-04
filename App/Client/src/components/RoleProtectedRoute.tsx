@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
+import { useHasRole } from '../hooks/useHasRole';
 import { Loading } from '@carbon/react';
 
 interface RoleProtectedRouteProps {
@@ -10,6 +11,7 @@ interface RoleProtectedRouteProps {
 
 export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({ children, requiredRoles }) => {
   const { user, loading } = useAuth();
+  const hasRequiredRole = useHasRole(requiredRoles);
 
   if (loading) {
     return (
@@ -22,8 +24,6 @@ export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({ children
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-
-  const hasRequiredRole = user.roles && requiredRoles.some(role => user.roles.includes(role));
   
   if (!hasRequiredRole) {
     return <Navigate to="/forbidden" replace />;
