@@ -1,6 +1,6 @@
 ﻿namespace Server.Core.IdentityAggregate;
 
-public static class ApplicationRoles
+public static class DefaultRoles
 {
   public const string Owner = "OWNER";
   public const string Admin = "ADMIN";

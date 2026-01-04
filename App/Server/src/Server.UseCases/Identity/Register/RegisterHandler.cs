@@ -93,7 +93,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 
     _logger.LogInformation("Registered new user");
 
-    var rolesToCreate = new[] { ApplicationRoles.Owner, ApplicationRoles.Admin, ApplicationRoles.Author, ApplicationRoles.Moderator };
+    var rolesToCreate = new[] { DefaultRoles.Owner, DefaultRoles.Admin, DefaultRoles.Author, DefaultRoles.Moderator };
     foreach (var roleName in rolesToCreate)
     {
       if (!await roleManager.RoleExistsAsync(roleName))
@@ -108,23 +108,25 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
       }
     }
 
-    _logger.LogDebug("Assigning {OwnerRole} and {AdminRole} roles to new user", ApplicationRoles.Owner, ApplicationRoles.Admin);
-
-    var ownerRoleResult = await userManager.AddToRoleAsync(user, ApplicationRoles.Owner);
-    if (!ownerRoleResult.Succeeded)
+    var defaultRoles = new List<string>
     {
-      var errorDetails = ownerRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
+      DefaultRoles.Owner,
+      DefaultRoles.Admin,
+      DefaultRoles.Author,
+      DefaultRoles.Moderator,
+    };
+
+    _logger.LogDebug("Assigning roles to new user: {@Roles}", defaultRoles);
+
+    var addRoleResult = await userManager.AddToRolesAsync(user, defaultRoles);
+
+    if (!addRoleResult.Succeeded)
+    {
+      var errorDetails = addRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
       return Result<Unit>.Error(errorDetails);
     }
 
-    var adminRoleResult = await userManager.AddToRoleAsync(user, ApplicationRoles.Admin);
-    if (!adminRoleResult.Succeeded)
-    {
-      var errorDetails = adminRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
-      return Result<Unit>.Error(errorDetails);
-    }
-
-    _logger.LogDebug("Assigned {OwnerRole} and {AdminRole} roles to new user", ApplicationRoles.Owner, ApplicationRoles.Admin);
+    _logger.LogDebug("Assigned roles to new user: {@Roles}", defaultRoles);
 
     var tenantClaim = new Claim("__tenant__", tenantId);
 
