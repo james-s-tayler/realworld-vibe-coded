@@ -129,4 +129,33 @@ describe('RequireRole', () => {
 
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
   });
+
+  it('does not render children when user lacks required role and no fallback provided', () => {
+    const user: User = {
+      email: 'user@test.com',
+      username: 'user',
+      bio: 'Regular user',
+      image: null,
+      roles: ['AUTHOR'],
+    };
+
+    render(
+      <AuthContext.Provider
+        value={{
+          user,
+          loading: false,
+          login: vi.fn(),
+          register: vi.fn(),
+          logout: vi.fn(),
+          updateUser: vi.fn(),
+        }}
+      >
+        <RequireRole roles={['ADMIN']}>
+          <div>Protected Content</div>
+        </RequireRole>
+      </AuthContext.Provider>
+    );
+
+    expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
+  });
 });
