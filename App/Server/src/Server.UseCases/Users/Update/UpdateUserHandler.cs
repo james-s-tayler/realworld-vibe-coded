@@ -122,16 +122,15 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationU
       var author = await _authorRepository.FirstOrDefaultAsync(
         new AuthorByUserIdSpec(user.Id), cancellationToken);
 
-      if (author != null)
+      if (author == null)
       {
-        author.Update(user.UserName!, user.Bio, user.Image);
-        await _authorRepository.UpdateAsync(author, cancellationToken);
-        _logger.LogInformation("Author record updated for user {Username}", user.UserName);
+        _logger.LogError("Author record not found for user {UserId} - data integrity violation", user.Id);
+        return Result<ApplicationUser>.Error(new ErrorDetail("author", "Author record not found - data integrity issue"));
       }
-      else
-      {
-        _logger.LogWarning("No Author record found for user {UserId} during profile update", user.Id);
-      }
+
+      author.Update(user.UserName!, user.Bio ?? string.Empty, user.Image);
+      await _authorRepository.UpdateAsync(author, cancellationToken);
+      _logger.LogInformation("Author record synced for user {Username}", user.UserName);
     }
 
     _logger.LogInformation("User {Username} updated successfully", user.UserName);

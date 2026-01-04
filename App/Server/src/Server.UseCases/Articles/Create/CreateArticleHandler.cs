@@ -27,14 +27,13 @@ public class CreateArticleHandler(
       return Result<Article>.ErrorMissingRequiredEntity(typeof(ApplicationUser), request.AuthorId);
     }
 
-    // Get or create the author
+    // Get the author (domain invariant - must exist)
     var author = await authorRepository.FirstOrDefaultAsync(
       new AuthorByUserIdSpec(request.AuthorId), cancellationToken);
 
     if (author == null)
     {
-      author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
-      await authorRepository.AddAsync(author, cancellationToken);
+      return Result<Article>.ErrorMissingRequiredEntity(typeof(Author), request.AuthorId);
     }
 
     // Check for duplicate slug

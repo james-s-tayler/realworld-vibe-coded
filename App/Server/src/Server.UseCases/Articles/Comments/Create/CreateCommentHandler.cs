@@ -47,14 +47,13 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
       return Result<CommentResponse>.ErrorMissingRequiredEntity(typeof(ApplicationUser), request.AuthorId);
     }
 
-    // Get or create the author
+    // Get the author (domain invariant - must exist)
     var author = await _authorRepository.FirstOrDefaultAsync(
       new AuthorByUserIdSpec(request.AuthorId), cancellationToken);
 
     if (author == null)
     {
-      author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
-      await _authorRepository.AddAsync(author, cancellationToken);
+      return Result<CommentResponse>.ErrorMissingRequiredEntity(typeof(Author), request.AuthorId);
     }
 
     // Create the comment

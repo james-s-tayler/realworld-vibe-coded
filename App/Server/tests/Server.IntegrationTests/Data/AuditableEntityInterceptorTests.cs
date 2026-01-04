@@ -64,9 +64,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     _dbContext.Users.Add(user);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
-    _dbContext.Authors.Add(author);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+    var author = await CreateTestAuthorAsync(user);
 
     var article = new Article(
       title: "Test Article",
@@ -95,9 +93,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     _dbContext.Users.Add(user);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
-    _dbContext.Authors.Add(author);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+    var author = await CreateTestAuthorAsync(user);
 
     var article = new Article(
       title: "Test Article",
@@ -135,9 +131,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     _dbContext.Users.Add(user);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
-    _dbContext.Authors.Add(author);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+    var author = await CreateTestAuthorAsync(user);
 
     var article = new Article(
       title: "Test Article",
@@ -177,9 +171,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     _dbContext.Users.Add(user);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
-    _dbContext.Authors.Add(author);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+    var author = await CreateTestAuthorAsync(user);
 
     var article1 = new Article("Article 1", "Description 1", "Body 1", author);
     var article2 = new Article("Article 2", "Description 2", "Body 2", author);
@@ -210,9 +202,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     _dbContext.Users.Add(user);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
-    _dbContext.Authors.Add(author);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+    var author = await CreateTestAuthorAsync(user);
 
     var article = new Article("Test Article", "Description", "Body", author);
     var comment = new Comment("Test comment", author, article);
@@ -251,9 +241,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     _dbContext.Users.Add(user);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
-    _dbContext.Authors.Add(author);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+    var author = await CreateTestAuthorAsync(user);
 
     var article = new Article("Test Article", "Description", "Body", author);
     _dbContext.Articles.Add(article);
@@ -281,9 +269,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     _dbContext.Users.Add(user);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
-    _dbContext.Authors.Add(author);
-    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+    var author = await CreateTestAuthorAsync(user);
 
     var article = new Article("Test Article", "Description", "Body", author);
     _dbContext.Articles.Add(article);
@@ -341,5 +327,13 @@ public class AuditableEntityInterceptorTests : IDisposable
       Bio = "Test bio",
       Image = null,
     };
+  }
+
+  private async Task<Author> CreateTestAuthorAsync(ApplicationUser user)
+  {
+    var author = new Author(user.Id, user.UserName!, user.Bio, user.Image);
+    _dbContext.Authors.Add(author);
+    await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+    return author;
   }
 }
