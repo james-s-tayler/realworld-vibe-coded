@@ -1,16 +1,18 @@
-﻿namespace Server.Web.Users.List;
+﻿using Server.UseCases.Users.Dtos;
 
-public class UserMapper : ResponseMapper<UsersResponse, List<Server.UseCases.Users.List.UserWithRoles>>
+namespace Server.Web.Users.List;
+
+public class UserMapper : ResponseMapper<UsersResponse, List<UserWithRolesDto>>
 {
-  public override Task<UsersResponse> FromEntityAsync(List<Server.UseCases.Users.List.UserWithRoles> usersWithRoles, CancellationToken ct)
+  public override Task<UsersResponse> FromEntityAsync(List<UserWithRolesDto> users, CancellationToken ct)
   {
-    var userDtos = usersWithRoles.Select(uwr => new UserDto
+    var userDtos = users.Select(user => new UserDto
     {
-      Email = uwr.User.Email!,
-      Username = uwr.User.UserName!,
-      Bio = uwr.User.Bio,
-      Image = uwr.User.Image,
-      Roles = uwr.Roles,
+      Email = user.Email,
+      Username = user.Username,
+      Bio = user.Bio,
+      Image = user.Image,
+      Roles = user.Roles,
     }).ToList();
 
     return Task.FromResult(new UsersResponse { Users = userDtos });
