@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Server.Core.AuthorAggregate;
 using Server.Core.IdentityAggregate;
 using Server.Core.TenantInfoAggregate;
 using Server.SharedKernel.Identity;
@@ -144,6 +145,15 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     }
 
     _logger.LogInformation("User {Email} registered successfully with tenant {TenantId}", request.Email, tenantId);
+
+    // Create Author record as domain invariant
+    // Repository must be resolved after SetTenantInfo to ensure tenant context is properly set
+    var authorRepository = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IRepository<Author>>();
+    var author = new Author(user.Id, user.UserName!, user.Bio ?? string.Empty, user.Image);
+    await authorRepository.AddAsync(author, cancellationToken);
+    await authorRepository.SaveChangesAsync(cancellationToken);
+
+    _logger.LogInformation("Author record created for user {Email}", request.Email);
 
     return Result<Unit>.NoContent();
   }
