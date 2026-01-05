@@ -1,5 +1,4 @@
 ﻿using Server.Core.AuthorAggregate;
-using Server.Core.IdentityAggregate;
 using Server.Core.TagAggregate;
 using Server.SharedKernel.Persistence;
 
@@ -20,7 +19,7 @@ public class Article : EntityBase, IAggregateRoot
     AuthorId = author.Id;
     Slug = GenerateSlug(title);
     Tags = new List<Tag>();
-    FavoritedBy = new List<ApplicationUser>();
+    FavoritedBy = new List<Author>();
     Comments = new List<Comment>();
   }
 
@@ -42,7 +41,7 @@ public class Article : EntityBase, IAggregateRoot
 
   public List<Tag> Tags { get; private set; } = new();
 
-  public List<ApplicationUser> FavoritedBy { get; private set; } = new();
+  public List<Author> FavoritedBy { get; private set; } = new();
 
   public List<Comment> Comments { get; private set; } = new();
 
@@ -70,21 +69,7 @@ public class Article : EntityBase, IAggregateRoot
       return false;
     }
 
-    return FavoritedBy.Any(u => u.Id == userId.Value);
-  }
-
-  /// <summary>
-  /// Checks if a user is following the article's author
-  /// </summary>
-  public bool IsAuthorFollowedBy(ApplicationUser? user)
-  {
-    if (user == null)
-    {
-      return false;
-    }
-
-    // Check if user is following the author via the Following collection
-    return user.Following.Any(f => f.FollowedId == AuthorId);
+    return FavoritedBy.Any(a => a.Id == userId.Value);
   }
 
   public void Update(string title, string description, string body)
@@ -108,16 +93,16 @@ public class Article : EntityBase, IAggregateRoot
     Tags.Remove(tag);
   }
 
-  public void AddToFavorites(ApplicationUser user)
+  public void AddToFavorites(Author author)
   {
-    if (!FavoritedBy.Contains(user))
+    if (!FavoritedBy.Contains(author))
     {
-      FavoritedBy.Add(user);
+      FavoritedBy.Add(author);
     }
   }
 
-  public void RemoveFromFavorites(ApplicationUser user)
+  public void RemoveFromFavorites(Author author)
   {
-    FavoritedBy.Remove(user);
+    FavoritedBy.Remove(author);
   }
 }

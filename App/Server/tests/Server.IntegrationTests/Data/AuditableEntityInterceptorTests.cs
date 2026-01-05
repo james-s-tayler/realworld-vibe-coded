@@ -153,7 +153,9 @@ public class AuditableEntityInterceptorTests : IDisposable
     _dbContext.Users.Add(user2);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-    article.AddToFavorites(user2);
+    var author2 = await CreateTestAuthorAsync(user2);
+
+    article.AddToFavorites(author2);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
     // Assert

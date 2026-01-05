@@ -35,7 +35,7 @@ public class ArticleConfiguration : IEntityTypeConfiguration<Article>
       .WithMany(x => x.Articles)
       .UsingEntity(j => j.ToTable("ArticleTags"));
 
-    // Many-to-many relationship with Users (Favorites)
+    // Many-to-many relationship with Authors (Favorites)
     builder.HasMany(x => x.FavoritedBy)
       .WithMany()
       .UsingEntity(j => j.ToTable("ArticleFavorites"));

@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
-using Server.Core.IdentityAggregate;
+using Server.Core.AuthorAggregate;
+using Server.Infrastructure.Data;
 using Server.UseCases.Articles;
 using Server.UseCases.Interfaces;
 
@@ -23,18 +23,15 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
     // Use domain methods to compute user-specific values
     var isFavorited = article.IsFavoritedBy(currentUserId);
 
-    // Get current user for following status check
-    ApplicationUser? currentUser = null;
+    // Check if current user follows the article author by querying AuthorFollowing directly
+    // This avoids loading ApplicationUser with all ASP.NET Identity fields
+    var isFollowing = false;
     if (currentUserId.HasValue)
     {
-      var userManager = Resolve<UserManager<ApplicationUser>>();
-      currentUser = await userManager.Users
-        .Include(u => u.Following)
-        .FirstOrDefaultAsync(u => u.Id == currentUserId.Value, ct);
+      var dbContext = Resolve<AppDbContext>();
+      isFollowing = await dbContext.Set<AuthorFollowing>()
+        .AnyAsync(af => af.FollowerId == currentUserId.Value && af.FollowedId == article.AuthorId, ct);
     }
-
-    // Use domain method to check if current user follows the article author
-    var isFollowing = article.IsAuthorFollowedBy(currentUser);
 
     var articleDto = new ArticleDto(
       article.Slug,

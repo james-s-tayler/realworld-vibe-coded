@@ -21,7 +21,7 @@ public class CountArticlesSpec : Specification<Article>
 
     if (!string.IsNullOrEmpty(favorited))
     {
-      Query.Where(x => x.FavoritedBy.Any(u => u.UserName == favorited));
+      Query.Where(x => x.FavoritedBy.Any(a => a.Username == favorited));
     }
   }
 }
