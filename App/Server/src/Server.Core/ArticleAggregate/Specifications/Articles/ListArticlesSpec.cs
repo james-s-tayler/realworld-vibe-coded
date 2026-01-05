@@ -22,12 +22,12 @@ public class ListArticlesSpec : Specification<Article>
 
     if (!string.IsNullOrEmpty(author))
     {
-      Query.Where(x => x.Author.UserName == author);
+      Query.Where(x => x.Author.Username == author);
     }
 
     if (!string.IsNullOrEmpty(favorited))
     {
-      Query.Where(x => x.FavoritedBy.Any(u => u.UserName == favorited));
+      Query.Where(x => x.FavoritedBy.Any(a => a.Username == favorited));
     }
 
     Query.Skip(offset)

@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Server.Core.AuthorAggregate;
+using Server.Core.AuthorAggregate.Specifications;
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Users.Update;
 
@@ -11,13 +14,16 @@ namespace Server.UseCases.Users.Update;
 public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationUser>
 {
   private readonly UserManager<ApplicationUser> _userManager;
+  private readonly IRepository<Author> _authorRepository;
   private readonly ILogger<UpdateUserHandler> _logger;
 
   public UpdateUserHandler(
     UserManager<ApplicationUser> userManager,
+    IRepository<Author> authorRepository,
     ILogger<UpdateUserHandler> logger)
   {
     _userManager = userManager;
+    _authorRepository = authorRepository;
     _logger = logger;
   }
 
@@ -108,6 +114,23 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationU
         Identifier = "body",
         ErrorMessage = string.Join(", ", result.Errors.Select(e => e.Description)),
       });
+    }
+
+    // Sync Author record if any profile fields changed
+    if (request.Username != null || request.Bio != null || request.Image != null)
+    {
+      var author = await _authorRepository.FirstOrDefaultAsync(
+        new AuthorByUserIdSpec(user.Id), cancellationToken);
+
+      if (author == null)
+      {
+        _logger.LogError("Author record not found for user {UserId} - data integrity violation", user.Id);
+        return Result<ApplicationUser>.Error(new ErrorDetail("author", "Author record not found - data integrity issue"));
+      }
+
+      author.Update(user.UserName!, user.Bio ?? string.Empty, user.Image);
+      await _authorRepository.UpdateAsync(author, cancellationToken);
+      _logger.LogInformation("Author record synced for user {Username}", user.UserName);
     }
 
     _logger.LogInformation("User {Username} updated successfully", user.UserName);

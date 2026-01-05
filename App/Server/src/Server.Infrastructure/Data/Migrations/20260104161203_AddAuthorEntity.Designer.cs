@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Server.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Server.Infrastructure.Data;
 namespace Server.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104161203_AddAuthorEntity")]
+    partial class AddAuthorEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace Server.Infrastructure.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ArticleAuthor", b =>
+            modelBuilder.Entity("ApplicationUserArticle", b =>
                 {
                     b.Property<Guid>("ArticleId")
                         .HasColumnType("uniqueidentifier");
@@ -400,58 +403,6 @@ namespace Server.Infrastructure.Data.Migrations
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("Server.Core.AuthorAggregate.AuthorFollowing", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<byte[]>("ChangeCheck")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<Guid>("FollowedId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("FollowerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FollowedId", "TenantId")
-                        .HasDatabaseName("IX_AuthorFollowing_FollowedId");
-
-                    b.HasIndex("FollowerId", "FollowedId", "TenantId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_AuthorFollowing_FollowerId_FollowedId");
-
-                    b.ToTable("AuthorFollowing", (string)null);
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
-                });
-
             modelBuilder.Entity("Server.Core.IdentityAggregate.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -625,7 +576,7 @@ namespace Server.Infrastructure.Data.Migrations
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("ArticleAuthor", b =>
+            modelBuilder.Entity("ApplicationUserArticle", b =>
                 {
                     b.HasOne("Server.Core.ArticleAggregate.Article", null)
                         .WithMany()
@@ -633,7 +584,7 @@ namespace Server.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Server.Core.AuthorAggregate.Author", null)
+                    b.HasOne("Server.Core.IdentityAggregate.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("FavoritedById")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -736,25 +687,6 @@ namespace Server.Infrastructure.Data.Migrations
                     b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("Server.Core.AuthorAggregate.AuthorFollowing", b =>
-                {
-                    b.HasOne("Server.Core.AuthorAggregate.Author", "Followed")
-                        .WithMany("Followers")
-                        .HasForeignKey("FollowedId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Server.Core.AuthorAggregate.Author", "Follower")
-                        .WithMany("Following")
-                        .HasForeignKey("FollowerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Followed");
-
-                    b.Navigation("Follower");
-                });
-
             modelBuilder.Entity("Server.Core.UserAggregate.UserFollowing", b =>
                 {
                     b.HasOne("Server.Core.IdentityAggregate.ApplicationUser", "Followed")
@@ -777,13 +709,6 @@ namespace Server.Infrastructure.Data.Migrations
             modelBuilder.Entity("Server.Core.ArticleAggregate.Article", b =>
                 {
                     b.Navigation("Comments");
-                });
-
-            modelBuilder.Entity("Server.Core.AuthorAggregate.Author", b =>
-                {
-                    b.Navigation("Followers");
-
-                    b.Navigation("Following");
                 });
 
             modelBuilder.Entity("Server.Core.IdentityAggregate.ApplicationUser", b =>

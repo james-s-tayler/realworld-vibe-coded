@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications.Articles;
+using Server.Core.AuthorAggregate;
+using Server.Core.AuthorAggregate.Specifications;
 using Server.Core.IdentityAggregate;
 using Server.Core.TagAggregate;
 using Server.Core.TagAggregate.Specifications;
@@ -12,16 +14,26 @@ namespace Server.UseCases.Articles.Create;
 public class CreateArticleHandler(
   UserManager<ApplicationUser> userManager,
   IRepository<Article> articleRepository,
+  IRepository<Author> authorRepository,
   IRepository<Tag> tagRepository)
   : ICommandHandler<CreateArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
   {
-    // Get the author
-    var author = await userManager.FindByIdAsync(request.AuthorId.ToString());
-    if (author == null)
+    // Get the user to verify they exist
+    var user = await userManager.FindByIdAsync(request.AuthorId.ToString());
+    if (user == null)
     {
       return Result<Article>.ErrorMissingRequiredEntity(typeof(ApplicationUser), request.AuthorId);
+    }
+
+    // Get the author (domain invariant - must exist)
+    var author = await authorRepository.FirstOrDefaultAsync(
+      new AuthorByUserIdSpec(request.AuthorId), cancellationToken);
+
+    if (author == null)
+    {
+      return Result<Article>.ErrorMissingRequiredEntity(typeof(Author), request.AuthorId);
     }
 
     // Check for duplicate slug

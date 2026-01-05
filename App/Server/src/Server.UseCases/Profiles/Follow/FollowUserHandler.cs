@@ -1,41 +1,37 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Server.Core.IdentityAggregate;
+﻿using Server.Core.AuthorAggregate;
+using Server.Core.AuthorAggregate.Specifications;
 using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Profiles.Follow;
 
-// PV014: This handler uses ASP.NET Identity's UserManager instead of the repository pattern.
-// UserManager.UpdateAsync performs the database mutation internally.
-#pragma warning disable PV014
-public class FollowUserHandler(UserManager<ApplicationUser> userManager)
-  : ICommandHandler<FollowUserCommand, ApplicationUser>
+public class FollowUserHandler(IRepository<Author> authorRepository)
+  : ICommandHandler<FollowUserCommand, Author>
 {
-  public async Task<Result<ApplicationUser>> Handle(FollowUserCommand request, CancellationToken cancellationToken)
+  public async Task<Result<Author>> Handle(FollowUserCommand request, CancellationToken cancellationToken)
   {
-    // Find the user to follow
-    var userToFollow = await userManager.FindByNameAsync(request.Username);
+    // Find the author to follow
+    var authorToFollow = await authorRepository.FirstOrDefaultAsync(
+      new AuthorByUsernameSpec(request.Username), cancellationToken);
 
-    if (userToFollow == null)
+    if (authorToFollow == null)
     {
-      return Result<ApplicationUser>.NotFound(request.Username);
+      return Result<Author>.NotFound(request.Username);
     }
 
-    // Get current user with following relationships
-    var currentUser = await userManager.Users
-      .Include(u => u.Following)
-      .FirstOrDefaultAsync(u => u.Id == request.CurrentUserId, cancellationToken);
+    // Get current author with following relationships
+    var currentAuthor = await authorRepository.FirstOrDefaultAsync(
+      new AuthorWithFollowingByUserIdSpec(request.CurrentUserId), cancellationToken);
 
-    if (currentUser == null)
+    if (currentAuthor == null)
     {
-      return Result<ApplicationUser>.NotFound(request.CurrentUserId);
+      return Result<Author>.ErrorMissingRequiredEntity(typeof(Author), request.CurrentUserId);
     }
 
-    // Follow the user
-    currentUser.Follow(userToFollow);
-    await userManager.UpdateAsync(currentUser);
+    // Follow the author
+    currentAuthor.Follow(authorToFollow);
+    await authorRepository.UpdateAsync(currentAuthor, cancellationToken);
 
-    return Result<ApplicationUser>.Success(userToFollow);
+    return Result<Author>.Success(authorToFollow);
   }
 }
-#pragma warning restore PV014

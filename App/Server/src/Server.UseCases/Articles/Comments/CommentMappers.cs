@@ -22,8 +22,8 @@ public static class CommentMappers
       comment.UpdatedAt,
       comment.Body,
       new AuthorDto(
-        comment.Author.UserName!,
-        comment.Author.Bio ?? string.Empty,
+        comment.Author.Username,
+        comment.Author.Bio,
         comment.Author.Image,
         isFollowing
       )
