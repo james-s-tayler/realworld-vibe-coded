@@ -21,6 +21,7 @@ public class NukeTargetLocationAnalyzer : DiagnosticAnalyzer
   // This list should match the actual Build*.cs files in the repository
   private static readonly ImmutableHashSet<string> AllowedFileNames = ImmutableHashSet.Create(
       "Build.cs",
+      "Build.ApiClient.cs",
       "Build.Build.cs",
       "Build.Db.cs",
       "Build.Install.cs",

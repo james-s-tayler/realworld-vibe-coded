@@ -25,6 +25,7 @@
       "type": "string",
       "enum": [
         "BuildClient",
+        "BuildGenerateApiClient",
         "BuildRoslynMcp",
         "BuildServer",
         "BuildServerPublish",
@@ -42,6 +43,7 @@
         "InstallGitHooks",
         "LintAllFix",
         "LintAllVerify",
+        "LintApiClientVerify",
         "LintClaudeMdVerify",
         "LintClientFix",
         "LintClientVerify",

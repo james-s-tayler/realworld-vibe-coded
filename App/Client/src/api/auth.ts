@@ -1,42 +1,42 @@
-import { apiRequest } from './client';
-import type {
-  UpdateUserRequest,
-  UserResponse,
-} from '../types/user';
+import { getApiClient } from './clientFactory';
+import { convertKiotaError } from './errors';
+import type { UserResponse } from '../types/user';
 
 export const authApi = {
   login: async (email: string, password: string): Promise<void> => {
-    const request = { email, password };
-    await apiRequest<void>('/api/identity/login?useCookies=true', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
-    // No token returned - cookie is automatically set by browser
+    try {
+      await getApiClient().api.identity.login.post(
+        { email, password },
+        { queryParameters: { useCookies: true } },
+      );
+    } catch (error) {
+      convertKiotaError(error);
+    }
   },
 
-  register: async (
-    email: string,
-    password: string
-  ): Promise<void> => {
-    const request = { email, password };
-    await apiRequest<void>('/api/identity/register', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
-    // No token returned from Identity register
+  register: async (email: string, password: string): Promise<void> => {
+    try {
+      await getApiClient().api.identity.register.post({ email, password });
+    } catch (error) {
+      convertKiotaError(error);
+    }
   },
 
   logout: async (): Promise<void> => {
-    await apiRequest<void>('/api/identity/logout', {
-      method: 'POST',
-    });
-    // Cookie is cleared by the server
+    try {
+      await getApiClient().api.identity.logout.post();
+    } catch (error) {
+      convertKiotaError(error);
+    }
   },
 
   getCurrentUser: async (): Promise<UserResponse> => {
-    return apiRequest<UserResponse>('/api/user', {
-      method: 'GET',
-    });
+    try {
+      const result = await getApiClient().api.user.get();
+      return result as unknown as UserResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   updateUser: async (updates: {
@@ -46,12 +46,11 @@ export const authApi = {
     bio?: string;
     image?: string;
   }): Promise<UserResponse> => {
-    const request: UpdateUserRequest = {
-      user: updates,
-    };
-    return apiRequest<UserResponse>('/api/user', {
-      method: 'PUT',
-      body: JSON.stringify(request),
-    });
+    try {
+      const result = await getApiClient().api.user.put({ user: updates });
+      return result as unknown as UserResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 };

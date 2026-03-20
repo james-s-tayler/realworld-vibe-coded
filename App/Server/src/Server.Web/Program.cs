@@ -1,4 +1,6 @@
-﻿using Server.Web.Configurations;
+﻿using FastEndpoints.ClientGen.Kiota;
+using Kiota.Builder;
+using Server.Web.Configurations;
 using Server.Web.DevOnly.Configuration;
 using Server.Web.Infrastructure;
 
@@ -54,7 +56,18 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 var app = builder.Build();
 
 app.UseStaticFiles();
-await app.UseAppMiddlewareAndSeedDatabase();
+app.UseFastEndpointsMiddleware();
+
+await app.GenerateApiClientsAndExitAsync(
+  c =>
+  {
+    c.SwaggerDocumentName = "v1";
+    c.Language = GenerationLanguage.TypeScript;
+    c.OutputPath = Path.Combine(app.Environment.ContentRootPath, "..", "..", "..", "Client", "src", "api", "generated");
+    c.ClientClassName = "ConduitApiClient";
+  });
+
+await app.UseAppMiddlewareAndSeedDatabaseAsync();
 
 // Only serve SPA fallback for non-API routes to prevent API 404s from returning index.html
 app.MapWhen(

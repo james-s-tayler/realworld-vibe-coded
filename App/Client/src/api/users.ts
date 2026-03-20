@@ -1,4 +1,5 @@
-import { apiRequest } from './client';
+import { getApiClient } from './clientFactory';
+import { convertKiotaError } from './errors';
 
 export interface User {
   email: string;
@@ -12,23 +13,21 @@ export interface UsersResponse {
   users: User[];
 }
 
-export interface InviteRequest {
-  email: string;
-  password: string;
-}
-
 export const usersApi = {
   listUsers: async (): Promise<UsersResponse> => {
-    return apiRequest<UsersResponse>('/api/users', {
-      method: 'GET',
-    });
+    try {
+      const result = await getApiClient().api.users.get();
+      return result as unknown as UsersResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   inviteUser: async (email: string, password: string): Promise<void> => {
-    const request: InviteRequest = { email, password };
-    await apiRequest<void>('/api/identity/invite', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
+    try {
+      await getApiClient().api.identity.invite.post({ email, password });
+    } catch (error) {
+      convertKiotaError(error);
+    }
   },
 };

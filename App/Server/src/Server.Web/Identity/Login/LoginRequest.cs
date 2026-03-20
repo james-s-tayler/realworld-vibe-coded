@@ -8,4 +8,10 @@ public class LoginRequest
 
   [NotLogged]
   public string Password { get; set; } = default!;
+
+  [QueryParam]
+  public bool? UseCookies { get; set; }
+
+  [QueryParam]
+  public bool? UseSessionCookies { get; set; }
 }

@@ -1,20 +1,32 @@
-import { apiRequest } from './client';
+import { getApiClient } from './clientFactory';
+import { convertKiotaError } from './errors';
 import type { ProfileResponse } from '../types/profile';
 
 export const profilesApi = {
   getProfile: async (username: string): Promise<ProfileResponse> => {
-    return apiRequest<ProfileResponse>(`/api/profiles/${username}`);
+    try {
+      const result = await getApiClient().api.profiles.byUsername(username).get();
+      return result as unknown as ProfileResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   followUser: async (username: string): Promise<ProfileResponse> => {
-    return apiRequest<ProfileResponse>(`/api/profiles/${username}/follow`, {
-      method: 'POST',
-    });
+    try {
+      const result = await getApiClient().api.profiles.byUsername(username).follow.post();
+      return result as unknown as ProfileResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   unfollowUser: async (username: string): Promise<ProfileResponse> => {
-    return apiRequest<ProfileResponse>(`/api/profiles/${username}/follow`, {
-      method: 'DELETE',
-    });
+    try {
+      const result = await getApiClient().api.profiles.byUsername(username).follow.delete();
+      return result as unknown as ProfileResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 };

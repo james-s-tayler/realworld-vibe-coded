@@ -1,24 +1,60 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { profilesApi } from './profiles';
-import * as client from './client';
+import { getApiClient } from './clientFactory';
 
-vi.mock('./client', () => ({
-  apiRequest: vi.fn(),
-}));
+vi.mock('./clientFactory');
+
+function createMockClient() {
+  const mockProfileGet = vi.fn();
+  const mockFollowPost = vi.fn();
+  const mockFollowDelete = vi.fn();
+  const mockByUsername = vi.fn();
+
+  mockByUsername.mockReturnValue({
+    get: mockProfileGet,
+    follow: {
+      post: mockFollowPost,
+      delete: mockFollowDelete,
+    },
+  });
+
+  const client = {
+    api: {
+      profiles: {
+        byUsername: mockByUsername,
+      },
+    },
+  };
+
+  return {
+    client,
+    mocks: {
+      profileGet: mockProfileGet,
+      followPost: mockFollowPost,
+      followDelete: mockFollowDelete,
+      byUsername: mockByUsername,
+    },
+  };
+}
 
 describe('profilesApi', () => {
+  let mocks: ReturnType<typeof createMockClient>['mocks'];
+
   beforeEach(() => {
     vi.clearAllMocks();
+    const mock = createMockClient();
+    mocks = mock.mocks;
+    vi.mocked(getApiClient).mockReturnValue(mock.client as ReturnType<typeof getApiClient>);
   });
 
   describe('getProfile', () => {
     it('should fetch a user profile', async () => {
       const mockResponse = { profile: { username: 'johndoe', bio: 'Test bio' } };
-      vi.mocked(client.apiRequest).mockResolvedValue(mockResponse);
+      mocks.profileGet.mockResolvedValue(mockResponse);
 
       const result = await profilesApi.getProfile('johndoe');
 
-      expect(client.apiRequest).toHaveBeenCalledWith('/api/profiles/johndoe');
+      expect(mocks.byUsername).toHaveBeenCalledWith('johndoe');
       expect(result).toEqual(mockResponse);
     });
   });
@@ -26,13 +62,12 @@ describe('profilesApi', () => {
   describe('followUser', () => {
     it('should follow a user', async () => {
       const mockResponse = { profile: { username: 'johndoe', following: true } };
-      vi.mocked(client.apiRequest).mockResolvedValue(mockResponse);
+      mocks.followPost.mockResolvedValue(mockResponse);
 
       const result = await profilesApi.followUser('johndoe');
 
-      expect(client.apiRequest).toHaveBeenCalledWith('/api/profiles/johndoe/follow', {
-        method: 'POST',
-      });
+      expect(mocks.byUsername).toHaveBeenCalledWith('johndoe');
+      expect(mocks.followPost).toHaveBeenCalled();
       expect(result).toEqual(mockResponse);
     });
   });
@@ -40,13 +75,12 @@ describe('profilesApi', () => {
   describe('unfollowUser', () => {
     it('should unfollow a user', async () => {
       const mockResponse = { profile: { username: 'johndoe', following: false } };
-      vi.mocked(client.apiRequest).mockResolvedValue(mockResponse);
+      mocks.followDelete.mockResolvedValue(mockResponse);
 
       const result = await profilesApi.unfollowUser('johndoe');
 
-      expect(client.apiRequest).toHaveBeenCalledWith('/api/profiles/johndoe/follow', {
-        method: 'DELETE',
-      });
+      expect(mocks.byUsername).toHaveBeenCalledWith('johndoe');
+      expect(mocks.followDelete).toHaveBeenCalled();
       expect(result).toEqual(mockResponse);
     });
   });

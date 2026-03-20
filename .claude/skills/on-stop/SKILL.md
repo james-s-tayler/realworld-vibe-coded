@@ -32,6 +32,9 @@ Match changed paths to the minimal set of test targets:
 | `App/Server/**` | `TestServer` |
 | `App/Client/**` | `TestClient` |
 | `Test/e2e/**` | `TestE2e` |
+| `App/Server/**` AND `App/Client/**` | `TestE2e` |
+
+When both backend and frontend changed, `TestE2e` is required — it's the only test that validates the actual contract between the two layers.
 
 For server endpoint/handler/validator changes, also run the relevant Postman collection:
 
@@ -42,8 +45,6 @@ For server endpoint/handler/validator changes, also run the relevant Postman col
 | Article CRUD/comments/favorites | `TestServerPostmanArticle` |
 | Feed/article listing | `TestServerPostmanFeedAndArticles` |
 | Unclear which collection | `TestServerPostmanAuth` (smoke test) |
-
-If both `App/Server/**` and `App/Client/**` changed, consider running `TestE2e` for full-stack integration.
 
 ## Step 4: Execute
 

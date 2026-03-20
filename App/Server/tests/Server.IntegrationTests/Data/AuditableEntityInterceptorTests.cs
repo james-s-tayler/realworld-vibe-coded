@@ -180,7 +180,7 @@ public class AuditableEntityInterceptorTests : IDisposable
     var tag = new Tag("testtag");
 
     // Act
-    _dbContext.Articles.AddRange(article1, article2);
+    await _dbContext.Articles.AddRangeAsync(article1, article2);
     _dbContext.Tags.Add(tag);
     await _dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 

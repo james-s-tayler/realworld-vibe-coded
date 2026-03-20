@@ -1,4 +1,5 @@
-import { apiRequest } from './client';
+import { getApiClient } from './clientFactory';
+import { convertKiotaError } from './errors';
 import type {
   ArticleResponse,
   ArticlesResponse,
@@ -9,59 +10,86 @@ import type {
 
 export const articlesApi = {
   listArticles: async (params: ListArticlesRequest = {}): Promise<ArticlesResponse> => {
-    const queryParams = new URLSearchParams();
-    if (params.tag) queryParams.append('tag', params.tag);
-    if (params.author) queryParams.append('author', params.author);
-    if (params.favorited) queryParams.append('favorited', params.favorited);
-    if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
-    if (params.offset !== undefined) queryParams.append('offset', params.offset.toString());
-
-    const query = queryParams.toString();
-    return apiRequest<ArticlesResponse>(`/api/articles${query ? `?${query}` : ''}`);
+    try {
+      const result = await getApiClient().api.articles.get({
+        queryParameters: {
+          tag: params.tag,
+          author: params.author,
+          favorited: params.favorited,
+          limit: params.limit,
+          offset: params.offset,
+        },
+      });
+      return result as unknown as ArticlesResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   getFeed: async (limit = 20, offset = 0): Promise<ArticlesResponse> => {
-    return apiRequest<ArticlesResponse>(`/api/articles/feed?limit=${limit}&offset=${offset}`);
+    try {
+      const result = await getApiClient().api.articles.feed.get({
+        queryParameters: { limit, offset },
+      });
+      return result as unknown as ArticlesResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   getArticle: async (slug: string): Promise<ArticleResponse> => {
-    return apiRequest<ArticleResponse>(`/api/articles/${slug}`);
+    try {
+      const result = await getApiClient().api.articles.bySlug(slug).get();
+      return result as unknown as ArticleResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   createArticle: async (article: CreateArticleRequest['article']): Promise<ArticleResponse> => {
-    const request: CreateArticleRequest = { article };
-    return apiRequest<ArticleResponse>('/api/articles', {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
+    try {
+      const result = await getApiClient().api.articles.post({ article });
+      return result as unknown as ArticleResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   updateArticle: async (
     slug: string,
     article: UpdateArticleRequest['article']
   ): Promise<ArticleResponse> => {
-    const request: UpdateArticleRequest = { article };
-    return apiRequest<ArticleResponse>(`/api/articles/${slug}`, {
-      method: 'PUT',
-      body: JSON.stringify(request),
-    });
+    try {
+      const result = await getApiClient().api.articles.bySlug(slug).put({ article });
+      return result as unknown as ArticleResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   deleteArticle: async (slug: string): Promise<void> => {
-    await apiRequest<void>(`/api/articles/${slug}`, {
-      method: 'DELETE',
-    });
+    try {
+      await getApiClient().api.articles.bySlug(slug).delete();
+    } catch (error) {
+      convertKiotaError(error);
+    }
   },
 
   favoriteArticle: async (slug: string): Promise<ArticleResponse> => {
-    return apiRequest<ArticleResponse>(`/api/articles/${slug}/favorite`, {
-      method: 'POST',
-    });
+    try {
+      const result = await getApiClient().api.articles.bySlug(slug).favorite.post();
+      return result as unknown as ArticleResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   unfavoriteArticle: async (slug: string): Promise<ArticleResponse> => {
-    return apiRequest<ArticleResponse>(`/api/articles/${slug}/favorite`, {
-      method: 'DELETE',
-    });
+    try {
+      const result = await getApiClient().api.articles.bySlug(slug).favorite.delete();
+      return result as unknown as ArticleResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 };
