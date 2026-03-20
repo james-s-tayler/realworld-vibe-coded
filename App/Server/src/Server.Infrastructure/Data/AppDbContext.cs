@@ -5,6 +5,7 @@ using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Server.Core.ArticleAggregate;
+using Server.Core.AuthorAggregate;
 using Server.Core.IdentityAggregate;
 using Server.Core.TagAggregate;
 using Server.Core.UserAggregate;
@@ -27,6 +28,8 @@ public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
   }
 
   public DbSet<Article> Articles => Set<Article>();
+
+  public DbSet<Author> Authors => Set<Author>();
 
   public DbSet<Tag> Tags => Set<Tag>();
 

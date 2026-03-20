@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Server.Core.ArticleAggregate;
+﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications.Articles;
-using Server.Core.IdentityAggregate;
+using Server.Core.AuthorAggregate;
+using Server.Core.AuthorAggregate.Specifications;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Unfavorite;
 
-public class UnfavoriteArticleHandler(IRepository<Article> articleRepository, UserManager<ApplicationUser> userManager)
+public class UnfavoriteArticleHandler(IRepository<Article> articleRepository, IRepository<Author> authorRepository)
   : ICommandHandler<UnfavoriteArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(UnfavoriteArticleCommand request, CancellationToken cancellationToken)
@@ -20,13 +20,14 @@ public class UnfavoriteArticleHandler(IRepository<Article> articleRepository, Us
       return Result<Article>.NotFound(request.Slug);
     }
 
-    var user = await userManager.FindByIdAsync(request.UserId.ToString());
-    if (user == null)
+    var author = await authorRepository.FirstOrDefaultAsync(
+      new AuthorByUserIdSpec(request.UserId), cancellationToken);
+    if (author == null)
     {
-      return Result<Article>.ErrorMissingRequiredEntity(typeof(ApplicationUser), request.UserId);
+      return Result<Article>.ErrorMissingRequiredEntity(typeof(Author), request.UserId);
     }
 
-    article.RemoveFromFavorites(user);
+    article.RemoveFromFavorites(author);
     await articleRepository.UpdateAsync(article, cancellationToken);
 
     return Result<Article>.Success(article);

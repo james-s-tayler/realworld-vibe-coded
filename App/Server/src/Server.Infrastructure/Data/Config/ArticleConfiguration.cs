@@ -24,7 +24,7 @@ public class ArticleConfiguration : IEntityTypeConfiguration<Article>
     builder.HasIndex(x => x.Slug)
       .IsUnique();
 
-    // One-to-many relationship with User (Author)
+    // One-to-many relationship with Author
     builder.HasOne(x => x.Author)
       .WithMany()
       .HasForeignKey(x => x.AuthorId)
@@ -35,7 +35,7 @@ public class ArticleConfiguration : IEntityTypeConfiguration<Article>
       .WithMany(x => x.Articles)
       .UsingEntity(j => j.ToTable("ArticleTags"));
 
-    // Many-to-many relationship with Users (Favorites)
+    // Many-to-many relationship with Authors (Favorites)
     builder.HasMany(x => x.FavoritedBy)
       .WithMany()
       .UsingEntity(j => j.ToTable("ArticleFavorites"));

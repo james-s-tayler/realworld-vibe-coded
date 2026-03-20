@@ -1,33 +1,31 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Server.Core.ArticleAggregate;
+﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications.Articles;
-using Server.Core.IdentityAggregate;
+using Server.Core.AuthorAggregate;
+using Server.Core.AuthorAggregate.Specifications;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Feed;
 
 public class GetFeedHandler(
-  UserManager<ApplicationUser> userManager,
+  IReadRepository<Author> authorRepository,
   IReadRepository<Article> articleRepository)
   : IQueryHandler<GetFeedQuery, GetFeedResult>
 {
   public async Task<Result<GetFeedResult>> Handle(GetFeedQuery request, CancellationToken cancellationToken)
   {
-    // Get the user with their following relationships
-    var user = await userManager.Users
-      .Include(u => u.Following)
-      .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+    // Get the author with their following relationships
+    var author = await authorRepository.FirstOrDefaultAsync(
+      new AuthorWithFollowingByUserIdSpec(request.UserId), cancellationToken);
 
-    if (user == null)
+    if (author == null)
     {
       return Result<GetFeedResult>.Success(new GetFeedResult(new List<Article>(), 0));
     }
 
-    // Get IDs of users that the current user follows
-    var followedUserIds = user.Following
-      .Select(uf => uf.FollowedId)
+    // Get IDs of authors that the current user follows
+    var followedUserIds = author.Following
+      .Select(af => af.FollowedId)
       .ToList();
 
     // If not following anyone, return empty list

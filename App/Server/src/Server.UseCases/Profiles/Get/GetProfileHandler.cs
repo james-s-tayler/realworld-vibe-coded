@@ -1,25 +1,23 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Server.Core.IdentityAggregate;
+﻿using Server.Core.AuthorAggregate;
+using Server.Core.AuthorAggregate.Specifications;
 using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Profiles.Get;
 
-public class GetProfileHandler(UserManager<ApplicationUser> userManager)
-  : IQueryHandler<GetProfileQuery, ApplicationUser>
+public class GetProfileHandler(IRepository<Author> authorRepository)
+  : IQueryHandler<GetProfileQuery, Author>
 {
-  public async Task<Result<ApplicationUser>> Handle(GetProfileQuery request, CancellationToken cancellationToken)
+  public async Task<Result<Author>> Handle(GetProfileQuery request, CancellationToken cancellationToken)
   {
-    var user = await userManager.Users
-      .Include(u => u.Following)
-      .Include(u => u.Followers)
-      .FirstOrDefaultAsync(u => u.UserName == request.Username, cancellationToken);
+    var author = await authorRepository.FirstOrDefaultAsync(
+      new AuthorWithRelationshipsByUsernameSpec(request.Username), cancellationToken);
 
-    if (user == null)
+    if (author == null)
     {
-      return Result<ApplicationUser>.NotFound(request.Username);
+      return Result<Author>.NotFound(request.Username);
     }
 
-    return Result<ApplicationUser>.Success(user);
+    return Result<Author>.Success(author);
   }
 }

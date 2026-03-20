@@ -1,4 +1,4 @@
-﻿using Server.Core.IdentityAggregate;
+﻿using Server.Core.AuthorAggregate;
 using Server.SharedKernel.Persistence;
 
 namespace Server.Core.ArticleAggregate;
@@ -7,7 +7,7 @@ public class Comment : EntityBase
 {
   public const int BodyMaxLength = 5000;
 
-  public Comment(string body, ApplicationUser author, Article article)
+  public Comment(string body, Author author, Article article)
   {
     Body = Guard.Against.NullOrEmpty(body);
     Author = Guard.Against.Null(author);
@@ -24,7 +24,7 @@ public class Comment : EntityBase
 
   public Guid AuthorId { get; private set; }
 
-  public ApplicationUser Author { get; private set; } = default!;
+  public Author Author { get; private set; } = default!;
 
   public Guid ArticleId { get; private set; }
 
