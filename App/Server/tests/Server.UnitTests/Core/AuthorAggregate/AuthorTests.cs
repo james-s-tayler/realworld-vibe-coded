@@ -80,4 +80,23 @@ public class AuthorTests
     author.Following.ShouldBeEmpty();
     author.IsFollowing(other).ShouldBeFalse();
   }
+
+  [Fact]
+  public void IsFollowing_ById_ReturnsTrueWhenFollowing()
+  {
+    var author = new Author(Guid.NewGuid(), "user1", "bio", null);
+    var other = new Author(Guid.NewGuid(), "user2", "bio", null);
+
+    author.Follow(other);
+
+    author.IsFollowing(other.Id).ShouldBeTrue();
+  }
+
+  [Fact]
+  public void IsFollowing_ById_ReturnsFalseWhenNotFollowing()
+  {
+    var author = new Author(Guid.NewGuid(), "user1", "bio", null);
+
+    author.IsFollowing(Guid.NewGuid()).ShouldBeFalse();
+  }
 }
