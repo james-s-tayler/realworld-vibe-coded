@@ -13,8 +13,14 @@ PROTECTED_PATTERNS=(
 
 for pattern in "${PROTECTED_PATTERNS[@]}"; do
   if [[ "$FILE_PATH" == *"$pattern"* ]]; then
-    echo "BLOCKED: '$FILE_PATH' is a protected file (matches '$pattern'). Only modify if explicitly instructed by the user." >&2
-    exit 2
+    echo "{
+      \"hookSpecificOutput\": {
+        \"hookEventName\": \"PreToolUse\",
+        \"permissionDecision\": \"ask\",
+        \"permissionDecisionReason\": \"'$FILE_PATH' is a protected file (matches '$pattern'). Only modify if explicitly instructed by the user.\"
+      }
+    }"
+    exit 0
   fi
 done
 exit 0

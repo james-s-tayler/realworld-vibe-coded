@@ -6,7 +6,7 @@ paths:
 ## Playwright E2E Conventions
 
 - Page Object Model: each page object subclasses `BasePage`
-- Test classes per page: `${Page}HappyPathTests.cs`, `${Page}ValidationTests.cs`, `${Page}PermissionsTests.cs`
+- Tests organized by folder: `Tests/${Page}/HappyPath.cs`, `Tests/${Page}/Validation.cs`, `Tests/${Page}/Permissions.cs`
 - All test classes subclass `AppPageTest`
 - Database wiped before each test
 - Use ARIA selectors (`GetByRole`, `GetByLabel`, `GetByTestId`) — avoid brittle CSS selectors

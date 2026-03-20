@@ -20,6 +20,17 @@
         ]
       }
     ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/on-nuke-test-fail.sh"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
