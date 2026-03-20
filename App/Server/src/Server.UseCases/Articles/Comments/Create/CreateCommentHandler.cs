@@ -1,54 +1,31 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Dtos;
 using Server.Core.ArticleAggregate.Specifications.Articles;
 using Server.Core.AuthorAggregate;
 using Server.Core.AuthorAggregate.Specifications;
-using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Comments.Create;
 
-public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, CommentResponse>
+public class CreateCommentHandler(
+  IRepository<Article> articleRepository,
+  IRepository<Author> authorRepository,
+  ILogger<CreateCommentHandler> logger)
+  : ICommandHandler<CreateCommentCommand, CommentResponse>
 {
-  private readonly IRepository<Article> _articleRepository;
-  private readonly IRepository<Author> _authorRepository;
-  private readonly UserManager<ApplicationUser> _userManager;
-  private readonly ILogger<CreateCommentHandler> _logger;
-
-  public CreateCommentHandler(
-    IRepository<Article> articleRepository,
-    IRepository<Author> authorRepository,
-    UserManager<ApplicationUser> userManager,
-    ILogger<CreateCommentHandler> logger)
-  {
-    _articleRepository = articleRepository;
-    _authorRepository = authorRepository;
-    _userManager = userManager;
-    _logger = logger;
-  }
-
   public async Task<Result<CommentResponse>> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
   {
     // Find the article
-    var article = await _articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(request.Slug), cancellationToken);
+    var article = await articleRepository.FirstOrDefaultAsync(new ArticleBySlugSpec(request.Slug), cancellationToken);
     if (article == null)
     {
       return Result<CommentResponse>.NotFound(typeof(Article), request.Slug);
     }
 
-    // Find the user
-    var user = await _userManager.FindByIdAsync(request.AuthorId.ToString());
-    if (user == null)
-    {
-      return Result<CommentResponse>.ErrorMissingRequiredEntity(typeof(ApplicationUser), request.AuthorId);
-    }
-
     // Get the author (domain invariant - must exist)
-    var author = await _authorRepository.FirstOrDefaultAsync(
+    var author = await authorRepository.FirstOrDefaultAsync(
       new AuthorByUserIdSpec(request.AuthorId), cancellationToken);
 
     if (author == null)
@@ -63,21 +40,20 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Commen
     article.Comments.Add(comment);
 
     // Update the article to let EF Core track the change
-    await _articleRepository.UpdateAsync(article, cancellationToken);
+    await articleRepository.UpdateAsync(article, cancellationToken);
 
-    _logger.LogInformation("Comment created successfully with ID {CommentId}", comment.Id);
+    logger.LogInformation("Comment created successfully with ID {CommentId}", comment.Id);
 
-    // Check if current user is following the comment author
-    ApplicationUser? currentUser = null;
+    // Check if current user is following the comment author via AuthorFollowing
+    bool isFollowing = false;
     if (request.CurrentUserId.HasValue)
     {
-      currentUser = await _userManager.Users
-        .Include(u => u.Following)
-        .FirstOrDefaultAsync(u => u.Id == request.CurrentUserId.Value, cancellationToken);
+      var currentAuthor = await authorRepository.FirstOrDefaultAsync(
+        new AuthorWithFollowingByUserIdSpec(request.CurrentUserId.Value), cancellationToken);
+      isFollowing = currentAuthor?.IsFollowing(comment.AuthorId) ?? false;
     }
 
-    // Return the comment response
-    var response = new CommentResponse(CommentMappers.MapToDto(comment, currentUser));
+    var response = new CommentResponse(CommentMappers.MapToDto(comment, isFollowing));
 
     return Result<CommentResponse>.Created(response);
   }

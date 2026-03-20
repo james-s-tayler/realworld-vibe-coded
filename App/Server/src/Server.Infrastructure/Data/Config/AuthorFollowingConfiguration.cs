@@ -10,17 +10,18 @@ public class AuthorFollowingConfiguration : IEntityTypeConfiguration<AuthorFollo
 
     builder.HasKey(x => x.Id);
 
-    // Follower relationship
+    // Follower relationship - ClientCascade so EF Core deletes orphaned AuthorFollowing
+    // when removed from collection (e.g. Author.Unfollow), without database cascade
     builder.HasOne(x => x.Follower)
       .WithMany(x => x.Following)
       .HasForeignKey(x => x.FollowerId)
-      .OnDelete(DeleteBehavior.Restrict);
+      .OnDelete(DeleteBehavior.ClientCascade);
 
     // Followed relationship
     builder.HasOne(x => x.Followed)
       .WithMany(x => x.Followers)
       .HasForeignKey(x => x.FollowedId)
-      .OnDelete(DeleteBehavior.Restrict);
+      .OnDelete(DeleteBehavior.ClientCascade);
 
     // Unique constraint to prevent duplicate following relationships
     builder.HasIndex(x => new { x.FollowerId, x.FollowedId })
