@@ -7,9 +7,6 @@ namespace Server.Web.Identity.Login;
 
 public class Login(IMediator mediator) : Endpoint<LoginRequest>
 {
-  private const string UseCookiesQueryParam = "useCookies";
-  private const string UseSessionCookiesQueryParam = "useSessionCookies";
-
   public override void Configure()
   {
     Post("/api/identity/login");
@@ -18,15 +15,12 @@ public class Login(IMediator mediator) : Endpoint<LoginRequest>
 
   public override async Task HandleAsync(LoginRequest req, CancellationToken ct)
   {
-    var useCookies = HttpContext.Request.Query[UseCookiesQueryParam].ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-    var useSessionCookies = HttpContext.Request.Query[UseSessionCookiesQueryParam].ToString().Equals("true", StringComparison.OrdinalIgnoreCase);
-
     var command = new LoginCommand
     {
       Email = req.Email,
       Password = req.Password,
-      UseCookies = useCookies,
-      UseSessionCookies = useSessionCookies,
+      UseCookies = req.UseCookies == true,
+      UseSessionCookies = req.UseSessionCookies == true,
     };
     var result = await mediator.Send(command, ct);
 

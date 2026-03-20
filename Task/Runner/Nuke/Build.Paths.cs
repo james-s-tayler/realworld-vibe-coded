@@ -30,6 +30,8 @@ public partial class Build
 
   internal AbsolutePath ClientDistDirectory => ClientDirectory / "dist";
 
+  internal AbsolutePath ClientApiGeneratedDirectory => ClientDirectory / "src" / "api" / "generated";
+
   #endregion
 
   #region Publish

@@ -1,7 +1,7 @@
 import type { Profile } from './article';
 
 export interface Comment {
-  id: number;
+  id: string;
   createdAt: string;
   updatedAt: string;
   body: string;

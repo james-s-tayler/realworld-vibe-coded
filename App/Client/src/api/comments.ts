@@ -1,28 +1,36 @@
-import { apiRequest } from './client';
+import { getApiClient } from './clientFactory';
+import { convertKiotaError } from './errors';
 import type {
   CommentResponse,
   CommentsResponse,
-  CreateCommentRequest,
 } from '../types/comment';
 
 export const commentsApi = {
   getComments: async (slug: string): Promise<CommentsResponse> => {
-    return apiRequest<CommentsResponse>(`/api/articles/${slug}/comments`);
+    try {
+      const result = await getApiClient().api.articles.bySlug(slug).comments.get();
+      return result as unknown as CommentsResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
   createComment: async (slug: string, body: string): Promise<CommentResponse> => {
-    const request: CreateCommentRequest = {
-      comment: { body },
-    };
-    return apiRequest<CommentResponse>(`/api/articles/${slug}/comments`, {
-      method: 'POST',
-      body: JSON.stringify(request),
-    });
+    try {
+      const result = await getApiClient().api.articles.bySlug(slug).comments.post({
+        comment: { body },
+      });
+      return result as unknown as CommentResponse;
+    } catch (error) {
+      return convertKiotaError(error);
+    }
   },
 
-  deleteComment: async (slug: string, id: number): Promise<void> => {
-    await apiRequest<void>(`/api/articles/${slug}/comments/${id}`, {
-      method: 'DELETE',
-    });
+  deleteComment: async (slug: string, id: string): Promise<void> => {
+    try {
+      await getApiClient().api.articles.bySlug(slug).comments.byId(id).delete();
+    } catch (error) {
+      convertKiotaError(error);
+    }
   },
 };

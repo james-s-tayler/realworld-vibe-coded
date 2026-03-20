@@ -34,6 +34,8 @@ All mutating requests must have a FluentValidation validator. Return 422 with co
 
 Standard HTTP codes: 200/201/204, 400/401/403/404/409/422, 500. For 422 validation, return flat errors object compatible with RealWorld clients. Don't throw raw exceptions from endpoints.
 
+**OpenAPI error declarations:** Use `ProducesProblemDetails()` (FastEndpoints), NOT `ProducesProblem()` (ASP.NET). The ASP.NET method declares standard `Microsoft.AspNetCore.Mvc.ProblemDetails` which lacks the `errors[]` array. FastEndpoints' method declares its own `ProblemDetails` type that includes `errors[]`, matching what the server actually returns. This matters for generated API clients (Kiota) — wrong type means error details are lost during deserialization.
+
 ## Logging
 
 Structured Serilog with properties (`{@Command}`, `{UserId}`, `{Slug}`). Never log secrets or JWTs.

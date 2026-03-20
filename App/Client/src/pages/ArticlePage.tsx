@@ -187,7 +187,7 @@ export const ArticlePage: React.FC = () => {
     }
   };
 
-  const handleCommentDelete = async (id: number) => {
+  const handleCommentDelete = async (id: string) => {
     if (!slug) return;
     try {
       await commentsApi.deleteComment(slug, id);

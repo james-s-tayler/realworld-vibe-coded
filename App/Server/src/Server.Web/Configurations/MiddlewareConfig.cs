@@ -8,7 +8,43 @@ namespace Server.Web.Configurations;
 
 public static class MiddlewareConfig
 {
-  public static async Task<IApplicationBuilder> UseAppMiddlewareAndSeedDatabase(this WebApplication app)
+  public static IApplicationBuilder UseFastEndpointsMiddleware(this WebApplication app)
+  {
+    app.UseExceptionHandler();
+    app.UseFastEndpoints(config =>
+    {
+      config.Errors.UseProblemDetails();
+      config.Endpoints.Configurator = ep =>
+      {
+        ep.PostProcessor<GlobalExceptionHandler>(Order.After);
+        ep.Description(d => d
+          .ProducesProblemDetails(StatusCodes.Status401Unauthorized)
+          .ProducesProblemDetails(StatusCodes.Status404NotFound)
+          .ProducesProblemDetails(StatusCodes.Status403Forbidden)
+          .ProducesProblemDetails(StatusCodes.Status409Conflict)
+          .ProducesProblemDetails(StatusCodes.Status500InternalServerError));
+      };
+      if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
+      {
+        config.Endpoints.Filter = ep =>
+        {
+          foreach (var route in ep.Routes)
+          {
+            if (route.StartsWith(DevOnly.Configuration.DevOnly.ROUTE))
+            {
+              return false; // don't register these endpoints in non-development environments
+            }
+          }
+
+          return true;
+        };
+      }
+    });
+
+    return app;
+  }
+
+  public static async Task<IApplicationBuilder> UseAppMiddlewareAndSeedDatabaseAsync(this WebApplication app)
   {
     // Configure Audit.NET - use path from configuration
     var auditLogsPath = app.Configuration["Audit:LogsPath"] ?? "Logs/Audit";
@@ -31,30 +67,6 @@ public static class MiddlewareConfig
       app.UseHsts();
     }
 
-    app.UseExceptionHandler();
-    app.UseFastEndpoints(config =>
-    {
-      config.Errors.UseProblemDetails();
-      config.Endpoints.Configurator = ep =>
-      {
-        ep.PostProcessor<GlobalExceptionHandler>(Order.After);
-      };
-      if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
-      {
-        config.Endpoints.Filter = ep =>
-        {
-          foreach (var route in ep.Routes)
-          {
-            if (route.StartsWith(DevOnly.Configuration.DevOnly.ROUTE))
-            {
-              return false; // don't register these endpoints in non-development environments
-            }
-          }
-
-          return true;
-        };
-      }
-    });
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
     app.UseMultiTenant();
@@ -75,12 +87,12 @@ public static class MiddlewareConfig
       Predicate = check => check.Tags.Contains("ready"), // Only run readiness checks (database)
     });
 
-    await RunMigrations(app);
+    await RunMigrationsAsync(app);
 
     return app;
   }
 
-  private static async Task RunMigrations(WebApplication app)
+  private static async Task RunMigrationsAsync(WebApplication app)
   {
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;

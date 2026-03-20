@@ -125,6 +125,9 @@ dotnet_diagnostic.SA1204.severity = error
 dotnet_diagnostic.SA1028.severity = error
 dotnet_diagnostic.SA1129.severity = error
 
+# Microsoft.VisualStudio.Threading.Analyzers: transitive leak from FastEndpoints.ClientGen.Kiota
+dotnet_diagnostic.VSTHRD200.severity = none
+
 # StylceCop: intentionally ignored Stylecop rules
 dotnet_diagnostic.SA1600.severity = none
 dotnet_diagnostic.SA1101.severity = none
