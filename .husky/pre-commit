@@ -13,9 +13,6 @@ client_changes=$(echo "$staged_files" | grep "^App/Client/" | wc -l)
 # Check if there are any changes in Task/Runner
 task_runner_changes=$(echo "$staged_files" | grep "^Task/Runner/" | wc -l)
 
-# Check if there are any changes in Task/FlowPilot
-task_flowpilot_changes=$(echo "$staged_files" | grep "^Task/FlowPilot/" | wc -l)
-
 # Check if there are any changes in Test/e2e
 e2e_test_changes=$(echo "$staged_files" | grep "^Test/e2e/" | wc -l)
 
@@ -52,16 +49,6 @@ if [ "$task_runner_changes" -gt 0 ]; then
   echo "✅ Nuke linting completed successfully."
 fi
 
-# Run test-flowpilot if there are FlowPilot changes
-if [ "$task_flowpilot_changes" -gt 0 ]; then
-  echo "🔧 Task/FlowPilot changes detected, running TestFlowPilot..."
-  if ! ./build.sh TestFlowPilot; then
-    echo "❌ FlowPilot tests failed."
-    exit 1
-  fi
-  echo "✅ FlowPilot tests completed successfully."
-fi
-
 # E2E tests are intentionally not run in pre-commit hook (too time-consuming)
 # Run them manually with: ./build.sh TestE2e
 if [ "$e2e_test_changes" -gt 0 ]; then
@@ -80,16 +67,8 @@ if [ "$migration_changes" -gt 0 ]; then
 fi
 
 # If no relevant changes, skip linting
-if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ] && [ "$task_flowpilot_changes" -eq 0 ] && [ "$e2e_test_changes" -eq 0 ] && [ "$migration_changes" -eq 0 ]; then
-  echo "ℹ️  No changes detected in App/Server, App/Client, Task/Runner, Task/FlowPilot, Test/e2e, or database migration directories. Skipping linting."
+if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ] && [ "$e2e_test_changes" -eq 0 ] && [ "$migration_changes" -eq 0 ]; then
+  echo "ℹ️  No changes detected in App/Server, App/Client, Task/Runner, Test/e2e, or database migration directories. Skipping linting."
 fi
-
-# Run flowpilot lint to ensure FlowPilot plan state is valid
-echo "🔧 Running flowpilot lint..."
-if ! flowpilot lint; then
-  echo "❌ FlowPilot lint failed. Please fix the FlowPilot plan state."
-  exit 1
-fi
-echo "✅ FlowPilot lint completed successfully."
 
 echo "🎉 Pre-commit hook completed successfully."

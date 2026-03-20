@@ -48,14 +48,6 @@ public partial class Build
 
   internal AbsolutePath DockerComposeDependencies => TaskLocalDevDirectory / "docker-compose.dev-deps.yml";
 
-  internal AbsolutePath FlowPilotDirectory => RootDirectory / "Task" / "FlowPilot";
-
-  internal AbsolutePath FlowPilotSolution => FlowPilotDirectory / "FlowPilot.sln";
-
-  internal AbsolutePath FlowPilotCliProject => FlowPilotDirectory / "FlowPilot.Cli" / "FlowPilot.Cli.csproj";
-
-  internal AbsolutePath FlowPilotTestProject => FlowPilotDirectory / "FlowPilot.Tests" / "FlowPilot.Tests.csproj";
-
   internal AbsolutePath RoslynMcpProject => RootDirectory / "Task" / "McpServers" / "roslyn-mcp" / "RoslynMCP" / "RoslynMCP.csproj";
 
   internal AbsolutePath LocalNuGetFeedDirectory => RootDirectory / ".local-nuget";
@@ -93,11 +85,6 @@ public partial class Build
 
   internal AbsolutePath ReportsTestPostmanArticleDirectory => ReportsTestPostmanDirectory / "Article";
 
-  internal AbsolutePath ReportsFlowPilotDirectory => RootDirectory / "Reports" / "FlowPilot";
-
-  internal AbsolutePath ReportsFlowPilotResultsDirectory => RootDirectory / "Reports" / "FlowPilot" / "Results";
-
-  internal AbsolutePath ReportsFlowPilotArtifactsDirectory => RootDirectory / "Reports" / "FlowPilot" / "Artifacts";
   #endregion
 
   #region Logs
