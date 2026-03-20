@@ -48,6 +48,8 @@
         "LintNukeVerify",
         "LintServerFix",
         "LintServerVerify",
+        "LintSkillsFix",
+        "LintSkillsVerify",
         "PathsCleanDirectories",
         "RunLocalClient",
         "RunLocalDependencies",

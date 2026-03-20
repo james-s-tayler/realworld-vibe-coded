@@ -1,3 +1,7 @@
+---
+description: Run full pre-commit verification. Use before committing to ensure all linting, builds, and tests pass. Execute each step sequentially and stop on first failure.
+---
+
 Run full pre-commit verification. Execute each step sequentially and stop on first failure:
 
 1. `./build.sh LintAllVerify` — If fails, run `./build.sh LintAllFix` then re-verify
