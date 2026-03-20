@@ -1,0 +1,57 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/enforce-nuke.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/protect-files.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/on-nuke-test-fail.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/on-stop.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "allowedTools": [
+    "Bash(./build.sh *)",
+    "Bash(git *)",
+    "Bash(gh *)",
+    "Bash(docker *)",
+    "Bash(docker-compose *)",
+    "Bash(ls *)",
+    "Bash(pwd)",
+    "Bash(which *)",
+    "Bash(npm *)",
+    "Bash(npx *)"
+  ]
+}

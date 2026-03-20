@@ -1,4 +1,8 @@
-﻿using Nuke.Common;
+﻿using System.Reflection;
+using System.Text.RegularExpressions;
+using Nuke.Common;
+using Nuke.Common.Execution;
+using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
@@ -83,7 +87,7 @@ public partial class Build
 
   internal Target LintAllVerify => _ => _
       .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
-      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintFlowPilotVerify)
+      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintSkillsVerify, LintClaudeMdVerify)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
@@ -96,7 +100,7 @@ public partial class Build
 
   internal Target LintAllFix => _ => _
       .Description("Fix all C# formatting & analyzer issues automatically")
-      .DependsOn(LintClientFix, LintServerFix, LintNukeFix, LintFlowPilotFix)
+      .DependsOn(LintClientFix, LintServerFix, LintNukeFix, LintSkillsFix)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
@@ -105,4 +109,114 @@ public partial class Build
         DotNetFormat(s => s
               .SetProject(e2eTestProject));
       });
+
+  internal Target LintClaudeMdVerify => _ => _
+      .Description("Verify CLAUDE.md stays within the 100-line limit for effective AI instruction following")
+      .Executes(() =>
+      {
+        var lines = ClaudeMdFile.ReadAllLines();
+        var lineCount = lines.Length;
+        Log.Information("CLAUDE.md is {LineCount} lines (limit: 100)", lineCount);
+
+        if (lineCount > 100)
+        {
+          throw new Exception($"CLAUDE.md is {lineCount} lines — exceeds the 100-line limit. Trim it to stay effective.");
+        }
+
+        Log.Information("✓ CLAUDE.md is within the 100-line limit");
+      });
+
+  internal Target LintSkillsVerify => _ => _
+      .Description("Verify every Nuke target has a corresponding Claude Code skill")
+      .Executes(() =>
+      {
+        var targets = GetAllExecutableTargets();
+        var skillsDirectory = RootDirectory / ".claude" / "skills";
+        var missing = new List<string>();
+
+        foreach (var target in targets)
+        {
+          var kebabName = PascalToKebabCase(target.Name);
+          var skillPath = skillsDirectory / $"nuke-{kebabName}" / "SKILL.md";
+
+          if (!skillPath.FileExists())
+          {
+            missing.Add($"  {target.Name} → .claude/skills/nuke-{kebabName}/SKILL.md");
+          }
+        }
+
+        if (missing.Any())
+        {
+          foreach (var entry in missing)
+          {
+            Log.Error("Missing skill: {Entry}", entry);
+          }
+
+          throw new Exception($"{missing.Count} Nuke target(s) missing Claude Code skills. Run './build.sh LintSkillsFix' to generate them.");
+        }
+
+        Log.Information("✓ All {Count} Nuke targets have corresponding Claude Code skills", targets.Count);
+      });
+
+  internal Target LintSkillsFix => _ => _
+      .Description("Generate missing Claude Code skills for Nuke targets")
+      .Executes(() =>
+      {
+        var targets = GetAllExecutableTargets();
+        var skillsDirectory = RootDirectory / ".claude" / "skills";
+        var created = 0;
+
+        foreach (var target in targets)
+        {
+          var kebabName = PascalToKebabCase(target.Name);
+          var skillDir = skillsDirectory / $"nuke-{kebabName}";
+          var skillPath = skillDir / "SKILL.md";
+
+          if (skillPath.FileExists())
+          {
+            continue;
+          }
+
+          skillDir.CreateDirectory();
+          var content = GenerateSkillContent(target.Name, target.Description);
+          skillPath.WriteAllText(content);
+          created++;
+          Log.Information("Created skill: nuke-{KebabName}/SKILL.md", kebabName);
+        }
+
+        if (created > 0)
+        {
+          Log.Information("✓ Created {Count} missing skill(s)", created);
+        }
+        else
+        {
+          Log.Information("✓ All skills already exist — nothing to do");
+        }
+      });
+
+  private static string PascalToKebabCase(string name)
+  {
+    var result = Regex.Replace(name, "([a-z0-9])([A-Z])", "$1-$2");
+    result = Regex.Replace(result, "([A-Z])([A-Z][a-z])", "$1-$2");
+    return result.ToLowerInvariant();
+  }
+
+  private static string GenerateSkillContent(string targetName, string description)
+  {
+    return string.Join(
+        "\n",
+        "---",
+        $"description: {description}",
+        "---",
+        string.Empty,
+        $"Run `./build.sh {targetName}`. Check output for details. If failures occur, check `Reports/` and `Logs/` directories.",
+        string.Empty);
+  }
+
+  private IReadOnlyCollection<ExecutableTarget> GetAllExecutableTargets()
+  {
+    return (IReadOnlyCollection<ExecutableTarget>)typeof(NukeBuild)
+        .GetProperty("ExecutableTargets", BindingFlags.Instance | BindingFlags.NonPublic)!
+        .GetValue(this)!;
+  }
 }
