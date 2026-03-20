@@ -7,6 +7,8 @@ PROTECTED_PATTERNS=(
   ".editorconfig"
   ".husky/"
   ".nuke/"
+  ".claude/"
+  "Nuke.Tests/"
 )
 
 for pattern in "${PROTECTED_PATTERNS[@]}"; do

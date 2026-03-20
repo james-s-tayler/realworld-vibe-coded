@@ -20,23 +20,12 @@
         ]
       }
     ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash -c 'INPUT=$(cat); FILE_PATH=$(echo \"$INPUT\" | jq -r \".tool_input.file_path // empty\"); if [[ \"$FILE_PATH\" == *.cs ]]; then echo \"[INFO] C# file modified: $FILE_PATH — remember to run ./build.sh LintAllVerify before committing.\"; fi; exit 0'"
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'INPUT=$(cat); STOP_REASON=$(echo \"$INPUT\" | jq -r \".stop_hook_reason // empty\"); if [ \"$STOP_REASON\" = \"end_turn\" ]; then echo \"[REMINDER] If files were modified, run ./build.sh LintAllVerify before committing.\"; fi; exit 0'"
+            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/on-stop.sh"
           }
         ]
       }

@@ -54,6 +54,12 @@ public partial class Build
 
   #endregion
 
+  #region Claude
+
+  internal AbsolutePath ClaudeMdFile => RootDirectory / "CLAUDE.md";
+
+  #endregion
+
   #region Reports
   internal AbsolutePath ReportsServerDirectory => RootDirectory / "Reports" / "Server";
 

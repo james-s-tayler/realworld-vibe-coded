@@ -42,6 +42,7 @@
         "InstallGitHooks",
         "LintAllFix",
         "LintAllVerify",
+        "LintClaudeMdVerify",
         "LintClientFix",
         "LintClientVerify",
         "LintNukeFix",

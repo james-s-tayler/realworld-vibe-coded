@@ -87,7 +87,7 @@ public partial class Build
 
   internal Target LintAllVerify => _ => _
       .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
-      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintSkillsVerify)
+      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintSkillsVerify, LintClaudeMdVerify)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
@@ -108,6 +108,22 @@ public partial class Build
         Log.Information($"Running dotnet format (fix mode) on {e2eTestProject}");
         DotNetFormat(s => s
               .SetProject(e2eTestProject));
+      });
+
+  internal Target LintClaudeMdVerify => _ => _
+      .Description("Verify CLAUDE.md stays within the 100-line limit for effective AI instruction following")
+      .Executes(() =>
+      {
+        var lines = ClaudeMdFile.ReadAllLines();
+        var lineCount = lines.Length;
+        Log.Information("CLAUDE.md is {LineCount} lines (limit: 100)", lineCount);
+
+        if (lineCount > 100)
+        {
+          throw new Exception($"CLAUDE.md is {lineCount} lines — exceeds the 100-line limit. Trim it to stay effective.");
+        }
+
+        Log.Information("✓ CLAUDE.md is within the 100-line limit");
       });
 
   internal Target LintSkillsVerify => _ => _
