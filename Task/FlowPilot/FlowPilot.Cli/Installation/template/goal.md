@@ -1,3 +1,0 @@
-## Goal
-
-Prompt goes here.
