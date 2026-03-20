@@ -191,29 +191,36 @@ public partial class Build
     {
       Log.Information("Running E2E tests with Docker Compose");
 
+      var composeFiles = SkipPublish
+          ? "-f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml"
+          : "-f Test/e2e/docker-compose.yml";
       int exitCode = 0;
       try
       {
-        var args = SkipPublish
-          ? "compose -f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml up --no-build --abort-on-container-exit"
-          : "compose -f Test/e2e/docker-compose.yml up --build --abort-on-container-exit";
+        var upArgs = SkipPublish
+          ? $"compose {composeFiles} up --no-build --abort-on-container-exit"
+          : $"compose {composeFiles} up --build --abort-on-container-exit";
         var envVars = new Dictionary<string, string> { ["DOCKER_BUILDKIT"] = "1", };
         var process = ProcessTasks.StartProcess(
           "docker",
-          args,
+          upArgs,
           workingDirectory: RootDirectory,
           environmentVariables: envVars);
         process.WaitForExit();
         exitCode = process.ExitCode;
+
+        var apiExitCode = GetServiceExitCode(composeFiles, "api");
+        if (apiExitCode > 0 && exitCode == 0)
+        {
+          Log.Error("API container crashed with exit code {ApiExitCode} but Docker Compose reported success", apiExitCode);
+          exitCode = apiExitCode;
+        }
       }
       finally
       {
-        var downArgs = SkipPublish ?
-          "compose -f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml down" :
-          "compose -f Test/e2e/docker-compose.yml down";
         var downProcess = ProcessTasks.StartProcess(
           "docker",
-          downArgs,
+          $"compose {composeFiles} down",
           workingDirectory: RootDirectory);
         downProcess.WaitForExit();
       }
@@ -247,6 +254,53 @@ public partial class Build
     return _;
   };
 
+  private int GetServiceExitCode(string composeFiles, string serviceName)
+  {
+    try
+    {
+      var psProcess = ProcessTasks.StartProcess(
+          "docker",
+          $"compose {composeFiles} ps -a -q {serviceName}",
+          workingDirectory: RootDirectory);
+      psProcess.WaitForExit();
+
+      var containerId = psProcess.Output
+          .Where(o => o.Type == OutputType.Std)
+          .Select(o => o.Text.Trim())
+          .FirstOrDefault(s => !string.IsNullOrEmpty(s));
+
+      if (string.IsNullOrEmpty(containerId))
+      {
+        Log.Warning("Could not find container ID for service {ServiceName}", serviceName);
+        return -1;
+      }
+
+      var inspectProcess = ProcessTasks.StartProcess(
+          "docker",
+          $"inspect --format={{{{.State.ExitCode}}}} {containerId}",
+          workingDirectory: RootDirectory);
+      inspectProcess.WaitForExit();
+
+      var exitCodeStr = inspectProcess.Output
+          .Where(o => o.Type == OutputType.Std)
+          .Select(o => o.Text.Trim())
+          .FirstOrDefault(s => !string.IsNullOrEmpty(s));
+
+      if (int.TryParse(exitCodeStr, out var exitCode))
+      {
+        return exitCode;
+      }
+
+      Log.Warning("Could not parse exit code for service {ServiceName}: {ExitCodeStr}", serviceName, exitCodeStr);
+      return -1;
+    }
+    catch (Exception ex)
+    {
+      Log.Warning("Failed to check exit code for service {ServiceName}: {Message}", serviceName, ex.Message);
+      return -1;
+    }
+  }
+
   // LiquidTestReports.Cli dotnet global tool isn't available as a built-in Nuke tool under Nuke.Common.Tools, so we resolve it manually
   private Tool Liquid => ToolResolver.GetPathTool("liquid");
 
@@ -264,28 +318,34 @@ public partial class Build
       envVars["NEWMAN_BAIL"] = "true";
     }
 
+    var composeFiles = $"-f Test/Postman/docker-compose.yml -f Test/Postman/docker-compose.{collectionName}.yml";
     int exitCode = 0;
     try
     {
-      var args = $"compose -f Test/Postman/docker-compose.yml -f Test/Postman/docker-compose.{collectionName}.yml up --build --abort-on-container-exit";
       var process = ProcessTasks.StartProcess(
             "docker",
-            args,
+            $"compose {composeFiles} up --build --abort-on-container-exit",
             workingDirectory: RootDirectory,
             environmentVariables: envVars);
       process.WaitForExit();
       exitCode = process.ExitCode;
+
+      var apiExitCode = GetServiceExitCode(composeFiles, "api");
+      if (apiExitCode > 0 && exitCode == 0)
+      {
+        Log.Error("API container crashed with exit code {ApiExitCode} but Docker Compose reported success", apiExitCode);
+        exitCode = apiExitCode;
+      }
     }
     finally
     {
-      var downArgs = $"compose -f Test/Postman/docker-compose.yml -f Test/Postman/docker-compose.{collectionName}.yml down";
       var downEnvVars = new Dictionary<string, string>
       {
         ["DOCKER_BUILDKIT"] = "1",
       };
       var downProcess = ProcessTasks.StartProcess(
             "docker",
-            downArgs,
+            $"compose {composeFiles} down",
             workingDirectory: RootDirectory,
             environmentVariables: downEnvVars);
       downProcess.WaitForExit();
