@@ -12,6 +12,8 @@ If a specific run ID or job URL was provided, use that directly.
 
 ## Step 2: Examine CI logs and form a hypothesis
 
+Prioritize investigating more fundamental failures first: lint failures before build failures, build failures before test failures. A build failure may explain downstream test failures, so fixing the root cause first avoids wasted effort.
+
 For each failing job, fetch logs using `gh run view <RUN_ID> --repo <OWNER/REPO> --job <JOB_ID> --log` and analyze them to understand what went wrong. Form a hypothesis about the root cause.
 
 ## Step 3: Reproduce locally

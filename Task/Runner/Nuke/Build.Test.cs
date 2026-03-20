@@ -194,12 +194,13 @@ public partial class Build
       var composeFiles = SkipPublish
           ? "-f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml"
           : "-f Test/e2e/docker-compose.yml";
+      var upArgs = SkipPublish
+          ? $"compose {composeFiles} up --no-build --abort-on-container-exit"
+          : $"compose {composeFiles} up --build --abort-on-container-exit";
+      var downArgs = $"compose {composeFiles} down";
       int exitCode = 0;
       try
       {
-        var upArgs = SkipPublish
-          ? $"compose {composeFiles} up --no-build --abort-on-container-exit"
-          : $"compose {composeFiles} up --build --abort-on-container-exit";
         var envVars = new Dictionary<string, string> { ["DOCKER_BUILDKIT"] = "1", };
         var process = ProcessTasks.StartProcess(
           "docker",
@@ -220,7 +221,7 @@ public partial class Build
       {
         var downProcess = ProcessTasks.StartProcess(
           "docker",
-          $"compose {composeFiles} down",
+          downArgs,
           workingDirectory: RootDirectory);
         downProcess.WaitForExit();
       }
@@ -258,9 +259,10 @@ public partial class Build
   {
     try
     {
+      var psArgs = $"compose {composeFiles} ps -a -q {serviceName}";
       var psProcess = ProcessTasks.StartProcess(
           "docker",
-          $"compose {composeFiles} ps -a -q {serviceName}",
+          psArgs,
           workingDirectory: RootDirectory);
       psProcess.WaitForExit();
 
@@ -275,9 +277,10 @@ public partial class Build
         return -1;
       }
 
+      var inspectArgs = $"inspect --format={{{{.State.ExitCode}}}} {containerId}";
       var inspectProcess = ProcessTasks.StartProcess(
           "docker",
-          $"inspect --format={{{{.State.ExitCode}}}} {containerId}",
+          inspectArgs,
           workingDirectory: RootDirectory);
       inspectProcess.WaitForExit();
 
@@ -319,12 +322,14 @@ public partial class Build
     }
 
     var composeFiles = $"-f Test/Postman/docker-compose.yml -f Test/Postman/docker-compose.{collectionName}.yml";
+    var upArgs = $"compose {composeFiles} up --build --abort-on-container-exit";
+    var downArgs = $"compose {composeFiles} down";
     int exitCode = 0;
     try
     {
       var process = ProcessTasks.StartProcess(
             "docker",
-            $"compose {composeFiles} up --build --abort-on-container-exit",
+            upArgs,
             workingDirectory: RootDirectory,
             environmentVariables: envVars);
       process.WaitForExit();
@@ -345,7 +350,7 @@ public partial class Build
       };
       var downProcess = ProcessTasks.StartProcess(
             "docker",
-            $"compose {composeFiles} down",
+            downArgs,
             workingDirectory: RootDirectory,
             environmentVariables: downEnvVars);
       downProcess.WaitForExit();
