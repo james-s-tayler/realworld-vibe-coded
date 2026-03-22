@@ -4,7 +4,7 @@ Conduit is a social blogging site (Medium.com clone) with a custom API for all r
 
 ## Tech Stack
 
-- **Backend:** .NET 9, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQLite, Serilog, xUnit
+- **Backend:** .NET 10, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQLite, Serilog, xUnit
 - **Frontend:** React + Vite + TypeScript, Carbon Design System
 - **Testing:** xUnit (backend), Vitest + Testing Library (frontend), Playwright (E2E), Postman (API)
 - **Build:** Nuke build system (`./build.sh`), GitHub Actions CI/CD
