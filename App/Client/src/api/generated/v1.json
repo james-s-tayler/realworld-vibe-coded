@@ -2794,6 +2794,88 @@
           }
         }
       }
+    },
+    "/dev-only/test-data/feature-flags/{featureName}": {
+      "get": {
+        "tags": [
+          "Dev-Only"
+        ],
+        "summary": "Check feature flag status",
+        "description": "Returns whether a feature flag is enabled or disabled.",
+        "operationId": "ServerWebDevOnlyEndpointsFeatureFlagCheckFeatureFlag",
+        "parameters": [
+          {
+            "name": "featureName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckFeatureFlagResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3355,6 +3437,22 @@
         }
       },
       "TestValidationRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "CheckFeatureFlagResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "featureName": {
+            "type": "string"
+          },
+          "isEnabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CheckFeatureFlagRequest": {
         "type": "object",
         "additionalProperties": false
       }

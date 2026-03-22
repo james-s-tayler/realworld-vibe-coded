@@ -98,6 +98,16 @@ export interface AuthorDto extends Parsable {
      */
     username?: string | null;
 }
+export interface CheckFeatureFlagResponse extends Parsable {
+    /**
+     * The featureName property
+     */
+    featureName?: string | null;
+    /**
+     * The isEnabled property
+     */
+    isEnabled?: boolean | null;
+}
 export interface CommentDto extends Parsable {
     /**
      * The author property
@@ -182,6 +192,15 @@ export function createArticlesResponseFromDiscriminatorValue(parseNode: ParseNod
 // @ts-ignore
 export function createAuthorDtoFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
     return deserializeIntoAuthorDto;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {CheckFeatureFlagResponse}
+ */
+// @ts-ignore
+export function createCheckFeatureFlagResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoCheckFeatureFlagResponse;
 }
 export interface CreateCommentDto extends Parsable {
     /**
@@ -480,6 +499,18 @@ export function deserializeIntoAuthorDto(authorDto: Partial<AuthorDto> | undefin
         "following": n => { authorDto.following = n.getBooleanValue(); },
         "image": n => { authorDto.image = n.getStringValue(); },
         "username": n => { authorDto.username = n.getStringValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param CheckFeatureFlagResponse The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoCheckFeatureFlagResponse(checkFeatureFlagResponse: Partial<CheckFeatureFlagResponse> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "featureName": n => { checkFeatureFlagResponse.featureName = n.getStringValue(); },
+        "isEnabled": n => { checkFeatureFlagResponse.isEnabled = n.getBooleanValue(); },
     }
 }
 /**
@@ -956,6 +987,18 @@ export function serializeAuthorDto(writer: SerializationWriter, authorDto: Parti
     writer.writeBooleanValue("following", authorDto.following);
     writer.writeStringValue("image", authorDto.image);
     writer.writeStringValue("username", authorDto.username);
+}
+/**
+ * Serializes information the current object
+ * @param CheckFeatureFlagResponse The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeCheckFeatureFlagResponse(writer: SerializationWriter, checkFeatureFlagResponse: Partial<CheckFeatureFlagResponse> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!checkFeatureFlagResponse || isSerializingDerivedType) { return; }
+    writer.writeStringValue("featureName", checkFeatureFlagResponse.featureName);
+    writer.writeBooleanValue("isEnabled", checkFeatureFlagResponse.isEnabled);
 }
 /**
  * Serializes information the current object
