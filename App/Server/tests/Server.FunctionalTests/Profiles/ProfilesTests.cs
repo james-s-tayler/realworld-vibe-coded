@@ -1,7 +1,5 @@
 ﻿using Server.Web.Profiles;
-using Server.Web.Profiles.Follow;
 using Server.Web.Profiles.Get;
-using Server.Web.Profiles.Unfollow;
 
 namespace Server.FunctionalTests.Profiles;
 
@@ -26,7 +24,7 @@ public class ProfilesTests : AppTestBase
   }
 
   [Fact]
-  public async Task GetProfile_Authenticated_NotFollowing_ReturnsProfile()
+  public async Task GetProfile_Authenticated_ReturnsProfile()
   {
     // Arrange
     var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
@@ -39,27 +37,6 @@ public class ProfilesTests : AppTestBase
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.Profile.ShouldNotBeNull();
     result.Profile.Username.ShouldBe(tenant.Users[1].Email);
-    result.Profile.Following.ShouldBeFalse();
-  }
-
-  [Fact]
-  public async Task GetProfile_Authenticated_Following_ReturnsProfileWithFollowing()
-  {
-    // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
-
-    var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
-    await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
-
-    // Act
-    var getRequest = new GetProfileRequest { Username = tenant.Users[1].Email };
-    var (response, result) = await tenant.Users.First().Client.GETAsync<Get, GetProfileRequest, ProfileResponse>(getRequest);
-
-    // Assert
-    response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(tenant.Users[1].Email);
-    result.Profile.Following.ShouldBeTrue();
   }
 
   [Fact]
@@ -88,110 +65,5 @@ public class ProfilesTests : AppTestBase
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-  }
-
-  [Fact]
-  public async Task FollowProfile_WithAuthentication_ReturnsProfileWithFollowing()
-  {
-    // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
-
-    // Act
-    var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
-    var (response, result) = await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
-
-    // Assert
-    response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(tenant.Users[1].Email);
-    result.Profile.Following.ShouldBeTrue();
-  }
-
-  [Fact]
-  public async Task FollowProfile_AlreadyFollowing_ReturnsProfileWithFollowing()
-  {
-    // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
-
-    var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
-    await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
-
-    // Act
-    var (response, result) = await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
-
-    // Assert
-    response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Profile.ShouldNotBeNull();
-    result.Profile.Following.ShouldBeTrue();
-  }
-
-  [Fact]
-  public async Task FollowProfile_WithoutAuthentication_ReturnsUnauthorized()
-  {
-    // Arrange
-    var followRequest = new FollowProfileRequest { Username = "someuser" };
-
-    // Act
-    var (response, _) = await Fixture.Client.POSTAsync<Follow, FollowProfileRequest, object>(followRequest);
-
-    // Assert
-    response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
-  }
-
-  [Fact]
-  public async Task FollowProfile_NonExistentUser_ReturnsNotFound()
-  {
-    // Arrange
-    var tenant = await Fixture.RegisterTenantAsync();
-    var followRequest = new FollowProfileRequest { Username = "nonexistentuser999" };
-
-    // Act
-    var (response, _) = await tenant.Users.First().Client.POSTAsync<Follow, FollowProfileRequest, object>(followRequest);
-
-    // Assert
-    response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-  }
-
-  [Fact]
-  public async Task UnfollowProfile_WithAuthentication_ReturnsProfileWithoutFollowing()
-  {
-    // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
-
-    var followRequest = new FollowProfileRequest { Username = tenant.Users[1].Email };
-    await tenant.Users[0].Client.POSTAsync<Follow, FollowProfileRequest, ProfileResponse>(followRequest);
-
-    // Act
-    var unfollowRequest = new UnfollowProfileRequest { Username = tenant.Users[1].Email };
-    var (response, result) = await tenant.Users[0].Client.DELETEAsync<Unfollow, UnfollowProfileRequest, ProfileResponse>(unfollowRequest);
-
-    // Assert
-    response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Profile.ShouldNotBeNull();
-    result.Profile.Username.ShouldBe(tenant.Users[1].Email);
-    result.Profile.Following.ShouldBeFalse();
-  }
-
-  [Fact]
-  public async Task UnfollowProfile_NotFollowing_ReturnsErrorDetail()
-  {
-    // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
-
-    // Act
-    var unfollowRequest = new UnfollowProfileRequest { Username = tenant.Users[1].Email };
-    var (response, _) = await tenant.Users[0].Client.DELETEAsync<Unfollow, UnfollowProfileRequest, object>(unfollowRequest);
-
-    // Assert
-    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-  }
-
-  [Fact]
-  public async Task UnfollowProfile_WithoutAuthentication_ReturnsUnauthorized()
-  {
-    var unfollowRequest = new UnfollowProfileRequest { Username = "someuser" };
-    var (response, _) = await Fixture.Client.DELETEAsync<Unfollow, UnfollowProfileRequest, object>(unfollowRequest);
-
-    response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
 }

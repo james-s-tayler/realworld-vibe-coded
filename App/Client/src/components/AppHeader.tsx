@@ -7,7 +7,6 @@ import {
   HeaderNavigation,
   HeaderMenuItem,
 } from '@carbon/react';
-import { Edit } from '@carbon/icons-react';
 import { useAuth } from '../hooks/useAuth';
 import { RequireRole } from './RequireRole';
 import { truncateUsername } from '../utils/textUtils';
@@ -38,14 +37,6 @@ export const AppHeader: React.FC = () => {
             )}
             {user ? (
               <>
-                <HeaderMenuItem
-                  as={Link}
-                  to="/editor"
-                  isActive={isActive('/editor')}
-                >
-                  <Edit size={16} style={{ marginRight: '4px' }} />
-                  New Article
-                </HeaderMenuItem>
                 <RequireRole roles={['ADMIN']}>
                   <HeaderMenuItem
                     as={Link}

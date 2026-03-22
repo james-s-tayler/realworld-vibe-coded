@@ -7,6 +7,4 @@ public class ProfileDto
   public string Bio { get; set; } = string.Empty;
 
   public string? Image { get; set; }
-
-  public bool Following { get; set; }
 }

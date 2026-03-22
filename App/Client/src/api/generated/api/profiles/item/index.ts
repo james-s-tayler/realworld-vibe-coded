@@ -4,18 +4,12 @@
 // @ts-ignore
 import { createProblemDetailsFromDiscriminatorValue, createProfileResponseFromDiscriminatorValue, type ProblemDetails, type ProfileResponse } from '../../../models/index.js';
 // @ts-ignore
-import { FollowRequestBuilderRequestsMetadata, type FollowRequestBuilder } from './follow/index.js';
-// @ts-ignore
-import { type BaseRequestBuilder, type KeysToExcludeForNavigationMetadata, type NavigationMetadata, type Parsable, type ParsableFactory, type RequestConfiguration, type RequestInformation, type RequestsMetadata } from '@microsoft/kiota-abstractions';
+import { type BaseRequestBuilder, type Parsable, type ParsableFactory, type RequestConfiguration, type RequestInformation, type RequestsMetadata } from '@microsoft/kiota-abstractions';
 
 /**
  * Builds and executes requests for operations under /api/profiles/{username}
  */
 export interface WithUsernameItemRequestBuilder extends BaseRequestBuilder<WithUsernameItemRequestBuilder> {
-    /**
-     * The follow property
-     */
-    get follow(): FollowRequestBuilder;
     /**
      * Get a user profile by username. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
@@ -39,14 +33,6 @@ export interface WithUsernameItemRequestBuilder extends BaseRequestBuilder<WithU
  * Uri template for the request builder.
  */
 export const WithUsernameItemRequestBuilderUriTemplate = "{+baseurl}/api/profiles/{username}";
-/**
- * Metadata for all the navigation properties in the request builder.
- */
-export const WithUsernameItemRequestBuilderNavigationMetadata: Record<Exclude<keyof WithUsernameItemRequestBuilder, KeysToExcludeForNavigationMetadata>, NavigationMetadata> = {
-    follow: {
-        requestsMetadata: FollowRequestBuilderRequestsMetadata,
-    },
-};
 /**
  * Metadata for all the requests in the request builder.
  */

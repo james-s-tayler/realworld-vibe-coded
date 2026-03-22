@@ -11,7 +11,7 @@ describe('RoleProtectedRoute', () => {
     username: 'admin',
     bio: 'Admin user',
     image: null,
-    roles: ['ADMIN', 'AUTHOR'],
+    roles: ['ADMIN', 'USER'],
   };
 
   const mockNonAdminUser: User = {
@@ -19,7 +19,7 @@ describe('RoleProtectedRoute', () => {
     username: 'user',
     bio: 'Regular user',
     image: null,
-    roles: ['AUTHOR'],
+    roles: ['USER'],
   };
 
   beforeEach(() => {
@@ -165,7 +165,7 @@ describe('RoleProtectedRoute', () => {
             <Route
               path="/admin"
               element={
-                <RoleProtectedRoute requiredRoles={['ADMIN', 'OWNER']}>
+                <RoleProtectedRoute requiredRoles={['ADMIN', 'USER']}>
                   <div>Admin Content</div>
                 </RoleProtectedRoute>
               }

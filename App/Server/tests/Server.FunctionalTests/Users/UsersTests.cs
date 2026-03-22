@@ -25,10 +25,8 @@ public class UsersTests : AppTestBase
     result.User.Email.ShouldBe(user.Email);
     result.User.Username.ShouldBe(user.Email);
     result.User.Roles.ShouldNotBeNull();
-    result.User.Roles.ShouldContain(DefaultRoles.Owner);
     result.User.Roles.ShouldContain(DefaultRoles.Admin);
-    result.User.Roles.ShouldContain(DefaultRoles.Author);
-    result.User.Roles.ShouldContain(DefaultRoles.Moderator);
+    result.User.Roles.ShouldContain(DefaultRoles.User);
   }
 
   [Fact]
@@ -251,9 +249,7 @@ public class UsersTests : AppTestBase
     // Verify first user (tenant owner) has ADMIN role
     var ownerDto = result.Users.First(u => u.Email == tenant.Users[0].Email);
     ownerDto.Roles.ShouldContain(DefaultRoles.Admin);
-    ownerDto.Roles.ShouldContain(DefaultRoles.Owner);
-    ownerDto.Roles.ShouldContain(DefaultRoles.Author);
-    ownerDto.Roles.ShouldContain(DefaultRoles.Moderator);
+    ownerDto.Roles.ShouldContain(DefaultRoles.User);
   }
 
   [Fact]

@@ -2,7 +2,7 @@
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.DomainEvents;
 using Server.SharedKernel.MediatR;
-using Server.UseCases.Articles.Create;
+using Server.UseCases.Profiles.Get;
 
 namespace Server.Web.Configurations;
 
@@ -13,7 +13,7 @@ public static class MediatrConfigs
     var mediatRAssemblies = new[]
       {
         Assembly.GetAssembly(typeof(ApplicationUser)), // Core
-        Assembly.GetAssembly(typeof(CreateArticleCommand)), // UseCases
+        Assembly.GetAssembly(typeof(GetProfileQuery)), // UseCases
         Assembly.GetAssembly(typeof(Server.Web.DevOnly.UseCases.ThrowInUseCaseQuery)), // DevOnly
       };
 

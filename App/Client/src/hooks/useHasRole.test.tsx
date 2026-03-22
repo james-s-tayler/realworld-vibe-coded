@@ -26,7 +26,7 @@ describe('useHasRole', () => {
       username: 'admin',
       bio: 'Admin user',
       image: null,
-      roles: ['ADMIN', 'AUTHOR'],
+      roles: ['ADMIN', 'USER'],
     };
 
     const { result } = renderHook(() => useHasRole(['ADMIN']), {
@@ -42,7 +42,7 @@ describe('useHasRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
-      roles: ['AUTHOR'],
+      roles: ['USER'],
     };
 
     const { result } = renderHook(() => useHasRole(['ADMIN']), {
@@ -58,10 +58,10 @@ describe('useHasRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
-      roles: ['AUTHOR'],
+      roles: ['USER'],
     };
 
-    const { result } = renderHook(() => useHasRole(['ADMIN', 'AUTHOR']), {
+    const { result } = renderHook(() => useHasRole(['ADMIN', 'USER']), {
       wrapper: wrapper(user),
     });
 

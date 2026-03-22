@@ -5,11 +5,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Server.Core.AuthorAggregate;
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.Identity;
 using Server.SharedKernel.MediatR;
-using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Identity.Invite;
 
@@ -17,18 +15,15 @@ namespace Server.UseCases.Identity.Invite;
 #pragma warning disable SRV015
 public class InviteHandler : ICommandHandler<InviteCommand, Unit>
 {
-  private readonly IRepository<Author> _authorRepository;
   private readonly IUserEmailChecker _userEmailChecker;
   private readonly ILogger<InviteHandler> _logger;
   private readonly IHttpContextAccessor _httpContextAccessor;
 
   public InviteHandler(
-    IRepository<Author> authorRepository,
     IUserEmailChecker userEmailChecker,
     ILogger<InviteHandler> logger,
     IHttpContextAccessor httpContextAccessor)
   {
-    _authorRepository = authorRepository;
     _userEmailChecker = userEmailChecker;
     _logger = logger;
     _httpContextAccessor = httpContextAccessor;
@@ -83,16 +78,16 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
 
     _logger.LogInformation("Created new user with email {Email}", request.Email);
 
-    _logger.LogDebug("Assigning {RoleName} role to invited user", DefaultRoles.Author);
+    _logger.LogDebug("Assigning {RoleName} role to invited user", DefaultRoles.User);
 
-    var authorRoleResult = await userManager.AddToRoleAsync(user, DefaultRoles.Author);
-    if (!authorRoleResult.Succeeded)
+    var userRoleResult = await userManager.AddToRoleAsync(user, DefaultRoles.User);
+    if (!userRoleResult.Succeeded)
     {
-      var errorDetails = authorRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
+      var errorDetails = userRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
       return Result<Unit>.Error(errorDetails);
     }
 
-    _logger.LogDebug("Assigned {RoleName} role to invited user", DefaultRoles.Author);
+    _logger.LogDebug("Assigned {RoleName} role to invited user", DefaultRoles.User);
 
     // Add tenant claim
     var tenantClaim = new Claim("__tenant__", tenantId);
@@ -109,14 +104,6 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
     }
 
     _logger.LogInformation("User {Email} invited successfully to tenant {TenantId}", request.Email, tenantId);
-
-    // Create Author record as domain invariant
-    // Tenant context is already resolved via claims, so repository can be injected normally
-    var author = new Author(user.Id, user.UserName!, user.Bio ?? string.Empty, user.Image);
-    await _authorRepository.AddAsync(author, cancellationToken);
-    await _authorRepository.SaveChangesAsync(cancellationToken);
-
-    _logger.LogInformation("Author record created for user {Email}", request.Email);
 
     return Result<Unit>.NoContent();
   }

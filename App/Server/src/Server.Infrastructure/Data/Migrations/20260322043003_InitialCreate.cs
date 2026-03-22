@@ -5,23 +5,11 @@
 namespace Server.Infrastructure.Data.Migrations;
 
 /// <inheritdoc />
-public partial class AddIdentityTables : Migration
+public partial class InitialCreate : Migration
 {
   /// <inheritdoc />
   protected override void Up(MigrationBuilder migrationBuilder)
   {
-    migrationBuilder.AddColumn<Guid>(
-        name: "ApplicationUserId",
-        table: "UserFollowing",
-        type: "uniqueidentifier",
-        nullable: true);
-
-    migrationBuilder.AddColumn<Guid>(
-        name: "ApplicationUserId1",
-        table: "UserFollowing",
-        type: "uniqueidentifier",
-        nullable: true);
-
     migrationBuilder.CreateTable(
         name: "AspNetRoles",
         columns: table => new
@@ -30,6 +18,7 @@ public partial class AddIdentityTables : Migration
           Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
           NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
           ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+          TenantId = table.Column<string>(type: "nvarchar(450)", nullable: false),
         },
         constraints: table =>
         {
@@ -43,6 +32,7 @@ public partial class AddIdentityTables : Migration
           Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
           Bio = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
           Image = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+          TenantId = table.Column<string>(type: "nvarchar(450)", nullable: false),
           UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
           NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
           Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -72,6 +62,7 @@ public partial class AddIdentityTables : Migration
           RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
           ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
           ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
+          TenantId = table.Column<string>(type: "nvarchar(max)", nullable: false),
         },
         constraints: table =>
         {
@@ -93,6 +84,7 @@ public partial class AddIdentityTables : Migration
           UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
           ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
           ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
+          TenantId = table.Column<string>(type: "nvarchar(max)", nullable: false),
         },
         constraints: table =>
         {
@@ -113,6 +105,7 @@ public partial class AddIdentityTables : Migration
           ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
           ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
           UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+          TenantId = table.Column<string>(type: "nvarchar(max)", nullable: false),
         },
         constraints: table =>
         {
@@ -131,6 +124,7 @@ public partial class AddIdentityTables : Migration
         {
           UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
           RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+          TenantId = table.Column<string>(type: "nvarchar(max)", nullable: false),
         },
         constraints: table =>
         {
@@ -157,6 +151,7 @@ public partial class AddIdentityTables : Migration
           LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
           Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
           Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+          TenantId = table.Column<string>(type: "nvarchar(max)", nullable: false),
         },
         constraints: table =>
         {
@@ -170,16 +165,6 @@ public partial class AddIdentityTables : Migration
         });
 
     migrationBuilder.CreateIndex(
-        name: "IX_UserFollowing_ApplicationUserId",
-        table: "UserFollowing",
-        column: "ApplicationUserId");
-
-    migrationBuilder.CreateIndex(
-        name: "IX_UserFollowing_ApplicationUserId1",
-        table: "UserFollowing",
-        column: "ApplicationUserId1");
-
-    migrationBuilder.CreateIndex(
         name: "IX_AspNetRoleClaims_RoleId",
         table: "AspNetRoleClaims",
         column: "RoleId");
@@ -187,7 +172,7 @@ public partial class AddIdentityTables : Migration
     migrationBuilder.CreateIndex(
         name: "RoleNameIndex",
         table: "AspNetRoles",
-        column: "NormalizedName",
+        columns: new[] { "NormalizedName", "TenantId" },
         unique: true,
         filter: "[NormalizedName] IS NOT NULL");
 
@@ -214,36 +199,14 @@ public partial class AddIdentityTables : Migration
     migrationBuilder.CreateIndex(
         name: "UserNameIndex",
         table: "AspNetUsers",
-        column: "NormalizedUserName",
+        columns: new[] { "NormalizedUserName", "TenantId" },
         unique: true,
         filter: "[NormalizedUserName] IS NOT NULL");
-
-    migrationBuilder.AddForeignKey(
-        name: "FK_UserFollowing_AspNetUsers_ApplicationUserId",
-        table: "UserFollowing",
-        column: "ApplicationUserId",
-        principalTable: "AspNetUsers",
-        principalColumn: "Id");
-
-    migrationBuilder.AddForeignKey(
-        name: "FK_UserFollowing_AspNetUsers_ApplicationUserId1",
-        table: "UserFollowing",
-        column: "ApplicationUserId1",
-        principalTable: "AspNetUsers",
-        principalColumn: "Id");
   }
 
   /// <inheritdoc />
   protected override void Down(MigrationBuilder migrationBuilder)
   {
-    migrationBuilder.DropForeignKey(
-        name: "FK_UserFollowing_AspNetUsers_ApplicationUserId",
-        table: "UserFollowing");
-
-    migrationBuilder.DropForeignKey(
-        name: "FK_UserFollowing_AspNetUsers_ApplicationUserId1",
-        table: "UserFollowing");
-
     migrationBuilder.DropTable(
         name: "AspNetRoleClaims");
 
@@ -264,21 +227,5 @@ public partial class AddIdentityTables : Migration
 
     migrationBuilder.DropTable(
         name: "AspNetUsers");
-
-    migrationBuilder.DropIndex(
-        name: "IX_UserFollowing_ApplicationUserId",
-        table: "UserFollowing");
-
-    migrationBuilder.DropIndex(
-        name: "IX_UserFollowing_ApplicationUserId1",
-        table: "UserFollowing");
-
-    migrationBuilder.DropColumn(
-        name: "ApplicationUserId",
-        table: "UserFollowing");
-
-    migrationBuilder.DropColumn(
-        name: "ApplicationUserId1",
-        table: "UserFollowing");
   }
 }

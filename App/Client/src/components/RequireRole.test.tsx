@@ -30,7 +30,7 @@ describe('RequireRole', () => {
       username: 'admin',
       bio: 'Admin user',
       image: null,
-      roles: ['ADMIN', 'AUTHOR'],
+      roles: ['ADMIN', 'USER'],
     };
 
     renderWithAuth(user, ['ADMIN']);
@@ -44,7 +44,7 @@ describe('RequireRole', () => {
       username: 'admin',
       bio: 'Admin user',
       image: null,
-      roles: ['ADMIN', 'AUTHOR'],
+      roles: ['ADMIN', 'USER'],
     };
 
     render(
@@ -73,7 +73,7 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
-      roles: ['AUTHOR'],
+      roles: ['USER'],
     };
 
     renderWithAuth(user, ['ADMIN']);
@@ -87,7 +87,7 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
-      roles: ['AUTHOR'],
+      roles: ['USER'],
     };
 
     renderWithAuth(user, ['ADMIN'], <div>Fallback Content</div>);
@@ -102,10 +102,10 @@ describe('RequireRole', () => {
       username: 'user',
       bio: 'Regular user',
       image: null,
-      roles: ['AUTHOR'],
+      roles: ['USER'],
     };
 
-    renderWithAuth(user, ['ADMIN', 'AUTHOR']);
+    renderWithAuth(user, ['ADMIN', 'USER']);
 
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
   });

@@ -45,11 +45,6 @@ public abstract class BasePage(IPage page, string baseUrl)
   public ILocator SignUpLink => Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" });
 
   /// <summary>
-  /// Navigation header link - New Article.
-  /// </summary>
-  public ILocator NewArticleLink => Page.GetByRole(AriaRole.Link, new() { Name = "New Article" });
-
-  /// <summary>
   /// Navigation header link - Settings.
   /// </summary>
   public ILocator SettingsLink => Page.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true });
@@ -87,14 +82,6 @@ public abstract class BasePage(IPage page, string baseUrl)
   public async Task ClickSignUpAsync()
   {
     await Navigate(SignUpLink, $"{BaseUrl}/register");
-  }
-
-  /// <summary>
-  /// Clicks the New Article link in the header.
-  /// </summary>
-  public async Task ClickNewArticleAsync()
-  {
-    await Navigate(NewArticleLink, $"{BaseUrl}/editor");
   }
 
   /// <summary>

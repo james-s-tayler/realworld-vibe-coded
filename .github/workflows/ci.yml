@@ -490,12 +490,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - collection: articles-empty
-            report_dir: ArticlesEmpty
-            bail: false
-          - collection: articles-empty
-            report_dir: ArticlesEmpty
-            bail: true
           - collection: auth
             report_dir: Auth
             bail: false
@@ -507,18 +501,6 @@ jobs:
             bail: false
           - collection: profiles
             report_dir: Profiles
-            bail: true
-          - collection: feed-and-articles
-            report_dir: FeedAndArticles
-            bail: false
-          - collection: feed-and-articles
-            report_dir: FeedAndArticles
-            bail: true
-          - collection: article
-            report_dir: Article
-            bail: false
-          - collection: article
-            report_dir: Article
             bail: true
     env:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1

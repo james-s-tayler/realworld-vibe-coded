@@ -10,16 +10,6 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
-  public async Task EditorPage_RedirectToLogin_WhenNotAuthenticated()
-  {
-    // Arrange
-    await Pages.EditorPage.GoToAsync();
-
-    // Act + Assert
-    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
-  }
-
-  [Fact]
   public async Task SettingsPage_RedirectToLogin_WhenNotAuthenticated()
   {
     // Arrange

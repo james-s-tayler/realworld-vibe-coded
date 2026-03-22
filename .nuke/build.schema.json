@@ -64,10 +64,7 @@
         "TestClient",
         "TestE2e",
         "TestServer",
-        "TestServerPostmanArticle",
-        "TestServerPostmanArticlesEmpty",
         "TestServerPostmanAuth",
-        "TestServerPostmanFeedAndArticles",
         "TestServerPostmanProfiles"
       ]
     },

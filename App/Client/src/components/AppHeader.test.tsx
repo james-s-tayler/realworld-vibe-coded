@@ -7,12 +7,12 @@ import type { User } from '../types/user';
 
 const renderWithAuth = (user: User | null) => {
   return render(
-    <AuthContext.Provider value={{ 
-      user, 
+    <AuthContext.Provider value={{
+      user,
       loading: false,
-      login: vi.fn(), 
+      login: vi.fn(),
       register: vi.fn(),
-      logout: vi.fn(), 
+      logout: vi.fn(),
       updateUser: vi.fn()
     }}>
       <MemoryRouter>
@@ -34,12 +34,12 @@ describe('AppHeader', () => {
   });
 
   it('renders Home link for authenticated users', () => {
-    renderWithAuth({ 
-      username: 'testuser', 
-      email: 'test@example.com', 
+    renderWithAuth({
+      username: 'testuser',
+      email: 'test@example.com',
       bio: 'Test bio',
       image: 'https://example.com/image.jpg',
-      roles: ['AUTHOR']
+      roles: ['USER']
     });
     expect(screen.getByText('Home')).toBeInTheDocument();
   });
@@ -50,55 +50,54 @@ describe('AppHeader', () => {
     expect(screen.getByText('Sign up')).toBeInTheDocument();
   });
 
-  it('renders New Article and Settings when logged in', () => {
-    renderWithAuth({ 
-      username: 'testuser', 
-      email: 'test@example.com', 
+  it('renders Settings when logged in', () => {
+    renderWithAuth({
+      username: 'testuser',
+      email: 'test@example.com',
       bio: 'Test bio',
       image: 'https://example.com/image.jpg',
-      roles: ['AUTHOR']
+      roles: ['USER']
     });
-    expect(screen.getByText('New Article')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
   });
 
   it('renders username link when logged in', () => {
-    renderWithAuth({ 
-      username: 'testuser', 
-      email: 'test@example.com', 
+    renderWithAuth({
+      username: 'testuser',
+      email: 'test@example.com',
       bio: 'Test bio',
       image: 'https://example.com/image.jpg',
-      roles: ['AUTHOR']
+      roles: ['USER']
     });
     expect(screen.getByText('testuser')).toBeInTheDocument();
   });
 
   it('renders Users link for ADMIN users', () => {
-    renderWithAuth({ 
-      username: 'admin', 
-      email: 'admin@example.com', 
+    renderWithAuth({
+      username: 'admin',
+      email: 'admin@example.com',
       bio: 'Admin bio',
       image: 'https://example.com/image.jpg',
-      roles: ['ADMIN', 'AUTHOR']
+      roles: ['ADMIN', 'USER']
     });
     expect(screen.getByText('Users')).toBeInTheDocument();
   });
 
   it('does not render Users link for non-ADMIN users', () => {
-    renderWithAuth({ 
-      username: 'testuser', 
-      email: 'test@example.com', 
+    renderWithAuth({
+      username: 'testuser',
+      email: 'test@example.com',
       bio: 'Test bio',
       image: 'https://example.com/image.jpg',
-      roles: ['AUTHOR']
+      roles: ['USER']
     });
     expect(screen.queryByText('Users')).not.toBeInTheDocument();
   });
 
   it('does not render Users link when user has no roles', () => {
-    renderWithAuth({ 
-      username: 'testuser', 
-      email: 'test@example.com', 
+    renderWithAuth({
+      username: 'testuser',
+      email: 'test@example.com',
       bio: 'Test bio',
       image: 'https://example.com/image.jpg',
       roles: []

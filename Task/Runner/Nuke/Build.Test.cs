@@ -131,16 +131,6 @@ public partial class Build
         }
       });
 
-  internal Target TestServerPostmanArticlesEmpty => _ => _
-      .Description("Run postman tests for ArticlesEmpty collection using Docker Compose")
-      .DependsOn(BuildServerPublish)
-      .DependsOn(DbResetForce)
-      .DependsOn(PathsCleanDirectories)
-      .Executes(() =>
-      {
-        RunPostmanCollection("ArticlesEmpty");
-      });
-
   internal Target TestServerPostmanAuth => _ => _
       .Description("Run postman tests for Auth collection using Docker Compose")
       .DependsOn(BuildServerPublish)
@@ -159,26 +149,6 @@ public partial class Build
       .Executes(() =>
       {
         RunPostmanCollection("Profiles");
-      });
-
-  internal Target TestServerPostmanFeedAndArticles => _ => _
-      .Description("Run postman tests for FeedAndArticles collection using Docker Compose")
-      .DependsOn(BuildServerPublish)
-      .DependsOn(DbResetForce)
-      .DependsOn(PathsCleanDirectories)
-      .Executes(() =>
-      {
-        RunPostmanCollection("FeedAndArticles");
-      });
-
-  internal Target TestServerPostmanArticle => _ => _
-      .Description("Run postman tests for Article collection using Docker Compose")
-      .DependsOn(BuildServerPublish)
-      .DependsOn(DbResetForce)
-      .DependsOn(PathsCleanDirectories)
-      .Executes(() =>
-      {
-        RunPostmanCollection("Article");
       });
 
   internal Target TestE2e => _ =>

@@ -4,11 +4,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using Server.Core.ArticleAggregate;
-using Server.Core.AuthorAggregate;
 using Server.Core.IdentityAggregate;
-using Server.Core.TagAggregate;
-using Server.Core.UserAggregate;
 using Server.SharedKernel.DomainEvents;
 using Server.SharedKernel.Persistence;
 
@@ -26,16 +22,6 @@ public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
   {
     _dispatcher = dispatcher;
   }
-
-  public DbSet<Article> Articles => Set<Article>();
-
-  public DbSet<Author> Authors => Set<Author>();
-
-  public DbSet<Tag> Tags => Set<Tag>();
-
-  public DbSet<Comment> Comments => Set<Comment>();
-
-  public DbSet<UserFollowing> UserFollowings => Set<UserFollowing>();
 
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
   {

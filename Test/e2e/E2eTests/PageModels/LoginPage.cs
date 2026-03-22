@@ -59,8 +59,9 @@ public class LoginPage : BasePage
     await FillLoginFormAsync(email, password);
     await ClickSignInButtonAsync();
 
-    // Wait for successful login by verifying the New Article link is visible (only shown when logged in)
-    await Expect(NewArticleLink).ToBeVisibleAsync();
+    // Wait for successful login by verifying the Settings link in the nav is visible (only shown when logged in)
+    // Use .First to avoid strict mode violation when dashboard also has a Settings link
+    await Expect(SettingsLink.First).ToBeVisibleAsync();
   }
 
   /// <summary>

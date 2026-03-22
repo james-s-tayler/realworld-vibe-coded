@@ -46,8 +46,6 @@
     "Bash(./build.sh *)",
     "Bash(git *)",
     "Bash(gh *)",
-    "Bash(docker *)",
-    "Bash(docker-compose *)",
     "Bash(ls *)",
     "Bash(pwd)",
     "Bash(which *)",
