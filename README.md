@@ -1,4 +1,4 @@
-# 🏗️ Agent-First Single-Tenant Starter Template
+# 🤖 Agent-First Single-Tenant Starter Template
 
 A production-ready .NET + React starter template built for agent-first development. Includes Clean Architecture, CQRS, 46 AI-invocable build skills, 32 custom Roslyn analyzers, and a 4-layer test suite — so AI coding agents can build, test, lint, and deploy through a single entry point (`nuke`).
 
