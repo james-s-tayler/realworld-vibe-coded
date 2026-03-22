@@ -53,3 +53,10 @@ When Nuke build targets fail, **carefully read the error messages** — they con
 8. **NEVER add or update documentation** unless explicitly asked.
 9. **If modifying the Nuke build, build it first** before committing.
 10. **Check Postman tests are passing** before finishing API work.
+
+## Task Tracking
+
+- Read `TODO.md` at the start of every session to understand current project tasks.
+- Update `TODO.md` when tasks are completed, started, discovered, or blocked.
+- Move completed tasks to the "Done" section with a date stamp (e.g. `- [x] 2026-03-21 Description`).
+- Keep the file concise — periodically archive old done items by removing them.
