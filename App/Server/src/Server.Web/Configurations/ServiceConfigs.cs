@@ -2,13 +2,16 @@
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.FeatureManagement;
 using Server.Core.IdentityAggregate;
 using Server.Core.TenantInfoAggregate;
 using Server.Infrastructure;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Email;
+using Server.SharedKernel.Interfaces;
 using Server.UseCases.Interfaces;
 using Server.Web.Infrastructure;
+using Server.Web.Services;
 
 namespace Server.Web.Configurations;
 
@@ -78,6 +81,9 @@ public static class ServiceConfigs
       options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
       options.Cookie.SameSite = SameSiteMode.Strict;
     });
+
+    services.AddFeatureManagement();
+    services.AddScoped<IFeatureFlagService, FeatureFlagService>();
 
     services.AddAuthorization();
     services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationMiddlewareResultHandler,
