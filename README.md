@@ -2,7 +2,7 @@
 
 > **This is an implementation of [gothinkster/realworld](https://github.com/gothinkster/realworld)** — the "Mother of all demo apps" — built on top of the [Agent-First Multi-Tenant Starter Template](https://github.com/james-s-tayler/realworld-vibe-coded/tree/multi-tenant-starter-template). The entire application was developed through agent-first vibe-coding: AI coding agents wrote the code, the build system, the tests, and the CI/CD pipeline, guided by human intent rather than manual implementation.
 >
-> **RealWorld** is a standardized spec for a Medium.com clone ("Conduit") that lets you compare different frontend/backend implementations. This version pairs a .NET 9 + FastEndpoints backend with a React + TypeScript frontend, demonstrating how a production-grade agent-first workflow can deliver a full-stack application with Clean Architecture, CQRS, multi-tenancy, 32 custom Roslyn analyzers, and a 4-layer test suite.
+> **RealWorld** is a standardized spec for a Medium.com clone ("Conduit") that lets you compare different frontend/backend implementations. This version pairs a .NET 10 + FastEndpoints backend with a React + TypeScript frontend, demonstrating how a production-grade agent-first workflow can deliver a full-stack application with Clean Architecture, CQRS, multi-tenancy, 32 custom Roslyn analyzers, and a 4-layer test suite.
 >
 > - [RealWorld Spec](https://github.com/gothinkster/realworld)
 > - [API Endpoints](https://docs.realworld.show/specifications/backend/endpoints/)
@@ -15,7 +15,7 @@ This is the third RealWorld implementation I've done, and it was for the purpose
 
 | Layer | Technologies |
 |:------|:-------------|
-| **Backend** | .NET 9, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQLite, Serilog, Audit.NET, Microsoft.FeatureManagement |
+| **Backend** | .NET 10, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQLite, Serilog, Audit.NET, Microsoft.FeatureManagement |
 | **Frontend** | React 19, Vite, TypeScript, Carbon Design System |
 | **Testing** | xUnit, Vitest, Playwright, Postman/Newman |
 | **Build** | Nuke Build, GitHub Actions |
@@ -68,7 +68,7 @@ Docs/                    — Project documentation
 
 ### Prerequisites
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Nuke global tool](https://nuke.build/) — `dotnet tool install Nuke.GlobalTool --global`
 - [Node.js 20+](https://nodejs.org/)
 - [Docker](https://www.docker.com/)
