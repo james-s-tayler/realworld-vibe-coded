@@ -179,28 +179,40 @@ Domain-specific coding rules for agents organized by area:
 - `functional-tests.md` — FastEndpoints test extensions, test data patterns
 - `cicd.md` — GitHub Actions conventions, job naming
 
-### 🛡️ Custom Roslyn Analyzers — 32 Compile-Time Guardrails
+### 🛡️ Compile-Time Guardrails — Roslyn Analyzers + FastEndpoints Framework
 
-The `Server.Analyzers` project contains 32 custom analyzers that enforce architecture constraints at compile time. These catch violations in both human and AI-generated code:
+The backend is built on a custom framework layered on top of FastEndpoints, `Result<T>`, and MediatR pipeline behaviors. This framework constrains generated code to be clean and correct by default — and 32 custom Roslyn analyzers enforce it at compile time.
 
-**🏛️ Architecture (PV series):**
+**The framework:**
+- **`Result<T>`** — all handlers return `Result<T>` with typed status codes (Ok, NotFound, Invalid, Conflict, CriticalError, etc.) instead of throwing exceptions. This makes error handling explicit and composable
+- **`ICommand<T>` / `IQuery<T>`** — CQRS interfaces that expose `T` at compile time via `IResultRequest<T>`, enabling type-safe pipeline behaviors without reflection
+- **MediatR pipeline behaviors** — every request flows through `ExceptionHandlingBehavior` (catches exceptions → Result), `TransactionBehavior` (wraps commands in DB transactions, auto-commits on success, rolls back on failure), and `LoggingBehavior` (structured logging with timing)
+- **`Send.ResultMapperAsync`** — FastEndpoints extension that maps `Result<T>` status to HTTP responses automatically (Ok → 200, NotFound → 404, Invalid → 422, etc.)
+
+The result: endpoints are thin wrappers (`request → mediator → result → response`), business logic lives in handlers, and cross-cutting concerns (transactions, error handling, logging) are handled by the pipeline — all enforced at compile time.
+
+**🏛️ Architecture analyzers (PV series):**
 - EF Core types must stay in Infrastructure (`PV001`)
 - Domain entities must not have EF attributes (`PV013`)
 - No Infrastructure types in the Application Domain (`PV051`)
 - Entity configuration must be in the correct location (`PV040`)
 
-**💾 Persistence (PV series):**
+**💾 Persistence analyzers (PV series):**
 - Use `AsNoTracking()` for read-only queries (`PV020`)
 - Avoid materialization before projection (`PV021`)
 - Use async EF variants (`PV022`)
 - Commands must call repository mutation methods (`PV014`)
 
-**🔌 Endpoints (SRV series):**
-- Keep endpoints thin — no business logic (`SRV003`)
+**🔌 Endpoint + MediatR analyzers (SRV series):**
+- Endpoints must delegate to MediatR, not contain business logic (`SRV003`)
+- All requests must return `Result<T>` via `IResultRequest<T>` (`SRV004`)
+- Pipeline behaviors must not use open generics (`SRV006`)
+- Handlers must not use try-catch — the pipeline handles exceptions (`SRV014`)
+- `Result<Unit>` is banned — use `Result<bool>` or a domain type (`SRV015`)
 - Endpoints must declare request types (`SRV005`)
 - Dev-only endpoints must be annotated correctly (`SRV012`, `SRV013`)
 
-**🧪 Testing (SRV series):**
+**🧪 Testing analyzers (SRV series):**
 - Use FastEndpoints test extensions, not raw `HttpClient` (`SRV007`)
 - Use FluentAssertions, not xUnit Assert (`SRV010`)
 - No `new DateTime()` in tests (`SRV011`)
