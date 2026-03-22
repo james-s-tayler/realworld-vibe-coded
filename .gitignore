@@ -87,3 +87,9 @@ publish/
 # Logs
 Logs/
 
+# Memsearch index
+.memsearch/
+
+# Task tracking
+TODO.md
+
