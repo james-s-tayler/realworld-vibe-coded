@@ -54,9 +54,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LocalDev", "LocalDev", "{1791A38C-44D1-4022-BFEE-18EFD0FEDFC9}"
 	ProjectSection(SolutionItems) = preProject
 		Task\LocalDev\docker-compose.dev-deps.yml = Task\LocalDev\docker-compose.dev-deps.yml
-		Task\LocalDev\docker-compose.hot-reload.yml = Task\LocalDev\docker-compose.hot-reload.yml
 		Task\LocalDev\docker-compose.publish.yml = Task\LocalDev\docker-compose.publish.yml
-		Task\LocalDev\Dockerfile.dev = Task\LocalDev\Dockerfile.dev
 		Task\LocalDev\Dockerfile.publish = Task\LocalDev\Dockerfile.publish
 		Task\LocalDev\README.md = Task\LocalDev\README.md
 	EndProjectSection

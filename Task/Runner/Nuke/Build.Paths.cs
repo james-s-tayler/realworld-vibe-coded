@@ -102,10 +102,6 @@ public partial class Build
 
   internal AbsolutePath LogsRunLocalPublishAuditDotNetDirectory => RootDirectory / "Logs" / "RunLocalPublish" / "Server.Web" / "Audit.NET";
 
-  internal AbsolutePath LogsRunLocalHotReloadSerilogDirectory => RootDirectory / "Logs" / "RunLocalHotReload" / "Server.Web" / "Serilog";
-
-  internal AbsolutePath LogsRunLocalHotReloadAuditDotNetDirectory => RootDirectory / "Logs" / "RunLocalHotReload" / "Server.Web" / "Audit.NET";
-
   internal AbsolutePath LogsTestE2eSerilogDirectory => RootDirectory / "Logs" / "Test" / "e2e" / "Server.Web" / "Serilog";
 
   internal AbsolutePath LogsTestE2eAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "e2e" / "Server.Web" / "Audit.NET";
@@ -132,8 +128,6 @@ public partial class Build
 
       // Create or clean Logs directories
       LogsDirectory.CreateOrCleanDirectory();
-      LogsRunLocalHotReloadAuditDotNetDirectory.CreateOrCleanDirectory();
-      LogsRunLocalHotReloadSerilogDirectory.CreateOrCleanDirectory();
       LogsRunLocalPublishAuditDotNetDirectory.CreateOrCleanDirectory();
       LogsRunLocalPublishSerilogDirectory.CreateOrCleanDirectory();
       LogsTestE2eAuditDotNetDirectory.CreateOrCleanDirectory();

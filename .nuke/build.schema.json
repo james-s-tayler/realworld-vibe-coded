@@ -59,7 +59,6 @@
         "RunLocalDependenciesDown",
         "RunLocalDocsMcpServerDown",
         "RunLocalDocsMcpServerUp",
-        "RunLocalHotReload",
         "RunLocalPublish",
         "TestClient",
         "TestE2e",

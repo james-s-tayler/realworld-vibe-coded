@@ -17,32 +17,6 @@ public partial class Build
 
   internal AbsolutePath NgrokPidFile => PidDirectory / "ngrok.pid";
 
-  internal Target RunLocalHotReload => _ => _
-    .Description("Run backend locally using Docker Compose with SQL Server and hot-reload")
-    .DependsOn(PathsCleanDirectories)
-    .DependsOn(RunLocalDependencies)
-    .Executes(() =>
-    {
-      Log.Information("Starting local development environment with Docker Compose (hot-reload)...");
-
-      var hotReloadComposeFile = TaskLocalDevDirectory / "docker-compose.hot-reload.yml";
-
-      var envVars = new Dictionary<string, string>
-      {
-        ["DOCKER_BUILDKIT"] = "1",
-      };
-
-      // Run docker-compose to start dev dependencies and API with hot-reload
-      Log.Information("Running Docker Compose for local development with hot-reload...");
-      var args = $"compose -f {hotReloadComposeFile} -p {Constants.Docker.Projects.App} up --build";
-      var process = ProcessTasks.StartProcess(
-        "docker",
-        args,
-        workingDirectory: RootDirectory,
-        environmentVariables: envVars);
-      process.WaitForExit();
-    });
-
   internal Target RunLocalPublish => _ => _
     .Description("Run backend locally using Docker Compose with published artifact")
     .DependsOn(RunLocalDependencies)

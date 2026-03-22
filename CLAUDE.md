@@ -35,7 +35,6 @@ All commands use Nuke via `./build.sh`:
 | `TestClient` | Run frontend Vitest tests |
 | `TestE2e` | Run Playwright E2E tests |
 | `TestServerPostmanAll` | Run all Postman API tests |
-| `RunLocalHotReload` | Start local dev server with hot-reload |
 | `RunLocalPublish` | Start local dev server from published artifact |
 | `DbMigrations*` | Database migration targets |
 

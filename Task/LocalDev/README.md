@@ -18,7 +18,7 @@ To start the local development environment:
 
 This will start:
 - SQL Server database container
-- .NET backend API container with hot-reload enabled
+- .NET backend API container
 
 The API will be available at `http://localhost:5000`
 
@@ -77,10 +77,6 @@ Now you can quickly attach by selecting this configuration from the run menu.
   ```
 - Ensure the container is running with the dotnet process
 - Check Rider's Docker integration is properly configured
-
-### Hot-reload not working
-- Ensure source code is properly mounted as a volume in docker-compose.yml
-- Check container logs: `docker logs localdev-api-1`
 
 ## Additional Resources
 
