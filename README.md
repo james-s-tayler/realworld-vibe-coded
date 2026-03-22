@@ -1,46 +1,226 @@
-# realworld-vibe-coded
-An attempt at implementing gothinkster/realworld purely through vibe-coding
+# Conduit — Single-Tenant Starter Template
 
-## Specifications
-- [Endpoints](https://docs.realworld.show/specifications/backend/endpoints/)
+A production-ready .NET + React starter template built for agent-first development. Includes Clean Architecture, CQRS, 46 AI-invocable build skills, 32 custom Roslyn analyzers, and a 4-layer test suite — so AI coding agents can build, test, lint, and deploy through a single entry point (`./build.sh`).
 
-## Notes on Vibe Coding
-- [Copilot Docs](https://code.visualstudio.com/docs/copilot/overview)
-- [Awesome Copilot](https://github.com/github/awesome-copilot/tree/main)
-- [Use prompt files in VS Code](https://code.visualstudio.com/docs/copilot/customization/prompt-files)
-- [Adding repository custom instructions for GitHub Copilot](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions?tool=jetbrains)
+## What You Get
 
-## Notes on MCP
-- [Docs MCP Server](https://github.com/arabold/docs-mcp-server)
-  - install via `sudo npm install -g @arabold/docs-mcp-server@latest`
-  - run via `npx @arabold/docs-mcp-server@latest`
-  - Add MCP server settings
-  - browse to [http://localhost:6280](http://localhost:6280) and slurp up the docs
+- **Clean Architecture** backend (.NET 10, FastEndpoints, MediatR CQRS, EF Core)
+- **React + TypeScript** frontend (Vite, Carbon Design System)
+- **Role-based authentication** with JWT (single-tenant)
+- **Auto-generated TypeScript API client** via Kiota — backend endpoint changes automatically sync to frontend
+- **32 custom Roslyn analyzers** enforcing architecture, persistence, and testing rules at compile time
+- **46 Claude Code skills** mapping 1:1 to Nuke build targets — agents invoke build/test/lint/deploy by name
+- **4-layer test suite** — xUnit (backend), Vitest (frontend), Playwright (E2E), Postman (API)
+- **Nuke build system** — single `./build.sh` entry point for all operations
+- **Docker support** for local dev, testing, and publishing
+- **GitHub Actions CI/CD** pipeline
 
-Inside Github Copilot in the repo settings for copilot
+## Tech Stack
 
-    {
-      "mcpServers": {
-        "docs-mcp-server": {
-          "type": "sse",
-          "url": "http://localhost:6280/sse",
-          "tools": ["SearchTool"]
-        }
-      }
-    }
+| Layer | Technologies |
+|:------|:-------------|
+| **Backend** | .NET 10, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQLite, Serilog |
+| **Frontend** | React 19, Vite, TypeScript, Carbon Design System |
+| **Testing** | xUnit, Vitest, Playwright, Postman/Newman |
+| **Build** | Nuke Build, GitHub Actions |
+| **Infrastructure** | Docker, Bicep (Azure) |
 
-- [MCP Servers](https://github.com/modelcontextprotocol/servers/tree/main)
-- [GitHub MCP Server](https://github.com/github/github-mcp-server)
-- [Hyperbrowser](https://github.com/hyperbrowserai/mcp)
-- [Kintone](https://github.com/kintone/mcp-server?tab=readme-ov-file)
-- [Microsoft Learn MCP Server](https://github.com/microsoftdocs/mcp)
-- [Playwright MCP](https://github.com/microsoft/playwright-mcp)
-- [Postman MCP Server](https://github.com/postmanlabs/postman-mcp-server)
-- [Azure MCP](https://github.com/Azure-Samples/mcp)
-- [MCP Devcontainers](https://github.com/AI-QL/mcp-devcontainers)
-- [Excel MCP Server](https://github.com/haris-musa/excel-mcp-server)
-- [Excel to JSON](https://github.com/he-yang/excel-to-json-mcp)
-- [Figma MCP Server](https://github.com/paulvandermeijs/figma-mcp)
-- [n8n MCP Server](https://github.com/leonardsellem/n8n-mcp-server)
-- [Unleash Feature Toggle MCP](https://github.com/cuongtl1992/unleash-mcp)
-- [Workflowy](https://github.com/danield137/mcp-workflowy)
+## Architecture
+
+The backend follows [Ardalis Clean Architecture](https://github.com/ardalis/CleanArchitecture) with CQRS via MediatR:
+
+```
+Server.Core              — Domain models, aggregates, value objects
+Server.SharedKernel      — Common types and shared abstractions
+Server.UseCases          — MediatR command/query handlers (business logic)
+Server.Infrastructure    — EF Core DbContext, repositories, persistence gateways
+Server.Web               — FastEndpoints endpoints, DTOs, mappers, middleware
+Server.Web.DevOnly       — Development-only endpoints (seeding, diagnostics)
+Server.Analyzers         — 32 custom Roslyn analyzers (SRV + PV series)
+```
+
+Endpoints are thin: bind request → authorize → delegate to MediatR → map response. Business rules live in handlers. Persistence is abstracted behind repository interfaces.
+
+## Project Structure
+
+```
+App/
+  Client/                — React + Vite + TypeScript frontend
+  Server/                — .NET backend (Clean Architecture)
+    analyzers/           — Custom Roslyn analyzers
+    src/                 — Application source (Core, UseCases, Infrastructure, Web)
+    tests/               — xUnit test projects
+Task/
+  Runner/                — Nuke build system
+  LocalDev/              — Docker Compose for local development
+Test/
+  e2e/                   — Playwright E2E tests
+  Postman/               — Postman/Newman API tests
+  Migrations/            — Migration verification tests
+Infra/                   — Infrastructure as Code (Bicep)
+Logs/                    — Serilog + Audit.NET logs (per run mode)
+Reports/                 — Test reports generated by Nuke targets
+Docs/                    — Project documentation
+```
+
+## Getting Started
+
+### Prerequisites
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Node.js 20+](https://nodejs.org/)
+- [Docker](https://www.docker.com/)
+
+### Build & Run
+
+```bash
+# Install frontend dependencies
+./build.sh InstallClient
+
+# Build everything
+./build.sh BuildServer
+./build.sh BuildClient
+
+# Start local dev dependencies (SQL Server via Docker)
+./build.sh RunLocalDependencies
+
+# Run the app locally
+./build.sh RunLocalPublish
+```
+
+### Run Tests
+
+```bash
+./build.sh TestServer              # Backend xUnit tests
+./build.sh TestClient              # Frontend Vitest tests
+./build.sh TestE2e                 # Playwright E2E tests
+./build.sh TestServerPostmanAll    # Postman API tests
+```
+
+### Lint
+
+```bash
+./build.sh LintAllVerify           # Check all linting (CI mode)
+./build.sh LintAllFix              # Auto-fix lint issues
+```
+
+## Nuke Build System
+
+All operations go through a single entry point: `./build.sh <Target>`. No need to run `dotnet`, `npm`, or `docker` commands directly.
+
+| Category | Targets |
+|:---------|:--------|
+| **Build** | `BuildServer`, `BuildClient`, `BuildServerPublish`, `BuildGenerateApiClient` |
+| **Test** | `TestServer`, `TestClient`, `TestE2e`, `TestServerPostmanAuth`, `TestServerPostmanProfiles` |
+| **Lint** | `LintAllVerify`, `LintAllFix`, `LintServerVerify`, `LintClientVerify`, `LintApiClientVerify` |
+| **Database** | `DbMigrationsAdd`, `DbMigrationsVerifyApply`, `DbMigrationsGenerateIdempotentScript`, `DbReset` |
+| **Run** | `RunLocalPublish`, `RunLocalDependencies`, `RunLocalClient` |
+| **Install** | `InstallClient`, `InstallGitHooks`, `InstallDockerNetwork` |
+| **Verify** | `Verify` (full pre-commit check: lint + build + test) |
+
+When a target fails, read the error messages carefully — they include specific guidance on where to find logs and reports.
+
+## Agent-First Workflow
+
+This template is designed to be operated by AI coding agents. Every layer of the development workflow is exposed in a way that agents can discover and invoke.
+
+### Semantic Folder Structure
+
+The repository's top-level directories provide clean semantic separation that agents can navigate without guesswork:
+
+- **`App/`** — all application source code (frontend and backend)
+- **`Task/`** — build system and local dev tooling (Nuke, Docker Compose)
+- **`Test/`** — integration and contract tests (Playwright, Postman, migration verification)
+- **`Infra/`** — infrastructure as code
+- **`Logs/`** — runtime logs (Serilog, Audit.NET)
+- **`Reports/`** — generated test reports
+
+Each directory has a single, clear responsibility. An agent can immediately locate where application code lives (`App/`), how to build it (`Task/`), how to test it (`Test/`), and where to find runtime output (`Logs/`, `Reports/`). No ambiguity, no overlapping concerns.
+
+### CLAUDE.md — Project Instructions
+
+The `CLAUDE.md` file at the repository root provides agents with full project context: tech stack, folder structure, build commands, critical rules, and conventions. This is the entry point for any agent working on the codebase.
+
+### `.claude/skills/` — 46 Build Skills
+
+Each Nuke build target has a corresponding skill definition in `.claude/skills/`. These are auto-generated and kept in sync via `./build.sh LintSkillsVerify`. Agents can invoke any build operation by name:
+
+- `nuke-build-server` — compile the .NET backend
+- `nuke-test-e2e` — run Playwright end-to-end tests
+- `nuke-lint-all-fix` — auto-fix all lint issues
+- `nuke-db-migrations-add` — add a new EF Core migration
+- `github-push-pr` — push to PR and monitor CI, auto-investigating failures
+
+Skills also include workflow skills like `debug` (structured debug analysis) and `on-stop` (pre-commit verification).
+
+### `.claude/rules/` — Coding Rules
+
+Domain-specific coding rules for agents organized by area:
+
+- `backend.md` — endpoint patterns, CQRS conventions, persistence rules, error handling
+- `frontend.md` — React/TypeScript conventions, Carbon Design System usage
+- `e2e.md` — Playwright Page Object Model, ARIA selectors, assertion patterns
+- `functional-tests.md` — FastEndpoints test extensions, test data patterns
+- `cicd.md` — GitHub Actions conventions, job naming
+
+### Custom Roslyn Analyzers — 32 Compile-Time Guardrails
+
+The `Server.Analyzers` project contains 32 custom analyzers that enforce architecture constraints at compile time. These catch violations in both human and AI-generated code:
+
+**Architecture (PV series):**
+- EF Core types must stay in Infrastructure (`PV001`)
+- Domain entities must not have EF attributes (`PV013`)
+- No Infrastructure types in the Application Domain (`PV051`)
+- Entity configuration must be in the correct location (`PV040`)
+
+**Persistence (PV series):**
+- Use `AsNoTracking()` for read-only queries (`PV020`)
+- Avoid materialization before projection (`PV021`)
+- Use async EF variants (`PV022`)
+- Commands must call repository mutation methods (`PV014`)
+
+**Endpoints (SRV series):**
+- Keep endpoints thin — no business logic (`SRV003`)
+- Endpoints must declare request types (`SRV005`)
+- Dev-only endpoints must be annotated correctly (`SRV012`, `SRV013`)
+
+**Testing (SRV series):**
+- Use FastEndpoints test extensions, not raw `HttpClient` (`SRV007`)
+- Use FluentAssertions, not xUnit Assert (`SRV010`)
+- No `new DateTime()` in tests (`SRV011`)
+
+### Kiota API Client Generation
+
+When backend endpoints change, run `./build.sh BuildGenerateApiClient` to regenerate the TypeScript API client. The drift check `./build.sh LintApiClientVerify` catches when the generated client is out of sync. This means agents adding or modifying API endpoints get frontend bindings automatically — no manual sync required.
+
+## Testing
+
+| Layer | Framework | Location | Purpose |
+|:------|:----------|:---------|:--------|
+| **Unit/Integration** | xUnit | `App/Server/tests/` | Backend business logic, handlers, persistence |
+| **Component** | Vitest + Testing Library | `App/Client/` | Frontend components, hooks, utilities |
+| **E2E** | Playwright | `Test/e2e/` | Full user flows through the browser |
+| **API** | Postman/Newman | `Test/Postman/` | API contract validation |
+
+All test results are output to `Reports/` with HTML reports generated by Nuke.
+
+## Deployment
+
+```bash
+# Build a publishable artifact (backend + frontend bundled)
+./build.sh BuildServerPublish
+
+# Docker build
+docker build -f App/Server/Dockerfile .
+```
+
+The `Infra/` directory is prepared for Azure Bicep infrastructure-as-code definitions.
+
+## Using This Template
+
+1. Clone this branch as your starting point
+2. Rename the solution/projects to match your domain
+3. Replace the Conduit domain models in `Server.Core` with your own
+4. Update MediatR handlers in `Server.UseCases`
+5. Add your endpoints in `Server.Web`
+6. The Roslyn analyzers, build system, test infrastructure, and agent workflow carry over automatically
