@@ -9,7 +9,7 @@
 
 ## What This Project Demonstrates
 
-This isn't just another RealWorld implementation — it's a case study in **agent-first development**. Every layer of the stack is designed so AI coding agents can build, test, lint, and deploy through a single entry point (`nuke`), with compile-time guardrails that keep generated code correct by default.
+This is the third RealWorld implementation I've done, and it was for the purpose of learning an agent-first engineering workflow. Every layer of the stack is designed so AI coding agents can build, test, lint, and deploy through a single entry point (`nuke`), with compile-time guardrails that keep generated code correct by default. Most of it was developed through Github Copilot initially, some of it was hand engineered to get the architecture crafted in a way that works well for an agentic workflow, and recently Claude Code has taken over :)
 
 ## Tech Stack
 
