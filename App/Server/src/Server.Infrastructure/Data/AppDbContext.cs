@@ -1,8 +1,4 @@
-﻿using System.Text;
-using Audit.EntityFramework;
-using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
-using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
+﻿using Audit.EntityFramework;
 using Microsoft.AspNetCore.Identity;
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.DomainEvents;
@@ -11,14 +7,13 @@ using Server.SharedKernel.Persistence;
 namespace Server.Infrastructure.Data;
 
 [AuditDbContext(Mode = AuditOptionMode.OptOut, IncludeEntityObjects = false)]
-public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class AppDbContext : AuditIdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
   private readonly IDomainEventDispatcher? _dispatcher;
 
   public AppDbContext(
-    IMultiTenantContextAccessor multiTenantContextAccessor,
     DbContextOptions<AppDbContext> options,
-    IDomainEventDispatcher? dispatcher) : base(multiTenantContextAccessor, options)
+    IDomainEventDispatcher? dispatcher) : base(options)
   {
     _dispatcher = dispatcher;
   }
@@ -106,41 +101,7 @@ public class AppDbContext : MultiTenantIdentityDbContext<ApplicationUser, Identi
             .IsRequired()
             .HasMaxLength(256);
         }
-
-        // Configure MultiTenancy
-        if (entityType.IsOwned())
-        {
-          continue;
-        }
-
-        modelBuilder.Entity(entityType.ClrType)
-          .IsMultiTenant()
-          .AdjustIndexes();
       }
-    }
-
-    // Guardrail: owned types must NOT declare unique indexes since this is a multi-tenant database.
-    var ownedUnique = modelBuilder.Model.GetEntityTypes()
-      .Where(et => et.IsOwned())
-      .SelectMany(et => et.GetIndexes()
-        .Where(i => i.IsUnique)
-        .Select(i => new { Owned = et, Index = i }))
-      .ToList();
-
-    if (ownedUnique.Count > 0)
-    {
-      var sb = new StringBuilder();
-      sb.AppendLine("Unique indexes on owned types are not supported by the multi-tenant convention.");
-      sb.AppendLine("Move the uniqueness to the owner, or model it as a real entity (recommended).");
-      sb.AppendLine();
-
-      foreach (var x in ownedUnique)
-      {
-        var props = string.Join(", ", x.Index.Properties.Select(p => p.Name));
-        sb.AppendLine($"- {x.Owned.DisplayName()}: UNIQUE ({props})");
-      }
-
-      throw new InvalidOperationException(sb.ToString());
     }
   }
 }

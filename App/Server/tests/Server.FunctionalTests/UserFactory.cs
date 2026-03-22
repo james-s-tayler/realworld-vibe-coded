@@ -5,15 +5,15 @@ using Server.Web.Identity.Register;
 
 namespace Server.FunctionalTests;
 
-public static class TenantFactory
+public static class UserFactory
 {
-  public static async Task<RegisteredTenant> RegisterTenantAsync(
+  public static async Task<RegisteredUsers> RegisterUserAsync(
     this AppFixture<Program> fixture)
   {
-    return await fixture.RegisterTenantWithUsersAsync(1);
+    return await fixture.RegisterUsersAsync(1);
   }
 
-  public static async Task<RegisteredTenant> RegisterTenantWithUsersAsync(
+  public static async Task<RegisteredUsers> RegisterUsersAsync(
     this AppFixture<Program> fixture,
     int numUsers)
   {
@@ -22,7 +22,7 @@ public static class TenantFactory
       throw new ArgumentOutOfRangeException(nameof(numUsers));
     }
 
-    var tenant = new RegisteredTenant();
+    var result = new RegisteredUsers();
 
     for (var i = 0; i < numUsers; i++)
     {
@@ -31,18 +31,18 @@ public static class TenantFactory
 
       if (i == 0)
       {
-        tenant.Users.Add(await fixture.RegisterTenantUserAsync(email, password));
+        result.Users.Add(await fixture.RegisterFirstUserAsync(email, password));
       }
       else
       {
-        tenant.Users.Add(await fixture.InviteUserAsync(tenant.GetTenantOwner(), email, password));
+        result.Users.Add(await fixture.InviteUserAsync(result.GetOwner(), email, password));
       }
     }
 
-    return tenant;
+    return result;
   }
 
-  private static async Task<RegisteredUser> RegisterTenantUserAsync(
+  private static async Task<RegisteredUser> RegisterFirstUserAsync(
     this AppFixture<Program> fixture,
     string email,
     string password)

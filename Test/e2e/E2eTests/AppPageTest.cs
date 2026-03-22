@@ -48,8 +48,7 @@ public abstract class AppPageTest : PageTest, IClassFixture<ApiFixture>
     // Initialize the Pages API
     Pages = new PageObjects(Page, BaseUrl);
 
-    // Multi-tenancy provides data isolation - no need to wipe data anymore
-    // Each test creates its own tenant via registration
+    // Each test creates its own user via registration
 
     // Generate unique test user credentials
     TestUsername = GenerateUniqueUsername("articleuser");
@@ -67,7 +66,6 @@ public abstract class AppPageTest : PageTest, IClassFixture<ApiFixture>
     // Stop Playwright tracing and save the trace file
     await StopTracingAsync();
 
-    // Multi-tenancy provides data isolation - no need to wipe data anymore
     await base.DisposeAsync();
   }
 

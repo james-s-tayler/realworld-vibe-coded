@@ -13,7 +13,7 @@ public class ProfilesTests : AppTestBase
   public async Task GetProfile_Unauthenticated_ReturnsUnauthorized()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantAsync();
+    var tenant = await Fixture.RegisterUserAsync();
     var request = new GetProfileRequest { Username = tenant.Users[0].Email };
 
     // Act
@@ -27,7 +27,7 @@ public class ProfilesTests : AppTestBase
   public async Task GetProfile_Authenticated_ReturnsProfile()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+    var tenant = await Fixture.RegisterUsersAsync(2);
 
     // Act
     var request = new GetProfileRequest { Username = tenant.Users[1].Email };
@@ -43,7 +43,7 @@ public class ProfilesTests : AppTestBase
   public async Task GetProfile_NonExistentUser_ReturnsNotFound()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantAsync();
+    var tenant = await Fixture.RegisterUserAsync();
     var request = new GetProfileRequest { Username = "nonexistentuser999" };
 
     // Act
@@ -57,7 +57,7 @@ public class ProfilesTests : AppTestBase
   public async Task GetProfile_InvalidUsername_ReturnsNotFound()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantAsync();
+    var tenant = await Fixture.RegisterUserAsync();
     var request = new GetProfileRequest { Username = "invalid user!" };
 
     // Act

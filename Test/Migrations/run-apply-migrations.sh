@@ -14,14 +14,4 @@ dotnet ef database update \
 
 echo "✓ AppDbContext migrations applied successfully!"
 
-echo "Running EF Core migrations for TenantStoreDbContext..."
-dotnet ef database update \
-  --context TenantStoreDbContext \
-  --project /app/App/Server/src/Server.Infrastructure/Server.Infrastructure.csproj \
-  --startup-project /app/App/Server/src/Server.Web/Server.Web.csproj \
-  --no-build \
-  --connection "${ConnectionStrings__TenantStoreConnection:-$ConnectionStrings__DefaultConnection}"
-
-echo "✓ TenantStoreDbContext migrations applied successfully!"
-
 echo "✓ All migrations applied successfully!"

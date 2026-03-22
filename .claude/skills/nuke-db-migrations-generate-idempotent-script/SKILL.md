@@ -1,5 +1,5 @@
 ---
-description: Generate idempotent SQL script from EF Core migrations (use --db-context to specify context)
+description: Generate idempotent SQL script from EF Core migrations
 ---
 
 Run `./build.sh DbMigrationsGenerateIdempotentScript`. Check output for details. If failures occur, check `Reports/` and `Logs/` directories.

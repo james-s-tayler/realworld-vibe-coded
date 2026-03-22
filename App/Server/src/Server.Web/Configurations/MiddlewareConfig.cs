@@ -1,6 +1,7 @@
 ﻿using Ardalis.ListStartupServices;
-using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Server.Core.IdentityAggregate;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
 
@@ -69,7 +70,6 @@ public static class MiddlewareConfig
 
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
-    app.UseMultiTenant();
     app.UseAuthentication();
     app.UseAuthorization();
     app.UseAntiforgery(); // Enable CSRF protection for cookie-based authentication
@@ -88,6 +88,7 @@ public static class MiddlewareConfig
     });
 
     await RunMigrationsAsync(app);
+    await SeedRolesAsync(app);
 
     return app;
   }
@@ -99,9 +100,6 @@ public static class MiddlewareConfig
 
     try
     {
-      var tenantStoreContext = services.GetRequiredService<TenantStoreDbContext>();
-      await tenantStoreContext.Database.MigrateAsync();
-
       var context = services.GetRequiredService<AppDbContext>();
       await context.Database.MigrateAsync();
     }
@@ -110,6 +108,23 @@ public static class MiddlewareConfig
       var logger = services.GetRequiredService<ILogger<Program>>();
       logger.LogError(ex, "An error occurred migrating the DB. {exceptionMessage}", ex.Message);
       throw;
+    }
+  }
+
+  private static async Task SeedRolesAsync(WebApplication app)
+  {
+    using var scope = app.Services.CreateScope();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    var rolesToSeed = new[] { DefaultRoles.Admin, DefaultRoles.User };
+    foreach (var roleName in rolesToSeed)
+    {
+      if (!await roleManager.RoleExistsAsync(roleName))
+      {
+        logger.LogInformation("Seeding role {RoleName}", roleName);
+        await roleManager.CreateAsync(new IdentityRole<Guid>(roleName));
+      }
     }
   }
 }

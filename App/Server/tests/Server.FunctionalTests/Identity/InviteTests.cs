@@ -11,7 +11,7 @@ public class InviteTests : AppTestBase
   [Fact]
   public async Task Invite_WithNonAdminRole_ReturnsForbidden()
   {
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+    var tenant = await Fixture.RegisterUsersAsync(2);
 
     var anotherInvitedEmail = $"another-invited-{Guid.NewGuid()}@example.com";
     var password = "Password123!";

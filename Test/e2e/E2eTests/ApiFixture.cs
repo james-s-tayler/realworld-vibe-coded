@@ -51,7 +51,7 @@ public class ApiFixture : IAsyncLifetime
   /// <summary>
   /// Creates a user via API and returns the user credentials.
   /// The fixture generates unique test data automatically.
-  /// This creates a new tenant for the user via /api/identity/register.
+  /// This creates a new user via /api/identity/register.
   /// </summary>
   public async Task<CreatedUser> CreateUserAsync()
   {
@@ -65,7 +65,7 @@ public class ApiFixture : IAsyncLifetime
       password,
     };
 
-    // Register via Identity - creates a new tenant
+    // Register via Identity
     using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/identity/register")
     {
       Content = JsonContent.Create(registerRequest, options: _jsonOptions),
@@ -86,8 +86,7 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
-  /// Invites a user to an existing tenant via API and returns the user credentials.
-  /// The invited user will belong to the same tenant as the inviting user.
+  /// Invites a user via API and returns the user credentials.
   /// This uses /api/identity/invite with the inviting user's token.
   /// </summary>
   public async Task<CreatedUser> InviteUserAsync(string inviterToken)
@@ -98,8 +97,7 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
-  /// Invites a user with a specific email to an existing tenant via API and returns the user credentials.
-  /// The invited user will belong to the same tenant as the inviting user.
+  /// Invites a user with a specific email via API and returns the user credentials.
   /// This uses /api/identity/invite with the inviting user's token.
   /// </summary>
   public async Task<CreatedUser> InviteUserAsync(string inviterToken, string email)
@@ -112,7 +110,7 @@ public class ApiFixture : IAsyncLifetime
       password,
     };
 
-    // Invite via authenticated endpoint - creates user in same tenant
+    // Invite via authenticated endpoint
     using var inviteHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/identity/invite")
     {
       Content = JsonContent.Create(inviteRequest, options: _jsonOptions),

@@ -15,7 +15,7 @@ public class UsersTests : AppTestBase
   [Fact]
   public async Task GetCurrentUser_WithValidToken_ReturnsUser()
   {
-    var tenant = await Fixture.RegisterTenantAsync();
+    var tenant = await Fixture.RegisterUserAsync();
     var user = tenant.Users[0];
 
     var (response, result) = await user.Client.GETAsync<GetCurrent, UserCurrentResponse>();
@@ -53,7 +53,7 @@ public class UsersTests : AppTestBase
   [Fact]
   public async Task UpdateUser_WithValidData_ReturnsUpdatedUser()
   {
-    var tenant = await Fixture.RegisterTenantAsync();
+    var tenant = await Fixture.RegisterUserAsync();
     var user = tenant.Users[0];
 
     var updateRequest = new UpdateUserRequest
@@ -95,7 +95,7 @@ public class UsersTests : AppTestBase
   public async Task UpdateUser_WithDuplicateEmail_ReturnsErrorDetail()
   {
     // Arrange
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+    var tenant = await Fixture.RegisterUsersAsync(2);
 
     var updateRequest = new UpdateUserRequest
     {
@@ -117,7 +117,7 @@ public class UsersTests : AppTestBase
   {
     // Arrange
     var existingUsername = $"existing-{Guid.NewGuid()}";
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+    var tenant = await Fixture.RegisterUsersAsync(2);
 
     var updateRequest1 = new UpdateUserRequest
     {
@@ -147,7 +147,7 @@ public class UsersTests : AppTestBase
   [Fact]
   public async Task UpdateUser_WithBlankFields_ReturnsErrorDetail()
   {
-    var tenant = await Fixture.RegisterTenantAsync();
+    var tenant = await Fixture.RegisterUserAsync();
     var user = tenant.Users[0];
 
     var updateRequest = new UpdateUserRequest
@@ -166,7 +166,7 @@ public class UsersTests : AppTestBase
   [Fact]
   public async Task UpdateUser_WithNewPassword_CanLoginWithNewPassword()
   {
-    var tenant = await Fixture.RegisterTenantAsync();
+    var tenant = await Fixture.RegisterUserAsync();
     var user = tenant.Users[0];
     var newPassword = "newpassword456";
 
@@ -200,7 +200,7 @@ public class UsersTests : AppTestBase
   [Fact]
   public async Task UpdateUser_WithUsernameChange_UpdatesUsername()
   {
-    var tenant = await Fixture.RegisterTenantAsync();
+    var tenant = await Fixture.RegisterUserAsync();
     var user = tenant.Users[0];
     var newUsername = $"newuser-{Guid.NewGuid()}";
 
@@ -222,7 +222,7 @@ public class UsersTests : AppTestBase
   public async Task ListUsers_WithAuthentication_ReturnsAllUsers()
   {
     // Arrange - create multiple users
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(3);
+    var tenant = await Fixture.RegisterUsersAsync(3);
     var user = tenant.Users[0];
 
     // Act

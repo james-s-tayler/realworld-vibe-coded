@@ -1,10 +1,6 @@
-﻿using Finbuckle.MultiTenant.AspNetCore.Extensions;
-using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
-using Finbuckle.MultiTenant.Extensions;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.FeatureManagement;
 using Server.Core.IdentityAggregate;
-using Server.Core.TenantInfoAggregate;
 using Server.Infrastructure;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Email;
@@ -105,11 +101,6 @@ public static class ServiceConfigs
     }
 
     services.AddSingleton<IEmailSender<ApplicationUser>, IdentityEmailSender>();
-
-    services.AddMultiTenant<TenantInfo>()
-      .WithClaimStrategy("__tenant__", IdentityConstants.ApplicationScheme)
-      .WithClaimStrategy("__tenant__", IdentityConstants.BearerScheme)
-      .WithEFCoreStore<TenantStoreDbContext, TenantInfo>();
 
     logger.LogInformation("{Project} services registered", "Mediatr and Email Sender");
 

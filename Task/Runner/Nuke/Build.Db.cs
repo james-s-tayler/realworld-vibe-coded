@@ -13,34 +13,6 @@ public partial class Build
   [Parameter("Migration name for DbMigrationsAdd target")]
   internal readonly string? MigrationName;
 
-  [Parameter("DbContext name for migrations (e.g., AppDbContext, TenantStoreDbContext)")]
-  internal readonly string? DbContext;
-
-  internal AbsolutePath GetMigrationsDirectory(string? dbContext)
-  {
-    return dbContext?.ToLowerInvariant() switch
-    {
-      "tenantstoredbcontext" => TenantStoreMigrationsDirectory,
-      "appdbcontext" => MigrationsDirectory,
-      _ => MigrationsDirectory, // Default to AppDbContext
-    };
-  }
-
-  internal AbsolutePath GetIdempotentScriptPath(string? dbContext)
-  {
-    return dbContext?.ToLowerInvariant() switch
-    {
-      "tenantstoredbcontext" => TenantStoreIdempotentScriptPath,
-      "appdbcontext" => IdempotentScriptPath,
-      _ => IdempotentScriptPath, // Default to AppDbContext
-    };
-  }
-
-  internal string GetContextFlag(string? dbContext)
-  {
-    return string.IsNullOrWhiteSpace(dbContext) ? string.Empty : $"--context {dbContext}";
-  }
-
   internal Target DbReset => _ => _
     .Description("Reset local SQL Server database by removing docker volume (confirm or --force to skip)")
     .Executes(() =>
@@ -157,15 +129,11 @@ public partial class Build
     });
 
   internal Target DbMigrationsGenerateIdempotentScript => _ => _
-    .Description("Generate idempotent SQL script from EF Core migrations (use --db-context to specify context)")
+    .Description("Generate idempotent SQL script from EF Core migrations")
     .DependsOn(InstallDotnetToolEf)
     .Executes(() =>
     {
-      var contextName = DbContext ?? "AppDbContext";
-      var outputDir = GetMigrationsDirectory(contextName);
-      var scriptPath = GetIdempotentScriptPath(contextName);
-
-      Log.Information("Generating idempotent SQL script for {DbContext}...", contextName);
+      Log.Information("Generating idempotent SQL script...");
 
       var dockerfilePath = RootDirectory / "Test" / "Migrations" / "Dockerfile";
 
@@ -174,29 +142,29 @@ public partial class Build
         // Build with build arg for context
         ProcessTasks.StartProcess(
           "docker",
-          $"build --target generate-idempotent --build-arg DBCONTEXT={contextName} -f {dockerfilePath} -t migrations-generate-{contextName.ToLowerInvariant()} {RootDirectory}",
+          $"build --target generate-idempotent --build-arg DBCONTEXT=AppDbContext -f {dockerfilePath} -t migrations-generate-appdbcontext {RootDirectory}",
           workingDirectory: RootDirectory,
           logOutput: true)
           .AssertZeroExitCode();
 
         ProcessTasks.StartProcess(
           "docker",
-          $"run --rm -v {outputDir}:/output migrations-generate-{contextName.ToLowerInvariant()}",
+          $"run --rm -v {MigrationsDirectory}:/output migrations-generate-appdbcontext",
           workingDirectory: RootDirectory,
           logOutput: true)
           .AssertZeroExitCode();
 
-        Log.Information("✓ Idempotent SQL script generated successfully for {DbContext} at {ScriptPath}", contextName, scriptPath);
+        Log.Information("✓ Idempotent SQL script generated successfully at {ScriptPath}", IdempotentScriptPath);
       }
       catch (Exception ex)
       {
-        Log.Error("Failed to generate idempotent SQL script for {DbContext}: {Message}", contextName, ex.Message);
+        Log.Error("Failed to generate idempotent SQL script: {Message}", ex.Message);
         throw;
       }
     });
 
   internal Target DbMigrationsAdd => _ => _
-    .Description("Add a new EF Core migration (requires --migration-name and --db-context parameters)")
+    .Description("Add a new EF Core migration (requires --migration-name parameter)")
     .DependsOn(InstallDotnetToolEf)
     .Triggers(LintServerFix)
     .Executes(() =>
@@ -207,21 +175,10 @@ public partial class Build
         throw new Exception("Migration name is required. Use --migration-name <name> parameter");
       }
 
-      if (string.IsNullOrWhiteSpace(DbContext))
-      {
-        Log.Error("DbContext name is required. Use --db-context <context> parameter (e.g., AppDbContext or TenantStoreDbContext)");
-        throw new Exception("DbContext name is required. Use --db-context <context> parameter");
-      }
-
-      Log.Information("Adding new migration: {MigrationName} for {DbContext}", MigrationName, DbContext);
-
-      // Determine output directory based on context
-      var outputDir = DbContext.ToLowerInvariant() == "tenantstoredbcontext"
-        ? "Data/TenantStoreMigrations"
-        : "Data/Migrations";
+      Log.Information("Adding new migration: {MigrationName}", MigrationName);
 
       // Add migration using dotnet ef
-      var args = $"ef migrations add {MigrationName} --context {DbContext} --output-dir {outputDir} --project {ServerInfrastructureProject} --startup-project {ServerProject}";
+      var args = $"ef migrations add {MigrationName} --context AppDbContext --output-dir Data/Migrations --project {ServerInfrastructureProject} --startup-project {ServerProject}";
 
       try
       {
@@ -232,8 +189,8 @@ public partial class Build
           logOutput: true)
           .AssertZeroExitCode();
 
-        Log.Information("✓ Migration '{MigrationName}' added successfully for {DbContext}", MigrationName, DbContext);
-        Log.Information("Don't forget to run 'nuke DbMigrationsGenerateIdempotentScript --db-context {DbContext}' to update the idempotent script", DbContext);
+        Log.Information("✓ Migration '{MigrationName}' added successfully", MigrationName);
+        Log.Information("Don't forget to run 'nuke DbMigrationsGenerateIdempotentScript' to update the idempotent script");
       }
       catch (Exception ex)
       {
@@ -243,21 +200,17 @@ public partial class Build
     });
 
   internal Target DbMigrationsVerifyIdempotentScript => _ => _
-    .Description("Verify that the idempotent SQL script matches the current migrations (use --db-context to specify context)")
+    .Description("Verify that the idempotent SQL script matches the current migrations")
     .DependsOn(InstallDotnetToolEf)
     .Executes(() =>
     {
-      var contextName = DbContext ?? "AppDbContext";
-      var scriptPath = GetIdempotentScriptPath(contextName);
-      var committedScriptDir = GetMigrationsDirectory(contextName);
+      Log.Information("Verifying idempotent SQL script is up to date...");
 
-      Log.Information("Verifying idempotent SQL script for {DbContext} is up to date...", contextName);
-
-      if (!scriptPath.FileExists())
+      if (!IdempotentScriptPath.FileExists())
       {
-        Log.Error("Idempotent SQL script not found for {DbContext} at {ScriptPath}", contextName, scriptPath);
-        Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript --db-context {DbContext}' to generate the script and commit it to source control.", contextName);
-        throw new Exception($"Idempotent SQL script not found for {contextName} in source control");
+        Log.Error("Idempotent SQL script not found at {ScriptPath}", IdempotentScriptPath);
+        Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript' to generate the script and commit it to source control.");
+        throw new Exception("Idempotent SQL script not found in source control");
       }
 
       var dockerfilePath = RootDirectory / "Test" / "Migrations" / "Dockerfile";
@@ -266,79 +219,68 @@ public partial class Build
       {
         ProcessTasks.StartProcess(
           "docker",
-          $"build --target verify-idempotent --build-arg DBCONTEXT={contextName} -f {dockerfilePath} -t migrations-verify-{contextName.ToLowerInvariant()} {RootDirectory}",
+          $"build --target verify-idempotent --build-arg DBCONTEXT=AppDbContext -f {dockerfilePath} -t migrations-verify-appdbcontext {RootDirectory}",
           workingDirectory: RootDirectory,
           logOutput: true)
           .AssertZeroExitCode();
 
         ProcessTasks.StartProcess(
           "docker",
-          $"run --rm -v {committedScriptDir}:/committed migrations-verify-{contextName.ToLowerInvariant()}",
+          $"run --rm -v {MigrationsDirectory}:/committed migrations-verify-appdbcontext",
           workingDirectory: RootDirectory,
           logOutput: true)
           .AssertZeroExitCode();
 
-        Log.Information("✓ Idempotent SQL script for {DbContext} is up to date with current migrations", contextName);
+        Log.Information("✓ Idempotent SQL script is up to date with current migrations");
       }
       catch (Exception ex)
       {
-        Log.Error("Idempotent SQL script verification failed for {DbContext}: {Message}", contextName, ex.Message);
+        Log.Error("Idempotent SQL script verification failed: {Message}", ex.Message);
         throw;
       }
     });
 
   internal Target DbMigrationsVerifyAll => _ => _
-    .Description("Verify all database migrations for all DbContexts: apply to test database and verify idempotent SQL scripts")
+    .Description("Verify all database migrations: apply to test database and verify idempotent SQL scripts")
     .DependsOn(DbMigrationsVerifyApply, InstallDotnetToolEf)
     .Executes(() =>
     {
       // Verify AppDbContext
-      VerifyIdempotentScriptForContext("AppDbContext");
+      Log.Information("Verifying idempotent SQL script is up to date...");
 
-      // Verify TenantStoreDbContext
-      VerifyIdempotentScriptForContext("TenantStoreDbContext");
+      if (!IdempotentScriptPath.FileExists())
+      {
+        Log.Error("Idempotent SQL script not found at {ScriptPath}", IdempotentScriptPath);
+        Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript' to generate the script and commit it to source control.");
+        throw new Exception("Idempotent SQL script not found in source control");
+      }
+
+      var dockerfilePath = RootDirectory / "Test" / "Migrations" / "Dockerfile";
+
+      try
+      {
+        ProcessTasks.StartProcess(
+          "docker",
+          $"build --target verify-idempotent --build-arg DBCONTEXT=AppDbContext -f {dockerfilePath} -t migrations-verify-appdbcontext {RootDirectory}",
+          workingDirectory: RootDirectory,
+          logOutput: true)
+          .AssertZeroExitCode();
+
+        ProcessTasks.StartProcess(
+          "docker",
+          $"run --rm -v {MigrationsDirectory}:/committed migrations-verify-appdbcontext",
+          workingDirectory: RootDirectory,
+          logOutput: true)
+          .AssertZeroExitCode();
+
+        Log.Information("✓ Idempotent SQL script is up to date with current migrations");
+      }
+      catch (Exception ex)
+      {
+        Log.Error("Idempotent SQL script verification failed: {Message}", ex.Message);
+        throw;
+      }
 
       Log.Information("✓ All database migration verifications completed successfully");
     });
-
-  private void VerifyIdempotentScriptForContext(string contextName)
-  {
-    var scriptPath = GetIdempotentScriptPath(contextName);
-    var committedScriptDir = GetMigrationsDirectory(contextName);
-
-    Log.Information("Verifying idempotent SQL script for {DbContext} is up to date...", contextName);
-
-    if (!scriptPath.FileExists())
-    {
-      Log.Error("Idempotent SQL script not found for {DbContext} at {ScriptPath}", contextName, scriptPath);
-      Log.Error("Run 'nuke DbMigrationsGenerateIdempotentScript --db-context {DbContext}' to generate the script and commit it to source control.", contextName);
-      throw new Exception($"Idempotent SQL script not found for {contextName} in source control");
-    }
-
-    var dockerfilePath = RootDirectory / "Test" / "Migrations" / "Dockerfile";
-
-    try
-    {
-      ProcessTasks.StartProcess(
-        "docker",
-        $"build --target verify-idempotent --build-arg DBCONTEXT={contextName} -f {dockerfilePath} -t migrations-verify-{contextName.ToLowerInvariant()} {RootDirectory}",
-        workingDirectory: RootDirectory,
-        logOutput: true)
-        .AssertZeroExitCode();
-
-      ProcessTasks.StartProcess(
-        "docker",
-        $"run --rm -v {committedScriptDir}:/committed migrations-verify-{contextName.ToLowerInvariant()}",
-        workingDirectory: RootDirectory,
-        logOutput: true)
-        .AssertZeroExitCode();
-
-      Log.Information("✓ Idempotent SQL script for {DbContext} is up to date with current migrations", contextName);
-    }
-    catch (Exception ex)
-    {
-      Log.Error("Idempotent SQL script verification failed for {DbContext}: {Message}", contextName, ex.Message);
-      throw;
-    }
-  }
 }

@@ -142,10 +142,6 @@
           "type": "boolean",
           "description": "Stop tests on first test failure"
         },
-        "DbContext": {
-          "type": "string",
-          "description": "DbContext name for migrations (e.g., AppDbContext, TenantStoreDbContext)"
-        },
         "Force": {
           "type": "boolean",
           "description": "Force operation without confirmation"

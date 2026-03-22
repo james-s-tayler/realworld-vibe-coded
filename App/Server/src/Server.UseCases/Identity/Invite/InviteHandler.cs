@@ -1,12 +1,7 @@
-﻿using System.Security.Claims;
-using Finbuckle.MultiTenant.AspNetCore.Extensions;
-using MediatR;
-using Microsoft.AspNetCore.Http;
+﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
-using Server.SharedKernel.Identity;
 using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Identity.Invite;
@@ -15,18 +10,15 @@ namespace Server.UseCases.Identity.Invite;
 #pragma warning disable SRV015
 public class InviteHandler : ICommandHandler<InviteCommand, Unit>
 {
-  private readonly IUserEmailChecker _userEmailChecker;
+  private readonly UserManager<ApplicationUser> _userManager;
   private readonly ILogger<InviteHandler> _logger;
-  private readonly IHttpContextAccessor _httpContextAccessor;
 
   public InviteHandler(
-    IUserEmailChecker userEmailChecker,
-    ILogger<InviteHandler> logger,
-    IHttpContextAccessor httpContextAccessor)
+    UserManager<ApplicationUser> userManager,
+    ILogger<InviteHandler> logger)
   {
-    _userEmailChecker = userEmailChecker;
+    _userManager = userManager;
     _logger = logger;
-    _httpContextAccessor = httpContextAccessor;
   }
 
   // PV014: UserManager.CreateAsync is a mutation operation, but the analyzer doesn't recognize it
@@ -36,27 +28,15 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
   public async Task<Result<Unit>> Handle(InviteCommand request, CancellationToken cancellationToken)
 #pragma warning restore PV014
   {
-    // Tenant context is already resolved from the authenticated user's __tenant__ claim
-    // via Finbuckle's ClaimsStrategy - no need to manually set it
-    var tenantInfo = _httpContextAccessor.HttpContext!.GetTenantInfo<Server.Core.TenantInfoAggregate.TenantInfo>();
-    if (tenantInfo == null)
-    {
-      _logger.LogError("User invitation failed: No tenant context found");
-      return Result<Unit>.Invalid(new ErrorDetail("tenant", "No tenant context found"));
-    }
-
-    var tenantId = tenantInfo.Id!;
-    _logger.LogInformation("Inviting user to tenant {TenantId}", tenantId);
-
-    // Check for duplicate email across ALL tenants
-    var emailExists = await _userEmailChecker.EmailExistsAsync(request.Email, cancellationToken);
-    if (emailExists)
+    // Check for duplicate email
+    var existingUser = await _userManager.FindByEmailAsync(request.Email);
+    if (existingUser != null)
     {
       _logger.LogWarning("User invitation failed for {Email}: Duplicate email", request.Email);
       return Result<Unit>.Invalid(new ErrorDetail("email", "A user has already been registered with that email"));
     }
 
-    _logger.LogInformation("Creating new user with email {Email} in tenant {TenantId}", request.Email, tenantId);
+    _logger.LogInformation("Creating new user with email {Email}", request.Email);
 
     var user = new ApplicationUser
     {
@@ -64,10 +44,7 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
       Email = request.Email,
     };
 
-    // UserManager is tenant-scoped via the already-resolved tenant context
-    var userManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
-
-    var result = await userManager.CreateAsync(user, request.Password);
+    var result = await _userManager.CreateAsync(user, request.Password);
 
     if (!result.Succeeded)
     {
@@ -80,7 +57,7 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
 
     _logger.LogDebug("Assigning {RoleName} role to invited user", DefaultRoles.User);
 
-    var userRoleResult = await userManager.AddToRoleAsync(user, DefaultRoles.User);
+    var userRoleResult = await _userManager.AddToRoleAsync(user, DefaultRoles.User);
     if (!userRoleResult.Succeeded)
     {
       var errorDetails = userRoleResult.Errors.Select(e => new ErrorDetail("role", e.Description)).ToArray();
@@ -89,21 +66,7 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
 
     _logger.LogDebug("Assigned {RoleName} role to invited user", DefaultRoles.User);
 
-    // Add tenant claim
-    var tenantClaim = new Claim("__tenant__", tenantId);
-    _logger.LogInformation("Adding claim to invited user __tenant__: {@Claim}", tenantClaim);
-
-    var claimResult = await userManager.AddClaimAsync(user, tenantClaim);
-    _logger.LogInformation("Added claim to invited user __tenant__: {@Claim}", tenantClaim);
-
-    if (!claimResult.Succeeded)
-    {
-      var errorDetails = claimResult.Errors.Select(e => new ErrorDetail("tenantId", e.Description)).ToArray();
-      _logger.LogError("Failed to add tenant claim for user {Email}", request.Email);
-      return Result<Unit>.Invalid(errorDetails);
-    }
-
-    _logger.LogInformation("User {Email} invited successfully to tenant {TenantId}", request.Email, tenantId);
+    _logger.LogInformation("User {Email} invited successfully", request.Email);
 
     return Result<Unit>.NoContent();
   }

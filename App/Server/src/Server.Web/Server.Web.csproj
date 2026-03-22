@@ -16,7 +16,6 @@
       <PrivateAssets>compile;build;native;contentfiles;analyzers;buildtransitive</PrivateAssets>
     </PackageReference>
     <PackageReference Include="FastEndpoints.Swagger" />
-    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />

@@ -1,10 +1,10 @@
 ﻿namespace Server.FunctionalTests;
 
-public class RegisteredTenant
+public class RegisteredUsers
 {
   public IList<RegisteredUser> Users { get; } = new List<RegisteredUser>();
 
-  public RegisteredUser GetTenantOwner()
+  public RegisteredUser GetOwner()
   {
     return Users.First();
   }
