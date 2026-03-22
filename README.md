@@ -189,6 +189,19 @@ The `Server.Analyzers` project contains 32 custom analyzers that enforce archite
 - Use FluentAssertions, not xUnit Assert (`SRV010`)
 - No `new DateTime()` in tests (`SRV011`)
 
+### 📊 Observability — Logs & Reports on Disk
+
+Application logs and test results are written to well-known directories on disk, giving agents concrete artifacts to inspect when something goes wrong:
+
+- **`Logs/`** — Serilog structured logs and Audit.NET audit logs, organized by run mode
+- **`Reports/`** — HTML test reports from xUnit, Vitest, and Playwright runs
+
+Nuke build targets emit explicit guidance on failure, pointing agents to the exact log files and reports to inspect. Claude Code hooks (`.claude/hooks/`) enforce that agents read these outputs rather than guessing at root causes — creating a closed feedback loop between running a command and diagnosing its result.
+
+### 🔎 Playwright Trace Debugging
+
+When Playwright E2E tests fail, traces are automatically captured to disk. The `view-playwright-traces` skill lets agents analyze these trace files to see exactly what happened — page navigations, network requests, screenshots, and DOM snapshots at each step. This means agents can self-diagnose E2E failures without human intervention: run the tests, inspect the trace, identify the issue, and fix it.
+
 ### 🔄 Kiota API Client Generation
 
 When backend endpoints change, run `./build.sh BuildGenerateApiClient` to regenerate the TypeScript API client. The drift check `./build.sh LintApiClientVerify` catches when the generated client is out of sync. This means agents adding or modifying API endpoints get frontend bindings automatically — no manual sync required.
