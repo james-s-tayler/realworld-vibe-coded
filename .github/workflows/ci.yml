@@ -690,6 +690,22 @@ jobs:
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
           restore-keys: nuget-${{ runner.os }}-
 
+      - name: Cache Nuke build
+        id: cache-nuke
+        uses: actions/cache@v4
+        with:
+          path: |
+            Task/Runner/Nuke/bin
+            Task/Runner/Nuke/obj
+            Task/Runner/Nuke.Analyzers/bin
+            Task/Runner/Nuke.Analyzers/obj
+          key: nuke-${{ runner.os }}-${{ hashFiles('Task/Runner/**/*.cs', 'Task/Runner/**/*.csproj', 'Task/Runner/*.sln') }}
+
+      - name: Touch Nuke build output
+        if: steps.cache-nuke.outputs.cache-hit == 'true'
+        run: |
+          find Task/Runner/Nuke/bin Task/Runner/Nuke.Analyzers/bin -type f -exec touch {} + 2>/dev/null || true
+
       - name: Cache client dist
         id: cache-client-dist
         uses: actions/cache@v4
