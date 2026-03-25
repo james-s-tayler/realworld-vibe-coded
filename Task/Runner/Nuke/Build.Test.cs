@@ -25,46 +25,33 @@ public partial class Build
       .DependsOn(RunLocalDependencies)
       .Executes(() =>
       {
-        // Give dependencies a chance to start-up (replace if proven flaky)
-        Thread.Sleep(TimeSpan.FromSeconds(3));
-
-        // Get all test projects in the solution
-        var testsDirectory = RootDirectory / "App" / "Server" / "tests";
-        var testProjects = testsDirectory.GlobDirectories("*")
-              .Select(dir => dir / $"{dir.Name}.csproj")
-              .Where(project => project.FileExists())
-              .ToArray();
-
-        var failures = new List<string>();
-
-        // Run tests for each project with unique result files
-        foreach (var testProject in testProjects)
+        var testFailed = false;
+        try
         {
-          var projectName = testProject.NameWithoutExtension;
-          var logFileName = $"{projectName}-results.trx";
-
-          Log.Information("Running tests for {ProjectName}", projectName);
-
-          try
-          {
-            DotNetTest(s => s
-                  .SetProjectFile(testProject)
-                  .SetLoggers($"trx;LogFileName={logFileName}")
-                  .SetResultsDirectory(ReportsServerResultsDirectory)
-                  .SetSettingsFile(RootDirectory / "App" / "Server" / "coverlet.runsettings")
-                  .AddProcessAdditionalArguments(
-                    "--collect:\"XPlat Code Coverage\"",
-                    "--",
-                    $"xUnit.StopOnFail={(Bail ? "true" : "false")}"
-                  ));
-          }
-          catch (ProcessException)
-          {
-            failures.Add(testProject.Name);
-          }
+          DotNetTest(s => s
+                .SetProjectFile(ServerSolution)
+                .SetLoggers("trx")
+                .SetResultsDirectory(ReportsServerResultsDirectory)
+                .SetSettingsFile(RootDirectory / "App" / "Server" / "coverlet.runsettings")
+                .AddProcessAdditionalArguments(
+                  "--collect:\"XPlat Code Coverage\"",
+                  "--",
+                  $"xUnit.StopOnFail={(Bail ? "true" : "false")}"
+                ));
+        }
+        catch (ProcessException)
+        {
+          testFailed = true;
         }
 
         var reportFile = ReportsServerArtifactsDirectory / "Tests" / "Report.md";
+
+        // Run coverage report generation in parallel with test report generation
+        var coverageTask = System.Threading.Tasks.Task.Run(() =>
+            ReportGenerator(s => s
+                  .SetReports(ReportsServerResultsDirectory / "**" / "coverage.cobertura.xml")
+                  .SetTargetDirectory(ReportsServerArtifactsDirectory / "Coverage")
+                  .SetReportTypes(ReportTypes.Html, ReportTypes.Cobertura)));
 
         Liquid($"--inputs \"File=*.trx;Folder={ReportsServerResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestServer)} Results\"");
 
@@ -72,18 +59,14 @@ public partial class Build
         var reportSummaryFile = ReportsServerArtifactsDirectory / "Tests" / "ReportSummary.md";
         ExtractReportSummary(reportFile, reportSummaryFile);
 
-        ReportGenerator(s => s
-              .SetReports(ReportsServerResultsDirectory / "**" / "coverage.cobertura.xml")
-              .SetTargetDirectory(ReportsServerArtifactsDirectory / "Coverage")
-              .SetReportTypes(ReportTypes.Html, ReportTypes.Cobertura));
+        coverageTask.Wait();
 
-        if (failures.Any())
+        if (testFailed)
         {
           var debugInstructions = $"For a details of specific failures, see {reportFile}. Then view logs via `cat {LogsTestServerSerilogDirectory}/*.json | grep 'Test_Name_Goes_Here'`";
 
-          var failedProjects = string.Join(", ", failures);
-          Log.Error("Some test projects failed: {FailedProjects}. {DebugInstructions}", failedProjects, debugInstructions);
-          throw new Exception($"Some test projects failed: {failedProjects}. {debugInstructions}");
+          Log.Error("Some test projects failed. {DebugInstructions}", debugInstructions);
+          throw new Exception($"Some test projects failed. {debugInstructions}");
         }
       });
 
