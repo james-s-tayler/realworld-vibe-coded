@@ -4,7 +4,7 @@ using Server.Web.Configurations;
 using Server.Web.DevOnly.Configuration;
 using Server.Web.Infrastructure;
 
-// setup the app
+// setup the app — Conduit (RealWorld) web host
 var builder = WebApplication.CreateBuilder(args);
 
 var logger = Log.Logger = new LoggerConfiguration()
