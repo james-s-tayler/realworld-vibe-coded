@@ -177,12 +177,6 @@ public partial class Build
       var composeFiles = SkipPublish
           ? "-f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml"
           : "-f Test/e2e/docker-compose.yml";
-      var extraCompose = Environment.GetEnvironmentVariable("E2E_EXTRA_COMPOSE");
-      if (!string.IsNullOrEmpty(extraCompose))
-      {
-        composeFiles += $" -f {extraCompose}";
-      }
-
       var upArgs = SkipPublish
           ? $"compose {composeFiles} up --no-build --abort-on-container-exit"
           : $"compose {composeFiles} up --build --abort-on-container-exit";

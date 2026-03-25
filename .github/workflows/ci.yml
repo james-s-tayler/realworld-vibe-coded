@@ -720,11 +720,8 @@ jobs:
 
       - name: Build app and Docker images
         run: |
-          # Pre-start SQL Server on shared network (overlaps startup with build)
-          docker network create e2e-net
-          docker run -d --name sqlserver --network e2e-net \
-            -e ACCEPT_EULA=Y -e SA_PASSWORD="YourStrong@Passw0rd" -e MSSQL_PID=Express \
-            mcr.microsoft.com/mssql/server:2022-latest
+          # Pre-start SQL Server via compose (overlaps startup with build phase)
+          docker compose -f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml up -d sqlserver &
 
           # Install liquid reports tool in background
           dotnet tool install --global LiquidTestReports.Cli --prerelease 2>/dev/null &
@@ -758,8 +755,6 @@ jobs:
 
       - name: Test Server (E2E)
         id: e2e_tests
-        env:
-          E2E_EXTRA_COMPOSE: Test/e2e/docker-compose.ci-prestart.yml
         run: |
           set +e  # Don't exit on error
           ./build.sh test-e2e -skip-publish true
