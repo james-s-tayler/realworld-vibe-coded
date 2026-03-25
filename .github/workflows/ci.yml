@@ -707,32 +707,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and publish (server + client)
-        run: ./build.sh build-server-publish
+      - name: Build app and Docker images
+        run: |
+          # Build Playwright image in background (doesn't depend on publish/)
+          docker buildx build \
+            --cache-from type=gha,scope=playwright \
+            --cache-from type=registry,ref=ghcr.io/${{ github.repository }}/playwright:cache \
+            --cache-to type=gha,scope=playwright,mode=max \
+            --load --provenance=false \
+            -t ghcr.io/${{ github.repository }}/playwright:ci \
+            -f ./Test/e2e/Dockerfile.playwright ./Test/e2e &
+          PW_PID=$!
 
-      - name: Build Playwright E2E image with cache
-        uses: docker/build-push-action@v6
-        with:
-          context: ./Test/e2e
-          file: ./Test/e2e/Dockerfile.playwright
-          tags: ghcr.io/${{ github.repository }}/playwright:ci
-          load: true
-          cache-from: |
-            type=gha
-            type=registry,ref=ghcr.io/${{ github.repository }}/playwright:cache
-          cache-to: type=gha,mode=max
+          # Build and publish server + client (creates publish/ for API image)
+          ./build.sh build-server-publish
 
-      - name: Build Api E2E image with cache
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Test/e2e/Dockerfile.api
-          tags: ghcr.io/${{ github.repository }}/api:ci
-          load: true
-          cache-from: |
-            type=gha
-            type=registry,ref=ghcr.io/${{ github.repository }}/api:cache
-          cache-to: type=gha,mode=max
+          # Build API image (needs publish/ from above)
+          docker buildx build \
+            --cache-from type=gha,scope=api \
+            --cache-from type=registry,ref=ghcr.io/${{ github.repository }}/api:cache \
+            --cache-to type=gha,scope=api,mode=max \
+            --load --provenance=false \
+            -t ghcr.io/${{ github.repository }}/api:ci \
+            -f ./Test/e2e/Dockerfile.api .
+
+          # Wait for background Playwright build
+          wait $PW_PID
 
       - name: Test Server (E2E)
         id: e2e_tests
