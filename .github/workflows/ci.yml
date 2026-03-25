@@ -734,7 +734,19 @@ jobs:
         if: steps.cache-client-dist.outputs.cache-hit != 'true' && steps.cache-node-modules.outputs.cache-hit == 'true'
         run: touch App/Client/node_modules
 
+      - name: Cache Playwright Docker image
+        id: cache-pw-image
+        uses: actions/cache@v4
+        with:
+          path: /tmp/playwright-image.tar
+          key: playwright-img-${{ runner.os }}-${{ hashFiles('Test/e2e/Dockerfile.playwright', 'Test/e2e/E2eTests/**', 'Test/e2e/E2eTests.Analyzers/**') }}
+
+      - name: Load cached Playwright image
+        if: steps.cache-pw-image.outputs.cache-hit == 'true'
+        run: docker load -i /tmp/playwright-image.tar
+
       - name: Setup Docker Buildx
+        if: steps.cache-pw-image.outputs.cache-hit != 'true'
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GHCR
@@ -745,8 +757,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build app and Docker images
-        env:
-          TEST_E2E_CHANGED: ${{ needs.changes.outputs.test_e2e }}
         run: |
           # Pre-start SQL Server via compose (overlaps startup with build phase)
           docker compose -f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml up -d sqlserver &
@@ -755,20 +765,9 @@ jobs:
           dotnet tool install --global LiquidTestReports.Cli --prerelease 2>/dev/null &
           TOOL_PID=$!
 
-          # Get Playwright image: pull from GHCR if test code unchanged, build locally if changed
-          if [ "$TEST_E2E_CHANGED" != "true" ]; then
-            # Test code unchanged — pull pre-built image from GHCR (faster than buildx export)
-            (docker pull ghcr.io/${{ github.repository }}/playwright:ci 2>/dev/null || \
-              docker buildx build \
-                --cache-from type=gha,scope=playwright \
-                --cache-from type=registry,ref=ghcr.io/${{ github.repository }}/playwright:cache \
-                --cache-to type=gha,scope=playwright,mode=max \
-                --load --provenance=false \
-                -t ghcr.io/${{ github.repository }}/playwright:ci \
-                -f ./Test/e2e/Dockerfile.playwright ./Test/e2e) &
-            PW_PID=$!
-          else
-            # Test code changed — build locally with cache
+          # Build Playwright image in background if not loaded from cache
+          PW_PID=""
+          if ! docker image inspect ghcr.io/${{ github.repository }}/playwright:ci > /dev/null 2>&1; then
             docker buildx build \
               --cache-from type=gha,scope=playwright \
               --cache-from type=registry,ref=ghcr.io/${{ github.repository }}/playwright:cache \
@@ -792,8 +791,14 @@ jobs:
             -f ./Test/e2e/Dockerfile.api .
 
           # Wait for background tasks
-          wait $PW_PID
+          if [ -n "$PW_PID" ]; then
+            wait $PW_PID
+          fi
           wait $TOOL_PID
+
+      - name: Save Playwright image for cache
+        if: steps.cache-pw-image.outputs.cache-hit != 'true'
+        run: docker save ghcr.io/${{ github.repository }}/playwright:ci -o /tmp/playwright-image.tar
 
       - name: Test Server (E2E)
         id: e2e_tests
