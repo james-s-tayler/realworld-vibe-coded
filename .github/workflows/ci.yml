@@ -697,6 +697,17 @@ jobs:
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
           restore-keys: nuget-${{ runner.os }}-
 
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: App/Client/node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('App/Client/package-lock.json') }}
+
+      - name: Update node_modules timestamp
+        if: steps.cache-node-modules.outputs.cache-hit == 'true'
+        run: touch App/Client/node_modules
+
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -707,8 +718,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install dotnet tools
+        run: dotnet tool install --global LiquidTestReports.Cli --prerelease 2>/dev/null || true
+
       - name: Build app and Docker images
         run: |
+          # Pre-pull SQL Server image in background (needed by docker compose later)
+          docker pull mcr.microsoft.com/mssql/server:2022-latest &
+          SQL_PULL_PID=$!
+
           # Build Playwright image in background (doesn't depend on publish/)
           docker buildx build \
             --cache-from type=gha,scope=playwright \
@@ -731,8 +749,9 @@ jobs:
             -t ghcr.io/${{ github.repository }}/api:ci \
             -f ./Test/e2e/Dockerfile.api .
 
-          # Wait for background Playwright build
+          # Wait for background tasks
           wait $PW_PID
+          wait $SQL_PULL_PID
 
       - name: Test Server (E2E)
         id: e2e_tests
