@@ -1,0 +1,11 @@
+# CI override: Use pre-started SQL Server on shared Docker network
+# SQL Server is started early in CI to overlap startup with app build
+services:
+  sqlserver:
+    profiles: ["not-used"]
+  api:
+    depends_on: {}
+networks:
+  default:
+    name: e2e-net
+    external: true

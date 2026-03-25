@@ -718,14 +718,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dotnet tools
-        run: dotnet tool install --global LiquidTestReports.Cli --prerelease 2>/dev/null || true
-
       - name: Build app and Docker images
         run: |
-          # Pre-pull SQL Server image in background (needed by docker compose later)
-          docker pull mcr.microsoft.com/mssql/server:2022-latest &
-          SQL_PULL_PID=$!
+          # Pre-start SQL Server on shared network (overlaps startup with build)
+          docker network create e2e-net
+          docker run -d --name sqlserver --network e2e-net \
+            -e ACCEPT_EULA=Y -e SA_PASSWORD="YourStrong@Passw0rd" -e MSSQL_PID=Express \
+            mcr.microsoft.com/mssql/server:2022-latest
+
+          # Install liquid reports tool in background
+          dotnet tool install --global LiquidTestReports.Cli --prerelease 2>/dev/null &
+          TOOL_PID=$!
 
           # Build Playwright image in background (doesn't depend on publish/)
           docker buildx build \
@@ -751,10 +754,12 @@ jobs:
 
           # Wait for background tasks
           wait $PW_PID
-          wait $SQL_PULL_PID
+          wait $TOOL_PID
 
       - name: Test Server (E2E)
         id: e2e_tests
+        env:
+          E2E_EXTRA_COMPOSE: Test/e2e/docker-compose.ci-prestart.yml
         run: |
           set +e  # Don't exit on error
           ./build.sh test-e2e -skip-publish true
