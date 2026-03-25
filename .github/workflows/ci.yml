@@ -700,6 +700,7 @@ jobs:
             Task/Runner/Nuke.Analyzers/bin
             Task/Runner/Nuke.Analyzers/obj
           key: nuke-${{ runner.os }}-${{ hashFiles('Task/Runner/**/*.cs', 'Task/Runner/**/*.csproj', 'Task/Runner/*.sln') }}
+          restore-keys: nuke-${{ runner.os }}-
 
       - name: Touch Nuke build output
         if: steps.cache-nuke.outputs.cache-hit == 'true'
@@ -744,6 +745,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build app and Docker images
+        env:
+          TEST_E2E_CHANGED: ${{ needs.changes.outputs.test_e2e }}
         run: |
           # Pre-start SQL Server via compose (overlaps startup with build phase)
           docker compose -f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml up -d sqlserver &
@@ -752,15 +755,29 @@ jobs:
           dotnet tool install --global LiquidTestReports.Cli --prerelease 2>/dev/null &
           TOOL_PID=$!
 
-          # Build Playwright image in background (doesn't depend on publish/)
-          docker buildx build \
-            --cache-from type=gha,scope=playwright \
-            --cache-from type=registry,ref=ghcr.io/${{ github.repository }}/playwright:cache \
-            --cache-to type=gha,scope=playwright,mode=max \
-            --load --provenance=false \
-            -t ghcr.io/${{ github.repository }}/playwright:ci \
-            -f ./Test/e2e/Dockerfile.playwright ./Test/e2e &
-          PW_PID=$!
+          # Get Playwright image: pull from GHCR if test code unchanged, build locally if changed
+          if [ "$TEST_E2E_CHANGED" != "true" ]; then
+            # Test code unchanged — pull pre-built image from GHCR (faster than buildx export)
+            (docker pull ghcr.io/${{ github.repository }}/playwright:ci 2>/dev/null || \
+              docker buildx build \
+                --cache-from type=gha,scope=playwright \
+                --cache-from type=registry,ref=ghcr.io/${{ github.repository }}/playwright:cache \
+                --cache-to type=gha,scope=playwright,mode=max \
+                --load --provenance=false \
+                -t ghcr.io/${{ github.repository }}/playwright:ci \
+                -f ./Test/e2e/Dockerfile.playwright ./Test/e2e) &
+            PW_PID=$!
+          else
+            # Test code changed — build locally with cache
+            docker buildx build \
+              --cache-from type=gha,scope=playwright \
+              --cache-from type=registry,ref=ghcr.io/${{ github.repository }}/playwright:cache \
+              --cache-to type=gha,scope=playwright,mode=max \
+              --load --provenance=false \
+              -t ghcr.io/${{ github.repository }}/playwright:ci \
+              -f ./Test/e2e/Dockerfile.playwright ./Test/e2e &
+            PW_PID=$!
+          fi
 
           # Build and publish server + client (creates publish/ for API image)
           ./build.sh build-server-publish ${{ steps.cache-client-dist.outputs.cache-hit == 'true' && '-skip-client-build true' || '' }}
