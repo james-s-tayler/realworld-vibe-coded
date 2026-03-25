@@ -683,13 +683,6 @@ jobs:
         with:
           global-json-file: App/Server/global.json
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: App/Client/package-lock.json
-
       - name: Cache NuGet packages
         uses: actions/cache@v4
         with:
@@ -697,7 +690,23 @@ jobs:
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
           restore-keys: nuget-${{ runner.os }}-
 
+      - name: Cache client dist
+        id: cache-client-dist
+        uses: actions/cache@v4
+        with:
+          path: App/Client/dist
+          key: client-dist-${{ runner.os }}-${{ hashFiles('App/Client/src/**', 'App/Client/package-lock.json', 'App/Client/vite.config.*', 'App/Client/tsconfig*', 'App/Client/index.html') }}
+
+      - name: Setup Node.js
+        if: steps.cache-client-dist.outputs.cache-hit != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: App/Client/package-lock.json
+
       - name: Cache node_modules
+        if: steps.cache-client-dist.outputs.cache-hit != 'true'
         id: cache-node-modules
         uses: actions/cache@v4
         with:
@@ -705,15 +714,8 @@ jobs:
           key: node-modules-${{ runner.os }}-${{ hashFiles('App/Client/package-lock.json') }}
 
       - name: Update node_modules timestamp
-        if: steps.cache-node-modules.outputs.cache-hit == 'true'
+        if: steps.cache-client-dist.outputs.cache-hit != 'true' && steps.cache-node-modules.outputs.cache-hit == 'true'
         run: touch App/Client/node_modules
-
-      - name: Cache client dist
-        id: cache-client-dist
-        uses: actions/cache@v4
-        with:
-          path: App/Client/dist
-          key: client-dist-${{ runner.os }}-${{ hashFiles('App/Client/src/**', 'App/Client/package-lock.json', 'App/Client/vite.config.*', 'App/Client/tsconfig*', 'App/Client/index.html') }}
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
