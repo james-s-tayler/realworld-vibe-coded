@@ -16,9 +16,9 @@ public partial class Build
       .Description("Run npm ci if node_modules is missing or package-lock.json is newer")
       .Executes(() =>
       {
-        if (SkipPublish)
+        if (SkipPublish || SkipClientBuild)
         {
-          Log.Information("Already published - skipping");
+          Log.Information("Skipping client install");
           return;
         }
 

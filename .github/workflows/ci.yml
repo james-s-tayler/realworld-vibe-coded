@@ -708,6 +708,13 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit == 'true'
         run: touch App/Client/node_modules
 
+      - name: Cache client dist
+        id: cache-client-dist
+        uses: actions/cache@v4
+        with:
+          path: App/Client/dist
+          key: client-dist-${{ runner.os }}-${{ hashFiles('App/Client/src/**', 'App/Client/package-lock.json', 'App/Client/vite.config.*', 'App/Client/tsconfig*', 'App/Client/index.html') }}
+
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -738,7 +745,7 @@ jobs:
           PW_PID=$!
 
           # Build and publish server + client (creates publish/ for API image)
-          ./build.sh build-server-publish
+          ./build.sh build-server-publish ${{ steps.cache-client-dist.outputs.cache-hit == 'true' && '-skip-client-build true' || '' }}
 
           # Build API image (needs publish/ from above)
           docker buildx build \
@@ -782,7 +789,7 @@ jobs:
 
       - name: Upload E2E Test Reports
         uses: actions/upload-artifact@v4
-        if: always()  # This should actually be failure(), but I will optimize later
+        if: steps.e2e_tests.outputs.exit_code != '0'
         with:
           name: test-e2e-reports
           path: |

@@ -57,9 +57,9 @@ public partial class Build
     .DependsOn(InstallClient)
     .Executes(() =>
     {
-      if (SkipPublish)
+      if (SkipPublish || SkipClientBuild)
       {
-        Log.Information("Already published - skipping");
+        Log.Information("Skipping client build");
         return;
       }
 
