@@ -111,19 +111,19 @@ public partial class Build
       });
 
   internal Target LintClaudeMdVerify => _ => _
-      .Description("Verify CLAUDE.md stays within the 100-line limit for effective AI instruction following")
+      .Description("Verify CLAUDE.md stays within the 50-line limit for effective AI instruction following")
       .Executes(() =>
       {
         var lines = ClaudeMdFile.ReadAllLines();
         var lineCount = lines.Length;
-        Log.Information("CLAUDE.md is {LineCount} lines (limit: 100)", lineCount);
+        Log.Information("CLAUDE.md is {LineCount} lines (limit: 50)", lineCount);
 
-        if (lineCount > 100)
+        if (lineCount > 50)
         {
-          throw new Exception($"CLAUDE.md is {lineCount} lines — exceeds the 100-line limit. Trim it to stay effective.");
+          throw new Exception($"CLAUDE.md is {lineCount} lines — exceeds the 50-line limit. Trim it to stay effective.");
         }
 
-        Log.Information("✓ CLAUDE.md is within the 100-line limit");
+        Log.Information("✓ CLAUDE.md is within the 50-line limit");
       });
 
   internal Target LintSkillsVerify => _ => _

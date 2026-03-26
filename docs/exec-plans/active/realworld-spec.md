@@ -294,3 +294,11 @@ Tags (standalone)          Auth (already built)
 7. **Size guide:** S = ~30 min (1 context window), M = ~60 min (1 context window), L = ~90 min (may need 1-2 context windows).
 8. **When a test fails**, read the error output carefully — Postman test failures include the specific assertion that failed and the actual vs expected values.
 9. **Context overflow?** If running low on context, finish the current story, commit, and start a new session. The next session picks up from where you left off by reading this plan.
+
+---
+
+## Decision Log
+
+<!-- Record implementation decisions here as they are made -->
+<!-- Format: ### YYYY-MM-DD: Decision Title -->
+<!-- What was decided, why, and any alternatives considered -->

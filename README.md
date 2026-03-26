@@ -64,7 +64,7 @@ nuke TestServer                         # xUnit backend unit/integration tests
 
 Open this repo in Claude Code and paste this prompt:
 
-> Read CLAUDE.md, IMPLEMENTATION-PLAN.md, and SPEC-REFERENCE.md. Then implement the RealWorld spec by following the story order in IMPLEMENTATION-PLAN.md exactly. For each story: implement the feature, run the specified test command, fix any failures, then commit. Track progress in PROGRESS.md. If stuck on a single test for more than 20 minutes, commit what you have, note the blocker in PROGRESS.md, and move to the next story.
+> Read CLAUDE.md and follow the Session Start instructions. Then implement the RealWorld spec by following the story order in the active exec plan exactly. For each story: implement the feature, run the specified test command, fix any failures, then commit. Track progress in PROGRESS.md. If stuck on a single test for more than 20 minutes, commit what you have, note the blocker in PROGRESS.md, and move to the next story.
 
 Good luck!
 
@@ -230,7 +230,7 @@ Each directory has a single, clear responsibility. An agent can immediately loca
 
 ### 📋 CLAUDE.md — Project Instructions
 
-The `CLAUDE.md` file at the repository root provides agents with full project context: tech stack, folder structure, build commands, critical rules, and conventions. This is the entry point for any agent working on the codebase.
+The `CLAUDE.md` file at the repository root is a ~40-line map that points agents to the right files via progressive disclosure: invariants and conventions inline, everything else in `docs/` (architecture, workflow, exec plans). This is the entry point for any agent working on the codebase.
 
 ### 🎯 `.claude/skills/` — 46 Build Skills
 
