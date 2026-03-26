@@ -1,10 +1,14 @@
 ---
-description: Run before finishing to run the full test suite and report a score. Triggered by the Stop hook.
+description: Run before finishing to self-review, run the full test suite, and report a score. Triggered by the Stop hook.
 ---
 
-Run the complete test suite and report a pass/fail score. This is mandatory before finishing.
+This is mandatory before finishing. Three steps: self-review, full test suite, score report.
 
-## Step 1: Run all Postman test collections
+## Step 1: Self-review
+
+Run `/self-review` to check your changes for agent-specific failure modes (over-abstraction, missing fields, unnecessary error handling, hardcoded values, stale TODOs). Fix any issues found before proceeding.
+
+## Step 2: Run all Postman test collections
 
 Run each collection individually and record results:
 
@@ -18,7 +22,7 @@ Run each collection individually and record results:
 
 For each collection, note: X passing, Y failing out of Z total.
 
-## Step 2: Run E2E test suite
+## Step 3: Run E2E test suite
 
 ```bash
 ./build.sh TestE2e
@@ -26,7 +30,7 @@ For each collection, note: X passing, Y failing out of Z total.
 
 Note: X passing, Y failing out of Z total.
 
-## Step 3: Calculate and report score
+## Step 4: Calculate and report score
 
 Calculate the overall score:
 
@@ -52,12 +56,32 @@ Report the score to the user in this format:
 **Score: X/Z (N%)**
 ```
 
-## Step 4: Append to PROGRESS.md
+## Step 5: Append to PROGRESS.md
 
 Append the score to `PROGRESS.md` under "Test Results Log":
 
 ```
 - YYYY-MM-DD HH:MM — Final score: X/Z (N%) — Auth: X/Y, Profiles: X/Y, ArticlesEmpty: X/Y, Article: X/Y, FeedAndArticles: X/Y, E2E: X/Y
+```
+
+## Step 6: Append to SCORES.csv
+
+Append a row to `SCORES.csv` with the results. The format is:
+
+```
+date,duration_minutes,auth,profiles,articles_empty,article,feed_and_articles,e2e,total_pass,total_tests,score
+```
+
+- `date`: ISO 8601 timestamp (e.g. `2026-03-27T14:30:00Z`)
+- `duration_minutes`: estimate how long the session ran (from first commit to now)
+- Each suite column: `X/Y` (passing/total)
+- `total_pass`: sum of all passing
+- `total_tests`: sum of all total
+- `score`: decimal (e.g. `0.85`)
+
+Example row:
+```
+2026-03-27T14:30:00Z,87,12/12,8/8,5/6,20/25,10/15,8/12,63,78,0.81
 ```
 
 ## Important
