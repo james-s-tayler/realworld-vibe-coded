@@ -16,11 +16,11 @@ public class Permissions : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(adminUser.Email, adminUser.Password);
 
-    // Act - Navigate to dashboard to see the navigation
-    await Page.GotoAsync(BaseUrl);
+    // Act - Navigate to home page to see the navigation
+    await Pages.HomePage.GoToAsync();
 
     // Assert - Verify Users link is visible for ADMIN
-    await Expect(Pages.LoginPage.UsersLink).ToBeVisibleAsync();
+    await Expect(Pages.HomePage.UsersLink).ToBeVisibleAsync();
   }
 
   [Fact]
@@ -35,11 +35,11 @@ public class Permissions : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(nonAdminUser.Email, nonAdminUser.Password);
 
-    // Act - Navigate to dashboard to see the navigation
-    await Page.GotoAsync(BaseUrl);
+    // Act - Navigate to home page to see the navigation
+    await Pages.HomePage.GoToAsync();
 
     // Assert - Verify Users link is NOT visible for non-ADMIN
-    await Expect(Pages.LoginPage.UsersLink).Not.ToBeVisibleAsync();
+    await Expect(Pages.HomePage.UsersLink).Not.ToBeVisibleAsync();
   }
 
   [Fact]
@@ -84,5 +84,6 @@ public class Permissions : AppPageTest
 
     // Assert - Verify we're back on the home page
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/");
+    await Expect(Pages.HomePage.GlobalFeedTab).ToBeVisibleAsync();
   }
 }

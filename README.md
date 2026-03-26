@@ -1,4 +1,70 @@
-# 🤖 Agent-First Multi-Tenant Starter Template
+# RealWorld Spec Challenge — Starter Template
+
+> **This is a coding challenge.** Use this multi-tenant starter template as your starting point and implement the full [RealWorld](https://docs.realworld.show/introduction/) spec. Your goal: **get all the tests passing.**
+
+## The Challenge
+
+The [RealWorld spec](https://docs.realworld.show/introduction/) defines a fully-featured blogging platform (a Medium clone) called "Conduit" — with users, articles, comments, tags, favorites, and follow feeds. This starter template gives you a production-grade foundation (Clean Architecture, CQRS, multi-tenancy, auth) with **all tests already included**. Your job is to implement the missing features until every test goes green.
+
+### What's Included
+
+- A working multi-tenant .NET backend with authentication, user registration, and profiles
+- A React + TypeScript frontend with login, registration, settings, and profile pages
+- **Postman API contract tests** covering the full RealWorld API spec (Auth, Profiles, Articles, Feed)
+- **Playwright E2E tests** covering the full UI (articles, editor, home feed, comments, favorites)
+- A Nuke build system that runs everything through a single CLI
+
+### What You Need to Implement
+
+The tests define the target. Run them, read the failures, and implement what's missing:
+
+- **Articles** — CRUD, slugs, tags, favorites, feed
+- **Comments** — create, list, delete on articles
+- **Tags** — list popular tags
+- **Feed** — personalized feed of followed authors' articles
+- **Frontend pages** — article view, editor, home page with feed/tags
+
+### Running the Test Suites
+
+**Prerequisites:** [.NET 10 SDK](https://dotnet.microsoft.com/download), [Nuke](https://nuke.build/) (`dotnet tool install Nuke.GlobalTool --global`), [Node.js 20+](https://nodejs.org/), [Docker](https://www.docker.com/)
+
+#### Postman API Tests (Newman)
+
+Each collection tests a specific API domain. Run them individually:
+
+```bash
+nuke TestServerPostmanAuth              # Auth endpoints (register, login, current user)
+nuke TestServerPostmanProfiles          # Profile endpoints (get, follow, unfollow)
+nuke TestServerPostmanArticlesEmpty     # Article list/feed when empty
+nuke TestServerPostmanArticle           # Full article CRUD (create, read, update, delete, favorite, comments, tags)
+nuke TestServerPostmanFeedAndArticles   # Feed + article listing with multiple users
+```
+
+#### Playwright E2E Tests
+
+```bash
+nuke TestE2e                            # Full Playwright E2E suite (all pages)
+```
+
+#### All Backend Tests
+
+```bash
+nuke TestServer                         # xUnit backend unit/integration tests
+```
+
+### Approach
+
+1. Start by running `nuke TestServerPostmanAuth` — those should pass already
+2. Move on to `nuke TestServerPostmanProfiles` — those should also pass
+3. Tackle `nuke TestServerPostmanArticlesEmpty` next — this will require implementing article endpoints
+4. Work through `nuke TestServerPostmanArticle` and `nuke TestServerPostmanFeedAndArticles`
+5. Run `nuke TestE2e` once the API is solid — the frontend tests exercise the full stack
+
+Good luck!
+
+---
+
+# Agent-First Multi-Tenant Starter Template
 
 A production-ready .NET + React starter template built for agent-first development. Includes Clean Architecture, CQRS, multi-tenancy via Finbuckle, 46 AI-invocable build skills, 32 custom Roslyn analyzers, and a 4-layer test suite — so AI coding agents can build, test, lint, and deploy through a single entry point (`nuke`).
 
@@ -104,11 +170,14 @@ nuke RunLocalPublish
 ### 🧪 Run Tests
 
 ```bash
-nuke TestServer              # Backend xUnit tests
-nuke TestClient              # Frontend Vitest tests
-nuke TestE2e                 # Playwright E2E tests
-nuke TestServerPostmanAuth    # Postman Auth API tests
-nuke TestServerPostmanProfiles # Postman Profiles API tests
+nuke TestServer                         # Backend xUnit tests
+nuke TestClient                         # Frontend Vitest tests
+nuke TestE2e                            # Playwright E2E tests
+nuke TestServerPostmanAuth              # Postman Auth API tests
+nuke TestServerPostmanProfiles          # Postman Profiles API tests
+nuke TestServerPostmanArticlesEmpty     # Postman Articles (empty state) tests
+nuke TestServerPostmanArticle           # Postman Article CRUD tests
+nuke TestServerPostmanFeedAndArticles   # Postman Feed + Articles tests
 ```
 
 ### 🔍 Lint
@@ -125,7 +194,7 @@ All operations go through `nuke <Target>`. No need to run `dotnet`, `npm`, or `d
 | Category | Targets |
 |:---------|:--------|
 | 🔨 **Build** | `BuildServer`, `BuildClient`, `BuildServerPublish`, `BuildGenerateApiClient` |
-| 🧪 **Test** | `TestServer`, `TestClient`, `TestE2e`, `TestServerPostmanAuth`, `TestServerPostmanProfiles` |
+| 🧪 **Test** | `TestServer`, `TestClient`, `TestE2e`, `TestServerPostmanAuth`, `TestServerPostmanProfiles`, `TestServerPostmanArticlesEmpty`, `TestServerPostmanArticle`, `TestServerPostmanFeedAndArticles` |
 | 🔍 **Lint** | `LintAllVerify`, `LintAllFix`, `LintServerVerify`, `LintClientVerify`, `LintApiClientVerify` |
 | 🗄️ **Database** | `DbMigrationsAdd`, `DbMigrationsVerifyApply`, `DbMigrationsGenerateIdempotentScript`, `DbReset` |
 | ▶️ **Run** | `RunLocalPublish`, `RunLocalDependencies`, `RunLocalClient` |

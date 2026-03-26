@@ -114,6 +114,16 @@ public partial class Build
         }
       });
 
+  internal Target TestServerPostmanArticlesEmpty => _ => _
+      .Description("Run postman tests for ArticlesEmpty collection using Docker Compose")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(DbResetForce)
+      .DependsOn(PathsCleanDirectories)
+      .Executes(() =>
+      {
+        RunPostmanCollection("ArticlesEmpty");
+      });
+
   internal Target TestServerPostmanAuth => _ => _
       .Description("Run postman tests for Auth collection using Docker Compose")
       .DependsOn(BuildServerPublish)
@@ -132,6 +142,26 @@ public partial class Build
       .Executes(() =>
       {
         RunPostmanCollection("Profiles");
+      });
+
+  internal Target TestServerPostmanFeedAndArticles => _ => _
+      .Description("Run postman tests for FeedAndArticles collection using Docker Compose")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(DbResetForce)
+      .DependsOn(PathsCleanDirectories)
+      .Executes(() =>
+      {
+        RunPostmanCollection("FeedAndArticles");
+      });
+
+  internal Target TestServerPostmanArticle => _ => _
+      .Description("Run postman tests for Article collection using Docker Compose")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(DbResetForce)
+      .DependsOn(PathsCleanDirectories)
+      .Executes(() =>
+      {
+        RunPostmanCollection("Article");
       });
 
   internal Target TestE2e => _ =>
@@ -172,28 +202,30 @@ public partial class Build
       }
       finally
       {
+        // Start docker compose down in background while report generation proceeds
         var downProcess = ProcessTasks.StartProcess(
           "docker",
           downArgs,
           workingDirectory: RootDirectory);
+
+        // Generate LiquidTestReport from TRX files in parallel with compose down
+        var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
+
+        try
+        {
+          Liquid(
+            $"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestE2e)} Results\"");
+
+          // Extract summary from Report.md (everything before first "---")
+          var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";
+          ExtractReportSummary(reportFile, reportSummaryFile);
+        }
+        catch (Exception ex)
+        {
+          Log.Warning("Failed to generate LiquidTestReport: {Message}", ex.Message);
+        }
+
         downProcess.WaitForExit();
-      }
-
-      // Generate LiquidTestReport from TRX files
-      var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
-
-      try
-      {
-        Liquid(
-          $"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestE2e)} Results\"");
-
-        // Extract summary from Report.md (everything before first "---")
-        var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";
-        ExtractReportSummary(reportFile, reportSummaryFile);
-      }
-      catch (Exception ex)
-      {
-        Log.Warning("Failed to generate LiquidTestReport: {Message}", ex.Message);
       }
 
       // Explicitly fail the target if Docker Compose failed

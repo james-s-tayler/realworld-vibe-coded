@@ -10,10 +10,10 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
-  public async Task UnauthenticatedUser_RedirectsToLogin_WhenAccessingDashboard()
+  public async Task UnauthenticatedUser_RedirectsToLogin_WhenAccessingHomePage()
   {
-    // Act - try to access dashboard without authentication
-    await Page.GotoAsync(BaseUrl);
+    // Act - try to access home page without authentication
+    await Pages.HomePage.GoToAsync();
 
     // Assert - should redirect to login page
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/login");
