@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/enforce-nuke.sh"
+          },
+          {
+            "type": "command",
+            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/test-before-commit.sh"
           }
         ]
       },
@@ -16,6 +20,17 @@
           {
             "type": "command",
             "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/protect-files.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/mark-tests-ran.sh"
           }
         ]
       }
@@ -50,6 +65,7 @@
     "Bash(pwd)",
     "Bash(which *)",
     "Bash(npm *)",
-    "Bash(npx *)"
+    "Bash(npx *)",
+    "Bash(touch /tmp/claude-circuit-breaker-skip)"
   ]
 }

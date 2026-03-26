@@ -47,3 +47,262 @@ Structured Serilog with properties (`{@Command}`, `{UserId}`, `{Slug}`). Never l
 - Small composable functions, early returns, no deep nesting
 - DRY via interfaces, generics, extension methods
 - Consolidate/update existing components rather than adding new ones
+
+---
+
+## Code Templates
+
+Copy-paste these templates when creating new features. Customize the marked sections.
+
+### Endpoint (authenticated POST)
+
+```csharp
+// File: App/Server/src/Server.Web/{Feature}/Create/Create.cs
+using Server.Infrastructure;
+using Server.UseCases.{Feature};
+using Server.UseCases.{Feature}.Create;
+using Server.UseCases.Interfaces;
+
+namespace Server.Web.{Feature}.Create;
+
+public class Create(IMediator mediator, IUserContext userContext) : Endpoint<CreateRequest, {Feature}Response, {Feature}Mapper>
+{
+  public override void Configure()
+  {
+    Post("/api/{route}");
+    AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
+  }
+
+  public override async Task HandleAsync(CreateRequest request, CancellationToken cancellationToken)
+  {
+    var userId = userContext.GetRequiredCurrentUserId();
+
+    var result = await mediator.Send(
+      new CreateCommand(/* map request fields */, userId),
+      cancellationToken);
+
+    await Send.ResultMapperAsync(
+      result,
+      async (entity, ct) => await Map.FromEntityAsync(entity, ct),
+      cancellationToken);
+  }
+}
+```
+
+### Request + Response DTOs
+
+```csharp
+// File: App/Server/src/Server.Web/{Feature}/Create/CreateRequest.cs
+namespace Server.Web.{Feature}.Create;
+
+public class CreateRequest
+{
+  // Wrap in an outer object to match RealWorld JSON: { "article": { ... } }
+  public CreateData {Feature} { get; set; } = new();
+}
+
+public class CreateData
+{
+  public string Title { get; set; } = default!;
+  public string Description { get; set; } = default!;
+  public string Body { get; set; } = default!;
+  public List<string>? TagList { get; set; }
+}
+```
+
+```csharp
+// File: App/Server/src/Server.Web/{Feature}/{Feature}Response.cs
+namespace Server.Web.{Feature};
+
+public class {Feature}Response
+{
+  // Match the exact shape from SPEC-REFERENCE.md
+  public {Feature}Dto {Feature} { get; set; } = default!;
+}
+```
+
+### MediatR Command + Handler
+
+```csharp
+// File: App/Server/src/Server.UseCases/{Feature}/Create/CreateCommand.cs
+using Server.SharedKernel.MediatR;
+
+namespace Server.UseCases.{Feature}.Create;
+
+public record CreateCommand(
+  string Title,
+  string Description,
+  string Body,
+  List<string> TagList,
+  Guid AuthorId,
+  Guid UserId
+) : ICommand<{Entity}>;
+```
+
+```csharp
+// File: App/Server/src/Server.UseCases/{Feature}/Create/CreateHandler.cs
+using Microsoft.Extensions.Logging;
+using Server.SharedKernel.MediatR;
+
+namespace Server.UseCases.{Feature}.Create;
+
+public class CreateHandler : ICommandHandler<CreateCommand, {Entity}>
+{
+  private readonly IRepository<{Entity}> _repository;
+  private readonly ILogger<CreateHandler> _logger;
+
+  public CreateHandler(
+    IRepository<{Entity}> repository,
+    ILogger<CreateHandler> logger)
+  {
+    _repository = repository;
+    _logger = logger;
+  }
+
+  public async Task<Result<{Entity}>> Handle(CreateCommand request, CancellationToken cancellationToken)
+  {
+    // Create entity from command
+    var entity = new {Entity}(/* ... */);
+
+    await _repository.AddAsync(entity, cancellationToken);
+
+    _logger.LogInformation("Created {Entity} with ID {Id}", entity.Id);
+
+    return Result<{Entity}>.Success(entity);
+  }
+}
+```
+
+### MediatR Query + Handler
+
+```csharp
+// File: App/Server/src/Server.UseCases/{Feature}/Get/GetQuery.cs
+using Server.SharedKernel.MediatR;
+
+namespace Server.UseCases.{Feature}.Get;
+
+public record GetQuery(string Identifier) : IQuery<{ResultDto}>;
+```
+
+```csharp
+// File: App/Server/src/Server.UseCases/{Feature}/Get/GetHandler.cs
+using Server.SharedKernel.MediatR;
+
+namespace Server.UseCases.{Feature}.Get;
+
+public class GetHandler : IQueryHandler<GetQuery, {ResultDto}>
+{
+  private readonly IReadRepository<{Entity}> _repository;
+
+  public GetHandler(IReadRepository<{Entity}> repository)
+  {
+    _repository = repository;
+  }
+
+  public async Task<Result<{ResultDto}>> Handle(GetQuery request, CancellationToken cancellationToken)
+  {
+    var spec = new {Entity}ByIdentifierSpec(request.Identifier);
+    var entity = await _repository.FirstOrDefaultAsync(spec, cancellationToken);
+
+    if (entity is null)
+      return Result<{ResultDto}>.NotFound();
+
+    return Result<{ResultDto}>.Success(/* map to DTO */);
+  }
+}
+```
+
+### FluentValidation Validator
+
+```csharp
+// File: App/Server/src/Server.Web/{Feature}/Create/CreateValidator.cs
+using FluentValidation;
+
+namespace Server.Web.{Feature}.Create;
+
+public class CreateValidator : Validator<CreateRequest>
+{
+  public CreateValidator()
+  {
+    RuleLevelCascadeMode = CascadeMode.Stop;
+
+    RuleFor(x => x.{Feature}.Title)
+      .NotEmpty().WithMessage("is required.")
+      .MaximumLength({Entity}.TitleMaxLength).WithMessage($"cannot exceed {{Entity}.TitleMaxLength} characters.")
+      .OverridePropertyName("title");
+
+    RuleFor(x => x.{Feature}.Description)
+      .NotEmpty().WithMessage("is required.")
+      .OverridePropertyName("description");
+  }
+}
+```
+
+### EF Core Entity Configuration
+
+```csharp
+// File: App/Server/src/Server.Infrastructure/Data/Config/{Entity}Configuration.cs
+using Server.Core.{Aggregate};
+
+namespace Server.Infrastructure.Data.Config;
+
+public class {Entity}Configuration : IEntityTypeConfiguration<{Entity}>
+{
+  public void Configure(EntityTypeBuilder<{Entity}> builder)
+  {
+    // Property constraints
+    builder.Property(x => x.Title)
+      .HasMaxLength({Entity}.TitleMaxLength)
+      .IsRequired();
+
+    builder.Property(x => x.Slug)
+      .HasMaxLength({Entity}.SlugMaxLength)
+      .IsRequired();
+
+    // Unique indexes
+    builder.HasIndex(x => x.Slug).IsUnique();
+
+    // Relationships
+    builder.HasOne(x => x.Author)
+      .WithMany()
+      .HasForeignKey(x => x.AuthorId)
+      .OnDelete(DeleteBehavior.Restrict);
+
+    // Many-to-many
+    builder.HasMany(x => x.Tags)
+      .WithMany(x => x.Articles)
+      .UsingEntity(j => j.ToTable("ArticleTags"));
+  }
+}
+```
+
+### ResponseMapper
+
+```csharp
+// File: App/Server/src/Server.Web/{Feature}/{Feature}Mapper.cs
+using Server.Core.{Aggregate};
+
+namespace Server.Web.{Feature};
+
+public class {Feature}Mapper : ResponseMapper<{Feature}Response, {Entity}>
+{
+  public override Task<{Feature}Response> FromEntityAsync({Entity} entity, CancellationToken ct)
+  {
+    var response = new {Feature}Response
+    {
+      {Feature} = new {Feature}Dto
+      {
+        // Map only the fields SPEC-REFERENCE.md requires
+        Title = entity.Title,
+        Slug = entity.Slug,
+        Description = entity.Description,
+        Body = entity.Body,
+        CreatedAt = entity.CreatedAt,
+        UpdatedAt = entity.UpdatedAt,
+      },
+    };
+
+    return Task.FromResult(response);
+  }
+}
+```

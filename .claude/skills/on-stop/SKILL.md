@@ -1,62 +1,67 @@
 ---
-description: Run before finishing to verify changes. Triggered by the Stop hook — maps modified files to minimal lint and test targets.
+description: Run before finishing to run the full test suite and report a score. Triggered by the Stop hook.
 ---
 
-Run verification based on what files actually changed. Skip if nothing was modified.
+Run the complete test suite and report a pass/fail score. This is mandatory before finishing.
 
-## Step 1: Identify changed files
+## Step 1: Run all Postman test collections
 
-Run `git diff --name-only HEAD` to get all modified files (staged + unstaged) relative to last commit.
+Run each collection individually and record results:
 
-If no files changed, skip verification entirely and stop.
+```bash
+./build.sh TestServerPostmanAuth
+./build.sh TestServerPostmanProfiles
+./build.sh TestServerPostmanArticlesEmpty
+./build.sh TestServerPostmanArticle
+./build.sh TestServerPostmanFeedAndArticles
+```
 
-## Step 2: Map to lint targets
+For each collection, note: X passing, Y failing out of Z total.
 
-Match changed paths to the minimal set of lint targets:
+## Step 2: Run E2E test suite
 
-| Path pattern | Lint target |
-|:-------------|:------------|
-| `App/Server/**` | `LintServerVerify` |
-| `App/Client/**` | `LintClientVerify` |
-| `Task/Runner/**` | `LintNukeVerify` |
-| `Test/e2e/**` | `LintAllVerify` |
-| `.claude/skills/**` | `LintSkillsVerify` |
-| `CLAUDE.md` | `LintClaudeMdVerify` |
+```bash
+./build.sh TestE2e
+```
 
-## Step 3: Map to test targets
+Note: X passing, Y failing out of Z total.
 
-Match changed paths to the minimal set of test targets:
+## Step 3: Calculate and report score
 
-| Path pattern | Test target |
-|:-------------|:------------|
-| `App/Server/**` | `TestServer` |
-| `App/Client/**` | `TestClient` |
-| `Test/e2e/**` | `TestE2e` |
-| `App/Server/**` AND `App/Client/**` | `TestE2e` |
+Calculate the overall score:
 
-When both backend and frontend changed, `TestE2e` is required — it's the only test that validates the actual contract between the two layers.
+```
+Score = (total passing across all suites) / (total tests across all suites)
+```
 
-For server endpoint/handler/validator changes, also run the relevant Postman collection:
+Report the score to the user in this format:
 
-| Endpoint area | Postman target |
-|:-------------|:---------------|
-| Auth/identity endpoints | `TestServerPostmanAuth` |
-| Profile endpoints | `TestServerPostmanProfiles` |
-| Article CRUD/comments/favorites | `TestServerPostmanArticle` |
-| Feed/article listing | `TestServerPostmanFeedAndArticles` |
-| Unclear which collection | `TestServerPostmanAuth` (smoke test) |
+```
+## Final Score
 
-## Step 4: Execute
+| Suite | Passing | Failing | Total |
+|-------|---------|---------|-------|
+| PostmanAuth | X | Y | Z |
+| PostmanProfiles | X | Y | Z |
+| PostmanArticlesEmpty | X | Y | Z |
+| PostmanArticle | X | Y | Z |
+| PostmanFeedAndArticles | X | Y | Z |
+| E2E | X | Y | Z |
+| **Total** | **X** | **Y** | **Z** |
 
-Run each target sequentially via `./build.sh <target>`. Stop on first failure.
+**Score: X/Z (N%)**
+```
 
-**Lint targets first, then test targets.**
+## Step 4: Append to PROGRESS.md
 
-If a lint target fails, run the corresponding `*Fix` target and re-verify before moving to tests:
-- `LintServerVerify` → `LintServerFix`
-- `LintClientVerify` → `LintClientFix`
-- `LintNukeVerify` → `LintNukeFix`
-- `LintAllVerify` → `LintAllFix`
-- `LintSkillsVerify` → `LintSkillsFix`
+Append the score to `PROGRESS.md` under "Test Results Log":
 
-Report results to the user when done.
+```
+- YYYY-MM-DD HH:MM — Final score: X/Z (N%) — Auth: X/Y, Profiles: X/Y, ArticlesEmpty: X/Y, Article: X/Y, FeedAndArticles: X/Y, E2E: X/Y
+```
+
+## Important
+
+- Run ALL suites even if earlier ones fail — we need the complete picture.
+- If a suite fails to run at all (e.g. build error), record 0/0 and note the error.
+- Do NOT skip this skill. The score is the metric for the time-to-realworld challenge.
