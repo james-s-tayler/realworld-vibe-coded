@@ -11,6 +11,7 @@ Reference as needed:
 - `SPEC-REFERENCE.md` — complete API spec
 - `.claude/rules/backend.md` — code templates
 - `Docs/architecture.md` — tech stack, folder structure, build commands
+- `Docs/references/` — engineering reference material (harness engineering, etc.)
 
 ## Invariants
 
