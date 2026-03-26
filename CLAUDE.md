@@ -4,13 +4,13 @@
 
 Read these files in order:
 1. `PROGRESS.md` — context from previous sessions
-2. `docs/exec-plans/active/realworld-spec.md` — story order and dependency DAG
-3. `docs/workflow.md` — mandatory workflow, circuit breaker, context management
+2. `Docs/exec-plans/active/realworld-spec.md` — story order and dependency DAG
+3. `Docs/workflow.md` — mandatory workflow, circuit breaker, context management
 
 Reference as needed:
 - `SPEC-REFERENCE.md` — complete API spec
 - `.claude/rules/backend.md` — code templates
-- `docs/architecture.md` — tech stack, folder structure, build commands
+- `Docs/architecture.md` — tech stack, folder structure, build commands
 
 ## Invariants
 
