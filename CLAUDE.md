@@ -53,6 +53,13 @@ When Nuke build targets fail, **carefully read the error messages** — they con
 9. **If modifying the Nuke build, build it first** before committing.
 10. **Check Postman tests are passing** before finishing API work.
 
+## Implementation Plan
+
+- Read `IMPLEMENTATION-PLAN.md` at the start of every session for the pre-planned implementation order.
+- Follow the story order strictly — each story builds only on completed dependencies.
+- Run the specified test command after each story to validate before moving on.
+- See `SPEC-REFERENCE.md` for the complete API specification with endpoint details, schemas, and validation rules.
+
 ## Task Tracking
 
 - Read `TODO.md` at the start of every session to understand current project tasks.
