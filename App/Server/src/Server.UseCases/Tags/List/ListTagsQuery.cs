@@ -1,0 +1,5 @@
+﻿using Server.SharedKernel.MediatR;
+
+namespace Server.UseCases.Tags.List;
+
+public record ListTagsQuery : IQuery<List<string>>;

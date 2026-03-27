@@ -411,3 +411,24 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327061352_AddArticleTagList'
+)
+BEGIN
+    ALTER TABLE [Article] ADD [TagList] nvarchar(max) NOT NULL DEFAULT N'[]';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327061352_AddArticleTagList'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260327061352_AddArticleTagList', N'10.0.1');
+END;
+
+COMMIT;
+GO
+

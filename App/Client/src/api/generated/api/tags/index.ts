@@ -11,7 +11,6 @@ import { type BaseRequestBuilder, type Parsable, type ParsableFactory, type Requ
  */
 export interface TagsRequestBuilder extends BaseRequestBuilder<TagsRequestBuilder> {
     /**
-     * Get all tags used in articles. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<TagsResponse>}
      * @throws {ProblemDetails} error when the service returns a 401 status code
@@ -22,7 +21,6 @@ export interface TagsRequestBuilder extends BaseRequestBuilder<TagsRequestBuilde
      */
      get(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<TagsResponse | undefined>;
     /**
-     * Get all tags used in articles. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */

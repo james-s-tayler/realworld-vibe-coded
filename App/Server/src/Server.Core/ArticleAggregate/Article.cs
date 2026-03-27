@@ -23,5 +23,7 @@ public class Article : EntityBase, IAggregateRoot
 
   public ApplicationUser Author { get; set; } = default!;
 
+  public List<string> TagList { get; set; } = [];
+
   public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 }
