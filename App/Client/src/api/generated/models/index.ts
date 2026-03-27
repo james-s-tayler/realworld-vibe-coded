@@ -234,6 +234,7 @@ export function deserializeIntoProblemDetails_Error(problemDetails_Error: Partia
 export function deserializeIntoProfileDto(profileDto: Partial<ProfileDto> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
         "bio": n => { profileDto.bio = n.getStringValue(); },
+        "following": n => { profileDto.following = n.getBooleanValue(); },
         "image": n => { profileDto.image = n.getStringValue(); },
         "username": n => { profileDto.username = n.getStringValue(); },
     }
@@ -440,6 +441,10 @@ export interface ProfileDto extends Parsable {
      */
     bio?: string | null;
     /**
+     * The following property
+     */
+    following?: boolean | null;
+    /**
      * The image property
      */
     image?: string | null;
@@ -541,6 +546,7 @@ export function serializeProblemDetails_Error(writer: SerializationWriter, probl
 export function serializeProfileDto(writer: SerializationWriter, profileDto: Partial<ProfileDto> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!profileDto || isSerializingDerivedType) { return; }
     writer.writeStringValue("bio", profileDto.bio);
+    writer.writeBooleanValue("following", profileDto.following);
     writer.writeStringValue("image", profileDto.image);
     writer.writeStringValue("username", profileDto.username);
 }

@@ -11,7 +11,6 @@ import { type BaseRequestBuilder, type Parsable, type ParsableFactory, type Requ
  */
 export interface FollowRequestBuilder extends BaseRequestBuilder<FollowRequestBuilder> {
     /**
-     * Unfollow a user by username. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<ProfileResponse>}
      * @throws {ProblemDetails} error when the service returns a 400 status code
@@ -23,7 +22,6 @@ export interface FollowRequestBuilder extends BaseRequestBuilder<FollowRequestBu
      */
      delete(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<ProfileResponse | undefined>;
     /**
-     * Follow a user by username. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<ProfileResponse>}
      * @throws {ProblemDetails} error when the service returns a 400 status code
@@ -35,13 +33,11 @@ export interface FollowRequestBuilder extends BaseRequestBuilder<FollowRequestBu
      */
      post(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<ProfileResponse | undefined>;
     /**
-     * Unfollow a user by username. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */
      toDeleteRequestInformation(requestConfiguration?: RequestConfiguration<object> | undefined) : RequestInformation;
     /**
-     * Follow a user by username. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */

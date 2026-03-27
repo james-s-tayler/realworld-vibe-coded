@@ -199,3 +199,215 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE TABLE [Article] (
+        [Id] uniqueidentifier NOT NULL,
+        [Slug] nvarchar(300) NOT NULL,
+        [Title] nvarchar(255) NOT NULL,
+        [Description] nvarchar(1000) NOT NULL,
+        [Body] nvarchar(max) NOT NULL,
+        [AuthorId] uniqueidentifier NOT NULL,
+        [TenantId] nvarchar(450) NOT NULL,
+        [ChangeCheck] rowversion NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NOT NULL,
+        [CreatedBy] nvarchar(256) NOT NULL,
+        [UpdatedBy] nvarchar(256) NOT NULL,
+        CONSTRAINT [PK_Article] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Article_AspNetUsers_AuthorId] FOREIGN KEY ([AuthorId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE TABLE [Tag] (
+        [Id] uniqueidentifier NOT NULL,
+        [Name] nvarchar(100) NOT NULL,
+        [TenantId] nvarchar(450) NOT NULL,
+        [ChangeCheck] rowversion NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NOT NULL,
+        [CreatedBy] nvarchar(256) NOT NULL,
+        [UpdatedBy] nvarchar(256) NOT NULL,
+        CONSTRAINT [PK_Tag] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE TABLE [UserFollowing] (
+        [Id] uniqueidentifier NOT NULL,
+        [FollowerId] uniqueidentifier NOT NULL,
+        [FollowedId] uniqueidentifier NOT NULL,
+        [TenantId] nvarchar(450) NOT NULL,
+        [ChangeCheck] rowversion NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NOT NULL,
+        [CreatedBy] nvarchar(256) NOT NULL,
+        [UpdatedBy] nvarchar(256) NOT NULL,
+        CONSTRAINT [PK_UserFollowing] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_UserFollowing_AspNetUsers_FollowedId] FOREIGN KEY ([FollowedId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_UserFollowing_AspNetUsers_FollowerId] FOREIGN KEY ([FollowerId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE TABLE [ArticleFavorite] (
+        [Id] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [ArticleId] uniqueidentifier NOT NULL,
+        [TenantId] nvarchar(450) NOT NULL,
+        [ChangeCheck] rowversion NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NOT NULL,
+        [CreatedBy] nvarchar(256) NOT NULL,
+        [UpdatedBy] nvarchar(256) NOT NULL,
+        CONSTRAINT [PK_ArticleFavorite] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_ArticleFavorite_Article_ArticleId] FOREIGN KEY ([ArticleId]) REFERENCES [Article] ([Id]) ON DELETE CASCADE,
+        CONSTRAINT [FK_ArticleFavorite_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE TABLE [Comment] (
+        [Id] uniqueidentifier NOT NULL,
+        [Body] nvarchar(max) NOT NULL,
+        [ArticleId] uniqueidentifier NOT NULL,
+        [AuthorId] uniqueidentifier NOT NULL,
+        [TenantId] nvarchar(450) NOT NULL,
+        [ChangeCheck] rowversion NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NOT NULL,
+        [CreatedBy] nvarchar(256) NOT NULL,
+        [UpdatedBy] nvarchar(256) NOT NULL,
+        CONSTRAINT [PK_Comment] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Comment_Article_ArticleId] FOREIGN KEY ([ArticleId]) REFERENCES [Article] ([Id]) ON DELETE CASCADE,
+        CONSTRAINT [FK_Comment_AspNetUsers_AuthorId] FOREIGN KEY ([AuthorId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE TABLE [ArticleTag] (
+        [ArticlesId] uniqueidentifier NOT NULL,
+        [TagsId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_ArticleTag] PRIMARY KEY ([ArticlesId], [TagsId]),
+        CONSTRAINT [FK_ArticleTag_Article_ArticlesId] FOREIGN KEY ([ArticlesId]) REFERENCES [Article] ([Id]) ON DELETE CASCADE,
+        CONSTRAINT [FK_ArticleTag_Tag_TagsId] FOREIGN KEY ([TagsId]) REFERENCES [Tag] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE INDEX [IX_Article_AuthorId] ON [Article] ([AuthorId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Article_Slug] ON [Article] ([Slug], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE INDEX [IX_ArticleFavorite_ArticleId] ON [ArticleFavorite] ([ArticleId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_ArticleFavorite_UserId_ArticleId] ON [ArticleFavorite] ([UserId], [ArticleId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE INDEX [IX_ArticleTag_TagsId] ON [ArticleTag] ([TagsId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE INDEX [IX_Comment_ArticleId] ON [Comment] ([ArticleId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE INDEX [IX_Comment_AuthorId] ON [Comment] ([AuthorId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Tag_Name] ON [Tag] ([Name], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE INDEX [IX_UserFollowing_FollowedId] ON [UserFollowing] ([FollowedId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_UserFollowing_FollowerId_FollowedId] ON [UserFollowing] ([FollowerId], [FollowedId], [TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260327055850_AddArticlesTagsCommentsFavoritesFollows'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260327055850_AddArticlesTagsCommentsFavoritesFollows', N'10.0.1');
+END;
+
+COMMIT;
+GO
+

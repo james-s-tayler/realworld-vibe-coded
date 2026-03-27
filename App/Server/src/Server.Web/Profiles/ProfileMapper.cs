@@ -1,18 +1,19 @@
-﻿using Server.Core.IdentityAggregate;
+﻿using Server.UseCases.Profiles;
 
 namespace Server.Web.Profiles;
 
-public class ProfileMapper : ResponseMapper<ProfileResponse, ApplicationUser>
+public class ProfileMapper : ResponseMapper<ProfileResponse, ProfileResult>
 {
-  public override Task<ProfileResponse> FromEntityAsync(ApplicationUser user, CancellationToken ct)
+  public override Task<ProfileResponse> FromEntityAsync(ProfileResult result, CancellationToken ct)
   {
     var response = new ProfileResponse
     {
       Profile = new ProfileDto
       {
-        Username = user.UserName ?? string.Empty,
-        Bio = user.Bio,
-        Image = user.Image,
+        Username = result.User.UserName ?? string.Empty,
+        Bio = result.User.Bio,
+        Image = result.User.Image,
+        Following = result.Following,
       },
     };
 
