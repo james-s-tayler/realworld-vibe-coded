@@ -940,10 +940,17 @@ interface CreateCommentRequest {
 - Subsequent users are invited by ADMIN users into the same tenant
 - All data is isolated per tenant (query filters via Finbuckle)
 
-### Slug Generation
-- Slugs are generated from article titles using kebab-case (lowercase, spaces → hyphens)
-- Example: `"How to train your dragon"` → `"how-to-train-your-dragon"`
+### Slug Generation Rules
+- Convert title to lowercase
+- Remove all characters except: letters, digits, whitespace, hyphens, underscores
+- Regex: `[^a-z0-9\s\-_]`
+- Replace whitespace sequences with a single hyphen
+- Trim leading/trailing hyphens
 - Duplicate titles that produce the same slug are REJECTED (400 error for field `"slug"`)
+- Examples:
+  - `"How to train your dragon"` → `"how-to-train-your-dragon"`
+  - `"How to train your dragon_2"` → `"how-to-train-your-dragon_2"`
+  - `"Côte d'Azur!"` → `"cte-dazur"`
 
 ### Tag Rules
 - Tags are stored as ordered arrays

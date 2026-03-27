@@ -65,6 +65,8 @@ nunit-*.xml
 # Newman/Postman test reports and E2E test results
 reports/
 Reports/
+# But keep agent stats CSV (committed as run artifacts)
+!Reports/agent-stats.csv
 
 # Nuke build temp files
 .nuke/temp/

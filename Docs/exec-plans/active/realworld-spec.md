@@ -75,9 +75,17 @@ Tags (standalone)          Auth (already built)
 
 **Location:** `App/Server/src/Server.Core/` for entities, `App/Server/src/Server.Infrastructure/` for EF config
 
-**Tests:** `./build.sh BuildServer` (compiles without errors)
+**Gate:**
+1. `./build.sh LintAllVerify` — must pass
+2. `./build.sh BuildServer` — must pass
+3. `./build.sh TestServerPostmanAuth` — expect: FAIL (no schema yet)
+4. `./build.sh TestServerPostmanProfiles` — expect: FAIL
+5. `./build.sh TestServerPostmanArticlesEmpty` — expect: FAIL
+6. `./build.sh TestServerPostmanArticle` — expect: FAIL
+7. `./build.sh TestServerPostmanFeedAndArticles` — expect: FAIL
+8. `./build.sh TestE2e` — note failures (infra vs code)
 
-**Done when:** Solution builds, migration applies cleanly, database schema includes all new tables.
+**Done when:** Solution builds, migration applies cleanly, database schema includes all new tables. No regressions from baseline.
 
 ---
 
@@ -97,9 +105,19 @@ Tags (standalone)          Auth (already built)
 - Unfollow is NOT idempotent (unfollowing when not following returns 400)
 - `following` field must appear in all profile responses and article `author` objects
 
-**Tests:** `./build.sh TestServerPostmanProfiles`
+**Post-implementation:** Run `./build.sh BuildGenerateApiClient` after creating new endpoints.
 
-**Done when:** All Postman Profiles collection tests pass.
+**Gate:**
+1. `./build.sh LintAllVerify` — must pass
+2. `./build.sh BuildServer` — must pass
+3. `./build.sh TestServerPostmanAuth` — expect: PASS
+4. `./build.sh TestServerPostmanProfiles` — expect: PASS (target)
+5. `./build.sh TestServerPostmanArticlesEmpty` — expect: FAIL
+6. `./build.sh TestServerPostmanArticle` — expect: FAIL
+7. `./build.sh TestServerPostmanFeedAndArticles` — expect: FAIL
+8. `./build.sh TestE2e` — note failures
+
+**Done when:** All Postman Profiles collection tests pass. No regressions on Auth.
 
 ---
 
@@ -115,15 +133,25 @@ Tags (standalone)          Auth (already built)
 **Depends on:** Story 1 (Article, Tag entities), Story 2 (profile `following` field in author response)
 
 **Key business rules:**
-- Slug auto-generated from title (kebab-case), duplicate slugs rejected (400)
+- Slug auto-generated from title: lowercase, strip non-alphanumeric except hyphens/underscores, replace whitespace with hyphens. Regex: `[^a-z0-9\s\-_]`. Underscores MUST be preserved.
 - Tags: each must be non-empty, no commas; order preserved
 - `favoritesCount` must be integer, `createdAt`/`updatedAt` ISO 8601
 - `author` object includes `following` field
 - Tags endpoint returns all tags across all articles in current tenant
 
-**Tests:** None pass in isolation yet — these are prerequisites for Stories 4-7. Validate with `./build.sh BuildServer` (compiles) and manual smoke test.
+**Post-implementation:** Run `./build.sh BuildGenerateApiClient` after creating new endpoints.
 
-**Done when:** Create article returns 201 with correct shape, get article returns 200, tags returns tag list.
+**Gate:**
+1. `./build.sh LintAllVerify` — must pass
+2. `./build.sh BuildServer` — must pass
+3. `./build.sh TestServerPostmanAuth` — expect: PASS
+4. `./build.sh TestServerPostmanProfiles` — expect: PASS
+5. `./build.sh TestServerPostmanArticlesEmpty` — expect: FAIL (list endpoint not yet implemented)
+6. `./build.sh TestServerPostmanArticle` — expect: FAIL
+7. `./build.sh TestServerPostmanFeedAndArticles` — expect: FAIL
+8. `./build.sh TestE2e` — note failures
+
+**Done when:** Create article returns 201 with correct shape, get article returns 200, tags returns tag list. No regressions.
 
 ---
 
@@ -137,9 +165,19 @@ Tags (standalone)          Auth (already built)
 
 **Depends on:** Story 3 (articles list + tags endpoints exist)
 
-**Tests:** `./build.sh TestServerPostmanArticlesEmpty`
+**Post-implementation:** Run `./build.sh BuildGenerateApiClient` after creating new endpoints.
 
-**Done when:** All Postman ArticlesEmpty collection tests pass.
+**Gate:**
+1. `./build.sh LintAllVerify` — must pass
+2. `./build.sh BuildServer` — must pass
+3. `./build.sh TestServerPostmanAuth` — expect: PASS
+4. `./build.sh TestServerPostmanProfiles` — expect: PASS
+5. `./build.sh TestServerPostmanArticlesEmpty` — expect: PASS (target)
+6. `./build.sh TestServerPostmanArticle` — expect: FAIL
+7. `./build.sh TestServerPostmanFeedAndArticles` — expect: FAIL
+8. `./build.sh TestE2e` — note failures
+
+**Done when:** All Postman ArticlesEmpty collection tests pass. No regressions on Auth, Profiles.
 
 ---
 
@@ -158,6 +196,8 @@ Tags (standalone)          Auth (already built)
 - Unfavoriting something not favorited returns article with `favorited: false`, `favoritesCount: 0`
 - Returns full article object (includes `body`)
 - `favoritesCount` reflects unique users who favorited
+
+**Post-implementation:** Run `./build.sh BuildGenerateApiClient` after creating new endpoints.
 
 **Tests:** Validated as part of `./build.sh TestServerPostmanArticle` (Story 7).
 
@@ -183,6 +223,8 @@ Tags (standalone)          Auth (already built)
 - Non-existent article -> 404 for create, 422 for list/delete
 - Invalid GUID format -> 400, valid GUID not found -> 404
 
+**Post-implementation:** Run `./build.sh BuildGenerateApiClient` after creating new endpoints.
+
 **Tests:** Validated as part of `./build.sh TestServerPostmanArticle` (Story 7).
 
 **Done when:** Create/list/delete comments work with correct auth checks and error responses.
@@ -206,9 +248,19 @@ Tags (standalone)          Auth (already built)
 - Pagination: `limit` (default 20, min 1), `offset` (default 0, min 0)
 - Non-existent filter values return `articlesCount: 0`
 
-**Tests:** `./build.sh TestServerPostmanArticle`
+**Post-implementation:** Run `./build.sh BuildGenerateApiClient` after creating new endpoints.
 
-**Done when:** All Postman Article collection tests pass (articles, tags, favorites, comments).
+**Gate:**
+1. `./build.sh LintAllVerify` — must pass
+2. `./build.sh BuildServer` — must pass
+3. `./build.sh TestServerPostmanAuth` — expect: PASS
+4. `./build.sh TestServerPostmanProfiles` — expect: PASS
+5. `./build.sh TestServerPostmanArticlesEmpty` — expect: PASS
+6. `./build.sh TestServerPostmanArticle` — expect: PASS (target)
+7. `./build.sh TestServerPostmanFeedAndArticles` — expect: FAIL
+8. `./build.sh TestE2e` — note failures
+
+**Done when:** All Postman Article collection tests pass (articles, tags, favorites, comments). No regressions.
 
 ---
 
@@ -227,9 +279,17 @@ Tags (standalone)          Auth (already built)
 
 **Note:** This can be run early (after Story 1) as a regression check, but is listed here to confirm no regressions after all features are built.
 
-**Tests:** `./build.sh TestServerPostmanAuth`
+**Gate:**
+1. `./build.sh LintAllVerify` — must pass
+2. `./build.sh BuildServer` — must pass
+3. `./build.sh TestServerPostmanAuth` — expect: PASS (target)
+4. `./build.sh TestServerPostmanProfiles` — expect: PASS
+5. `./build.sh TestServerPostmanArticlesEmpty` — expect: PASS
+6. `./build.sh TestServerPostmanArticle` — expect: PASS
+7. `./build.sh TestServerPostmanFeedAndArticles` — expect: FAIL
+8. `./build.sh TestE2e` — note failures
 
-**Done when:** All Postman Auth collection tests pass.
+**Done when:** All Postman Auth collection tests pass. No regressions.
 
 ---
 
@@ -251,9 +311,19 @@ Tags (standalone)          Auth (already built)
 - Pagination: `limit` (default 20, min 1), `offset` (default 0, min 0)
 - Empty feed -> `{ articles: [], articlesCount: 0 }`
 
-**Tests:** `./build.sh TestServerPostmanFeedAndArticles`
+**Post-implementation:** Run `./build.sh BuildGenerateApiClient` after creating new endpoints.
 
-**Done when:** All Postman FeedAndArticles collection tests pass.
+**Gate:**
+1. `./build.sh LintAllVerify` — must pass
+2. `./build.sh BuildServer` — must pass
+3. `./build.sh TestServerPostmanAuth` — expect: PASS
+4. `./build.sh TestServerPostmanProfiles` — expect: PASS
+5. `./build.sh TestServerPostmanArticlesEmpty` — expect: PASS
+6. `./build.sh TestServerPostmanArticle` — expect: PASS
+7. `./build.sh TestServerPostmanFeedAndArticles` — expect: PASS (target)
+8. `./build.sh TestE2e` — expect: PASS
+
+**Done when:** All Postman FeedAndArticles collection tests pass. All suites green. No regressions.
 
 ---
 
@@ -271,14 +341,30 @@ Tags (standalone)          Auth (already built)
 | 8 | Auth Regression | S | `./build.sh TestServerPostmanAuth` | Confirm no regressions |
 | 9 | Feed + Integration | L | `./build.sh TestServerPostmanFeedAndArticles` | Feed endpoint + final integration |
 
+### Expected Baselines
+
+Use this table to detect **regressions** (a suite that previously passed now fails) and confirm **expected progress**.
+
+| Suite | After S1 | After S2 | After S3 | After S4 | After S5-7 | After S8 | After S9 |
+|-------|----------|----------|----------|----------|------------|----------|----------|
+| Auth | FAIL | PASS | PASS | PASS | PASS | PASS | PASS |
+| Profiles | FAIL | PASS | PASS | PASS | PASS | PASS | PASS |
+| ArticlesEmpty | FAIL | FAIL | FAIL | PASS | PASS | PASS | PASS |
+| Article | FAIL | FAIL | FAIL | FAIL | PASS | PASS | PASS |
+| FeedAndArticles | FAIL | FAIL | FAIL | FAIL | FAIL | FAIL | PASS |
+| E2E | note | note | note | note | note | note | PASS |
+
 ### Full Test Pass (all green = done)
 
 ```bash
+./build.sh LintAllVerify
+./build.sh BuildServer
 ./build.sh TestServerPostmanAuth
 ./build.sh TestServerPostmanProfiles
 ./build.sh TestServerPostmanArticlesEmpty
 ./build.sh TestServerPostmanArticle
 ./build.sh TestServerPostmanFeedAndArticles
+./build.sh TestE2e
 ```
 
 ---

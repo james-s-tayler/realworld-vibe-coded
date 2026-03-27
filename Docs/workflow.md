@@ -16,11 +16,20 @@ Wait for health checks to pass. If Docker or SQL Server fails, fix infrastructur
 
 1. Read the active exec plan and pick the next incomplete story
 2. Implement the feature (backend first, then frontend if applicable)
-3. Run the story's test command (e.g., `./build.sh TestServerPostmanAuth`)
-4. If tests **PASS**: commit with message `feat: implement <story-name> — tests passing`
-5. If tests **FAIL**: fix and re-test. Do NOT move to the next story until this one passes.
-6. Append to `PROGRESS.md`: what was implemented, test results, any gotchas discovered
-7. Repeat from step 1
+3. After creating or modifying endpoint files, run `./build.sh BuildGenerateApiClient` to regenerate the TypeScript API client. The commit hook will block until API client drift is resolved.
+4. Run the **full gate** (not just the story-specific test):
+   a. `./build.sh LintAllVerify` — must pass (zero new warnings)
+   b. `./build.sh BuildServer` — must pass
+   c. Run ALL Postman suites: `TestServerPostmanAuth`, `TestServerPostmanProfiles`, `TestServerPostmanArticlesEmpty`, `TestServerPostmanArticle`, `TestServerPostmanFeedAndArticles`
+   d. `./build.sh TestE2e` — note failures (infra vs code)
+5. Compare results against the **Expected Baselines** table in the exec plan:
+   - **Regression** = a suite that previously passed now fails → fix before committing
+   - **Expected progress** = this story's target suite now passes → good
+   - **Expected failure** = a suite for a later story still fails → fine, move on
+6. If no regressions and story target passes: commit with message `feat: implement <story-name> — tests passing`
+7. If regressions or story target fails: fix and re-run the full gate
+8. Append to `PROGRESS.md`: what was implemented, test results, any gotchas discovered
+9. Repeat from step 1
 
 ### Stop Condition
 

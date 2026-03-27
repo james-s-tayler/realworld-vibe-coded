@@ -56,7 +56,29 @@ Report the score to the user in this format:
 **Score: X/Z (N%)**
 ```
 
-## Step 5: Append to PROGRESS.md
+## Step 5: Agent Performance Summary
+
+If `Reports/agent-stats.csv` exists, summarize it:
+
+1. Count total invocations per target
+2. Count pass/fail per target
+3. Calculate pass rate per target
+4. Report in this format:
+
+```
+## Agent Performance
+
+| Target | Runs | Pass | Fail | Pass Rate |
+|--------|------|------|------|-----------|
+| BuildServer | 5 | 4 | 1 | 80% |
+| TestServerPostmanArticle | 3 | 1 | 2 | 33% |
+| ... | | | | |
+| **Total** | **N** | **X** | **Y** | **Z%** |
+```
+
+Append this table to PROGRESS.md under a new "## Agent Performance" section.
+
+## Step 6: Append to PROGRESS.md
 
 Append the score to `PROGRESS.md` under "Test Results Log":
 
@@ -64,7 +86,7 @@ Append the score to `PROGRESS.md` under "Test Results Log":
 - YYYY-MM-DD HH:MM — Final score: X/Z (N%) — Auth: X/Y, Profiles: X/Y, ArticlesEmpty: X/Y, Article: X/Y, FeedAndArticles: X/Y, E2E: X/Y
 ```
 
-## Step 6: Append to SCORES.csv
+## Step 7: Append to SCORES.csv
 
 Append a row to `SCORES.csv` with the results. The format is:
 
