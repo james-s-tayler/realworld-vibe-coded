@@ -64,7 +64,7 @@ nuke TestServer                         # xUnit backend unit/integration tests
 
 Open this repo in Claude Code and paste this prompt:
 
-> Read CLAUDE.md and follow the Session Start instructions. Then implement the RealWorld spec by following the story order in the active exec plan exactly. For each story: implement the feature, run the specified test command, fix any failures, then commit. Track progress in PROGRESS.md. If stuck on a single test for more than 20 minutes, commit what you have, note the blocker in PROGRESS.md, and move to the next story.
+> Read CLAUDE.md and follow the Session Start instructions. Then implement the RealWorld spec by following the story order in the active exec plan exactly. For each story: implement the feature, run the specified test command, fix any failures, then commit. Track progress in PROGRESS.md. If stuck on a single test for more than 20 minutes, commit what you have, note the blocker in PROGRESS.md, and move to the next story. The win condition is the `nuke TestE2e` must be passing and cannot be modified.
 
 Good luck!
 
