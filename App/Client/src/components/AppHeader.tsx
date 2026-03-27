@@ -37,6 +37,13 @@ export const AppHeader: React.FC = () => {
             )}
             {user ? (
               <>
+                <HeaderMenuItem
+                  as={Link}
+                  to="/editor"
+                  isActive={isActive('/editor')}
+                >
+                  New Article
+                </HeaderMenuItem>
                 <RequireRole roles={['ADMIN']}>
                   <HeaderMenuItem
                     as={Link}

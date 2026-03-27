@@ -1,4 +1,5 @@
-﻿using Server.Core.IdentityAggregate;
+﻿using Server.Core.ArticleFavoriteAggregate;
+using Server.Core.IdentityAggregate;
 using Server.Core.TagAggregate;
 using Server.SharedKernel.Persistence;
 
@@ -26,4 +27,6 @@ public class Article : EntityBase, IAggregateRoot
   public List<string> TagList { get; set; } = [];
 
   public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
+  public ICollection<ArticleFavorite> Favorites { get; set; } = new List<ArticleFavorite>();
 }

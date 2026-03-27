@@ -11,10 +11,8 @@ import { type BaseRequestBuilder, type Parsable, type ParsableFactory, type Requ
  */
 export interface FavoriteRequestBuilder extends BaseRequestBuilder<FavoriteRequestBuilder> {
     /**
-     * Remove article from favorites. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<ArticleResponse>}
-     * @throws {ProblemDetails} error when the service returns a 400 status code
      * @throws {ProblemDetails} error when the service returns a 401 status code
      * @throws {ProblemDetails} error when the service returns a 403 status code
      * @throws {ProblemDetails} error when the service returns a 404 status code
@@ -23,10 +21,8 @@ export interface FavoriteRequestBuilder extends BaseRequestBuilder<FavoriteReque
      */
      delete(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<ArticleResponse | undefined>;
     /**
-     * Add article to favorites. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<ArticleResponse>}
-     * @throws {ProblemDetails} error when the service returns a 400 status code
      * @throws {ProblemDetails} error when the service returns a 401 status code
      * @throws {ProblemDetails} error when the service returns a 403 status code
      * @throws {ProblemDetails} error when the service returns a 404 status code
@@ -35,13 +31,11 @@ export interface FavoriteRequestBuilder extends BaseRequestBuilder<FavoriteReque
      */
      post(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<ArticleResponse | undefined>;
     /**
-     * Remove article from favorites. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */
      toDeleteRequestInformation(requestConfiguration?: RequestConfiguration<object> | undefined) : RequestInformation;
     /**
-     * Add article to favorites. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */
@@ -59,7 +53,6 @@ export const FavoriteRequestBuilderRequestsMetadata: RequestsMetadata = {
         uriTemplate: FavoriteRequestBuilderUriTemplate,
         responseBodyContentType: "application/json",
         errorMappings: {
-            400: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             401: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             403: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             404: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
@@ -73,7 +66,6 @@ export const FavoriteRequestBuilderRequestsMetadata: RequestsMetadata = {
         uriTemplate: FavoriteRequestBuilderUriTemplate,
         responseBodyContentType: "application/json",
         errorMappings: {
-            400: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             401: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             403: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             404: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,

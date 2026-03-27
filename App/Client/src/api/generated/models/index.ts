@@ -52,6 +52,16 @@ export interface ArticleResponse extends Parsable {
      */
     article?: ArticleDto | null;
 }
+export interface ArticlesResponse extends Parsable {
+    /**
+     * The articles property
+     */
+    articles?: ArticleDto[] | null;
+    /**
+     * The articlesCount property
+     */
+    articlesCount?: number | null;
+}
 export interface CheckFeatureFlagResponse extends Parsable {
     /**
      * The featureName property
@@ -61,6 +71,40 @@ export interface CheckFeatureFlagResponse extends Parsable {
      * The isEnabled property
      */
     isEnabled?: boolean | null;
+}
+export interface CommentDto extends Parsable {
+    /**
+     * The author property
+     */
+    author?: ProfileDto | null;
+    /**
+     * The body property
+     */
+    body?: string | null;
+    /**
+     * The createdAt property
+     */
+    createdAt?: Date | null;
+    /**
+     * The id property
+     */
+    id?: string | null;
+    /**
+     * The updatedAt property
+     */
+    updatedAt?: Date | null;
+}
+export interface CommentResponse extends Parsable {
+    /**
+     * The comment property
+     */
+    comment?: CommentDto | null;
+}
+export interface CommentsResponse extends Parsable {
+    /**
+     * The comments property
+     */
+    comments?: CommentDto[] | null;
 }
 export interface CreateArticleData extends Parsable {
     /**
@@ -107,11 +151,59 @@ export function createArticleResponseFromDiscriminatorValue(parseNode: ParseNode
 /**
  * Creates a new instance of the appropriate class based on discriminator value
  * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {ArticlesResponse}
+ */
+// @ts-ignore
+export function createArticlesResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoArticlesResponse;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
  * @returns {CheckFeatureFlagResponse}
  */
 // @ts-ignore
 export function createCheckFeatureFlagResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
     return deserializeIntoCheckFeatureFlagResponse;
+}
+export interface CreateCommentData extends Parsable {
+    /**
+     * The body property
+     */
+    body?: string | null;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {CommentDto}
+ */
+// @ts-ignore
+export function createCommentDtoFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoCommentDto;
+}
+export interface CreateCommentRequest extends Parsable {
+    /**
+     * The comment property
+     */
+    comment?: CreateCommentData | null;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {CommentResponse}
+ */
+// @ts-ignore
+export function createCommentResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoCommentResponse;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {CommentsResponse}
+ */
+// @ts-ignore
+export function createCommentsResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoCommentsResponse;
 }
 /**
  * Creates a new instance of the appropriate class based on discriminator value
@@ -130,6 +222,24 @@ export function createCreateArticleDataFromDiscriminatorValue(parseNode: ParseNo
 // @ts-ignore
 export function createCreateArticleRequestFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
     return deserializeIntoCreateArticleRequest;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {CreateCommentData}
+ */
+// @ts-ignore
+export function createCreateCommentDataFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoCreateCommentData;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {CreateCommentRequest}
+ */
+// @ts-ignore
+export function createCreateCommentRequestFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoCreateCommentRequest;
 }
 /**
  * Creates a new instance of the appropriate class based on discriminator value
@@ -211,6 +321,24 @@ export function createTagsResponseFromDiscriminatorValue(parseNode: ParseNode | 
 // @ts-ignore
 export function createTestValidationRequestFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
     return deserializeIntoTestValidationRequest;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {UpdateArticleData}
+ */
+// @ts-ignore
+export function createUpdateArticleDataFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoUpdateArticleData;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {UpdateArticleRequest}
+ */
+// @ts-ignore
+export function createUpdateArticleRequestFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoUpdateArticleRequest;
 }
 /**
  * Creates a new instance of the appropriate class based on discriminator value
@@ -308,6 +436,18 @@ export function deserializeIntoArticleResponse(articleResponse: Partial<ArticleR
 }
 /**
  * The deserialization information for the current model
+ * @param ArticlesResponse The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoArticlesResponse(articlesResponse: Partial<ArticlesResponse> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "articles": n => { articlesResponse.articles = n.getCollectionOfObjectValues<ArticleDto>(createArticleDtoFromDiscriminatorValue); },
+        "articlesCount": n => { articlesResponse.articlesCount = n.getNumberValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
  * @param CheckFeatureFlagResponse The instance to deserialize into.
  * @returns {Record<string, (node: ParseNode) => void>}
  */
@@ -316,6 +456,43 @@ export function deserializeIntoCheckFeatureFlagResponse(checkFeatureFlagResponse
     return {
         "featureName": n => { checkFeatureFlagResponse.featureName = n.getStringValue(); },
         "isEnabled": n => { checkFeatureFlagResponse.isEnabled = n.getBooleanValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param CommentDto The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoCommentDto(commentDto: Partial<CommentDto> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "author": n => { commentDto.author = n.getObjectValue<ProfileDto>(createProfileDtoFromDiscriminatorValue); },
+        "body": n => { commentDto.body = n.getStringValue(); },
+        "createdAt": n => { commentDto.createdAt = n.getDateValue(); },
+        "id": n => { commentDto.id = n.getStringValue(); },
+        "updatedAt": n => { commentDto.updatedAt = n.getDateValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param CommentResponse The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoCommentResponse(commentResponse: Partial<CommentResponse> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "comment": n => { commentResponse.comment = n.getObjectValue<CommentDto>(createCommentDtoFromDiscriminatorValue); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param CommentsResponse The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoCommentsResponse(commentsResponse: Partial<CommentsResponse> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "comments": n => { commentsResponse.comments = n.getCollectionOfObjectValues<CommentDto>(createCommentDtoFromDiscriminatorValue); },
     }
 }
 /**
@@ -341,6 +518,28 @@ export function deserializeIntoCreateArticleData(createArticleData: Partial<Crea
 export function deserializeIntoCreateArticleRequest(createArticleRequest: Partial<CreateArticleRequest> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
         "article": n => { createArticleRequest.article = n.getObjectValue<CreateArticleData>(createCreateArticleDataFromDiscriminatorValue); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param CreateCommentData The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoCreateCommentData(createCommentData: Partial<CreateCommentData> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "body": n => { createCommentData.body = n.getStringValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param CreateCommentRequest The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoCreateCommentRequest(createCommentRequest: Partial<CreateCommentRequest> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "comment": n => { createCommentRequest.comment = n.getObjectValue<CreateCommentData>(createCreateCommentDataFromDiscriminatorValue); },
     }
 }
 /**
@@ -454,6 +653,30 @@ export function deserializeIntoTagsResponse(tagsResponse: Partial<TagsResponse> 
 // @ts-ignore
 export function deserializeIntoTestValidationRequest(testValidationRequest: Partial<TestValidationRequest> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param UpdateArticleData The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoUpdateArticleData(updateArticleData: Partial<UpdateArticleData> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "body": n => { updateArticleData.body = n.getStringValue(); },
+        "description": n => { updateArticleData.description = n.getStringValue(); },
+        "title": n => { updateArticleData.title = n.getStringValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param UpdateArticleRequest The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoUpdateArticleRequest(updateArticleRequest: Partial<UpdateArticleRequest> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "article": n => { updateArticleRequest.article = n.getObjectValue<UpdateArticleData>(createUpdateArticleDataFromDiscriminatorValue); },
     }
 }
 /**
@@ -686,6 +909,18 @@ export function serializeArticleResponse(writer: SerializationWriter, articleRes
 }
 /**
  * Serializes information the current object
+ * @param ArticlesResponse The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeArticlesResponse(writer: SerializationWriter, articlesResponse: Partial<ArticlesResponse> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!articlesResponse || isSerializingDerivedType) { return; }
+    writer.writeCollectionOfObjectValues<ArticleDto>("articles", articlesResponse.articles, serializeArticleDto);
+    writer.writeNumberValue("articlesCount", articlesResponse.articlesCount);
+}
+/**
+ * Serializes information the current object
  * @param CheckFeatureFlagResponse The instance to serialize from.
  * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
  * @param writer Serialization writer to use to serialize this model
@@ -695,6 +930,43 @@ export function serializeCheckFeatureFlagResponse(writer: SerializationWriter, c
     if (!checkFeatureFlagResponse || isSerializingDerivedType) { return; }
     writer.writeStringValue("featureName", checkFeatureFlagResponse.featureName);
     writer.writeBooleanValue("isEnabled", checkFeatureFlagResponse.isEnabled);
+}
+/**
+ * Serializes information the current object
+ * @param CommentDto The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeCommentDto(writer: SerializationWriter, commentDto: Partial<CommentDto> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!commentDto || isSerializingDerivedType) { return; }
+    writer.writeObjectValue<ProfileDto>("author", commentDto.author, serializeProfileDto);
+    writer.writeStringValue("body", commentDto.body);
+    writer.writeDateValue("createdAt", commentDto.createdAt);
+    writer.writeStringValue("id", commentDto.id);
+    writer.writeDateValue("updatedAt", commentDto.updatedAt);
+}
+/**
+ * Serializes information the current object
+ * @param CommentResponse The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeCommentResponse(writer: SerializationWriter, commentResponse: Partial<CommentResponse> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!commentResponse || isSerializingDerivedType) { return; }
+    writer.writeObjectValue<CommentDto>("comment", commentResponse.comment, serializeCommentDto);
+}
+/**
+ * Serializes information the current object
+ * @param CommentsResponse The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeCommentsResponse(writer: SerializationWriter, commentsResponse: Partial<CommentsResponse> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!commentsResponse || isSerializingDerivedType) { return; }
+    writer.writeCollectionOfObjectValues<CommentDto>("comments", commentsResponse.comments, serializeCommentDto);
 }
 /**
  * Serializes information the current object
@@ -720,6 +992,28 @@ export function serializeCreateArticleData(writer: SerializationWriter, createAr
 export function serializeCreateArticleRequest(writer: SerializationWriter, createArticleRequest: Partial<CreateArticleRequest> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!createArticleRequest || isSerializingDerivedType) { return; }
     writer.writeObjectValue<CreateArticleData>("article", createArticleRequest.article, serializeCreateArticleData);
+}
+/**
+ * Serializes information the current object
+ * @param CreateCommentData The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeCreateCommentData(writer: SerializationWriter, createCommentData: Partial<CreateCommentData> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!createCommentData || isSerializingDerivedType) { return; }
+    writer.writeStringValue("body", createCommentData.body);
+}
+/**
+ * Serializes information the current object
+ * @param CreateCommentRequest The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeCreateCommentRequest(writer: SerializationWriter, createCommentRequest: Partial<CreateCommentRequest> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!createCommentRequest || isSerializingDerivedType) { return; }
+    writer.writeObjectValue<CreateCommentData>("comment", createCommentRequest.comment, serializeCreateCommentData);
 }
 /**
  * Serializes information the current object
@@ -837,6 +1131,30 @@ export function serializeTestValidationRequest(writer: SerializationWriter, test
 /**
  * Serializes information the current object
  * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param UpdateArticleData The instance to serialize from.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeUpdateArticleData(writer: SerializationWriter, updateArticleData: Partial<UpdateArticleData> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!updateArticleData || isSerializingDerivedType) { return; }
+    writer.writeStringValue("body", updateArticleData.body);
+    writer.writeStringValue("description", updateArticleData.description);
+    writer.writeStringValue("title", updateArticleData.title);
+}
+/**
+ * Serializes information the current object
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param UpdateArticleRequest The instance to serialize from.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeUpdateArticleRequest(writer: SerializationWriter, updateArticleRequest: Partial<UpdateArticleRequest> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!updateArticleRequest || isSerializingDerivedType) { return; }
+    writer.writeObjectValue<UpdateArticleData>("article", updateArticleRequest.article, serializeUpdateArticleData);
+}
+/**
+ * Serializes information the current object
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
  * @param UpdateUserData The instance to serialize from.
  * @param writer Serialization writer to use to serialize this model
  */
@@ -930,6 +1248,26 @@ export interface TagsResponse extends Parsable {
     tags?: string[] | null;
 }
 export interface TestValidationRequest extends Parsable {
+}
+export interface UpdateArticleData extends Parsable {
+    /**
+     * The body property
+     */
+    body?: string | null;
+    /**
+     * The description property
+     */
+    description?: string | null;
+    /**
+     * The title property
+     */
+    title?: string | null;
+}
+export interface UpdateArticleRequest extends Parsable {
+    /**
+     * The article property
+     */
+    article?: UpdateArticleData | null;
 }
 export interface UpdateUserData extends Parsable {
     /**

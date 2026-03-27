@@ -14,7 +14,7 @@ public class ArticleFavoriteConfiguration : IEntityTypeConfiguration<ArticleFavo
       .OnDelete(DeleteBehavior.Cascade);
 
     builder.HasOne(x => x.Article)
-      .WithMany()
+      .WithMany(a => a.Favorites)
       .HasForeignKey(x => x.ArticleId)
       .OnDelete(DeleteBehavior.Cascade);
   }

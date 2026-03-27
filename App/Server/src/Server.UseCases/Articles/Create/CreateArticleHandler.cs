@@ -21,7 +21,7 @@ public class CreateArticleHandler(
     var slugExists = await articleRepo.AnyAsync(new ArticleBySlugSpec(slug), cancellationToken);
     if (slugExists)
     {
-      return Result<ArticleResult>.Invalid(new ErrorDetail("slug", "Article with this slug already exists."));
+      return Result<ArticleResult>.Invalid(new ErrorDetail("slug", "has already been taken."));
     }
 
     var author = await userManager.FindByIdAsync(request.AuthorId.ToString());

@@ -1,0 +1,106 @@
+.home-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+.home-page .article-preview {
+  border-bottom: 1px solid var(--cds-border-subtle-01, rgba(0, 0, 0, 0.1));
+  padding: var(--cds-spacing-05, 1rem) 0;
+  overflow: hidden;
+}
+
+.home-page .article-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--cds-spacing-03, 0.5rem);
+}
+
+.home-page .article-meta .author-info {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.home-page .article-meta img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: var(--cds-spacing-03, 0.5rem);
+}
+
+.home-page .article-meta .info {
+  display: flex;
+  flex-direction: column;
+}
+
+.home-page .article-meta .author {
+  color: #5cb85c;
+  font-weight: 500;
+}
+
+.home-page .article-meta .date {
+  color: var(--cds-text-secondary, #525252);
+  font-size: 0.8rem;
+}
+
+.home-page .article-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.home-page .article-link h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: var(--cds-spacing-02, 0.25rem);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.home-page .article-link p {
+  color: var(--cds-text-secondary, #525252);
+  font-size: 0.9rem;
+  margin-bottom: var(--cds-spacing-02, 0.25rem);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.home-page .article-link span {
+  color: var(--cds-text-helper, #6f6f6f);
+  font-size: 0.8rem;
+}
+
+.home-page .tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cds-spacing-02, 0.25rem);
+  list-style: none;
+  padding: 0;
+  margin: var(--cds-spacing-03, 0.5rem) 0 0 0;
+}
+
+.sidebar {
+  padding: var(--cds-spacing-04, 0.75rem);
+  background: var(--cds-layer-01, #f4f4f4);
+  border-radius: 4px;
+}
+
+.sidebar p {
+  margin-bottom: var(--cds-spacing-03, 0.5rem);
+  font-weight: 500;
+}
+
+.sidebar .tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cds-spacing-02, 0.25rem);
+}
+
+.home-page .favorite-button {
+  min-width: auto;
+}

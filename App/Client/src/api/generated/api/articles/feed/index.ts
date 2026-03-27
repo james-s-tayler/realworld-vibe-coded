@@ -11,7 +11,6 @@ import { type BaseRequestBuilder, type Parsable, type ParsableFactory, type Requ
  */
 export interface FeedRequestBuilder extends BaseRequestBuilder<FeedRequestBuilder> {
     /**
-     * Get articles from followed users. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<ArticlesResponse>}
      * @throws {ProblemDetails} error when the service returns a 400 status code
@@ -23,15 +22,11 @@ export interface FeedRequestBuilder extends BaseRequestBuilder<FeedRequestBuilde
      */
      get(requestConfiguration?: RequestConfiguration<FeedRequestBuilderGetQueryParameters> | undefined) : Promise<ArticlesResponse | undefined>;
     /**
-     * Get articles from followed users. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */
      toGetRequestInformation(requestConfiguration?: RequestConfiguration<FeedRequestBuilderGetQueryParameters> | undefined) : RequestInformation;
 }
-/**
- * Get articles from followed users. Authentication required.
- */
 export interface FeedRequestBuilderGetQueryParameters {
     limit?: number;
     offset?: number;

@@ -11,9 +11,7 @@ import { type BaseRequestBuilder, type Parsable, type ParsableFactory, type Requ
  */
 export interface CommentsItemRequestBuilder extends BaseRequestBuilder<CommentsItemRequestBuilder> {
     /**
-     * Delete a comment. Authentication required. Only comment author can delete.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
-     * @throws {ProblemDetails} error when the service returns a 400 status code
      * @throws {ProblemDetails} error when the service returns a 401 status code
      * @throws {ProblemDetails} error when the service returns a 403 status code
      * @throws {ProblemDetails} error when the service returns a 404 status code
@@ -22,7 +20,6 @@ export interface CommentsItemRequestBuilder extends BaseRequestBuilder<CommentsI
      */
      delete(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<void>;
     /**
-     * Delete a comment. Authentication required. Only comment author can delete.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */
@@ -40,7 +37,6 @@ export const CommentsItemRequestBuilderRequestsMetadata: RequestsMetadata = {
         uriTemplate: CommentsItemRequestBuilderUriTemplate,
         responseBodyContentType: "application/problem+json",
         errorMappings: {
-            400: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             401: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             403: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             404: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,

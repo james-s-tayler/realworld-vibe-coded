@@ -8,6 +8,8 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SettingsPage } from './pages/SettingsPage';
+import { EditorPage } from './pages/EditorPage';
+import { ArticlePage } from './pages/ArticlePage';
 import { UsersPage } from './pages/UsersPage';
 import { ForbiddenPage } from './pages/ForbiddenPage';
 
@@ -32,6 +34,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/editor"
+            element={
+              <ProtectedRoute>
+                <EditorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/editor/:slug"
+            element={
+              <ProtectedRoute>
+                <EditorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/article/:slug"
+            element={
+              <ProtectedRoute>
+                <ArticlePage />
               </ProtectedRoute>
             }
           />

@@ -19,7 +19,6 @@ export interface CommentsRequestBuilder extends BaseRequestBuilder<CommentsReque
      */
      byId(id: string) : CommentsItemRequestBuilder;
     /**
-     * Get all comments for an article. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<CommentsResponse>}
      * @throws {ProblemDetails} error when the service returns a 401 status code
@@ -30,7 +29,6 @@ export interface CommentsRequestBuilder extends BaseRequestBuilder<CommentsReque
      */
      get(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<CommentsResponse | undefined>;
     /**
-     * Create a new comment for an article. Authentication required.
      * @param body The request body
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<CommentResponse>}
@@ -43,13 +41,11 @@ export interface CommentsRequestBuilder extends BaseRequestBuilder<CommentsReque
      */
      post(body: CreateCommentRequest, requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<CommentResponse | undefined>;
     /**
-     * Get all comments for an article. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */
      toGetRequestInformation(requestConfiguration?: RequestConfiguration<object> | undefined) : RequestInformation;
     /**
-     * Create a new comment for an article. Authentication required.
      * @param body The request body
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
