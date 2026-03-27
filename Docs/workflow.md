@@ -4,6 +4,16 @@
 
 Follow this workflow for every feature. No exceptions.
 
+### Step 0 — Infrastructure Smoke Test
+
+Before starting any stories, verify the test infrastructure works:
+```
+./build.sh RunLocalDependencies
+```
+Wait for health checks to pass. If Docker or SQL Server fails, fix infrastructure before proceeding. This prevents discovering infra failures only at the E2E stage.
+
+### Story Loop
+
 1. Read the active exec plan and pick the next incomplete story
 2. Implement the feature (backend first, then frontend if applicable)
 3. Run the story's test command (e.g., `./build.sh TestServerPostmanAuth`)

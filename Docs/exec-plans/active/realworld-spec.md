@@ -263,10 +263,10 @@ Tags (standalone)          Auth (already built)
 |-------|-------|------|-------------|-----------------|
 | 1 | DB Entities & Migrations | S | `./build.sh BuildServer` | All entity classes + migration |
 | 2 | Follow/Unfollow + Profile | M | `./build.sh TestServerPostmanProfiles` | Follow/unfollow endpoints + `following` field |
-| 3 | Create Article + Get + Tags | M | `./build.sh BuildServer` | Article CRUD core + tags endpoint |
+| 3 | Create Article + Get + Tags | M | `./build.sh TestServerPostmanArticlesEmpty` | Article CRUD core + tags endpoint |
 | 4 | Articles Empty State | S | `./build.sh TestServerPostmanArticlesEmpty` | Empty list + empty tags responses |
-| 5 | Favorites | S | `./build.sh BuildServer` | Favorite/unfavorite endpoints |
-| 6 | Comments | M | `./build.sh BuildServer` | Comment create/list/delete |
+| 5 | Favorites | S | `./build.sh TestServerPostmanArticle` | Favorite/unfavorite endpoints |
+| 6 | Comments | M | `./build.sh TestServerPostmanArticle` | Comment create/list/delete |
 | 7 | Article Collection | L | `./build.sh TestServerPostmanArticle` | Article list + filters + full integration |
 | 8 | Auth Regression | S | `./build.sh TestServerPostmanAuth` | Confirm no regressions |
 | 9 | Feed + Integration | L | `./build.sh TestServerPostmanFeedAndArticles` | Feed endpoint + final integration |

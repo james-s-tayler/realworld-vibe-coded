@@ -65,7 +65,6 @@
     "Bash(pwd)",
     "Bash(which *)",
     "Bash(npm *)",
-    "Bash(npx *)",
-    "Bash(touch /tmp/claude-circuit-breaker-skip)"
+    "Bash(npx *)"
   ]
 }

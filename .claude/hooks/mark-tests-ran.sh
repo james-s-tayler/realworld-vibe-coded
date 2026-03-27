@@ -2,9 +2,10 @@
 INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
-# Only mark when a ./build.sh Test* command succeeds
-if echo "$COMMAND" | grep -qP '^\./build\.sh\s+Test'; then
-  touch /tmp/claude-tests-ran
+# Mark when ./build.sh BuildServer, BuildClient, or Test* succeeds
+if echo "$COMMAND" | grep -qP '^\./build\.sh\s+(Build(Server|Client)|Test)'; then
+  # Record which command was used as the gate
+  echo "$COMMAND" > /tmp/claude-tests-ran
 fi
 
 exit 0

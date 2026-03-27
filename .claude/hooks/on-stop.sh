@@ -17,5 +17,16 @@ fi
 # Create marker so the next stop allows through
 touch "$MARKER"
 
-echo "IMPORTANT: Before finishing, run the on-stop skill to verify your changes. Use: /on-stop"
+cat >&2 << 'EOF'
+BLOCKED: Session cannot end without running the verification suite.
+
+You MUST execute the /on-stop skill before finishing. This skill:
+1. Runs all 5 Postman test collections
+2. Runs TestE2e
+3. Records scores to SCORES.csv and PROGRESS.md
+
+Run this command now: /on-stop
+
+If E2E tests fail due to infrastructure (not code), document the failure in PROGRESS.md and create /tmp/claude-stop-hook-active to bypass.
+EOF
 exit 2

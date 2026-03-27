@@ -16,11 +16,17 @@ if [ -f "$CIRCUIT_BREAKER_MARKER" ]; then
   exit 0
 fi
 
-# Check if tests were run since last commit
+# Check if tests were run since last commit AND marker contains a valid command
 if [ -f "$TEST_MARKER" ]; then
+  MARKER_CONTENT=$(cat "$TEST_MARKER")
+  if echo "$MARKER_CONTENT" | grep -qP '^\./build\.sh\s+(Build(Server|Client)|Test)'; then
+    rm -f "$TEST_MARKER"
+    exit 0
+  fi
+  echo "BLOCKED: Test marker exists but contains invalid content: '$MARKER_CONTENT'. Run actual tests via ./build.sh." >&2
   rm -f "$TEST_MARKER"
-  exit 0
+  exit 2
 fi
 
-echo "BLOCKED: You must run tests before committing. Run the relevant test command from IMPLEMENTATION-PLAN.md (e.g., ./build.sh TestServerPostmanAuth). If you are using the circuit breaker to skip a stuck feature, create the marker file first: touch /tmp/claude-circuit-breaker-skip" >&2
+echo "BLOCKED: You must run tests before committing. Run the relevant test command from the exec plan (e.g., ./build.sh TestServerPostmanAuth). If you are using the circuit breaker to skip a stuck feature, create the marker file first: touch /tmp/claude-circuit-breaker-skip" >&2
 exit 2
