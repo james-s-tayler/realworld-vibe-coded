@@ -4,14 +4,12 @@
 
 Read these files in order:
 1. `PROGRESS.md` — context from previous sessions
-2. `Docs/exec-plans/active/realworld-spec.md` — story order and dependency DAG
-3. `Docs/workflow.md` — mandatory workflow, circuit breaker, context management
+2. `Docs/workflow.md` — mandatory R→P→I workflow, circuit breaker, context management
 
 Reference as needed:
-- `SPEC-REFERENCE.md` — complete API spec
+- `SPEC-REFERENCE.md` — complete API spec (the source of truth for what to build)
 - `.claude/rules/backend.md` — code templates
 - `Docs/architecture.md` — tech stack, folder structure, build commands
-- `Docs/agentic-engineering-principles/` — first-principles on how to improve agentic-engineering workflows can be derived from the reference material within
 
 ## Invariants
 

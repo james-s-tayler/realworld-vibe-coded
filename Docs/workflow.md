@@ -1,28 +1,45 @@
 # Workflow
 
-## Implementation Workflow (MANDATORY)
+## R→P→I Workflow (MANDATORY)
 
-Follow this workflow for every feature. No exceptions.
+This workflow has three phases: Research, Plan, Implement. Follow them in order.
 
-### Step 0 — Infrastructure Smoke Test
+### Phase 1 — Research
 
-Before starting any stories, verify the test infrastructure works:
-```
-./build.sh RunLocalDependencies
-```
-Wait for health checks to pass. If Docker or SQL Server fails, fix infrastructure before proceeding. This prevents discovering infra failures only at the E2E stage.
+Read and analyze before doing anything:
 
-### Story Loop
+1. Read `SPEC-REFERENCE.md` — understand every endpoint, entity, and validation rule
+2. Scan the existing codebase — identify what's already built (run `./build.sh BuildServer` to confirm it compiles)
+3. Run `./build.sh RunLocalDependencies` — verify infrastructure works before proceeding
+4. Run existing test suites to establish a baseline — note which pass and which fail
 
-1. Read the active exec plan and pick the next incomplete story
+**Gate:** Before proceeding to Plan, you must know: (a) what the spec requires, (b) what already exists, (c) what's missing, (d) infrastructure is healthy.
+
+### Phase 2 — Plan
+
+Generate your own execution plan from the spec analysis:
+
+1. Identify all features/entities/endpoints that need to be built
+2. Map dependencies between features (what must exist before what)
+3. Create a dependency DAG and order features into stories
+4. Record your plan in `PROGRESS.md` under "Plan Generated"
+5. Each story should target a specific test suite — when those tests pass, the story is done
+
+**Gate:** Before proceeding to Implement, your plan must have: (a) a dependency DAG, (b) ordered stories with clear deliverables, (c) each story mapped to a test validation command.
+
+### Phase 3 — Implement (Story Loop)
+
+Execute stories from your plan, one at a time:
+
+1. Pick the next incomplete story from your plan
 2. Implement the feature (backend first, then frontend if applicable)
-3. After creating or modifying endpoint files, run `./build.sh BuildGenerateApiClient` to regenerate the TypeScript API client. The commit hook will block until API client drift is resolved.
+3. After creating or modifying endpoint files, run `./build.sh BuildGenerateApiClient` to regenerate the TypeScript API client
 4. Run the **full gate** (not just the story-specific test):
    a. `./build.sh LintAllVerify` — must pass (zero new warnings)
    b. `./build.sh BuildServer` — must pass
    c. Run ALL Postman suites: `TestServerPostmanAuth`, `TestServerPostmanProfiles`, `TestServerPostmanArticlesEmpty`, `TestServerPostmanArticle`, `TestServerPostmanFeedAndArticles`
    d. `./build.sh TestE2e` — note failures (infra vs code)
-5. Compare results against the **Expected Baselines** table in the exec plan:
+5. Compare results against your previous run:
    - **Regression** = a suite that previously passed now fails → fix before committing
    - **Expected progress** = this story's target suite now passes → good
    - **Expected failure** = a suite for a later story still fails → fine, move on
@@ -44,7 +61,7 @@ If you are stuck on a single failing test or feature for more than 20 minutes:
 
 1. Commit what you have (even if tests are failing for this feature)
 2. Note the issue in `PROGRESS.md` under "Blocked Items"
-3. Move to the next story in the active exec plan
+3. Move to the next story in your plan
 4. Return to blocked items only after all other stories are attempted
 
 Breadth of feature coverage is more important than depth on any single feature.
@@ -55,8 +72,8 @@ If you notice your context is getting large (many files read, long conversation)
 
 1. Commit all current progress immediately
 2. Update `PROGRESS.md` with current state and next steps
-3. If using compact, ensure `PROGRESS.md` and the active exec plan are referenced in the summary
-4. After compact, re-read `PROGRESS.md` and the active exec plan to recover context
+3. If context exceeds 60%, compact immediately
+4. After compact, re-read `PROGRESS.md` and `Docs/workflow.md` to recover context
 
 Commit-gate semantics ensure progress survives context resets. `PROGRESS.md` ensures knowledge survives.
 
@@ -66,3 +83,14 @@ Commit-gate semantics ensure progress survives context resets. `PROGRESS.md` ens
 - After each story: append what was done, which tests pass, any gotchas discovered.
 - **NEVER delete or modify existing entries** — `PROGRESS.md` is append-only.
 - This file survives context compression and is the primary cross-session memory.
+
+## Scaffolding Assumptions
+
+The following harness components encode assumptions about model capabilities. As models improve, these may become unnecessary and can be removed:
+
+- **Circuit breaker** — assumes the agent can get stuck in unproductive loops
+- **Explicit phase gates** — assumes the agent won't naturally research before planning
+- **Mandatory reading order** — assumes the agent won't discover files on its own
+- **Full test gate after every story** — assumes the agent might miss regressions
+
+These are designed for simplification — removing any of them is safe to try. Measure the impact via `./scripts/score.sh`.

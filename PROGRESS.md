@@ -3,6 +3,12 @@
 > **This file is append-only.** Never delete or modify existing entries.
 > Read this at the start of every session to recover context from previous work.
 
+## Plan Generated
+
+<!-- After the Research and Plan phases, record your execution plan here -->
+<!-- Include: dependency DAG, ordered story list, test command per story -->
+<!-- This is YOUR plan — generated from analyzing SPEC-REFERENCE.md and the codebase -->
+
 ## Completed Stories
 
 <!-- Append after each completed story -->
