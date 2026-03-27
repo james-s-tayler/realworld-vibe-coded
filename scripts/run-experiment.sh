@@ -82,16 +82,47 @@ if [[ -f "$AGENT_OUTPUT_FILE" && -s "$AGENT_OUTPUT_FILE" ]]; then
 fi
 
 # Run all test suites in the worktree
+# Each Nuke target runs PathsCleanDirectories which wipes Reports.
+# Save newman reports after each suite to prevent loss.
 echo "Running test suites..."
 TEST_EXIT_CODES=()
-SUITES=("TestServerPostmanAuth" "TestServerPostmanProfiles" "TestServerPostmanArticlesEmpty" "TestServerPostmanArticle" "TestServerPostmanFeedAndArticles" "TestE2e")
+SAVED_REPORTS_DIR="$WORKTREE_BASE/$RUN_ID-reports"
+mkdir -p "$SAVED_REPORTS_DIR"
 
-for suite in "${SUITES[@]}"; do
+POSTMAN_SUITES=("TestServerPostmanAuth" "TestServerPostmanProfiles" "TestServerPostmanArticlesEmpty" "TestServerPostmanArticle" "TestServerPostmanFeedAndArticles")
+POSTMAN_COLLECTIONS=("Auth" "Profiles" "ArticlesEmpty" "Article" "FeedAndArticles")
+
+for i in "${!POSTMAN_SUITES[@]}"; do
+  suite="${POSTMAN_SUITES[$i]}"
+  collection="${POSTMAN_COLLECTIONS[$i]}"
   echo "  Running $suite..."
   suite_exit=0
   (cd "$WORKTREE_DIR" && ./build.sh "$suite" 2>&1) || suite_exit=$?
   TEST_EXIT_CODES+=("$suite:$suite_exit")
   echo "  $suite: exit $suite_exit"
+  # Save newman report before next suite's PathsCleanDirectories wipes it
+  report_file="$WORKTREE_DIR/Reports/Test/Postman/$collection/Results/newman-report.json"
+  if [[ -f "$report_file" ]]; then
+    mkdir -p "$SAVED_REPORTS_DIR/$collection/Results"
+    cp "$report_file" "$SAVED_REPORTS_DIR/$collection/Results/newman-report.json"
+    echo "  Saved $collection report"
+  fi
+done
+
+# Run E2E last (it also cleans, but we've saved all Postman reports)
+echo "  Running TestE2e..."
+suite_exit=0
+(cd "$WORKTREE_DIR" && ./build.sh TestE2e 2>&1) || suite_exit=$?
+TEST_EXIT_CODES+=("TestE2e:$suite_exit")
+echo "  TestE2e: exit $suite_exit"
+
+# Copy saved postman reports back so parse-results.sh can find them
+for collection in "${POSTMAN_COLLECTIONS[@]}"; do
+  saved="$SAVED_REPORTS_DIR/$collection/Results/newman-report.json"
+  if [[ -f "$saved" ]]; then
+    mkdir -p "$WORKTREE_DIR/Reports/Test/Postman/$collection/Results"
+    cp "$saved" "$WORKTREE_DIR/Reports/Test/Postman/$collection/Results/newman-report.json"
+  fi
 done
 
 TEST_END_TIME=$(date +%s)
