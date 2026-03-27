@@ -236,7 +236,7 @@ public class HomePage : BasePage
   }
 
   public ILocator GetArticlePreviewTag(string title, string tagName) =>
-    GetArticlePreviewByTitle(title).Locator(".tag-list .cds--tag").Filter(new() { HasText = tagName });
+    GetArticlePreviewByTitle(title).Locator(".cds--tag").Filter(new() { HasText = tagName });
 
   public async Task VerifyArticlePreviewTagsAsync(string title, params string[] tags)
   {
