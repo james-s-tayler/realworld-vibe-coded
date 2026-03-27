@@ -60,7 +60,7 @@ AGENT_OUTPUT_FILE="$WORKTREE_BASE/$RUN_ID-agent-output.json"
 AGENT_EXIT_CODE=0
 echo "Starting Claude Code agent (timeout: ${TIMEOUT}s)..."
 
-timeout "$TIMEOUT" claude -p "$(cat "$WORKTREE_DIR/scripts/starter-prompt.txt")" \
+timeout "$TIMEOUT" claude -p "$(cat "$WORKTREE_DIR/scripts/starter-prompt.md")" \
   --dangerously-skip-permissions \
   --output-format json \
   --cwd "$WORKTREE_DIR" \
