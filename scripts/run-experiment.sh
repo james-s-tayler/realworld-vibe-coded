@@ -61,11 +61,11 @@ AGENT_EXIT_CODE=0
 echo "Starting Claude Code agent (timeout: ${TIMEOUT}s)..."
 
 # Unset CLAUDECODE to allow nested invocation from within a Claude Code session
-env -u CLAUDECODE timeout "$TIMEOUT" claude -p "$(cat "$WORKTREE_DIR/scripts/starter-prompt.md")" \
+# cd into worktree since claude CLI uses cwd as project root
+(cd "$WORKTREE_DIR" && env -u CLAUDECODE timeout "$TIMEOUT" claude -p "$(cat scripts/starter-prompt.md)" \
   --dangerously-skip-permissions \
   --output-format json \
-  --cwd "$WORKTREE_DIR" \
-  > "$AGENT_OUTPUT_FILE" 2>&1 || AGENT_EXIT_CODE=$?
+  > "$AGENT_OUTPUT_FILE" 2>&1) || AGENT_EXIT_CODE=$?
 
 AGENT_END_TIME=$(date +%s)
 AGENT_DURATION=$((AGENT_END_TIME - START_TIME))
