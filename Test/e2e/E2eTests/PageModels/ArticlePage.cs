@@ -215,4 +215,15 @@ public class ArticlePage : BasePage
   {
     await Expect(Page.GetByText(commentText)).Not.ToBeVisibleAsync();
   }
+
+  public ILocator GetArticleTag(string tagName) =>
+    Page.Locator(".article-tags .cds--tag").Filter(new() { HasText = tagName });
+
+  public async Task VerifyArticleTagsVisibleAsync(params string[] tags)
+  {
+    foreach (var tag in tags)
+    {
+      await Expect(GetArticleTag(tag)).ToBeVisibleAsync();
+    }
+  }
 }

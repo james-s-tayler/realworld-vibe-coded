@@ -10,6 +10,25 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  public async Task Tags_AreVisibleOnIndividualArticlePage()
+  {
+    // Arrange
+    var tag1 = $"tag{Guid.NewGuid().ToString("N")[..8]}";
+    var tag2 = $"tag{Guid.NewGuid().ToString("N")[..8]}";
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token, new[] { tag1, tag2 });
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
+    // Act
+    await Pages.ArticlePage.GoToAsync(article.Slug);
+
+    // Assert
+    await Pages.ArticlePage.VerifyArticleTagsVisibleAsync(tag1, tag2);
+  }
+
+  [Fact]
   public async Task UserCanDeleteOwnArticle()
   {
     // Arrange - create user and article via API
