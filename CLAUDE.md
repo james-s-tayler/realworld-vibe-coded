@@ -11,7 +11,7 @@ Reference as needed:
 - `SPEC-REFERENCE.md` — complete API spec
 - `.claude/rules/backend.md` — code templates
 - `Docs/architecture.md` — tech stack, folder structure, build commands
-- `Docs/references/` — engineering reference material (harness engineering, etc.)
+- `Docs/agentic-engineering-principles/` — first-principles on how to improve agentic-engineering workflows can be derived from the reference material within
 
 ## Invariants
 
