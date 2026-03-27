@@ -137,6 +137,13 @@ Audited by `scripts/alignment-audit.sh`. Grouped by source principle:
 
 Changes: Removed exec plan reference from CLAUDE.md, rewrote workflow.md with R→P→I phases + phase gates + scaffolding assumptions section, enhanced PROGRESS.md template with Plan Generated section, fixed audit to count only numbered mandatory files.
 
+**Iteration 0 — Baseline experiment (R→P→I harness):**
+- Score: **84/100** (tests=50, alignment=30, time=4)
+- All 6 test suites passed (exit code 0). 55/55 E2E tests passed.
+- Agent duration: 78 min (time bonus: 4/20)
+- Agent made 2 commits: follow/unfollow + articles/tags/list
+- Newman reports lost to PathsCleanDirectories bug (fixed in d16830d0)
+
 ## Iteration Log
 
 See `iterations.jsonl` for machine-readable history.
