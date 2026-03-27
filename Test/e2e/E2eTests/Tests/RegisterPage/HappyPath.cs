@@ -1,4 +1,4 @@
-﻿namespace E2eTests.Tests.RegisterPage;
+namespace E2eTests.Tests.RegisterPage;
 
 /// <summary>
 /// Happy path tests for the Registration page (/register).
@@ -9,5 +9,25 @@ public class HappyPath : AppPageTest
   {
   }
 
-  // No happy path tests for RegisterPage currently
+  [Fact]
+  public async Task NewTenantSignup_ShowsUsersNavItem()
+  {
+    // Arrange
+    var email = GenerateUniqueEmail(GenerateUniqueUsername("signup"));
+    var password = "TestPassword123!";
+
+    await Pages.RegisterPage.GoToAsync();
+
+    // Act
+    await Pages.RegisterPage.RegisterAsync(email, password);
+
+    // Assert — first user is ADMIN, so Users nav should be visible
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/");
+    await Expect(Pages.UsersPage.UsersLink).ToBeVisibleAsync();
+
+    // Verify navigation to Users page works
+    await Pages.UsersPage.ClickUsersAsync();
+    await Expect(Page).ToHaveURLAsync($"{BaseUrl}/users");
+    await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
+  }
 }
