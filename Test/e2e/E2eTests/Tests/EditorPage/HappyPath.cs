@@ -34,6 +34,28 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  public async Task UserCanCreateArticleWithTags_AndViewTagsOnArticle()
+  {
+    // Arrange
+    var user = await Api.CreateUserAsync();
+    var tag1 = $"tag{Guid.NewGuid().ToString("N")[..8]}";
+    var tag2 = $"tag{Guid.NewGuid().ToString("N")[..8]}";
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    await Pages.HomePage.ClickNewArticleAsync();
+
+    var title = $"Tagged Article {Guid.NewGuid().ToString("N")[..8]}";
+
+    // Act
+    await Pages.EditorPage.CreateArticleWithTagsListAsync(
+      title, "Description", "Body content", tag1, tag2);
+
+    // Assert
+    await Pages.ArticlePage.VerifyArticleTagsVisibleAsync(tag1, tag2);
+  }
+
+  [Fact]
   public async Task UserCanEditOwnArticle()
   {
     // Arrange

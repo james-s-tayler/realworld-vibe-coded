@@ -99,6 +99,65 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  public async Task Tags_AppearInArticlePreview_OnGlobalFeed()
+  {
+    // Arrange
+    var tag1 = $"tag{Guid.NewGuid().ToString("N")[..8]}";
+    var tag2 = $"tag{Guid.NewGuid().ToString("N")[..8]}";
+    var user = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user.Token, new[] { tag1, tag2 });
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    await Pages.HomePage.GoToAsync();
+
+    // Act
+    await Pages.HomePage.ClickGlobalFeedTabAsync();
+
+    // Assert
+    await Pages.HomePage.VerifyArticlePreviewTagsAsync(article.Title, tag1, tag2);
+  }
+
+  [Fact]
+  public async Task Tags_AppearInArticlePreview_OnYourFeed()
+  {
+    // Arrange
+    var tag1 = $"tag{Guid.NewGuid().ToString("N")[..8]}";
+    var tag2 = $"tag{Guid.NewGuid().ToString("N")[..8]}";
+    var user1 = await Api.CreateUserAsync();
+    var article = await Api.CreateArticleAsync(user1.Token, new[] { tag1, tag2 });
+
+    var user2 = await Api.InviteUserAsync(user1.Token);
+    await Api.FollowUserAsync(user2.Token, user1.Email);
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user2.Email, user2.Password);
+    await Pages.HomePage.GoToAsync();
+
+    // Act
+    await Pages.HomePage.ClickYourFeedTabAsync();
+
+    // Assert
+    await Pages.HomePage.VerifyArticlePreviewTagsAsync(article.Title, tag1, tag2);
+  }
+
+  [Fact]
+  public async Task CreatedArticleTags_AppearInSidebar_PopularTags()
+  {
+    // Arrange
+    var tag = $"tag{Guid.NewGuid().ToString("N")[..8]}";
+    var user = await Api.CreateUserAsync();
+    await Api.CreateArticleAsync(user.Token, new[] { tag });
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    await Pages.HomePage.GoToAsync();
+
+    // Assert
+    await Expect(Pages.HomePage.GetSidebarTag(tag)).ToBeVisibleAsync();
+  }
+
+  [Fact]
   public async Task UserCanFilterArticlesByTag()
   {
     // Arrange - create user and article with tag via API
