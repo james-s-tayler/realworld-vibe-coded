@@ -234,4 +234,15 @@ public class HomePage : BasePage
   {
     await Expect(ArticlePreviews.First).ToBeVisibleAsync();
   }
+
+  public ILocator GetArticlePreviewTag(string title, string tagName) =>
+    GetArticlePreviewByTitle(title).Locator(".tag-list .cds--tag").Filter(new() { HasText = tagName });
+
+  public async Task VerifyArticlePreviewTagsAsync(string title, params string[] tags)
+  {
+    foreach (var tag in tags)
+    {
+      await Expect(GetArticlePreviewTag(title, tag)).ToBeVisibleAsync();
+    }
+  }
 }

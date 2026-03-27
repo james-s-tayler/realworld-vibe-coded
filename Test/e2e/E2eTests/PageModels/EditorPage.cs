@@ -133,4 +133,22 @@ public class EditorPage : BasePage
   {
     await Expect(ErrorDisplay).ToContainTextAsync(expectedText);
   }
+
+  public async Task AddTagsAsync(params string[] tags)
+  {
+    foreach (var tag in tags)
+    {
+      await TagsInput.FillAsync(tag);
+      await TagsInput.PressAsync("Enter");
+    }
+  }
+
+  public async Task CreateArticleWithTagsListAsync(
+    string title, string description, string body, params string[] tags)
+  {
+    await FillArticleFormAsync(title, description, body);
+    await AddTagsAsync(tags);
+    await ClickPublishButtonAsync();
+    await Pages.ArticlePage.VerifyArticleTitleAsync(title);
+  }
 }
