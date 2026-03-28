@@ -104,7 +104,7 @@ Audited by `scripts/alignment-audit.sh`. Grouped by source principle:
 
 | # | Action | Est. Impact | Status |
 |---|--------|-------------|--------|
-| 4 | Compress SPEC-REFERENCE.md | +3-5 | pending |
+| 4 | Compress SPEC-REFERENCE.md | +3-5 | done (84→84, no time change) |
 | 5 | Add regression detection (domain-agnostic) | +2-3 | pending |
 | 6 | Improve PROGRESS.md template | +2-3 | pending |
 | 7 | Add context utilization guidance | +1-2 | pending |
