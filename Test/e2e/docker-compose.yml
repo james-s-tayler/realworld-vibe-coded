@@ -13,6 +13,7 @@ services:
       start_period: 5s
 
   api:
+    image: conduit-e2e-api:local
     build:
       context: ../../
       dockerfile: Test/e2e/Dockerfile.api
@@ -42,6 +43,7 @@ services:
       start_period: 10s
 
   playwright:
+    image: conduit-e2e-playwright:local
     build:
       context: ./
       dockerfile: Dockerfile.playwright
