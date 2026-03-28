@@ -3,6 +3,16 @@ paths:
   - "App/Client/**"
 ---
 
+## Kiota Bridge — Backend → Generated Client → Frontend
+
+The generated API client (`src/api/generated/`) is the **type contract** between backend and frontend. The workflow is strictly ordered:
+
+1. **Backend first** — implement/modify endpoints in `Server.Web/`
+2. **Build server** — `./build.sh BuildServer` compiles the backend AND regenerates the Kiota TypeScript client (transitive dependency)
+3. **Frontend second** — only then use the generated types in React components and API modules
+
+**Never** reference properties in frontend code that don't exist in the generated client types. If a backend endpoint returns a new field (e.g., `following` on Profile), you must regenerate before the frontend can use it. The `BuildClient` target depends on `BuildGenerateApiClient` which depends on `BuildServer`, so running `./build.sh BuildClient` always produces fresh types.
+
 ## Project Structure
 
 - `src/api/` — API client modules, one per domain (e.g., `articlesApi`, `commentsApi`)

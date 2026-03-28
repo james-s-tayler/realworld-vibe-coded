@@ -11,10 +11,6 @@
           {
             "type": "command",
             "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/test-before-commit.sh"
-          },
-          {
-            "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/kiota-before-commit.sh"
           }
         ]
       },
@@ -48,15 +44,6 @@
           {
             "type": "command",
             "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/agent-stats-record.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/kiota-drift-check.sh"
           }
         ]
       }

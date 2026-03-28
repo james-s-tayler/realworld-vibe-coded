@@ -22,6 +22,7 @@ These are the primary rules. The Postman test suites are the spec — if a test 
 5. **All compiler warnings and errors must be resolved.** Never suppress or ignore them.
 6. **The solution must build cleanly via `./build.sh BuildServer`.** Never run `dotnet` commands directly.
 7. **All configurable values must use enums, constants, or reflection.** No magic strings (exception: SQL or UI text).
+8. **Frontend API client relies on Kiota code generation.** Always make backend changes first, then run `./build.sh BuildGenerateApiClient` before writing frontend code. `BuildClient` does this automatically (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Never reference fields in frontend that don't exist in the generated types.
 
 ## Guidance
 
