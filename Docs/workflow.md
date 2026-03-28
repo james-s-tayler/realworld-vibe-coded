@@ -41,18 +41,17 @@ Execute stories from your plan, one at a time:
 
 1. Pick the next incomplete story from your plan
 2. Implement the feature (backend first, then frontend if applicable). The Kiota API client regenerates automatically when `BuildClient` runs (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Always finish and build backend changes before writing frontend code that uses new/changed API types.
-3. Run the **full gate** (not just the story-specific test):
-   a. `./build.sh LintAllVerify` — must pass (zero new warnings)
-   b. `./build.sh BuildServer` — must pass
-   c. Run ALL Postman suites: `TestServerPostmanAuth`, `TestServerPostmanProfiles`, `TestServerPostmanArticlesEmpty`, `TestServerPostmanArticle`, `TestServerPostmanFeedAndArticles`
-   d. `./build.sh TestE2e` — note failures (infra vs code)
+3. Run the **full gate** (commit hook enforces these — running them creates gate markers):
+   a. `./build.sh BuildServer` — must compile cleanly
+   b. Run ALL Postman suites: `TestServerPostmanAuth`, `TestServerPostmanProfiles`, `TestServerPostmanArticlesEmpty`, `TestServerPostmanArticle`, `TestServerPostmanFeedAndArticles`
+   c. `./build.sh TestE2e` — note failures (infra vs code)
 4. Compare results against your previous run:
    - **Regression** = a suite that previously passed now fails → fix before committing
    - **Expected progress** = this story's target suite now passes → good
    - **Expected failure** = a suite for a later story still fails → fine, move on
 5. If no regressions and story target passes: commit with message `feat(story-N): <story-name> — tests passing`
 6. If regressions or story target fails: fix and re-run the full gate
-7. Update `PROGRESS.md`: mark `- [x]` on the completed story, append test results
+7. Update `PROGRESS.md` immediately: mark `- [x]` on the completed story and append a summary under "Completed Stories" with test counts. Do this BEFORE starting the next story.
 8. **Do NOT start the next story until you have committed the current one.** Each story must be its own commit. Do not batch multiple stories into one commit.
 9. Repeat from step 1
 

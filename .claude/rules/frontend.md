@@ -148,3 +148,19 @@ export const articlesApi = {
 - Local state (`useState`) for page-level data
 - `useApiCall` handles loading/error/data lifecycle
 - No global state library — each page fetches its own data
+
+## Common Gotchas
+
+- **Carbon Tabs:** `selectedIndex={-1}` doesn't work — compute the proper tab index for dynamic tab sets
+
+## Frontend Implementation Checklist
+
+Before implementing a frontend page/component:
+1. Check generated types in `src/api/generated/models/` — know what fields are available
+2. Check existing components in `src/components/` — reuse before creating new ones
+3. Check existing API modules in `src/api/` — extend before creating new ones
+4. Check existing CSS classes in stylesheets — use before adding new ones
+
+After implementing:
+1. Verify with `./build.sh BuildClient` (auto-regenerates Kiota types)
+2. Run `./build.sh TestE2e` to validate against E2E expectations

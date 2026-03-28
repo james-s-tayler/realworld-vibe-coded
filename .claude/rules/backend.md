@@ -96,6 +96,10 @@ For GET/DELETE endpoints with no request body (only route params), use `EmptyReq
 Required in ALL web endpoint files for `ResultMapperAsync` and `ResultValueAsync` extension methods.
 This is the #1 most-forgotten import — add it to every endpoint file.
 
+## Common Gotchas
+
+- **EF Core inverse navigation:** When adding an inverse navigation property (e.g., `Article.Favorites`), update the relationship config to `.WithMany(a => a.Favorites)` — otherwise EF creates duplicate FK columns
+
 ## Result Status -> HTTP Code Mapping
 
 - `Result.Success()` -> 200 OK
