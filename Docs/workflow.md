@@ -9,9 +9,9 @@ This workflow has three phases: Research, Plan, Implement. Follow them in order.
 Read and analyze before doing anything:
 
 1. Read `SPEC-REFERENCE.md` — understand every endpoint, entity, and validation rule
-2. Scan the existing codebase — identify what's already built. Check the "Implementation Status" section of the spec for what exists vs what needs building.
-3. Run `./build.sh BuildServer` to confirm it compiles and `./build.sh RunLocalDependencies` to verify infrastructure
-4. Do NOT run all test suites during research — the spec's Implementation Status section tells you the baseline. Save test runs for the implementation phase.
+2. Scan the existing codebase — identify what's already built (run `./build.sh BuildServer` to confirm it compiles)
+3. Run `./build.sh RunLocalDependencies` — verify infrastructure works before proceeding
+4. Run existing test suites to establish a baseline — note which pass and which fail
 
 **Gate:** Before proceeding to Plan, you must know: (a) what the spec requires, (b) what already exists, (c) what's missing, (d) infrastructure is healthy.
 

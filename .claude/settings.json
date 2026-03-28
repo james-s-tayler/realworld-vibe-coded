@@ -30,6 +30,15 @@
     ],
     "PostToolUse": [
       {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/action-log.sh"
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -53,6 +62,15 @@
       }
     ],
     "PostToolUseFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/action-log.sh"
+          }
+        ]
+      },
       {
         "matcher": "Bash",
         "hooks": [

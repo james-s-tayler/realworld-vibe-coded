@@ -154,6 +154,20 @@ Changes: Removed exec plan reference from CLAUDE.md, rewrote workflow.md with R�
 - Enhanced `.claude/rules/frontend.md` with PageShell, Carbon, API patterns
 - 526/526 tests passing
 
+**Iteration 3 — Skip baseline test runs (REVERTED):**
+- Score: **81/100** (REGRESSION: tests=50, alignment=30, time=1)
+- Agent duration: 85 min (27 min slower — worse than baseline)
+- Told agent not to run tests during research. Agent lost calibration, spent more time guessing.
+- **Learning: baseline test runs are essential for agent orientation. Don't skip them.**
+- Change reverted.
+
+**Iteration 4 — Fix backend.md contradictions + add gotchas:**
+- Fixed SRV001/SRV015 contradiction (backend.md told agent to use `Result<Unit>` which SRV015 bans)
+- Added SA1402 (one type per file), EmptyRequest gotcha, split DTO template
+- Removed pre-baked exec plan (`Docs/exec-plans/`) — agent must generate its own
+- Added ACTION-LOG.md observability hooks
+- Reverted skip-baseline-tests change
+
 ## Iteration Log
 
 See `iterations.jsonl` for machine-readable history.

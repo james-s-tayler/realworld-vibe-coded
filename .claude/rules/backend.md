@@ -78,7 +78,19 @@ Every endpoint needs a request type. Use `Endpoint<TRequest, TResponse>` or
 `Endpoint<TRequest, TResponse, TMapper>`.
 
 ### SRV001: No non-generic Result
-Use `Result<T>` always. For void operations: `Result<Unit>`.
+Use `Result<T>` always.
+
+### SRV015: No `Result<Unit>`
+Never use `Result<Unit>`. For delete/void operations, use `Result<{Entity}>` with the entity being
+acted on. Return `Result<{Entity}>.NoContent()` for HTTP 204 responses.
+
+### SA1402: One type per file (StyleCop)
+Every class, record, and struct MUST be in its own file. Never put `CreateRequest` and `CreateData`
+in the same file — split them into `CreateRequest.cs` and `CreateData.cs`.
+
+### FastEndpoints: EmptyRequest for no-body endpoints
+Request DTOs with zero properties throw `TypeInitializationException` at runtime.
+For GET/DELETE endpoints with no request body (only route params), use `EmptyRequest` from FastEndpoints.
 
 ### Key import: `using Server.Infrastructure;`
 Required in ALL web endpoint files for `ResultMapperAsync` and `ResultValueAsync` extension methods.
@@ -141,6 +153,8 @@ public class Create(IMediator mediator, IUserContext userContext) : Endpoint<Cre
 
 ### Request + Response DTOs
 
+SA1402: One type per file — always split request wrapper and data into separate files.
+
 ```csharp
 // File: App/Server/src/Server.Web/{Feature}/Create/CreateRequest.cs
 namespace Server.Web.{Feature}.Create;
@@ -150,6 +164,11 @@ public class CreateRequest
   // Wrap in an outer object to match RealWorld JSON: { "article": { ... } }
   public CreateData {Feature} { get; set; } = new();
 }
+```
+
+```csharp
+// File: App/Server/src/Server.Web/{Feature}/Create/CreateData.cs
+namespace Server.Web.{Feature}.Create;
 
 public class CreateData
 {

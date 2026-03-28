@@ -132,6 +132,10 @@ TOTAL_DURATION=$((TEST_END_TIME - START_TIME))
 echo "Parsing results..."
 TEST_RESULTS=$("$WORKTREE_DIR/scripts/parse-results.sh" "$WORKTREE_DIR")
 
+# Analyze action log if present
+echo "Analyzing action log..."
+ACTION_LOG_JSON=$("$WORKTREE_DIR/scripts/analyze-experiment.sh" "$WORKTREE_DIR" 2>/dev/null || echo '{}')
+
 # Build suite exit codes JSON
 suite_exits_json="{"
 first=true
@@ -162,6 +166,7 @@ cat > "$RESULTS_FILE" <<EOF
   },
   "suite_exit_codes": $suite_exits_json,
   "test_results": $TEST_RESULTS,
+  "action_log": $ACTION_LOG_JSON,
   "worktree": "$WORKTREE_DIR",
   "branch": "$BRANCH_NAME"
 }
