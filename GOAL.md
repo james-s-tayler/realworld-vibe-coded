@@ -144,6 +144,16 @@ Changes: Removed exec plan reference from CLAUDE.md, rewrote workflow.md with R�
 - Agent made 2 commits: follow/unfollow + articles/tags/list
 - Newman reports lost to PathsCleanDirectories bug (fixed in d16830d0)
 
+**Iteration 1 — Compress SPEC-REFERENCE.md:**
+- Score: **84/100** (unchanged)
+- SPEC-REFERENCE 1128→345 lines (69% reduction). No time impact.
+
+**Iteration 2 — Enhanced frontend.md rules:**
+- Score: **91/100** (tests=50, alignment=30, time=11)
+- Agent duration: 58 min (20 min faster than baseline)
+- Enhanced `.claude/rules/frontend.md` with PageShell, Carbon, API patterns
+- 526/526 tests passing
+
 ## Iteration Log
 
 See `iterations.jsonl` for machine-readable history.
