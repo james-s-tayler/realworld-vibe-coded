@@ -5,9 +5,25 @@
 
 ## Plan Generated
 
-<!-- After the Research and Plan phases, record your execution plan here -->
-<!-- Include: dependency DAG, ordered story list, test command per story -->
-<!-- This is YOUR plan — generated from analyzing SPEC-REFERENCE.md and the codebase -->
+<!-- Record your execution plan here using the format below. -->
+<!-- Mark stories [x] as you complete and commit them. Each story = one commit. -->
+
+### Dependency DAG
+
+<!-- ASCII diagram showing feature dependencies, e.g.:
+  Auth → Profiles → Articles → Comments/Favorites/Tags → Feed
+-->
+
+### Stories
+
+<!-- Use this checkbox format:
+- [ ] Story 1: <name> — gate: `./build.sh <target>`
+  Deliverables: <entities, endpoints, migrations>
+  Depends on: (none)
+- [ ] Story 2: <name> — gate: `./build.sh <target>`
+  Deliverables: <entities, endpoints>
+  Depends on: Story 1
+-->
 
 ## Completed Stories
 

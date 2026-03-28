@@ -17,4 +17,14 @@ if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*docker(-compose)?\b' || echo "$COMM
   exit 2
 fi
 
+if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*npx\b'; then
+  echo "BLOCKED: Do not run npx commands directly. Use ./build.sh <target> instead." >&2
+  exit 2
+fi
+
+if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*npm\s+run\b'; then
+  echo "BLOCKED: Do not run npm scripts directly. Use ./build.sh <target> instead." >&2
+  exit 2
+fi
+
 exit 0

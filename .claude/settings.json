@@ -99,7 +99,6 @@
     "Bash(ls *)",
     "Bash(pwd)",
     "Bash(which *)",
-    "Bash(npm *)",
-    "Bash(npx *)"
+    "Bash(npm *)"
   ]
 }

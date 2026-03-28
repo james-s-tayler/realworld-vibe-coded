@@ -46,6 +46,9 @@ git -C "$REPO_ROOT" worktree add -b "$BRANCH_NAME" "$WORKTREE_DIR" HEAD
 
 echo "Worktree created at $WORKTREE_DIR"
 
+# Record base SHA before agent makes changes
+BASE_SHA=$(git -C "$WORKTREE_DIR" rev-parse HEAD)
+
 # Copy settings.json but rewrite absolute paths to point to worktree
 mkdir -p "$WORKTREE_DIR/.claude"
 if [[ -f "$REPO_ROOT/.claude/settings.json" ]]; then
@@ -71,6 +74,14 @@ AGENT_END_TIME=$(date +%s)
 AGENT_DURATION=$((AGENT_END_TIME - START_TIME))
 
 echo "Agent completed in ${AGENT_DURATION}s (exit code: $AGENT_EXIT_CODE)"
+
+# Capture agent commits
+AGENT_COMMITS=$(git -C "$WORKTREE_DIR" log --oneline "$BASE_SHA..HEAD" 2>/dev/null || echo "")
+AGENT_COMMIT_COUNT=0
+if [ -n "$AGENT_COMMITS" ]; then
+  AGENT_COMMIT_COUNT=$(echo "$AGENT_COMMITS" | wc -l)
+fi
+echo "Agent made $AGENT_COMMIT_COUNT commit(s)"
 
 # Extract token usage from agent output if available
 TOTAL_INPUT_TOKENS=0
@@ -134,7 +145,7 @@ TEST_RESULTS=$("$WORKTREE_DIR/scripts/parse-results.sh" "$WORKTREE_DIR")
 
 # Analyze action log if present
 echo "Analyzing action log..."
-ACTION_LOG_JSON=$("$WORKTREE_DIR/scripts/analyze-experiment.sh" "$WORKTREE_DIR" 2>/dev/null || echo '{}')
+ACTION_LOG_JSON=$("$WORKTREE_DIR/scripts/analyze-experiment.sh" "$WORKTREE_DIR" "$BASE_SHA" 2>/dev/null || echo '{}')
 
 # Build suite exit codes JSON
 suite_exits_json="{"
@@ -151,6 +162,12 @@ for entry in "${TEST_EXIT_CODES[@]}"; do
 done
 suite_exits_json+="}"
 
+# Build agent commits JSON array
+AGENT_COMMITS_JSON="[]"
+if [ -n "$AGENT_COMMITS" ]; then
+  AGENT_COMMITS_JSON=$(echo "$AGENT_COMMITS" | jq -R -s 'split("\n") | map(select(length > 0))')
+fi
+
 # Write results
 cat > "$RESULTS_FILE" <<EOF
 {
@@ -164,6 +181,9 @@ cat > "$RESULTS_FILE" <<EOF
     "input": $TOTAL_INPUT_TOKENS,
     "output": $TOTAL_OUTPUT_TOKENS
   },
+  "base_sha": "$BASE_SHA",
+  "agent_commit_count": $AGENT_COMMIT_COUNT,
+  "agent_commits": $AGENT_COMMITS_JSON,
   "suite_exit_codes": $suite_exits_json,
   "test_results": $TEST_RESULTS,
   "action_log": $ACTION_LOG_JSON,

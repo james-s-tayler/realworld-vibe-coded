@@ -5,6 +5,7 @@
 set -eu
 
 WORKTREE_DIR="${1:-.}"
+BASE_SHA="${2:-}"
 LOG_FILE="$WORKTREE_DIR/ACTION-LOG.md"
 
 if [ ! -f "$LOG_FILE" ]; then
@@ -209,6 +210,73 @@ if [ -d "$NUKE_DIR" ] && ls "$NUKE_DIR"/build*.log >/dev/null 2>&1; then
   rm -f "$NUKE_EVENTS_FILE"
 fi
 
+# === Commits analysis ===
+COMMITS_JSON="{}"
+if [ -n "$BASE_SHA" ] && git -C "$WORKTREE_DIR" rev-parse --verify "$BASE_SHA" >/dev/null 2>&1; then
+  COMMIT_LOG=$(git -C "$WORKTREE_DIR" log --oneline "$BASE_SHA..HEAD" 2>/dev/null || true)
+  COMMIT_TOTAL=0
+  STORY_COMMITS=0
+  GIANT_COMMITS=0
+  if [ -n "$COMMIT_LOG" ]; then
+    COMMIT_TOTAL=$(echo "$COMMIT_LOG" | wc -l)
+    STORY_COMMITS=$(echo "$COMMIT_LOG" | grep -cE 'feat\(story-[0-9]+\)' || true)
+    # Giant commits: feat commits that don't follow story-N pattern (likely batched)
+    NON_STORY_FEATS=$(echo "$COMMIT_LOG" | grep -cE '^[0-9a-f]+ feat[:(]' || true)
+    GIANT_COMMITS=$((NON_STORY_FEATS - STORY_COMMITS))
+    [ "$GIANT_COMMITS" -lt 0 ] && GIANT_COMMITS=0
+  fi
+  COMMITS_JSON="{\"total\": $COMMIT_TOTAL, \"story_commits\": $STORY_COMMITS, \"giant_commits\": $GIANT_COMMITS}"
+fi
+
+# === Plan quality ===
+PLAN_JSON="{}"
+PROGRESS_FILE="$WORKTREE_DIR/PROGRESS.md"
+if [ -f "$PROGRESS_FILE" ]; then
+  HAS_DAG=false
+  HAS_STORIES=false
+  STORY_COUNT=0
+  CHECKED_COUNT=0
+  if grep -qE '### Dependency DAG' "$PROGRESS_FILE" 2>/dev/null; then
+    # Check if there's actual content after the DAG heading (not just comments)
+    DAG_CONTENT=$(sed -n '/### Dependency DAG/,/###/p' "$PROGRESS_FILE" | grep -vE '^(#|<!--|-->|$)' | head -1 || true)
+    [ -n "$DAG_CONTENT" ] && HAS_DAG=true
+  fi
+  if grep -qE '^\- \[[ x]\] Story [0-9]+' "$PROGRESS_FILE" 2>/dev/null; then
+    HAS_STORIES=true
+    STORY_COUNT=$(grep -cE '^\- \[[ x]\] Story [0-9]+' "$PROGRESS_FILE" || true)
+    CHECKED_COUNT=$(grep -cE '^\- \[x\] Story [0-9]+' "$PROGRESS_FILE" || true)
+  fi
+  PLAN_JSON="{\"has_dag\": $HAS_DAG, \"has_stories\": $HAS_STORIES, \"story_count\": $STORY_COUNT, \"stories_completed\": $CHECKED_COUNT}"
+fi
+
+# === Bypasses ===
+BYPASS_NPX=0
+BYPASS_NPM_RUN=0
+BYPASS_DOTNET=0
+BYPASS_DOCKER=0
+if [ -n "$ACTION_LINES" ]; then
+  # Count successful (PASS) tool bypasses — only Bash actions
+  PASS_BASH=$(echo "$ACTION_LINES" | grep 'Bash.*PASS' || true)
+  if [ -n "$PASS_BASH" ]; then
+    BYPASS_NPX=$(echo "$PASS_BASH" | grep -cE '\bnpx\b' || true)
+    BYPASS_NPM_RUN=$(echo "$PASS_BASH" | grep -cE '\bnpm\s+run\b' || true)
+    BYPASS_DOTNET=$(echo "$PASS_BASH" | grep -cE '\bdotnet\b' || true)
+    BYPASS_DOCKER=$(echo "$PASS_BASH" | grep -cE '\bdocker\b' || true)
+  fi
+fi
+BYPASSES_JSON="{\"npx\": $BYPASS_NPX, \"npm_run\": $BYPASS_NPM_RUN, \"dotnet\": $BYPASS_DOTNET, \"docker\": $BYPASS_DOCKER}"
+
+# === Phase activity ===
+READ_COUNT=0
+PROGRESS_WRITES=0
+CODE_EDITS=0
+if [ -n "$ACTION_LINES" ]; then
+  READ_COUNT=$(echo "$ACTION_LINES" | grep -c 'Read' || true)
+  PROGRESS_WRITES=$(echo "$ACTION_LINES" | grep -cE '(Edit|Write).*PROGRESS\.md' || true)
+  CODE_EDITS=$(echo "$ACTION_LINES" | grep -cE '(Edit|Write).*(\.cs|\.ts|\.tsx|\.json|\.csproj)' || true)
+fi
+PHASE_JSON="{\"reads\": $READ_COUNT, \"progress_writes\": $PROGRESS_WRITES, \"code_edits\": $CODE_EDITS}"
+
 cat <<EOF
 {
   "total_actions": $TOTAL,
@@ -217,6 +285,10 @@ cat <<EOF
   "build_targets": $BUILD_TARGETS,
   "nuke_targets": $NUKE_TARGETS,
   "timeline": {"first": "$FIRST_TS", "last": "$LAST_TS", "duration_min": ${DURATION_MIN:-0}},
-  "retry_sequences": $RETRY_JSON
+  "retry_sequences": $RETRY_JSON,
+  "commits": $COMMITS_JSON,
+  "plan_quality": $PLAN_JSON,
+  "bypasses": $BYPASSES_JSON,
+  "phase_activity": $PHASE_JSON
 }
 EOF

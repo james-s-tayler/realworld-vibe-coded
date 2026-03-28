@@ -17,17 +17,25 @@ Read and analyze before doing anything:
 
 ### Phase 2 — Plan
 
-Generate your own execution plan from the spec analysis:
+Generate your own execution plan from the spec analysis. The plan must be written to `PROGRESS.md` under "Plan Generated" in this exact format:
 
 1. Identify all features/entities/endpoints that need to be built
 2. Map dependencies between features (what must exist before what)
-3. Create a dependency DAG and order features into stories
-4. Record your plan in `PROGRESS.md` under "Plan Generated"
-5. Each story should target a specific test suite — when those tests pass, the story is done
+3. Write a **Dependency DAG** (ASCII or text) showing feature build order
+4. Break the work into **checkbox stories** — each story is ONE commit (~8 endpoints max):
+   ```
+   - [ ] Story 1: <name> — gate: `./build.sh <target>`
+     Deliverables: <entities, endpoints, migrations>
+     Depends on: (none)
+   - [ ] Story 2: <name> — gate: `./build.sh <target>`
+     Deliverables: <entities, endpoints>
+     Depends on: Story 1
+   ```
+5. Each story targets a specific test suite gate — when those tests pass, the story is done
 
-**Gate:** Before proceeding to Implement, your plan must have: (a) a dependency DAG, (b) ordered stories with clear deliverables, (c) each story mapped to a test validation command.
+**Gate:** Before proceeding to Implement, `PROGRESS.md` must contain: (a) a dependency DAG, (b) checkbox stories with deliverables and depends-on fields, (c) each story mapped to a `./build.sh` gate command.
 
-### Phase 3 — Implement (Story Loop)
+### Phase 3 — Implement (Story Loop) — Each story = one commit
 
 Execute stories from your plan, one at a time:
 
@@ -43,10 +51,11 @@ Execute stories from your plan, one at a time:
    - **Regression** = a suite that previously passed now fails → fix before committing
    - **Expected progress** = this story's target suite now passes → good
    - **Expected failure** = a suite for a later story still fails → fine, move on
-6. If no regressions and story target passes: commit with message `feat: implement <story-name> — tests passing`
+6. If no regressions and story target passes: commit with message `feat(story-N): <story-name> — tests passing`
 7. If regressions or story target fails: fix and re-run the full gate
-8. Append to `PROGRESS.md`: what was implemented, test results, any gotchas discovered
-9. Repeat from step 1
+8. Update `PROGRESS.md`: mark `- [x]` on the completed story, append test results
+9. **Do NOT start the next story until you have committed the current one.** Each story must be its own commit. Do not batch multiple stories into one commit.
+10. Repeat from step 1
 
 ### Stop Condition
 
