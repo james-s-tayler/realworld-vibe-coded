@@ -2,7 +2,7 @@
 # analyze-experiment.sh — Parse ACTION-LOG.md into structured JSON
 # Usage: ./scripts/analyze-experiment.sh <worktree-dir>
 
-set -euo pipefail
+set -eu
 
 WORKTREE_DIR="${1:-.}"
 LOG_FILE="$WORKTREE_DIR/ACTION-LOG.md"
@@ -134,12 +134,88 @@ if [ -n "$BUILD_LINES" ]; then
   RETRY_JSON="[$RETRY_ITEMS]"
 fi
 
+# Nuke build log analysis — extract per-target durations from .nuke/temp/*.log
+NUKE_DIR="$WORKTREE_DIR/.nuke/temp"
+NUKE_TARGETS="{}"
+if [ -d "$NUKE_DIR" ] && ls "$NUKE_DIR"/build*.log >/dev/null 2>&1; then
+  # Extract events: "timestamp target_name event_type" from all logs
+  # Log format: "18:01:22.970 | V | TargetName           | EventInvoker.OnTargetRunning ..."
+  # build.log has timestamps; build.2026-*.log files don't. Use build.log if it has events.
+  NUKE_EVENTS_FILE=$(mktemp)
+  grep -E 'EventInvoker\.OnTarget(Running|Succeeded|Failed)' "$NUKE_DIR/build.log" 2>/dev/null | \
+    sed -E 's/^([0-9:.]+) *\| *[A-Z] *\| *([A-Za-z]+) *\| *EventInvoker\.OnTarget(Running|Succeeded|Failed).*/\1 \2 \3/' \
+    > "$NUKE_EVENTS_FILE" 2>/dev/null || true
+
+  # Also extract from timestamped logs — they lack inline timestamps but we can
+  # get per-log summary: filename has start time, content has target + result
+  NUKE_LOG_SUMMARY=$(for logfile in "$NUKE_DIR"/build.2026-*.log; do
+    [ -f "$logfile" ] || continue
+    fname=$(basename "$logfile")
+    # Extract targets and results from each log
+    grep -E 'EventInvoker\.OnTarget(Succeeded|Failed)' "$logfile" 2>/dev/null | \
+      sed -E 's/.*\| *([A-Za-z]+) *\| *EventInvoker\.OnTarget(Succeeded|Failed).*/\1 \2/' | \
+      while IFS= read -r line; do echo "$fname $line"; done
+  done)
+
+  if [ -s "$NUKE_EVENTS_FILE" ]; then
+    # Use timestamped events from build.log for per-target timing
+    NUKE_TARGETS=$(awk '
+    function to_secs(ts) {
+      split(ts, p, /[:.]/);
+      return p[1]*3600 + p[2]*60 + p[3] + (length(p)>=4 ? p[4]/1000 : 0)
+    }
+    {
+      target = $2; event = $3; ts = to_secs($1)
+      if (event == "Running") {
+        start[target] = ts
+      } else if (start[target] > 0) {
+        dur = ts - start[target]
+        runs[target]++
+        total[target] += dur
+        if (event == "Failed") fails[target]++
+        delete start[target]
+      }
+    }
+    END {
+      printf "{"
+      first = 1
+      for (t in runs) {
+        if (!first) printf ","
+        avg = total[t] / runs[t]
+        printf "\"%s\": {\"runs\": %d, \"fails\": %d, \"total_sec\": %.1f, \"avg_sec\": %.1f}", t, runs[t], fails[t]+0, total[t], avg
+        first = 0
+      }
+      printf "}"
+    }
+    ' "$NUKE_EVENTS_FILE")
+  elif [ -n "$NUKE_LOG_SUMMARY" ]; then
+    # Fallback: count invocations from per-file summaries (no timing)
+    NUKE_TARGETS=$(echo "$NUKE_LOG_SUMMARY" | awk '{
+      target=$2; result=$3
+      runs[target]++
+      if (result == "Failed") fails[target]++
+    }
+    END {
+      printf "{"
+      first = 1
+      for (t in runs) {
+        if (!first) printf ","
+        printf "\"%s\": {\"runs\": %d, \"fails\": %d}", t, runs[t], fails[t]+0
+        first = 0
+      }
+      printf "}"
+    }')
+  fi
+  rm -f "$NUKE_EVENTS_FILE"
+fi
+
 cat <<EOF
 {
   "total_actions": $TOTAL,
   "by_tool": {$BY_TOOL},
   "failures": {$FAIL_BY_TOOL},
   "build_targets": $BUILD_TARGETS,
+  "nuke_targets": $NUKE_TARGETS,
   "timeline": {"first": "$FIRST_TS", "last": "$LAST_TS", "duration_min": ${DURATION_MIN:-0}},
   "retry_sequences": $RETRY_JSON
 }
