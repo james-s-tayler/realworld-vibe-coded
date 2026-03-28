@@ -1,5 +1,6 @@
 services:
   api:
+    image: conduit-localdev-api:local
     build:
       context: ../../
       dockerfile: Task/LocalDev/Dockerfile.publish

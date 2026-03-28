@@ -15,6 +15,7 @@ services:
       start_period: 5s
 
   api:
+    image: conduit-postman-api:local
     build:
       context: ../../
       dockerfile: Test/Postman/Dockerfile
