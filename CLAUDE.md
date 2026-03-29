@@ -14,7 +14,7 @@ Reference as needed:
 
 These are the primary rules.
 
-1. All lint, build, test, deployment operations must be performed through Nuke targets. Run `nuke --help` to see what targets are available.
+1. All lint, build, test, deployment operations must be performed through Nuke targets with the `--agent` flag (e.g., `./build.sh TestServerPostmanAuth --agent`). This suppresses verbose Docker output for context efficiency. Run `nuke --help` to see what targets are available.
 2. All nuke Test* and RunLocal* targets record Serilog and Audit.NET logs in the Logs/ folder and.
 3. All Test* Nuke targets record comprehensive reports in the Reports/ directory. Additionally TestE2e* nuke targets record playwright traces that can be viewed with /view-playwright-traces
 4. **Every feature must have its Postman and E2E tests passing before moving to the next feature.** The implementation workflow enforces this.
