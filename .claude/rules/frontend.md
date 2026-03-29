@@ -59,3 +59,10 @@ Before implementing a frontend page/component:
 After implementing:
 1. Verify with `./build.sh BuildClient` (auto-regenerates Kiota types)
 2. Run `./build.sh TestE2e` to validate against E2E expectations
+
+## Carbon Design System Styling
+
+- Use Carbon's `<Theme theme="g100">` wrapper for dark-themed sections (e.g., sidebar)
+- Override Carbon token variables (e.g., `--cds-layer`) on scoped selectors, not globally
+- For layout CSS (spacing, sizing, positioning), use standard CSS — not Carbon tokens
+- Scope Carbon overrides to component class (e.g., `.app-sidebar .cds--side-nav__item`)
