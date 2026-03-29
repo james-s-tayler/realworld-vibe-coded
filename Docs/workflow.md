@@ -31,28 +31,23 @@ Generate your own execution plan from the spec analysis. The plan must be writte
      Deliverables: <entities, endpoints>
      Depends on: Story 1
    ```
-5. Each story targets a specific test suite gate — when those tests pass, the story is done
+5. Each story targets a specific set of test suite gates covering the full stack— when those tests pass, the story is done
 
-**Gate:** Before proceeding to Implement, `PROGRESS.md` must contain: (a) a dependency DAG, (b) checkbox stories with deliverables and depends-on fields, (c) each story mapped to a `./build.sh` gate command.
+**Gate:** Before proceeding to Implement, `PROGRESS.md` must contain: (a) a dependency DAG, (b) checkbox stories with deliverables and depends-on fields, (c) each story mapped to a `./build.sh` gate commands.
 
 ### Phase 3 — Implement (Story Loop) — Each story = one commit
 
 Execute stories from your plan, one at a time:
 
 1. Pick the next incomplete story from your plan
-2. Implement the feature (backend first, then frontend if applicable). The Kiota API client regenerates automatically when `BuildClient` runs (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Always finish and build backend changes before writing frontend code that uses new/changed API types.
+2. Implement the feature (backend first, then frontend). The Kiota API client regenerates automatically when `BuildClient` runs (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Always finish and build backend changes before writing frontend code that uses new/changed API types.
 3. Run the **full gate** (commit hook enforces these — running them creates gate markers):
-   a. `./build.sh BuildServer` — must compile cleanly
-   b. Run ALL Postman suites: `TestServerPostmanAuth`, `TestServerPostmanProfiles`, `TestServerPostmanArticlesEmpty`, `TestServerPostmanArticle`, `TestServerPostmanFeedAndArticles`
-   c. `./build.sh TestE2e` — note failures (infra vs code)
+   a. `./build.sh LintAllVerify` — must lint cleanly
+   b. `./build.sh BuildServer` — must compile cleanly
+   c. `./build.sh TestServerPostman`: `TestServerPostmanAuth`, `TestServerPostmanProfiles`, `TestServerPostmanArticlesEmpty`, `TestServerPostmanArticle`, `TestServerPostmanFeedAndArticles` - confirm passing tests ratchet up, and no regressions
+   d. `./build.sh TestE2e` — confirm passing tests ratchet up, and no regressions
 
-   TIP: For faster feedback during development, run the tier matching your current work:
-   | Story focus | Quick feedback target |
-   |-------------|----------------------|
-   | Auth + frontend shell | `TestE2eAuth` |
-   | Articles + Comments + Favorites + frontend | `TestE2eArticles` |
-   | Feed + Tags + frontend | `TestE2eFeed` |
-   | Final integration | `TestE2e` (all 55 tests) |
+   TIP: For faster feedback during development, run the tier matching your current work.
 
    The commit hook still requires full `TestE2e` to pass.
 4. Compare results against your previous run:
@@ -68,20 +63,6 @@ Execute stories from your plan, one at a time:
 ### Stop Condition
 
 You are done when ALL Postman tests AND all E2E tests pass:
-```
-./build.sh TestServerPostmanAuth TestServerPostmanProfiles TestServerPostmanArticlesEmpty TestServerPostmanArticle TestServerPostmanFeedAndArticles TestE2e
-```
-
-## Circuit Breaker
-
-If you are stuck on a single failing test or feature for more than 20 minutes:
-
-1. Commit what you have (even if tests are failing for this feature)
-2. Note the issue in `PROGRESS.md` under "Blocked Items"
-3. Move to the next story in your plan
-4. Return to blocked items only after all other stories are attempted
-
-Breadth of feature coverage is more important than depth on any single feature.
 
 ## Context Management
 
@@ -100,14 +81,3 @@ Commit-gate semantics ensure progress survives context resets. `PROGRESS.md` ens
 - After each story: append what was done, which tests pass, any gotchas discovered.
 - **NEVER delete or modify existing entries** — `PROGRESS.md` is append-only.
 - This file survives context compression and is the primary cross-session memory.
-
-## Scaffolding Assumptions
-
-The following harness components encode assumptions about model capabilities. As models improve, these may become unnecessary and can be removed:
-
-- **Circuit breaker** — assumes the agent can get stuck in unproductive loops
-- **Explicit phase gates** — assumes the agent won't naturally research before planning
-- **Mandatory reading order** — assumes the agent won't discover files on its own
-- **Full test gate after every story** — assumes the agent might miss regressions
-
-These are designed for simplification — removing any of them is safe to try. Measure the impact via `./scripts/score.sh`.

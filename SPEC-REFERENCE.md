@@ -548,22 +548,30 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
 
 ### PUT `/api/articles/{slug}` — Update Article
 
-> **Note:** This endpoint is part of the standard RealWorld spec but is NOT tested by the current Postman test suites. Implement if the project scope requires it.
+> **Note:** This endpoint is part of the standard RealWorld spec but is NOT tested by the current Postman test suites. However, it IS exercised by E2E tests (EditorPage edit flow with tag changes). Implement it.
 
 - **Auth:** Required (Bearer token, must be article author)
 - **Path Parameters:** `slug` (string, required)
-- **Request Body:** (partial update)
+- **Request Body:** (partial update — all fields optional, but at least one must be provided)
   ```json
   {
     "article": {
       "title": "Updated title",
       "description": "Updated description",
-      "body": "Updated body"
+      "body": "Updated body",
+      "tagList": ["updated-tag", "new-tag"]
     }
   }
   ```
-- **Success Response:** `200 OK` with full article object
+- **Success Response:** `200 OK` with full article object (including updated `tagList`)
+- **Tag Update Behavior:**
+  - `tagList` replaces the article's entire tag set (not a merge)
+  - Tags not in the new list are removed from the article
+  - New tags are created if they don't already exist (find-or-create)
+  - Tag order from the input is preserved
+  - Omitting `tagList` from the request leaves existing tags unchanged
 - **Error Responses:**
+  - `400 Bad Request` — empty request body `{}` (at least one field required)
   - `401 Unauthorized` — missing/invalid token
   - `403 Forbidden` — not the article author
   - `404 Not Found` — article doesn't exist

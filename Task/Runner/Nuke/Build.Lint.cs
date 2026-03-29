@@ -111,7 +111,7 @@ public partial class Build
       });
 
   internal Target LintClaudeMdVerify => _ => _
-      .Description("Verify CLAUDE.md stays within the 50-line limit for effective AI instruction following")
+      .Description("Verify CLAUDE.md stays within the 50-line limit and Rules Index table covers all rules files")
       .Executes(() =>
       {
         var lines = ClaudeMdFile.ReadAllLines();
@@ -124,6 +124,37 @@ public partial class Build
         }
 
         Log.Information("✓ CLAUDE.md is within the 50-line limit");
+
+        var rulesFiles = ClaudeRulesDirectory.GlobFiles("*.md")
+            .Select(f => f.Name)
+            .OrderBy(f => f)
+            .ToList();
+
+        var tableEntries = lines
+            .Where(l => l.TrimStart().StartsWith("| `") && l.Contains(".md`"))
+            .Select(l => l.Split('`')[1])
+            .OrderBy(f => f)
+            .ToList();
+
+        var missing = rulesFiles.Except(tableEntries).ToList();
+        var stale = tableEntries.Except(rulesFiles).ToList();
+
+        if (missing.Any() || stale.Any())
+        {
+          if (missing.Any())
+          {
+            Log.Error("Rules files missing from CLAUDE.md Rules Index table: {Files}", string.Join(", ", missing));
+          }
+
+          if (stale.Any())
+          {
+            Log.Error("Stale entries in CLAUDE.md Rules Index table (file no longer exists): {Files}", string.Join(", ", stale));
+          }
+
+          throw new Exception("CLAUDE.md Rules Index table is out of sync with .claude/rules/*.md files.");
+        }
+
+        Log.Information("✓ Rules Index table covers all {Count} rules files", rulesFiles.Count);
       });
 
   internal Target LintClaudeRulesVerify => _ => _
