@@ -307,7 +307,7 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
       "username": "newusername",
       "bio": "Updated bio",
       "image": "https://example.com/photo.jpg",
-      "roles": []
+      "roles": ["ADMIN", "USER"]
     }
   }
   ```
@@ -443,10 +443,10 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
   - `400 Bad Request` — empty tag string: error for `"article.TagList[0]"`
   - `401 Unauthorized` — missing/invalid token
 - **Validation Rules:**
-  - `title`: required, not empty
-  - `description`: required, not empty
-  - `body`: required, not empty
-  - `tagList`: optional (defaults to empty array); each tag must be non-empty and must not contain commas
+  - `title`: required, not empty, max 200 chars
+  - `description`: required, not empty, max 500 chars
+  - `body`: required, not empty, max 4000 chars
+  - `tagList`: optional (defaults to empty array); each tag must be non-empty, max 50 chars, and must not contain commas
 - **Test Assertions:**
   - `favoritesCount` is an integer (not a float)
   - `createdAt` and `updatedAt` are ISO 8601 format
@@ -457,7 +457,7 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
   - `author.bio` is `"I work at statefarm"` for new users
   - `author.image` is `null` for new users
   - `author.following` is `false` for own articles
-  - Duplicate title (producing same slug) returns 400 with error for `"slug"`
+  - Duplicate title (producing same slug) returns 400 with error for `"slug"` — error text: `"has already been taken"`
 
 ### GET `/api/articles/{slug}` — Get Single Article
 
@@ -548,22 +548,30 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
 
 ### PUT `/api/articles/{slug}` — Update Article
 
-> **Note:** This endpoint is part of the standard RealWorld spec but is NOT tested by the current Postman test suites. Implement if the project scope requires it.
+> **Note:** This endpoint is part of the standard RealWorld spec but is NOT tested by the current Postman test suites. However, it IS exercised by E2E tests (EditorPage edit flow with tag changes). Implement it.
 
 - **Auth:** Required (Bearer token, must be article author)
 - **Path Parameters:** `slug` (string, required)
-- **Request Body:** (partial update)
+- **Request Body:** (partial update — all fields optional, but at least one must be provided)
   ```json
   {
     "article": {
       "title": "Updated title",
       "description": "Updated description",
-      "body": "Updated body"
+      "body": "Updated body",
+      "tagList": ["updated-tag", "new-tag"]
     }
   }
   ```
-- **Success Response:** `200 OK` with full article object
+- **Success Response:** `200 OK` with full article object (including updated `tagList`)
+- **Tag Update Behavior:**
+  - `tagList` replaces the article's entire tag set (not a merge)
+  - Tags not in the new list are removed from the article
+  - New tags are created if they don't already exist (find-or-create)
+  - Tag order from the input is preserved
+  - Omitting `tagList` from the request leaves existing tags unchanged
 - **Error Responses:**
+  - `400 Bad Request` — empty request body `{}` (at least one field required)
   - `401 Unauthorized` — missing/invalid token
   - `403 Forbidden` — not the article author
   - `404 Not Found` — article doesn't exist
@@ -613,6 +621,8 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
     }
   }
   ```
+- **Validation Rules:**
+  - `body`: required, not empty, max 5000 chars
 - **Error Responses:**
   - `400 Bad Request` — missing/blank body: error for `"body"`
   - `401 Unauthorized` — missing/invalid token
@@ -621,6 +631,7 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
   - `comment.id` exists (GUID format)
   - `comment.createdAt` is ISO 8601, after request timestamp
   - `comment.author.following` reflects the authenticated user's follow state
+  - When the authenticated user is also the comment author, `author.following` is always `false` (cannot follow yourself)
 
 ### GET `/api/articles/{slug}/comments` — Get Comments
 
@@ -837,8 +848,8 @@ interface ArticleResponse {
   description: string;
   body: string;          // Only in single article responses, NOT in lists
   tagList: string[];     // Ordered array, may be empty
-  createdAt: string;     // ISO 8601 datetime
-  updatedAt: string;     // ISO 8601 datetime
+  createdAt: string;     // ISO 8601 datetime with UTC 'Z' suffix (e.g., `2026-03-27T12:00:00.0000000Z`)
+  updatedAt: string;     // ISO 8601 datetime with UTC 'Z' suffix (e.g., `2026-03-27T12:00:00.0000000Z`)
   favorited: boolean;    // Whether the authenticated user favorited this
   favoritesCount: number; // Integer, total favorites across all users
   author: ProfileResponse;
@@ -855,8 +866,8 @@ interface ArticleResponse {
 interface CommentResponse {
   id: string;          // GUID format (e.g., "a1b2c3d4-e5f6-7890-abcd-ef1234567890")
   body: string;
-  createdAt: string;   // ISO 8601 datetime
-  updatedAt: string;   // ISO 8601 datetime
+  createdAt: string;   // ISO 8601 datetime with UTC 'Z' suffix (e.g., `2026-03-27T12:00:00.0000000Z`)
+  updatedAt: string;   // ISO 8601 datetime with UTC 'Z' suffix (e.g., `2026-03-27T12:00:00.0000000Z`)
   author: ProfileResponse;
 }
 
@@ -879,6 +890,39 @@ public class ApplicationUser : IdentityUser<Guid>
 
   public string Bio { get; set; } = "I work at statefarm";
   public string? Image { get; set; }
+}
+```
+
+### Article (database entity)
+
+```csharp
+public class Article : EntityBase, IAggregateRoot
+{
+  // Field constraints
+  public const int TitleMaxLength = 200;
+  public const int DescriptionMaxLength = 500;
+  public const int BodyMaxLength = 4000;
+  public const int SlugMaxLength = 250;
+}
+```
+
+### Comment (database entity)
+
+```csharp
+public class Comment : EntityBase
+{
+  // Field constraints
+  public const int BodyMaxLength = 5000;
+}
+```
+
+### Tag (database entity)
+
+```csharp
+public class Tag : EntityBase, IAggregateRoot
+{
+  // Field constraints
+  public const int NameMaxLength = 50;
 }
 ```
 
@@ -958,6 +1002,15 @@ interface CreateCommentRequest {
 - Individual tags must be non-empty strings
 - Individual tags must NOT contain commas
 - Articles without `tagList` get an empty array `[]`
+- `.tag-list` is the standard CSS class for tag containers in both article previews and article detail pages
+
+### Editor Tag Input Behavior
+- Pressing Enter after typing a tag adds it and displays it below the input
+- Typing a comma after a tag also adds it and displays it below the input
+- When editing an existing article, its tags must be displayed below the input
+- Each displayed tag must be individually removable
+- Removing a tag and saving the article must persist the removal (tag no longer appears on article view)
+- If text is in the tag input when Publish Article is clicked, it must be added as a tag before submission
 
 ### Article Ordering
 - Articles are always ordered by creation time, most recent first (descending)
@@ -968,6 +1021,8 @@ interface CreateCommentRequest {
 - Minimum `offset`: 0
 - Non-numeric `limit`/`offset` values are rejected (400)
 - `articlesCount` always reflects the TOTAL matching count, regardless of pagination
+- Frontend pages (HomePage, ProfilePage) must default to `limit=20`
+- Frontend pagination component must be rendered even when total articles ≤ page size
 
 ### Feed Rules
 - Feed returns articles ONLY from users the authenticated user follows

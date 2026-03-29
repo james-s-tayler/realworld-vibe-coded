@@ -40,4 +40,5 @@ ENV PLAYWRIGHT_HEADLESS=true
 COPY --from=build /app/publish .
 
 # Use the xUnit v3 in-process console runner directly
-ENTRYPOINT ["/app/E2eTests", "-trx", "/Reports/Test/e2e/Results/e2e-results.trx"]
+ENTRYPOINT ["/app/E2eTests"]
+CMD ["-trx", "/Reports/Test/e2e/Results/e2e-results.trx"]
