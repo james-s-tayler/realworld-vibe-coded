@@ -47,10 +47,8 @@ public class HappyPath : AppPageTest
     // Wait for the user to appear in the table
     await Pages.UsersPage.VerifyUserVisibleAsync(invitedEmail);
 
-    // Logout
-    await Pages.SettingsPage.GoToAsync();
-    await Pages.SettingsPage.LogoutAsync();
-    await Expect(Pages.SettingsPage.SignInLink).ToBeVisibleAsync();
+    // Logout via sidebar link
+    await Pages.UsersPage.LogoutAsync();
 
     // Login as the invited user
     await Pages.LoginPage.GoToAsync();
