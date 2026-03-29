@@ -43,7 +43,7 @@ describe('App', () => {
     })
 
     await waitFor(() => {
-      const navigation = screen.getByRole('navigation', { name: /main navigation/i })
+      const navigation = screen.getByRole('navigation', { name: /side navigation/i })
       expect(navigation).toBeInTheDocument()
     }, { timeout: 3000 })
   })

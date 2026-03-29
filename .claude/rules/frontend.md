@@ -48,6 +48,13 @@ The generated API client (`src/api/generated/`) is the **type contract** between
 
 - **Carbon Tabs:** `selectedIndex={-1}` doesn't work — compute the proper tab index for dynamic tab sets
 
+## Carbon Design System Styling
+
+- Use Carbon's `<Theme theme="g100">` wrapper for dark-themed sections (e.g., sidebar)
+- Override Carbon token variables (e.g., `--cds-layer`) on scoped selectors, not globally
+- For layout CSS (spacing, sizing, positioning), use standard CSS — not Carbon tokens
+- Scope Carbon overrides to component class (e.g., `.app-sidebar .cds--side-nav__item`)
+
 ## Frontend Implementation Checklist
 
 Before implementing a frontend page/component:
