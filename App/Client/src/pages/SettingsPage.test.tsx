@@ -14,15 +14,6 @@ vi.mock('../api/auth', () => ({
   },
 }))
 
-const mockNavigate = vi.fn()
-vi.mock('react-router', async () => {
-  const actual = await vi.importActual('react-router')
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  }
-})
-
 const mockUser = {
   email: 'test@example.com',
   username: 'testuser',
@@ -143,26 +134,6 @@ describe('SettingsPage', () => {
         bio: 'New bio',
         image: 'https://example.com/new-avatar.jpg',
       })
-    })
-  })
-
-  it('handles logout correctly', async () => {
-    const user = userEvent.setup()
-    
-    vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
-    vi.mocked(authApi.logout).mockResolvedValue()
-
-    renderSettingsPage()
-
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /click here to logout/i })).toBeInTheDocument()
-    })
-
-    await user.click(screen.getByRole('button', { name: /click here to logout/i }))
-
-    await waitFor(() => {
-      expect(authApi.logout).toHaveBeenCalled()
-      expect(mockNavigate).toHaveBeenCalledWith('/')
     })
   })
 

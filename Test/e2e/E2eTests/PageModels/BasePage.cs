@@ -60,6 +60,11 @@ public abstract class BasePage(IPage page, string baseUrl)
   public ILocator UsersLink => Page.GetByRole(AriaRole.Link, new() { Name = "Users", Exact = true });
 
   /// <summary>
+  /// Navigation sidebar link - Log out.
+  /// </summary>
+  public ILocator LogoutLink => Page.GetByRole(AriaRole.Link, new() { Name = "Log out" });
+
+  /// <summary>
   /// Gets the user profile link in the navigation header.
   /// </summary>
   public ILocator GetUserProfileLink(string username) =>
@@ -119,6 +124,15 @@ public abstract class BasePage(IPage page, string baseUrl)
   public async Task ClickUserProfileAsync(string username)
   {
     await Navigate(GetUserProfileLink(username), $"{BaseUrl}/profile/{username}");
+  }
+
+  /// <summary>
+  /// Performs logout via sidebar and verifies the user is logged out.
+  /// </summary>
+  public async Task LogoutAsync()
+  {
+    await LogoutLink.ClickAsync();
+    await Expect(SignInLink).ToBeVisibleAsync();
   }
 
   /// <summary>
