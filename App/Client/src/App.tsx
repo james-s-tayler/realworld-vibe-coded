@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleProtectedRoute } from './components/RoleProtectedRoute';
 import { AppHeader } from './components/AppHeader';
+import { AppSidebar } from './components/AppSidebar';
 import { DashboardPage } from './pages/DashboardPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -16,6 +17,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <AppHeader />
+        <AppSidebar />
         <Routes>
           <Route
             path="/"

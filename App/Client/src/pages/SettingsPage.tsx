@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router';
 import {
   Form,
   TextInput,
@@ -16,8 +15,7 @@ import { USER_CONSTRAINTS } from '../constants';
 import './SettingsPage.css';
 
 export const SettingsPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { user, updateUser, logout } = useAuth();
+  const { user, updateUser } = useAuth();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
@@ -63,11 +61,6 @@ export const SettingsPage: React.FC = () => {
     e.preventDefault();
     setSuccess(false);
     await execute();
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
   };
 
   if (!user) {
@@ -154,11 +147,6 @@ export const SettingsPage: React.FC = () => {
         </Stack>
       </Form>
 
-      <hr />
-
-      <Button kind="danger--ghost" onClick={handleLogout}>
-        Or click here to logout.
-      </Button>
     </PageShell>
   );
 };
