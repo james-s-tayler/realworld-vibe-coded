@@ -1,0 +1,14 @@
+.app-sidebar.cds--side-nav {
+  top: var(--header-height);
+  width: var(--sidebar-width);
+}
+
+.app-sidebar .cds--side-nav__items {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-sidebar__profile-spacer {
+  flex-grow: 1;
+}

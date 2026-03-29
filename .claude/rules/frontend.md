@@ -44,6 +44,13 @@ The generated API client (`src/api/generated/`) is the **type contract** between
 
 `src/constants.ts` mirrors backend entity constraint constants. Use these for `maxLength` on `TextInput`/`TextArea` and client-side validation. The values must match `SPEC-REFERENCE.md` entity definitions. When creating forms, always apply `maxCount` on `TextArea` and `maxLength` on `TextInput` using these constants.
 
+## Carbon Design System — Styling Rules
+
+**Never write direct CSS overrides for Carbon components.** Before adding custom CSS for colors, theming, hover states, or layout of any Carbon component:
+1. Research the Carbon-native approach first (e.g., `Theme` component for scoped theming, component props like `kind`, `size`, design tokens)
+2. Use Carbon's `Theme` component (`theme="g100"`, `"g90"`, `"g10"`, `"white"`) for dark/light zones — not manual background/color overrides
+3. Only add custom CSS for layout concerns (positioning, sizing, spacing) that Carbon doesn't handle
+
 ## Common Gotchas
 
 - **Carbon Tabs:** `selectedIndex={-1}` doesn't work — compute the proper tab index for dynamic tab sets

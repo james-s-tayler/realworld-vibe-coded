@@ -66,6 +66,11 @@ public abstract class BasePage(IPage page, string baseUrl)
     Page.GetByRole(AriaRole.Link, new() { Name = username }).First;
 
   /// <summary>
+  /// Log out link in the sidebar navigation.
+  /// </summary>
+  public ILocator LogoutLink => Page.GetByRole(AriaRole.Link, new() { Name = "Log out" });
+
+  /// <summary>
   /// Navigates to the home page.
   /// </summary>
   public async Task GoToHomePageAsync()
@@ -127,6 +132,15 @@ public abstract class BasePage(IPage page, string baseUrl)
   public async Task<bool> IsUserLoggedInAsync()
   {
     return !await SignInLink.IsVisibleAsync();
+  }
+
+  /// <summary>
+  /// Clicks the Log out link in the sidebar and verifies the user is logged out.
+  /// </summary>
+  public async Task LogoutAsync()
+  {
+    await LogoutLink.ClickAsync();
+    await Expect(SignInLink).ToBeVisibleAsync();
   }
 
   public virtual async Task GoToAsync(string urlParams = "")

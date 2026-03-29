@@ -43,11 +43,6 @@ public class SettingsPage : BasePage
   public ILocator UpdateSettingsButton => Page.GetByRole(AriaRole.Button, new() { Name = "Update Settings" });
 
   /// <summary>
-  /// Logout button.
-  /// </summary>
-  public ILocator LogoutButton => Page.GetByRole(AriaRole.Button, new() { Name = "Or click here to logout." });
-
-  /// <summary>
   /// Success message after updating settings.
   /// </summary>
   public ILocator SuccessMessage => Page.GetByText("Settings updated successfully");
@@ -84,35 +79,11 @@ public class SettingsPage : BasePage
   }
 
   /// <summary>
-  /// Clicks the logout button.
-  /// </summary>
-  public async Task ClickLogoutButtonAsync()
-  {
-    await LogoutButton.ClickAsync();
-  }
-
-  /// <summary>
-  /// Performs logout and verifies the user is logged out.
-  /// </summary>
-  public async Task LogoutAsync()
-  {
-    await ClickLogoutButtonAsync();
-  }
-
-  /// <summary>
   /// Verifies that the success message is displayed.
   /// </summary>
   public async Task VerifySuccessMessageAsync()
   {
     await Expect(SuccessMessage).ToBeVisibleAsync();
-  }
-
-  /// <summary>
-  /// Verifies that the Sign in link is visible (user is logged out).
-  /// </summary>
-  public async Task VerifyLoggedOutAsync()
-  {
-    await Expect(SignInLink).ToBeVisibleAsync();
   }
 
   /// <summary>

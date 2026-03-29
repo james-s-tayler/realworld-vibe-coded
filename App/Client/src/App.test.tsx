@@ -78,7 +78,7 @@ describe('App', () => {
     // After auth loads, we should either see home page or be able to interact with the app
     await waitFor(() => {
       // Check that loading is done by seeing if we have the header navigation
-      const navigation = screen.getByRole('navigation', { name: /main navigation/i })
+      const navigation = screen.getByRole('navigation', { name: /side navigation/i })
       expect(navigation).toBeInTheDocument()
     }, { timeout: 3000 })
   })
