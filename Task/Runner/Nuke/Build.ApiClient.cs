@@ -6,6 +6,7 @@ public partial class Build
 {
   internal Target BuildGenerateApiClient => _ => _
     .Description("Generate TypeScript API client from FastEndpoints using Kiota")
+    .DependsOn(BuildServer)
     .Executes(() =>
     {
       Log.Information("Generating TypeScript API client from {ServerProject}", ServerProject);
