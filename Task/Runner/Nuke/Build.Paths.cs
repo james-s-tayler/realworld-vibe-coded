@@ -60,6 +60,8 @@ public partial class Build
 
   internal AbsolutePath ClaudeMdFile => RootDirectory / "CLAUDE.md";
 
+  internal AbsolutePath ClaudeRulesDirectory => RootDirectory / ".claude" / "rules";
+
   #endregion
 
   #region Reports

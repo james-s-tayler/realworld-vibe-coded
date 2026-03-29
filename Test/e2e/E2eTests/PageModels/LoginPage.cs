@@ -59,9 +59,8 @@ public class LoginPage : BasePage
     await FillLoginFormAsync(email, password);
     await ClickSignInButtonAsync();
 
-    // Wait for successful login by verifying the Settings link in the nav is visible (only shown when logged in)
-    // Use .First to avoid strict mode violation when dashboard also has a Settings link
-    await Expect(SettingsLink.First).ToBeVisibleAsync();
+    // Wait for successful login by verifying the Settings nav link is visible (only shown when logged in)
+    await Expect(Page.GetByLabel("Main navigation").GetByRole(AriaRole.Link, new() { Name = "Settings" })).ToBeVisibleAsync();
   }
 
   /// <summary>
