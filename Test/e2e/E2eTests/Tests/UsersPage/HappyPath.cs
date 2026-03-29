@@ -19,9 +19,8 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
-    // Act - Click the Users link from the navigation menu
-    await Pages.HomePage.GoToAsync();
-    await Pages.HomePage.ClickUsersAsync();
+    // Act - Click the Users link from the sidebar navigation
+    await Pages.UsersPage.ClickUsersAsync();
 
     // Assert - Verify we're on the users page
     await Expect(Page).ToHaveURLAsync(BaseUrl + "/users");
@@ -49,10 +48,8 @@ public class HappyPath : AppPageTest
     // Wait for the user to appear in the table
     await Pages.UsersPage.VerifyUserVisibleAsync(invitedEmail);
 
-    // Logout
-    await Pages.SettingsPage.GoToAsync();
-    await Pages.SettingsPage.LogoutAsync();
-    await Expect(Pages.SettingsPage.SignInLink).ToBeVisibleAsync();
+    // Logout via sidebar
+    await Pages.UsersPage.LogoutAsync();
 
     // Login as the invited user
     await Pages.LoginPage.GoToAsync();
