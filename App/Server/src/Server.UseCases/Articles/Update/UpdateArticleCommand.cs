@@ -8,6 +8,7 @@ public record UpdateArticleCommand(
   string? Title,
   string? Description,
   string? Body,
+  List<string>? TagList,
   Guid UserId,
   Guid CurrentUserId
 ) : ICommand<Article>;

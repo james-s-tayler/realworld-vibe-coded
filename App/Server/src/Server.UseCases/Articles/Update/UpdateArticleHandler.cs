@@ -1,11 +1,15 @@
 ﻿using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications.Articles;
+using Server.Core.TagAggregate;
+using Server.Core.TagAggregate.Specifications;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
 
 namespace Server.UseCases.Articles.Update;
 
-public class UpdateArticleHandler(IRepository<Article> articleRepository)
+public class UpdateArticleHandler(
+  IRepository<Article> articleRepository,
+  IRepository<Tag> tagRepository)
   : ICommandHandler<UpdateArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(UpdateArticleCommand request, CancellationToken cancellationToken)
@@ -45,6 +49,29 @@ public class UpdateArticleHandler(IRepository<Article> articleRepository)
     var newBody = request.Body ?? article.Body;
 
     article.Update(newTitle, newDescription, newBody);
+
+    if (request.TagList != null)
+    {
+      article.Tags.Clear();
+
+      foreach (var tagName in request.TagList)
+      {
+        var existingTag = await tagRepository.FirstOrDefaultAsync(
+          new TagByNameSpec(tagName), cancellationToken);
+
+        if (existingTag != null)
+        {
+          article.AddTag(existingTag);
+        }
+        else
+        {
+          var newTag = new Tag(tagName);
+          await tagRepository.AddAsync(newTag, cancellationToken);
+          article.AddTag(newTag);
+        }
+      }
+    }
+
     await articleRepository.UpdateAsync(article, cancellationToken);
 
     return Result<Article>.Success(article);

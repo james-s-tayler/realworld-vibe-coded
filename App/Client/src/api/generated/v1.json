@@ -3289,6 +3289,13 @@
           "body": {
             "type": "string",
             "nullable": true
+          },
+          "tagList": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

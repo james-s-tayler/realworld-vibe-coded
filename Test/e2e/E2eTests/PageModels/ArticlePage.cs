@@ -226,4 +226,9 @@ public class ArticlePage : BasePage
       await Expect(GetArticleTag(tag)).ToBeVisibleAsync();
     }
   }
+
+  public async Task VerifyArticleTagNotVisibleAsync(string tagName)
+  {
+    await Expect(GetArticleTag(tagName)).Not.ToBeVisibleAsync();
+  }
 }
