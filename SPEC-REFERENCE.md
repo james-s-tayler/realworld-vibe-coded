@@ -966,6 +966,8 @@ interface CreateCommentRequest {
 - Typing a comma after a tag also adds it and displays it below the input
 - When editing an existing article, its tags must be displayed below the input
 - Each displayed tag must be individually removable
+- Removing a tag and saving the article must persist the removal (tag no longer appears on article view)
+- If text is in the tag input when Publish Article is clicked, it must be added as a tag before submission
 
 ### Article Ordering
 - Articles are always ordered by creation time, most recent first (descending)

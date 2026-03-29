@@ -137,6 +137,52 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  public async Task RemovedTagIsPersistedAfterSave()
+  {
+    // Arrange
+    var user = await Api.CreateUserAsync();
+    var tag1 = $"tag{Guid.NewGuid().ToString("N")[..6]}";
+    var tag2 = $"tag{Guid.NewGuid().ToString("N")[..6]}";
+    var article = await Api.CreateArticleAsync(user.Token, [tag1, tag2]);
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    await Pages.ArticlePage.GoToAsync(article.Slug);
+    await Pages.ArticlePage.ClickEditButtonAsync();
+
+    // Act — remove tag1 and save
+    await Pages.EditorPage.RemoveTagAsync(tag1);
+    await Pages.EditorPage.ClickPublishButtonAsync();
+    await Pages.ArticlePage.VerifyArticleTitleAsync(article.Title);
+
+    // Assert — tag1 should be gone, tag2 should remain
+    await Pages.ArticlePage.VerifyArticleTagNotVisibleAsync(tag1);
+    await Pages.ArticlePage.VerifyArticleTagsVisibleAsync(tag2);
+  }
+
+  [Fact]
+  public async Task UnsubmittedTagInInputIsAddedOnPublish()
+  {
+    // Arrange
+    var user = await Api.CreateUserAsync();
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    await Pages.HomePage.ClickNewArticleAsync();
+
+    var title = $"Pending Tag Article {Guid.NewGuid().ToString("N")[..8]}";
+    var pendingTag = $"tag{Guid.NewGuid().ToString("N")[..6]}";
+
+    // Act — fill form with tag text left in input (not pressed Enter)
+    await Pages.EditorPage.FillArticleFormAsync(title, "Description", "Body content");
+    await Pages.EditorPage.TagsInput.FillAsync(pendingTag);
+    await Pages.EditorPage.ClickPublishButtonAsync();
+    await Pages.ArticlePage.VerifyArticleTitleAsync(title);
+
+    // Assert — the pending tag should have been added
+    await Pages.ArticlePage.VerifyArticleTagsVisibleAsync(pendingTag);
+  }
+
+  [Fact]
   public async Task UserCanEditOwnArticle()
   {
     // Arrange
