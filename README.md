@@ -1,6 +1,6 @@
 # 🤖 Agent-First Single-Tenant Starter Template
 
-A production-ready .NET + React starter template built for agent-first development. Includes Clean Architecture, CQRS, 46 AI-invocable build skills, 32 custom Roslyn analyzers, and a 4-layer test suite — so AI coding agents can build, test, lint, and deploy through a single entry point (`nuke`).
+A production-ready .NET + React starter template built for agent-first development. Includes Clean Architecture, CQRS, AI-invocable Nuke build targets (via `./build.sh <Target>`), 32 custom Roslyn analyzers, and a 4-layer test suite — so AI coding agents can build, test, lint, and deploy through a single entry point (`nuke`).
 
 ## 📦 What You Get
 
@@ -9,7 +9,7 @@ A production-ready .NET + React starter template built for agent-first developme
 - 🔐 **Role-based authentication** with JWT (single-tenant)
 - 🔄 **Auto-generated TypeScript API client** via Kiota — backend endpoint changes automatically sync to frontend
 - 🛡️ **32 custom Roslyn analyzers** enforcing architecture, persistence, and testing rules at compile time
-- 🤖 **46 Claude Code skills** mapping 1:1 to Nuke build targets — agents invoke build/test/lint/deploy by name
+- 🤖 **Nuke build targets** invocable directly via `./build.sh <Target>` — agents invoke build/test/lint/deploy by name
 - 🧪 **4-layer test suite** — xUnit (backend), Vitest (frontend), Playwright (E2E), Postman (API)
 - ⚙️ **Nuke build system** — single `nuke` entry point for all operations
 - 🐳 **Docker support** for local dev, testing, and publishing
@@ -140,17 +140,16 @@ Each directory has a single, clear responsibility. An agent can immediately loca
 
 The `CLAUDE.md` file at the repository root provides agents with full project context: tech stack, folder structure, build commands, critical rules, and conventions. This is the entry point for any agent working on the codebase.
 
-### 🎯 `.claude/skills/` — 46 Build Skills
+### 🎯 Nuke Build Targets — Direct Invocation
 
-Each Nuke build target has a corresponding skill definition in `.claude/skills/`. These are auto-generated and kept in sync via `nuke LintSkillsVerify`. Agents can invoke any build operation by name:
+All Nuke build targets are invocable directly via `./build.sh <Target> --agent`. The `--agent` flag suppresses verbose Docker output for context efficiency. Run `nuke --help` to discover all available targets. Examples:
 
-- `nuke-build-server` — compile the .NET backend
-- `nuke-test-e2e` — run Playwright end-to-end tests
-- `nuke-lint-all-fix` — auto-fix all lint issues
-- `nuke-db-migrations-add` — add a new EF Core migration
-- `github-push-pr` — push to PR and monitor CI, auto-investigating failures
+- `./build.sh BuildServer --agent` — compile the .NET backend
+- `./build.sh TestE2e --agent` — run Playwright end-to-end tests
+- `./build.sh LintAllFix --agent` — auto-fix all lint issues
+- `./build.sh DbMigrationsAdd --agent` — add a new EF Core migration
 
-Skills also include workflow skills like `debug` (structured debug analysis) and `on-stop` (pre-commit verification).
+Workflow skills like `nuke-verify` (pre-commit verification) and `debug` (structured debug analysis) are available in `.claude/skills/`.
 
 ### 📏 `.claude/rules/` — Coding Rules
 
