@@ -1,0 +1,3 @@
+services:
+  playwright:
+    command: ["-trx", "/Reports/Test/e2e/Results/e2e-results.trx", "-namespace", "E2eTests.Tests.EditorPage", "-namespace", "E2eTests.Tests.ArticlePage", "-namespace", "E2eTests.Tests.ProfilePage"]

@@ -5,29 +5,34 @@ using Server.Core.AuthorAggregate.Specifications;
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
+using Server.UseCases.Interfaces;
+using Server.UseCases.Users.Dtos;
 
 namespace Server.UseCases.Users.Update;
 
 // PV014: This handler uses ASP.NET Identity's UserManager instead of the repository pattern.
 // UserManager.UpdateAsync and ResetPasswordAsync perform database mutations internally.
 #pragma warning disable PV014
-public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationUser>
+public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRolesDto>
 {
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly IRepository<Author> _authorRepository;
+  private readonly IQueryApplicationUsers _queryApplicationUsers;
   private readonly ILogger<UpdateUserHandler> _logger;
 
   public UpdateUserHandler(
     UserManager<ApplicationUser> userManager,
     IRepository<Author> authorRepository,
+    IQueryApplicationUsers queryApplicationUsers,
     ILogger<UpdateUserHandler> logger)
   {
     _userManager = userManager;
     _authorRepository = authorRepository;
+    _queryApplicationUsers = queryApplicationUsers;
     _logger = logger;
   }
 
-  public async Task<Result<ApplicationUser>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+  public async Task<Result<UserWithRolesDto>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
   {
     _logger.LogInformation("Updating user {UserId}", request.UserId);
 
@@ -36,7 +41,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationU
     if (user == null)
     {
       _logger.LogWarning("User with ID {UserId} not found", request.UserId);
-      return Result<ApplicationUser>.NotFound();
+      return Result<UserWithRolesDto>.NotFound();
     }
 
     // Check for duplicate email
@@ -47,7 +52,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationU
       if (existingUserByEmail != null && existingUserByEmail.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Email {Email} already exists", request.Email);
-        return Result<ApplicationUser>.Invalid(new ErrorDetail
+        return Result<UserWithRolesDto>.Invalid(new ErrorDetail
         {
           Identifier = "email",
           ErrorMessage = "Email already exists",
@@ -65,7 +70,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationU
       if (existingUserByUsername != null && existingUserByUsername.Id != user.Id)
       {
         _logger.LogWarning("Update failed: Username {Username} already exists", request.Username);
-        return Result<ApplicationUser>.Invalid(new ErrorDetail
+        return Result<UserWithRolesDto>.Invalid(new ErrorDetail
         {
           Identifier = "username",
           ErrorMessage = "Username already exists",
@@ -84,7 +89,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationU
       if (!passwordResult.Succeeded)
       {
         _logger.LogWarning("Password update failed for user {UserId}: {Errors}", request.UserId, string.Join(", ", passwordResult.Errors.Select(e => e.Description)));
-        return Result<ApplicationUser>.Invalid(new ErrorDetail
+        return Result<UserWithRolesDto>.Invalid(new ErrorDetail
         {
           Identifier = "password",
           ErrorMessage = string.Join(", ", passwordResult.Errors.Select(e => e.Description)),
@@ -109,7 +114,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationU
     if (!result.Succeeded)
     {
       _logger.LogWarning("User update failed for {UserId}: {Errors}", request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
-      return Result<ApplicationUser>.Invalid(new ErrorDetail
+      return Result<UserWithRolesDto>.Invalid(new ErrorDetail
       {
         Identifier = "body",
         ErrorMessage = string.Join(", ", result.Errors.Select(e => e.Description)),
@@ -125,7 +130,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationU
       if (author == null)
       {
         _logger.LogError("Author record not found for user {UserId} - data integrity violation", user.Id);
-        return Result<ApplicationUser>.Error(new ErrorDetail("author", "Author record not found - data integrity issue"));
+        return Result<UserWithRolesDto>.Error(new ErrorDetail("author", "Author record not found - data integrity issue"));
       }
 
       author.Update(user.UserName!, user.Bio ?? string.Empty, user.Image);
@@ -135,7 +140,9 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, ApplicationU
 
     _logger.LogInformation("User {Username} updated successfully", user.UserName);
 
-    return Result<ApplicationUser>.Success(user);
+    var userWithRoles = await _queryApplicationUsers.GetCurrentUserWithRoles(request.UserId, cancellationToken);
+
+    return Result<UserWithRolesDto>.Success(userWithRoles!);
   }
 }
 #pragma warning restore PV014

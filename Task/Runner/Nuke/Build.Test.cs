@@ -240,6 +240,97 @@ public partial class Build
     return _;
   };
 
+  internal Target TestE2eAuth => _ => _
+      .Description("Run E2E Playwright tests for Auth tier (LoginPage, RegisterPage, SwaggerPage, SettingsPage, UsersPage)")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(InstallDotnetToolLiquidReports)
+      .DependsOn(PathsCleanDirectories)
+      .Executes(() => RunE2eCollection("Auth"));
+
+  internal Target TestE2eArticles => _ => _
+      .Description("Run E2E Playwright tests for Articles tier (EditorPage, ArticlePage, ProfilePage)")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(InstallDotnetToolLiquidReports)
+      .DependsOn(PathsCleanDirectories)
+      .Executes(() => RunE2eCollection("Articles"));
+
+  internal Target TestE2eFeed => _ => _
+      .Description("Run E2E Playwright tests for Feed tier (HomePage)")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(InstallDotnetToolLiquidReports)
+      .DependsOn(PathsCleanDirectories)
+      .Executes(() => RunE2eCollection("Feed"));
+
+  internal Target TestE2eMultitenancy => _ => _
+      .Description("Run E2E Playwright tests for Multitenancy tier")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(InstallDotnetToolLiquidReports)
+      .DependsOn(PathsCleanDirectories)
+      .Executes(() => RunE2eCollection("Multitenancy"));
+
+  private void RunE2eCollection(string collectionName)
+  {
+    Log.Information("Running E2E {CollectionName} tests with Docker Compose", collectionName);
+
+    var composeFiles = SkipPublish
+        ? $"-f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.{collectionName}.yml -f Test/e2e/docker-compose.ci.yml"
+        : $"-f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.{collectionName}.yml";
+    var upArgs = SkipPublish
+        ? $"compose {composeFiles} up --no-build --abort-on-container-exit"
+        : $"compose {composeFiles} up --build --abort-on-container-exit";
+    var downArgs = $"compose {composeFiles} down";
+    int exitCode = 0;
+    try
+    {
+      var envVars = new Dictionary<string, string> { ["DOCKER_BUILDKIT"] = "1", };
+      var process = ProcessTasks.StartProcess(
+        "docker",
+        upArgs,
+        workingDirectory: RootDirectory,
+        environmentVariables: envVars);
+      process.WaitForExit();
+      exitCode = process.ExitCode;
+
+      var apiExitCode = GetServiceExitCode(composeFiles, "api");
+      if (apiExitCode > 0 && exitCode == 0)
+      {
+        Log.Error("API container crashed with exit code {ApiExitCode} but Docker Compose reported success", apiExitCode);
+        exitCode = apiExitCode;
+      }
+    }
+    finally
+    {
+      var downProcess = ProcessTasks.StartProcess(
+        "docker",
+        downArgs,
+        workingDirectory: RootDirectory);
+
+      var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
+
+      try
+      {
+        Liquid(
+          $"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke TestE2e{collectionName} Results\"");
+
+        var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";
+        ExtractReportSummary(reportFile, reportSummaryFile);
+      }
+      catch (Exception ex)
+      {
+        Log.Warning("Failed to generate LiquidTestReport: {Message}", ex.Message);
+      }
+
+      downProcess.WaitForExit();
+    }
+
+    if (exitCode != 0)
+    {
+      const string debugInstructions = "For a high-level summary of specific failures, see Reports/Test/e2e/Artifacts/ReportSummary.md. Then view logs in Logs/Test/e2e/Server.Web/Serilog to diagnose specific failures.";
+      Log.Error("E2E {CollectionName} tests failed. {DebugInstructions}", collectionName, debugInstructions);
+      throw new Exception($"E2E {collectionName} tests failed with exit code: {exitCode}. {debugInstructions}");
+    }
+  }
+
   private int GetServiceExitCode(string composeFiles, string serviceName)
   {
     try
