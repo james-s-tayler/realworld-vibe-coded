@@ -18,6 +18,9 @@ public partial class Build
   [Parameter("Stop tests on first test failure")]
   internal readonly bool Bail;
 
+  [Parameter("Suppress verbose output for agent context efficiency")]
+  internal readonly bool Agent;
+
   internal Target TestServer => _ => _
       .Description("Run backend tests and generate test and coverage reports")
       .DependsOn(InstallDotnetToolLiquidReports)
@@ -189,7 +192,8 @@ public partial class Build
           "docker",
           upArgs,
           workingDirectory: RootDirectory,
-          environmentVariables: envVars);
+          environmentVariables: envVars,
+          logOutput: !Agent);
         process.WaitForExit();
         exitCode = process.ExitCode;
 
@@ -206,7 +210,8 @@ public partial class Build
         var downProcess = ProcessTasks.StartProcess(
           "docker",
           downArgs,
-          workingDirectory: RootDirectory);
+          workingDirectory: RootDirectory,
+          logOutput: !Agent);
 
         // Generate LiquidTestReport from TRX files in parallel with compose down
         var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
@@ -219,6 +224,11 @@ public partial class Build
           // Extract summary from Report.md (everything before first "---")
           var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";
           ExtractReportSummary(reportFile, reportSummaryFile);
+
+          if (Agent)
+          {
+            PrintReportSummary(reportSummaryFile);
+          }
         }
         catch (Exception ex)
         {
@@ -287,7 +297,8 @@ public partial class Build
         "docker",
         upArgs,
         workingDirectory: RootDirectory,
-        environmentVariables: envVars);
+        environmentVariables: envVars,
+        logOutput: !Agent);
       process.WaitForExit();
       exitCode = process.ExitCode;
 
@@ -303,7 +314,8 @@ public partial class Build
       var downProcess = ProcessTasks.StartProcess(
         "docker",
         downArgs,
-        workingDirectory: RootDirectory);
+        workingDirectory: RootDirectory,
+        logOutput: !Agent);
 
       var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
 
@@ -314,6 +326,11 @@ public partial class Build
 
         var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";
         ExtractReportSummary(reportFile, reportSummaryFile);
+
+        if (Agent)
+        {
+          PrintReportSummary(reportSummaryFile);
+        }
       }
       catch (Exception ex)
       {
@@ -339,7 +356,8 @@ public partial class Build
       var psProcess = ProcessTasks.StartProcess(
           "docker",
           psArgs,
-          workingDirectory: RootDirectory);
+          workingDirectory: RootDirectory,
+          logOutput: !Agent);
       psProcess.WaitForExit();
 
       var containerId = psProcess.Output
@@ -357,7 +375,8 @@ public partial class Build
       var inspectProcess = ProcessTasks.StartProcess(
           "docker",
           inspectArgs,
-          workingDirectory: RootDirectory);
+          workingDirectory: RootDirectory,
+          logOutput: !Agent);
       inspectProcess.WaitForExit();
 
       var exitCodeStr = inspectProcess.Output
@@ -377,6 +396,19 @@ public partial class Build
     {
       Log.Warning("Failed to check exit code for service {ServiceName}: {Message}", serviceName, ex.Message);
       return -1;
+    }
+  }
+
+  private void PrintReportSummary(AbsolutePath summaryFile)
+  {
+    if (!summaryFile.FileExists())
+    {
+      return;
+    }
+
+    foreach (var line in summaryFile.ReadAllLines())
+    {
+      Log.Information(line);
     }
   }
 
@@ -407,7 +439,8 @@ public partial class Build
             "docker",
             upArgs,
             workingDirectory: RootDirectory,
-            environmentVariables: envVars);
+            environmentVariables: envVars,
+            logOutput: !Agent);
       process.WaitForExit();
       exitCode = process.ExitCode;
 
@@ -428,7 +461,8 @@ public partial class Build
             "docker",
             downArgs,
             workingDirectory: RootDirectory,
-            environmentVariables: downEnvVars);
+            environmentVariables: downEnvVars,
+            logOutput: !Agent);
       downProcess.WaitForExit();
     }
 
@@ -442,6 +476,11 @@ public partial class Build
       try
       {
         GenerateNewmanReport(newmanReportFile, reportFile, reportSummaryFile, collectionName, Bail);
+
+        if (Agent)
+        {
+          PrintReportSummary(reportSummaryFile);
+        }
       }
       catch (Exception ex)
       {

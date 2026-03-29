@@ -122,14 +122,10 @@ This project is designed to be operated by AI coding agents. Every layer of the 
 
 The `CLAUDE.md` file at the repository root provides agents with full project context: tech stack, folder structure, build commands, critical rules, and conventions. This is the entry point for any agent working on the codebase.
 
-### `.claude/skills/` — Build Skills
+### Nuke Build Targets
 
-Each Nuke build target has a corresponding skill definition in `.claude/skills/`. These are auto-generated and kept in sync via `nuke LintSkillsVerify`. Agents can invoke any build operation by name:
+All Nuke build targets are invocable directly via `./build.sh <Target>`. Run `nuke --help` to see all available targets. Agents use the `--agent` flag to suppress verbose Docker output for context efficiency (e.g., `./build.sh TestE2e --agent`).
 
-- `nuke-build-server` — compile the .NET backend
-- `nuke-test-e2e` — run Playwright end-to-end tests
-- `nuke-lint-all-fix` — auto-fix all lint issues
-- `nuke-db-migrations-add` — add a new EF Core migration
 - `github-push-pr` — push to PR and monitor CI, auto-investigating failures
 
 ### `.claude/rules/` — Coding Rules
