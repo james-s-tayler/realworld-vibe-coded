@@ -38,5 +38,5 @@ These are conventions to follow. See `.claude/rules/backend.md` for copy-pasteab
 - Never add comments unless the logic is inherently unclear
 - Never use python, perl, awk, sed, or regex for mass refactoring
 - Never modify Roslyn analyzers unless explicitly instructed
-- Use the Grep and Glob tools for searching code — never use bash grep, rg, find, or ls for search
+- Use the Grep and Glob tools for searching code — never use bash grep, rg, find, or ls for search. This includes exploratory searches like `find . -name "*.cs"` — use `Glob **/*.cs` instead.
 - If modifying the Nuke build, build it first before committing

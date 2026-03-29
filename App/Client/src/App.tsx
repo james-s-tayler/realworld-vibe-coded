@@ -36,6 +36,14 @@ function App() {
             }
           />
           <Route
+            path="/editor"
+            element={
+              <ProtectedRoute>
+                <div />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/settings"
             element={
               <ProtectedRoute>

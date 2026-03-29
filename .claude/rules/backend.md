@@ -99,6 +99,7 @@ This is the #1 most-forgotten import — add it to every endpoint file.
 ## Common Gotchas
 
 - **EF Core inverse navigation:** When adding an inverse navigation property (e.g., `Article.Favorites`), update the relationship config to `.WithMany(a => a.Favorites)` — otherwise EF creates duplicate FK columns
+- **Partial update validation:** `PUT` endpoints with optional fields (e.g., Update*) must validate at least one field is provided — reject empty `{}` payloads
 
 ## Result Status -> HTTP Code Mapping
 

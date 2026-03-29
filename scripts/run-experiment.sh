@@ -12,6 +12,9 @@
 
 set -euo pipefail
 
+# Ignore SIGPIPE — prevents death when stdout is piped through head/tail
+trap '' PIPE
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
@@ -141,7 +144,7 @@ TOTAL_DURATION=$((TEST_END_TIME - START_TIME))
 
 # Parse test results
 echo "Parsing results..."
-TEST_RESULTS=$("$WORKTREE_DIR/scripts/parse-results.sh" "$WORKTREE_DIR")
+TEST_RESULTS=$("$WORKTREE_DIR/scripts/parse-results.sh" "$WORKTREE_DIR" 2>/dev/null || echo '{"error": "parse-results.sh failed"}')
 
 # Analyze action log if present
 echo "Analyzing action log..."

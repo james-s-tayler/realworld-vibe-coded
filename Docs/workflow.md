@@ -45,6 +45,16 @@ Execute stories from your plan, one at a time:
    a. `./build.sh BuildServer` — must compile cleanly
    b. Run ALL Postman suites: `TestServerPostmanAuth`, `TestServerPostmanProfiles`, `TestServerPostmanArticlesEmpty`, `TestServerPostmanArticle`, `TestServerPostmanFeedAndArticles`
    c. `./build.sh TestE2e` — note failures (infra vs code)
+
+   TIP: For faster feedback during development, run the tier matching your current work:
+   | Story focus | Quick feedback target |
+   |-------------|----------------------|
+   | Auth + frontend shell | `TestE2eAuth` |
+   | Articles + Comments + Favorites + frontend | `TestE2eArticles` |
+   | Feed + Tags + frontend | `TestE2eFeed` |
+   | Final integration | `TestE2e` (all 55 tests) |
+
+   The commit hook still requires full `TestE2e` to pass.
 4. Compare results against your previous run:
    - **Regression** = a suite that previously passed now fails → fix before committing
    - **Expected progress** = this story's target suite now passes → good

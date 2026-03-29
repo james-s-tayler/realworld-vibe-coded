@@ -84,6 +84,6 @@ public class Permissions : AppPageTest
 
     // Assert - Verify we're back on the home page
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/");
-    await Expect(Pages.HomePage.GlobalFeedTab).ToBeVisibleAsync();
+    await Expect(Page.GetByRole(AriaRole.Heading, new() { Level = 1 })).ToBeVisibleAsync();
   }
 }

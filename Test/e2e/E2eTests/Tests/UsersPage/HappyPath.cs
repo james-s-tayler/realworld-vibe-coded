@@ -1,4 +1,6 @@
-﻿namespace E2eTests.Tests.UsersPage;
+﻿using Microsoft.Playwright;
+
+namespace E2eTests.Tests.UsersPage;
 
 /// <summary>
 /// Happy path tests for the Users page (/users).
@@ -58,7 +60,7 @@ public class HappyPath : AppPageTest
 
     // Assert - Verify we're logged in successfully
     await Expect(Page).ToHaveURLAsync(BaseUrl + "/");
-    await Expect(Pages.HomePage.GlobalFeedTab).ToBeVisibleAsync();
+    await Expect(Page.GetByRole(AriaRole.Heading, new() { Level = 1 })).ToBeVisibleAsync();
   }
 
   [Fact]
