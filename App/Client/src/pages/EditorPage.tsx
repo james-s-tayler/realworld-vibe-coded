@@ -103,8 +103,27 @@ export const EditorPage: React.FC = () => {
     }
   };
 
+  const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value.endsWith(',')) {
+      const tag = value.slice(0, -1).trim();
+      if (tag && !tags.includes(tag)) {
+        setTags([...tags, tag]);
+      }
+      setTagInput('');
+    } else {
+      setTagInput(value);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const pendingTag = tagInput.trim();
+    if (pendingTag && !tags.includes(pendingTag)) {
+      tags.push(pendingTag);
+      setTags([...tags]);
+      setTagInput('');
+    }
     await submitArticle();
   };
 
@@ -160,7 +179,7 @@ export const EditorPage: React.FC = () => {
                 labelText=""
                 placeholder="Enter tags"
                 value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
+                onChange={handleTagChange}
                 onKeyPress={handleTagKeyPress}
                 onBlur={handleAddTag}
                 maxLength={TAG_CONSTRAINTS.NAME_MAX_LENGTH}

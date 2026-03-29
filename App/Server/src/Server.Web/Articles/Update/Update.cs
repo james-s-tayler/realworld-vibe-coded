@@ -34,6 +34,7 @@ public class Update(IMediator mediator, IUserContext userContext) : Endpoint<Upd
         request.Article.Title,
         request.Article.Description,
         request.Article.Body,
+        request.Article.TagList,
         userId,
         userId),
       cancellationToken);

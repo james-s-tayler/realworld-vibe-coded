@@ -134,6 +134,40 @@ public class EditorPage : BasePage
     await Expect(ErrorDisplay).ToContainTextAsync(expectedText);
   }
 
+  public ILocator TagPills => Page.Locator(".tag-list .cds--tag");
+
+  public ILocator GetTagPill(string tagName) =>
+    Page.Locator(".tag-list .cds--tag").Filter(new() { HasText = tagName });
+
+  public ILocator GetTagRemoveButton(string tagName) =>
+    GetTagPill(tagName).GetByRole(AriaRole.Button);
+
+  public async Task AddTagViaEnterAsync(string tag)
+  {
+    await TagsInput.FillAsync(tag);
+    await TagsInput.PressAsync("Enter");
+  }
+
+  public async Task AddTagViaCommaAsync(string tag)
+  {
+    await TagsInput.FillAsync(tag + ",");
+  }
+
+  public async Task VerifyTagVisibleAsync(string tagName)
+  {
+    await Expect(GetTagPill(tagName)).ToBeVisibleAsync();
+  }
+
+  public async Task VerifyTagNotVisibleAsync(string tagName)
+  {
+    await Expect(GetTagPill(tagName)).Not.ToBeVisibleAsync();
+  }
+
+  public async Task RemoveTagAsync(string tagName)
+  {
+    await GetTagRemoveButton(tagName).ClickAsync();
+  }
+
   public async Task AddTagsAsync(params string[] tags)
   {
     foreach (var tag in tags)

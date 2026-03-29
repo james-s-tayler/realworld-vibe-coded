@@ -706,6 +706,7 @@ export function deserializeIntoUpdateArticleData(updateArticleData: Partial<Upda
     return {
         "body": n => { updateArticleData.body = n.getStringValue(); },
         "description": n => { updateArticleData.description = n.getStringValue(); },
+        "tagList": n => { updateArticleData.tagList = n.getCollectionOfPrimitiveValues<string>(); },
         "title": n => { updateArticleData.title = n.getStringValue(); },
     }
 }
@@ -1194,6 +1195,7 @@ export function serializeUpdateArticleData(writer: SerializationWriter, updateAr
     if (!updateArticleData || isSerializingDerivedType) { return; }
     writer.writeStringValue("body", updateArticleData.body);
     writer.writeStringValue("description", updateArticleData.description);
+    writer.writeCollectionOfPrimitiveValues<string>("tagList", updateArticleData.tagList);
     writer.writeStringValue("title", updateArticleData.title);
 }
 /**
@@ -1313,6 +1315,10 @@ export interface UpdateArticleData extends Parsable {
      * The description property
      */
     description?: string | null;
+    /**
+     * The tagList property
+     */
+    tagList?: string[] | null;
     /**
      * The title property
      */
