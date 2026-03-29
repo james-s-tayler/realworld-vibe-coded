@@ -961,6 +961,12 @@ interface CreateCommentRequest {
 - Articles without `tagList` get an empty array `[]`
 - `.tag-list` is the standard CSS class for tag containers in both article previews and article detail pages
 
+### Editor Tag Input Behavior
+- Pressing Enter after typing a tag adds it and displays it below the input
+- Typing a comma after a tag also adds it and displays it below the input
+- When editing an existing article, its tags must be displayed below the input
+- Each displayed tag must be individually removable
+
 ### Article Ordering
 - Articles are always ordered by creation time, most recent first (descending)
 

@@ -1,4 +1,6 @@
-﻿namespace E2eTests.Tests.EditorPage;
+﻿using Microsoft.Playwright;
+
+namespace E2eTests.Tests.EditorPage;
 
 /// <summary>
 /// Happy path tests for the Editor page (/editor and /editor/:slug).
@@ -53,6 +55,85 @@ public class HappyPath : AppPageTest
 
     // Assert
     await Pages.ArticlePage.VerifyArticleTagsVisibleAsync(tag1, tag2);
+  }
+
+  [Fact]
+  public async Task TagsAppearBelowInput_WhenAddedViaEnter()
+  {
+    // Arrange
+    var user = await Api.CreateUserAsync();
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    await Pages.HomePage.ClickNewArticleAsync();
+
+    var tag = $"tag{Guid.NewGuid().ToString("N")[..6]}";
+
+    // Act
+    await Pages.EditorPage.AddTagViaEnterAsync(tag);
+
+    // Assert
+    await Pages.EditorPage.VerifyTagVisibleAsync(tag);
+  }
+
+  [Fact]
+  public async Task TagsAppearBelowInput_WhenAddedViaComma()
+  {
+    // Arrange
+    var user = await Api.CreateUserAsync();
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    await Pages.HomePage.ClickNewArticleAsync();
+
+    var tag = $"tag{Guid.NewGuid().ToString("N")[..6]}";
+
+    // Act
+    await Pages.EditorPage.AddTagViaCommaAsync(tag);
+
+    // Assert
+    await Pages.EditorPage.VerifyTagVisibleAsync(tag);
+  }
+
+  [Fact]
+  public async Task ExistingTagsDisplayed_WhenEditingArticle()
+  {
+    // Arrange
+    var user = await Api.CreateUserAsync();
+    var tag1 = $"tag{Guid.NewGuid().ToString("N")[..6]}";
+    var tag2 = $"tag{Guid.NewGuid().ToString("N")[..6]}";
+    var article = await Api.CreateArticleAsync(user.Token, [tag1, tag2]);
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    await Pages.ArticlePage.GoToAsync(article.Slug);
+    await Pages.ArticlePage.ClickEditButtonAsync();
+
+    // Assert — existing tags should be displayed
+    await Pages.EditorPage.VerifyTagVisibleAsync(tag1);
+    await Pages.EditorPage.VerifyTagVisibleAsync(tag2);
+  }
+
+  [Fact]
+  public async Task TagsCanBeIndividuallyRemoved()
+  {
+    // Arrange
+    var user = await Api.CreateUserAsync();
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    await Pages.HomePage.ClickNewArticleAsync();
+
+    var tag1 = $"tag{Guid.NewGuid().ToString("N")[..6]}";
+    var tag2 = $"tag{Guid.NewGuid().ToString("N")[..6]}";
+    await Pages.EditorPage.AddTagViaEnterAsync(tag1);
+    await Pages.EditorPage.AddTagViaEnterAsync(tag2);
+    await Pages.EditorPage.VerifyTagVisibleAsync(tag1);
+    await Pages.EditorPage.VerifyTagVisibleAsync(tag2);
+
+    // Act — remove first tag
+    await Pages.EditorPage.RemoveTagAsync(tag1);
+
+    // Assert
+    await Pages.EditorPage.VerifyTagNotVisibleAsync(tag1);
+    await Pages.EditorPage.VerifyTagVisibleAsync(tag2);
   }
 
   [Fact]
