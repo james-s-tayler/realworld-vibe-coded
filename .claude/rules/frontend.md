@@ -48,6 +48,13 @@ The generated API client (`src/api/generated/`) is the **type contract** between
 
 - **Carbon Tabs:** `selectedIndex={-1}` doesn't work — compute the proper tab index for dynamic tab sets
 
+## Carbon Design System — Styling Rules
+
+**Never write direct CSS overrides for Carbon components.** Before adding custom CSS for colors, theming, hover states, or layout of any Carbon component:
+1. Research the Carbon-native approach first (e.g., `Theme` component for scoped theming, component props like `kind`, `size`, design tokens)
+2. Use Carbon's `Theme` component (`theme="g100"`, `"g90"`, `"g10"`, `"white"`) for dark/light zones — not manual background/color overrides
+3. Only add custom CSS for layout concerns (positioning, sizing, spacing) that Carbon doesn't handle
+
 ## Frontend Implementation Checklist
 
 Before implementing a frontend page/component:

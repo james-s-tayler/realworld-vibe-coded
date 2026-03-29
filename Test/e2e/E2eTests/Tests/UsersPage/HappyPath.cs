@@ -1,6 +1,4 @@
-﻿using Microsoft.Playwright;
-
-namespace E2eTests.Tests.UsersPage;
+﻿namespace E2eTests.Tests.UsersPage;
 
 /// <summary>
 /// Happy path tests for the Users page (/users).
@@ -19,9 +17,9 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
-    // Act - Click the Users link from the navigation menu on the dashboard
-    await Page.GotoAsync(BaseUrl);
-    await Page.GetByRole(AriaRole.Link, new() { Name = "Users", Exact = true }).ClickAsync();
+    // Act - Click the Users link from the sidebar navigation
+    await Pages.UsersPage.GoToHomePageAsync();
+    await Pages.UsersPage.ClickUsersAsync();
 
     // Assert - Verify we're on the users page
     await Expect(Page).ToHaveURLAsync(BaseUrl + "/users");
@@ -49,10 +47,8 @@ public class HappyPath : AppPageTest
     // Wait for the user to appear in the table
     await Pages.UsersPage.VerifyUserVisibleAsync(invitedEmail);
 
-    // Logout
-    await Pages.SettingsPage.GoToAsync();
-    await Pages.SettingsPage.LogoutAsync();
-    await Expect(Pages.SettingsPage.SignInLink).ToBeVisibleAsync();
+    // Logout via sidebar link
+    await Pages.UsersPage.LogoutAsync();
 
     // Login as the invited user
     await Pages.LoginPage.GoToAsync();

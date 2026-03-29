@@ -2,6 +2,7 @@
 
 :root {
   --header-height: 3rem; /* Carbon Design System header height (48px) */
+  --sidebar-width: 256px;
   font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -22,6 +23,7 @@ body {
 #root {
   min-height: 100vh;
   padding-top: var(--header-height);
+  padding-left: var(--sidebar-width);
 }
 
 a {

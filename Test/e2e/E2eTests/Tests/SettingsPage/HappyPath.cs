@@ -41,12 +41,10 @@ public class HappyPath : AppPageTest
     await Pages.LoginPage.GoToAsync();
     await Pages.LoginPage.LoginAsync(user.Email, user.Password);
 
-    await Pages.SettingsPage.GoToAsync();
-
-    // Act
+    // Act — logout via sidebar link (available on any page)
     await Pages.SettingsPage.LogoutAsync();
 
     // Assert
-    await Pages.SettingsPage.VerifyLoggedOutAsync();
+    await Expect(Pages.SettingsPage.SignInLink).ToBeVisibleAsync();
   }
 }
