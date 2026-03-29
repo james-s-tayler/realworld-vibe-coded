@@ -1,61 +1,36 @@
 # Conduit — RealWorld Vibe-Coded
 
-Conduit is a social blogging site (Medium.com clone) with a custom API for all requests including authentication.
+## Invariants
 
-## Tech Stack
+These are the primary rules.
 
-- **Backend:** .NET 9, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQLite, Serilog, xUnit
-- **Frontend:** React + Vite + TypeScript, Carbon Design System
-- **Testing:** xUnit (backend), Vitest + Testing Library (frontend), Playwright (E2E), Postman (API)
-- **Build:** Nuke build system (`./build.sh`), GitHub Actions CI/CD
-- **Infra:** Docker, Bicep (Azure), Azure App Service
+1. All lint, build, test, deployment operations must be performed through Nuke targets. Run `nuke --help` to see what targets are available.
+2. All nuke Test* and RunLocal* targets record Serilog and Audit.NET logs in the Logs/ folder and.
+3. All Test* Nuke targets record comprehensive reports in the Reports/ directory. Additionally TestE2e* nuke targets record playwright traces that can be viewed with /view-playwright-traces
+4. **Every feature must have its Postman and E2E tests passing before moving to the next feature.** The implementation workflow enforces this.
+5. **All compiler warnings and errors must be resolved.** Never suppress or ignore them.
+8. **Frontend API client relies on Kiota code generation.** Always make backend changes first, then run `./build.sh BuildGenerateApiClient` before writing frontend code. `BuildClient` does this automatically (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Never reference fields in frontend that don't exist in the generated types.
 
-## Folder Structure
+Reference as needed:
+- `SPEC-REFERENCE.md` — complete API spec (the source of truth for what to build)
+- `Docs/architecture.md` — tech stack, folder structure, build commands
 
-- `/App/Client` — React-Vite-TypeScript frontend
-- `/App/Server` — .NET backend (Ardalis Clean Architecture, no Aspire)
-- `/Infra` — Bicep Azure IaC
-- `/Logs` — Serilog and Audit.NET logs for debugging (subdirectories per run mode)
-- `/Test` — Playwright, Postman, and performance tests
-- `/Task/Runner` — Nuke build system
-- `/Task/LocalDev` — Docker Compose for local dev
-- `/Reports` — Test reports from Nuke test targets
+## Rules Index
 
-## Build & Test Commands
+Rules in `.claude/rules/` are loaded automatically by path scope. Read the relevant files before starting work.
 
-All commands use Nuke via `./build.sh`:
-
-| Target | Purpose |
-|:-------|:--------|
-| `LintAllVerify` | Check all linting (run before commit) |
-| `LintAllFix` | Auto-fix lint issues |
-| `BuildServer` | Build .NET backend |
-| `BuildClient` | Build React frontend |
-| `TestServer` | Run backend xUnit tests |
-| `TestClient` | Run frontend Vitest tests |
-| `TestE2e` | Run Playwright E2E tests |
-| `TestServerPostmanAll` | Run all Postman API tests |
-| `RunLocalPublish` | Start local dev server from published artifact |
-| `DbMigrations*` | Database migration targets |
-
-When Nuke build targets fail, **carefully read the error messages** — they contain specific guidance on how to access logs and reports.
-
-## Critical Rules
-
-1. **NEVER run `dotnet` commands directly.** Always use `./build.sh <target>`.
-2. **NEVER suppress warnings or errors** in code unless explicitly instructed.
-3. **NEVER use magic strings.** Use configurable values, enums, constants, or reflection (exception: SQL or UI text).
-4. **NEVER write XML documentation comments.** Only add if explicitly asked.
-5. **NEVER add comments to code** unless the logic is inherently unclear. Preserve existing comments.
-6. **NEVER use python, perl, awk, sed, or regex for mass refactoring.** Only make direct, manual edits.
-7. **NEVER modify Roslyn analyzers or ArchUnit rules** unless explicitly instructed.
-8. **NEVER add or update documentation** unless explicitly asked.
-9. **If modifying the Nuke build, build it first** before committing.
-10. **Check Postman tests are passing** before finishing API work.
-
-## Task Tracking
-
-- Read `TODO.md` at the start of every session to understand current project tasks.
-- Update `TODO.md` when tasks are completed, started, discovered, or blocked.
-- Move completed tasks to the "Done" section with a date stamp (e.g. `- [x] 2026-03-21 Description`).
-- Keep the file concise — periodically archive old done items by removing them.
+| File | Scope | Contents |
+|------|-------|----------|
+| `backend.md` | `App/Server/**` | Endpoint, CQRS, persistence, validation, error handling patterns |
+| `backend-analyzers.md` | `App/Server/**` | Roslyn analyzers that enforce architectural invariants, Result→HTTP mapping |
+| `backend-templates-endpoint.md` | `App/Server/**` | Copy-paste: Endpoint, Request/Response DTOs |
+| `backend-templates-commands.md` | `App/Server/**` | Copy-paste: MediatR Command + Handler |
+| `backend-templates-queries.md` | `App/Server/**` | Copy-paste: MediatR Query + Handler, FluentValidation |
+| `backend-templates-persistence.md` | `App/Server/**` | Copy-paste: EF Core config, ResponseMapper |
+| `frontend.md` | `App/Client/**` | Kiota bridge workflow, project structure, routing, state |
+| `frontend-components.md` | `App/Client/**` | Hooks, Carbon components, CSS classes, API module template |
+| `e2e.md` | `Test/e2e/**` | Playwright conventions, ARIA selectors, Expect() only |
+| `functional-tests.md` | `App/Server/tests/**` | FastEndpoints test extensions (SRV007), AppFixture |
+| `testing.md` | — | E2E test structure overview, progressive tier targets |
+| `cicd.md` | `.github/**` | GitHub Actions naming, path-based job gating |
+| `harness.md` | `.claude/**`, `scripts/**` | Hook conventions, settings.json, marker files, protected files |

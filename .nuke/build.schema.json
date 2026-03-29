@@ -45,6 +45,7 @@
         "LintAllVerify",
         "LintApiClientVerify",
         "LintClaudeMdVerify",
+        "LintClaudeRulesVerify",
         "LintClientFix",
         "LintClientVerify",
         "LintNukeFix",
@@ -62,8 +63,15 @@
         "RunLocalPublish",
         "TestClient",
         "TestE2e",
+        "TestE2eArticles",
+        "TestE2eAuth",
+        "TestE2eFeed",
+        "TestE2eMultitenancy",
         "TestServer",
+        "TestServerPostmanArticle",
+        "TestServerPostmanArticlesEmpty",
         "TestServerPostmanAuth",
+        "TestServerPostmanFeedAndArticles",
         "TestServerPostmanProfiles"
       ]
     },

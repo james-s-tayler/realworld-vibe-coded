@@ -40,6 +40,10 @@ Standard HTTP codes: 200/201/204, 400/401/403/404/409/422, 500. For 422 validati
 
 Structured Serilog with properties (`{@Command}`, `{UserId}`, `{Slug}`). Never log secrets or JWTs.
 
+## Entity Constraint Constants
+
+Define max length constants on the entity class itself (e.g., `Article.TitleMaxLength`). Reference these constants in EF Core configurations (`HasMaxLength(Article.TitleMaxLength)`) and FluentValidation validators (`.MaximumLength(Article.TitleMaxLength)`). Never use magic numbers — the entity is the single source of truth. Frontend mirrors these in `src/constants.ts`.
+
 ## Code Style
 
 - Prefer functional composition (`Func<T>`, `Action<T>`, delegates) over OO inheritance

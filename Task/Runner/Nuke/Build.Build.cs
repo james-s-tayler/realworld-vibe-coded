@@ -54,7 +54,7 @@ public partial class Build
 
   internal Target BuildClient => _ => _
     .Description("Build client (frontend)")
-    .DependsOn(InstallClient)
+    .DependsOn(InstallClient, BuildGenerateApiClient)
     .Executes(() =>
     {
       if (SkipPublish)
