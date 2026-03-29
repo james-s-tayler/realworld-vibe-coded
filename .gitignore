@@ -95,3 +95,6 @@ Logs/
 # Task tracking
 TODO.md
 
+# Action log (generated per experiment run)
+ACTION-LOG.md
+
