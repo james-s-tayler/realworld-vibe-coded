@@ -1,6 +1,6 @@
 # Distilled Tactics for Harness Engineering
 
-Concrete, proven tactics extracted from 8 primary sources. Each tactic has been implemented by practitioners and has reported results. Organized by the problem they solve.
+Concrete, proven tactics extracted from 9 primary sources. Each tactic has been implemented by practitioners and has reported results. Organized by the problem they solve.
 
 ---
 
@@ -16,7 +16,7 @@ Split all work into Research → Plan → Implement with explicit context resets
 
 Spawn fresh-context subagents to handle all searching, file reading, and exploration. Parent agent receives only a focused markdown summary with key findings. Never pollute the parent context with Glob/Grep/Read noise.
 
-Subagents are about context control, not role-playing. The ideal output is a structured markdown artifact with findings and next steps. *(ACE, Ralph)*
+Subagents are about context control, not role-playing — personality-based agents (frontend/backend/analyst) don't work. The ideal output is a condensed markdown artifact with findings, next steps, and source citations (filepath:line or URLs) so the parent can verify without full context exposure. Use cheaper models (Haiku/Sonnet) for subagents while reserving expensive models (Opus) for orchestration. *(ACE, Ralph, HumanLayer)*
 
 ### One Task Per Loop
 
@@ -94,7 +94,9 @@ Decouple generation from validation into two explicit phases:
 - **Phase 1 — Generate:** Produce code; quality depends on specifications and standard library patterns
 - **Phase 2 — Backpressure:** Reject invalid generations through tests, type checks, linters, security scanning, and static analysis
 
-Quality emerges from selection pressure, not from single-shot perfection. *(Ralph)*
+Quality emerges from selection pressure, not from single-shot perfection.
+
+**Critical:** Verification output must be context-efficient. Running full test suites floods context with 4,000+ lines and causes hallucination. **Swallow successful output; surface only errors.** Same approach for builds and typechecks. *(Ralph, HumanLayer)*
 
 ### Self-Verification Loop
 
@@ -165,7 +167,43 @@ Encouragement-only approaches (comments, docs) do not work at scale. *(OpenAI)*
 
 Keep the injected instruction file small (~100 lines). Use it as a table of contents with pointers to deeper sources of truth in a structured docs/ directory.
 
-**Why:** Too much guidance becomes non-guidance. Agents pattern-match locally on giant instruction blobs instead of navigating intentionally. Monolithic manuals become graveyards of stale rules. *(OpenAI)*
+**Why:** Too much guidance becomes non-guidance. Agents pattern-match locally on giant instruction blobs instead of navigating intentionally. Monolithic manuals become graveyards of stale rules. ETH Zurich confirmed: LLM-generated agentfiles hurt performance while costing 20%+ more; codebase overviews and directory listings provided no benefit. *(OpenAI, HumanLayer)*
+
+### Replace MCP Servers with Custom CLIs
+
+When an MCP server duplicates CLI functionality already in the model's training data, replace the MCP server with the CLI and add usage examples to CLAUDE.md. MCP tool descriptions inject into the system prompt, creating per-invocation context bloat.
+
+**Example:** HumanLayer replaced their Linear MCP server with a custom CLI + 6 usage examples in CLAUDE.md, saving thousands of tokens per invocation. *(HumanLayer)*
+
+### Silent Success, Loud Failure Hooks
+
+Design hooks so successful operations produce no output (preserving context budget) and only failures surface diagnostic information. Use exit code 2 to block the agent and re-engage it for fixes.
+
+```bash
+#!/bin/bash
+OUTPUT=$(some-build-or-lint-command 2>&1)
+if [ $? -ne 0 ]; then
+  echo "$OUTPUT" >&2
+  exit 2
+fi
+# Success: silent. No context consumed.
+```
+
+This pattern maximizes the verification frequency you can afford within the context budget. *(HumanLayer)*
+
+### Skills as Progressive Disclosure Bundles
+
+Package domain-specific instructions, response templates, and CLIs into skill directories that only load when activated. This keeps the baseline context small while making deep expertise available on demand.
+
+```
+example-skill/
+|--- SKILL.md           # Instructions loaded on activation
+|--- response_template.md
+|--- CLIs/
+    |--- custom-cli
+```
+
+**Security warning:** Skill registries have distributed malicious skills. Always read skill source before installing — treat like `npm install random-package`. *(HumanLayer)*
 
 ### Full Observability Stack
 
@@ -252,3 +290,23 @@ In high-throughput agent systems, don't block PRs until they're perfect. Keep PR
 ### Model Capability Assumption Stress Testing
 
 Every harness component encodes an assumption about what the model cannot do alone. As models improve (4.5 → 4.6 → next), these assumptions become stale overhead. Schedule regular stress tests: remove a scaffolding component and measure whether quality degrades. If not, the component was compensating for a limitation the model has outgrown. *(Anthropic)*
+
+---
+
+## Anti-Patterns (What Didn't Work)
+
+### Designing the Ideal Harness Upfront
+
+Building elaborate harness infrastructure before encountering real failures. Configuration should be reactive to observed problems, not speculative. *(HumanLayer)*
+
+### Preemptive Tool Loading
+
+Installing dozens of skills/MCP servers "just in case." Each idle tool adds context overhead and decision complexity without proven benefit. Start bare, add tools when specific failures justify them, pare down after stabilizing. *(HumanLayer)*
+
+### Running Full Test Suites After Every Session
+
+Running 5+ minute test suites after every agent session is wasteful. Use progressive tier targets for faster feedback during development; reserve full suites for commit gates. *(HumanLayer)*
+
+### Micro-Optimizing Sub-Agent Tool Access
+
+Finely tuning which tools each sub-agent can access creates "tool thrash" — constant adjustment overhead without proportional quality gains. Give sub-agents reasonable defaults and only restrict when problems emerge. *(HumanLayer)*
