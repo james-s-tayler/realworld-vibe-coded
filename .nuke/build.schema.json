@@ -52,8 +52,6 @@
         "LintNukeVerify",
         "LintServerFix",
         "LintServerVerify",
-        "LintSkillsFix",
-        "LintSkillsVerify",
         "PathsCleanDirectories",
         "RunLocalClient",
         "RunLocalDependencies",
@@ -146,6 +144,10 @@
   "allOf": [
     {
       "properties": {
+        "Agent": {
+          "type": "boolean",
+          "description": "Suppress verbose output for agent context efficiency"
+        },
         "Bail": {
           "type": "boolean",
           "description": "Stop tests on first test failure"
