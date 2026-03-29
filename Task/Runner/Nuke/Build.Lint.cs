@@ -87,7 +87,7 @@ public partial class Build
 
   internal Target LintAllVerify => _ => _
       .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
-      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintSkillsVerify, LintClaudeMdVerify, LintApiClientVerify)
+      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintSkillsVerify, LintClaudeMdVerify, LintClaudeRulesVerify, LintApiClientVerify)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
@@ -124,6 +124,37 @@ public partial class Build
         }
 
         Log.Information("✓ CLAUDE.md is within the 50-line limit");
+      });
+
+  internal Target LintClaudeRulesVerify => _ => _
+      .Description("Verify all .claude/rules/*.md files are within the 85-line limit")
+      .Executes(() =>
+      {
+        const int maxLines = 85;
+        var files = ClaudeRulesDirectory.GlobFiles("*.md");
+        var violations = new List<string>();
+
+        foreach (var file in files)
+        {
+          var lineCount = file.ReadAllLines().Length;
+
+          if (lineCount > maxLines)
+          {
+            violations.Add($"  {file.Name}: {lineCount} lines (limit: {maxLines})");
+          }
+        }
+
+        if (violations.Any())
+        {
+          foreach (var violation in violations)
+          {
+            Log.Error("Over limit: {Violation}", violation);
+          }
+
+          throw new Exception($"{violations.Count} rules file(s) exceed the {maxLines}-line limit. Split them into smaller files.");
+        }
+
+        Log.Information("✓ All {Count} rules files are within the {MaxLines}-line limit", files.Count, maxLines);
       });
 
   internal Target LintSkillsVerify => _ => _

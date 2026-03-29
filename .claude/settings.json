@@ -6,15 +6,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/enforce-nuke.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/enforce-nuke.sh"
           },
           {
             "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/enforce-tools.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/enforce-tools.sh"
           },
           {
             "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/test-before-commit.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/test-before-commit.sh"
           }
         ]
       },
@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/protect-files.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/protect-files.sh"
           }
         ]
       }
@@ -34,7 +34,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/action-log.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/action-log.sh"
           }
         ]
       },
@@ -43,11 +43,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/mark-tests-ran.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/mark-tests-ran.sh"
           },
           {
             "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/agent-stats-record.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/agent-stats-record.sh"
           }
         ]
       }
@@ -58,7 +58,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/action-log.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/action-log.sh"
           }
         ]
       },
@@ -67,7 +67,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/agent-stats-record-fail.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/agent-stats-record-fail.sh"
           }
         ]
       }
@@ -77,7 +77,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/me/source/realworld-vibe-coded/.claude/hooks/on-stop.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-stop.sh"
           }
         ]
       }

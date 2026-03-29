@@ -45,6 +45,7 @@
         "LintAllVerify",
         "LintApiClientVerify",
         "LintClaudeMdVerify",
+        "LintClaudeRulesVerify",
         "LintClientFix",
         "LintClientVerify",
         "LintNukeFix",
