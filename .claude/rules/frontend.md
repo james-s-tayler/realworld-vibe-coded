@@ -40,6 +40,10 @@ The generated API client (`src/api/generated/`) is the **type contract** between
 - `useApiCall` handles loading/error/data lifecycle
 - No global state library — each page fetches its own data
 
+## Constraint Constants Sync
+
+`src/constants.ts` mirrors backend entity constraint constants. Use these for `maxLength` on `TextInput`/`TextArea` and client-side validation. The values must match `SPEC-REFERENCE.md` entity definitions. When creating forms, always apply `maxCount` on `TextArea` and `maxLength` on `TextInput` using these constants.
+
 ## Common Gotchas
 
 - **Carbon Tabs:** `selectedIndex={-1}` doesn't work — compute the proper tab index for dynamic tab sets

@@ -307,7 +307,7 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
       "username": "newusername",
       "bio": "Updated bio",
       "image": "https://example.com/photo.jpg",
-      "roles": []
+      "roles": ["ADMIN", "USER"]
     }
   }
   ```
@@ -443,10 +443,10 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
   - `400 Bad Request` — empty tag string: error for `"article.TagList[0]"`
   - `401 Unauthorized` — missing/invalid token
 - **Validation Rules:**
-  - `title`: required, not empty
-  - `description`: required, not empty
-  - `body`: required, not empty
-  - `tagList`: optional (defaults to empty array); each tag must be non-empty and must not contain commas
+  - `title`: required, not empty, max 200 chars
+  - `description`: required, not empty, max 500 chars
+  - `body`: required, not empty, max 4000 chars
+  - `tagList`: optional (defaults to empty array); each tag must be non-empty, max 50 chars, and must not contain commas
 - **Test Assertions:**
   - `favoritesCount` is an integer (not a float)
   - `createdAt` and `updatedAt` are ISO 8601 format
@@ -621,6 +621,8 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
     }
   }
   ```
+- **Validation Rules:**
+  - `body`: required, not empty, max 5000 chars
 - **Error Responses:**
   - `400 Bad Request` — missing/blank body: error for `"body"`
   - `401 Unauthorized` — missing/invalid token
@@ -888,6 +890,39 @@ public class ApplicationUser : IdentityUser<Guid>
 
   public string Bio { get; set; } = "I work at statefarm";
   public string? Image { get; set; }
+}
+```
+
+### Article (database entity)
+
+```csharp
+public class Article : EntityBase, IAggregateRoot
+{
+  // Field constraints
+  public const int TitleMaxLength = 200;
+  public const int DescriptionMaxLength = 500;
+  public const int BodyMaxLength = 4000;
+  public const int SlugMaxLength = 250;
+}
+```
+
+### Comment (database entity)
+
+```csharp
+public class Comment : EntityBase
+{
+  // Field constraints
+  public const int BodyMaxLength = 5000;
+}
+```
+
+### Tag (database entity)
+
+```csharp
+public class Tag : EntityBase, IAggregateRoot
+{
+  // Field constraints
+  public const int NameMaxLength = 50;
 }
 ```
 

@@ -10,6 +10,7 @@ export const DEFAULT_PROFILE_IMAGE = 'https://placehold.co/200';
 export const ARTICLE_CONSTRAINTS = {
   TITLE_MAX_LENGTH: 200,
   DESCRIPTION_MAX_LENGTH: 500,
+  BODY_MAX_LENGTH: 4000,
   SLUG_MAX_LENGTH: 250,
 } as const;
 
