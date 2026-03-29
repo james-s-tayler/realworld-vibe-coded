@@ -87,7 +87,7 @@ public partial class Build
 
   internal Target LintAllVerify => _ => _
       .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
-      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintSkillsVerify, LintClaudeMdVerify)
+      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintSkillsVerify, LintClaudeMdVerify, LintClaudeRulesVerify, LintApiClientVerify)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
@@ -111,7 +111,7 @@ public partial class Build
       });
 
   internal Target LintClaudeMdVerify => _ => _
-      .Description("Verify CLAUDE.md stays within the 50-line limit for effective AI instruction following")
+      .Description("Verify CLAUDE.md stays within the 50-line limit and Rules Index table covers all rules files")
       .Executes(() =>
       {
         var lines = ClaudeMdFile.ReadAllLines();
@@ -124,6 +124,68 @@ public partial class Build
         }
 
         Log.Information("✓ CLAUDE.md is within the 50-line limit");
+
+        var rulesFiles = ClaudeRulesDirectory.GlobFiles("*.md")
+            .Select(f => f.Name)
+            .OrderBy(f => f)
+            .ToList();
+
+        var tableEntries = lines
+            .Where(l => l.TrimStart().StartsWith("| `") && l.Contains(".md`"))
+            .Select(l => l.Split('`')[1])
+            .OrderBy(f => f)
+            .ToList();
+
+        var missing = rulesFiles.Except(tableEntries).ToList();
+        var stale = tableEntries.Except(rulesFiles).ToList();
+
+        if (missing.Any() || stale.Any())
+        {
+          if (missing.Any())
+          {
+            Log.Error("Rules files missing from CLAUDE.md Rules Index table: {Files}", string.Join(", ", missing));
+          }
+
+          if (stale.Any())
+          {
+            Log.Error("Stale entries in CLAUDE.md Rules Index table (file no longer exists): {Files}", string.Join(", ", stale));
+          }
+
+          throw new Exception("CLAUDE.md Rules Index table is out of sync with .claude/rules/*.md files.");
+        }
+
+        Log.Information("✓ Rules Index table covers all {Count} rules files", rulesFiles.Count);
+      });
+
+  internal Target LintClaudeRulesVerify => _ => _
+      .Description("Verify all .claude/rules/*.md files are within the 85-line limit")
+      .Executes(() =>
+      {
+        const int maxLines = 85;
+        var files = ClaudeRulesDirectory.GlobFiles("*.md");
+        var violations = new List<string>();
+
+        foreach (var file in files)
+        {
+          var lineCount = file.ReadAllLines().Length;
+
+          if (lineCount > maxLines)
+          {
+            violations.Add($"  {file.Name}: {lineCount} lines (limit: {maxLines})");
+          }
+        }
+
+        if (violations.Any())
+        {
+          foreach (var violation in violations)
+          {
+            Log.Error("Over limit: {Violation}", violation);
+          }
+
+          throw new Exception($"{violations.Count} rules file(s) exceed the {maxLines}-line limit. Split them into smaller files.");
+        }
+
+        Log.Information("✓ All {Count} rules files are within the {MaxLines}-line limit", files.Count, maxLines);
       });
 
   internal Target LintSkillsVerify => _ => _

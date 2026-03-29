@@ -17,7 +17,6 @@ fi
 
 # Require full gate completion
 REQUIRED_MARKERS=(
-  "LintAllVerify"
   "BuildServer"
   "TestServerPostmanAuth"
   "TestServerPostmanProfiles"

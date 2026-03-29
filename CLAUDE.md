@@ -4,39 +4,39 @@
 
 Read these files in order:
 1. `PROGRESS.md` — context from previous sessions
-2. `Docs/exec-plans/active/realworld-spec.md` — story order and dependency DAG
-3. `Docs/workflow.md` — mandatory workflow, circuit breaker, context management
+2. `Docs/workflow.md` — mandatory R→P→I workflow, circuit breaker, context management
 
 Reference as needed:
-- `SPEC-REFERENCE.md` — complete API spec
-- `.claude/rules/backend.md` — code templates
+- `SPEC-REFERENCE.md` — complete API spec (the source of truth for what to build)
 - `Docs/architecture.md` — tech stack, folder structure, build commands
-- `Docs/agentic-engineering-principles/` — first-principles on how to improve agentic-engineering workflows can be derived from the reference material within
 
 ## Invariants
 
-These are the primary rules. The Postman test suites are the spec — if a test expects something, it must be true.
+These are the primary rules.
 
-1. **All API endpoints must return the exact response shapes defined in SPEC-REFERENCE.md.** The Postman tests validate response shapes — if a test expects a field, that field must exist with the correct type.
-2. **All mutating endpoints must validate input and return appropriate error responses on failure.** See SPEC-REFERENCE.md for the error response format.
-3. **All authenticated endpoints must return 401 when no valid JWT is present.**
-4. **Every feature must have its Postman tests passing before moving to the next feature.** The implementation workflow enforces this.
+1. All lint, build, test, deployment operations must be performed through Nuke targets. Run `nuke --help` to see what targets are available.
+2. All nuke Test* and RunLocal* targets record Serilog and Audit.NET logs in the Logs/ folder and.
+3. All Test* Nuke targets record comprehensive reports in the Reports/ directory. Additionally TestE2e* nuke targets record playwright traces that can be viewed with /view-playwright-traces
+4. **Every feature must have its Postman and E2E tests passing before moving to the next feature.** The implementation workflow enforces this.
 5. **All compiler warnings and errors must be resolved.** Never suppress or ignore them.
-6. **The solution must build cleanly via `./build.sh BuildServer`.** Never run `dotnet` commands directly.
-7. **All configurable values must use enums, constants, or reflection.** No magic strings (exception: SQL or UI text).
+8. **Frontend API client relies on Kiota code generation.** Always make backend changes first, then run `./build.sh BuildGenerateApiClient` before writing frontend code. `BuildClient` does this automatically (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Never reference fields in frontend that don't exist in the generated types.
 
-## Guidance
+## Rules Index
 
-These are conventions to follow. See `.claude/rules/backend.md` for copy-pasteable code templates.
+Rules in `.claude/rules/` are loaded automatically by path scope. Read the relevant files before starting work.
 
-- Use FastEndpoints with `Endpoint<TRequest, TResponse, TMapper>` pattern
-- Use MediatR for CQRS (commands and queries in Server.UseCases)
-- Use FluentValidation `Validator<TRequest>` for request validation
-- Use `Result<T>` return type from handlers (Ok, NotFound, Invalid, etc.)
-- Use `Send.ResultMapperAsync` to map Result to HTTP responses
-- Use `ResponseMapper<TResponse, TEntity>` for domain-to-DTO conversion
-- Never write XML documentation comments
-- Never add comments unless the logic is inherently unclear
-- Never use python, perl, awk, sed, or regex for mass refactoring
-- Never modify Roslyn analyzers unless explicitly instructed
-- If modifying the Nuke build, build it first before committing
+| File | Scope | Contents |
+|------|-------|----------|
+| `backend.md` | `App/Server/**` | Endpoint, CQRS, persistence, validation, error handling patterns |
+| `backend-analyzers.md` | `App/Server/**` | Roslyn analyzers that enforce architectural invariants, Result→HTTP mapping |
+| `backend-templates-endpoint.md` | `App/Server/**` | Copy-paste: Endpoint, Request/Response DTOs |
+| `backend-templates-commands.md` | `App/Server/**` | Copy-paste: MediatR Command + Handler |
+| `backend-templates-queries.md` | `App/Server/**` | Copy-paste: MediatR Query + Handler, FluentValidation |
+| `backend-templates-persistence.md` | `App/Server/**` | Copy-paste: EF Core config, ResponseMapper |
+| `frontend.md` | `App/Client/**` | Kiota bridge workflow, project structure, routing, state |
+| `frontend-components.md` | `App/Client/**` | Hooks, Carbon components, CSS classes, API module template |
+| `e2e.md` | `Test/e2e/**` | Playwright conventions, ARIA selectors, Expect() only |
+| `functional-tests.md` | `App/Server/tests/**` | FastEndpoints test extensions (SRV007), AppFixture |
+| `testing.md` | — | E2E test structure overview, progressive tier targets |
+| `cicd.md` | `.github/**` | GitHub Actions naming, path-based job gating |
+| `harness.md` | `.claude/**`, `scripts/**` | Hook conventions, settings.json, marker files, protected files |
