@@ -45,6 +45,23 @@ in the same file — split them into `CreateRequest.cs` and `CreateData.cs`.
 Request DTOs with zero properties throw `TypeInitializationException` at runtime.
 For GET/DELETE endpoints with no request body (only route params), use `EmptyRequest` from FastEndpoints.
 
+### FastEndpoints: `[RouteParam]` on route-only PUT/POST/PATCH endpoints
+FastEndpoints defaults to requiring `Content-Type: application/json` for PUT/POST/PATCH. If the request DTO only has route parameters (no JSON body), Kiota and other clients send no body and no Content-Type, causing **415 Unsupported Media Type**. Annotate ALL route-bound properties with `[RouteParam]` — when every property has a non-JSON binding source attribute, FastEndpoints automatically accepts `*/*` (since v6.2). This is required for Kiota compatibility.
+```csharp
+// WRONG — returns 415 when called without Content-Type header
+public class DeactivateUserRequest
+{
+  public Guid UserId { get; set; }
+}
+
+// CORRECT — accepts */* because all properties are annotated
+public class DeactivateUserRequest
+{
+  [RouteParam]
+  public Guid UserId { get; set; }
+}
+```
+
 ### Key import: `using Server.Infrastructure;`
 Required in ALL web endpoint files for `ResultMapperAsync` and `ResultValueAsync` extension methods.
 This is the #1 most-forgotten import — add it to every endpoint file.

@@ -41,4 +41,63 @@ public class Screenshots : AppPageTest
     // Assert we're on the users page
     await Expect(Page).ToHaveURLAsync(BaseUrl + "/users");
   }
+
+  [Fact]
+  public async Task UsersPageWithPagination()
+  {
+    // Arrange - create admin and invite a user
+    var admin = await Api.CreateUserAsync();
+    await Api.InviteUserAsync(admin.Token);
+
+    // Act
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(admin.Email, admin.Password);
+    await Pages.UsersPage.GoToAsync();
+    await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
+    await Expect(Pages.UsersPage.Pagination).ToBeVisibleAsync();
+
+    // Take screenshot
+    var screenshotPath = await TakeScreenshotAsync();
+    await AssertScreenshotWidthNotExceedingViewportAsync(screenshotPath);
+  }
+
+  [Fact]
+  public async Task UsersPageWithDeactivatedUser()
+  {
+    // Arrange - create admin, invite user, then deactivate them
+    var admin = await Api.CreateUserAsync();
+    var invited = await Api.InviteUserAsync(admin.Token);
+    var invitedUserId = await Api.GetUserIdByEmailAsync(admin.Token, invited.Email);
+    await Api.DeactivateUserAsync(admin.Token, invitedUserId);
+
+    // Act
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(admin.Email, admin.Password);
+    await Pages.UsersPage.GoToAsync();
+    await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
+    await Expect(Pages.UsersPage.GetUserStatusTag(invited.Email)).ToContainTextAsync("Deactivated");
+
+    // Take screenshot
+    var screenshotPath = await TakeScreenshotAsync();
+    await AssertScreenshotWidthNotExceedingViewportAsync(screenshotPath);
+  }
+
+  [Fact]
+  public async Task EditRolesModalOpen()
+  {
+    // Arrange
+    var admin = await Api.CreateUserAsync();
+    var invited = await Api.InviteUserAsync(admin.Token);
+
+    // Act
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(admin.Email, admin.Password);
+    await Pages.UsersPage.GoToAsync();
+    await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
+    await Pages.UsersPage.OpenEditRolesModalAsync(invited.Email);
+
+    // Take screenshot with modal open
+    var screenshotPath = await TakeScreenshotAsync();
+    await AssertScreenshotWidthNotExceedingViewportAsync(screenshotPath);
+  }
 }

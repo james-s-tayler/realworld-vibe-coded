@@ -48,6 +48,22 @@ public class UsersPage : BasePage
   public ILocator InviteCancelButton => InviteModal.GetByRole(AriaRole.Button, new() { Name = "Cancel" });
 
   /// <summary>
+  /// Gets the edit roles modal.
+  /// </summary>
+  public ILocator EditRolesModal => Page.Locator(".cds--modal").Filter(new() { HasText = "Edit Roles" });
+
+  /// <summary>
+  /// Gets the Save button in the edit roles modal.
+  /// </summary>
+  public ILocator EditRolesSaveButton => EditRolesModal.GetByRole(AriaRole.Button, new() { Name = "Save" });
+
+  /// <summary>
+  /// Gets a checkbox for a specific role in the edit roles modal.
+  /// </summary>
+  public ILocator GetRoleCheckbox(string role) =>
+    EditRolesModal.GetByRole(AriaRole.Checkbox, new() { Name = role, Exact = true });
+
+  /// <summary>
   /// Gets a user row by username.
   /// </summary>
   public ILocator GetUserRowByUsername(string username) =>
@@ -58,6 +74,23 @@ public class UsersPage : BasePage
   /// </summary>
   public new ILocator GetUserProfileLink(string username) =>
     Page.GetByRole(AriaRole.Link, new() { Name = username, Exact = true });
+
+  /// <summary>
+  /// Gets the status tag for a user row.
+  /// </summary>
+  public ILocator GetUserStatusTag(string username) =>
+    GetUserRowByUsername(username).Locator(".cds--tag");
+
+  /// <summary>
+  /// Gets the overflow menu button for a user row.
+  /// </summary>
+  public ILocator GetUserActionsMenu(string username) =>
+    GetUserRowByUsername(username).GetByRole(AriaRole.Button, new() { Name = $"Actions for {username}" });
+
+  /// <summary>
+  /// Gets the pagination component.
+  /// </summary>
+  public ILocator Pagination => Page.Locator(".cds--pagination");
 
   /// <summary>
   /// Navigates to the Users page.
@@ -103,5 +136,32 @@ public class UsersPage : BasePage
   public async Task VerifyUserVisibleAsync(string username)
   {
     await Expect(GetUserRowByUsername(username)).ToBeVisibleAsync();
+  }
+
+  /// <summary>
+  /// Opens the overflow menu for a user and clicks a menu item.
+  /// </summary>
+  public async Task ClickUserAction(string username, string actionText)
+  {
+    await GetUserActionsMenu(username).ClickAsync();
+    await Page.GetByRole(AriaRole.Menuitem, new() { Name = actionText }).ClickAsync();
+  }
+
+  /// <summary>
+  /// Opens the Edit Roles modal for a user.
+  /// </summary>
+  public async Task OpenEditRolesModalAsync(string username)
+  {
+    await ClickUserAction(username, "Edit Roles");
+    await Expect(EditRolesModal).ToBeVisibleAsync();
+  }
+
+  /// <summary>
+  /// Saves the edit roles modal.
+  /// </summary>
+  public async Task SaveEditRolesAsync()
+  {
+    await EditRolesSaveButton.ClickAsync();
+    await Expect(EditRolesModal).Not.ToBeVisibleAsync();
   }
 }

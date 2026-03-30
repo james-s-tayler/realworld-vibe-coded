@@ -117,7 +117,7 @@ public static class MiddlewareConfig
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-    var rolesToSeed = new[] { DefaultRoles.Admin, DefaultRoles.User };
+    var rolesToSeed = new[] { DefaultRoles.Owner, DefaultRoles.Admin, DefaultRoles.User };
     foreach (var roleName in rolesToSeed)
     {
       if (!await roleManager.RoleExistsAsync(roleName))
