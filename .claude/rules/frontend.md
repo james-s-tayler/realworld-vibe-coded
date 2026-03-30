@@ -47,6 +47,7 @@ The generated API client (`src/api/generated/`) is the **type contract** between
 ## Common Gotchas
 
 - **Carbon Tabs:** `selectedIndex={-1}` doesn't work — compute the proper tab index for dynamic tab sets
+- **Kiota body-less PUT/POST:** Kiota sends no body and no `Content-Type` header for endpoints without a request body defined in the OpenAPI spec. FastEndpoints rejects these with 415. The fix is on the backend — annotate all route-bound properties with `[RouteParam]` so FastEndpoints accepts `*/*`. Never bypass Kiota with raw `fetch` for this — fix the root cause.
 
 ## Carbon Design System — Styling Rules
 

@@ -6,6 +6,110 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/users/{userId}/roles": {
+      "put": {
+        "tags": [
+          "Api"
+        ],
+        "operationId": "ServerWebUsersUpdateRolesUpdateRoles",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "UpdateRolesRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRolesRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Identity.Bearer": [
+              "ADMIN"
+            ]
+          }
+        ]
+      }
+    },
     "/api/user": {
       "put": {
         "tags": [
@@ -181,6 +285,87 @@
         ]
       }
     },
+    "/api/users/{userId}/reactivate": {
+      "put": {
+        "tags": [
+          "Api"
+        ],
+        "operationId": "ServerWebUsersReactivateReactivateUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Identity.Bearer": [
+              "ADMIN"
+            ]
+          }
+        ]
+      }
+    },
     "/api/users": {
       "get": {
         "tags": [
@@ -189,6 +374,26 @@
         "summary": "List all users",
         "description": "List all users in the system. Authentication required.",
         "operationId": "ServerWebUsersListListUsers",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -254,6 +459,87 @@
         "security": [
           {
             "Identity.Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/users/{userId}/deactivate": {
+      "put": {
+        "tags": [
+          "Api"
+        ],
+        "operationId": "ServerWebUsersDeactivateDeactivateUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Identity.Bearer": [
+              "ADMIN"
+            ]
           }
         ]
       }
@@ -1496,6 +1782,84 @@
   },
   "components": {
     "schemas": {
+      "UpdateRolesRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "description": "RFC7807 compatible problem details/ error response class. this can be used by configuring startup like so:\napp.UseFastEndpoints(c => c.Errors.UseProblemDetails())",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "default": "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.1"
+          },
+          "title": {
+            "type": "string",
+            "default": "One or more validation errors occurred."
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "default": 400
+          },
+          "instance": {
+            "type": "string",
+            "default": "/api/route"
+          },
+          "traceId": {
+            "type": "string",
+            "default": "0HMPNHL0JHL76:00000001"
+          },
+          "detail": {
+            "type": "string",
+            "description": "the details of the error",
+            "nullable": true
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProblemDetails_Error"
+            }
+          }
+        }
+      },
+      "ProblemDetails_Error": {
+        "type": "object",
+        "description": "the error details object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "the name of the error or property of the dto that caused the error",
+            "default": "Error or field name"
+          },
+          "reason": {
+            "type": "string",
+            "description": "the reason for the error",
+            "default": "Error reason"
+          },
+          "code": {
+            "type": "string",
+            "description": "the code of the error",
+            "nullable": true
+          },
+          "severity": {
+            "type": "string",
+            "description": "the severity of the error",
+            "nullable": true
+          }
+        }
+      },
       "UpdateUserResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -1581,71 +1945,9 @@
           }
         }
       },
-      "ProblemDetails": {
+      "ReactivateUserRequest": {
         "type": "object",
-        "description": "RFC7807 compatible problem details/ error response class. this can be used by configuring startup like so:\napp.UseFastEndpoints(c => c.Errors.UseProblemDetails())",
-        "additionalProperties": false,
-        "properties": {
-          "type": {
-            "type": "string",
-            "default": "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.1"
-          },
-          "title": {
-            "type": "string",
-            "default": "One or more validation errors occurred."
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "default": 400
-          },
-          "instance": {
-            "type": "string",
-            "default": "/api/route"
-          },
-          "traceId": {
-            "type": "string",
-            "default": "0HMPNHL0JHL76:00000001"
-          },
-          "detail": {
-            "type": "string",
-            "description": "the details of the error",
-            "nullable": true
-          },
-          "errors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProblemDetails_Error"
-            }
-          }
-        }
-      },
-      "ProblemDetails_Error": {
-        "type": "object",
-        "description": "the error details object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "the name of the error or property of the dto that caused the error",
-            "default": "Error or field name"
-          },
-          "reason": {
-            "type": "string",
-            "description": "the reason for the error",
-            "default": "Error reason"
-          },
-          "code": {
-            "type": "string",
-            "description": "the code of the error",
-            "nullable": true
-          },
-          "severity": {
-            "type": "string",
-            "description": "the severity of the error",
-            "nullable": true
-          }
-        }
+        "additionalProperties": false
       },
       "UsersResponse": {
         "type": "object",
@@ -1656,6 +1958,10 @@
             "items": {
               "$ref": "#/components/schemas/UserDto"
             }
+          },
+          "usersCount": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -1663,6 +1969,10 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
           "email": {
             "type": "string"
           },
@@ -1681,8 +1991,15 @@
             "items": {
               "type": "string"
             }
+          },
+          "isActive": {
+            "type": "boolean"
           }
         }
+      },
+      "ListUsersRequest": {
+        "type": "object",
+        "additionalProperties": false
       },
       "UserCurrentResponse": {
         "type": "object",
@@ -1692,6 +2009,10 @@
             "$ref": "#/components/schemas/UserResponse"
           }
         }
+      },
+      "DeactivateUserRequest": {
+        "type": "object",
+        "additionalProperties": false
       },
       "ProfileResponse": {
         "type": "object",

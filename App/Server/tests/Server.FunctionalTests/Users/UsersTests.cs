@@ -25,6 +25,7 @@ public class UsersTests : AppTestBase
     result.User.Email.ShouldBe(user.Email);
     result.User.Username.ShouldBe(user.Email);
     result.User.Roles.ShouldNotBeNull();
+    result.User.Roles.ShouldContain(DefaultRoles.Owner);
     result.User.Roles.ShouldContain(DefaultRoles.Admin);
     result.User.Roles.ShouldContain(DefaultRoles.User);
   }
@@ -225,8 +226,9 @@ public class UsersTests : AppTestBase
     var tenant = await Fixture.RegisterUsersAsync(3);
     var user = tenant.Users[0];
 
-    // Act
-    var (response, result) = await user.Client.GETAsync<ListUsers, UsersResponse>();
+    // Act - use large limit to ensure all users are returned
+    var listRequest = new ListUsersRequest();
+    var (response, result) = await user.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=1000&offset=0", listRequest);
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -246,8 +248,9 @@ public class UsersTests : AppTestBase
       u.Roles.ShouldNotBeEmpty();
     });
 
-    // Verify first user (tenant owner) has ADMIN role
+    // Verify first user (tenant owner) has OWNER + ADMIN + USER roles
     var ownerDto = result.Users.First(u => u.Email == tenant.Users[0].Email);
+    ownerDto.Roles.ShouldContain(DefaultRoles.Owner);
     ownerDto.Roles.ShouldContain(DefaultRoles.Admin);
     ownerDto.Roles.ShouldContain(DefaultRoles.User);
   }
@@ -260,5 +263,60 @@ public class UsersTests : AppTestBase
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+  }
+
+  [Fact]
+  public async Task ListUsers_WithPagination_ReturnsCorrectPage()
+  {
+    var tenant = await Fixture.RegisterUsersAsync(3);
+    var user = tenant.Users[0];
+
+    var request = new ListUsersRequest();
+    var (response, result) = await user.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=2&offset=0", request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.Users.Count.ShouldBeLessThanOrEqualTo(2);
+    result.UsersCount.ShouldBeGreaterThanOrEqualTo(3);
+  }
+
+  [Fact]
+  public async Task ListUsers_WithOffset_ReturnsRemainingUsers()
+  {
+    var tenant = await Fixture.RegisterUsersAsync(3);
+    var user = tenant.Users[0];
+
+    var request = new ListUsersRequest();
+    var (response, result) = await user.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=20&offset=1", request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.Users.Count.ShouldBeGreaterThanOrEqualTo(2);
+    result.UsersCount.ShouldBeGreaterThanOrEqualTo(3);
+  }
+
+  [Fact]
+  public async Task ListUsers_IncludesUsersCount()
+  {
+    var tenant = await Fixture.RegisterUsersAsync(2);
+    var user = tenant.Users[0];
+
+    var (response, result) = await user.Client.GETAsync<ListUsers, UsersResponse>();
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.UsersCount.ShouldBeGreaterThanOrEqualTo(2);
+  }
+
+  [Fact]
+  public async Task ListUsers_ShowsIsActiveField()
+  {
+    var tenant = await Fixture.RegisterUserAsync();
+    var user = tenant.Users[0];
+
+    var listRequest = new ListUsersRequest();
+    var (response, result) = await user.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=1000&offset=0", listRequest);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.Users.ShouldNotBeEmpty();
+    var createdUser = result.Users.First(u => u.Email == user.Email);
+    createdUser.IsActive.ShouldBeTrue();
   }
 }

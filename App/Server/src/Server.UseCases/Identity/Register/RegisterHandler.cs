@@ -58,6 +58,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     // Roles are seeded at application startup — assign Admin + User to the first registered user
     var defaultRoles = new List<string>
     {
+      DefaultRoles.Owner,
       DefaultRoles.Admin,
       DefaultRoles.User,
     };
