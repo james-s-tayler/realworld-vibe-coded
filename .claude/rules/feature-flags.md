@@ -5,6 +5,11 @@
 Feature flag names live in `App/Server/src/Server.SharedKernel/FeatureFlags/FeatureFlags.cs`.
 Add new flags as `public const string` fields.
 
+### When to Use Feature Flags
+
+- **Any change that can be feature flagged must be feature flagged.** New endpoints, behavior changes, and UI features should be gated behind a flag so they can be toggled without redeployment.
+- When adding a feature-flagged change, **tests must cover both the enabled and disabled states** — verify the feature works when on and confirm the old behavior is preserved when off.
+
 ### Conventions
 
 - New flags must default to `false` in both `appsettings.json` and `appsettings.Testing.json`
