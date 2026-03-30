@@ -1,7 +1,6 @@
 ﻿using Ardalis.ListStartupServices;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Microsoft.EntityFrameworkCore;
-using OpenTelemetry.Metrics;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
 
