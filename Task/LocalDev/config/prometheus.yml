@@ -3,12 +3,13 @@ global:
 
 scrape_configs:
   - job_name: conduit-server
-    # When app runs on host (normal dev)
+    # When app runs on host (normal dev via dotnet run)
     static_configs:
       - targets: ["host.docker.internal:5000"]
 
   - job_name: conduit-server-docker
     # When app runs in Docker (RunLocalPublish)
+    scheme: http
     static_configs:
       - targets: ["api:5000"]
 

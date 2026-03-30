@@ -145,6 +145,15 @@ Set the `APPLICATIONINSIGHTS_CONNECTION_STRING` environment variable. The code a
 
 ## Using Grafana
 
+### Conduit Overview Dashboard
+
+A pre-provisioned dashboard is available at [http://localhost:3000/d/conduit-overview](http://localhost:3000/d/conduit-overview) with:
+- Recent traces table (click any trace to see the full span waterfall)
+- HTTP request rate and latency percentiles (p50/p95/p99)
+- Requests by status code
+- .NET runtime metrics (GC collections, heap size, thread pool)
+- SQL Server metrics (connections, batch requests/sec, page life expectancy)
+
 ### Viewing Traces
 
 1. Open [http://localhost:3000](http://localhost:3000)
