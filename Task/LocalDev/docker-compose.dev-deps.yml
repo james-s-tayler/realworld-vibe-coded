@@ -49,14 +49,13 @@ services:
     networks:
       - app-network
 
-  tempo:
-    image: grafana/tempo:latest
-    command: ["-config.file=/etc/tempo.yaml"]
-    volumes:
-      - ./config/tempo.yaml:/etc/tempo.yaml
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
     ports:
       - "4317:4317"
-      - "3200:3200"
+      - "16686:16686"
     networks:
       - app-network
 
@@ -100,7 +99,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - tempo
+      - jaeger
       - prometheus
     networks:
       - app-network

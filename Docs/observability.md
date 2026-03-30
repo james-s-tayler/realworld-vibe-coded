@@ -2,12 +2,12 @@
 
 ## Overview
 
-The application uses OpenTelemetry for distributed tracing and metrics, with Serilog for structured logging. In local development, telemetry flows to a Grafana + Tempo + Prometheus stack. In production, the same instrumentation exports to Azure Application Insights via environment variable — zero code changes.
+The application uses OpenTelemetry for distributed tracing and metrics, with Serilog for structured logging. In local development, telemetry flows to a Grafana + Jaeger + Prometheus stack. In production, the same instrumentation exports to Azure Application Insights via environment variable — zero code changes.
 
 ```
 LOCAL DEV:
 .NET App
-├── Traces  → OTLP gRPC push  → Tempo       → Grafana
+├── Traces  → OTLP gRPC push  → Jaeger      → Grafana / Jaeger UI
 ├── Metrics → /metrics scrape  → Prometheus  → Grafana
 └── Logs    → Serilog          → Seq (unchanged)
 
@@ -23,9 +23,9 @@ PRODUCTION (Azure):
 | Service | URL | Purpose |
 |:--------|:----|:--------|
 | **Grafana** | [http://localhost:3000](http://localhost:3000) | Dashboards, trace explorer, metrics explorer |
+| **Jaeger UI** | [http://localhost:16686](http://localhost:16686) | Native trace search and visualization |
 | **Seq** | [http://localhost:5341](http://localhost:5341) | Structured log search (Serilog) |
 | **Prometheus** | [http://localhost:9090](http://localhost:9090) | Metrics query UI, target health |
-| **Tempo API** | [http://localhost:3200](http://localhost:3200) | Trace storage API (queried by Grafana) |
 | **App Metrics** | [http://localhost:5000/metrics](http://localhost:5000/metrics) | Prometheus scrape endpoint exposed by the app |
 
 ## Audit Logs (Audit.NET)
@@ -41,7 +41,7 @@ See `Docs/AUDIT.md` for full details on the audit log format and configuration.
 
 ## What Gets Instrumented
 
-### Traces (Tempo → Grafana)
+### Traces (Jaeger → Grafana)
 
 - **ASP.NET Core** — every HTTP request (excluding `/health`, `/swagger`, `/metrics`)
 - **HttpClient** — outgoing HTTP calls
@@ -69,7 +69,7 @@ See `Docs/AUDIT.md` for full details on the audit log format and configuration.
 Serilog 4.x automatically enriches log events with `TraceId` and `SpanId` from `Activity.Current` via the `FromLogContext` enricher. This means:
 
 1. See a log entry in Seq with a `TraceId`
-2. Copy that `TraceId` into Grafana → Explore → Tempo
+2. Copy that `TraceId` into Jaeger UI or Grafana → Explore → Jaeger
 3. See the full distributed trace with ASP.NET Core, EF Core, and MediatR spans
 
 ## Architecture
@@ -99,13 +99,12 @@ Defined in `Task/LocalDev/docker-compose.dev-deps.yml`:
 
 | Container | Image | Purpose |
 |:----------|:------|:--------|
-| `tempo` | `grafana/tempo` | Trace storage, receives OTLP gRPC on port 4317 |
+| `jaeger` | `jaegertracing/all-in-one` | Trace storage + UI, receives OTLP gRPC on port 4317 |
 | `prometheus` | `prom/prometheus` | Metrics storage, scrapes app `/metrics` and SQL exporter |
 | `sql-exporter` | `awaragi/prometheus-mssql-exporter` | Exports SQL Server DMV metrics to Prometheus |
-| `grafana` | `grafana/grafana` | Visualization — auto-provisioned with Tempo + Prometheus datasources |
+| `grafana` | `grafana/grafana` | Visualization — auto-provisioned with Jaeger + Prometheus datasources |
 
 Config files in `Task/LocalDev/config/`:
-- `tempo.yaml` — OTLP receiver + local block storage
 - `prometheus.yml` — scrape targets (host app, Docker app, SQL Server)
 - `grafana/datasources.yaml` — auto-provisioned datasources
 
@@ -136,7 +135,7 @@ Empty endpoint disables OTLP export — traces and metrics are still collected i
 ### Docker (`docker-compose.publish.yml`)
 
 ```yaml
-OpenTelemetry__OtlpEndpoint: "http://tempo:4317"
+OpenTelemetry__OtlpEndpoint: "http://jaeger:4317"
 ```
 
 ### Production (Azure Application Insights)
@@ -156,11 +155,17 @@ A pre-provisioned dashboard is available at [http://localhost:3000/d/conduit-ove
 
 ### Viewing Traces
 
+**Via Jaeger UI** (recommended for trace exploration):
+1. Open [http://localhost:16686](http://localhost:16686)
+2. Select service `Conduit` from the dropdown
+3. Click **Find Traces** to see recent traces
+4. Click a trace to see the span waterfall (ASP.NET Core → MediatR → EF Core)
+
+**Via Grafana**:
 1. Open [http://localhost:3000](http://localhost:3000)
 2. Go to **Explore** (compass icon in sidebar)
-3. Select **Tempo** datasource
-4. Choose **Search** tab and filter by service name `Conduit`
-5. Click a trace to see the span waterfall (ASP.NET Core → MediatR → EF Core)
+3. Select **Jaeger** datasource
+4. Search by service name `Conduit`
 
 ### Viewing Metrics
 

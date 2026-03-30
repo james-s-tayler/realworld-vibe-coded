@@ -189,12 +189,13 @@ The app is instrumented with OpenTelemetry for distributed tracing and metrics, 
 | Service | URL | Purpose |
 |:--------|:----|:--------|
 | **Grafana** | [http://localhost:3000](http://localhost:3000) | Dashboards, trace explorer, metrics explorer |
+| **Jaeger UI** | [http://localhost:16686](http://localhost:16686) | Distributed trace search and visualization |
 | **Seq** | [http://localhost:5341](http://localhost:5341) | Structured log search (Serilog) |
 | **Prometheus** | [http://localhost:9090](http://localhost:9090) | Metrics query UI |
 | **App Metrics** | [http://localhost:5000/metrics](http://localhost:5000/metrics) | Prometheus scrape endpoint |
 
 **What's instrumented:**
-- **Traces** (Grafana → Tempo): ASP.NET Core requests, HttpClient calls, EF Core queries, MediatR commands/queries
+- **Traces** (Jaeger + Grafana): ASP.NET Core requests, HttpClient calls, EF Core queries, MediatR commands/queries
 - **Metrics** (Grafana → Prometheus): HTTP request latency/counts, .NET runtime (GC, threadpool), SQL Server DMVs
 - **Logs** (Seq): Structured Serilog logs enriched with `TraceId` for cross-correlation with Grafana traces
 - **Audit** (disk): Audit.NET entity change logs with before/after values in `Logs/Server.Web/Audit.NET/`

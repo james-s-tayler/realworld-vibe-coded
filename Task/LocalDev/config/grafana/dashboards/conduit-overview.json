@@ -11,12 +11,12 @@
       "title": "Recent Traces",
       "type": "table",
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
-      "datasource": { "type": "tempo", "uid": "tempo" },
+      "datasource": { "type": "jaeger", "uid": "jaeger" },
       "targets": [
         {
-          "datasource": { "type": "tempo", "uid": "tempo" },
-          "queryType": "nativeSearch",
-          "serviceName": "Conduit",
+          "datasource": { "type": "jaeger", "uid": "jaeger" },
+          "queryType": "search",
+          "service": "Conduit",
           "limit": 20
         }
       ],

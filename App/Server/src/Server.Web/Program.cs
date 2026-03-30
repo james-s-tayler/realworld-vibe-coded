@@ -75,6 +75,7 @@ app.MapWhen(
   context =>
     !context.Request.Path.StartsWithSegments("/api") &&
     !context.Request.Path.StartsWithSegments("/health") &&
+    !context.Request.Path.StartsWithSegments("/metrics") &&
     !context.Request.Path.StartsWithSegments($"/{DevOnly.ROUTE}"),
   builder => builder.Run(async context =>
   {

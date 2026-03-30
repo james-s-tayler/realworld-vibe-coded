@@ -17,6 +17,8 @@ public partial class Build
 
   internal AbsolutePath NgrokPidFile => PidDirectory / "ngrok.pid";
 
+  internal AbsolutePath DockerComposePublish => TaskLocalDevDirectory / "docker-compose.publish.yml";
+
   internal Target RunLocalPublish => _ => _
     .Description("Run backend locally using Docker Compose with published artifact")
     .DependsOn(RunLocalDependencies)
@@ -26,21 +28,28 @@ public partial class Build
     {
       Log.Information("Starting local development environment with Docker Compose (published artifact)...");
 
-      var publishComposeFile = TaskLocalDevDirectory / "docker-compose.publish.yml";
-
       var envVars = new Dictionary<string, string>
       {
         ["DOCKER_BUILDKIT"] = "1",
       };
 
+      var detached = Agent ? " -d" : string.Empty;
       Log.Information("Running Docker Compose for local development with published artifact...");
-      var args = $"compose -f {publishComposeFile} -p {Constants.Docker.Projects.App} up --build";
+      var args = $"compose -f {DockerComposePublish} -p {Constants.Docker.Projects.App} up --build{detached}";
       var process = ProcessTasks.StartProcess(
             "docker",
             args,
             workingDirectory: RootDirectory,
             environmentVariables: envVars);
       process.WaitForExit();
+    });
+
+  internal Target RunLocalPublishDown => _ => _
+    .Description("Stop backend Docker Compose containers")
+    .Executes(() =>
+    {
+      Log.Information("Stopping local published app containers...");
+      DockerTasks.Docker($"compose -f {DockerComposePublish} -p {Constants.Docker.Projects.App} down", workingDirectory: RootDirectory);
     });
 
   internal Target RunLocalDependencies => _ => _

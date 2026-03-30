@@ -59,6 +59,7 @@
         "RunLocalDocsMcpServerDown",
         "RunLocalDocsMcpServerUp",
         "RunLocalPublish",
+        "RunLocalPublishDown",
         "TestClient",
         "TestE2e",
         "TestE2eArticles",
