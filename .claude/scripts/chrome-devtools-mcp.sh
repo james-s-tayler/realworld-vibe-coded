@@ -23,4 +23,4 @@ if [ -z "$CHROME_PATH" ]; then
   exit 1
 fi
 
-exec npx -y chrome-devtools-mcp@latest "$@"
+exec npx -y chrome-devtools-mcp@latest --executablePath "$CHROME_PATH" "$@"

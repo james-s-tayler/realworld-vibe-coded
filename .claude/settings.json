@@ -68,11 +68,5 @@
     "Bash(pwd)",
     "Bash(which *)",
     "Bash(npm *)"
-  ],
-  "mcpServers": {
-    "chrome-devtools": {
-      "command": "bash",
-      "args": [".claude/scripts/chrome-devtools-mcp.sh", "--headless", "--isolated"]
-    }
-  }
+  ]
 }
