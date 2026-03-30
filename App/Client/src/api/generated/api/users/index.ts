@@ -4,12 +4,20 @@
 // @ts-ignore
 import { createProblemDetailsFromDiscriminatorValue, createUsersResponseFromDiscriminatorValue, type ProblemDetails, type UsersResponse } from '../../models/index.js';
 // @ts-ignore
-import { type BaseRequestBuilder, type Parsable, type ParsableFactory, type RequestConfiguration, type RequestInformation, type RequestsMetadata } from '@microsoft/kiota-abstractions';
+import { type WithUserItemRequestBuilder, WithUserItemRequestBuilderNavigationMetadata } from './item/index.js';
+// @ts-ignore
+import { type BaseRequestBuilder, type KeysToExcludeForNavigationMetadata, type NavigationMetadata, type Parsable, type ParsableFactory, type RequestConfiguration, type RequestInformation, type RequestsMetadata } from '@microsoft/kiota-abstractions';
 
 /**
  * Builds and executes requests for operations under /api/users
  */
 export interface UsersRequestBuilder extends BaseRequestBuilder<UsersRequestBuilder> {
+    /**
+     * Gets an item from the ApiSdk.api.users.item collection
+     * @param userId Unique identifier of the item
+     * @returns {WithUserItemRequestBuilder}
+     */
+     byUserId(userId: string) : WithUserItemRequestBuilder;
     /**
      * List all users in the system. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
@@ -20,18 +28,34 @@ export interface UsersRequestBuilder extends BaseRequestBuilder<UsersRequestBuil
      * @throws {ProblemDetails} error when the service returns a 409 status code
      * @throws {ProblemDetails} error when the service returns a 500 status code
      */
-     get(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<UsersResponse | undefined>;
+     get(requestConfiguration?: RequestConfiguration<UsersRequestBuilderGetQueryParameters> | undefined) : Promise<UsersResponse | undefined>;
     /**
      * List all users in the system. Authentication required.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */
-     toGetRequestInformation(requestConfiguration?: RequestConfiguration<object> | undefined) : RequestInformation;
+     toGetRequestInformation(requestConfiguration?: RequestConfiguration<UsersRequestBuilderGetQueryParameters> | undefined) : RequestInformation;
+}
+/**
+ * List all users in the system. Authentication required.
+ */
+export interface UsersRequestBuilderGetQueryParameters {
+    limit?: number;
+    offset?: number;
 }
 /**
  * Uri template for the request builder.
  */
-export const UsersRequestBuilderUriTemplate = "{+baseurl}/api/users";
+export const UsersRequestBuilderUriTemplate = "{+baseurl}/api/users?limit={limit}&offset={offset}";
+/**
+ * Metadata for all the navigation properties in the request builder.
+ */
+export const UsersRequestBuilderNavigationMetadata: Record<Exclude<keyof UsersRequestBuilder, KeysToExcludeForNavigationMetadata>, NavigationMetadata> = {
+    byUserId: {
+        navigationMetadata: WithUserItemRequestBuilderNavigationMetadata,
+        pathParametersMappings: ["userId"],
+    },
+};
 /**
  * Metadata for all the requests in the request builder.
  */
