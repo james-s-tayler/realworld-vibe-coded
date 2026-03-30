@@ -71,8 +71,8 @@
   ],
   "mcpServers": {
     "chrome-devtools": {
-      "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest", "--headless", "--isolated"]
+      "command": "bash",
+      "args": [".claude/scripts/chrome-devtools-mcp.sh", "--headless", "--isolated"]
     }
   }
 }
