@@ -42,6 +42,7 @@ import { Add, FavoriteFilled, Favorite, UserFollow, Settings } from '@carbon/ico
 - `Loading`: `withOverlay={false}` for inline
 - `Tabs`: `Tabs > TabList > Tab` + `TabPanels > TabPanel`
 - `Tag`: supports `onClick`, `size="sm"`; `Pagination`: for article list pagination
+- `OverflowMenu`: use `iconDescription` (NOT `aria-label`) to set the trigger button's accessible name. `aria-label` on `<OverflowMenu>` does NOT propagate to the rendered button — Playwright and screen readers won't see it.
 
 ## CSS Classes (from existing stylesheets)
 

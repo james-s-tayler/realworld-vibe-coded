@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Json;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -193,6 +193,73 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
+  /// Deactivates a user account via the admin API.
+  /// </summary>
+  public async Task DeactivateUserAsync(string adminToken, string userId)
+  {
+    using var request = new HttpRequestMessage(HttpMethod.Put, $"/api/users/{userId}/deactivate");
+    request.Headers.Add("Authorization", $"Bearer {adminToken}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+  }
+
+  /// <summary>
+  /// Reactivates a user account via the admin API.
+  /// </summary>
+  public async Task ReactivateUserAsync(string adminToken, string userId)
+  {
+    using var request = new HttpRequestMessage(HttpMethod.Put, $"/api/users/{userId}/reactivate");
+    request.Headers.Add("Authorization", $"Bearer {adminToken}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+  }
+
+  /// <summary>
+  /// Updates the roles for a user via the admin API.
+  /// </summary>
+  public async Task UpdateUserRolesAsync(string adminToken, string userId, string[] roles)
+  {
+    var rolesRequest = new { roles };
+
+    using var request = new HttpRequestMessage(HttpMethod.Put, $"/api/users/{userId}/roles")
+    {
+      Content = JsonContent.Create(rolesRequest, options: _jsonOptions),
+    };
+    request.Headers.Add("Authorization", $"Bearer {adminToken}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+  }
+
+  /// <summary>
+  /// Lists users and returns their details. Used to get user IDs.
+  /// </summary>
+  public async Task<List<ListedUser>> ListUsersAsync(string token)
+  {
+    using var request = new HttpRequestMessage(HttpMethod.Get, "/api/users");
+    request.Headers.Add("Authorization", $"Bearer {token}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+
+    var responseContent = await response.Content.ReadAsStringAsync();
+    var usersResponse = JsonSerializer.Deserialize<UsersListResponse>(responseContent, _jsonOptions)!;
+    return usersResponse.Users;
+  }
+
+  /// <summary>
+  /// Gets a user's ID by their email from the users list.
+  /// </summary>
+  public async Task<string> GetUserIdByEmailAsync(string token, string email)
+  {
+    var users = await ListUsersAsync(token);
+    var user = users.First(u => u.Email == email);
+    return user.Id;
+  }
+
+  /// <summary>
   /// Logs in a user and returns the authentication token.
   /// </summary>
   public async Task<string> LoginAsync(string email, string password)
@@ -245,5 +312,11 @@ public class ApiFixture : IAsyncLifetime
   {
     [JsonPropertyName("accessToken")]
     public string AccessToken { get; set; } = string.Empty;
+  }
+
+  private class UsersListResponse
+  {
+    [JsonPropertyName("users")]
+    public List<ListedUser> Users { get; set; } = [];
   }
 }

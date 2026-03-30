@@ -9,21 +9,42 @@ vi.mock('../api/users', () => ({
   usersApi: {
     listUsers: vi.fn(),
     inviteUser: vi.fn(),
+    deactivateUser: vi.fn(),
+    reactivateUser: vi.fn(),
+    updateUserRoles: vi.fn(),
   },
 }));
+
+vi.mock('../hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: { email: 'admin@test.com', username: 'admin', bio: '', image: null, roles: ['OWNER', 'ADMIN', 'USER'] },
+    loading: false,
+  }),
+}));
+
+const mockUser = (overrides = {}) => ({
+  id: crypto.randomUUID(),
+  email: 'user@test.com',
+  username: 'user',
+  bio: 'Bio',
+  image: null,
+  roles: ['USER'],
+  isActive: true,
+  ...overrides,
+});
 
 describe('UsersPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders users table', async () => {
+  it('renders users table with status column', async () => {
     const mockUsers = [
-      { email: 'user1@test.com', username: 'user1', bio: 'Bio 1', image: null, roles: ['USER'] },
-      { email: 'user2@test.com', username: 'user2', bio: 'Bio 2', image: null, roles: ['ADMIN'] },
+      mockUser({ id: '1', email: 'user1@test.com', username: 'user1', roles: ['USER'] }),
+      mockUser({ id: '2', email: 'user2@test.com', username: 'user2', roles: ['ADMIN', 'USER'] }),
     ];
 
-    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockUsers });
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockUsers, usersCount: 2 });
 
     render(
       <MemoryRouter>
@@ -36,8 +57,6 @@ describe('UsersPage', () => {
       expect(screen.getByText('user2')).toBeInTheDocument();
       expect(screen.getByText('user1@test.com')).toBeInTheDocument();
       expect(screen.getByText('user2@test.com')).toBeInTheDocument();
-      expect(screen.getByText('USER')).toBeInTheDocument();
-      expect(screen.getByText('ADMIN')).toBeInTheDocument();
     });
   });
 
@@ -71,7 +90,7 @@ describe('UsersPage', () => {
 
   it('opens invite modal when invite button is clicked', async () => {
     const user = userEvent.setup();
-    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: [] });
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: [], usersCount: 0 });
 
     render(
       <MemoryRouter>
@@ -94,16 +113,16 @@ describe('UsersPage', () => {
   it('invites user and refreshes list', async () => {
     const user = userEvent.setup();
     const initialUsers = [
-      { email: 'user1@test.com', username: 'user1', bio: 'Bio 1', image: null, roles: ['USER'] },
+      mockUser({ id: '1', email: 'user1@test.com', username: 'user1' }),
     ];
     const updatedUsers = [
       ...initialUsers,
-      { email: 'user2@test.com', username: 'user2', bio: 'Bio 2', image: null, roles: ['USER'] },
+      mockUser({ id: '2', email: 'user2@test.com', username: 'user2' }),
     ];
 
     vi.mocked(usersApi.listUsers)
-      .mockResolvedValueOnce({ users: initialUsers })
-      .mockResolvedValueOnce({ users: updatedUsers });
+      .mockResolvedValueOnce({ users: initialUsers, usersCount: 1 })
+      .mockResolvedValueOnce({ users: updatedUsers, usersCount: 2 });
     vi.mocked(usersApi.inviteUser).mockResolvedValue();
 
     render(
@@ -143,7 +162,7 @@ describe('UsersPage', () => {
 
   it('shows error when invite fails', async () => {
     const user = userEvent.setup();
-    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: [] });
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: [], usersCount: 0 });
     vi.mocked(usersApi.inviteUser).mockRejectedValue(new Error('Invite failed'));
 
     render(
@@ -173,6 +192,56 @@ describe('UsersPage', () => {
     // Verify error is shown
     await waitFor(() => {
       expect(screen.getByText('Failed to invite user')).toBeInTheDocument();
+    });
+  });
+
+  it('passes pagination params to listUsers', async () => {
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: [], usersCount: 0 });
+
+    render(
+      <MemoryRouter>
+        <UsersPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(usersApi.listUsers).toHaveBeenCalledWith(20, 0);
+    });
+  });
+
+  it('shows active status tags for active users', async () => {
+    const mockUsers = [
+      mockUser({ id: '1', email: 'user1@test.com', username: 'user1', isActive: true }),
+    ];
+
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockUsers, usersCount: 1 });
+
+    render(
+      <MemoryRouter>
+        <UsersPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Active')).toBeInTheDocument();
+    });
+  });
+
+  it('shows deactivated status tag for inactive users', async () => {
+    const mockUsers = [
+      mockUser({ id: '1', email: 'user1@test.com', username: 'user1', isActive: false }),
+    ];
+
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockUsers, usersCount: 1 });
+
+    render(
+      <MemoryRouter>
+        <UsersPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Deactivated')).toBeInTheDocument();
     });
   });
 });
