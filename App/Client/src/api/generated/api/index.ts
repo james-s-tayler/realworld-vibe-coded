@@ -8,7 +8,7 @@ import { ProfilesRequestBuilderNavigationMetadata, type ProfilesRequestBuilder }
 // @ts-ignore
 import { type UserRequestBuilder, UserRequestBuilderRequestsMetadata } from './user/index.js';
 // @ts-ignore
-import { type UsersRequestBuilder, UsersRequestBuilderRequestsMetadata } from './users/index.js';
+import { type UsersRequestBuilder, UsersRequestBuilderNavigationMetadata, UsersRequestBuilderRequestsMetadata } from './users/index.js';
 // @ts-ignore
 import { type BaseRequestBuilder, type KeysToExcludeForNavigationMetadata, type NavigationMetadata } from '@microsoft/kiota-abstractions';
 
@@ -52,6 +52,7 @@ export const ApiRequestBuilderNavigationMetadata: Record<Exclude<keyof ApiReques
     },
     users: {
         requestsMetadata: UsersRequestBuilderRequestsMetadata,
+        navigationMetadata: UsersRequestBuilderNavigationMetadata,
     },
 };
 /* tslint:enable */

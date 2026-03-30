@@ -9,7 +9,7 @@ namespace Server.Web.Users.List;
 /// <remarks>
 /// List all users in the system. Authentication required.
 /// </remarks>
-public class ListUsers(IMediator mediator) : Endpoint<EmptyRequest, UsersResponse, UserMapper>
+public class ListUsers(IMediator mediator) : Endpoint<ListUsersRequest, UsersResponse, UserMapper>
 {
   public override void Configure()
   {
@@ -22,9 +22,9 @@ public class ListUsers(IMediator mediator) : Endpoint<EmptyRequest, UsersRespons
     });
   }
 
-  public override async Task HandleAsync(EmptyRequest req, CancellationToken cancellationToken)
+  public override async Task HandleAsync(ListUsersRequest req, CancellationToken cancellationToken)
   {
-    var result = await mediator.Send(new ListUsersQuery(), cancellationToken);
+    var result = await mediator.Send(new ListUsersQuery(req.Limit, req.Offset), cancellationToken);
 
     await Send.ResultMapperAsync(result, async (users, ct) => await Map.FromEntityAsync(users, ct), cancellationToken);
   }
