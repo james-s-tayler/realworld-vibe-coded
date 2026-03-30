@@ -13,6 +13,7 @@ export interface AuthContextType {
     password?: string;
     bio?: string;
     image?: string;
+    language?: string;
   }) => Promise<void>;
 }
 

@@ -4,6 +4,7 @@ export interface User {
   bio: string;
   image: string | null;
   roles: string[];
+  language: string;
 }
 
 export interface LoginRequest {
@@ -27,6 +28,7 @@ export interface UpdateUserRequest {
     password?: string;
     bio?: string;
     image?: string;
+    language?: string;
   };
 }
 

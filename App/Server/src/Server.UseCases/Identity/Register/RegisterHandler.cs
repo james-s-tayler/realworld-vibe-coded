@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
 using Server.Core.TenantInfoAggregate;
@@ -19,17 +20,20 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 {
   private readonly IRepository<TenantInfo> _tenantRepository;
   private readonly IUserEmailChecker _userEmailChecker;
+  private readonly IStringLocalizer _localizer;
   private readonly ILogger<RegisterHandler> _logger;
   private readonly IHttpContextAccessor _httpContextAccessor;
 
   public RegisterHandler(
     IRepository<TenantInfo> tenantRepository,
     IUserEmailChecker userEmailChecker,
+    IStringLocalizer localizer,
     ILogger<RegisterHandler> logger,
     IHttpContextAccessor httpContextAccessor)
   {
     _tenantRepository = tenantRepository;
     _userEmailChecker = userEmailChecker;
+    _localizer = localizer;
     _logger = logger;
     _httpContextAccessor = httpContextAccessor;
   }
@@ -46,7 +50,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     if (emailExists)
     {
       _logger.LogWarning("User registration failed for {Email}: Duplicate email", request.Email);
-      return Result<Unit>.Invalid(new ErrorDetail("email", "A user has already been registered with that email"));
+      return Result<Unit>.Invalid(new ErrorDetail("email", _localizer["EmailAlreadyRegistered"]));
     }
 
     var tenantId = Guid.NewGuid().ToString();

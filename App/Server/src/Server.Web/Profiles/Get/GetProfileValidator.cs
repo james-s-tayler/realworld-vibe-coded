@@ -10,7 +10,6 @@ public class GetProfileValidator : Validator<GetProfileRequest>
 
     RuleFor(x => x.Username)
       .NotEmpty()
-      .WithMessage("is required.")
       .OverridePropertyName("username");
   }
 }

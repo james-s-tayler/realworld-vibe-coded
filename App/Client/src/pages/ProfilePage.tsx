@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
 import { Button, Loading, InlineNotification } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { profilesApi } from '../api/profiles';
 import { PageShell } from '../components/PageShell';
@@ -16,32 +17,37 @@ interface ProfileBannerProps {
   isOwnProfile: boolean;
 }
 
-const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile }) => (
-  <div className="user-info">
-    <div className="container">
-      <div className="row">
-        <div className="col-xs-12 col-md-10 offset-md-1">
-          <img
-            src={profile.image || DEFAULT_PROFILE_IMAGE}
-            alt={profile.username}
-            className="user-img"
-          />
-          <h4 title={profile.username}>{truncateUsername(profile.username)}</h4>
-          <p>{profile.bio}</p>
-          {isOwnProfile && (
-            <Link to="/settings">
-              <Button kind="ghost" size="sm" renderIcon={Settings}>
-                Edit Profile Settings
-              </Button>
-            </Link>
-          )}
+const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="user-info">
+      <div className="container">
+        <div className="row">
+          <div className="col-xs-12 col-md-10 offset-md-1">
+            <img
+              src={profile.image || DEFAULT_PROFILE_IMAGE}
+              alt={profile.username}
+              className="user-img"
+            />
+            <h4 title={profile.username}>{truncateUsername(profile.username)}</h4>
+            <p>{profile.bio}</p>
+            {isOwnProfile && (
+              <Link to="/settings">
+                <Button kind="ghost" size="sm" renderIcon={Settings}>
+                  {t('profile.editSettings')}
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const ProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -60,12 +66,12 @@ export const ProfilePage: React.FC = () => {
       if (error instanceof ApiError) {
         setError(error.errors.join(', '));
       } else {
-        setError('Failed to load profile');
+        setError(t('profile.failedToLoad'));
       }
     } finally {
       setLoading(false);
     }
-  }, [username]);
+  }, [username, t]);
 
   useEffect(() => {
     loadProfile();
@@ -74,7 +80,7 @@ export const ProfilePage: React.FC = () => {
   if (loading) {
     return (
       <div className="profile-page loading">
-        <Loading description="Loading profile..." withOverlay={false} />
+        <Loading description={t('profile.loading')} withOverlay={false} />
       </div>
     );
   }
@@ -84,7 +90,7 @@ export const ProfilePage: React.FC = () => {
       <PageShell className="profile-page">
         <InlineNotification
           kind="error"
-          title="Error"
+          title={t('profile.error')}
           subtitle={error}
           lowContrast
         />
@@ -95,7 +101,7 @@ export const ProfilePage: React.FC = () => {
   if (!profile) {
     return (
       <PageShell className="profile-page">
-        <p>Profile not found</p>
+        <p>{t('profile.notFound')}</p>
       </PageShell>
     );
   }

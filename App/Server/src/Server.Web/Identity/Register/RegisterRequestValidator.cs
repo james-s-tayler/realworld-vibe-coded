@@ -10,12 +10,9 @@ public class RegisterRequestValidator : Validator<RegisterRequest>
 
     RuleFor(x => x.Email)
       .NotEmpty()
-      .WithMessage("is required.")
-      .EmailAddress()
-      .WithMessage("is invalid.");
+      .EmailAddress();
 
     RuleFor(x => x.Password)
-      .NotEmpty()
-      .WithMessage("is required.");
+      .NotEmpty();
   }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
@@ -14,15 +15,18 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
 {
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly IQueryApplicationUsers _queryApplicationUsers;
+  private readonly IStringLocalizer _localizer;
   private readonly ILogger<UpdateUserHandler> _logger;
 
   public UpdateUserHandler(
     UserManager<ApplicationUser> userManager,
     IQueryApplicationUsers queryApplicationUsers,
+    IStringLocalizer localizer,
     ILogger<UpdateUserHandler> logger)
   {
     _userManager = userManager;
     _queryApplicationUsers = queryApplicationUsers;
+    _localizer = localizer;
     _logger = logger;
   }
 
@@ -49,7 +53,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
         return Result<UserWithRolesDto>.Invalid(new ErrorDetail
         {
           Identifier = "email",
-          ErrorMessage = "Email already exists",
+          ErrorMessage = _localizer["EmailAlreadyExists"],
         });
       }
 
@@ -67,7 +71,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
         return Result<UserWithRolesDto>.Invalid(new ErrorDetail
         {
           Identifier = "username",
-          ErrorMessage = "Username already exists",
+          ErrorMessage = _localizer["UsernameAlreadyExists"],
         });
       }
 
@@ -101,6 +105,12 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
     if (request.Image != null)
     {
       user.Image = request.Image;
+    }
+
+    // Update language if provided
+    if (request.Language != null)
+    {
+      user.Language = request.Language;
     }
 
     var result = await _userManager.UpdateAsync(user);

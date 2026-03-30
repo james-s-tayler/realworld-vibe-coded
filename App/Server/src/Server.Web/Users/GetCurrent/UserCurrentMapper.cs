@@ -19,6 +19,7 @@ public class UserCurrentMapper : ResponseMapper<UserCurrentResponse, UserWithRol
         Bio = user.Bio,
         Image = user.Image,
         Roles = user.Roles,
+        Language = user.Language,
       },
     };
 

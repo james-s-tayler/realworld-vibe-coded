@@ -15,6 +15,7 @@ public class UserMapper : ResponseMapper<UsersResponse, ListUsersResult>
       Image = user.Image,
       Roles = user.Roles,
       IsActive = user.IsActive,
+      Language = user.Language,
     }).ToList();
 
     return Task.FromResult(new UsersResponse { Users = userDtos, UsersCount = result.TotalCount });

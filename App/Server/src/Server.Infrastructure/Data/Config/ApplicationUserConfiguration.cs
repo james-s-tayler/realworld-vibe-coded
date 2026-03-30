@@ -11,5 +11,9 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 
     builder.Property(p => p.Image)
         .HasMaxLength(ApplicationUser.ImageUrlMaxLength);
+
+    builder.Property(p => p.Language)
+        .HasMaxLength(ApplicationUser.LanguageMaxLength)
+        .IsRequired();
   }
 }

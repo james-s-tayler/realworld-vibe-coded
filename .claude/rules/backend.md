@@ -28,7 +28,7 @@ Use `*Request`, `*Response`, `*Dto` suffixes. Only expose whitelisted fields. Ma
 
 ## Validation
 
-All mutating requests must have a FluentValidation validator. Return 422 with consistent problem/details payload.
+All mutating requests must have a FluentValidation validator. Return 422 with consistent problem/details payload. Custom business-rule messages (not standard FluentValidation) must use `IStringLocalizer<SharedResource>`. Standard validator messages auto-translate. See `.claude/rules/i18n.md`.
 
 ## Error Handling
 

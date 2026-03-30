@@ -2,6 +2,7 @@
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 using Microsoft.FeatureManagement;
 using Server.Core.IdentityAggregate;
 using Server.Core.TenantInfoAggregate;
@@ -10,6 +11,7 @@ using Server.Infrastructure.Data;
 using Server.Infrastructure.Email;
 using Server.SharedKernel.Interfaces;
 using Server.UseCases.Interfaces;
+using Server.Web.I18n;
 using Server.Web.Infrastructure;
 using Server.Web.Services;
 
@@ -19,6 +21,23 @@ public static class ServiceConfigs
 {
   public static IServiceCollection AddServiceConfigs(this IServiceCollection services, Microsoft.Extensions.Logging.ILogger logger, WebApplicationBuilder builder)
   {
+    services.AddLocalization();
+
+    services.Configure<I18nSettings>(builder.Configuration.GetSection(I18nSettings.SectionName));
+
+    var i18nSettings = builder.Configuration.GetSection(I18nSettings.SectionName).Get<I18nSettings>() ?? new I18nSettings();
+    var supportedCultures = i18nSettings.SupportedLanguages.Select(l => new System.Globalization.CultureInfo(l)).ToArray();
+
+    services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(options =>
+    {
+      options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture(i18nSettings.DefaultLanguage);
+      options.SupportedCultures = supportedCultures;
+      options.SupportedUICultures = supportedCultures;
+    });
+
+    services.AddSingleton<IStringLocalizer>(sp =>
+      sp.GetRequiredService<IStringLocalizer<SharedResource>>());
+
     services.AddProblemDetails();
 
     services.AddInfrastructureServices(builder, logger)
