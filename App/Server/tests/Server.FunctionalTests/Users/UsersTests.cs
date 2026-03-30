@@ -261,4 +261,60 @@ public class UsersTests : AppTestBase
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
+
+  [Fact]
+  public async Task ListUsers_WithPagination_ReturnsCorrectPage()
+  {
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(3);
+    var user = tenant.Users[0];
+
+    var request = new ListUsersRequest();
+    var (response, result) = await user.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=2&offset=0", request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.Users.Count.ShouldBeLessThanOrEqualTo(2);
+    result.UsersCount.ShouldBeGreaterThanOrEqualTo(3);
+  }
+
+  [Fact]
+  public async Task ListUsers_WithOffset_ReturnsRemainingUsers()
+  {
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(3);
+    var user = tenant.Users[0];
+
+    var request = new ListUsersRequest();
+    var (response, result) = await user.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=20&offset=1", request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.Users.Count.ShouldBeGreaterThanOrEqualTo(2);
+    result.UsersCount.ShouldBeGreaterThanOrEqualTo(3);
+  }
+
+  [Fact]
+  public async Task ListUsers_IncludesUsersCount()
+  {
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+    var user = tenant.Users[0];
+
+    var (response, result) = await user.Client.GETAsync<ListUsers, UsersResponse>();
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.UsersCount.ShouldBeGreaterThanOrEqualTo(2);
+  }
+
+  [Fact]
+  public async Task ListUsers_ShowsIsActiveField()
+  {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
+    var (response, result) = await user.Client.GETAsync<ListUsers, UsersResponse>();
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.Users.ShouldNotBeEmpty();
+    result.Users.ForEach(u =>
+    {
+      u.IsActive.ShouldBeTrue();
+    });
+  }
 }

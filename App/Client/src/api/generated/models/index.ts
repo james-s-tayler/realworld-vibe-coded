@@ -98,6 +98,15 @@ export function createTestValidationRequestFromDiscriminatorValue(parseNode: Par
 /**
  * Creates a new instance of the appropriate class based on discriminator value
  * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {UpdateRolesRequest}
+ */
+// @ts-ignore
+export function createUpdateRolesRequestFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoUpdateRolesRequest;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
  * @returns {UpdateUserData}
  */
 // @ts-ignore
@@ -273,6 +282,17 @@ export function deserializeIntoTestValidationRequest(testValidationRequest: Part
 }
 /**
  * The deserialization information for the current model
+ * @param UpdateRolesRequest The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoUpdateRolesRequest(updateRolesRequest: Partial<UpdateRolesRequest> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "roles": n => { updateRolesRequest.roles = n.getCollectionOfPrimitiveValues<string>(); },
+    }
+}
+/**
+ * The deserialization information for the current model
  * @param UpdateUserData The instance to deserialize into.
  * @returns {Record<string, (node: ParseNode) => void>}
  */
@@ -329,7 +349,9 @@ export function deserializeIntoUserDto(userDto: Partial<UserDto> | undefined = {
     return {
         "bio": n => { userDto.bio = n.getStringValue(); },
         "email": n => { userDto.email = n.getStringValue(); },
+        "id": n => { userDto.id = n.getStringValue(); },
         "image": n => { userDto.image = n.getStringValue(); },
+        "isActive": n => { userDto.isActive = n.getBooleanValue(); },
         "roles": n => { userDto.roles = n.getCollectionOfPrimitiveValues<string>(); },
         "username": n => { userDto.username = n.getStringValue(); },
     }
@@ -358,6 +380,7 @@ export function deserializeIntoUserResponse(userResponse: Partial<UserResponse> 
 export function deserializeIntoUsersResponse(usersResponse: Partial<UsersResponse> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
         "users": n => { usersResponse.users = n.getCollectionOfObjectValues<UserDto>(createUserDtoFromDiscriminatorValue); },
+        "usersCount": n => { usersResponse.usersCount = n.getNumberValue(); },
     }
 }
 export interface InviteRequest extends Parsable {
@@ -580,6 +603,17 @@ export function serializeTestValidationRequest(writer: SerializationWriter, test
 /**
  * Serializes information the current object
  * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param UpdateRolesRequest The instance to serialize from.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeUpdateRolesRequest(writer: SerializationWriter, updateRolesRequest: Partial<UpdateRolesRequest> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!updateRolesRequest || isSerializingDerivedType) { return; }
+    writer.writeCollectionOfPrimitiveValues<string>("roles", updateRolesRequest.roles);
+}
+/**
+ * Serializes information the current object
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
  * @param UpdateUserData The instance to serialize from.
  * @param writer Serialization writer to use to serialize this model
  */
@@ -636,7 +670,9 @@ export function serializeUserDto(writer: SerializationWriter, userDto: Partial<U
     if (!userDto || isSerializingDerivedType) { return; }
     writer.writeStringValue("bio", userDto.bio);
     writer.writeStringValue("email", userDto.email);
+    writer.writeStringValue("id", userDto.id);
     writer.writeStringValue("image", userDto.image);
+    writer.writeBooleanValue("isActive", userDto.isActive);
     writer.writeCollectionOfPrimitiveValues<string>("roles", userDto.roles);
     writer.writeStringValue("username", userDto.username);
 }
@@ -665,8 +701,15 @@ export function serializeUserResponse(writer: SerializationWriter, userResponse:
 export function serializeUsersResponse(writer: SerializationWriter, usersResponse: Partial<UsersResponse> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!usersResponse || isSerializingDerivedType) { return; }
     writer.writeCollectionOfObjectValues<UserDto>("users", usersResponse.users, serializeUserDto);
+    writer.writeNumberValue("usersCount", usersResponse.usersCount);
 }
 export interface TestValidationRequest extends Parsable {
+}
+export interface UpdateRolesRequest extends Parsable {
+    /**
+     * The roles property
+     */
+    roles?: string[] | null;
 }
 export interface UpdateUserData extends Parsable {
     /**
@@ -718,9 +761,17 @@ export interface UserDto extends Parsable {
      */
     email?: string | null;
     /**
+     * The id property
+     */
+    id?: string | null;
+    /**
      * The image property
      */
     image?: string | null;
+    /**
+     * The isActive property
+     */
+    isActive?: boolean | null;
     /**
      * The roles property
      */
@@ -757,6 +808,10 @@ export interface UsersResponse extends Parsable {
      * The users property
      */
     users?: UserDto[] | null;
+    /**
+     * The usersCount property
+     */
+    usersCount?: number | null;
 }
 /* tslint:enable */
 /* eslint-enable */
