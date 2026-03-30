@@ -93,7 +93,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 
     _logger.LogInformation("Registered new user");
 
-    var rolesToCreate = new[] { DefaultRoles.Admin, DefaultRoles.User };
+    var rolesToCreate = new[] { DefaultRoles.Owner, DefaultRoles.Admin, DefaultRoles.User };
     foreach (var roleName in rolesToCreate)
     {
       if (!await roleManager.RoleExistsAsync(roleName))
@@ -110,6 +110,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
 
     var defaultRoles = new List<string>
     {
+      DefaultRoles.Owner,
       DefaultRoles.Admin,
       DefaultRoles.User,
     };

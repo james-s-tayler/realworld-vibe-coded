@@ -6,4 +6,5 @@ public record UserWithRolesDto(
   string Username,
   string Bio,
   string? Image,
-  List<string> Roles);
+  List<string> Roles,
+  bool IsActive);
