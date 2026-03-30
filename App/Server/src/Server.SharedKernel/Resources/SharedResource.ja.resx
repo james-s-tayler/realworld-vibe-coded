@@ -37,4 +37,25 @@
   <data name="InvalidAssignableRole" xml:space="preserve">
     <value>'{0}'は有効な割り当て可能なロールではありません。許可されたロール：ADMIN</value>
   </data>
+  <data name="InvalidEmailOrPassword" xml:space="preserve">
+    <value>メールアドレスまたはパスワードが無効です。</value>
+  </data>
+  <data name="CannotRemoveOwnAdminRole" xml:space="preserve">
+    <value>自分のADMINロールは削除できません。</value>
+  </data>
+  <data name="CannotDeactivateOwnAccount" xml:space="preserve">
+    <value>自分のアカウントは無効にできません。</value>
+  </data>
+  <data name="CannotDeactivateTenantOwner" xml:space="preserve">
+    <value>テナントオーナーは無効にできません。</value>
+  </data>
+  <data name="NoTenantContext" xml:space="preserve">
+    <value>テナントコンテキストが見つかりません</value>
+  </data>
+  <data name="AccountLockedOut" xml:space="preserve">
+    <value>アカウントがロックされています。</value>
+  </data>
+  <data name="TwoFactorRequired" xml:space="preserve">
+    <value>二要素認証が必要です。</value>
+  </data>
 </root>

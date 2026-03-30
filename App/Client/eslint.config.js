@@ -22,13 +22,17 @@ export default defineConfig([
     },
   },
   {
-    files: ['**/*.{tsx}'],
+    files: ['**/*.tsx'],
+    ignores: ['**/*.test.tsx'],
     plugins: { i18next },
     rules: {
       'i18next/no-literal-string': ['error', {
-        mode: 'jsx-text-only',
+        mode: 'jsx-only',
         'jsx-components': {
           exclude: ['Trans'],
+        },
+        'jsx-attributes': {
+          include: ['title', 'aria-label', 'alt', 'placeholder'],
         },
       }],
     },

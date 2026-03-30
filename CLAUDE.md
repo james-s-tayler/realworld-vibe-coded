@@ -34,4 +34,5 @@ Rules in `.claude/rules/` are loaded automatically by path scope. Read the relev
 | `functional-tests.md` | `App/Server/tests/**` | FastEndpoints test extensions (SRV007), AppFixture |
 | `testing.md` | — | E2E test structure overview, progressive tier targets |
 | `cicd.md` | `.github/**` | GitHub Actions naming, path-based job gating |
+| `nuke.md` | `Task/Runner/**` | Target naming (ArchUnit-enforced), built-in tool APIs, file operations, docs-first |
 | `harness.md` | `.claude/**`, `scripts/**` | Hook conventions, settings.json, marker files, protected files |
