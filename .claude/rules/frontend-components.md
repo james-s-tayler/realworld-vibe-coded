@@ -40,14 +40,12 @@ import { Add, FavoriteFilled, Favorite, UserFollow, Settings } from '@carbon/ico
 - `Button`: `kind="primary|secondary|ghost|danger--ghost"`, `size="sm|lg"`, `renderIcon={Icon}`
 - `InlineNotification`: `kind="error|success"`, `title`, `subtitle`, `onCloseButtonClick`
 - `Loading`: `withOverlay={false}` for inline
-- `Tabs`: `Tabs > TabList > Tab` + `TabPanels > TabPanel`
 - `Tag`: supports `onClick`, `size="sm"`; `Pagination`: for article list pagination
-- `OverflowMenu`: use `iconDescription` (NOT `aria-label`) to set the trigger button's accessible name. `aria-label` on `<OverflowMenu>` does NOT propagate to the rendered button — Playwright and screen readers won't see it.
+- `OverflowMenu`: use `iconDescription` (NOT `aria-label`) for accessible name
 
 ## CSS Classes (from existing stylesheets)
 
-- `.article-preview` — Card container; `.article-meta`, `.author-info`, `.author-image` — Author
-- `.article-title`, `.article-description`, `.article-footer` — Content
+- `.article-preview` — Card; `.article-meta`, `.author-info`, `.author-image` — Author
 - `.tag-pill`, `.tag-list` — Tags; `.sidebar` — Sidebar; `.pull-xs-right` — Float right
 
 ## Error Handling
@@ -56,8 +54,6 @@ import { Add, FavoriteFilled, Favorite, UserFollow, Settings } from '@carbon/ico
 import { ErrorDisplay } from '../components/ErrorDisplay';
 // In JSX: {error && <ErrorDisplay error={error} onClose={clearError} />}
 ```
-
-`ErrorDisplay` renders `InlineNotification` with normalized error messages.
 
 ## API Module Template
 
@@ -76,8 +72,12 @@ export const featureApi = {
 };
 ```
 
+## Carbon i18n
+
+Use `translateWithId` for DataTable/Dropdown: `(id) => t('carbon.${id}')`.
+For Pagination, pass translated text props (`backwardText`, `forwardText`, etc.). See `.claude/rules/i18n.md`.
+
 ## Testing (Vitest)
 
 - Mock API modules matching their export structure (object with methods)
 - `vi.clearAllMocks()` in `beforeEach`; use `MemoryRouter` for route-dependent components
-- Carbon components need: `import '@carbon/react'` (auto-available in test setup)

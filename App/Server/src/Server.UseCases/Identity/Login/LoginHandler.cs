@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Server.Core.IdentityAggregate;
 using Server.Core.TenantInfoAggregate;
+using Server.SharedKernel;
 using Server.SharedKernel.Identity;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
@@ -20,6 +22,7 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
   private readonly IRepository<TenantInfo> _tenantRepository;
   private readonly IOptionsMonitor<BearerTokenOptions> _bearerTokenOptions;
   private readonly TimeProvider _timeProvider;
+  private readonly IStringLocalizer _localizer;
   private readonly ILogger<LoginHandler> _logger;
   private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -28,6 +31,7 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     IRepository<TenantInfo> tenantRepository,
     IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
     TimeProvider timeProvider,
+    IStringLocalizer localizer,
     ILogger<LoginHandler> logger,
     IHttpContextAccessor httpContextAccessor)
   {
@@ -35,6 +39,7 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     _tenantRepository = tenantRepository;
     _bearerTokenOptions = bearerTokenOptions;
     _timeProvider = timeProvider;
+    _localizer = localizer;
     _logger = logger;
     _httpContextAccessor = httpContextAccessor;
   }
@@ -51,7 +56,7 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     if (user == null)
     {
       _logger.LogWarning("Login failed for {Email}: User not found", request.Email);
-      return Result<LoginResult>.Unauthorized(new ErrorDetail("email", "Invalid email or password."));
+      return Result<LoginResult>.Unauthorized(new ErrorDetail("email", _localizer[SharedResource.Keys.InvalidEmailOrPassword]));
     }
 
     // Set tenant context before calling any UserManager/SignInManager methods
@@ -61,7 +66,7 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     if (tenantInfo == null)
     {
       _logger.LogError("Tenant {TenantId} not found for user {Email}", tenantId, request.Email);
-      return Result<LoginResult>.CriticalError(new ErrorDetail("Tenant not found"));
+      return Result<LoginResult>.CriticalError(new ErrorDetail(_localizer[SharedResource.Keys.NoTenantContext]));
     }
 
     _httpContextAccessor.HttpContext!.SetTenantInfo(tenantInfo, resetServiceProviderScope: true);
@@ -74,7 +79,7 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
     if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.UtcNow)
     {
       _logger.LogWarning("Login failed for {Email}: Account is locked out", request.Email);
-      return Result<LoginResult>.Unauthorized(new ErrorDetail("Account is locked out."));
+      return Result<LoginResult>.Unauthorized(new ErrorDetail(_localizer[SharedResource.Keys.AccountLockedOut]));
     }
 
     var isPasswordValid = await userManager.CheckPasswordAsync(user, request.Password);
@@ -84,14 +89,14 @@ public class LoginHandler : IQueryHandler<LoginCommand, LoginResult>
       // to avoid entity tracking conflicts with the already-loaded user entity
       await _userEmailChecker.IncrementAccessFailedCountAsync(user, cancellationToken);
       _logger.LogWarning("Login failed for {Email}: Invalid password", request.Email);
-      return Result<LoginResult>.Unauthorized(new ErrorDetail("Invalid email or password."));
+      return Result<LoginResult>.Unauthorized(new ErrorDetail(_localizer[SharedResource.Keys.InvalidEmailOrPassword]));
     }
 
     // Check two-factor status directly from the user entity
     if (user.TwoFactorEnabled)
     {
       _logger.LogWarning("Login failed for {Email}: Two-factor authentication is required", request.Email);
-      return Result<LoginResult>.Unauthorized(new ErrorDetail("Two-factor authentication is required."));
+      return Result<LoginResult>.Unauthorized(new ErrorDetail(_localizer[SharedResource.Keys.TwoFactorRequired]));
     }
 
     // Reset access failed count directly via IUserEmailChecker

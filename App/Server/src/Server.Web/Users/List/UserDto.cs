@@ -15,4 +15,6 @@ public class UserDto
   public List<string> Roles { get; set; } = [];
 
   public bool IsActive { get; set; }
+
+  public string Language { get; set; } = "en";
 }

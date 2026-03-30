@@ -9,5 +9,6 @@ public record UpdateUserCommand(
   string? Username = null,
   string? Password = null,
   string? Bio = null,
-  string? Image = null
+  string? Image = null,
+  string? Language = null
 ) : ICommand<UserWithRolesDto>;

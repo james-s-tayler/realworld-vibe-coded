@@ -1,5 +1,7 @@
 import React, { useState, useEffect, type ReactNode } from 'react';
+import i18n from 'i18next';
 import { authApi } from '../api/auth';
+import { setApiLanguage } from '../api/clientFactory';
 import type { User } from '../types/user';
 import { AuthContext } from './AuthContextType';
 
@@ -7,6 +9,11 @@ export { AuthContext };
 
 interface AuthProviderProps {
   children: ReactNode;
+}
+
+function syncLanguage(user: User) {
+  i18n.changeLanguage(user.language);
+  setApiLanguage(user.language);
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -19,6 +26,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       .getCurrentUser()
       .then((response) => {
         setUser(response.user);
+        syncLanguage(response.user);
       })
       .catch(() => {
         // No valid session - user is not authenticated
@@ -34,6 +42,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Fetch user details after login
     const response = await authApi.getCurrentUser();
     setUser(response.user);
+    syncLanguage(response.user);
   };
 
   const register = async (email: string, password: string) => {
@@ -45,6 +54,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     await authApi.logout();
     setUser(null);
+    i18n.changeLanguage('en');
+    setApiLanguage('en');
   };
 
   const updateUser = async (updates: {
@@ -53,9 +64,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password?: string;
     bio?: string;
     image?: string;
+    language?: string;
   }) => {
     const response = await authApi.updateUser(updates);
     setUser(response.user);
+    syncLanguage(response.user);
   };
 
   return (

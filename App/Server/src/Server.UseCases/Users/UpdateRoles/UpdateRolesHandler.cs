@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
+using Server.SharedKernel;
 using Server.SharedKernel.MediatR;
 
 namespace Server.UseCases.Users.UpdateRoles;
@@ -10,13 +12,16 @@ namespace Server.UseCases.Users.UpdateRoles;
 public class UpdateRolesHandler : ICommandHandler<UpdateRolesCommand, ApplicationUser>
 {
   private readonly IHttpContextAccessor _httpContextAccessor;
+  private readonly IStringLocalizer _localizer;
   private readonly ILogger<UpdateRolesHandler> _logger;
 
   public UpdateRolesHandler(
     IHttpContextAccessor httpContextAccessor,
+    IStringLocalizer localizer,
     ILogger<UpdateRolesHandler> logger)
   {
     _httpContextAccessor = httpContextAccessor;
+    _localizer = localizer;
     _logger = logger;
   }
 
@@ -41,7 +46,7 @@ public class UpdateRolesHandler : ICommandHandler<UpdateRolesCommand, Applicatio
     if (request.UserId == request.CurrentUserId && currentRoles.Contains(DefaultRoles.Admin) && !request.Roles.Contains(DefaultRoles.Admin))
     {
       _logger.LogWarning("User {UserId} attempted to remove their own ADMIN role", request.CurrentUserId);
-      return Result<ApplicationUser>.Forbidden(new ErrorDetail("roles", "Cannot remove your own ADMIN role."));
+      return Result<ApplicationUser>.Forbidden(new ErrorDetail("roles", _localizer[SharedResource.Keys.CannotRemoveOwnAdminRole]));
     }
 
     // Compute roles to remove (exclude OWNER and USER from removal — they're immutable)

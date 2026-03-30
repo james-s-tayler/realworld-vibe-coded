@@ -1,0 +1,100 @@
+{
+  "brand": "conduit",
+  "nav": {
+    "home": "ホーム",
+    "users": "ユーザー",
+    "settings": "設定",
+    "signIn": "サインイン",
+    "signUp": "サインアップ",
+    "logOut": "ログアウト",
+    "sideNavLabel": "サイドナビゲーション"
+  },
+  "login": {
+    "title": "サインイン",
+    "needAccount": "アカウントをお持ちでない方",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "submit": "サインイン",
+    "submitting": "サインイン中..."
+  },
+  "register": {
+    "title": "サインアップ",
+    "haveAccount": "アカウントをお持ちの方",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "submit": "サインアップ",
+    "submitting": "アカウント作成中..."
+  },
+  "settings": {
+    "title": "設定",
+    "imageUrl": "プロフィール画像のURL",
+    "username": "ユーザー名",
+    "bio": "自己紹介",
+    "email": "メールアドレス",
+    "newPassword": "新しいパスワード",
+    "language": "言語",
+    "submit": "設定を更新",
+    "submitting": "更新中...",
+    "success": "成功",
+    "successMessage": "設定が正常に更新されました"
+  },
+  "dashboard": {
+    "welcome": "ようこそ、{{username}}さん！",
+    "welcomeGuest": "ようこそ！",
+    "subtitle": "ダッシュボードです。以下から始めましょう：",
+    "settings": "設定",
+    "viewProfile": "プロフィールを見る"
+  },
+  "profile": {
+    "editSettings": "プロフィール設定を編集",
+    "loading": "プロフィールを読み込み中...",
+    "error": "エラー",
+    "notFound": "プロフィールが見つかりません",
+    "failedToLoad": "プロフィールの読み込みに失敗しました"
+  },
+  "users": {
+    "title": "ユーザー",
+    "inviteUser": "ユーザーを招待",
+    "username": "ユーザー名",
+    "email": "メールアドレス",
+    "roles": "ロール",
+    "status": "ステータス",
+    "actions": "アクション",
+    "active": "有効",
+    "deactivated": "無効",
+    "editRoles": "ロールを編集",
+    "deactivate": "無効にする",
+    "reactivate": "有効にする",
+    "loading": "ユーザーを読み込み中...",
+    "failedToLoad": "ユーザーの読み込みに失敗しました",
+    "failedToDeactivate": "ユーザーの無効化に失敗しました",
+    "failedToReactivate": "ユーザーの有効化に失敗しました",
+    "failedToUpdateRoles": "ロールの更新に失敗しました",
+    "failedToInvite": "ユーザーの招待に失敗しました",
+    "inviteModalTitle": "ユーザーを招待",
+    "invite": "招待",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "editRolesTitle": "ロールを編集 — {{username}}",
+    "emailAndPasswordRequired": "メールアドレスとパスワードは必須です",
+    "actionsFor": "{{email}}のアクション",
+    "password": "パスワード",
+    "emailPlaceholder": "user@example.com"
+  },
+  "forbidden": {
+    "title": "403 - アクセス拒否",
+    "message": "このページにアクセスする権限がありません。",
+    "goHome": "ホームに戻る"
+  },
+  "error": {
+    "title": "エラー"
+  },
+  "pagination": {
+    "previous": "前のページ",
+    "next": "次のページ",
+    "itemsPerPage": "ページあたりの件数：",
+    "itemRange": "{{min}}–{{max}} / {{total}}件",
+    "pageRange_one": "/ {{count}}ページ",
+    "pageRange_other": "/ {{count}}ページ"
+  }
+}

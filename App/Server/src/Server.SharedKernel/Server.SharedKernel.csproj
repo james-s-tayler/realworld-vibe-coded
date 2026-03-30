@@ -3,6 +3,15 @@
 
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" />
+    <PackageReference Include="Darp.Utils.ResxSourceGenerator" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\SharedResource.resx" Public="true" EmitFormatMethods="true" ClassName="Server.SharedKernel.SharedResource" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" />
     <PackageReference Include="Ardalis.Specification" />
     <PackageReference Include="Finbuckle.MultiTenant.Abstractions" />
     <PackageReference Include="MediatR" />

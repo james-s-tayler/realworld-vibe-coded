@@ -624,6 +624,56 @@ public class Tag : EntityBase, IAggregateRoot { }
 
 ---
 
+## i18n Analyzers (I18N001-I18N002)
+
+### I18N001: HardcodedErrorMessageAnalyzer
+**Description:** Warns when `ErrorMessage` is assigned a string literal or interpolated string instead of a localized value from `IStringLocalizer`.
+
+**Severity:** Warning
+
+**Scope:** Classes implementing `ICommandHandler<,>` or `IQueryHandler<,>` (excludes test projects)
+
+**Rationale:** All user-facing error messages should be localizable. Hardcoded strings in ErrorMessage assignments bypass the i18n pipeline.
+
+**Allowed:** `string.Join(...)` expressions (used for wrapping ASP.NET Identity framework errors that can't easily be localized).
+
+**Example:**
+```csharp
+// ❌ Bad - Hardcoded string
+return Result<User>.Invalid(new ErrorDetail
+{
+  Identifier = "email",
+  ErrorMessage = "Email already exists",
+});
+
+// ✅ Good - Localized via IStringLocalizer
+return Result<User>.Invalid(new ErrorDetail
+{
+  Identifier = "email",
+  ErrorMessage = _localizer[SharedResource.Keys.EmailAlreadyExists],
+});
+```
+
+---
+
+### I18N002: ValidatorLocalizerLambdaAnalyzer
+**Description:** Ensures `.WithMessage()` calls in FastEndpoints `Validator<T>` classes use a lambda when accessing `IStringLocalizer`, to avoid frozen culture values in singletons.
+
+**Severity:** Error
+
+**Rationale:** FastEndpoints Validators are singletons. `IStringLocalizer` values evaluated eagerly in the constructor are frozen to the culture at startup time. Using a lambda defers evaluation to request time, respecting `Accept-Language` headers.
+
+**Example:**
+```csharp
+// ❌ Bad - Eager evaluation (frozen culture)
+.WithMessage(localizer[SharedResource.Keys.UnsupportedLanguage])
+
+// ✅ Good - Lambda defers to request time
+.WithMessage(x => localizer[SharedResource.Keys.UnsupportedLanguage])
+```
+
+---
+
 ## Adding a New Analyzer
 
 To add a new analyzer to this project:

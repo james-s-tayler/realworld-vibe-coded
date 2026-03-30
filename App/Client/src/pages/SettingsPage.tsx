@@ -6,21 +6,25 @@ import {
   Button,
   InlineNotification,
   Stack,
+  Dropdown,
 } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
-import { USER_CONSTRAINTS } from '../constants';
+import { USER_CONSTRAINTS, SUPPORTED_LANGUAGES } from '../constants';
 import './SettingsPage.css';
 
 export const SettingsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { user, updateUser } = useAuth();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [image, setImage] = useState('');
   const [password, setPassword] = useState('');
+  const [language, setLanguage] = useState('en');
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
@@ -29,6 +33,7 @@ export const SettingsPage: React.FC = () => {
       setUsername(user.username);
       setBio(user.bio || '');
       setImage(user.image || '');
+      setLanguage(user.language || 'en');
     }
   }, [user]);
 
@@ -39,6 +44,7 @@ export const SettingsPage: React.FC = () => {
       bio?: string;
       image?: string;
       password?: string;
+      language?: string;
     } = {};
 
     if (email !== user?.email) updates.email = email;
@@ -46,9 +52,10 @@ export const SettingsPage: React.FC = () => {
     if (bio !== (user?.bio || '')) updates.bio = bio;
     if (image !== (user?.image || '')) updates.image = image;
     if (password) updates.password = password;
+    if (language !== (user?.language || 'en')) updates.language = language;
 
     return updateUser(updates);
-  }, [email, username, bio, image, password, user, updateUser]);
+  }, [email, username, bio, image, password, language, user, updateUser]);
 
   const { error, loading, execute, clearError } = useApiCall(updateApi, {
     onSuccess: () => {
@@ -67,11 +74,13 @@ export const SettingsPage: React.FC = () => {
     return null;
   }
 
+  const selectedLanguage = SUPPORTED_LANGUAGES.find((l) => l.id === language) || SUPPORTED_LANGUAGES[0];
+
   return (
     <PageShell
       className="settings-page"
       columnLayout="narrow"
-      title="Your Settings"
+      title={t('settings.title')}
     >
       <ErrorDisplay
         error={error}
@@ -81,8 +90,8 @@ export const SettingsPage: React.FC = () => {
       {success && (
         <InlineNotification
           kind="success"
-          title="Success"
-          subtitle="Settings updated successfully"
+          title={t('settings.success')}
+          subtitle={t('settings.successMessage')}
           onCloseButtonClick={() => setSuccess(false)}
           style={{ marginBottom: '1rem' }}
         />
@@ -93,7 +102,7 @@ export const SettingsPage: React.FC = () => {
           <TextInput
             id="image"
             labelText=""
-            placeholder="URL of profile picture"
+            placeholder={t('settings.imageUrl')}
             value={image}
             onChange={(e) => setImage(e.target.value)}
             maxLength={USER_CONSTRAINTS.IMAGE_URL_MAX_LENGTH}
@@ -102,7 +111,7 @@ export const SettingsPage: React.FC = () => {
           <TextInput
             id="username"
             labelText=""
-            placeholder="Username"
+            placeholder={t('settings.username')}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -113,7 +122,7 @@ export const SettingsPage: React.FC = () => {
           <TextArea
             id="bio"
             labelText=""
-            placeholder="Short bio about you"
+            placeholder={t('settings.bio')}
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={8}
@@ -123,7 +132,7 @@ export const SettingsPage: React.FC = () => {
           <TextInput
             id="email"
             labelText=""
-            placeholder="Email"
+            placeholder={t('settings.email')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -134,15 +143,29 @@ export const SettingsPage: React.FC = () => {
           <TextInput
             id="password"
             labelText=""
-            placeholder="New Password"
+            placeholder={t('settings.newPassword')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
             minLength={USER_CONSTRAINTS.PASSWORD_MIN_LENGTH}
           />
 
+          <Dropdown
+            id="language"
+            titleText={t('settings.language')}
+            label=""
+            items={[...SUPPORTED_LANGUAGES]}
+            itemToString={(item) => item?.label ?? ''}
+            selectedItem={selectedLanguage}
+            onChange={({ selectedItem }) => {
+              if (selectedItem) {
+                setLanguage(selectedItem.id);
+              }
+            }}
+          />
+
           <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">
-            {loading ? 'Updating...' : 'Update Settings'}
+            {loading ? t('settings.submitting') : t('settings.submit')}
           </Button>
         </Stack>
       </Form>

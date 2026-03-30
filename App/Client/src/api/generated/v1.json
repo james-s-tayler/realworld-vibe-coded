@@ -1891,6 +1891,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "language": {
+            "type": "string"
           }
         }
       },
@@ -1902,7 +1905,8 @@
             "username": "newusername",
             "password": null,
             "bio": "Updated bio",
-            "image": "https://example.com/avatar.jpg"
+            "image": "https://example.com/avatar.jpg",
+            "language": null
           }
         },
         "additionalProperties": false,
@@ -1913,7 +1917,8 @@
               "username": "newusername",
               "password": null,
               "bio": "Updated bio",
-              "image": "https://example.com/avatar.jpg"
+              "image": "https://example.com/avatar.jpg",
+              "language": null
             },
             "$ref": "#/components/schemas/UpdateUserData"
           }
@@ -1940,6 +1945,10 @@
             "nullable": true
           },
           "image": {
+            "type": "string",
+            "nullable": true
+          },
+          "language": {
             "type": "string",
             "nullable": true
           }
@@ -1994,6 +2003,9 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "language": {
+            "type": "string"
           }
         }
       },

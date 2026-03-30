@@ -25,6 +25,7 @@ public class ApplicationUsersQuery : IQueryApplicationUsers
         user.Bio,
         user.Image,
         user.LockoutEnd,
+        user.Language,
         Roles = (from ur in _dbContext.UserRoles
                  where ur.UserId == user.Id
                  join r in _dbContext.Roles on ur.RoleId equals r.Id
@@ -44,7 +45,8 @@ public class ApplicationUsersQuery : IQueryApplicationUsers
       userWithRoles.Bio ?? string.Empty,
       userWithRoles.Image,
       userWithRoles.Roles.ToList(),
-      !(userWithRoles.LockoutEnd.HasValue && userWithRoles.LockoutEnd.Value > DateTimeOffset.UtcNow));
+      !(userWithRoles.LockoutEnd.HasValue && userWithRoles.LockoutEnd.Value > DateTimeOffset.UtcNow),
+      userWithRoles.Language);
   }
 
   public async Task<List<UserWithRolesDto>> ListUsersWithRoles(int limit, int offset, CancellationToken cancellationToken = default)
@@ -53,7 +55,7 @@ public class ApplicationUsersQuery : IQueryApplicationUsers
       .OrderBy(u => u.UserName)
       .Skip(offset)
       .Take(limit)
-      .Select(u => new { u.Id, u.Email, u.UserName, u.Bio, u.Image, u.LockoutEnd })
+      .Select(u => new { u.Id, u.Email, u.UserName, u.Bio, u.Image, u.LockoutEnd, u.Language })
       .ToListAsync(cancellationToken);
 
     var userIds = users.Select(u => u.Id).ToList();
@@ -76,7 +78,8 @@ public class ApplicationUsersQuery : IQueryApplicationUsers
       u.Bio ?? string.Empty,
       u.Image,
       rolesByUser.GetValueOrDefault(u.Id, []),
-      !(u.LockoutEnd.HasValue && u.LockoutEnd.Value > DateTimeOffset.UtcNow))).ToList();
+      !(u.LockoutEnd.HasValue && u.LockoutEnd.Value > DateTimeOffset.UtcNow),
+      u.Language)).ToList();
   }
 
   public async Task<int> CountUsers(CancellationToken cancellationToken = default)

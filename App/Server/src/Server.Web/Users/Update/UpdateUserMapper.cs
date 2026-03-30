@@ -15,6 +15,7 @@ public class UpdateUserMapper : ResponseMapper<UpdateUserResponse, UserWithRoles
         Bio = user.Bio,
         Image = user.Image,
         Roles = user.Roles,
+        Language = user.Language,
       },
     };
 
