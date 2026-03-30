@@ -14,6 +14,10 @@ public partial class Build
 
   internal AbsolutePath ServerInfrastructureProject => RootDirectory / "App" / "Server" / "src" / "Server.Infrastructure" / "Server.Infrastructure.csproj";
 
+  internal AbsolutePath AppSettingsDirectory => RootDirectory / "App" / "Server" / "src" / "Server.Web";
+
+  internal AbsolutePath SchemaDirectory => RootDirectory / "App" / "Server" / "schemas";
+
   internal AbsolutePath MigrationsDirectory => RootDirectory / "App" / "Server" / "src" / "Server.Infrastructure" / "Data" / "Migrations";
 
   internal AbsolutePath IdempotentScriptPath => MigrationsDirectory / "idempotent.sql";

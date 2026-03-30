@@ -43,6 +43,17 @@ builder.Services.AddFastEndpoints(o =>
                   };
                 });
 
+// Azure App Configuration — enabled when connection string is provided (e.g., production)
+var azureAppConfigConnectionString = builder.Configuration["AzureAppConfiguration:ConnectionString"];
+var useAzureAppConfig = !string.IsNullOrEmpty(azureAppConfigConnectionString);
+
+if (useAzureAppConfig)
+{
+  builder.Configuration.AddAzureAppConfiguration(options =>
+    options.Connect(azureAppConfigConnectionString).UseFeatureFlags());
+  builder.Services.AddAzureAppConfiguration();
+}
+
 // Configure JSON serialization options
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -55,6 +66,11 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 var app = builder.Build();
+
+if (useAzureAppConfig)
+{
+  app.UseAzureAppConfiguration();
+}
 
 app.UseStaticFiles();
 app.UseFastEndpointsMiddleware();

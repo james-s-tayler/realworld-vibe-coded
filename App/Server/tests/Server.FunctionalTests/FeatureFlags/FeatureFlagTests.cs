@@ -31,4 +31,16 @@ public class FeatureFlagTests : AppTestBase
     result.FeatureName.ShouldBe("NonExistentFeature");
     result.IsEnabled.ShouldBeFalse();
   }
+
+  [Fact]
+  public async Task CheckFeatureFlag_DisabledFeature_ReturnsDisabled()
+  {
+    var (response, result) = await Fixture.Client
+      .GETAsync<CheckFeatureFlag, CheckFeatureFlagRequest, CheckFeatureFlagResponse>(
+        new CheckFeatureFlagRequest { FeatureName = "DisabledFeature" });
+
+    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    result.FeatureName.ShouldBe("DisabledFeature");
+    result.IsEnabled.ShouldBeFalse();
+  }
 }
