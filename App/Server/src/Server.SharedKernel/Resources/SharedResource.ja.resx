@@ -17,21 +17,24 @@
     </xsd:element>
   </xsd:schema>
   <data name="EmailAlreadyExists" xml:space="preserve">
-    <value>Email already exists</value>
+    <value>メールアドレスは既に使用されています</value>
   </data>
   <data name="UsernameAlreadyExists" xml:space="preserve">
-    <value>Username already exists</value>
+    <value>ユーザー名は既に使用されています</value>
   </data>
   <data name="UnsupportedLanguage" xml:space="preserve">
-    <value>is not a supported language.</value>
+    <value>はサポートされていない言語です。</value>
   </data>
   <data name="PasswordUpdateFailed" xml:space="preserve">
-    <value>Password update failed.</value>
+    <value>パスワードの更新に失敗しました。</value>
   </data>
   <data name="UserUpdateFailed" xml:space="preserve">
-    <value>User update failed.</value>
+    <value>ユーザーの更新に失敗しました。</value>
   </data>
   <data name="EmailAlreadyRegistered" xml:space="preserve">
-    <value>A user has already been registered with that email</value>
+    <value>そのメールアドレスは既に登録されています</value>
+  </data>
+  <data name="InvalidAssignableRole" xml:space="preserve">
+    <value>'{0}'は有効な割り当て可能なロールではありません。許可されたロール：ADMIN</value>
   </data>
 </root>

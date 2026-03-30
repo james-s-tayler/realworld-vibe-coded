@@ -9,6 +9,7 @@ using Server.Core.TenantInfoAggregate;
 using Server.Infrastructure;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Email;
+using Server.SharedKernel;
 using Server.SharedKernel.Interfaces;
 using Server.UseCases.Interfaces;
 using Server.Web.I18n;

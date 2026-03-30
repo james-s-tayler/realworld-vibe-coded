@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
+using Server.SharedKernel;
 using Server.SharedKernel.MediatR;
 using Server.UseCases.Interfaces;
 using Server.UseCases.Users.Dtos;
@@ -53,7 +54,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
         return Result<UserWithRolesDto>.Invalid(new ErrorDetail
         {
           Identifier = "email",
-          ErrorMessage = _localizer["EmailAlreadyExists"],
+          ErrorMessage = _localizer[SharedResource.Keys.EmailAlreadyExists],
         });
       }
 
@@ -71,7 +72,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
         return Result<UserWithRolesDto>.Invalid(new ErrorDetail
         {
           Identifier = "username",
-          ErrorMessage = _localizer["UsernameAlreadyExists"],
+          ErrorMessage = _localizer[SharedResource.Keys.UsernameAlreadyExists],
         });
       }
 

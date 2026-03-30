@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Server.Core.IdentityAggregate;
+using Server.SharedKernel;
 using Server.Web.I18n;
 
 namespace Server.Web.Users.Update;
@@ -56,7 +57,7 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
     {
       RuleFor(x => x.User.Language)
         .Must(lang => supportedLanguages.Contains(lang!))
-        .WithMessage(x => localizer["UnsupportedLanguage"])
+        .WithMessage(x => localizer[SharedResource.Keys.UnsupportedLanguage])
         .OverridePropertyName("language");
     });
   }

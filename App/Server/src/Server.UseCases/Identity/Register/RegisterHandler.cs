@@ -8,6 +8,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
 using Server.Core.TenantInfoAggregate;
+using Server.SharedKernel;
 using Server.SharedKernel.Identity;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
@@ -50,7 +51,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     if (emailExists)
     {
       _logger.LogWarning("User registration failed for {Email}: Duplicate email", request.Email);
-      return Result<Unit>.Invalid(new ErrorDetail("email", _localizer["EmailAlreadyRegistered"]));
+      return Result<Unit>.Invalid(new ErrorDetail("email", _localizer[SharedResource.Keys.EmailAlreadyRegistered]));
     }
 
     var tenantId = Guid.NewGuid().ToString();
