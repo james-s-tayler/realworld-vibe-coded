@@ -19,7 +19,7 @@ A production-ready .NET + React starter template built for agent-first developme
 
 | Layer | Technologies |
 |:------|:-------------|
-| **Backend** | .NET 10, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQL Server, Finbuckle.MultiTenant, Audit.NET, Microsoft.FeatureManagement, Serilog |
+| **Backend** | .NET 10, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQL Server, Finbuckle.MultiTenant, OpenTelemetry, Audit.NET, Serilog |
 | **Frontend** | React 19, Vite, TypeScript, Carbon Design System |
 | **Testing** | xUnit, Vitest, Playwright, Postman/Newman |
 | **Build** | Nuke Build, GitHub Actions |
@@ -42,6 +42,7 @@ Server.Analyzers         — 32 custom Roslyn analyzers (SRV + PV series)
 Endpoints are thin: bind request → authorize → delegate to MediatR → map response. Business rules live in handlers. Persistence is abstracted behind repository interfaces.
 
 **Cross-cutting concerns:**
+- **OpenTelemetry** — distributed tracing and metrics (see [Observability](#-observability))
 - **Serilog** — structured logging with enrichers, file sinks, and Seq integration
 - **Audit.NET** — automatic audit trails for EF Core entity changes and Identity operations
 - **Microsoft.FeatureManagement** — feature flags for toggling functionality at runtime
@@ -181,14 +182,32 @@ The backend is built on a custom framework layered on top of FastEndpoints, `Res
 - **`Send.ResultMapperAsync`** — FastEndpoints extension that maps `Result<T>` status to HTTP responses automatically (Ok → 200, NotFound → 404, Invalid → 422, etc.)
 
 The result: endpoints are thin wrappers (`request → mediator → result → response`), business logic lives in handlers, and cross-cutting concerns (transactions, error handling, logging) are handled by the pipeline — all enforced at compile time by 32 custom Roslyn analyzers covering architecture boundaries, persistence patterns, endpoint conventions, and testing rules.
-### 📊 Observability — Logs & Reports on Disk
+### 📊 Observability — Traces, Metrics, Logs & Audit
 
-Application logs and test results are written to well-known directories on disk, giving agents concrete artifacts to inspect when something goes wrong:
+The app is instrumented with OpenTelemetry for distributed tracing and metrics, Serilog for structured logging, and Audit.NET for entity change tracking. In local dev, telemetry flows to a Grafana stack started automatically by `nuke RunLocalDependencies`.
+
+| Service | URL | Purpose |
+|:--------|:----|:--------|
+| **Grafana** | [http://localhost:3000](http://localhost:3000) | Dashboards, trace explorer, metrics explorer |
+| **Jaeger UI** | [http://localhost:16686](http://localhost:16686) | Distributed trace search and visualization |
+| **Seq** | [http://localhost:5341](http://localhost:5341) | Structured log search (Serilog) |
+| **Prometheus** | [http://localhost:9090](http://localhost:9090) | Metrics query UI |
+| **App Metrics** | [http://localhost:5000/metrics](http://localhost:5000/metrics) | Prometheus scrape endpoint |
+
+**What's instrumented:**
+- **Traces** (Jaeger + Grafana): ASP.NET Core requests, HttpClient calls, EF Core queries, MediatR commands/queries
+- **Metrics** (Grafana → Prometheus): HTTP request latency/counts, .NET runtime (GC, threadpool), SQL Server DMVs
+- **Logs** (Seq): Structured Serilog logs enriched with `TraceId` for cross-correlation with Grafana traces
+- **Audit** (disk): Audit.NET entity change logs with before/after values in `Logs/Server.Web/Audit.NET/`
+
+Application logs and test results are also written to well-known directories on disk:
 
 - **`Logs/`** — Serilog structured logs and Audit.NET audit logs, organized by run mode
 - **`Reports/`** — HTML test reports from xUnit, Vitest, and Playwright runs
 
 Nuke build targets emit explicit guidance on failure, pointing agents to the exact log files and reports to inspect. Claude Code hooks (`.claude/hooks/`) enforce that agents read these outputs rather than guessing at root causes — creating a closed feedback loop between running a command and diagnosing its result.
+
+For full details, see [`Docs/observability.md`](Docs/observability.md).
 
 ### 🔎 Playwright Trace Debugging
 

@@ -21,6 +21,7 @@ var appLogger = new SerilogLoggerFactory(logger)
 
 builder.Services.AddOptionConfigs(builder.Configuration, appLogger, builder);
 builder.Services.AddServiceConfigs(appLogger, builder);
+builder.Services.AddOpenTelemetryConfigs(builder.Configuration, builder.Environment);
 
 
 builder.Services.AddFastEndpoints(o =>
@@ -74,6 +75,7 @@ app.MapWhen(
   context =>
     !context.Request.Path.StartsWithSegments("/api") &&
     !context.Request.Path.StartsWithSegments("/health") &&
+    !context.Request.Path.StartsWithSegments("/metrics") &&
     !context.Request.Path.StartsWithSegments($"/{DevOnly.ROUTE}"),
   builder => builder.Run(async context =>
   {
