@@ -205,7 +205,7 @@ describe('UsersPage', () => {
     );
 
     await waitFor(() => {
-      expect(usersApi.listUsers).toHaveBeenCalledWith(20, 0);
+      expect(usersApi.listUsers).toHaveBeenCalledWith(50, 0);
     });
   });
 

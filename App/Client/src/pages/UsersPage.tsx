@@ -27,7 +27,7 @@ import { useAuth } from '../hooks/useAuth';
 import { ApiError } from '../api/client';
 import './UsersPage.css';
 
-const DEFAULT_PAGE_SIZE = 20;
+const DEFAULT_PAGE_SIZE = 50;
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 const ASSIGNABLE_ROLES = ['ADMIN'];
 
