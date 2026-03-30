@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main, single-tenant-starter-template, multi-tenant-starter-template, realworld-starter, harness-autoresearch ]
+    branches: [ main, single-tenant-starter-template, multi-tenant-starter-template ]
 
 # Cancel in-progress runs for the same ref/PR to save minutes
 concurrency:
