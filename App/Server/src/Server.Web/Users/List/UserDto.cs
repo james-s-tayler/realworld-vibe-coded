@@ -2,6 +2,8 @@
 
 public class UserDto
 {
+  public required Guid Id { get; set; }
+
   public required string Email { get; set; }
 
   public required string Username { get; set; }
@@ -11,4 +13,6 @@ public class UserDto
   public string? Image { get; set; }
 
   public List<string> Roles { get; set; } = [];
+
+  public bool IsActive { get; set; }
 }

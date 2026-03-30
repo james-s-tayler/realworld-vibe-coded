@@ -86,4 +86,40 @@ public class Permissions : AppPageTest
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/");
     await Expect(Pages.HomePage.GlobalFeedTab).ToBeVisibleAsync();
   }
+
+  [Fact]
+  public async Task AdminCannotDeactivateSelf()
+  {
+    // Arrange - log in as admin
+    var admin = await Api.CreateUserAsync();
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(admin.Email, admin.Password);
+    await Pages.UsersPage.GoToAsync();
+    await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
+
+    // Act - Open the overflow menu for self
+    await Pages.UsersPage.GetUserActionsMenu(admin.Email).ClickAsync();
+
+    // Assert - Deactivate option should not be present for self
+    await Expect(Page.GetByRole(AriaRole.Menuitem, new() { Name = "Deactivate" })).Not.ToBeVisibleAsync();
+  }
+
+  [Fact]
+  public async Task AdminCannotRemoveOwnAdminRole()
+  {
+    // Arrange - log in as admin
+    var admin = await Api.CreateUserAsync();
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(admin.Email, admin.Password);
+    await Pages.UsersPage.GoToAsync();
+    await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
+
+    // Act - Open edit roles modal for self and uncheck ADMIN, then try to save
+    await Pages.UsersPage.OpenEditRolesModalAsync(admin.Email);
+    await Pages.UsersPage.GetRoleCheckbox("ADMIN").UncheckAsync(new() { Force = true });
+    await Pages.UsersPage.EditRolesSaveButton.ClickAsync();
+
+    // Assert - Should show an error (Forbidden)
+    await Expect(Page.GetByText("Cannot remove your own ADMIN role")).ToBeVisibleAsync();
+  }
 }

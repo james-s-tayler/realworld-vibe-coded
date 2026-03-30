@@ -1,10 +1,9 @@
 ﻿using Server.SharedKernel.MediatR;
 using Server.UseCases.Interfaces;
-using Server.UseCases.Users.Dtos;
 
 namespace Server.UseCases.Users.List;
 
-public class ListUsersHandler : IQueryHandler<ListUsersQuery, List<UserWithRolesDto>>
+public class ListUsersHandler : IQueryHandler<ListUsersQuery, ListUsersResult>
 {
   private readonly IQueryApplicationUsers _queryApplicationUsers;
 
@@ -13,9 +12,10 @@ public class ListUsersHandler : IQueryHandler<ListUsersQuery, List<UserWithRoles
     _queryApplicationUsers = queryApplicationUsers;
   }
 
-  public async Task<Result<List<UserWithRolesDto>>> Handle(ListUsersQuery request, CancellationToken cancellationToken)
+  public async Task<Result<ListUsersResult>> Handle(ListUsersQuery request, CancellationToken cancellationToken)
   {
-    var users = await _queryApplicationUsers.ListUsersWithRoles(cancellationToken);
-    return Result<List<UserWithRolesDto>>.Success(users);
+    var users = await _queryApplicationUsers.ListUsersWithRoles(request.Limit, request.Offset, cancellationToken);
+    var totalCount = await _queryApplicationUsers.CountUsers(cancellationToken);
+    return Result<ListUsersResult>.Success(new ListUsersResult(users, totalCount));
   }
 }
