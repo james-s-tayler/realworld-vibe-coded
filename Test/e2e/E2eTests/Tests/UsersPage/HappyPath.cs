@@ -198,6 +198,24 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  public async Task OwnerRoleIsReadOnlyInEditModal()
+  {
+    // Arrange - log in as the owner/admin
+    var admin = await Api.CreateUserAsync();
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(admin.Email, admin.Password);
+    await Pages.UsersPage.GoToAsync();
+    await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
+
+    // Act - Open edit roles modal for the owner user
+    await Pages.UsersPage.OpenEditRolesModalAsync(admin.Email);
+
+    // Assert - OWNER checkbox should be disabled
+    await Expect(Pages.UsersPage.GetRoleCheckbox("OWNER")).ToBeDisabledAsync();
+  }
+
+  [Fact]
   public async Task PaginationShowsCorrectCount()
   {
     // Arrange - create admin and invite a user

@@ -27,7 +27,8 @@ public class UpdateRolesTests : AppTestBase
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
     // Verify roles were updated
-    var (_, listResult) = await owner.Client.GETAsync<ListUsers, UsersResponse>();
+    var listReq = new ListUsersRequest();
+    var (_, listResult) = await owner.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=1000&offset=0", listReq);
     var updatedUser = listResult.Users.First(u => u.Email == tenant.Users[1].Email);
     updatedUser.Roles.ShouldContain(DefaultRoles.Admin);
     updatedUser.Roles.ShouldContain(DefaultRoles.User);
@@ -48,7 +49,7 @@ public class UpdateRolesTests : AppTestBase
     };
     await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, object>(addRequest);
 
-    // Now remove ADMIN by sending empty roles
+    // Now send empty roles to remove ADMIN (USER is preserved)
     var request = new UpdateRolesRequest
     {
       UserId = invitedUserId,
@@ -58,11 +59,29 @@ public class UpdateRolesTests : AppTestBase
 
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-    // Verify ADMIN was removed, USER preserved
-    var (_, listResult) = await owner.Client.GETAsync<ListUsers, UsersResponse>();
+    // Verify ADMIN was removed but USER is preserved
+    var listReq = new ListUsersRequest();
+    var (_, listResult) = await owner.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=1000&offset=0", listReq);
     var updatedUser = listResult.Users.First(u => u.Email == tenant.Users[1].Email);
     updatedUser.Roles.ShouldNotContain(DefaultRoles.Admin);
     updatedUser.Roles.ShouldContain(DefaultRoles.User);
+  }
+
+  [Fact]
+  public async Task UpdateRoles_CannotAssignOwnerRole_ReturnsError()
+  {
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+    var owner = tenant.Users[0];
+    var invitedUserId = await GetUserIdByEmail(owner.Client, tenant.Users[1].Email);
+
+    var request = new UpdateRolesRequest
+    {
+      UserId = invitedUserId,
+      Roles = [DefaultRoles.Owner, DefaultRoles.Admin],
+    };
+    var (response, _) = await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, object>(request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -83,13 +102,39 @@ public class UpdateRolesTests : AppTestBase
   }
 
   [Fact]
+  public async Task UpdateRoles_OwnerRolePreserved_WhenNotInRequest()
+  {
+    var tenant = await Fixture.RegisterTenantAsync();
+    var owner = tenant.Users[0];
+    var ownerId = await GetUserIdByEmail(owner.Client, owner.Email);
+
+    // Update roles to just ADMIN (OWNER and USER should be preserved automatically)
+    var request = new UpdateRolesRequest
+    {
+      UserId = ownerId,
+      Roles = [DefaultRoles.Admin],
+    };
+    var (response, _) = await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, object>(request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+    // Verify OWNER and USER are still there
+    var listReq = new ListUsersRequest();
+    var (_, listResult) = await owner.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=1000&offset=0", listReq);
+    var ownerUser = listResult.Users.First(u => u.Email == owner.Email);
+    ownerUser.Roles.ShouldContain(DefaultRoles.Owner);
+    ownerUser.Roles.ShouldContain(DefaultRoles.Admin);
+    ownerUser.Roles.ShouldContain(DefaultRoles.User);
+  }
+
+  [Fact]
   public async Task UpdateRoles_UserRolePreserved_WhenNotInRequest()
   {
     var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
     var owner = tenant.Users[0];
     var invitedUserId = await GetUserIdByEmail(owner.Client, tenant.Users[1].Email);
 
-    // Update roles to just ADMIN (USER should be preserved automatically)
+    // Send ADMIN — USER should be preserved automatically
     var request = new UpdateRolesRequest
     {
       UserId = invitedUserId,
@@ -100,27 +145,11 @@ public class UpdateRolesTests : AppTestBase
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
     // Verify USER is still there
-    var (_, listResult) = await owner.Client.GETAsync<ListUsers, UsersResponse>();
+    var listReq = new ListUsersRequest();
+    var (_, listResult) = await owner.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=1000&offset=0", listReq);
     var updatedUser = listResult.Users.First(u => u.Email == tenant.Users[1].Email);
     updatedUser.Roles.ShouldContain(DefaultRoles.User);
     updatedUser.Roles.ShouldContain(DefaultRoles.Admin);
-  }
-
-  [Fact]
-  public async Task UpdateRoles_WithInvalidRole_ReturnsValidationError()
-  {
-    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
-    var owner = tenant.Users[0];
-    var invitedUserId = await GetUserIdByEmail(owner.Client, tenant.Users[1].Email);
-
-    var request = new UpdateRolesRequest
-    {
-      UserId = invitedUserId,
-      Roles = ["INVALID_ROLE"],
-    };
-    var (response, _) = await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, object>(request);
-
-    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -138,6 +167,23 @@ public class UpdateRolesTests : AppTestBase
     var (response, _) = await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+  }
+
+  [Fact]
+  public async Task UpdateRoles_WithInvalidRole_ReturnsValidationError()
+  {
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+    var owner = tenant.Users[0];
+    var invitedUserId = await GetUserIdByEmail(owner.Client, tenant.Users[1].Email);
+
+    var request = new UpdateRolesRequest
+    {
+      UserId = invitedUserId,
+      Roles = ["INVALID_ROLE"],
+    };
+    var (response, _) = await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, object>(request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
   }
 
   [Fact]
@@ -172,7 +218,8 @@ public class UpdateRolesTests : AppTestBase
 
   private async Task<Guid> GetUserIdByEmail(HttpClient client, string email)
   {
-    var (_, result) = await client.GETAsync<ListUsers, UsersResponse>();
+    var request = new ListUsersRequest();
+    var (_, result) = await client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=1000&offset=0", request);
     var user = result.Users.First(u => u.Email == email);
     return user.Id;
   }

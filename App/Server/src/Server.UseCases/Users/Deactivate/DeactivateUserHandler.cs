@@ -41,6 +41,13 @@ public class DeactivateUserHandler : ICommandHandler<DeactivateUserCommand, Appl
       return Result<ApplicationUser>.NotFound();
     }
 
+    var roles = await userManager.GetRolesAsync(user);
+    if (roles.Contains(DefaultRoles.Owner))
+    {
+      _logger.LogWarning("User {CurrentUserId} attempted to deactivate tenant owner {UserId}", request.CurrentUserId, request.UserId);
+      return Result<ApplicationUser>.Forbidden(new ErrorDetail("userId", "Cannot deactivate the tenant owner."));
+    }
+
     await userManager.SetLockoutEnabledAsync(user, true);
     await userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
 

@@ -44,9 +44,9 @@ public class UpdateRolesHandler : ICommandHandler<UpdateRolesCommand, Applicatio
       return Result<ApplicationUser>.Forbidden(new ErrorDetail("roles", "Cannot remove your own ADMIN role."));
     }
 
-    // Compute roles to remove (exclude USER from removal — it's always preserved)
+    // Compute roles to remove (exclude OWNER and USER from removal — they're immutable)
     var rolesToRemove = currentRoles
-      .Where(r => r != DefaultRoles.User && !request.Roles.Contains(r))
+      .Where(r => r != DefaultRoles.Owner && r != DefaultRoles.User && !request.Roles.Contains(r))
       .ToList();
 
     // Compute roles to add

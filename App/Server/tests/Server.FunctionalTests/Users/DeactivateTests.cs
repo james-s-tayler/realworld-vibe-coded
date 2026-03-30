@@ -1,4 +1,5 @@
-﻿using Server.Web.Identity.Login;
+﻿using Server.Core.IdentityAggregate;
+using Server.Web.Identity.Login;
 using Server.Web.Users.Deactivate;
 using Server.Web.Users.List;
 using Server.Web.Users.Reactivate;
@@ -54,6 +55,31 @@ public class DeactivateTests : AppTestBase
 
     var request = new DeactivateUserRequest { UserId = ownerId };
     var (response, _) = await owner.Client.PUTAsync<DeactivateUser, DeactivateUserRequest, object>(request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+  }
+
+  [Fact]
+  public async Task DeactivateUser_CannotDeactivateOwner_ReturnsForbidden()
+  {
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+    var owner = tenant.Users[0];
+
+    // Give the invited user ADMIN role first so they can call deactivate
+    var invitedUserId = await GetUserIdByEmail(owner.Client, tenant.Users[1].Email);
+    var ownerId = await GetUserIdByEmail(owner.Client, owner.Email);
+
+    // Make invited user an admin
+    var updateRolesRequest = new Server.Web.Users.UpdateRoles.UpdateRolesRequest
+    {
+      UserId = invitedUserId,
+      Roles = [DefaultRoles.Admin],
+    };
+    await owner.Client.PUTAsync<Server.Web.Users.UpdateRoles.UpdateRoles, Server.Web.Users.UpdateRoles.UpdateRolesRequest, object>(updateRolesRequest);
+
+    // Now try to deactivate the owner from the admin user
+    var request = new DeactivateUserRequest { UserId = ownerId };
+    var (response, _) = await tenant.Users[1].Client.PUTAsync<DeactivateUser, DeactivateUserRequest, object>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
   }
@@ -148,7 +174,8 @@ public class DeactivateTests : AppTestBase
     await owner.Client.PUTAsync<DeactivateUser, DeactivateUserRequest, object>(deactivateRequest);
 
     // List users
-    var (_, result) = await owner.Client.GETAsync<ListUsers, UsersResponse>();
+    var listRequest = new ListUsersRequest();
+    var (_, result) = await owner.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=1000&offset=0", listRequest);
     var deactivatedUser = result.Users.First(u => u.Email == tenant.Users[1].Email);
 
     deactivatedUser.IsActive.ShouldBeFalse();
@@ -156,7 +183,8 @@ public class DeactivateTests : AppTestBase
 
   private async Task<Guid> GetUserIdByEmail(HttpClient client, string email)
   {
-    var (_, result) = await client.GETAsync<ListUsers, UsersResponse>();
+    var request = new ListUsersRequest();
+    var (_, result) = await client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=1000&offset=0", request);
     var user = result.Users.First(u => u.Email == email);
     return user.Id;
   }

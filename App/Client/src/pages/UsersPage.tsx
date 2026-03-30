@@ -364,6 +364,14 @@ export const UsersPage: React.FC = () => {
           />
         )}
         <div className="edit-roles-checkboxes">
+          {editRolesUser?.roles.includes('OWNER') && (
+            <Checkbox
+              id="role-owner"
+              labelText="OWNER"
+              checked
+              disabled
+            />
+          )}
           {ASSIGNABLE_ROLES.map((role) => (
             <Checkbox
               key={role}

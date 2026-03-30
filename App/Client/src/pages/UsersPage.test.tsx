@@ -17,7 +17,7 @@ vi.mock('../api/users', () => ({
 
 vi.mock('../hooks/useAuth', () => ({
   useAuth: () => ({
-    user: { email: 'admin@test.com', username: 'admin', bio: '', image: null, roles: ['ADMIN', 'USER'] },
+    user: { email: 'admin@test.com', username: 'admin', bio: '', image: null, roles: ['OWNER', 'ADMIN', 'USER'] },
     loading: false,
   }),
 }));
