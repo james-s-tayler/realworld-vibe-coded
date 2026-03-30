@@ -21,6 +21,7 @@ var appLogger = new SerilogLoggerFactory(logger)
 
 builder.Services.AddOptionConfigs(builder.Configuration, appLogger, builder);
 builder.Services.AddServiceConfigs(appLogger, builder);
+builder.Services.AddOpenTelemetryConfigs(builder.Configuration, builder.Environment);
 
 
 builder.Services.AddFastEndpoints(o =>

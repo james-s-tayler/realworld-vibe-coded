@@ -1,6 +1,7 @@
 ﻿using Ardalis.ListStartupServices;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Metrics;
 using Server.Infrastructure.Data;
 using Server.Web.Infrastructure;
 
@@ -87,6 +88,8 @@ public static class MiddlewareConfig
     {
       Predicate = check => check.Tags.Contains("ready"), // Only run readiness checks (database)
     });
+
+    app.MapPrometheusScrapingEndpoint();
 
     await RunMigrationsAsync(app);
 

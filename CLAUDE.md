@@ -14,6 +14,7 @@ These are the primary rules.
 Reference as needed:
 - `SPEC-REFERENCE.md` — complete API spec (the source of truth for what to build)
 - `Docs/architecture.md` — tech stack, folder structure, build commands
+- `Docs/observability.md` — OpenTelemetry tracing/metrics, Grafana/Tempo/Prometheus stack, Audit.NET
 
 ## Rules Index
 

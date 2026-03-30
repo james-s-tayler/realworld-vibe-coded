@@ -13,6 +13,7 @@ services:
       Audit__LogsPath: /app/Logs/RunLocalPublish/Server.Web/Audit.NET
       Serilog__WriteTo__1__Args__Path: /app/Logs/RunLocalPublish/Server.Web/Serilog/logs.json
       Serilog__WriteTo__2__Args__ServerUrl: http://seq:80
+      OpenTelemetry__OtlpEndpoint: "http://tempo:4317"
     ports:
       - "5000:5000"
       - "5001:5001"
