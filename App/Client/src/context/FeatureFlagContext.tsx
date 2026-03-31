@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, type ReactNode } from 'react';
 import { FeatureManager, ConfigurationObjectFeatureFlagProvider } from '@microsoft/feature-management';
 import { featureFlagsApi } from '../api/featureFlagsApi';
+import { useAuth } from '../hooks/useAuth';
 import { FeatureFlagContext } from './FeatureFlagContextType';
 
 export { FeatureFlagContext };
@@ -12,8 +13,20 @@ interface FeatureFlagProviderProps {
 export const FeatureFlagProvider: React.FC<FeatureFlagProviderProps> = ({ children }) => {
   const [flags, setFlags] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!user) {
+      setFlags({});
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     featureFlagsApi
       .getConfig()
       .then(async (config) => {
@@ -27,12 +40,12 @@ export const FeatureFlagProvider: React.FC<FeatureFlagProviderProps> = ({ childr
         setFlags(evaluated);
       })
       .catch(() => {
-        // Silently degrade to all-flags-off
+        setFlags({});
       })
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [user, authLoading]);
 
   const isEnabled = useCallback(
     (flagName: string): boolean => flags[flagName] ?? false,

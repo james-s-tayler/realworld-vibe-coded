@@ -1057,7 +1057,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Identity.Bearer": []
+          }
+        ]
       }
     },
     "/dev-only/test-error/throw-concurrency": {
