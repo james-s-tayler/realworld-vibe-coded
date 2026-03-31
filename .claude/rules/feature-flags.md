@@ -50,7 +50,7 @@ Flags exposed to the frontend must be listed in `FeatureFlags.ClientVisible` arr
 
 ### Public Endpoint
 
-`GET /api/feature-flags` — returns client-visible flags in v2 format (AllowAnonymous). Only flags in `FeatureFlags.ClientVisible` are exposed.
+`GET /api/feature-flags` — returns client-visible flags in v2 format (requires authentication). Only flags in `FeatureFlags.ClientVisible` are exposed. Feature flags are only available on authenticated pages.
 
 ### Checking Flags in Backend Code
 

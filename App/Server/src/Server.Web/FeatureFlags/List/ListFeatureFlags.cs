@@ -8,7 +8,7 @@ public class ListFeatureFlags(IMediator mediator) : Endpoint<EmptyRequest, Featu
   public override void Configure()
   {
     Get("/api/feature-flags");
-    AllowAnonymous();
+    AuthSchemes(Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme, Microsoft.AspNetCore.Identity.IdentityConstants.BearerScheme);
     Summary(s =>
     {
       s.Summary = "List client-visible feature flags";

@@ -11,7 +11,10 @@ public class ListFeatureFlagsTests : AppTestBase
   [Fact]
   public async Task ListFeatureFlags_ReturnsV2FormatWithClientVisibleFlags()
   {
-    var (response, result) = await Fixture.Client.GETAsync<ListFeatureFlags, FeatureFlagsResponse>();
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
+    var (response, result) = await user.Client.GETAsync<ListFeatureFlags, FeatureFlagsResponse>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.FeatureManagement.ShouldNotBeNull();
@@ -26,7 +29,10 @@ public class ListFeatureFlagsTests : AppTestBase
   [Fact]
   public async Task ListFeatureFlags_DoesNotExposeNonClientVisibleFlags()
   {
-    var (_, result) = await Fixture.Client.GETAsync<ListFeatureFlags, FeatureFlagsResponse>();
+    var tenant = await Fixture.RegisterTenantAsync();
+    var user = tenant.Users[0];
+
+    var (_, result) = await user.Client.GETAsync<ListFeatureFlags, FeatureFlagsResponse>();
 
     var flagIds = result.FeatureManagement.FeatureFlags.Select(f => f.Id).ToList();
     flagIds.ShouldNotContain("SampleFeature");
@@ -34,10 +40,10 @@ public class ListFeatureFlagsTests : AppTestBase
   }
 
   [Fact]
-  public async Task ListFeatureFlags_IsAccessibleWithoutAuthentication()
+  public async Task ListFeatureFlags_WithoutAuthentication_ReturnsUnauthorized()
   {
-    var (response, _) = await Fixture.Client.GETAsync<ListFeatureFlags, FeatureFlagsResponse>();
+    var (response, _) = await Fixture.Client.GETAsync<ListFeatureFlags, object>();
 
-    response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
   }
 }
