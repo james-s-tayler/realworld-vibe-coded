@@ -47,11 +47,23 @@ builder.Services.AddFastEndpoints(o =>
 var azureAppConfigConnectionString = builder.Configuration["AzureAppConfiguration:ConnectionString"];
 var useAzureAppConfig = !string.IsNullOrEmpty(azureAppConfigConnectionString);
 
+var featureFlagSettings = builder.Configuration
+  .GetSection(Server.SharedKernel.FeatureFlags.FeatureFlagSettings.SectionName)
+  .Get<Server.SharedKernel.FeatureFlags.FeatureFlagSettings>() ?? new();
+
 if (useAzureAppConfig)
 {
   builder.Configuration.AddAzureAppConfiguration(options =>
-    options.Connect(azureAppConfigConnectionString).UseFeatureFlags());
+    options.Connect(azureAppConfigConnectionString)
+      .UseFeatureFlags(o => o.SetRefreshInterval(TimeSpan.FromSeconds(featureFlagSettings.RefreshIntervalSeconds))));
   builder.Services.AddAzureAppConfiguration();
+}
+
+if (builder.Environment.IsDevelopment())
+{
+  var overrideSource = new FeatureFlagOverrideSource();
+  ((IConfigurationBuilder)builder.Configuration).Add(overrideSource);
+  builder.Services.AddSingleton(overrideSource.Provider);
 }
 
 // Configure JSON serialization options

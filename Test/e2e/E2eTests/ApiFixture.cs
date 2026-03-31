@@ -284,6 +284,22 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
+  /// Sets a feature flag override via the DevOnly endpoint.
+  /// Only works when the server is running in Development environment.
+  /// </summary>
+  public async Task SetFeatureFlagOverrideAsync(string featureName, bool enabled)
+  {
+    var request = new { enabled };
+    using var httpRequest = new HttpRequestMessage(HttpMethod.Put, $"/dev-only/feature-flags/{featureName}")
+    {
+      Content = JsonContent.Create(request, options: _jsonOptions),
+    };
+
+    var response = await _httpClient.SendAsync(httpRequest);
+    response.EnsureSuccessStatusCode();
+  }
+
+  /// <summary>
   /// Updates a user's profile (bio and image).
   /// </summary>
   private async Task UpdateUserProfileAsync(string token, string bio, string image)

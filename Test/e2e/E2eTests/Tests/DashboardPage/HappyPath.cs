@@ -35,4 +35,35 @@ public class HappyPath : AppPageTest
     // Assert — banner should be visible because DashboardBanner flag is enabled
     await Expect(Pages.DashboardPage.FeatureBanner).ToBeVisibleAsync();
   }
+
+  [Fact]
+  public async Task Dashboard_BannerDisappears_WhenFeatureFlagToggledOff()
+  {
+    // Arrange — login and verify banner is visible
+    var user = await Api.CreateUserAsync();
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+    await Expect(Pages.DashboardPage.FeatureBanner).ToBeVisibleAsync();
+
+    try
+    {
+      // Act — disable the feature flag via DevOnly endpoint
+      await Api.SetFeatureFlagOverrideAsync("DashboardBanner", false);
+
+      // Assert — banner should disappear after frontend refreshes (Development = 3s interval)
+      await Expect(Pages.DashboardPage.FeatureBanner).Not.ToBeVisibleAsync(new() { Timeout = 10_000 });
+
+      // Act — re-enable the feature flag
+      await Api.SetFeatureFlagOverrideAsync("DashboardBanner", true);
+
+      // Assert — banner should reappear after frontend refreshes
+      await Expect(Pages.DashboardPage.FeatureBanner).ToBeVisibleAsync(new() { Timeout = 10_000 });
+    }
+    finally
+    {
+      // Always re-enable the flag to prevent state leakage to other tests
+      await Api.SetFeatureFlagOverrideAsync("DashboardBanner", true);
+    }
+  }
 }

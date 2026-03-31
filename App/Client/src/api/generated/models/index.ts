@@ -14,6 +14,12 @@ export interface CheckFeatureFlagResponse extends Parsable {
      */
     isEnabled?: boolean | null;
 }
+export interface ConfigResponse extends Parsable {
+    /**
+     * The feature_flag_refresh_interval_seconds property
+     */
+    featureFlagRefreshIntervalSeconds?: number | null;
+}
 /**
  * Creates a new instance of the appropriate class based on discriminator value
  * @param parseNode The parse node to use to read the discriminator value and create the object
@@ -22,6 +28,15 @@ export interface CheckFeatureFlagResponse extends Parsable {
 // @ts-ignore
 export function createCheckFeatureFlagResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
     return deserializeIntoCheckFeatureFlagResponse;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {ConfigResponse}
+ */
+// @ts-ignore
+export function createConfigResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoConfigResponse;
 }
 /**
  * Creates a new instance of the appropriate class based on discriminator value
@@ -116,6 +131,15 @@ export function createRegisterRequestFromDiscriminatorValue(parseNode: ParseNode
 /**
  * Creates a new instance of the appropriate class based on discriminator value
  * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {SetFeatureFlagOverrideRequest}
+ */
+// @ts-ignore
+export function createSetFeatureFlagOverrideRequestFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoSetFeatureFlagOverrideRequest;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
  * @returns {TestValidationRequest}
  */
 // @ts-ignore
@@ -204,6 +228,17 @@ export function deserializeIntoCheckFeatureFlagResponse(checkFeatureFlagResponse
     return {
         "featureName": n => { checkFeatureFlagResponse.featureName = n.getStringValue(); },
         "isEnabled": n => { checkFeatureFlagResponse.isEnabled = n.getBooleanValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param ConfigResponse The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoConfigResponse(configResponse: Partial<ConfigResponse> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "feature_flag_refresh_interval_seconds": n => { configResponse.featureFlagRefreshIntervalSeconds = n.getNumberValue(); },
     }
 }
 /**
@@ -329,6 +364,17 @@ export function deserializeIntoRegisterRequest(registerRequest: Partial<Register
     return {
         "email": n => { registerRequest.email = n.getStringValue(); },
         "password": n => { registerRequest.password = n.getStringValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param SetFeatureFlagOverrideRequest The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoSetFeatureFlagOverrideRequest(setFeatureFlagOverrideRequest: Partial<SetFeatureFlagOverrideRequest> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "enabled": n => { setFeatureFlagOverrideRequest.enabled = n.getBooleanValue(); },
     }
 }
 /**
@@ -587,6 +633,17 @@ export function serializeCheckFeatureFlagResponse(writer: SerializationWriter, c
 }
 /**
  * Serializes information the current object
+ * @param ConfigResponse The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeConfigResponse(writer: SerializationWriter, configResponse: Partial<ConfigResponse> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!configResponse || isSerializingDerivedType) { return; }
+    writer.writeNumberValue("feature_flag_refresh_interval_seconds", configResponse.featureFlagRefreshIntervalSeconds);
+}
+/**
+ * Serializes information the current object
  * @param FeatureFlagEntry The instance to serialize from.
  * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
  * @param writer Serialization writer to use to serialize this model
@@ -713,6 +770,17 @@ export function serializeRegisterRequest(writer: SerializationWriter, registerRe
 /**
  * Serializes information the current object
  * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param SetFeatureFlagOverrideRequest The instance to serialize from.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeSetFeatureFlagOverrideRequest(writer: SerializationWriter, setFeatureFlagOverrideRequest: Partial<SetFeatureFlagOverrideRequest> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!setFeatureFlagOverrideRequest || isSerializingDerivedType) { return; }
+    writer.writeBooleanValue("enabled", setFeatureFlagOverrideRequest.enabled);
+}
+/**
+ * Serializes information the current object
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
  * @param TestValidationRequest The instance to serialize from.
  * @param writer Serialization writer to use to serialize this model
  */
@@ -825,6 +893,12 @@ export function serializeUsersResponse(writer: SerializationWriter, usersRespons
     if (!usersResponse || isSerializingDerivedType) { return; }
     writer.writeCollectionOfObjectValues<UserDto>("users", usersResponse.users, serializeUserDto);
     writer.writeNumberValue("usersCount", usersResponse.usersCount);
+}
+export interface SetFeatureFlagOverrideRequest extends Parsable {
+    /**
+     * The enabled property
+     */
+    enabled?: boolean | null;
 }
 export interface TestValidationRequest extends Parsable {
 }
