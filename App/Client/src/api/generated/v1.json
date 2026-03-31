@@ -988,6 +988,78 @@
         ]
       }
     },
+    "/api/feature-flags": {
+      "get": {
+        "tags": [
+          "Api"
+        ],
+        "summary": "List client-visible feature flags",
+        "description": "Returns feature flags visible to the client in v2 format.",
+        "operationId": "ServerWebFeatureFlagsListListFeatureFlags",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureFlagsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dev-only/test-error/throw-concurrency": {
       "get": {
         "tags": [
@@ -2118,6 +2190,39 @@
             "type": "string",
             "minLength": 6,
             "nullable": false
+          }
+        }
+      },
+      "FeatureFlagsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "feature_management": {
+            "$ref": "#/components/schemas/FeatureManagementSection"
+          }
+        }
+      },
+      "FeatureManagementSection": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "feature_flags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureFlagEntry"
+            }
+          }
+        }
+      },
+      "FeatureFlagEntry": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
           }
         }
       },

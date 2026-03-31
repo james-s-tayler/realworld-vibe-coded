@@ -26,6 +26,33 @@ export function createCheckFeatureFlagResponseFromDiscriminatorValue(parseNode: 
 /**
  * Creates a new instance of the appropriate class based on discriminator value
  * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {FeatureFlagEntry}
+ */
+// @ts-ignore
+export function createFeatureFlagEntryFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoFeatureFlagEntry;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {FeatureFlagsResponse}
+ */
+// @ts-ignore
+export function createFeatureFlagsResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoFeatureFlagsResponse;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {FeatureManagementSection}
+ */
+// @ts-ignore
+export function createFeatureManagementSectionFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoFeatureManagementSection;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
  * @returns {InviteRequest}
  */
 // @ts-ignore
@@ -177,6 +204,40 @@ export function deserializeIntoCheckFeatureFlagResponse(checkFeatureFlagResponse
     return {
         "featureName": n => { checkFeatureFlagResponse.featureName = n.getStringValue(); },
         "isEnabled": n => { checkFeatureFlagResponse.isEnabled = n.getBooleanValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param FeatureFlagEntry The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoFeatureFlagEntry(featureFlagEntry: Partial<FeatureFlagEntry> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "enabled": n => { featureFlagEntry.enabled = n.getBooleanValue(); },
+        "id": n => { featureFlagEntry.id = n.getStringValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param FeatureFlagsResponse The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoFeatureFlagsResponse(featureFlagsResponse: Partial<FeatureFlagsResponse> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "feature_management": n => { featureFlagsResponse.featureManagement = n.getObjectValue<FeatureManagementSection>(createFeatureManagementSectionFromDiscriminatorValue); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param FeatureManagementSection The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoFeatureManagementSection(featureManagementSection: Partial<FeatureManagementSection> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "feature_flags": n => { featureManagementSection.featureFlags = n.getCollectionOfObjectValues<FeatureFlagEntry>(createFeatureFlagEntryFromDiscriminatorValue); },
     }
 }
 /**
@@ -386,6 +447,28 @@ export function deserializeIntoUsersResponse(usersResponse: Partial<UsersRespons
         "usersCount": n => { usersResponse.usersCount = n.getNumberValue(); },
     }
 }
+export interface FeatureFlagEntry extends Parsable {
+    /**
+     * The enabled property
+     */
+    enabled?: boolean | null;
+    /**
+     * The id property
+     */
+    id?: string | null;
+}
+export interface FeatureFlagsResponse extends Parsable {
+    /**
+     * The feature_management property
+     */
+    featureManagement?: FeatureManagementSection | null;
+}
+export interface FeatureManagementSection extends Parsable {
+    /**
+     * The feature_flags property
+     */
+    featureFlags?: FeatureFlagEntry[] | null;
+}
 export interface InviteRequest extends Parsable {
     /**
      * The email property
@@ -501,6 +584,40 @@ export function serializeCheckFeatureFlagResponse(writer: SerializationWriter, c
     if (!checkFeatureFlagResponse || isSerializingDerivedType) { return; }
     writer.writeStringValue("featureName", checkFeatureFlagResponse.featureName);
     writer.writeBooleanValue("isEnabled", checkFeatureFlagResponse.isEnabled);
+}
+/**
+ * Serializes information the current object
+ * @param FeatureFlagEntry The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeFeatureFlagEntry(writer: SerializationWriter, featureFlagEntry: Partial<FeatureFlagEntry> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!featureFlagEntry || isSerializingDerivedType) { return; }
+    writer.writeBooleanValue("enabled", featureFlagEntry.enabled);
+    writer.writeStringValue("id", featureFlagEntry.id);
+}
+/**
+ * Serializes information the current object
+ * @param FeatureFlagsResponse The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeFeatureFlagsResponse(writer: SerializationWriter, featureFlagsResponse: Partial<FeatureFlagsResponse> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!featureFlagsResponse || isSerializingDerivedType) { return; }
+    writer.writeObjectValue<FeatureManagementSection>("feature_management", featureFlagsResponse.featureManagement, serializeFeatureManagementSection);
+}
+/**
+ * Serializes information the current object
+ * @param FeatureManagementSection The instance to serialize from.
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeFeatureManagementSection(writer: SerializationWriter, featureManagementSection: Partial<FeatureManagementSection> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!featureManagementSection || isSerializingDerivedType) { return; }
+    writer.writeCollectionOfObjectValues<FeatureFlagEntry>("feature_flags", featureManagementSection.featureFlags, serializeFeatureFlagEntry);
 }
 /**
  * Serializes information the current object

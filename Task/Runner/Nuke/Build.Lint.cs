@@ -85,10 +85,10 @@ public partial class Build
       });
 
   internal Target LintAppSettingsVerify => _ => _
-      .Description("Validate FeatureManagement sections in appsettings*.json against the vendored JSON schema")
+      .Description("Validate feature_management sections in appsettings*.json against the vendored v2 JSON schema")
       .Executes(() =>
       {
-        var schemaPath = SchemaDirectory / "FeatureManagement.Dotnet.v1.0.0.schema.json";
+        var schemaPath = SchemaDirectory / "FeatureManagement.v2.0.0.schema.json";
         var schemaText = schemaPath.ReadAllText();
         var buildOptions = new BuildOptions { Dialect = Dialect.Draft07 };
         var schema = JsonSchema.FromText(schemaText, buildOptions);
@@ -106,14 +106,14 @@ public partial class Build
           };
           var doc = JsonDocument.Parse(content, jsonOptions);
 
-          if (!doc.RootElement.TryGetProperty("FeatureManagement", out var featureSection))
+          if (!doc.RootElement.TryGetProperty("feature_management", out var featureSection))
           {
-            Log.Warning("{File} has no FeatureManagement section — skipping", file.Name);
+            Log.Warning("{File} has no feature_management section — skipping", file.Name);
             continue;
           }
 
           // Wrap the section to match the schema's root structure
-          var wrapped = JsonDocument.Parse(JsonSerializer.Serialize(new { FeatureManagement = featureSection }));
+          var wrapped = JsonDocument.Parse(JsonSerializer.Serialize(new { feature_management = featureSection }));
 
           var options = new EvaluationOptions
           {
@@ -139,7 +139,7 @@ public partial class Build
           }
           else
           {
-            Log.Information("✓ {File} FeatureManagement section is valid", file.Name);
+            Log.Information("✓ {File} feature_management section is valid", file.Name);
           }
         }
 
@@ -150,10 +150,10 @@ public partial class Build
             Log.Error("{Error}", error);
           }
 
-          throw new Exception("FeatureManagement schema validation failed.");
+          throw new Exception("feature_management schema validation failed.");
         }
 
-        Log.Information("✓ All appsettings FeatureManagement sections pass schema validation");
+        Log.Information("✓ All appsettings feature_management sections pass schema validation");
       });
 
   internal Target LintAllVerify => _ => _

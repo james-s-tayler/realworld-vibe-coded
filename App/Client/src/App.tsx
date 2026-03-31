@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
 import { AuthProvider } from './context/AuthContext';
+import { FeatureFlagProvider } from './context/FeatureFlagContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleProtectedRoute } from './components/RoleProtectedRoute';
 import { AppHeader } from './components/AppHeader';
@@ -16,6 +17,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <FeatureFlagProvider>
         <AppHeader />
         <AppSidebar />
         <Routes>
@@ -55,6 +57,7 @@ function App() {
           />
           <Route path="/forbidden" element={<ForbiddenPage />} />
         </Routes>
+        </FeatureFlagProvider>
       </AuthProvider>
     </BrowserRouter>
   );
