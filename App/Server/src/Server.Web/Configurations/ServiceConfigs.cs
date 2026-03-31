@@ -104,7 +104,8 @@ public static class ServiceConfigs
     });
 
     services.Configure<FeatureFlagSettings>(builder.Configuration.GetSection(FeatureFlagSettings.SectionName));
-    services.AddFeatureManagement();
+    services.AddFeatureManagement()
+            .WithTargeting<TenantTargetingContextAccessor>();
     services.AddScoped<IFeatureFlagService, FeatureFlagService>();
 
     services.AddAuthorization();

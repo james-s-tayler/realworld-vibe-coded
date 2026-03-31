@@ -37,11 +37,19 @@ Flags exposed to the frontend must be listed in `FeatureFlags.ClientVisible` arr
 ### Conventions
 
 - New flags must be added to **three** appsettings files:
-  - `appsettings.json` — default `false`
-  - `appsettings.Testing.json` — default `false`
+  - `appsettings.json` — default `false` (or with targeting filter)
+  - `appsettings.Testing.json` — default `false` (or with targeting filter)
   - `appsettings.Development.json` — default `true` (E2E tests and local dev)
 - Never use magic strings — always reference `FeatureFlags.*` constants (FF001 analyzer enforces this as a build error)
+- Never inject `IFeatureManager` directly — use `IFeatureFlagService` (FF002 analyzer enforces this as a build error)
 - Flags are in the `feature_management.feature_flags` array (v2 format), alphabetically ordered by `id`
+
+### Roslyn Analyzers
+
+| ID | Severity | Rule |
+|----|----------|------|
+| FF001 | Error | Feature flag names must use `FeatureFlags.*` constants, not string literals |
+| FF002 | Error | Inject `IFeatureFlagService` instead of `IFeatureManager`/`IVariantFeatureManager` — exempts `FeatureFlagService` itself and test assemblies |
 
 ### Azure App Configuration
 
@@ -57,10 +65,38 @@ Flags exposed to the frontend must be listed in `FeatureFlags.ClientVisible` arr
 ```csharp
 // In a handler or service — inject IFeatureFlagService
 var isEnabled = await featureFlagService.IsEnabledAsync(FeatureFlags.SampleFeature);
-
-// Or inject IFeatureManager directly
-var isEnabled = await featureManager.IsEnabledAsync(FeatureFlags.SampleFeature);
 ```
+
+### Tenant-Targeted Feature Flags
+
+Feature flags support per-tenant targeting via `TenantTargetingContextAccessor`, which sets `TargetingContext.UserId = TenantId` from Finbuckle multi-tenancy. This makes percentage rollouts deterministic per-tenant — all users in the same tenant see the same feature state.
+
+To add a targeting-based flag in appsettings:
+```json
+{
+  "id": "MyFlag",
+  "enabled": true,
+  "conditions": {
+    "client_filters": [
+      {
+        "name": "Microsoft.Targeting",
+        "parameters": {
+          "Audience": {
+            "DefaultRolloutPercentage": 50
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+The `Microsoft.Targeting` filter supports:
+- `DefaultRolloutPercentage` — percentage of users (tenants) that see the feature
+- `Users` — list of specific UserIds (TenantIds) to include
+- `Groups` — list of groups with name and rollout percentage (not currently used)
+
+When no tenant is resolved (unauthenticated requests), `UserId` is empty and targeting filters won't match.
 
 ### Frontend
 
