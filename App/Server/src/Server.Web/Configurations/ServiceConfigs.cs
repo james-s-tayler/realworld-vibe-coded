@@ -10,6 +10,7 @@ using Server.Infrastructure;
 using Server.Infrastructure.Data;
 using Server.Infrastructure.Email;
 using Server.SharedKernel;
+using Server.SharedKernel.FeatureFlags;
 using Server.SharedKernel.Interfaces;
 using Server.UseCases.Interfaces;
 using Server.Web.I18n;
@@ -102,7 +103,9 @@ public static class ServiceConfigs
       options.Cookie.SameSite = SameSiteMode.Strict;
     });
 
-    services.AddFeatureManagement();
+    services.Configure<FeatureFlagSettings>(builder.Configuration.GetSection(FeatureFlagSettings.SectionName));
+    services.AddFeatureManagement()
+            .WithTargeting<TenantTargetingContextAccessor>();
     services.AddScoped<IFeatureFlagService, FeatureFlagService>();
 
     services.AddAuthorization();

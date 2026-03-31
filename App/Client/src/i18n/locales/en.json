@@ -43,7 +43,9 @@
     "welcomeGuest": "Welcome!",
     "subtitle": "This is your dashboard. Get started by exploring:",
     "settings": "Settings",
-    "viewProfile": "View Profile"
+    "viewProfile": "View Profile",
+    "bannerTitle": "New Feature",
+    "bannerMessage": "Check out our latest updates and improvements!"
   },
   "profile": {
     "editSettings": "Edit Profile Settings",

@@ -21,6 +21,11 @@ public class PageObjects
   }
 
   /// <summary>
+  /// Gets the Dashboard page instance.
+  /// </summary>
+  public DashboardPage DashboardPage => new(_page, _baseUrl);
+
+  /// <summary>
   /// Gets the Login page instance.
   /// </summary>
   public LoginPage LoginPage => new(_page, $"{_baseUrl}/login");

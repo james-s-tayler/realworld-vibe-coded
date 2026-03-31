@@ -43,7 +43,9 @@
     "welcomeGuest": "ようこそ！",
     "subtitle": "ダッシュボードです。以下から始めましょう：",
     "settings": "設定",
-    "viewProfile": "プロフィールを見る"
+    "viewProfile": "プロフィールを見る",
+    "bannerTitle": "新機能",
+    "bannerMessage": "最新のアップデートと改善をご確認ください！"
   },
   "profile": {
     "editSettings": "プロフィール設定を編集",

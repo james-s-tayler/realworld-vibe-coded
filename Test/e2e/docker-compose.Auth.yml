@@ -1,3 +1,3 @@
 services:
   playwright:
-    command: ["-trx", "/Reports/Test/e2e/Results/e2e-results.trx", "-namespace", "E2eTests.Tests.LoginPage", "-namespace", "E2eTests.Tests.RegisterPage", "-namespace", "E2eTests.Tests.SwaggerPage", "-namespace", "E2eTests.Tests.SettingsPage", "-namespace", "E2eTests.Tests.UsersPage"]
+    command: ["-trx", "/Reports/Test/e2e/Results/e2e-results.trx", "-namespace", "E2eTests.Tests.DashboardPage", "-namespace", "E2eTests.Tests.LoginPage", "-namespace", "E2eTests.Tests.RegisterPage", "-namespace", "E2eTests.Tests.SwaggerPage", "-namespace", "E2eTests.Tests.SettingsPage", "-namespace", "E2eTests.Tests.UsersPage"]

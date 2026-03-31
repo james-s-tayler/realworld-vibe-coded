@@ -7,7 +7,6 @@ PROTECTED_PATTERNS=(
   ".editorconfig"
   ".husky/"
   ".nuke/"
-  ".claude/"
   "Nuke.Tests/"
 )
 

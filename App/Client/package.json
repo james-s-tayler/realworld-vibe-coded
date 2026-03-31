@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@carbon/react": "^1.92.1",
+    "@microsoft/feature-management": "^2.3.0",
     "@microsoft/kiota-bundle": "^1.0.0-preview.100",
     "i18next": "^26.0.1",
     "react": "^19.1.1",

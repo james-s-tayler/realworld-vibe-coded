@@ -988,6 +988,160 @@
         ]
       }
     },
+    "/api/feature-flags": {
+      "get": {
+        "tags": [
+          "Api"
+        ],
+        "summary": "List client-visible feature flags",
+        "description": "Returns feature flags visible to the client in v2 format.",
+        "operationId": "ServerWebFeatureFlagsListListFeatureFlags",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureFlagsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Identity.Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/config": {
+      "get": {
+        "tags": [
+          "Api"
+        ],
+        "summary": "Get client configuration",
+        "description": "Returns configuration values for the client application.",
+        "operationId": "ServerWebConfigGetGetConfig",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Identity.Bearer": []
+          }
+        ]
+      }
+    },
     "/dev-only/test-error/throw-concurrency": {
       "get": {
         "tags": [
@@ -1697,7 +1851,7 @@
         }
       }
     },
-    "/dev-only/test-data/feature-flags/{featureName}": {
+    "/dev-only/feature-flags/{featureName}": {
       "get": {
         "tags": [
           "Dev-Only"
@@ -1715,6 +1869,179 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckFeatureFlagResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dev-Only"
+        ],
+        "summary": "Clear a feature flag override",
+        "description": "Removes a runtime override, reverting to the configured value. Only available in Development environment.",
+        "operationId": "ServerWebDevOnlyEndpointsFeatureFlagClearFeatureFlagOverride",
+        "parameters": [
+          {
+            "name": "featureName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckFeatureFlagResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Dev-Only"
+        ],
+        "summary": "Override a feature flag value",
+        "description": "Sets a runtime override for a feature flag. Only available in Development environment.",
+        "operationId": "ServerWebDevOnlyEndpointsFeatureFlagSetFeatureFlagOverride",
+        "parameters": [
+          {
+            "name": "featureName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "x-name": "SetFeatureFlagOverrideRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetFeatureFlagOverrideRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": "Success",
@@ -2121,6 +2448,49 @@
           }
         }
       },
+      "FeatureFlagsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "feature_management": {
+            "$ref": "#/components/schemas/FeatureManagementSection"
+          }
+        }
+      },
+      "FeatureManagementSection": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "feature_flags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureFlagEntry"
+            }
+          }
+        }
+      },
+      "FeatureFlagEntry": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ConfigResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "feature_flag_refresh_interval_seconds": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "TestValidationRequest": {
         "type": "object",
         "additionalProperties": false
@@ -2140,6 +2510,15 @@
       "CheckFeatureFlagRequest": {
         "type": "object",
         "additionalProperties": false
+      },
+      "SetFeatureFlagOverrideRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        }
       }
     },
     "securitySchemes": {
