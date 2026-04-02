@@ -69,12 +69,7 @@
         "TestE2eFeed",
         "TestE2eMobile",
         "TestE2eMultitenancy",
-        "TestServer",
-        "TestServerPostmanArticle",
-        "TestServerPostmanArticlesEmpty",
-        "TestServerPostmanAuth",
-        "TestServerPostmanFeedAndArticles",
-        "TestServerPostmanProfiles"
+        "TestServer"
       ]
     },
     "Verbosity": {

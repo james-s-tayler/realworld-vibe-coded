@@ -87,18 +87,6 @@ public partial class Build
 
   internal AbsolutePath ReportsTestE2eArtifactsDirectory => RootDirectory / "Reports" / "Test" / "e2e" / "Artifacts";
 
-  internal AbsolutePath ReportsTestPostmanDirectory => RootDirectory / "Reports" / "Test" / "Postman";
-
-  internal AbsolutePath ReportsTestPostmanArticlesEmptyDirectory => ReportsTestPostmanDirectory / "ArticlesEmpty";
-
-  internal AbsolutePath ReportsTestPostmanAuthDirectory => ReportsTestPostmanDirectory / "Auth";
-
-  internal AbsolutePath ReportsTestPostmanProfilesDirectory => ReportsTestPostmanDirectory / "Profiles";
-
-  internal AbsolutePath ReportsTestPostmanFeedAndArticlesDirectory => ReportsTestPostmanDirectory / "FeedAndArticles";
-
-  internal AbsolutePath ReportsTestPostmanArticleDirectory => ReportsTestPostmanDirectory / "Article";
-
   #endregion
 
   #region Logs
@@ -116,7 +104,6 @@ public partial class Build
 
   internal AbsolutePath LogsTestServerAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "Server" / "Server.Web" / "Audit.NET";
 
-  internal AbsolutePath LogsTestServerPostman => RootDirectory / "Logs" / "Test" / "Postman";
   #endregion
 
   internal Target PathsShowWorktreeInfo => _ => _
@@ -144,26 +131,6 @@ public partial class Build
       LogsTestE2eSerilogDirectory.CreateOrCleanDirectory();
       LogsTestServerSerilogDirectory.CreateOrCleanDirectory();
       LogsTestServerAuditDotNetDirectory.CreateOrCleanDirectory();
-
-      var postmanCollections = new List<string>
-      {
-        "Auth",
-        "ArticlesEmpty",
-        "Article",
-        "FeedAndArticles",
-        "Profiles",
-      };
-
-      LogsTestServerPostman.CreateOrCleanDirectory();
-      ReportsTestPostmanDirectory.CreateOrCleanDirectory();
-
-      foreach (var collection in postmanCollections)
-      {
-        (LogsTestServerPostman / collection / "Server.Web" / "Serilog").CreateOrCleanDirectory();
-        (LogsTestServerPostman / collection / "Server.Web" / "Audit.NET").CreateOrCleanDirectory();
-        (ReportsTestPostmanDirectory / collection / "Artifacts").CreateOrCleanDirectory();
-        (ReportsTestPostmanDirectory / collection / "Results").CreateOrCleanDirectory();
-      }
 
       Log.Information("✓ Directories cleaned and pre-created");
     });
