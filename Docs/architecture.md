@@ -4,7 +4,7 @@
 
 - **Backend:** .NET 10, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQLite, Serilog, xUnit
 - **Frontend:** React + Vite + TypeScript, Carbon Design System
-- **Testing:** xUnit (backend), Vitest + Testing Library (frontend), Playwright (E2E), Postman (API)
+- **Testing:** xUnit (backend), Vitest + Testing Library (frontend), Playwright (E2E)
 - **Build:** Nuke build system (`./build.sh`), GitHub Actions CI/CD
 - **Infra:** Docker, Bicep (Azure), Azure App Service
 
@@ -14,7 +14,7 @@
 - `/App/Server` — .NET backend (Ardalis Clean Architecture, no Aspire)
 - `/Infra` — Bicep Azure IaC
 - `/Logs` — Serilog and Audit.NET logs for debugging (subdirectories per run mode)
-- `/Test` — Playwright, Postman, and performance tests
+- `/Test` — Playwright and migration verification tests
 - `/Task/Runner` — Nuke build system
 - `/Task/LocalDev` — Docker Compose for local dev
 - `/Reports` — Test reports from Nuke test targets
@@ -32,7 +32,6 @@ All commands use Nuke via `./build.sh`:
 | `TestServer` | Run backend xUnit tests |
 | `TestClient` | Run frontend Vitest tests |
 | `TestE2e` | Run Playwright E2E tests |
-| `TestServerPostmanAll` | Run all Postman API tests |
 | `RunLocalPublish` | Start local dev server from published artifact |
 | `DbMigrations*` | Database migration targets |
 

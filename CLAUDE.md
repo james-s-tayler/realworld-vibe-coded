@@ -7,7 +7,7 @@ These are the primary rules.
 1. **NEVER run `dotnet` commands directly.** Always use `./build.sh <target> --agent`. The `--agent` flag suppresses verbose Docker output for context efficiency.
 2. All nuke Test* and RunLocal* targets record Serilog and Audit.NET logs in the Logs/ folder and.
 3. All Test* Nuke targets record comprehensive reports in the Reports/ directory. Additionally TestE2e* nuke targets record playwright traces that can be viewed with /view-playwright-traces
-4. **Every feature must have its Postman and E2E tests passing before moving to the next feature.** The implementation workflow enforces this.
+4. **Every feature must have its E2E tests passing before moving to the next feature.** The implementation workflow enforces this.
 5. **All compiler warnings and errors must be resolved.** Never suppress or ignore them.
 8. **Frontend API client relies on Kiota code generation.** Always make backend changes first, then run `./build.sh BuildGenerateApiClient` before writing frontend code. `BuildClient` does this automatically (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Never reference fields in frontend that don't exist in the generated types.
 

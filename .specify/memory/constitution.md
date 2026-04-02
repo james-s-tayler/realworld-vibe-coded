@@ -7,7 +7,7 @@ A multi-tenant B2B SaaS application.
 - **Backend**: .NET 10 / FastEndpoints / MediatR CQRS / EF Core + SQLite / Serilog
 - **Frontend**: React + Vite + TypeScript / Carbon Design System
 - **Build**: Nuke build system (`./build.sh`) — never invoke `dotnet` directly
-- **Tests**: xUnit (backend), Vitest (frontend), Playwright E2E, Postman API
+- **Tests**: xUnit (backend), Vitest (frontend), Playwright E2E
 
 ## Authoritative Sources
 
@@ -29,7 +29,7 @@ All compilation, testing, and local runs go through `./build.sh <target> --agent
 
 ### II. Tests Gate Progress
 
-Every feature must have its Postman and E2E tests passing before moving to the next feature. No exceptions. Progressive test tiers (`TestE2e{Area}`) provide faster feedback during development; `TestE2e` is the full gate.
+Every feature must have its E2E tests passing before moving to the next feature. No exceptions. Progressive test tiers (`TestE2e{Area}`) provide faster feedback during development; `TestE2e` is the full gate.
 
 ### III. Compiler Warnings Are Errors
 
