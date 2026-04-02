@@ -6,7 +6,7 @@ services:
       SA_PASSWORD: "YourStrong@Passw0rd"
       MSSQL_PID: "Express"
     ports:
-      - "1433:1433"
+      - "${PORT_SQL:-1433}:1433"
     healthcheck:
       test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong@Passw0rd", "-Q", "SELECT 1", "-C"]
       interval: 3s
@@ -15,7 +15,7 @@ services:
       start_period: 5s
 
   api:
-    image: conduit-postman-api:local
+    image: conduit-postman-api:${IMAGE_TAG:-local}
     build:
       context: ../../
       dockerfile: Test/Postman/Dockerfile
@@ -27,7 +27,7 @@ services:
       ASPNETCORE_URLS: http://+:5000
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true"
     ports:
-      - "5000:5000"
+      - "${PORT_API_HTTP:-5000}:5000"
     volumes:
       - ../../Logs:/app/Logs
     healthcheck:

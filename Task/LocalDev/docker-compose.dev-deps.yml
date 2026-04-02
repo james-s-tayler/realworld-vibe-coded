@@ -5,7 +5,7 @@ services:
       ACCEPT_EULA: "Y"
       SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
     ports:
-      - "5341:80"
+      - "${PORT_SEQ:-5341}:80"
     volumes:
       - seq-data:/data
     networks:
@@ -19,7 +19,7 @@ services:
     environment:
       SEQ_ADDRESS: "http://seq:5341"
     ports:
-      - "12201:12201/udp"
+      - "${PORT_GELF:-12201}:12201/udp"
     networks:
       - app-network
 
@@ -32,7 +32,7 @@ services:
       SA_PASSWORD: "YourStrong@Passw0rd"
       MSSQL_PID: "Express"
     ports:
-      - "1433:1433"
+      - "${PORT_SQL:-1433}:1433"
     healthcheck:
       test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong@Passw0rd", "-Q", "SELECT 1", "-C"]
       interval: 3s
@@ -44,7 +44,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: "udp://127.0.0.1:12201"
+        gelf-address: "udp://127.0.0.1:${PORT_GELF:-12201}"
         tag: "{{.Name}}"
     networks:
       - app-network
@@ -54,8 +54,8 @@ services:
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
     ports:
-      - "4317:4317"
-      - "16686:16686"
+      - "${PORT_OTLP:-4317}:4317"
+      - "${PORT_JAEGER_UI:-16686}:16686"
     networks:
       - app-network
 
@@ -68,7 +68,7 @@ services:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
     ports:
-      - "9090:9090"
+      - "${PORT_PROMETHEUS:-9090}:9090"
     networks:
       - app-network
 
@@ -97,7 +97,7 @@ services:
       - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards/json
       - grafana-data:/var/lib/grafana
     ports:
-      - "3000:3000"
+      - "${PORT_GRAFANA:-3000}:3000"
     depends_on:
       - jaeger
       - prometheus
@@ -113,4 +113,4 @@ volumes:
 networks:
   app-network:
     external: true
-    name: app-network
+    name: ${NETWORK_NAME:-app-network}

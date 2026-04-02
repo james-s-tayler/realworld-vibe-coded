@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Nuke;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
@@ -31,11 +32,14 @@ public partial class Build
         var testFailed = false;
         try
         {
+          var sqlPort = 1433 + Constants.Worktree.GetPortOffset(RootDirectory);
+          var connectionString = $"Server=localhost,{sqlPort};Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true";
           DotNetTest(s => s
                 .SetProjectFile(ServerSolution)
                 .SetLoggers("trx")
                 .SetResultsDirectory(ReportsServerResultsDirectory)
                 .SetSettingsFile(RootDirectory / "App" / "Server" / "coverlet.runsettings")
+                .SetProcessEnvironmentVariable("ConnectionStrings__DefaultConnection", connectionString)
                 .AddProcessAdditionalArguments(
                   "--collect:\"XPlat Code Coverage\"",
                   "--",
@@ -197,7 +201,7 @@ public partial class Build
       int exitCode = 0;
       try
       {
-        var envVars = new Dictionary<string, string> { ["DOCKER_BUILDKIT"] = "1", };
+        var envVars = new Dictionary<string, string>(GetWorktreeEnvVars()) { ["DOCKER_BUILDKIT"] = "1", };
         var process = ProcessTasks.StartProcess(
           "docker",
           upArgs,
@@ -217,10 +221,12 @@ public partial class Build
       finally
       {
         // Start docker compose down in background while report generation proceeds
+        var downEnvVars = GetWorktreeEnvVars();
         var downProcess = ProcessTasks.StartProcess(
           "docker",
           downArgs,
           workingDirectory: RootDirectory,
+          environmentVariables: downEnvVars,
           logOutput: !Agent);
 
         // Generate LiquidTestReport from TRX files in parallel with compose down
@@ -302,7 +308,7 @@ public partial class Build
     int exitCode = 0;
     try
     {
-      var envVars = new Dictionary<string, string> { ["DOCKER_BUILDKIT"] = "1", };
+      var envVars = new Dictionary<string, string>(GetWorktreeEnvVars()) { ["DOCKER_BUILDKIT"] = "1", };
       var process = ProcessTasks.StartProcess(
         "docker",
         upArgs,
@@ -321,10 +327,12 @@ public partial class Build
     }
     finally
     {
+      var downEnvVars = GetWorktreeEnvVars();
       var downProcess = ProcessTasks.StartProcess(
         "docker",
         downArgs,
         workingDirectory: RootDirectory,
+        environmentVariables: downEnvVars,
         logOutput: !Agent);
 
       var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
@@ -429,7 +437,7 @@ public partial class Build
   {
     Log.Information("Running Postman {CollectionName} tests with Docker Compose{BailSuffix}", collectionName, Bail ? " (with --bail)" : string.Empty);
 
-    var envVars = new Dictionary<string, string>
+    var envVars = new Dictionary<string, string>(GetWorktreeEnvVars())
     {
       ["DOCKER_BUILDKIT"] = "1",
     };
@@ -463,7 +471,7 @@ public partial class Build
     }
     finally
     {
-      var downEnvVars = new Dictionary<string, string>
+      var downEnvVars = new Dictionary<string, string>(GetWorktreeEnvVars())
       {
         ["DOCKER_BUILDKIT"] = "1",
       };

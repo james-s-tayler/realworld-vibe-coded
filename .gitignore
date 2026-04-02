@@ -96,3 +96,7 @@ TODO.md
 
 # Claude action log
 ACTION-LOG.md
+
+# Environment files
+.env
+.claude/worktrees/
