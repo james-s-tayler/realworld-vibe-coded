@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import {
   Header,
@@ -32,6 +32,16 @@ export const AppHeader: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const closeRef = useRef<(() => void) | null>(null);
+
+  // Track viewport to toggle SideNav between persistent (desktop) and overlay (mobile)
+  const lgBreakpoint = '(min-width: 66rem)';
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia(lgBreakpoint).matches);
+  useEffect(() => {
+    const mql = window.matchMedia(lgBreakpoint);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -68,7 +78,7 @@ export const AppHeader: React.FC = () => {
               <SideNav
                 aria-label={t('nav.sideNavLabel')}
                 expanded={isSideNavExpanded}
-                isPersistent={false}
+                isPersistent={isDesktop}
                 isChildOfHeader
                 onSideNavBlur={onClickSideNavExpand}
               >
