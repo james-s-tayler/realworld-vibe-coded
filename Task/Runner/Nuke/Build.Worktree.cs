@@ -19,6 +19,7 @@ public partial class Build
       ["PORT_GRAFANA"] = (3000 + offset).ToString(),
       ["NETWORK_NAME"] = ScopedNetworkName,
       ["IMAGE_TAG"] = Constants.Worktree.IsMainCheckout(RootDirectory) ? "local" : Constants.Worktree.GetSlug(RootDirectory),
+      ["COOKIE_SUFFIX"] = Constants.Worktree.IsMainCheckout(RootDirectory) ? string.Empty : $".{Constants.Worktree.GetSlug(RootDirectory)}",
     };
   }
 

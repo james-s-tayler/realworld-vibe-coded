@@ -99,3 +99,4 @@ ACTION-LOG.md
 
 # Environment files
 .env
+.claude/worktrees/
