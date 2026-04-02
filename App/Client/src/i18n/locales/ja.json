@@ -7,7 +7,9 @@
     "signIn": "サインイン",
     "signUp": "サインアップ",
     "logOut": "ログアウト",
-    "sideNavLabel": "サイドナビゲーション"
+    "sideNavLabel": "サイドナビゲーション",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる"
   },
   "login": {
     "title": "サインイン",
