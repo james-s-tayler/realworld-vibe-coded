@@ -36,16 +36,6 @@ Match changed paths to the minimal set of test targets:
 
 When both backend and frontend changed, `TestE2e` is required — it's the only test that validates the actual contract between the two layers.
 
-For server endpoint/handler/validator changes, also run the relevant Postman collection:
-
-| Endpoint area | Postman target |
-|:-------------|:---------------|
-| Auth/identity endpoints | `TestServerPostmanAuth` |
-| Profile endpoints | `TestServerPostmanProfiles` |
-| Article CRUD/comments/favorites | `TestServerPostmanArticle` |
-| Feed/article listing | `TestServerPostmanFeedAndArticles` |
-| Unclear which collection | `TestServerPostmanAuth` (smoke test) |
-
 ## Step 4: Execute
 
 Run each target sequentially via `./build.sh <target>`. Stop on first failure.
