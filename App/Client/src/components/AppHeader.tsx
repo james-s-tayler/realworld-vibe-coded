@@ -68,6 +68,7 @@ export const AppHeader: React.FC = () => {
               <SideNav
                 aria-label={t('nav.sideNavLabel')}
                 expanded={isSideNavExpanded}
+                isPersistent={false}
                 isChildOfHeader
                 onSideNavBlur={onClickSideNavExpand}
               >
