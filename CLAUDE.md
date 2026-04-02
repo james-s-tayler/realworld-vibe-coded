@@ -12,7 +12,6 @@ These are the primary rules.
 8. **Frontend API client relies on Kiota code generation.** Always make backend changes first, then run `./build.sh BuildGenerateApiClient` before writing frontend code. `BuildClient` does this automatically (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Never reference fields in frontend that don't exist in the generated types.
 
 Reference as needed:
-- `SPEC-REFERENCE.md` — complete API spec (the source of truth for what to build)
 - `Docs/architecture.md` — tech stack, folder structure, build commands
 - `Docs/observability.md` — OpenTelemetry tracing/metrics, Grafana/Tempo/Prometheus stack, Audit.NET
 
