@@ -44,10 +44,11 @@ public class Navigation : MobileAppPageTest
     await LoginOnMobileAsync(user.Email, user.Password);
 
     await HamburgerButton.ClickAsync();
-    await Expect(SideNav).ToBeVisibleAsync();
 
-    // Force: Carbon SideNav overlay animation can cause page content to intercept pointer events
-    await SideNav.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true }).ClickAsync(new() { Force = true });
+    // Wait for the Settings link to be in viewport (SideNav slide-in animation must complete)
+    var settingsLink = SideNav.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true });
+    await Expect(settingsLink).ToBeInViewportAsync();
+    await settingsLink.ClickAsync();
 
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/settings");
     await Expect(SideNav).Not.ToBeVisibleAsync();
