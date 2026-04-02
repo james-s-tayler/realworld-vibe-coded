@@ -45,11 +45,12 @@ public class Navigation : MobileAppPageTest
 
     await HamburgerButton.ClickAsync();
 
-    // Wait for the Settings link to be in viewport (SideNav slide-in animation must complete),
+    // Wait for SideNav to be visible (confirms state change from hamburger click),
     // then dispatch click via DOM event. Carbon's SideNav overlay on mobile renders inside the
     // Header's stacking context, which can cause page content to intercept pointer events.
+    // DispatchEventAsync bypasses hit-testing entirely and doesn't require viewport intersection.
+    await Expect(SideNav).ToBeVisibleAsync();
     var settingsLink = SideNav.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true });
-    await Expect(settingsLink).ToBeInViewportAsync();
     await settingsLink.DispatchEventAsync("click");
 
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/settings");
