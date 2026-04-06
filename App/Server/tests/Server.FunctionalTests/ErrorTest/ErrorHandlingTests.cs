@@ -17,6 +17,7 @@ public class ErrorHandlingTests(ApiFixture apiFixture)
   [InlineData($"/{DevOnly.ROUTE}/{TestError.ROUTE}/throw-in-use-case", 500, 0, "invalidOperationException", "This is a test exception thrown in the use case")]
   [InlineData($"/{DevOnly.ROUTE}/{TestError.ROUTE}/throw-in-endpoint", 500, 0, "invalidOperationException", "This is a test exception thrown in the endpoint")]
   [InlineData($"/{DevOnly.ROUTE}/{TestError.ROUTE}/throw-concurrency", 409, 0, "dbUpdateConcurrencyException", "Test concurrency conflict")]
+  [InlineData($"/{DevOnly.ROUTE}/{TestError.ROUTE}/throw-sql-timeout", 503, 0, "timeoutException", ThrowSqlTimeoutHandler.TimeoutMessage)]
   [Theory]
   public async Task AllErrorTypes_UseSameFormat(string route, int statusCode, int errorIndex, string name, string reason)
   {

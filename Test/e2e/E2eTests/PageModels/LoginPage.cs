@@ -59,7 +59,7 @@ public class LoginPage : BasePage
     await FillLoginFormAsync(email, password);
     await ClickSignInButtonAsync();
 
-    // Wait for successful login by verifying the Settings nav link is visible (only shown when logged in)
+    // Wait for successful login by verifying the Settings link in the sidebar is visible (only shown when logged in)
     await Expect(Page.GetByLabel("Side navigation").GetByRole(AriaRole.Link, new() { Name = "Settings" })).ToBeVisibleAsync();
   }
 

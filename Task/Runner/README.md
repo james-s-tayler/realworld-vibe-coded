@@ -35,7 +35,6 @@ build.cmd                 # Cross-platform build script (Windows)
 | `build-server-publish`     | Publish backend for linux-x64 in Release configuration                                                                                     |
 | `build-client`             | Build the frontend (placeholder)                                                                                                           |
 | `test-server`              | Run backend unit/integration tests                                                                                                         |
-| `test-server-postman-auth` | Run Postman API tests - auth collection                                                                                                    |
 | `test-e2e`                 | Run E2E Playwright tests                                                                                                                   |
 | `lint-server-verify`       | Verify backend formatting & analyzers (no changes). Fails if issues found                                                                  |
 | `lint-server-fix`          | Fix backend formatting & analyzer issues automatically                                                                                     |
@@ -56,9 +55,9 @@ All Nuke targets follow specific naming conventions:
 - **Lint targets**: Must end with either `Verify` (check for issues) or `Fix` (auto-fix issues)
   - `LintServerVerify`, `LintServerFix`, `LintNukeVerify`, `LintNukeFix`
 - **Build targets**: Start with `Build` - `BuildServer`, `BuildClient`
-- **Test targets**: Start with `Test` - `TestServer`, `TestServerPostman`
+- **Test targets**: Start with `Test` - `TestServer`, `TestE2e`
 - **Database targets**: Start with `Db` or `DbMigrations` - `DbReset`, `DbMigrationsCheckUncommitted`
-- **Utility targets**: Use descriptive names - `RunLocalServer`, `InstallClient`, etc.
+- **Utility targets**: Use descriptive names - `RunLocalPublish`, `InstallClient`, etc.
 
 These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` target.
 
@@ -87,9 +86,6 @@ These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` t
 
 # Fix Nuke build formatting issues
 ./build.sh lint-nuke-fix
-
-# Run Postman tests with specific collection
-./build.sh test-server-postman-auth
 
 # Reset SQL Server database
 ./build.sh db-reset-force

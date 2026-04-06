@@ -6,6 +6,7 @@ import {
   Button,
   Stack,
 } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
@@ -14,6 +15,7 @@ import { USER_CONSTRAINTS } from '../constants';
 import './AuthPages.css';
 
 export const RegisterPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { register } = useAuth();
   const [email, setEmail] = useState('');
@@ -37,8 +39,8 @@ export const RegisterPage: React.FC = () => {
     <PageShell
       className="auth-page"
       columnLayout="narrow"
-      title="Sign up"
-      subtitle={<Link to="/login">Have an account?</Link>}
+      title={t('register.title')}
+      subtitle={<Link to="/login">{t('register.haveAccount')}</Link>}
     >
       <ErrorDisplay
         error={error}
@@ -49,8 +51,8 @@ export const RegisterPage: React.FC = () => {
         <Stack gap={6}>
           <TextInput
             id="email"
-            labelText="Email"
-            placeholder="Email"
+            labelText={t('register.email')}
+            placeholder={t('register.email')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -60,8 +62,8 @@ export const RegisterPage: React.FC = () => {
 
           <TextInput
             id="password"
-            labelText="Password"
-            placeholder="Password"
+            labelText={t('register.password')}
+            placeholder={t('register.password')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -70,7 +72,7 @@ export const RegisterPage: React.FC = () => {
           />
 
           <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">
-            {loading ? 'Creating account...' : 'Sign up'}
+            {loading ? t('register.submitting') : t('register.submit')}
           </Button>
         </Stack>
       </Form>

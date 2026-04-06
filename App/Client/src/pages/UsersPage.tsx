@@ -21,6 +21,7 @@ import {
   OverflowMenuItem,
 } from '@carbon/react';
 import { Add } from '@carbon/icons-react';
+import { useTranslation } from 'react-i18next';
 import { PageShell } from '../components/PageShell';
 import { usersApi, type User } from '../api/users';
 import { useAuth } from '../hooks/useAuth';
@@ -31,15 +32,8 @@ const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 const ASSIGNABLE_ROLES = ['ADMIN'];
 
-const headers = [
-  { key: 'username', header: 'Username' },
-  { key: 'email', header: 'Email' },
-  { key: 'roles', header: 'Role(s)' },
-  { key: 'status', header: 'Status' },
-  { key: 'actions', header: 'Actions' },
-];
-
 export const UsersPage: React.FC = () => {
+  const { t } = useTranslation();
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [usersCount, setUsersCount] = useState(0);
@@ -74,12 +68,12 @@ export const UsersPage: React.FC = () => {
       if (err instanceof ApiError) {
         setError(err.errors.join(', '));
       } else {
-        setError('Failed to load users');
+        setError(t('users.failedToLoad'));
       }
     } finally {
       setLoading(false);
     }
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, t]);
 
   useEffect(() => {
     loadUsers();
@@ -92,7 +86,7 @@ export const UsersPage: React.FC = () => {
 
   const handleInviteUser = async () => {
     if (!inviteEmail || !invitePassword) {
-      setInviteError('Email and password are required');
+      setInviteError(t('users.emailAndPasswordRequired'));
       return;
     }
 
@@ -108,7 +102,7 @@ export const UsersPage: React.FC = () => {
       if (err instanceof ApiError) {
         setInviteError(err.errors.join(', '));
       } else {
-        setInviteError('Failed to invite user');
+        setInviteError(t('users.failedToInvite'));
       }
     } finally {
       setInviting(false);
@@ -123,7 +117,7 @@ export const UsersPage: React.FC = () => {
       if (err instanceof ApiError) {
         setError(err.errors.join(', '));
       } else {
-        setError('Failed to deactivate user');
+        setError(t('users.failedToDeactivate'));
       }
     }
   };
@@ -136,7 +130,7 @@ export const UsersPage: React.FC = () => {
       if (err instanceof ApiError) {
         setError(err.errors.join(', '));
       } else {
-        setError('Failed to reactivate user');
+        setError(t('users.failedToReactivate'));
       }
     }
   };
@@ -164,7 +158,7 @@ export const UsersPage: React.FC = () => {
       if (err instanceof ApiError) {
         setEditRolesError(err.errors.join(', '));
       } else {
-        setEditRolesError('Failed to update roles');
+        setEditRolesError(t('users.failedToUpdateRoles'));
       }
     } finally {
       setEditRolesSaving(false);
@@ -179,41 +173,48 @@ export const UsersPage: React.FC = () => {
     }
   };
 
-  const isOwner = (user: User) => user.roles.includes('OWNER');
   const isSelf = (user: User) => currentUser?.email === user.email;
+
+  const headers = [
+    { key: 'username', header: t('users.username') },
+    { key: 'email', header: t('users.email') },
+    { key: 'roles', header: t('users.roles') },
+    { key: 'status', header: t('users.status') },
+    { key: 'actions', header: t('users.actions') },
+  ];
 
   const rows = users.map((user) => ({
     id: user.id,
     username: user.username,
     email: user.email,
     roles: user.roles?.join(', ') || '',
-    status: user.isActive ? 'Active' : 'Deactivated',
+    status: user.isActive ? t('users.active') : t('users.deactivated'),
     actions: user,
   }));
 
   return (
     <PageShell className="users-page">
       <div className="users-page-header">
-        <h1>Users</h1>
+        <h1>{t('users.title')}</h1>
         <Button
           renderIcon={Add}
           onClick={() => setInviteModalOpen(true)}
         >
-          Invite User
+          {t('users.inviteUser')}
         </Button>
       </div>
 
       {error && (
         <InlineNotification
           kind="error"
-          title="Error"
+          title={t('error.title')}
           subtitle={error}
           onClose={() => setError(null)}
         />
       )}
 
       {loading ? (
-        <Loading description="Loading users..." withOverlay={false} />
+        <Loading description={t('users.loading')} withOverlay={false} />
       ) : (
         <>
           <DataTable rows={rows} headers={headers}>
@@ -246,30 +247,30 @@ export const UsersPage: React.FC = () => {
                               return (
                                 <TableCell key={cell.id}>
                                   <Tag type={userData.isActive ? 'green' : 'red'} size="sm">
-                                    {userData.isActive ? 'Active' : 'Deactivated'}
+                                    {userData.isActive ? t('users.active') : t('users.deactivated')}
                                   </Tag>
                                 </TableCell>
                               );
                             }
                             if (cell.info.header === 'actions' && userData) {
-                              const showDeactivateToggle = !isSelf(userData) && !isOwner(userData);
+                              const showDeactivateToggle = !isSelf(userData);
                               return (
                                 <TableCell key={cell.id}>
-                                  <OverflowMenu iconDescription={`Actions for ${userData.email}`} flipped>
+                                  <OverflowMenu iconDescription={t('users.actionsFor', { email: userData.email })} flipped>
                                     <OverflowMenuItem
-                                      itemText="Edit Roles"
+                                      itemText={t('users.editRoles')}
                                       onClick={() => openEditRolesModal(userData)}
                                     />
                                     {showDeactivateToggle && userData.isActive && (
                                       <OverflowMenuItem
-                                        itemText="Deactivate"
+                                        itemText={t('users.deactivate')}
                                         isDelete
                                         onClick={() => handleDeactivate(userData)}
                                       />
                                     )}
                                     {showDeactivateToggle && !userData.isActive && (
                                       <OverflowMenuItem
-                                        itemText="Reactivate"
+                                        itemText={t('users.reactivate')}
                                         onClick={() => handleReactivate(userData)}
                                       />
                                     )}
@@ -294,6 +295,11 @@ export const UsersPage: React.FC = () => {
               pageSizes={PAGE_SIZE_OPTIONS}
               totalItems={usersCount}
               onChange={handlePageChange}
+              backwardText={t('pagination.previous')}
+              forwardText={t('pagination.next')}
+              itemsPerPageText={t('pagination.itemsPerPage')}
+              itemRangeText={(min, max, total) => t('pagination.itemRange', { min, max, total })}
+              pageRangeText={(_current, total) => t('pagination.pageRange', { count: total })}
             />
           )}
         </>
@@ -307,16 +313,16 @@ export const UsersPage: React.FC = () => {
           setInvitePassword('');
           setInviteError(null);
         }}
-        modalHeading="Invite User"
-        primaryButtonText="Invite"
-        secondaryButtonText="Cancel"
+        modalHeading={t('users.inviteModalTitle')}
+        primaryButtonText={t('users.invite')}
+        secondaryButtonText={t('users.cancel')}
         onRequestSubmit={handleInviteUser}
         primaryButtonDisabled={inviting}
       >
         {inviteError && (
           <InlineNotification
             kind="error"
-            title="Error"
+            title={t('error.title')}
             subtitle={inviteError}
             onClose={() => setInviteError(null)}
             style={{ marginBottom: '1rem' }}
@@ -324,17 +330,17 @@ export const UsersPage: React.FC = () => {
         )}
         <TextInput
           id="invite-email"
-          labelText="Email"
-          placeholder="user@example.com"
+          labelText={t('users.email')}
+          placeholder={t('users.emailPlaceholder')}
           value={inviteEmail}
           onChange={(e) => setInviteEmail(e.target.value)}
           disabled={inviting}
         />
         <TextInput
           id="invite-password"
-          labelText="Password"
+          labelText={t('users.password')}
           type="password"
-          placeholder="Password"
+          placeholder={t('users.password')}
           value={invitePassword}
           onChange={(e) => setInvitePassword(e.target.value)}
           disabled={inviting}
@@ -349,16 +355,16 @@ export const UsersPage: React.FC = () => {
           setEditRolesUser(null);
           setEditRolesError(null);
         }}
-        modalHeading={`Edit Roles — ${editRolesUser?.username ?? ''}`}
-        primaryButtonText="Save"
-        secondaryButtonText="Cancel"
+        modalHeading={t('users.editRolesTitle', { username: editRolesUser?.username ?? '' })}
+        primaryButtonText={t('users.save')}
+        secondaryButtonText={t('users.cancel')}
         onRequestSubmit={handleEditRolesSubmit}
         primaryButtonDisabled={editRolesSaving}
       >
         {editRolesError && (
           <InlineNotification
             kind="error"
-            title="Error"
+            title={t('error.title')}
             subtitle={editRolesError}
             onClose={() => setEditRolesError(null)}
             style={{ marginBottom: '1rem' }}

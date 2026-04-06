@@ -5,7 +5,7 @@ services:
       ACCEPT_EULA: "Y"
       SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
     ports:
-      - "5341:80"
+      - "${PORT_SEQ:-5341}:80"
     volumes:
       - seq-data:/data
     networks:
@@ -19,7 +19,7 @@ services:
     environment:
       SEQ_ADDRESS: "http://seq:5341"
     ports:
-      - "12201:12201/udp"
+      - "${PORT_GELF:-12201}:12201/udp"
     networks:
       - app-network
 
@@ -32,7 +32,7 @@ services:
       SA_PASSWORD: "YourStrong@Passw0rd"
       MSSQL_PID: "Express"
     ports:
-      - "1433:1433"
+      - "${PORT_SQL:-1433}:1433"
     healthcheck:
       test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong@Passw0rd", "-Q", "SELECT 1", "-C"]
       interval: 3s
@@ -44,16 +44,73 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: "udp://127.0.0.1:12201"
+        gelf-address: "udp://127.0.0.1:${PORT_GELF:-12201}"
         tag: "{{.Name}}"
+    networks:
+      - app-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "${PORT_OTLP:-4317}:4317"
+      - "${PORT_JAEGER_UI:-16686}:16686"
+    networks:
+      - app-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--web.enable-remote-write-receiver"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "${PORT_PROMETHEUS:-9090}:9090"
+    networks:
+      - app-network
+
+  sql-exporter:
+    image: awaragi/prometheus-mssql-exporter:latest
+    environment:
+      SERVER: sqlserver
+      PORT: 1433
+      USERNAME: sa
+      PASSWORD: "YourStrong@Passw0rd"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    volumes:
+      - ./config/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./config/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards/json
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "${PORT_GRAFANA:-3000}:3000"
+    depends_on:
+      - jaeger
+      - prometheus
     networks:
       - app-network
 
 volumes:
   seq-data:
   sqlserver-data:
+  prometheus-data:
+  grafana-data:
 
 networks:
   app-network:
     external: true
-    name: app-network
+    name: ${NETWORK_NAME:-app-network}

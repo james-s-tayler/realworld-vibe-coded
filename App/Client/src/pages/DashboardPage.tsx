@@ -1,27 +1,41 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Button } from '@carbon/react';
+import { Button, InlineNotification } from '@carbon/react';
 import { Settings, UserAvatar } from '@carbon/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { useFeatureFlag } from '../hooks/useFeatureFlag';
+import { FEATURE_FLAGS } from '../featureFlags';
 import { PageShell } from '../components/PageShell';
 
 export const DashboardPage: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
+  const showBanner = useFeatureFlag(FEATURE_FLAGS.DASHBOARD_BANNER);
 
   return (
     <PageShell className="dashboard-page">
-      <h1>Welcome{user ? `, ${user.username}` : ''}!</h1>
-      <p>This is your dashboard. Get started by exploring:</p>
+      {showBanner && (
+        <InlineNotification
+          kind="info"
+          title={t('dashboard.bannerTitle')}
+          subtitle={t('dashboard.bannerMessage')}
+          lowContrast
+          hideCloseButton
+        />
+      )}
+      <h1>{user ? t('dashboard.welcome', { username: user.username }) : t('dashboard.welcomeGuest')}</h1>
+      <p>{t('dashboard.subtitle')}</p>
       <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
         <Link to="/settings">
           <Button kind="primary" renderIcon={Settings}>
-            Settings
+            {t('dashboard.settings')}
           </Button>
         </Link>
         {user && (
           <Link to={`/profile/${user.username}`}>
             <Button kind="secondary" renderIcon={UserAvatar}>
-              View Profile
+              {t('dashboard.viewProfile')}
             </Button>
           </Link>
         )}

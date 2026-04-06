@@ -1,5 +1,4 @@
-﻿using Nuke;
-using Nuke.Common;
+﻿using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.Docker;
@@ -93,10 +92,10 @@ public partial class Build
       });
 
   internal Target InstallDockerNetwork => _ => _
-    .Description($"Creates {Constants.Docker.Networks.AppNetwork} docker network which is a shared global network")
+    .Description("Creates the Docker network for this worktree instance")
     .Executes(() =>
     {
-      var name = Constants.Docker.Networks.AppNetwork;
+      var name = ScopedNetworkName;
 
       var existing = DockerTasks.DockerNetworkLs(s => s
           .SetFilter($"name=^{name}$")

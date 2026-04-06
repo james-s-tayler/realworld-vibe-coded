@@ -13,6 +13,7 @@ services:
       start_period: 5s
 
   api:
+    image: conduit-e2e-api:${IMAGE_TAG:-local}
     build:
       context: ../../
       dockerfile: Test/e2e/Dockerfile.api
@@ -26,12 +27,12 @@ services:
       ASPNETCORE_URLS: https://+:5001;http://+:5000
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
       ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERT_PASSWORD:-DevPassword123!}
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true;Command Timeout=60"
       Audit__LogsPath: /app/Logs/Test/e2e/Server.Web/Audit.NET
       Serilog__WriteTo__1__Args__Path: /app/Logs/Test/e2e/Server.Web/Serilog/logs.txt
     ports:
-      - "5000:5000"
-      - "5001:5001"
+      - "${PORT_API_HTTP:-5000}:5000"
+      - "${PORT_API_HTTPS:-5001}:5001"
     volumes:
       - ../../Logs:/app/Logs
     healthcheck:
@@ -42,6 +43,7 @@ services:
       start_period: 10s
 
   playwright:
+    image: conduit-e2e-playwright:${IMAGE_TAG:-local}
     build:
       context: ./
       dockerfile: Dockerfile.playwright

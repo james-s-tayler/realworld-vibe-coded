@@ -9,13 +9,20 @@
   <PropertyGroup>
     <NoWarn>1591</NoWarn> <!-- Remove this to turn on warnings for missing XML Comments -->
   </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'Server.Analyzers'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
   <ItemGroup Condition="'$(MSBuildProjectName)' != 'Server.Analyzers'">
-    <ProjectReference Include="$(MSBuildThisFileDirectory)analyzers\Server.Analyzers\Server.Analyzers.csproj" 
-                      OutputItemType="Analyzer" 
+    <ProjectReference Include="$(MSBuildThisFileDirectory)analyzers\Server.Analyzers\Server.Analyzers.csproj"
+                      OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
   <ItemGroup Condition="'$(MSBuildProjectName)' != 'Server.Analyzers'">
     <PackageReference Include="StyleCop.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="ReferenceTrimmer">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

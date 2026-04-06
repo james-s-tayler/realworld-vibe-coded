@@ -16,6 +16,9 @@ task_runner_changes=$(echo "$staged_files" | grep "^Task/Runner/" | wc -l)
 # Check if there are any changes in Test/e2e
 e2e_test_changes=$(echo "$staged_files" | grep "^Test/e2e/" | wc -l)
 
+# Check if there are any changes in Server.Web (endpoint definitions that affect OpenAPI spec)
+server_web_changes=$(echo "$staged_files" | grep "^App/Server/src/Server\.Web/" | wc -l)
+
 # Check if there are any changes in Server.Infrastructure/Data or Server.Core
 migration_changes=$(echo "$staged_files" | grep -E "^App/Server/src/Server\.(Infrastructure/Data|Core)/" | wc -l)
 
@@ -37,6 +40,23 @@ if [ "$client_changes" -gt 0 ]; then
     exit 1
   fi
   echo "✅ Client linting completed successfully."
+fi
+
+# Verify Kiota-generated API client is in sync when Server.Web endpoints change.
+# BuildGenerateApiClient regenerates the client, then we auto-stage any drift and
+# run LintApiClientVerify to confirm the working tree matches.
+if [ "$server_web_changes" -gt 0 ]; then
+  echo "🔧 Server.Web endpoint changes detected, verifying API client is in sync..."
+  if ! ./build.sh LintApiClientVerify; then
+    echo "⚠️  API client drift detected — auto-staging regenerated files..."
+    git add App/Client/src/api/generated/
+    if ! ./build.sh LintApiClientVerify; then
+      echo "❌ API client verification failed even after regeneration. Investigate manually."
+      exit 1
+    fi
+    echo "✅ Regenerated API client files have been auto-staged."
+  fi
+  echo "✅ API client is in sync with server endpoints."
 fi
 
 # Run lint-nuke-fix if there are Task/Runner changes
@@ -67,7 +87,7 @@ if [ "$migration_changes" -gt 0 ]; then
 fi
 
 # If no relevant changes, skip linting
-if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ] && [ "$e2e_test_changes" -eq 0 ] && [ "$migration_changes" -eq 0 ]; then
+if [ "$server_changes" -eq 0 ] && [ "$client_changes" -eq 0 ] && [ "$task_runner_changes" -eq 0 ] && [ "$e2e_test_changes" -eq 0 ] && [ "$migration_changes" -eq 0 ] && [ "$server_web_changes" -eq 0 ]; then
   echo "ℹ️  No changes detected in App/Server, App/Client, Task/Runner, Test/e2e, or database migration directories. Skipping linting."
 fi
 

@@ -13,6 +13,7 @@ services:
       start_period: 10s
 
   migration-test:
+    image: conduit-migration-test:local
     build:
       context: ../../
       dockerfile: Test/Migrations/Dockerfile

@@ -13,7 +13,12 @@ if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*dotnet\b'; then
 fi
 
 if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*docker(-compose)?\b' || echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*docker\s+compose\b'; then
-  echo "BLOCKED: Do not run docker/docker-compose commands directly. Use ./build.sh <target> instead. Key targets: RunLocalPublish, RunLocalDependencies, RunLocalDependenciesDown, DbReset, TestServerPostman*, TestE2e" >&2
+  echo "BLOCKED: Do not run docker/docker-compose commands directly. Use ./build.sh <target> instead. Key targets: RunLocalPublish, RunLocalDependencies, RunLocalDependenciesDown, DbReset, TestE2e" >&2
+  exit 2
+fi
+
+if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*npm\s+run\b'; then
+  echo "BLOCKED: Do not run npm scripts directly. Use ./build.sh <target> instead." >&2
   exit 2
 fi
 

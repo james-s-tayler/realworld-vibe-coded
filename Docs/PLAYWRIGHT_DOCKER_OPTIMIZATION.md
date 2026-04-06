@@ -4,7 +4,6 @@
 
 This document summarizes the optimizations made to Docker Compose setups across the repository to significantly reduce startup and execution times. These optimizations apply to:
 - **E2E Playwright Tests** (`Test/e2e/`)
-- **Postman API Tests** (`Test/Postman/`)
 - **Local Development** (`Task/LocalDev/`)
 
 ## Performance Improvements
@@ -159,9 +158,8 @@ Combined with `DOCKER_BUILDKIT: 1` environment variable, this enables persistent
 
 These optimizations were applied to:
 - `test-e2e`: E2E Playwright tests
-- `test-server-postman`: Postman API tests
 
-Both jobs benefit from faster builds and reduced network usage in CI.
+This job benefits from faster builds and reduced network usage in CI.
 
 ## Applied to All Docker Setups
 
@@ -173,19 +171,13 @@ The same optimizations have been applied to all Docker Compose configurations in
 - Docker layer caching
 - GitHub Actions CI caching
 
-### 2. Postman API Tests (`Test/Postman/`)
-- Optimized SQL Server health checks (10s → 3s interval)
-- Optimized API health checks (5s → 2s interval, 30s → 10s start_period)
-- BuildKit enabled via `DOCKER_BUILDKIT=1` in NUKE build target
-- Faster test execution for both local and CI environments
-
-### 3. Local Development (`Task/LocalDev/`)
+### 2. Local Development (`Task/LocalDev/`)
 - Optimized SQL Server health checks (10s → 3s interval)
 - Optimized API health checks (10s → 3s interval, 30s → 10s start_period)
 - BuildKit enabled for faster rebuilds during development
 - Faster container startup for improved developer experience
 
-All three setups now benefit from:
+Both setups now benefit from:
 - Reduced startup times through faster health checks
 - BuildKit support for better caching
 - Consistent optimization approach across environments
@@ -200,4 +192,4 @@ While the current optimizations provide significant improvements, additional opt
 
 ## Conclusion
 
-The optimizations reduce Docker Compose startup times by **52-72%** for E2E tests, with similar improvements across Postman tests and local development environments. These changes significantly improve developer feedback cycles and CI efficiency while maintaining test reliability.
+The optimizations reduce Docker Compose startup times by **52-72%** for E2E tests, with similar improvements for local development environments. These changes significantly improve developer feedback cycles and CI efficiency while maintaining test reliability.

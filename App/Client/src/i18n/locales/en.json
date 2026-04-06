@@ -1,0 +1,104 @@
+{
+  "brand": "conduit",
+  "nav": {
+    "home": "Home",
+    "users": "Users",
+    "settings": "Settings",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "logOut": "Log out",
+    "sideNavLabel": "Side navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "login": {
+    "title": "Sign in",
+    "needAccount": "Need an account?",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in..."
+  },
+  "register": {
+    "title": "Sign up",
+    "haveAccount": "Have an account?",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign up",
+    "submitting": "Creating account..."
+  },
+  "settings": {
+    "title": "Your Settings",
+    "imageUrl": "URL of profile picture",
+    "username": "Username",
+    "bio": "Short bio about you",
+    "email": "Email",
+    "newPassword": "New Password",
+    "language": "Language",
+    "submit": "Update Settings",
+    "submitting": "Updating...",
+    "success": "Success",
+    "successMessage": "Settings updated successfully"
+  },
+  "dashboard": {
+    "welcome": "Welcome, {{username}}!",
+    "welcomeGuest": "Welcome!",
+    "subtitle": "This is your dashboard. Get started by exploring:",
+    "settings": "Settings",
+    "viewProfile": "View Profile",
+    "bannerTitle": "New Feature",
+    "bannerMessage": "Check out our latest updates and improvements!"
+  },
+  "profile": {
+    "editSettings": "Edit Profile Settings",
+    "loading": "Loading profile...",
+    "error": "Error",
+    "notFound": "Profile not found",
+    "failedToLoad": "Failed to load profile"
+  },
+  "users": {
+    "title": "Users",
+    "inviteUser": "Invite User",
+    "username": "Username",
+    "email": "Email",
+    "roles": "Role(s)",
+    "status": "Status",
+    "actions": "Actions",
+    "active": "Active",
+    "deactivated": "Deactivated",
+    "editRoles": "Edit Roles",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
+    "loading": "Loading users...",
+    "failedToLoad": "Failed to load users",
+    "failedToDeactivate": "Failed to deactivate user",
+    "failedToReactivate": "Failed to reactivate user",
+    "failedToUpdateRoles": "Failed to update roles",
+    "failedToInvite": "Failed to invite user",
+    "inviteModalTitle": "Invite User",
+    "invite": "Invite",
+    "cancel": "Cancel",
+    "save": "Save",
+    "editRolesTitle": "Edit Roles — {{username}}",
+    "emailAndPasswordRequired": "Email and password are required",
+    "actionsFor": "Actions for {{email}}",
+    "password": "Password",
+    "emailPlaceholder": "user@example.com"
+  },
+  "forbidden": {
+    "title": "403 - Forbidden",
+    "message": "You don't have permission to access this page.",
+    "goHome": "Go back to home"
+  },
+  "error": {
+    "title": "Error"
+  },
+  "pagination": {
+    "previous": "Previous page",
+    "next": "Next page",
+    "itemsPerPage": "Items per page:",
+    "itemRange": "{{min}}–{{max}} of {{total}} items",
+    "pageRange_one": "of {{count}} page",
+    "pageRange_other": "of {{count}} pages"
+  }
+}

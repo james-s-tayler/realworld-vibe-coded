@@ -26,6 +26,13 @@ body {
   padding-left: var(--sidebar-width);
 }
 
+/* Carbon's SideNav with isChildOfHeader auto-pushes content at lg+ */
+@media (min-width: 66rem) {
+  #root {
+    padding-left: var(--sidebar-width);
+  }
+}
+
 a {
   color: #5cb85c;
   text-decoration: none;
@@ -58,4 +65,3 @@ h1, h2, h3, h4, h5, h6 {
   max-width: 100%;
   padding: 0 15px;
 }
-

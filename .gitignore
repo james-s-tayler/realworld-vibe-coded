@@ -62,7 +62,7 @@ nunit-*.xml
 *.sqlite-shm
 *.sqlite-wal
 
-# Newman/Postman test reports and E2E test results
+# E2E test results
 reports/
 Reports/
 # But keep agent stats CSV (committed as run artifacts)
@@ -98,3 +98,6 @@ TODO.md
 # Action log (generated per experiment run)
 ACTION-LOG.md
 
+# Environment files
+.env
+.claude/worktrees/

@@ -23,10 +23,10 @@ public class HappyPath : AppPageTest
 
     // Assert — first user is ADMIN, so Users nav should be visible
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/");
-    await Expect(Pages.HomePage.UsersLink).ToBeVisibleAsync();
+    await Expect(Pages.UsersPage.UsersLink).ToBeVisibleAsync();
 
     // Verify navigation to Users page works
-    await Pages.HomePage.ClickUsersAsync();
+    await Pages.UsersPage.ClickUsersAsync();
     await Expect(Page).ToHaveURLAsync($"{BaseUrl}/users");
     await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
   }

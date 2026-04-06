@@ -4,7 +4,6 @@ using Nuke;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
-using Nuke.Common.Tools.Docker;
 using Nuke.Common.Tools.Npm;
 using Serilog;
 using static Nuke.Common.Tools.Npm.NpmTasks;
@@ -15,7 +14,7 @@ public partial class Build
 
   internal AbsolutePath DocsMcpPidFile => PidDirectory / "docs-mcp-server.pid";
 
-  internal AbsolutePath NgrokPidFile => PidDirectory / "ngrok.pid";
+  internal AbsolutePath DockerComposePublish => TaskLocalDevDirectory / "docker-compose.publish.yml";
 
   internal Target RunLocalPublish => _ => _
     .Description("Run backend locally using Docker Compose with published artifact")
@@ -25,21 +24,36 @@ public partial class Build
     .Executes(() =>
     {
       Log.Information("Starting local development environment with Docker Compose (published artifact)...");
+      LogWorktreeInfo();
 
-      var publishComposeFile = TaskLocalDevDirectory / "docker-compose.publish.yml";
-
-      var envVars = new Dictionary<string, string>
+      var envVars = new Dictionary<string, string>(GetWorktreeEnvVars())
       {
         ["DOCKER_BUILDKIT"] = "1",
       };
 
+      var detached = Agent ? " -d" : string.Empty;
       Log.Information("Running Docker Compose for local development with published artifact...");
-      var args = $"compose -f {publishComposeFile} -p {Constants.Docker.Projects.App} up --build";
+      var args = $"compose -f {DockerComposePublish} -p {ScopedProjectName(Constants.Docker.Projects.App)} up --build{detached}";
       var process = ProcessTasks.StartProcess(
             "docker",
             args,
             workingDirectory: RootDirectory,
             environmentVariables: envVars);
+      process.WaitForExit();
+    });
+
+  internal Target RunLocalPublishDown => _ => _
+    .Description("Stop backend Docker Compose containers")
+    .Executes(() =>
+    {
+      Log.Information("Stopping local published app containers...");
+      var envVars = GetWorktreeEnvVars();
+      var args = $"compose -f {DockerComposePublish} -p {ScopedProjectName(Constants.Docker.Projects.App)} down";
+      var process = ProcessTasks.StartProcess(
+        "docker",
+        args,
+        workingDirectory: RootDirectory,
+        environmentVariables: envVars);
       process.WaitForExit();
     });
 
@@ -50,15 +64,15 @@ public partial class Build
     {
       Log.Information("Starting dev dependencies");
 
-      var envVars = new Dictionary<string, string>
+      var envVars = new Dictionary<string, string>(GetWorktreeEnvVars())
       {
         ["DOCKER_BUILDKIT"] = "1",
       };
 
       try
       {
-        Log.Information("Running Docker Compose for local development with published artifact...");
-        var args = $"compose -f {DockerComposeDependencies} -p {Constants.Docker.Projects.DevDependencies} up -d";
+        Log.Information("Running Docker Compose for dev dependencies...");
+        var args = $"compose -f {DockerComposeDependencies} -p {ScopedProjectName(Constants.Docker.Projects.DevDependencies)} up -d";
         var process = ProcessTasks.StartProcess(
           "docker",
           args,
@@ -74,11 +88,18 @@ public partial class Build
     });
 
   internal Target RunLocalDependenciesDown => _ => _
-    .Description("stop dev dependencies")
+    .Description("Stop dev dependencies")
     .Executes(() =>
     {
       Log.Information("Stopping dev dependencies");
-      DockerTasks.Docker($"compose -f {DockerComposeDependencies} -p {Constants.Docker.Projects.DevDependencies} down", workingDirectory: RootDirectory);
+      var envVars = GetWorktreeEnvVars();
+      var args = $"compose -f {DockerComposeDependencies} -p {ScopedProjectName(Constants.Docker.Projects.DevDependencies)} down";
+      var process = ProcessTasks.StartProcess(
+        "docker",
+        args,
+        workingDirectory: RootDirectory,
+        environmentVariables: envVars);
+      process.WaitForExit();
     });
 
   internal Target RunLocalClient => _ => _
@@ -86,39 +107,39 @@ public partial class Build
     .DependsOn(InstallClient)
     .Executes(() =>
     {
-      Log.Information($"Starting Vite dev server in {ClientDirectory}");
+      var offset = Constants.Worktree.GetPortOffset(RootDirectory);
+      var apiPort = 5000 + offset;
+      Log.Information("Starting Vite dev server in {ClientDirectory} (API proxy → http://localhost:{ApiPort})", ClientDirectory, apiPort);
       NpmRun(s => s
         .SetProcessWorkingDirectory(ClientDirectory)
-        .SetCommand("dev"));
+        .SetCommand("dev")
+        .SetProcessEnvironmentVariable("VITE_API_URL", $"http://localhost:{apiPort}"));
     });
 
   internal Target RunLocalDocsMcpServerUp => _ => _
-    .Description("Start Docs MCP Server and ngrok in the background")
+    .Description("Start Docs MCP Server in the background")
     .Executes(() =>
     {
       // Ensure PID directory exists
       PidDirectory.CreateDirectory();
 
-      // Check if services are already running
-      if (DocsMcpPidFile.FileExists() || NgrokPidFile.FileExists())
+      // Check if server is already running
+      if (DocsMcpPidFile.FileExists())
       {
-        Log.Warning("Services may already be running. Run RunLocalDocsMcpServerDown first.");
-        var existingFiles = new[] { DocsMcpPidFile, NgrokPidFile }
-          .Where(f => f.FileExists())
-          .Select(f => f.ToString());
-        Log.Warning("PID files found: {Files}", string.Join(", ", existingFiles));
-        throw new Exception("Services may already be running. Clean up PID files first.");
+        Log.Warning("Docs MCP Server may already be running. Run RunLocalDocsMcpServerDown first.");
+        throw new Exception("Docs MCP Server may already be running. Clean up PID file first.");
       }
 
       // Start Docs MCP Server in the background
       Log.Information("Starting Docs MCP Server in the background...");
-      var mcpProcess = StartBackgroundProcess("npx", "--yes @arabold/docs-mcp-server@latest");
+      var mcpProcess = StartBackgroundProcess("npx", $"--yes @arabold/docs-mcp-server@latest server --protocol http --port {DocsMcpPort}");
       DocsMcpPidFile.WriteAllText(mcpProcess.Id.ToString());
       Log.Information("Docs MCP Server started with PID: {PID}", mcpProcess.Id);
 
       // Wait for the server to be available
-      Log.Information("Waiting for Docs MCP Server to be available at http://127.0.0.1:6280...");
-      if (!WaitForHttpEndpoint("http://127.0.0.1:6280", timeoutSeconds: 15))
+      var mcpUrl = $"http://127.0.0.1:{DocsMcpPort}";
+      Log.Information("Waiting for Docs MCP Server to be available at {Url}...", mcpUrl);
+      if (!WaitForHttpEndpoint(mcpUrl, timeoutSeconds: 60))
       {
         Log.Error("Docs MCP Server did not become available within the timeout period");
 
@@ -128,66 +149,16 @@ public partial class Build
         throw new Exception("Docs MCP Server failed to start - try run npx @arabold/docs-mcp-server@latest");
       }
 
-      Log.Information("✓ Docs MCP Server is available at http://127.0.0.1:6280");
-
-      // Check if ngrok is available
-      if (!IsCommandAvailable("ngrok"))
-      {
-        Log.Warning("ngrok is not installed or not in PATH");
-        Log.Warning("Install ngrok from https://ngrok.com/download");
-        Log.Warning("Continuing without ngrok...");
-        Log.Information("✓ Docs MCP Server started successfully (without ngrok)");
-        Log.Information("  Docs MCP Server: http://127.0.0.1:6280");
-        Log.Information("  PID files stored in: {PidDirectory}", PidDirectory);
-        return;
-      }
-
-      // Start ngrok in the background
-      Log.Information("Starting ngrok in the background...");
-      var ngrokProcess = StartBackgroundProcess("ngrok", "http 6280 --url noncognizably-chartographical-fae.ngrok-free.app");
-      NgrokPidFile.WriteAllText(ngrokProcess.Id.ToString());
-      Log.Information("ngrok started with PID: {PID}", ngrokProcess.Id);
-
-      // Give ngrok a moment to initialize
-      Log.Information("Waiting for ngrok to initialize...");
-      System.Threading.Thread.Sleep(3000);
-
-      Log.Information("✓ Services started successfully");
-      Log.Information("  Docs MCP Server: http://127.0.0.1:6280");
-      Log.Information("  ngrok: https://noncognizably-chartographical-fae.ngrok-free.app");
-      Log.Information("  PID files stored in: {PidDirectory}", PidDirectory);
+      Log.Information("✓ Docs MCP Server started successfully at {Url}", mcpUrl);
+      Log.Information("  PID file stored in: {PidDirectory}", PidDirectory);
     });
 
   internal Target RunLocalDocsMcpServerDown => _ => _
-    .Description("Stop Docs MCP Server and ngrok background processes")
+    .Description("Stop Docs MCP Server background process")
     .Executes(() =>
     {
       var errors = new List<string>();
 
-      // Stop ngrok first (reverse order of startup)
-      if (NgrokPidFile.FileExists())
-      {
-        var ngrokPid = int.Parse(NgrokPidFile.ReadAllText());
-        Log.Information("Stopping ngrok (PID: {PID})...", ngrokPid);
-        try
-        {
-          KillProcess(ngrokPid);
-          NgrokPidFile.DeleteFile();
-          Log.Information("✓ ngrok stopped");
-        }
-        catch (Exception ex)
-        {
-          var error = $"Failed to stop ngrok: {ex.Message}";
-          Log.Error(error);
-          errors.Add(error);
-        }
-      }
-      else
-      {
-        Log.Warning("ngrok PID file not found: {File}", NgrokPidFile);
-      }
-
-      // Stop Docs MCP Server
       if (DocsMcpPidFile.FileExists())
       {
         var mcpPid = int.Parse(DocsMcpPidFile.ReadAllText());
@@ -214,9 +185,9 @@ public partial class Build
       Log.Information("Verifying services are stopped...");
       System.Threading.Thread.Sleep(1000);
 
-      if (IsHttpEndpointAvailable("http://127.0.0.1:6280"))
+      if (IsHttpEndpointAvailable($"http://127.0.0.1:{DocsMcpPort}"))
       {
-        var error = "Docs MCP Server is still accessible at http://127.0.0.1:6280";
+        var error = $"Docs MCP Server is still accessible at http://127.0.0.1:{DocsMcpPort}";
         Log.Error(error);
         errors.Add(error);
       }
@@ -340,28 +311,6 @@ public partial class Build
     {
       Log.Warning("Error killing process {PID}: {Message}", pid, ex.Message);
       throw;
-    }
-  }
-
-  private bool IsCommandAvailable(string command)
-  {
-    try
-    {
-      var startInfo = new ProcessStartInfo
-      {
-        FileName = "which",
-        Arguments = command,
-        UseShellExecute = false,
-        CreateNoWindow = true,
-        RedirectStandardOutput = true,
-      };
-      var process = Process.Start(startInfo);
-      process?.WaitForExit();
-      return process?.ExitCode == 0;
-    }
-    catch
-    {
-      return false;
     }
   }
 }
