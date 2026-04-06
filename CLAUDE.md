@@ -9,6 +9,7 @@ These are the primary rules.
 3. All Test* Nuke targets record comprehensive reports in the Reports/ directory. Additionally TestE2e* nuke targets record playwright traces that can be viewed with /view-playwright-traces
 4. **Every feature must have its E2E tests passing before moving to the next feature.** The implementation workflow enforces this.
 5. **All compiler warnings and errors must be resolved.** Never suppress or ignore them.
+6. **No SQLite in tests.** Never use SQLite (including in-memory SQLite) for test databases. All database tests must use the real SQL Server via the functional test infrastructure (`AppFixture<Program>`). Prefer integration/functional tests over isolated unit tests with fake databases.
 8. **Frontend API client relies on Kiota code generation.** Always make backend changes first, then run `./build.sh BuildGenerateApiClient` before writing frontend code. `BuildClient` does this automatically (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Never reference fields in frontend that don't exist in the generated types.
 
 Reference as needed:
