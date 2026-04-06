@@ -26,6 +26,21 @@ public class PageObjects
   public DashboardPage DashboardPage => new(_page, _baseUrl);
 
   /// <summary>
+  /// Gets the Home page instance (alias for DashboardPage).
+  /// </summary>
+  public HomePage HomePage => new(_page, _baseUrl);
+
+  /// <summary>
+  /// Gets the Article page instance.
+  /// </summary>
+  public ArticlePage ArticlePage => new(_page, $"{_baseUrl}/article");
+
+  /// <summary>
+  /// Gets the Editor page instance.
+  /// </summary>
+  public EditorPage EditorPage => new(_page, $"{_baseUrl}/editor");
+
+  /// <summary>
   /// Gets the Login page instance.
   /// </summary>
   public LoginPage LoginPage => new(_page, $"{_baseUrl}/login");
