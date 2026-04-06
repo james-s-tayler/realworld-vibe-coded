@@ -50,6 +50,11 @@ public class ExceptionHandlingBehavior<TRequest, T> : IPipelineBehavior<TRequest
       _logger.LogWarning(ex, "Duplicate key conflict occurred while processing {RequestName}", typeof(TRequest).Name);
       return Result<T>.Conflict(ex);
     }
+    catch (TimeoutException ex)
+    {
+      _logger.LogWarning(ex, "Timeout occurred while processing {RequestName}", typeof(TRequest).Name);
+      return Result<T>.Unavailable(new ErrorDetail(ex.GetType().Name, ex.Message));
+    }
     catch (Exception ex)
     {
       _logger.LogError(ex, "An unhandled exception occurred while processing {RequestName}", typeof(TRequest).Name);

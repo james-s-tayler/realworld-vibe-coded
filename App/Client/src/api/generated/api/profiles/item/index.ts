@@ -20,6 +20,7 @@ export interface WithUsernameItemRequestBuilder extends BaseRequestBuilder<WithU
      * @throws {ProblemDetails} error when the service returns a 404 status code
      * @throws {ProblemDetails} error when the service returns a 409 status code
      * @throws {ProblemDetails} error when the service returns a 500 status code
+     * @throws {ProblemDetails} error when the service returns a 503 status code
      */
      get(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<ProfileResponse | undefined>;
     /**
@@ -47,6 +48,7 @@ export const WithUsernameItemRequestBuilderRequestsMetadata: RequestsMetadata = 
             404: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             409: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             500: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
+            503: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
         },
         adapterMethodName: "send",
         responseBodyFactory:  createProfileResponseFromDiscriminatorValue,
