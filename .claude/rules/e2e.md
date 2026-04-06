@@ -22,3 +22,12 @@ paths:
   await link.DispatchEventAsync("click");
   ```
 - **Mobile tests:** Subclass `MobileAppPageTest` (375×667 viewport, `IsMobile = true`, `HasTouch = true`). Use `LoginOnMobileAsync()` instead of `LoginAsync()` — the standard login asserts sidebar link visibility which fails on mobile.
+
+## HttpClient in E2E Test Fixtures
+
+- **Never** construct `HttpClient` directly — use `IHttpClientFactory` via `ServiceCollection`
+- Add `Microsoft.Extensions.Http.Resilience` for transient retry (408, 429, 503, 504)
+- **Never** retry on 500 — that's a server bug, not a transient error
+- Server returns 503 for `TimeoutException` (SQL timeouts etc.) — see `ExceptionHandlingBehavior`
+- Pattern: see `ApiFixture.cs` constructor for `AddResilienceHandler` setup
+- Dispose `ServiceProvider` in `DisposeAsync()` — it owns the handler pipeline

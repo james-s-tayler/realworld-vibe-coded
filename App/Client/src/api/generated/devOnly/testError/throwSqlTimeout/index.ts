@@ -7,11 +7,11 @@ import { createProblemDetailsFromDiscriminatorValue, type ProblemDetails } from 
 import { type BaseRequestBuilder, type Parsable, type ParsableFactory, type RequestConfiguration, type RequestInformation, type RequestsMetadata } from '@microsoft/kiota-abstractions';
 
 /**
- * Builds and executes requests for operations under /dev-only/test-error/throw-concurrency
+ * Builds and executes requests for operations under /dev-only/test-error/throw-sql-timeout
  */
-export interface ThrowConcurrencyRequestBuilder extends BaseRequestBuilder<ThrowConcurrencyRequestBuilder> {
+export interface ThrowSqlTimeoutRequestBuilder extends BaseRequestBuilder<ThrowSqlTimeoutRequestBuilder> {
     /**
-     * This endpoint throws a DbUpdateConcurrencyException to test conflict handling.
+     * This endpoint throws a TimeoutException to test transient error handling (503).
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @throws {ProblemDetails} error when the service returns a 401 status code
      * @throws {ProblemDetails} error when the service returns a 403 status code
@@ -22,7 +22,7 @@ export interface ThrowConcurrencyRequestBuilder extends BaseRequestBuilder<Throw
      */
      get(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<void>;
     /**
-     * This endpoint throws a DbUpdateConcurrencyException to test conflict handling.
+     * This endpoint throws a TimeoutException to test transient error handling (503).
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */
@@ -31,13 +31,13 @@ export interface ThrowConcurrencyRequestBuilder extends BaseRequestBuilder<Throw
 /**
  * Uri template for the request builder.
  */
-export const ThrowConcurrencyRequestBuilderUriTemplate = "{+baseurl}/dev-only/test-error/throw-concurrency";
+export const ThrowSqlTimeoutRequestBuilderUriTemplate = "{+baseurl}/dev-only/test-error/throw-sql-timeout";
 /**
  * Metadata for all the requests in the request builder.
  */
-export const ThrowConcurrencyRequestBuilderRequestsMetadata: RequestsMetadata = {
+export const ThrowSqlTimeoutRequestBuilderRequestsMetadata: RequestsMetadata = {
     get: {
-        uriTemplate: ThrowConcurrencyRequestBuilderUriTemplate,
+        uriTemplate: ThrowSqlTimeoutRequestBuilderUriTemplate,
         responseBodyContentType: "application/problem+json",
         errorMappings: {
             401: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,

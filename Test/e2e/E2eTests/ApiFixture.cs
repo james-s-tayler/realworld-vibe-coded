@@ -1,40 +1,64 @@
-﻿using System.Net.Http.Json;
+using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
+using Polly;
 
 namespace E2eTests;
 
 /// <summary>
 /// Provides API-based data setup methods for E2E tests.
 /// This fixture enables tests to arrange data via API calls instead of UI interactions.
+/// Uses IHttpClientFactory with Polly resilience for transient server error retries.
 /// </summary>
 public class ApiFixture : IAsyncLifetime
 {
-  private readonly string _baseUrl;
   private readonly JsonSerializerOptions _jsonOptions;
   private readonly HttpClient _httpClient;
+  private readonly ServiceProvider _serviceProvider;
   private int _userCounter;
 
   public ApiFixture()
   {
-    _baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
+    var baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
     _jsonOptions = new JsonSerializerOptions
     {
       PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
-    // Configure HttpClientHandler to accept self-signed certificates in test environments
-    var handler = new HttpClientHandler();
-
-    // WARNING: Disables all SSL/TLS certificate validation for E2E tests.
-    // This is safe ONLY in isolated test environments (e.g., E2E tests with self-signed dev certificates in Docker containers).
-    // NEVER use this pattern in production code, as it allows any certificate (including expired, self-signed, or malicious).
-    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-
-    _httpClient = new HttpClient(handler)
+    var services = new ServiceCollection();
+    services.AddHttpClient("ApiFixture", client =>
     {
-      BaseAddress = new Uri(_baseUrl),
-    };
+      client.BaseAddress = new Uri(baseUrl);
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+      // WARNING: Disables all SSL/TLS certificate validation for E2E tests.
+      // This is safe ONLY in isolated test environments (e.g., E2E tests with self-signed dev certificates in Docker containers).
+      // NEVER use this pattern in production code.
+      ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true,
+    })
+    .AddResilienceHandler("transient-retry", builder =>
+    {
+      builder.AddRetry(new HttpRetryStrategyOptions
+      {
+        MaxRetryAttempts = 3,
+        Delay = TimeSpan.FromSeconds(2),
+        BackoffType = DelayBackoffType.Exponential,
+        ShouldHandle = static args => ValueTask.FromResult(
+          args.Outcome.Result?.StatusCode is
+            HttpStatusCode.RequestTimeout or       // 408
+            HttpStatusCode.TooManyRequests or       // 429
+            HttpStatusCode.ServiceUnavailable or    // 503
+            HttpStatusCode.GatewayTimeout),         // 504
+      });
+    });
+
+    _serviceProvider = services.BuildServiceProvider();
+    var factory = _serviceProvider.GetRequiredService<IHttpClientFactory>();
+    _httpClient = factory.CreateClient("ApiFixture");
   }
 
   public ValueTask InitializeAsync()
@@ -42,10 +66,10 @@ public class ApiFixture : IAsyncLifetime
     return ValueTask.CompletedTask;
   }
 
-  public ValueTask DisposeAsync()
+  public async ValueTask DisposeAsync()
   {
-    _httpClient?.Dispose();
-    return ValueTask.CompletedTask;
+    _httpClient.Dispose();
+    await _serviceProvider.DisposeAsync();
   }
 
   /// <summary>
@@ -65,13 +89,8 @@ public class ApiFixture : IAsyncLifetime
       password,
     };
 
-    // Register via Identity - creates a new tenant
-    using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/identity/register")
-    {
-      Content = JsonContent.Create(registerRequest, options: _jsonOptions),
-    };
-
-    var registerResponse = await _httpClient.SendAsync(registerHttpRequest);
+    // Register via Identity - creates a new tenant (retry handled by Polly pipeline)
+    var registerResponse = await _httpClient.PostAsJsonAsync("/api/identity/register", registerRequest, _jsonOptions);
     registerResponse.EnsureSuccessStatusCode();
 
     // Now login to get the token
@@ -166,13 +185,8 @@ public class ApiFixture : IAsyncLifetime
       password,
     };
 
-    // Register via Identity - no token expected
-    using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/identity/register")
-    {
-      Content = JsonContent.Create(registerRequest, options: _jsonOptions),
-    };
-
-    var registerResponse = await _httpClient.SendAsync(registerHttpRequest);
+    // Register via Identity (retry handled by Polly pipeline)
+    var registerResponse = await _httpClient.PostAsJsonAsync("/api/identity/register", registerRequest, _jsonOptions);
     registerResponse.EnsureSuccessStatusCode();
 
     // Now login to get the token

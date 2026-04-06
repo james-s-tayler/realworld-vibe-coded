@@ -3,11 +3,7 @@
     <PackageVersion Include="Ardalis.GuardClauses" Version="5.0.0" />
     <PackageVersion Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.6.0" />
     <PackageVersion Include="Darp.Utils.ResxSourceGenerator" Version="1.19.1" />
-    <PackageVersion Include="Ardalis.HttpClientTestExtensions" Version="4.2.0" />
     <PackageVersion Include="Ardalis.ListStartupServices" Version="1.1.4" />
-    <PackageVersion Include="Ardalis.Result" Version="10.1.0" />
-    <PackageVersion Include="Ardalis.Result.AspNetCore" Version="10.1.0" />
-    <PackageVersion Include="Ardalis.SmartEnum" Version="8.2.0" />
     <PackageVersion Include="Ardalis.Specification" Version="9.2.0" />
     <PackageVersion Include="Ardalis.Specification.EntityFrameworkCore" Version="9.2.0" />
     <PackageVersion Include="Audit.EntityFramework.Core" Version="31.3.1" />
@@ -65,6 +61,7 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
+    <PackageVersion Include="ReferenceTrimmer" Version="3.4.5" />
     <PackageVersion Include="ReportGenerator" Version="5.4.8" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />

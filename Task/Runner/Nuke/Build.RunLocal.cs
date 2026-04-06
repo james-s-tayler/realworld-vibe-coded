@@ -14,8 +14,6 @@ public partial class Build
 
   internal AbsolutePath DocsMcpPidFile => PidDirectory / "docs-mcp-server.pid";
 
-  internal AbsolutePath NgrokPidFile => PidDirectory / "ngrok.pid";
-
   internal AbsolutePath DockerComposePublish => TaskLocalDevDirectory / "docker-compose.publish.yml";
 
   internal Target RunLocalPublish => _ => _
@@ -119,33 +117,29 @@ public partial class Build
     });
 
   internal Target RunLocalDocsMcpServerUp => _ => _
-    .Description("Start Docs MCP Server and ngrok in the background")
+    .Description("Start Docs MCP Server in the background")
     .Executes(() =>
     {
       // Ensure PID directory exists
       PidDirectory.CreateDirectory();
 
-      // Check if services are already running
-      if (DocsMcpPidFile.FileExists() || NgrokPidFile.FileExists())
+      // Check if server is already running
+      if (DocsMcpPidFile.FileExists())
       {
-        Log.Warning("Services may already be running. Run RunLocalDocsMcpServerDown first.");
-        var existingFiles = new[] { DocsMcpPidFile, NgrokPidFile }
-          .Where(f => f.FileExists())
-          .Select(f => f.ToString());
-        Log.Warning("PID files found: {Files}", string.Join(", ", existingFiles));
-        throw new Exception("Services may already be running. Clean up PID files first.");
+        Log.Warning("Docs MCP Server may already be running. Run RunLocalDocsMcpServerDown first.");
+        throw new Exception("Docs MCP Server may already be running. Clean up PID file first.");
       }
 
       // Start Docs MCP Server in the background
       Log.Information("Starting Docs MCP Server in the background...");
-      var mcpProcess = StartBackgroundProcess("npx", $"--yes @arabold/docs-mcp-server@latest --port {DocsMcpPort}");
+      var mcpProcess = StartBackgroundProcess("npx", $"--yes @arabold/docs-mcp-server@latest server --protocol http --port {DocsMcpPort}");
       DocsMcpPidFile.WriteAllText(mcpProcess.Id.ToString());
       Log.Information("Docs MCP Server started with PID: {PID}", mcpProcess.Id);
 
       // Wait for the server to be available
       var mcpUrl = $"http://127.0.0.1:{DocsMcpPort}";
       Log.Information("Waiting for Docs MCP Server to be available at {Url}...", mcpUrl);
-      if (!WaitForHttpEndpoint(mcpUrl, timeoutSeconds: 15))
+      if (!WaitForHttpEndpoint(mcpUrl, timeoutSeconds: 60))
       {
         Log.Error("Docs MCP Server did not become available within the timeout period");
 
@@ -155,66 +149,16 @@ public partial class Build
         throw new Exception("Docs MCP Server failed to start - try run npx @arabold/docs-mcp-server@latest");
       }
 
-      Log.Information("✓ Docs MCP Server is available at {Url}", mcpUrl);
-
-      // Check if ngrok is available
-      if (!IsCommandAvailable("ngrok"))
-      {
-        Log.Warning("ngrok is not installed or not in PATH");
-        Log.Warning("Install ngrok from https://ngrok.com/download");
-        Log.Warning("Continuing without ngrok...");
-        Log.Information("✓ Docs MCP Server started successfully (without ngrok)");
-        Log.Information("  Docs MCP Server: http://127.0.0.1:{Port}", DocsMcpPort);
-        Log.Information("  PID files stored in: {PidDirectory}", PidDirectory);
-        return;
-      }
-
-      // Start ngrok in the background
-      Log.Information("Starting ngrok in the background...");
-      var ngrokProcess = StartBackgroundProcess("ngrok", $"http {DocsMcpPort} --url noncognizably-chartographical-fae.ngrok-free.app");
-      NgrokPidFile.WriteAllText(ngrokProcess.Id.ToString());
-      Log.Information("ngrok started with PID: {PID}", ngrokProcess.Id);
-
-      // Give ngrok a moment to initialize
-      Log.Information("Waiting for ngrok to initialize...");
-      System.Threading.Thread.Sleep(3000);
-
-      Log.Information("✓ Services started successfully");
-      Log.Information("  Docs MCP Server: http://127.0.0.1:{Port}", DocsMcpPort);
-      Log.Information("  ngrok: https://noncognizably-chartographical-fae.ngrok-free.app");
-      Log.Information("  PID files stored in: {PidDirectory}", PidDirectory);
+      Log.Information("✓ Docs MCP Server started successfully at {Url}", mcpUrl);
+      Log.Information("  PID file stored in: {PidDirectory}", PidDirectory);
     });
 
   internal Target RunLocalDocsMcpServerDown => _ => _
-    .Description("Stop Docs MCP Server and ngrok background processes")
+    .Description("Stop Docs MCP Server background process")
     .Executes(() =>
     {
       var errors = new List<string>();
 
-      // Stop ngrok first (reverse order of startup)
-      if (NgrokPidFile.FileExists())
-      {
-        var ngrokPid = int.Parse(NgrokPidFile.ReadAllText());
-        Log.Information("Stopping ngrok (PID: {PID})...", ngrokPid);
-        try
-        {
-          KillProcess(ngrokPid);
-          NgrokPidFile.DeleteFile();
-          Log.Information("✓ ngrok stopped");
-        }
-        catch (Exception ex)
-        {
-          var error = $"Failed to stop ngrok: {ex.Message}";
-          Log.Error(error);
-          errors.Add(error);
-        }
-      }
-      else
-      {
-        Log.Warning("ngrok PID file not found: {File}", NgrokPidFile);
-      }
-
-      // Stop Docs MCP Server
       if (DocsMcpPidFile.FileExists())
       {
         var mcpPid = int.Parse(DocsMcpPidFile.ReadAllText());
@@ -367,28 +311,6 @@ public partial class Build
     {
       Log.Warning("Error killing process {PID}: {Message}", pid, ex.Message);
       throw;
-    }
-  }
-
-  private bool IsCommandAvailable(string command)
-  {
-    try
-    {
-      var startInfo = new ProcessStartInfo
-      {
-        FileName = "which",
-        Arguments = command,
-        UseShellExecute = false,
-        CreateNoWindow = true,
-        RedirectStandardOutput = true,
-      };
-      var process = Process.Start(startInfo);
-      process?.WaitForExit();
-      return process?.ExitCode == 0;
-    }
-    catch
-    {
-      return false;
     }
   }
 }
