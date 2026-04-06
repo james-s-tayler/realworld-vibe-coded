@@ -235,6 +235,20 @@ public class HomePage : BasePage
     await Expect(ArticlePreviews.First).ToBeVisibleAsync();
   }
 
+  /// <summary>
+  /// New Article button/link.
+  /// </summary>
+  public ILocator NewArticleLink => Page.GetByRole(AriaRole.Link, new() { Name = "New Article" });
+
+  /// <summary>
+  /// Clicks the "New Article" link to navigate to the editor page.
+  /// </summary>
+  public async Task ClickNewArticleAsync()
+  {
+    await Expect(NewArticleLink).ToBeVisibleAsync();
+    await NewArticleLink.ClickAsync();
+  }
+
   public ILocator GetArticlePreviewTag(string title, string tagName) =>
     GetArticlePreviewByTitle(title).Locator(".tag-list .cds--tag").Filter(new() { HasText = tagName });
 
