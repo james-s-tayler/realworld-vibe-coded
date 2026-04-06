@@ -47,6 +47,8 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.playwright
+    # Default: run all implemented feature tests (excludes ArticlePage, EditorPage, HomePage — not yet implemented)
+    command: ["-trx", "/Reports/Test/e2e/Results/e2e-results.trx", "-namespace", "E2eTests.Tests.DashboardPage", "-namespace", "E2eTests.Tests.LoginPage", "-namespace", "E2eTests.Tests.RegisterPage", "-namespace", "E2eTests.Tests.SwaggerPage", "-namespace", "E2eTests.Tests.SettingsPage", "-namespace", "E2eTests.Tests.UsersPage", "-namespace", "E2eTests.Tests.ProfilePage", "-namespace", "E2eTests.Tests.Multitenancy", "-namespace", "E2eTests.Tests.Mobile"]
     depends_on:
       api:
         condition: service_healthy
