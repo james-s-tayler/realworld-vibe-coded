@@ -1056,6 +1056,144 @@ interface CreateCommentRequest {
 
 ---
 
+## Frontend UI Behaviors
+
+> These behaviors are tested via E2E (Playwright) tests and describe how the frontend application
+> should behave from the user's perspective. They complement the API specification above.
+
+### Navigation & Layout
+
+- **Sidebar navigation:** Authenticated users see links for Dashboard, Home, Editor, Settings in the sidebar
+- **Admin navigation:** Users with ADMIN role see a "Users" link in the sidebar navigation; non-admin users do NOT see it
+- **Non-admin access to /users:** Non-admin users navigating directly to `/users` are redirected to a Forbidden page
+- **Forbidden page:** The 403 Forbidden page displays a message and includes a link to the home page
+- **Active nav highlighting:** The current page's sidebar link should be visually distinguished
+
+### Route Guards (Frontend Redirects)
+
+When an unauthenticated user navigates to a protected page, the frontend redirects to `/login`:
+
+| Protected Route | Redirect Target |
+|----------------|----------------|
+| `/editor` | `/login` |
+| `/settings` | `/login` |
+| `/dashboard` | `/login` |
+| `/profile/*` | `/login` |
+| `/article/*` | `/login` |
+
+This is distinct from the API returning 401 — the frontend route guard prevents the API call entirely. E2E tests must verify the browser URL changes to `/login`, not just that the API returns 401. Each protected route must have its own redirect test.
+
+### Mobile Responsive Behavior
+
+The app uses Carbon Design System's responsive layout. At mobile viewport (375×667):
+
+- **Sidebar hidden on load:** The sidebar navigation is not visible on initial page load
+- **Hamburger button visible:** A hamburger menu button is visible in the header
+- **Hamburger toggles sidebar:** Clicking the hamburger button opens the sidebar overlay
+- **Nav link closes sidebar:** Clicking a navigation link navigates to the target page AND closes the sidebar
+- **Unauthenticated mobile nav:** Unauthenticated users see Sign In and Sign Up links in the mobile sidebar
+- **Mobile screenshots:** Visual regression tests capture the mobile layout for Dashboard, sidebar open state, and other key pages
+
+### Dashboard Page
+
+- **URL:** `/dashboard` (authenticated only)
+- **Welcome message:** Displays a personalized welcome message when logged in (e.g., "Welcome, {username}")
+- **Feature flag banner:** When the `DashboardBanner` feature flag is enabled, a promotional banner is displayed
+- **Banner toggle:** When the `DashboardBanner` feature flag is disabled/toggled off, the banner disappears without page reload
+
+### Internationalization (i18n)
+
+- **Language switching:** Users can change the app language in Settings (e.g., English → Japanese)
+- **Translated UI elements:** After language change, the sidebar navigation, page titles, success messages, and dashboard welcome text are displayed in the selected language
+- **Persistence:** The selected language persists across page navigations within the session
+
+### Authentication UI Flows
+
+- **Sign out:** Users can sign out from the Settings page; after sign out, the user is redirected to the login page
+- **Login error display (wrong password):** When login fails due to incorrect password, the frontend must display a visible error message to the user. This is a UI behavior test — the API returns 401, but the frontend must catch it and render an error notification. The test must verify the error text is visible in the DOM, not just the API status code.
+- **Login error display (unregistered email):** When login fails due to an unregistered email, the frontend must display a visible error message. Same pattern: API returns 401, frontend renders error. Test must verify error text visibility in the DOM.
+- **Registration duplicate email:** Attempting to register with an already-taken email displays an error message in the UI (not just an API 400 — the error must be visible to the user). The error text contains "already been registered with that email".
+- **Registration duplicate username (via email):** Since username defaults to email, registering a second user with the same email as an existing user also produces a duplicate username. This is a SEPARATE test case from duplicate email — it verifies the error message is displayed when the resulting username (which equals the email) would collide. The error message contains "already been registered with that email".
+- **Post-registration navigation:** After first user registration (tenant signup), the user is redirected and the sidebar shows the "Users" nav item (since first user gets ADMIN role)
+- **Invite + login flow:** After an admin invites a user, the admin can sign out and the invited user can sign in via the login page
+
+### Admin User Management Page
+
+- **URL:** `/users` (requires ADMIN role)
+- **Navigation:** Admin users can navigate to the Users page from the sidebar menu
+- **User list:** Displays a table of all users in the current tenant with columns for username, email, roles, and status (active/deactivated)
+- **Pagination:** The users table supports pagination; pagination controls display the correct total count
+- **Profile link:** Clicking a user's profile link in the table navigates to that user's profile page
+
+#### User Deactivation
+
+- **Deactivate user:** Admin can deactivate a user; the status column updates to show "Deactivated"
+- **Deactivate + reactivate:** Admin can deactivate and then reactivate a user; status toggles accordingly
+- **Deactivated user cannot login:** A deactivated user attempting to log in is rejected
+- **Cannot deactivate self:** An admin cannot deactivate their own account (button disabled or action prevented)
+
+#### Role Management
+
+- **Edit roles modal:** Clicking an edit button on a user row opens a modal for editing roles
+- **Add admin role:** Admin can add the ADMIN role to a user via the edit roles modal
+- **Remove admin role:** Admin can remove the ADMIN role from a user
+- **Owner role read-only:** The OWNER role (first tenant user) is displayed as read-only and cannot be removed
+- **Cannot remove own admin role:** An admin cannot remove their own ADMIN role
+
+### Screenshots (Visual Regression)
+
+The following pages/states have visual regression screenshot tests. Each is a separate test case:
+
+- Users page with multiple users listed
+- Users page with pagination visible
+- Users page with a deactivated user visible
+- Edit roles modal in open state
+- Mobile viewport: Login page (375×667)
+- Mobile viewport: Register page (375×667)
+- Mobile viewport: Settings page (375×667)
+- Mobile viewport: Dashboard page (375×667)
+- Mobile viewport: Sidebar open state (375×667)
+- Article page with max-length content (title, description, body all at their maximum allowed lengths)
+- Home page showing Global Feed tab with at least one article preview visible
+
+### Home Page (Feed)
+
+- **Default tab for authenticated users:** "Your Feed" tab is selected by default when an authenticated user visits the home page
+- **Tags visible on individual article page:** When viewing a single article at `/article/{slug}`, the article's tags must be rendered visibly on the page (not just present in the API response — they must be in the DOM)
+- **Tags in article previews:** Tags appear in article preview cards on both Global Feed and Your Feed tabs (using `.tag-list` CSS class)
+- **Popular tags sidebar:** Tags from created articles appear in the "Popular Tags" sidebar section
+- **Tag filtering:** Clicking a tag in the Popular Tags sidebar filters articles to show only those with that tag
+- **Pagination with few articles:** Pagination controls are rendered even when the total article count is within a single page
+- **Global Feed pagination navigation:** On the Global Feed tab, clicking pagination page numbers navigates between pages — the displayed articles change and the active page indicator updates. This is a frontend UI navigation test, not an API pagination test.
+- **Your Feed pagination navigation:** On the Your Feed tab, pagination works identically — clicking page numbers navigates between pages of followed-user articles. This is distinct from the API `limit/offset` test; it verifies the UI pagination component works on the Your Feed tab specifically.
+
+### Editor Page Tag UI
+
+- **Add tag via Enter:** Typing a tag name and pressing Enter adds it; the tag appears as a chip/pill below the input
+- **Add tag via comma:** Typing a tag name followed by a comma adds it similarly
+- **Edit mode shows existing tags:** When editing an existing article, its current tags are displayed below the input
+- **Remove individual tag:** Each tag chip has a remove/close button; clicking it removes that tag
+- **Removed tag persists on save:** After removing a tag and clicking Publish, the article is saved without the removed tag
+- **Unsubmitted tag added on publish:** If text is in the tag input field when Publish Article is clicked, it is automatically added as a tag before submission
+- **Duplicate title error display:** When creating an article with a title that produces a duplicate slug, the frontend must display the error message to the user (not just receive a 400 from the API — the error must be visible in the DOM)
+
+### Profile Page
+
+- **View own profile:** Authenticated user can navigate to their own profile page and see their username, bio, and image
+- **Profile redirect when unauthenticated:** Unauthenticated users accessing a profile page are redirected to `/login`
+
+### Swagger / API Documentation
+
+- **URL:** `/swagger` (publicly accessible)
+- **API docs displayed:** The Swagger UI renders and displays the API documentation with endpoint listings
+
+### Multi-Tenancy (Frontend Behavior)
+
+- **User isolation:** Users registered in one tenant are not visible or accessible from another tenant
+- **Duplicate usernames across tenants:** Two users can have the same email/username if they are in different tenants (each tenant is isolated)
+
+---
+
 ## Implementation Status
 
 ### Already Built (in the starter template)

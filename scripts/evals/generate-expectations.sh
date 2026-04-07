@@ -31,9 +31,11 @@ if [[ ! -f "$SPEC_FILE" ]]; then
 fi
 
 PROMPT=$(cat <<'PROMPT_EOF'
-You are generating test expectations from an API specification. Read the spec below and produce a JSON array of test expectations.
+You are generating E2E test expectations from a full-stack application specification. The spec contains BOTH API endpoints AND frontend UI behaviors. Read the ENTIRE spec and produce a JSON array of test expectations.
 
-Each expectation describes ONE testable behavior that an E2E test should demonstrate. Group them by feature area (auth, profiles, articles, comments, favorites, feed, tags, settings, users).
+These expectations are used to grade Playwright E2E test traces. They describe what a test should demonstrate from the user's perspective in the browser, backed by network evidence.
+
+Each expectation describes ONE testable behavior. Group by feature area: auth, profiles, articles, comments, favorites, feed, tags, settings, users, dashboard, mobile, multitenancy, swagger, editor.
 
 For each expectation, produce:
 
@@ -41,7 +43,7 @@ For each expectation, produce:
 {
   "id": "auth-001",
   "name": "UserCanRegisterAsFirstUser",
-  "category": "happy_path" | "validation" | "permissions",
+  "category": "happy_path" | "validation" | "permissions" | "screenshots",
   "spec_section": "Authentication > Registration Flow",
   "feature_area": "auth",
   "expected_behavior": "First user registers via /register, gets 204, can then login and receives a JWT token. First user gets ADMIN + USER roles.",
@@ -67,15 +69,26 @@ For each expectation, produce:
 ```
 
 Rules:
-1. Cover ALL endpoints and behaviors in the spec
-2. Include happy path, validation (bad input), and permissions (unauthorized access) cases
-3. `key_assertions` — what MUST be true for this test to be considered passing
-4. `ui_indicators` — what a human (or model) looking at screenshots/DOM would see
-5. `network_indicators` — what API calls should appear in the network trace
+1. COMPREHENSIVENESS IS CRITICAL. Cover ALL endpoints AND ALL frontend UI behaviors in the spec. Do not skip any section. Every API endpoint, every UI behavior bullet point, every screenshot test, every validation scenario must have at least one expectation.
+2. Include happy_path, validation, permissions, and screenshots categories
+3. `key_assertions` — what MUST be true for this test to pass. Include BOTH:
+   - UI-level assertions: DOM state, visible text, URL changes, error messages displayed, elements visible/hidden
+   - API-level assertions: status codes, response fields (these support the UI assertions)
+4. `ui_indicators` — what a human looking at screenshots/DOM would see. Be specific: name the exact text, link, button, or element.
+5. `network_indicators` — API calls that should appear in the network trace
 6. Keep descriptions concrete and verifiable, not vague
-7. For validation cases, specify the exact error message or status code expected
-8. For permissions cases, specify what happens when an unauthorized user tries the action
-9. IDs should be sequential within each feature area (auth-001, auth-002, etc.)
+7. For validation cases: include BOTH the API response (e.g., "returns 400") AND the UI outcome (e.g., "error message is displayed in the DOM"). Both matter.
+8. For permissions/redirect cases: include BOTH the API response (e.g., "returns 401") AND the frontend behavior (e.g., "browser URL changes to /login").
+9. For frontend-only behaviors (mobile layout, tag input UI, pagination navigation, feature flags, i18n): there may be NO network indicators — that's fine. The key assertions are purely UI-based.
+10. IDs should be sequential within each feature area (auth-001, auth-002, etc.)
+11. Do NOT collapse multiple distinct behaviors into one expectation. Each separately testable behavior gets its own entry.
+12. Generate SEPARATE expectations for:
+    - Each distinct validation scenario (duplicate email vs duplicate username are separate)
+    - Each settings field validation (duplicate username on settings page vs duplicate email on settings page are separate)
+    - Each screenshot/visual regression test mentioned in the spec
+    - Each mobile-specific behavior
+    - Each protected route redirect
+    - Viewing own profile vs viewing another user's profile
 
 Output ONLY the JSON array, no markdown fencing, no explanation.
 
