@@ -8,6 +8,10 @@
     "docs-mcp-server": {
       "command": "npx",
       "args": ["-y", "@arabold/docs-mcp-server@latest", "mcp"]
+    },
+    "microsoft-learn": {
+      "type": "http",
+      "url": "https://learn.microsoft.com/api/mcp"
     }
   }
 }
