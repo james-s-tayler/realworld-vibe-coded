@@ -54,6 +54,8 @@ public partial class Build
 
   internal AbsolutePath DockerComposeDependencies => TaskLocalDevDirectory / "docker-compose.dev-deps.yml";
 
+  internal AbsolutePath DockerComposeServer => TaskLocalDevDirectory / "docker-compose.server.yml";
+
   internal AbsolutePath RoslynMcpProject => RootDirectory / "Task" / "McpServers" / "roslyn-mcp" / "RoslynMCP" / "RoslynMCP.csproj";
 
   internal AbsolutePath LocalNuGetFeedDirectory => RootDirectory / ".local-nuget";
@@ -104,6 +106,10 @@ public partial class Build
 
   internal AbsolutePath LogsTestServerAuditDotNetDirectory => RootDirectory / "Logs" / "Test" / "Server" / "Server.Web" / "Audit.NET";
 
+  internal AbsolutePath LogsRunLocalServerSerilogDirectory => RootDirectory / "Logs" / "RunLocalServer" / "Server.Web" / "Serilog";
+
+  internal AbsolutePath LogsRunLocalServerAuditDotNetDirectory => RootDirectory / "Logs" / "RunLocalServer" / "Server.Web" / "Audit.NET";
+
   #endregion
 
   internal Target PathsShowWorktreeInfo => _ => _
@@ -131,6 +137,8 @@ public partial class Build
       LogsTestE2eSerilogDirectory.CreateOrCleanDirectory();
       LogsTestServerSerilogDirectory.CreateOrCleanDirectory();
       LogsTestServerAuditDotNetDirectory.CreateOrCleanDirectory();
+      LogsRunLocalServerSerilogDirectory.CreateOrCleanDirectory();
+      LogsRunLocalServerAuditDotNetDirectory.CreateOrCleanDirectory();
 
       Log.Information("✓ Directories cleaned and pre-created");
     });

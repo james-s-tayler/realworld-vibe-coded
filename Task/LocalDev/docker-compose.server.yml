@@ -1,0 +1,57 @@
+services:
+  api:
+    image: conduit-localdev-server:${IMAGE_TAG:-local}
+    build:
+      context: ../../
+      dockerfile: Task/LocalDev/Dockerfile.server
+    command: ["dotnet", "run", "--project", "src/Server.Web/Server.Web.csproj", "--no-launch-profile"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+:5001;http://+:5000
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: DevPassword123!
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=Conduit;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true"
+      Audit__LogsPath: /app/Logs/RunLocalServer/Server.Web/Audit.NET
+      Serilog__WriteTo__1__Args__Path: /app/Logs/RunLocalServer/Server.Web/Serilog/logs.json
+      Serilog__WriteTo__2__Args__ServerUrl: http://seq:80
+      OpenTelemetry__OtlpEndpoint: "http://jaeger:4317"
+      CookieSuffix: "${COOKIE_SUFFIX:-}"
+    ports:
+      - "${PORT_API_HTTP:-5000}:5000"
+      - "${PORT_API_HTTPS:-5001}:5001"
+    volumes:
+      - ../../App/Server:/app
+      - ../../.editorconfig:/app/.editorconfig:ro
+      - ../../Logs:/app/Logs
+      - nuget-cache:/root/.nuget/packages
+      # Anonymous volumes prevent host/container build artifact conflicts
+      - /app/src/Server.Web/obj
+      - /app/src/Server.Web/bin
+      - /app/src/Server.Web.DevOnly/obj
+      - /app/src/Server.Web.DevOnly/bin
+      - /app/src/Server.Infrastructure/obj
+      - /app/src/Server.Infrastructure/bin
+      - /app/src/Server.UseCases/obj
+      - /app/src/Server.UseCases/bin
+      - /app/src/Server.Core/obj
+      - /app/src/Server.Core/bin
+      - /app/src/Server.SharedKernel/obj
+      - /app/src/Server.SharedKernel/bin
+      - /app/analyzers/Server.Analyzers/obj
+      - /app/analyzers/Server.Analyzers/bin
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://localhost:5001/health/ready"]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 60s
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
+    name: ${NETWORK_NAME:-app-network}
+
+volumes:
+  nuget-cache:

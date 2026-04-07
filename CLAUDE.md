@@ -33,7 +33,8 @@ Rules in `.claude/rules/` are loaded automatically by path scope. Read the relev
 | `frontend-components.md` | `App/Client/**` | Hooks, Carbon components, CSS classes, API module template |
 | `i18n.md` | `App/Server/**`, `App/Client/**` | i18n conventions, FluentValidation auto-translate, react-i18next patterns |
 | `e2e.md` | `Test/e2e/**` | Playwright conventions, ARIA selectors, Expect() only |
-| `feature-flags.md` | `App/Server/**`, `App/Client/**` | v2 schema, FeatureFlags constants, ClientVisible, FF001 analyzer, frontend useFeatureFlag hook |
+| `feature-flags.md` | `App/Server/**`, `App/Client/**` | v2 schema, FeatureFlags constants, ClientVisible, FF001/FF002 analyzers, conventions |
+| `feature-flags-targeting.md` | `App/Server/**` | Tenant targeting, frontend useFeatureFlag hook, adding new flags checklist |
 | `functional-tests.md` | `App/Server/tests/**` | FastEndpoints test extensions (SRV007), AppFixture |
 | `testing.md` | — | E2E test structure overview, progressive tier targets |
 | `cicd.md` | `.github/**` | GitHub Actions naming, path-based job gating |

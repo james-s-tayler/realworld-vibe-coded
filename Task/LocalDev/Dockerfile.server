@@ -1,0 +1,4 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0
+RUN mkdir -p /https && dotnet dev-certs https -ep /https/aspnetapp.pfx -p DevPassword123!
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+WORKDIR /app

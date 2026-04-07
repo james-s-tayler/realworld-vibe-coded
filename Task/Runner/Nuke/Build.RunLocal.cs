@@ -102,18 +102,90 @@ public partial class Build
       process.WaitForExit();
     });
 
+  internal Target RunLocalServer => _ => _
+    .Description("Run backend in source-mounted Docker container for hot-reload development")
+    .DependsOn(RunLocalDependencies)
+    .DependsOn(PathsCleanDirectories)
+    .Executes(() =>
+    {
+      Log.Information("Starting backend server in source-mounted Docker container...");
+      LogWorktreeInfo();
+
+      var envVars = new Dictionary<string, string>(GetWorktreeEnvVars())
+      {
+        ["DOCKER_BUILDKIT"] = "1",
+      };
+
+      var args = $"compose -f {DockerComposeServer} -p {ScopedProjectName(Constants.Docker.Projects.Server)} up --build -d";
+      var process = ProcessTasks.StartProcess(
+        "docker",
+        args,
+        workingDirectory: RootDirectory,
+        environmentVariables: envVars);
+      process.WaitForExit();
+
+      var offset = Constants.Worktree.GetPortOffset(RootDirectory);
+      var httpsPort = 5001 + offset;
+      var healthUrl = $"https://localhost:{httpsPort}/health/ready";
+      Log.Information("Waiting for backend to be healthy at {Url}...", healthUrl);
+      if (!WaitForHttpsEndpoint(healthUrl, timeoutSeconds: 300))
+      {
+        throw new Exception($"Backend did not become healthy at {healthUrl} within timeout");
+      }
+
+      Log.Information("✓ Backend server is healthy and ready");
+    });
+
+  internal Target RunLocalServerDown => _ => _
+    .Description("Stop backend source-mounted Docker container")
+    .Executes(() =>
+    {
+      Log.Information("Stopping backend server container...");
+      var envVars = GetWorktreeEnvVars();
+      var args = $"compose -f {DockerComposeServer} -p {ScopedProjectName(Constants.Docker.Projects.Server)} down";
+      var process = ProcessTasks.StartProcess(
+        "docker",
+        args,
+        workingDirectory: RootDirectory,
+        environmentVariables: envVars);
+      process.WaitForExit();
+    });
+
+  internal Target RunLocalHotReload => _ => _
+    .Description("Run backend (Docker) + frontend (Vite HMR) for hot-reload development")
+    .DependsOn(RunLocalServer)
+    .DependsOn(RunLocalClient);
+
+  internal Target RunLocalHotReloadDown => _ => _
+    .Description("Stop backend container and Vite dev server")
+    .DependsOn(RunLocalServerDown)
+    .DependsOn(RunLocalClientDown);
+
   internal Target RunLocalClient => _ => _
     .Description("Run client locally")
     .DependsOn(InstallClient)
+    .After(RunLocalServer)
     .Executes(() =>
     {
       var offset = Constants.Worktree.GetPortOffset(RootDirectory);
-      var apiPort = 5000 + offset;
-      Log.Information("Starting Vite dev server in {ClientDirectory} (API proxy → http://localhost:{ApiPort})", ClientDirectory, apiPort);
+      var apiPort = 5001 + offset;
+      var vitePort = 5173 + offset;
+      Log.Information("Starting Vite dev server on port {VitePort} in {ClientDirectory} (API proxy → https://localhost:{ApiPort})", vitePort, ClientDirectory, apiPort);
       NpmRun(s => s
         .SetProcessWorkingDirectory(ClientDirectory)
         .SetCommand("dev")
-        .SetProcessEnvironmentVariable("VITE_API_URL", $"http://localhost:{apiPort}"));
+        .SetProcessEnvironmentVariable("API_PROXY_TARGET", $"https://localhost:{apiPort}")
+        .SetProcessEnvironmentVariable("VITE_DEV_PORT", $"{vitePort}"));
+    });
+
+  internal Target RunLocalClientDown => _ => _
+    .Description("Stop Vite dev server")
+    .Executes(() =>
+    {
+      var offset = Constants.Worktree.GetPortOffset(RootDirectory);
+      var vitePort = 5173 + offset;
+      Log.Information("Stopping Vite dev server on port {Port}...", vitePort);
+      KillProcessOnPort(vitePort);
     });
 
   internal Target RunLocalDocsMcpServerUp => _ => _
@@ -250,6 +322,40 @@ public partial class Build
     return process;
   }
 
+  private bool WaitForHttpsEndpoint(string url, int timeoutSeconds)
+  {
+    var handler = new HttpClientHandler
+    {
+      ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true,
+    };
+    using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(5) };
+    var endTime = DateTime.Now.AddSeconds(timeoutSeconds);
+    var attempts = 0;
+
+    while (DateTime.Now < endTime)
+    {
+      attempts++;
+      try
+      {
+        var response = client.GetAsync(url).Result;
+        Log.Debug("HTTPS check attempt {Attempt}: Status {Status}", attempts, response.StatusCode);
+        if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NotFound)
+        {
+          return true;
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Debug("HTTPS check attempt {Attempt} failed: {Message}", attempts, ex.InnerException?.Message ?? ex.Message);
+      }
+
+      System.Threading.Thread.Sleep(2000);
+    }
+
+    Log.Error("HTTPS endpoint check failed after {Attempts} attempts over {Timeout} seconds", attempts, timeoutSeconds);
+    return false;
+  }
+
   private bool WaitForHttpEndpoint(string url, int timeoutSeconds)
   {
     using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
@@ -291,6 +397,42 @@ public partial class Build
     catch
     {
       return false;
+    }
+  }
+
+  private void KillProcessOnPort(int port)
+  {
+    try
+    {
+      var process = ProcessTasks.StartProcess(
+        "lsof",
+        $"-ti :{port}",
+        logOutput: false);
+      process.WaitForExit();
+
+      if (process.ExitCode == 0)
+      {
+        var pids = process.Output
+          .Select(o => o.Text.Trim())
+          .Where(s => !string.IsNullOrEmpty(s));
+
+        foreach (var pidStr in pids)
+        {
+          if (int.TryParse(pidStr, out var pid))
+          {
+            KillProcess(pid);
+            Log.Information("✓ Killed process {PID} on port {Port}", pid, port);
+          }
+        }
+      }
+      else
+      {
+        Log.Information("No process found on port {Port}", port);
+      }
+    }
+    catch (Exception ex)
+    {
+      Log.Warning("Could not find process on port {Port}: {Message}", port, ex.Message);
     }
   }
 
