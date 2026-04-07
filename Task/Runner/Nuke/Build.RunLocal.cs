@@ -156,6 +156,11 @@ public partial class Build
     .DependsOn(RunLocalServer)
     .DependsOn(RunLocalClient);
 
+  internal Target RunLocalHotReloadDown => _ => _
+    .Description("Stop backend container and Vite dev server")
+    .DependsOn(RunLocalServerDown)
+    .DependsOn(RunLocalClientDown);
+
   internal Target RunLocalClient => _ => _
     .Description("Run client locally")
     .DependsOn(InstallClient)
@@ -171,6 +176,16 @@ public partial class Build
         .SetCommand("dev")
         .SetProcessEnvironmentVariable("API_PROXY_TARGET", $"https://localhost:{apiPort}")
         .SetProcessEnvironmentVariable("VITE_DEV_PORT", $"{vitePort}"));
+    });
+
+  internal Target RunLocalClientDown => _ => _
+    .Description("Stop Vite dev server")
+    .Executes(() =>
+    {
+      var offset = Constants.Worktree.GetPortOffset(RootDirectory);
+      var vitePort = 5173 + offset;
+      Log.Information("Stopping Vite dev server on port {Port}...", vitePort);
+      KillProcessOnPort(vitePort);
     });
 
   internal Target RunLocalDocsMcpServerUp => _ => _
@@ -382,6 +397,42 @@ public partial class Build
     catch
     {
       return false;
+    }
+  }
+
+  private void KillProcessOnPort(int port)
+  {
+    try
+    {
+      var process = ProcessTasks.StartProcess(
+        "lsof",
+        $"-ti :{port}",
+        logOutput: false);
+      process.WaitForExit();
+
+      if (process.ExitCode == 0)
+      {
+        var pids = process.Output
+          .Select(o => o.Text.Trim())
+          .Where(s => !string.IsNullOrEmpty(s));
+
+        foreach (var pidStr in pids)
+        {
+          if (int.TryParse(pidStr, out var pid))
+          {
+            KillProcess(pid);
+            Log.Information("✓ Killed process {PID} on port {Port}", pid, port);
+          }
+        }
+      }
+      else
+      {
+        Log.Information("No process found on port {Port}", port);
+      }
+    }
+    catch (Exception ex)
+    {
+      Log.Warning("Could not find process on port {Port}: {Message}", port, ex.Message);
     }
   }
 

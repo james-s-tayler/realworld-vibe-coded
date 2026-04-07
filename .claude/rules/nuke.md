@@ -35,4 +35,12 @@ Use `Nuke.Common.IO` APIs, not `System.IO`:
 
 Define scripts in `package.json` and call via `NpmRun()`. Don't invoke `node` directly from Nuke — if a script needs to run during lint/build/test, wire it into the appropriate npm script.
 
+### Worktree Port Isolation
+
+Every listening service in `RunLocal*` targets MUST use `Constants.Worktree.GetPortOffset(RootDirectory)` for its port. This includes Vite, backend, MCP servers — any service that binds a port.
+
+### Vite Environment Variables
+
+Never pass `VITE_`-prefixed env vars from Nuke unless intended for browser-side use. Vite auto-exposes `VITE_*` to client code via `import.meta.env`. Use unprefixed names (e.g., `API_PROXY_TARGET`, `VITE_DEV_PORT` is the exception — it's consumed by vite.config.ts server-side via `process.env`, not `import.meta.env`).
+
 ### Every Target Needs a `.Description()`
