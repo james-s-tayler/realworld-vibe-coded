@@ -242,11 +242,49 @@ The coverage score: `(covered * 1.0 + weak * 0.5) / total * 100`
 
 `TestEvalsCoverage` **fails** if any master list entries are missing — this is a hard gate, not a soft score. If the generator can't produce expectations that cover what the hand-written tests cover, the generator (or the spec) needs to be improved.
 
+## Spec Quality
+
+The eval system revealed that **spec completeness is the bottleneck** for expectation generation. An API-only spec scored 33.9/100 on coverage; adding frontend UI behaviors to the spec raised it to 98.7/100 — without changing any tests or eval logic.
+
+### Spec linter
+
+`LintSpecVerify` checks structural completeness of `SPEC-REFERENCE.md` — no LLM call, runs in <1 second. It verifies:
+
+- Required top-level sections (Overview, Endpoints, Data Models, Business Rules, Frontend UI Behaviors)
+- Frontend subsections (Navigation, Route Guards, Mobile, Screenshots)
+- Dual-perspective coverage: frontend redirect behaviors (not just API 401s), UI error display (not just status codes), pagination UI (not just API limit/offset)
+
+```bash
+# Standalone
+./scripts/evals/lint-spec.sh
+
+# Via Nuke (also runs as part of LintAllVerify)
+./build.sh LintSpecVerify --agent
+```
+
+### Spec writing rules
+
+`.claude/rules/spec-writing.md` is auto-loaded when editing `SPEC-REFERENCE.md`. It contains the checklist of what a complete spec must cover, derived from the coverage gaps the eval system found.
+
+Key patterns that cause coverage gaps if missing:
+- **Route guards vs API 401s** — "browser redirects to /login" is distinct from "API returns 401"
+- **Error display vs error response** — "user sees error message" is distinct from "API returns 400"
+- **Mobile as a separate section** — responsive behavior is not implied by desktop
+- **Screenshots enumerated individually** — "visual regression tests" is too vague
+- **Each validation scenario is separate** — duplicate email vs duplicate username are different test cases
+
+### Spec generation eval prompt
+
+`scripts/evals/generate-spec.prompt.md` contains a prompt for generating a complete spec from codebase access. Can be used as a standalone eval: delete the spec, regenerate from the prompt, then score with `TestEvalsCoverage`. The 98.7 score becomes the target to beat.
+
 ## Usage
 
 ### Via Nuke targets (recommended)
 
 ```bash
+# Lint the spec for structural completeness (fast, no LLM)
+./build.sh LintSpecVerify --agent
+
 # Generate expectations from spec (once, or when spec changes)
 ./build.sh TestEvalsGenerate --agent
 
@@ -262,8 +300,9 @@ The coverage score: `(covered * 1.0 + weak * 0.5) / total * 100`
 
 | Target | What it does | When to run |
 |--------|-------------|-------------|
+| `LintSpecVerify` | Structural completeness check on `SPEC-REFERENCE.md` (no LLM) | Before generating expectations, or as part of `LintAllVerify` |
 | `TestEvalsGenerate` | Reads `SPEC-REFERENCE.md`, calls Claude to produce `expectations.json` | Once, or when spec changes |
-| `TestEvalsMasterList` | Reads existing test code, calls Claude to produce `master-list.json` | Once, or when E2E tests change |
+| `TestEvalsMasterList` | Parses `[TestCoverage]` attributes from test source into `master-list.json` (no LLM) | Once, or when E2E tests change |
 | `TestEvalsCoverage` | Asserts `expectations.json ⊇ master-list.json` — fails if gaps exist | After generating both files |
 | `TestEvals` | Runs E2E with tracing, extracts traces, grades each against expectations | Full eval run |
 
@@ -278,6 +317,9 @@ Output goes to `Reports/Test/Evals/`:
 ### Via shell scripts (for debugging or custom pipelines)
 
 ```bash
+# Lint the spec
+./scripts/evals/lint-spec.sh
+
 # Generate expectations
 ./scripts/evals/generate-expectations.sh \
   --spec SPEC-REFERENCE.md \
