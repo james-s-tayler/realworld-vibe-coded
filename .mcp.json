@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "chrome-devtools": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [".claude/scripts/chrome-devtools-mcp.sh", "--headless", "--isolated", "--acceptInsecureCerts"]
+    },
+    "docs-mcp-server": {
+      "command": "npx",
+      "args": ["-y", "@arabold/docs-mcp-server@latest", "mcp"]
+    }
+  }
+}

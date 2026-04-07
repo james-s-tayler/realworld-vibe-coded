@@ -7,8 +7,8 @@
     <DataCollectors>
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
-          <Exclude>[*.Tests]*,[*.UnitTests]*,[*.IntegrationTests]*,[*.FunctionalTests]*</Exclude>
-          <ExcludeByFile>**/Migrations/*.cs,**/Migrations/*.Designer.cs</ExcludeByFile>
+          <Exclude>[*.Tests]*,[*.UnitTests]*,[*.IntegrationTests]*,[*.FunctionalTests]*,[Server.Analyzers]*</Exclude>
+          <ExcludeByFile>**/Migrations/*.cs,**/Migrations/*.Designer.cs,**/TenantStoreMigrations/*.cs</ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>

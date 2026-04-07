@@ -3,7 +3,7 @@
 namespace Server.UnitTests;
 
 /// <summary>
-/// Tests for Result<T> exception handling methods to ensure Result creation works correctly.
+/// Tests for Result exception handling methods to ensure Result creation works correctly.
 /// </summary>
 public class ResultExceptionHandlingTests
 {

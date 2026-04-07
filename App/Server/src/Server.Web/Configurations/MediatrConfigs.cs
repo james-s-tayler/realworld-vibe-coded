@@ -55,9 +55,11 @@ public static class MediatrConfigs
       var resultType = typeof(Result<>).MakeGenericType(innerType);
 
       // Register behaviors in the correct order:
-      // 1. LoggingBehavior (logs request handling)
-      // 2. TransactionBehavior (wraps handler execution in transaction)
-      // 3. ExceptionHandlingBehavior (catches exceptions and converts to Result)
+      // 1. TracingBehavior (creates OpenTelemetry spans)
+      // 2. LoggingBehavior (logs request handling)
+      // 3. TransactionBehavior (wraps handler execution in transaction)
+      // 4. ExceptionHandlingBehavior (catches exceptions and converts to Result)
+      RegisterBehavior(services, typeof(TracingBehavior<,>), requestType, innerType, resultType);
       RegisterBehavior(services, typeof(LoggingBehavior<,>), requestType, innerType, resultType);
       RegisterBehavior(services, typeof(TransactionBehavior<,>), requestType, innerType, resultType);
       RegisterBehavior(services, typeof(ExceptionHandlingBehavior<,>), requestType, innerType, resultType);

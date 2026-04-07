@@ -12,6 +12,7 @@ public class ApplicationUser : IdentityUser<Guid>
   public const int PasswordMinLength = 6;
   public const int BioMaxLength = 1000;
   public const int ImageUrlMaxLength = 500;
+  public const int LanguageMaxLength = 10;
 
   public ApplicationUser()
   {
@@ -22,4 +23,6 @@ public class ApplicationUser : IdentityUser<Guid>
   public string Bio { get; set; } = default!;
 
   public string? Image { get; set; }
+
+  public string Language { get; set; } = "en";
 }

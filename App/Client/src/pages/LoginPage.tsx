@@ -6,6 +6,7 @@ import {
   Button,
   Stack,
 } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
@@ -13,6 +14,7 @@ import { PageShell } from '../components/PageShell';
 import './AuthPages.css';
 
 export const LoginPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
@@ -36,8 +38,8 @@ export const LoginPage: React.FC = () => {
     <PageShell
       className="auth-page"
       columnLayout="narrow"
-      title="Sign in"
-      subtitle={<Link to="/register">Need an account?</Link>}
+      title={t('login.title')}
+      subtitle={<Link to="/register">{t('login.needAccount')}</Link>}
     >
       <ErrorDisplay
         error={error}
@@ -48,8 +50,8 @@ export const LoginPage: React.FC = () => {
         <Stack gap={6}>
           <TextInput
             id="email"
-            labelText="Email"
-            placeholder="Email"
+            labelText={t('login.email')}
+            placeholder={t('login.email')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -58,8 +60,8 @@ export const LoginPage: React.FC = () => {
 
           <TextInput
             id="password"
-            labelText="Password"
-            placeholder="Password"
+            labelText={t('login.password')}
+            placeholder={t('login.password')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -67,7 +69,7 @@ export const LoginPage: React.FC = () => {
           />
 
           <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? t('login.submitting') : t('login.submit')}
           </Button>
         </Stack>
       </Form>

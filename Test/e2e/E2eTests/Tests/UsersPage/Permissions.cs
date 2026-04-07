@@ -122,4 +122,5 @@ public class Permissions : AppPageTest
     // Assert - Should show an error (Forbidden)
     await Expect(Page.GetByText("Cannot remove your own ADMIN role")).ToBeVisibleAsync();
   }
+
 }

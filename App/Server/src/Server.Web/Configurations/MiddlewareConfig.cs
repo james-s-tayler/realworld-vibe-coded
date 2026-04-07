@@ -22,7 +22,8 @@ public static class MiddlewareConfig
           .ProducesProblemDetails(StatusCodes.Status404NotFound)
           .ProducesProblemDetails(StatusCodes.Status403Forbidden)
           .ProducesProblemDetails(StatusCodes.Status409Conflict)
-          .ProducesProblemDetails(StatusCodes.Status500InternalServerError));
+          .ProducesProblemDetails(StatusCodes.Status500InternalServerError)
+          .ProducesProblemDetails(StatusCodes.Status503ServiceUnavailable));
       };
       if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
       {
@@ -67,6 +68,7 @@ public static class MiddlewareConfig
       app.UseHsts();
     }
 
+    app.UseRequestLocalization();
     app.UseSwaggerGen(); // Includes AddFileServer and static files middleware
     app.UseHttpsRedirection(); // Note this will drop Authorization headers
     app.UseMultiTenant();
@@ -86,6 +88,8 @@ public static class MiddlewareConfig
     {
       Predicate = check => check.Tags.Contains("ready"), // Only run readiness checks (database)
     });
+
+    app.MapPrometheusScrapingEndpoint();
 
     await RunMigrationsAsync(app);
 

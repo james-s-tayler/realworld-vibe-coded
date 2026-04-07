@@ -21,7 +21,12 @@ public class PageObjects
   }
 
   /// <summary>
-  /// Gets the Home page instance.
+  /// Gets the Dashboard page instance.
+  /// </summary>
+  public DashboardPage DashboardPage => new(_page, _baseUrl);
+
+  /// <summary>
+  /// Gets the Home page instance (alias for DashboardPage).
   /// </summary>
   public HomePage HomePage => new(_page, _baseUrl);
 

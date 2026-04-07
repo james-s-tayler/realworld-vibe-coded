@@ -1,78 +1,6 @@
-# RealWorld Spec Challenge — Starter Template
+# 🤖 Agent-First Multi-Tenant Starter Template
 
-> **This is a coding challenge.** Use this multi-tenant starter template as your starting point and implement the full [RealWorld](https://docs.realworld.show/introduction/) spec. Your goal: **get all the tests passing.**
-
-## The Challenge
-
-The [RealWorld spec](https://docs.realworld.show/introduction/) defines a fully-featured blogging platform (a Medium clone) called "Conduit" — with users, articles, comments, tags, favorites, and follow feeds. This starter template gives you a production-grade foundation (Clean Architecture, CQRS, multi-tenancy, auth) with **all tests already included**. Your job is to implement the missing features until every test goes green.
-
-### What's Included
-
-- A working multi-tenant .NET backend with authentication, user registration, and profiles
-- A React + TypeScript frontend with login, registration, settings, and profile pages
-- **Postman API contract tests** covering the full RealWorld API spec (Auth, Profiles, Articles, Feed)
-- **Playwright E2E tests** covering the full UI (articles, editor, home feed, comments, favorites)
-- A Nuke build system that runs everything through a single CLI
-
-### What You Need to Implement
-
-The tests define the target. Run them, read the failures, and implement what's missing:
-
-- **Articles** — CRUD, slugs, tags, favorites, feed
-- **Comments** — create, list, delete on articles
-- **Tags** — list popular tags
-- **Feed** — personalized feed of followed authors' articles
-- **Frontend pages** — article view, editor, home page with feed/tags
-
-### Running the Test Suites
-
-**Prerequisites:** [.NET 10 SDK](https://dotnet.microsoft.com/download), [Nuke](https://nuke.build/) (`dotnet tool install Nuke.GlobalTool --global`), [Node.js 20+](https://nodejs.org/), [Docker](https://www.docker.com/)
-
-#### Postman API Tests (Newman)
-
-Each collection tests a specific API domain. Run them individually:
-
-```bash
-nuke TestServerPostmanAuth              # Auth endpoints (register, login, current user)
-nuke TestServerPostmanProfiles          # Profile endpoints (get, follow, unfollow)
-nuke TestServerPostmanArticlesEmpty     # Article list/feed when empty
-nuke TestServerPostmanArticle           # Full article CRUD (create, read, update, delete, favorite, comments, tags)
-nuke TestServerPostmanFeedAndArticles   # Feed + article listing with multiple users
-```
-
-#### Playwright E2E Tests
-
-```bash
-nuke TestE2e                            # Full Playwright E2E suite (all pages)
-```
-
-#### All Backend Tests
-
-```bash
-nuke TestServer                         # xUnit backend unit/integration tests
-```
-
-### Approach
-
-1. Start by running `nuke TestServerPostmanAuth` — those should pass already
-2. Move on to `nuke TestServerPostmanProfiles` — those should also pass
-3. Tackle `nuke TestServerPostmanArticlesEmpty` next — this will require implementing article endpoints
-4. Work through `nuke TestServerPostmanArticle` and `nuke TestServerPostmanFeedAndArticles`
-5. Run `nuke TestE2e` once the API is solid — the frontend tests exercise the full stack
-
-### Starting with Claude Code
-
-Open this repo in Claude Code and paste this prompt:
-
-> Read CLAUDE.md and follow the Session Start instructions. Then implement the RealWorld spec by following the workflow defined in Docs/workflow.md. Start by reading SPEC-REFERENCE.md to understand the full API spec, then generate your own execution plan. For each story: implement the feature, run the full test gate, fix any failures, then commit. Track progress in PROGRESS.md. If stuck on a single test for more than 20 minutes, commit what you have, note the blocker in PROGRESS.md, and move to the next story. The win condition is all Postman tests AND TestE2e must pass. Tests cannot be modified.
-
-Good luck!
-
----
-
-# Agent-First Multi-Tenant Starter Template
-
-A production-ready .NET + React starter template built for agent-first development. Includes Clean Architecture, CQRS, multi-tenancy via Finbuckle, 46 AI-invocable build skills, 32 custom Roslyn analyzers, and a 4-layer test suite — so AI coding agents can build, test, lint, and deploy through a single entry point (`nuke`).
+A production-ready .NET + React starter template built for agent-first development. Includes Clean Architecture, CQRS, multi-tenancy via Finbuckle, Nuke build targets invocable directly via `./build.sh <Target>`, 32 custom Roslyn analyzers, and a 4-layer test suite — so AI coding agents can build, test, lint, and deploy through a single entry point (`nuke`).
 
 ## 📦 What You Get
 
@@ -82,9 +10,8 @@ A production-ready .NET + React starter template built for agent-first developme
 - 🔐 **Role-based authentication** with JWT and ASP.NET Identity (multi-tenant aware)
 - 🔄 **Auto-generated TypeScript API client** via Kiota — backend endpoint changes automatically sync to frontend
 - 🛡️ **32 custom Roslyn analyzers** enforcing architecture, persistence, and testing rules at compile time
-- 🤖 **Nuke build targets** invocable directly via `./build.sh <Target>` — agents run build/test/lint/deploy by name
-- 🧪 **4-layer test suite** — xUnit (backend), Vitest (frontend), Playwright (E2E), Postman (API)
-- ⚙️ **Nuke build system** — single `nuke` entry point for all operations
+- ⚙️ **Nuke build system** — all targets invocable directly via `./build.sh <Target>`, no wrapper skills needed
+- 🧪 **3-layer test suite** — xUnit (backend), Vitest (frontend), Playwright (E2E)
 - 🐳 **Docker support** for local dev, testing, and publishing
 - 🚀 **GitHub Actions CI/CD** pipeline
 
@@ -92,9 +19,9 @@ A production-ready .NET + React starter template built for agent-first developme
 
 | Layer | Technologies |
 |:------|:-------------|
-| **Backend** | .NET 10, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQL Server, Finbuckle.MultiTenant, Audit.NET, Microsoft.FeatureManagement, Serilog |
+| **Backend** | .NET 10, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQL Server, Finbuckle.MultiTenant, OpenTelemetry, Audit.NET, Serilog |
 | **Frontend** | React 19, Vite, TypeScript, Carbon Design System |
-| **Testing** | xUnit, Vitest, Playwright, Postman/Newman |
+| **Testing** | xUnit, Vitest, Playwright |
 | **Build** | Nuke Build, GitHub Actions |
 | **Infrastructure** | Docker, GitHub Actions CI/CD |
 
@@ -115,6 +42,7 @@ Server.Analyzers         — 32 custom Roslyn analyzers (SRV + PV series)
 Endpoints are thin: bind request → authorize → delegate to MediatR → map response. Business rules live in handlers. Persistence is abstracted behind repository interfaces.
 
 **Cross-cutting concerns:**
+- **OpenTelemetry** — distributed tracing and metrics (see [Observability](#-observability))
 - **Serilog** — structured logging with enrichers, file sinks, and Seq integration
 - **Audit.NET** — automatic audit trails for EF Core entity changes and Identity operations
 - **Microsoft.FeatureManagement** — feature flags for toggling functionality at runtime
@@ -147,7 +75,6 @@ Task/
   LocalDev/              — Docker Compose for local development
 Test/
   e2e/                   — Playwright E2E tests
-  Postman/               — Postman/Newman API tests
   Migrations/            — Migration verification tests
 Infra/                   — Infrastructure as Code (placeholder)
 Logs/                    — Serilog + Audit.NET logs (per run mode)
@@ -176,14 +103,9 @@ nuke RunLocalPublish
 ### 🧪 Run Tests
 
 ```bash
-nuke TestServer                         # Backend xUnit tests
-nuke TestClient                         # Frontend Vitest tests
-nuke TestE2e                            # Playwright E2E tests
-nuke TestServerPostmanAuth              # Postman Auth API tests
-nuke TestServerPostmanProfiles          # Postman Profiles API tests
-nuke TestServerPostmanArticlesEmpty     # Postman Articles (empty state) tests
-nuke TestServerPostmanArticle           # Postman Article CRUD tests
-nuke TestServerPostmanFeedAndArticles   # Postman Feed + Articles tests
+nuke TestServer              # Backend xUnit tests
+nuke TestClient              # Frontend Vitest tests
+nuke TestE2e                 # Playwright E2E tests
 ```
 
 ### 🔍 Lint
@@ -200,7 +122,7 @@ All operations go through `nuke <Target>`. No need to run `dotnet`, `npm`, or `d
 | Category | Targets |
 |:---------|:--------|
 | 🔨 **Build** | `BuildServer`, `BuildClient`, `BuildServerPublish`, `BuildGenerateApiClient` |
-| 🧪 **Test** | `TestServer`, `TestClient`, `TestE2e`, `TestServerPostmanAuth`, `TestServerPostmanProfiles`, `TestServerPostmanArticlesEmpty`, `TestServerPostmanArticle`, `TestServerPostmanFeedAndArticles` |
+| 🧪 **Test** | `TestServer`, `TestClient`, `TestE2e` |
 | 🔍 **Lint** | `LintAllVerify`, `LintAllFix`, `LintServerVerify`, `LintClientVerify`, `LintApiClientVerify` |
 | 🗄️ **Database** | `DbMigrationsAdd`, `DbMigrationsVerifyApply`, `DbMigrationsGenerateIdempotentScript`, `DbReset` |
 | ▶️ **Run** | `RunLocalPublish`, `RunLocalDependencies`, `RunLocalClient` |
@@ -221,7 +143,7 @@ The repository's top-level directories provide clean semantic separation that ag
 
 - **`App/`** — all application source code (frontend and backend)
 - **`Task/`** — build system and local dev tooling (Nuke, Docker Compose)
-- **`Test/`** — integration and contract tests (Playwright, Postman, migration verification)
+- **`Test/`** — integration and contract tests (Playwright, migration verification)
 - **`Infra/`** — infrastructure as code (placeholder)
 - **`Logs/`** — runtime logs (Serilog, Audit.NET)
 - **`Reports/`** — generated test reports
@@ -230,13 +152,11 @@ Each directory has a single, clear responsibility. An agent can immediately loca
 
 ### 📋 CLAUDE.md — Project Instructions
 
-The `CLAUDE.md` file at the repository root is a ~40-line map that points agents to the right files via progressive disclosure: invariants and conventions inline, everything else in `Docs/` (architecture, workflow). This is the entry point for any agent working on the codebase.
+The `CLAUDE.md` file at the repository root provides agents with full project context: tech stack, folder structure, build commands, critical rules, and conventions. This is the entry point for any agent working on the codebase.
 
-### 🎯 Nuke Build Targets
+### 🎯 Nuke Build Targets — Direct Invocation
 
-All build operations are invoked directly via `./build.sh <Target>` (or `nuke <Target>`). No per-target skill wrappers needed — agents already have `Bash(./build.sh *)` in their allowed tools. Run `nuke --help` to see all available targets.
-
-Workflow skills like `nuke-verify` (pre-commit orchestration), `debug` (structured debug analysis), and `github-push-pr` (push + CI monitoring) provide genuine multi-step orchestration beyond simple target invocation.
+All Nuke build targets are invoked directly via `./build.sh <Target>` (or `nuke <Target>`). There are no wrapper skill files per target — agents call build operations by name. Run `nuke --help` to discover all available targets. The `--agent` flag can be passed to suppress verbose Docker output for context efficiency (e.g., `./build.sh TestE2e --agent`).
 
 ### 📏 `.claude/rules/` — Coding Rules
 
@@ -259,14 +179,32 @@ The backend is built on a custom framework layered on top of FastEndpoints, `Res
 - **`Send.ResultMapperAsync`** — FastEndpoints extension that maps `Result<T>` status to HTTP responses automatically (Ok → 200, NotFound → 404, Invalid → 422, etc.)
 
 The result: endpoints are thin wrappers (`request → mediator → result → response`), business logic lives in handlers, and cross-cutting concerns (transactions, error handling, logging) are handled by the pipeline — all enforced at compile time by 32 custom Roslyn analyzers covering architecture boundaries, persistence patterns, endpoint conventions, and testing rules.
-### 📊 Observability — Logs & Reports on Disk
+### 📊 Observability — Traces, Metrics, Logs & Audit
 
-Application logs and test results are written to well-known directories on disk, giving agents concrete artifacts to inspect when something goes wrong:
+The app is instrumented with OpenTelemetry for distributed tracing and metrics, Serilog for structured logging, and Audit.NET for entity change tracking. In local dev, telemetry flows to a Grafana stack started automatically by `nuke RunLocalDependencies`.
+
+| Service | URL | Purpose |
+|:--------|:----|:--------|
+| **Grafana** | [http://localhost:3000](http://localhost:3000) | Dashboards, trace explorer, metrics explorer |
+| **Jaeger UI** | [http://localhost:16686](http://localhost:16686) | Distributed trace search and visualization |
+| **Seq** | [http://localhost:5341](http://localhost:5341) | Structured log search (Serilog) |
+| **Prometheus** | [http://localhost:9090](http://localhost:9090) | Metrics query UI |
+| **App Metrics** | [http://localhost:5000/metrics](http://localhost:5000/metrics) | Prometheus scrape endpoint |
+
+**What's instrumented:**
+- **Traces** (Jaeger + Grafana): ASP.NET Core requests, HttpClient calls, EF Core queries, MediatR commands/queries
+- **Metrics** (Grafana → Prometheus): HTTP request latency/counts, .NET runtime (GC, threadpool), SQL Server DMVs
+- **Logs** (Seq): Structured Serilog logs enriched with `TraceId` for cross-correlation with Grafana traces
+- **Audit** (disk): Audit.NET entity change logs with before/after values in `Logs/Server.Web/Audit.NET/`
+
+Application logs and test results are also written to well-known directories on disk:
 
 - **`Logs/`** — Serilog structured logs and Audit.NET audit logs, organized by run mode
 - **`Reports/`** — HTML test reports from xUnit, Vitest, and Playwright runs
 
 Nuke build targets emit explicit guidance on failure, pointing agents to the exact log files and reports to inspect. Claude Code hooks (`.claude/hooks/`) enforce that agents read these outputs rather than guessing at root causes — creating a closed feedback loop between running a command and diagnosing its result.
+
+For full details, see [`Docs/observability.md`](Docs/observability.md).
 
 ### 🔎 Playwright Trace Debugging
 
@@ -283,7 +221,6 @@ When backend endpoints change, run `nuke BuildGenerateApiClient` to regenerate t
 | **Unit/Integration** | xUnit | `App/Server/tests/` | Backend business logic, handlers, persistence |
 | **Component** | Vitest + Testing Library | `App/Client/` | Frontend components, hooks, utilities |
 | **E2E** | Playwright | `Test/e2e/` | Full user flows through the browser |
-| **API** | Postman/Newman | `Test/Postman/` | API contract validation |
 
 All test results are output to `Reports/` with HTML reports generated by Nuke.
 

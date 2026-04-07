@@ -1,15 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { PageShell } from '../components/PageShell';
 import './ForbiddenPage.css';
 
 export const ForbiddenPage: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <PageShell className="forbidden-page">
-      <h1>403 - Forbidden</h1>
-      <p>You don't have permission to access this page.</p>
+      <h1>{t('forbidden.title')}</h1>
+      <p>{t('forbidden.message')}</p>
       <p>
-        <Link to="/">Go back to home</Link>
+        <Link to="/">{t('forbidden.goHome')}</Link>
       </p>
     </PageShell>
   );

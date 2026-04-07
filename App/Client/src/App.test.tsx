@@ -43,8 +43,8 @@ describe('App', () => {
     })
 
     await waitFor(() => {
-      const navigation = screen.getByRole('navigation', { name: /side navigation/i })
-      expect(navigation).toBeInTheDocument()
+      const navigations = screen.getAllByRole('navigation', { name: /side navigation/i })
+      expect(navigations.length).toBeGreaterThan(0)
     }, { timeout: 3000 })
   })
 
@@ -52,8 +52,8 @@ describe('App', () => {
     vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('Not authenticated'))
     render(<App />)
     await waitFor(() => {
-      expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument()
-      expect(screen.getByRole('link', { name: /sign up/i })).toBeInTheDocument()
+      expect(screen.getAllByRole('link', { name: /sign in/i }).length).toBeGreaterThan(0)
+      expect(screen.getAllByRole('link', { name: /sign up/i }).length).toBeGreaterThan(0)
     })
   })
 })

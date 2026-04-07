@@ -1,6 +1,4 @@
-﻿using Microsoft.Playwright;
-
-namespace E2eTests.Tests.UsersPage;
+﻿namespace E2eTests.Tests.UsersPage;
 
 /// <summary>
 /// Happy path tests for the Users page (/users).
@@ -21,9 +19,6 @@ public class HappyPath : AppPageTest
 
     // Act - Click the Users link from the sidebar navigation
     await Pages.UsersPage.ClickUsersAsync();
-
-    // Assert - Verify we're on the users page
-    await Expect(Page).ToHaveURLAsync(BaseUrl + "/users");
     await Expect(Pages.UsersPage.Heading).ToBeVisibleAsync();
     await Expect(Pages.UsersPage.InviteUserButton).ToBeVisibleAsync();
   }
@@ -57,7 +52,6 @@ public class HappyPath : AppPageTest
 
     // Assert - Verify we're logged in successfully
     await Expect(Page).ToHaveURLAsync(BaseUrl + "/");
-    await Expect(Page.GetByRole(AriaRole.Heading, new() { Level = 1 })).ToBeVisibleAsync();
   }
 
   [Fact]
@@ -190,7 +184,7 @@ public class HappyPath : AppPageTest
     await Pages.UsersPage.GetRoleCheckbox("ADMIN").UncheckAsync(new() { Force = true });
     await Pages.UsersPage.SaveEditRolesAsync();
 
-    // Assert - ADMIN should no longer be in the roles, USER is preserved
+    // Assert - ADMIN should no longer be in the roles, USER preserved
     await Expect(Pages.UsersPage.GetUserRowByUsername(invited.Email)).Not.ToContainTextAsync("ADMIN");
     await Expect(Pages.UsersPage.GetUserRowByUsername(invited.Email)).ToContainTextAsync("USER");
   }

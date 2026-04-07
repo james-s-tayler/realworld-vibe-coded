@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
+using Microsoft.Extensions.Localization;
 using Server.Core.IdentityAggregate;
+using Server.SharedKernel;
 
 namespace Server.Web.Users.UpdateRoles;
 
@@ -10,13 +12,13 @@ public class UpdateRolesValidator : Validator<UpdateRolesRequest>
     DefaultRoles.Admin,
   ];
 
-  public UpdateRolesValidator()
+  public UpdateRolesValidator(IStringLocalizer<SharedResource> localizer)
   {
     RuleLevelCascadeMode = CascadeMode.Stop;
 
     RuleForEach(x => x.Roles)
       .Must(role => AllowedRoles.Contains(role))
-      .WithMessage(role => $"'{role}' is not a valid assignable role. Allowed roles: {string.Join(", ", AllowedRoles)}")
+      .WithMessage(role => string.Format(localizer[SharedResource.Keys.InvalidAssignableRole], role))
       .OverridePropertyName("roles");
   }
 }

@@ -6,8 +6,8 @@ public class CheckFeatureFlag(IMediator mediator) : Endpoint<CheckFeatureFlagReq
 {
   public override void Configure()
   {
-    Get("feature-flags/{FeatureName}");
-    Group<TestData>();
+    Get("{FeatureName}");
+    Group<FeatureFlagDevOnly>();
     Summary(s =>
     {
       s.Summary = "Check feature flag status";

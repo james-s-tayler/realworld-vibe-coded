@@ -1,41 +1,65 @@
-﻿using System.Net.Http.Json;
+using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
+using Polly;
 
 namespace E2eTests;
 
 /// <summary>
 /// Provides API-based data setup methods for E2E tests.
 /// This fixture enables tests to arrange data via API calls instead of UI interactions.
+/// Uses IHttpClientFactory with Polly resilience for transient server error retries.
 /// </summary>
 public class ApiFixture : IAsyncLifetime
 {
-  private readonly string _baseUrl;
   private readonly JsonSerializerOptions _jsonOptions;
   private readonly HttpClient _httpClient;
+  private readonly ServiceProvider _serviceProvider;
   private int _userCounter;
   private int _articleCounter;
 
   public ApiFixture()
   {
-    _baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
+    var baseUrl = Environment.GetEnvironmentVariable("PLAYWRIGHT_BASE_URL") ?? "http://localhost:5000";
     _jsonOptions = new JsonSerializerOptions
     {
       PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
-    // Configure HttpClientHandler to accept self-signed certificates in test environments
-    var handler = new HttpClientHandler();
-
-    // WARNING: Disables all SSL/TLS certificate validation for E2E tests.
-    // This is safe ONLY in isolated test environments (e.g., E2E tests with self-signed dev certificates in Docker containers).
-    // NEVER use this pattern in production code, as it allows any certificate (including expired, self-signed, or malicious).
-    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-
-    _httpClient = new HttpClient(handler)
+    var services = new ServiceCollection();
+    services.AddHttpClient("ApiFixture", client =>
     {
-      BaseAddress = new Uri(_baseUrl),
-    };
+      client.BaseAddress = new Uri(baseUrl);
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+      // WARNING: Disables all SSL/TLS certificate validation for E2E tests.
+      // This is safe ONLY in isolated test environments (e.g., E2E tests with self-signed dev certificates in Docker containers).
+      // NEVER use this pattern in production code.
+      ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true,
+    })
+    .AddResilienceHandler("transient-retry", builder =>
+    {
+      builder.AddRetry(new HttpRetryStrategyOptions
+      {
+        MaxRetryAttempts = 3,
+        Delay = TimeSpan.FromSeconds(2),
+        BackoffType = DelayBackoffType.Exponential,
+        ShouldHandle = static args => ValueTask.FromResult(
+          args.Outcome.Result?.StatusCode is
+            HttpStatusCode.RequestTimeout or       // 408
+            HttpStatusCode.TooManyRequests or       // 429
+            HttpStatusCode.ServiceUnavailable or    // 503
+            HttpStatusCode.GatewayTimeout),         // 504
+      });
+    });
+
+    _serviceProvider = services.BuildServiceProvider();
+    var factory = _serviceProvider.GetRequiredService<IHttpClientFactory>();
+    _httpClient = factory.CreateClient("ApiFixture");
   }
 
   public ValueTask InitializeAsync()
@@ -43,10 +67,10 @@ public class ApiFixture : IAsyncLifetime
     return ValueTask.CompletedTask;
   }
 
-  public ValueTask DisposeAsync()
+  public async ValueTask DisposeAsync()
   {
-    _httpClient?.Dispose();
-    return ValueTask.CompletedTask;
+    _httpClient.Dispose();
+    await _serviceProvider.DisposeAsync();
   }
 
   /// <summary>
@@ -66,13 +90,8 @@ public class ApiFixture : IAsyncLifetime
       password,
     };
 
-    // Register via Identity - creates a new tenant
-    using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/identity/register")
-    {
-      Content = JsonContent.Create(registerRequest, options: _jsonOptions),
-    };
-
-    var registerResponse = await _httpClient.SendAsync(registerHttpRequest);
+    // Register via Identity - creates a new tenant (retry handled by Polly pipeline)
+    var registerResponse = await _httpClient.PostAsJsonAsync("/api/identity/register", registerRequest, _jsonOptions);
     registerResponse.EnsureSuccessStatusCode();
 
     // Now login to get the token
@@ -167,13 +186,8 @@ public class ApiFixture : IAsyncLifetime
       password,
     };
 
-    // Register via Identity - no token expected
-    using var registerHttpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/identity/register")
-    {
-      Content = JsonContent.Create(registerRequest, options: _jsonOptions),
-    };
-
-    var registerResponse = await _httpClient.SendAsync(registerHttpRequest);
+    // Register via Identity (retry handled by Polly pipeline)
+    var registerResponse = await _httpClient.PostAsJsonAsync("/api/identity/register", registerRequest, _jsonOptions);
     registerResponse.EnsureSuccessStatusCode();
 
     // Now login to get the token
@@ -191,174 +205,6 @@ public class ApiFixture : IAsyncLifetime
       Email = email,
       Password = password,
     };
-  }
-
-  /// <summary>
-  /// Creates an article for the authenticated user and returns the article details.
-  /// The fixture generates unique test data automatically.
-  /// </summary>
-  public async Task<CreatedArticle> CreateArticleAsync(
-    string token,
-    string[]? tags = null)
-  {
-    var articleId = Interlocked.Increment(ref _articleCounter);
-    var title = $"Test Article {articleId} - {Guid.NewGuid().ToString("N")[..8]}";
-    var description = $"Test description for article {articleId}";
-    var body = $"Test body content for article {articleId}";
-
-    var articleRequest = new
-    {
-      article = new
-      {
-        title,
-        description,
-        body,
-        tagList = tags ?? Array.Empty<string>(),
-      },
-    };
-
-    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/articles")
-    {
-      Content = JsonContent.Create(articleRequest, options: _jsonOptions),
-    };
-    request.Headers.Add("Authorization", $"Bearer {token}");
-
-    var response = await _httpClient.SendAsync(request);
-    response.EnsureSuccessStatusCode();
-
-    var responseContent = await response.Content.ReadAsStringAsync();
-    var articleResponse = JsonSerializer.Deserialize<ArticleResponse>(responseContent, _jsonOptions)!;
-    return new CreatedArticle
-    {
-      Slug = articleResponse.Article.Slug,
-      Title = articleResponse.Article.Title,
-    };
-  }
-
-  /// <summary>
-  /// Creates an article with custom field values for the authenticated user.
-  /// </summary>
-  public async Task<CreatedArticle> CreateArticleAsync(
-    string token,
-    string title,
-    string description,
-    string body,
-    string[]? tags = null)
-  {
-    var articleRequest = new
-    {
-      article = new
-      {
-        title,
-        description,
-        body,
-        tagList = tags ?? Array.Empty<string>(),
-      },
-    };
-
-    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/articles")
-    {
-      Content = JsonContent.Create(articleRequest, options: _jsonOptions),
-    };
-    request.Headers.Add("Authorization", $"Bearer {token}");
-
-    var response = await _httpClient.SendAsync(request);
-    response.EnsureSuccessStatusCode();
-
-    var responseContent = await response.Content.ReadAsStringAsync();
-    var articleResponse = JsonSerializer.Deserialize<ArticleResponse>(responseContent, _jsonOptions)!;
-    return new CreatedArticle
-    {
-      Slug = articleResponse.Article.Slug,
-      Title = articleResponse.Article.Title,
-    };
-  }
-
-  /// <summary>
-  /// Creates an article with maximum length fields (except body = 500 chars as specified).
-  /// </summary>
-  public async Task<CreatedArticle> CreateArticleWithMaxLengthsAsync(string token)
-  {
-    var articleId = Interlocked.Increment(ref _articleCounter);
-
-    // Title: max 200 chars
-    var title = $"Article{articleId} {new string('T', 200 - $"Article{articleId} ".Length)}";
-
-    // Description: max 500 chars
-    var description = new string('D', 500);
-
-    // Body: 500 chars as specified in requirements
-    var body = new string('B', 500);
-
-    return await CreateArticleAsync(token, title, description, body);
-  }
-
-  /// <summary>
-  /// Creates multiple articles for the authenticated user.
-  /// </summary>
-  public async Task CreateArticlesAsync(string token, int count, string[]? tags = null)
-  {
-    for (var i = 0; i < count; i++)
-    {
-      await CreateArticleAsync(token, tags);
-    }
-  }
-
-  /// <summary>
-  /// Creates a comment on an article.
-  /// </summary>
-  public async Task CreateCommentAsync(string token, string articleSlug, string commentBody)
-  {
-    var commentRequest = new
-    {
-      comment = new
-      {
-        body = commentBody,
-      },
-    };
-
-    using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/articles/{articleSlug}/comments")
-    {
-      Content = JsonContent.Create(commentRequest, options: _jsonOptions),
-    };
-    request.Headers.Add("Authorization", $"Bearer {token}");
-
-    var response = await _httpClient.SendAsync(request);
-    response.EnsureSuccessStatusCode();
-  }
-
-  /// <summary>
-  /// Creates a comment with maximum length body on an article.
-  /// </summary>
-  public async Task CreateCommentWithMaxLengthAsync(string token, string articleSlug)
-  {
-    // Comment body: max 5000 chars
-    var commentBody = new string('C', 5000);
-    await CreateCommentAsync(token, articleSlug, commentBody);
-  }
-
-  /// <summary>
-  /// Follows a user.
-  /// </summary>
-  public async Task FollowUserAsync(string followerToken, string usernameToFollow)
-  {
-    using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/profiles/{usernameToFollow}/follow");
-    request.Headers.Add("Authorization", $"Bearer {followerToken}");
-
-    var response = await _httpClient.SendAsync(request);
-    response.EnsureSuccessStatusCode();
-  }
-
-  /// <summary>
-  /// Favorites an article.
-  /// </summary>
-  public async Task FavoriteArticleAsync(string token, string articleSlug)
-  {
-    using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/articles/{articleSlug}/favorite");
-    request.Headers.Add("Authorization", $"Bearer {token}");
-
-    var response = await _httpClient.SendAsync(request);
-    response.EnsureSuccessStatusCode();
   }
 
   /// <summary>
@@ -429,6 +275,138 @@ public class ApiFixture : IAsyncLifetime
   }
 
   /// <summary>
+  /// Creates an article for the authenticated user and returns the article details.
+  /// </summary>
+  public async Task<CreatedArticle> CreateArticleAsync(string token, string[]? tags = null)
+  {
+    var articleId = Interlocked.Increment(ref _articleCounter);
+    var title = $"Test Article {articleId} - {Guid.NewGuid().ToString("N")[..8]}";
+    var description = $"Test description for article {articleId}";
+    var body = $"Test body content for article {articleId}";
+
+    return await CreateArticleAsync(token, title, description, body, tags);
+  }
+
+  /// <summary>
+  /// Creates an article with custom field values for the authenticated user.
+  /// </summary>
+  public async Task<CreatedArticle> CreateArticleAsync(
+    string token,
+    string title,
+    string description,
+    string body,
+    string[]? tags = null)
+  {
+    var articleRequest = new
+    {
+      article = new
+      {
+        title,
+        description,
+        body,
+        tagList = tags ?? Array.Empty<string>(),
+      },
+    };
+
+    using var request = new HttpRequestMessage(HttpMethod.Post, "/api/articles")
+    {
+      Content = JsonContent.Create(articleRequest, options: _jsonOptions),
+    };
+    request.Headers.Add("Authorization", $"Bearer {token}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+
+    var responseContent = await response.Content.ReadAsStringAsync();
+    var articleResponse = JsonSerializer.Deserialize<ArticleResponse>(responseContent, _jsonOptions)!;
+    return new CreatedArticle
+    {
+      Slug = articleResponse.Article.Slug,
+      Title = articleResponse.Article.Title,
+    };
+  }
+
+  /// <summary>
+  /// Creates an article with maximum length fields (except body = 500 chars as specified).
+  /// </summary>
+  public async Task<CreatedArticle> CreateArticleWithMaxLengthsAsync(string token)
+  {
+    var articleId = Interlocked.Increment(ref _articleCounter);
+    var title = $"Article{articleId} {new string('T', 200 - $"Article{articleId} ".Length)}";
+    var description = new string('D', 500);
+    var body = new string('B', 500);
+
+    return await CreateArticleAsync(token, title, description, body);
+  }
+
+  /// <summary>
+  /// Creates multiple articles for the authenticated user.
+  /// </summary>
+  public async Task CreateArticlesAsync(string token, int count, string[]? tags = null)
+  {
+    for (var i = 0; i < count; i++)
+    {
+      await CreateArticleAsync(token, tags);
+    }
+  }
+
+  /// <summary>
+  /// Creates a comment on an article.
+  /// </summary>
+  public async Task CreateCommentAsync(string token, string articleSlug, string commentBody)
+  {
+    var commentRequest = new
+    {
+      comment = new
+      {
+        body = commentBody,
+      },
+    };
+
+    using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/articles/{articleSlug}/comments")
+    {
+      Content = JsonContent.Create(commentRequest, options: _jsonOptions),
+    };
+    request.Headers.Add("Authorization", $"Bearer {token}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+  }
+
+  /// <summary>
+  /// Creates a comment with maximum length body on an article.
+  /// </summary>
+  public async Task CreateCommentWithMaxLengthAsync(string token, string articleSlug)
+  {
+    var commentBody = new string('C', 5000);
+    await CreateCommentAsync(token, articleSlug, commentBody);
+  }
+
+  /// <summary>
+  /// Follows a user.
+  /// </summary>
+  public async Task FollowUserAsync(string followerToken, string usernameToFollow)
+  {
+    using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/profiles/{usernameToFollow}/follow");
+    request.Headers.Add("Authorization", $"Bearer {followerToken}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+  }
+
+  /// <summary>
+  /// Favorites an article.
+  /// </summary>
+  public async Task FavoriteArticleAsync(string token, string articleSlug)
+  {
+    using var request = new HttpRequestMessage(HttpMethod.Post, $"/api/articles/{articleSlug}/favorite");
+    request.Headers.Add("Authorization", $"Bearer {token}");
+
+    var response = await _httpClient.SendAsync(request);
+    response.EnsureSuccessStatusCode();
+  }
+
+  /// <summary>
   /// Logs in a user and returns the authentication token.
   /// </summary>
   public async Task<string> LoginAsync(string email, string password)
@@ -450,6 +428,22 @@ public class ApiFixture : IAsyncLifetime
     var responseContent = await response.Content.ReadAsStringAsync();
     var loginResponse = JsonSerializer.Deserialize<IdentityLoginResponse>(responseContent, _jsonOptions)!;
     return loginResponse.AccessToken;
+  }
+
+  /// <summary>
+  /// Sets a feature flag override via the DevOnly endpoint.
+  /// Only works when the server is running in Development environment.
+  /// </summary>
+  public async Task SetFeatureFlagOverrideAsync(string featureName, bool enabled)
+  {
+    var request = new { enabled };
+    using var httpRequest = new HttpRequestMessage(HttpMethod.Put, $"/dev-only/feature-flags/{featureName}")
+    {
+      Content = JsonContent.Create(request, options: _jsonOptions),
+    };
+
+    var response = await _httpClient.SendAsync(httpRequest);
+    response.EnsureSuccessStatusCode();
   }
 
   /// <summary>
@@ -483,21 +477,6 @@ public class ApiFixture : IAsyncLifetime
     public string AccessToken { get; set; } = string.Empty;
   }
 
-  private class UserResponse
-  {
-    [JsonPropertyName("user")]
-    public UserData User { get; set; } = null!;
-  }
-
-  private class UserData
-  {
-    [JsonPropertyName("token")]
-    public string Token { get; set; } = string.Empty;
-
-    [JsonPropertyName("username")]
-    public string Username { get; set; } = string.Empty;
-  }
-
   private class ArticleResponse
   {
     [JsonPropertyName("article")]
@@ -511,27 +490,6 @@ public class ApiFixture : IAsyncLifetime
 
     [JsonPropertyName("title")]
     public string Title { get; set; } = string.Empty;
-  }
-
-  private class UserResponseWrapper
-  {
-    [JsonPropertyName("user")]
-    public UserDataExtended User { get; set; } = null!;
-  }
-
-  private class UserDataExtended
-  {
-    [JsonPropertyName("email")]
-    public string Email { get; set; } = string.Empty;
-
-    [JsonPropertyName("username")]
-    public string Username { get; set; } = string.Empty;
-
-    [JsonPropertyName("bio")]
-    public string Bio { get; set; } = string.Empty;
-
-    [JsonPropertyName("image")]
-    public string? Image { get; set; }
   }
 
   private class UsersListResponse

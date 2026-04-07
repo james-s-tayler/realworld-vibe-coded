@@ -13,3 +13,14 @@
 .cds--header__name:hover {
   color: #5cb85c;
 }
+
+/* SideNav styles (merged from AppSidebar.css) */
+.cds--side-nav .cds--side-nav__items {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-sidebar__profile-spacer {
+  flex-grow: 1;
+}

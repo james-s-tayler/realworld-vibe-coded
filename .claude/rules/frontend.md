@@ -3,7 +3,7 @@ paths:
   - "App/Client/**"
 ---
 
-## Kiota Bridge — Backend → Generated Client → Frontend
+## Kiota Bridge — Backend -> Generated Client -> Frontend
 
 The generated API client (`src/api/generated/`) is the **type contract** between backend and frontend. The workflow is strictly ordered:
 
@@ -40,6 +40,10 @@ The generated API client (`src/api/generated/`) is the **type contract** between
 - `useApiCall` handles loading/error/data lifecycle
 - No global state library — each page fetches its own data
 
+## i18n
+
+All user-facing strings must use `useTranslation()` hook. Never hardcode display text. Carbon components with `translateWithId` must receive translation function. See `.claude/rules/i18n.md`.
+
 ## Constraint Constants Sync
 
 `src/constants.ts` mirrors backend entity constraint constants. Use these for `maxLength` on `TextInput`/`TextArea` and client-side validation. The values must match `SPEC-REFERENCE.md` entity definitions. When creating forms, always apply `maxCount` on `TextArea` and `maxLength` on `TextInput` using these constants.
@@ -48,6 +52,13 @@ The generated API client (`src/api/generated/`) is the **type contract** between
 
 - **Carbon Tabs:** `selectedIndex={-1}` doesn't work — compute the proper tab index for dynamic tab sets
 - **Kiota body-less PUT/POST:** Kiota sends no body and no `Content-Type` header for endpoints without a request body defined in the OpenAPI spec. FastEndpoints rejects these with 415. The fix is on the backend — annotate all route-bound properties with `[RouteParam]` so FastEndpoints accepts `*/*`. Never bypass Kiota with raw `fetch` for this — fix the root cause.
+
+## Carbon Design System Styling
+
+- Use Carbon's `<Theme theme="g100">` wrapper for dark-themed sections (e.g., sidebar)
+- Override Carbon token variables (e.g., `--cds-layer`) on scoped selectors, not globally
+- For layout CSS (spacing, sizing, positioning), use standard CSS — not Carbon tokens
+- Scope Carbon overrides to component class (e.g., `.app-sidebar .cds--side-nav__item`)
 
 ## Frontend Implementation Checklist
 
@@ -60,10 +71,3 @@ Before implementing a frontend page/component:
 After implementing:
 1. Verify with `./build.sh BuildClient` (auto-regenerates Kiota types)
 2. Run `./build.sh TestE2e` to validate against E2E expectations
-
-## Carbon Design System Styling
-
-- Use Carbon's `<Theme theme="g100">` wrapper for dark-themed sections (e.g., sidebar)
-- Override Carbon token variables (e.g., `--cds-layer`) on scoped selectors, not globally
-- For layout CSS (spacing, sizing, positioning), use standard CSS — not Carbon tokens
-- Scope Carbon overrides to component class (e.g., `.app-sidebar .cds--side-nav__item`)

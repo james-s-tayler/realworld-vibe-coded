@@ -6,7 +6,7 @@ namespace E2eTests.PageModels;
 /// Base class for all page models providing common functionality.
 /// </summary>
 /// <remarks>
-/// This comment triggers Test/e2e change detection for flake detection jobs.
+/// This comment triggers Test/e2e change detection for flake detection jobs. Run 3/3.
 /// </remarks>
 public abstract class BasePage(IPage page, string baseUrl)
 {
@@ -45,11 +45,6 @@ public abstract class BasePage(IPage page, string baseUrl)
   public ILocator SignUpLink => Page.GetByRole(AriaRole.Link, new() { Name = "Sign up" });
 
   /// <summary>
-  /// Navigation header link - New Article.
-  /// </summary>
-  public ILocator NewArticleLink => Page.GetByRole(AriaRole.Link, new() { Name = "New Article" });
-
-  /// <summary>
   /// Navigation header link - Settings.
   /// </summary>
   public ILocator SettingsLink => Page.GetByRole(AriaRole.Link, new() { Name = "Settings", Exact = true });
@@ -60,7 +55,7 @@ public abstract class BasePage(IPage page, string baseUrl)
   public ILocator UsersLink => Page.GetByRole(AriaRole.Link, new() { Name = "Users", Exact = true });
 
   /// <summary>
-  /// Sidebar link - Log out.
+  /// Navigation sidebar link - Log out.
   /// </summary>
   public ILocator LogoutLink => Page.GetByRole(AriaRole.Link, new() { Name = "Log out" });
 
@@ -95,14 +90,6 @@ public abstract class BasePage(IPage page, string baseUrl)
   }
 
   /// <summary>
-  /// Clicks the New Article link in the header.
-  /// </summary>
-  public async Task ClickNewArticleAsync()
-  {
-    await Navigate(NewArticleLink, $"{BaseUrl}/editor");
-  }
-
-  /// <summary>
   /// Clicks the Settings link in the header.
   /// </summary>
   public async Task ClickSettingsAsync()
@@ -119,20 +106,20 @@ public abstract class BasePage(IPage page, string baseUrl)
   }
 
   /// <summary>
-  /// Logs out via sidebar and verifies the user is logged out.
-  /// </summary>
-  public async Task LogoutAsync()
-  {
-    await LogoutLink.ClickAsync();
-    await Expect(SignInLink).ToBeVisibleAsync();
-  }
-
-  /// <summary>
   /// Clicks on the user's profile link in the header.
   /// </summary>
   public async Task ClickUserProfileAsync(string username)
   {
     await Navigate(GetUserProfileLink(username), $"{BaseUrl}/profile/{username}");
+  }
+
+  /// <summary>
+  /// Performs logout via sidebar and verifies the user is logged out.
+  /// </summary>
+  public async Task LogoutAsync()
+  {
+    await LogoutLink.ClickAsync();
+    await Expect(SignInLink).ToBeVisibleAsync();
   }
 
   /// <summary>

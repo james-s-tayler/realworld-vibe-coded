@@ -4,8 +4,10 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
+using Server.SharedKernel;
 using Server.SharedKernel.Identity;
 using Server.SharedKernel.MediatR;
 
@@ -16,15 +18,18 @@ namespace Server.UseCases.Identity.Invite;
 public class InviteHandler : ICommandHandler<InviteCommand, Unit>
 {
   private readonly IUserEmailChecker _userEmailChecker;
+  private readonly IStringLocalizer _localizer;
   private readonly ILogger<InviteHandler> _logger;
   private readonly IHttpContextAccessor _httpContextAccessor;
 
   public InviteHandler(
     IUserEmailChecker userEmailChecker,
+    IStringLocalizer localizer,
     ILogger<InviteHandler> logger,
     IHttpContextAccessor httpContextAccessor)
   {
     _userEmailChecker = userEmailChecker;
+    _localizer = localizer;
     _logger = logger;
     _httpContextAccessor = httpContextAccessor;
   }
@@ -42,7 +47,7 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
     if (tenantInfo == null)
     {
       _logger.LogError("User invitation failed: No tenant context found");
-      return Result<Unit>.Invalid(new ErrorDetail("tenant", "No tenant context found"));
+      return Result<Unit>.Invalid(new ErrorDetail("tenant", _localizer[SharedResource.Keys.NoTenantContext]));
     }
 
     var tenantId = tenantInfo.Id!;
@@ -53,7 +58,7 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
     if (emailExists)
     {
       _logger.LogWarning("User invitation failed for {Email}: Duplicate email", request.Email);
-      return Result<Unit>.Invalid(new ErrorDetail("email", "A user has already been registered with that email"));
+      return Result<Unit>.Invalid(new ErrorDetail("email", _localizer[SharedResource.Keys.EmailAlreadyRegistered]));
     }
 
     _logger.LogInformation("Creating new user with email {Email} in tenant {TenantId}", request.Email, tenantId);

@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom'
+import '../i18n/i18n'
 
 // Polyfill for ResizeObserver (required by Carbon Design System components)
 global.ResizeObserver = class ResizeObserver {

@@ -1,4 +1,6 @@
-﻿using Nuke.Common;
+﻿using System.Text.Json;
+using Json.Schema;
+using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
@@ -82,9 +84,81 @@ public partial class Build
               .SetSeverity("error"));
       });
 
+  internal Target LintAppSettingsVerify => _ => _
+      .Description("Validate feature_management sections in appsettings*.json against the vendored v2 JSON schema")
+      .Executes(() =>
+      {
+        var schemaPath = SchemaDirectory / "FeatureManagement.v2.0.0.schema.json";
+        var schemaText = schemaPath.ReadAllText();
+        var buildOptions = new BuildOptions { Dialect = Dialect.Draft07 };
+        var schema = JsonSchema.FromText(schemaText, buildOptions);
+
+        var appSettingsFiles = AppSettingsDirectory.GlobFiles("appsettings*.json");
+        var errors = new List<string>();
+
+        foreach (var file in appSettingsFiles)
+        {
+          var content = file.ReadAllText();
+          var jsonOptions = new JsonDocumentOptions
+          {
+            CommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+          };
+          var doc = JsonDocument.Parse(content, jsonOptions);
+
+          if (!doc.RootElement.TryGetProperty("feature_management", out var featureSection))
+          {
+            Log.Warning("{File} has no feature_management section — skipping", file.Name);
+            continue;
+          }
+
+          // Wrap the section to match the schema's root structure
+          var wrapped = JsonDocument.Parse(JsonSerializer.Serialize(new { feature_management = featureSection }));
+
+          var options = new EvaluationOptions
+          {
+            OutputFormat = OutputFormat.List,
+          };
+
+          var result = schema.Evaluate(wrapped.RootElement, options);
+
+          if (!result.IsValid)
+          {
+            errors.Add($"  {file.Name}:");
+
+            if (result.Details != null)
+            {
+              foreach (var detail in result.Details.Where(d => d.Errors != null))
+              {
+                foreach (var error in detail.Errors!)
+                {
+                  errors.Add($"    [{detail.InstanceLocation}] {error.Key}: {error.Value}");
+                }
+              }
+            }
+          }
+          else
+          {
+            Log.Information("✓ {File} feature_management section is valid", file.Name);
+          }
+        }
+
+        if (errors.Any())
+        {
+          foreach (var error in errors)
+          {
+            Log.Error("{Error}", error);
+          }
+
+          throw new Exception("feature_management schema validation failed.");
+        }
+
+        Log.Information("✓ All appsettings feature_management sections pass schema validation");
+      });
+
   internal Target LintAllVerify => _ => _
       .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
-      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintClaudeMdVerify, LintClaudeRulesVerify, LintApiClientVerify)
+      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintClaudeMdVerify, LintClaudeRulesVerify, LintApiClientVerify, LintAppSettingsVerify)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";

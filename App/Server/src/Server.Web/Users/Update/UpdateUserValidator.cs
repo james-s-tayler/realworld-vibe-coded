@@ -1,11 +1,15 @@
 ﻿using FluentValidation;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Server.Core.IdentityAggregate;
+using Server.SharedKernel;
+using Server.Web.I18n;
 
 namespace Server.Web.Users.Update;
 
 public class UpdateUserValidator : Validator<UpdateUserRequest>
 {
-  public UpdateUserValidator()
+  public UpdateUserValidator(IStringLocalizer<SharedResource> localizer, IOptions<I18nSettings> i18nSettings)
   {
     RuleLevelCascadeMode = CascadeMode.Stop;
 
@@ -14,11 +18,8 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
     {
       RuleFor(x => x.User.Email)
         .NotEmpty()
-        .WithMessage("is required.")
         .EmailAddress()
-        .WithMessage("is invalid.")
         .MaximumLength(ApplicationUser.EmailMaxLength)
-        .WithMessage($"cannot exceed {ApplicationUser.EmailMaxLength} characters.")
         .OverridePropertyName("email");
     });
 
@@ -27,11 +28,8 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
     {
       RuleFor(x => x.User.Username)
         .NotEmpty()
-        .WithMessage("is required.")
         .MinimumLength(ApplicationUser.UsernameMinLength)
-        .WithMessage($"must be at least {ApplicationUser.UsernameMinLength} characters.")
         .MaximumLength(ApplicationUser.UsernameMaxLength)
-        .WithMessage($"cannot exceed {ApplicationUser.UsernameMaxLength} characters.")
         .OverridePropertyName("username");
     });
 
@@ -40,9 +38,7 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
     {
       RuleFor(x => x.User.Password)
         .NotEmpty()
-        .WithMessage("is required.")
         .MinimumLength(ApplicationUser.PasswordMinLength)
-        .WithMessage($"must be at least {ApplicationUser.PasswordMinLength} characters.")
         .OverridePropertyName("password");
     });
 
@@ -51,10 +47,18 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
     {
       RuleFor(x => x.User.Bio)
         .NotEmpty()
-        .WithMessage("is required.")
         .MaximumLength(ApplicationUser.BioMaxLength)
-        .WithMessage($"cannot exceed {ApplicationUser.BioMaxLength} characters.")
         .OverridePropertyName("bio");
+    });
+
+    // Language validation - if provided, must be a supported language
+    var supportedLanguages = i18nSettings.Value.SupportedLanguages;
+    When(x => x.User.Language != null, () =>
+    {
+      RuleFor(x => x.User.Language)
+        .Must(lang => supportedLanguages.Contains(lang!))
+        .WithMessage(x => localizer[SharedResource.Keys.UnsupportedLanguage])
+        .OverridePropertyName("language");
     });
   }
 }

@@ -53,6 +53,16 @@ public class SettingsPage : BasePage
   public ILocator ErrorDisplay => Page.GetByTestId("error-display");
 
   /// <summary>
+  /// Language dropdown trigger button.
+  /// </summary>
+  public ILocator LanguageDropdown => Page.Locator("#language");
+
+  /// <summary>
+  /// Gets a language option in the dropdown menu by label.
+  /// </summary>
+  public ILocator GetLanguageOption(string label) => Page.GetByText(label, new() { Exact = true });
+
+  /// <summary>
   /// Updates the bio field.
   /// </summary>
   public async Task UpdateBioAsync(string bio)
@@ -113,5 +123,23 @@ public class SettingsPage : BasePage
   public async Task VerifyErrorContainsTextAsync(string expectedText)
   {
     await Expect(ErrorDisplay).ToContainTextAsync(expectedText);
+  }
+
+  /// <summary>
+  /// Selects a language from the language dropdown.
+  /// </summary>
+  public async Task SelectLanguageAsync(string languageLabel)
+  {
+    await LanguageDropdown.ClickAsync();
+    await GetLanguageOption(languageLabel).ClickAsync();
+  }
+
+  /// <summary>
+  /// Selects a language, saves settings, and verifies success.
+  /// </summary>
+  public async Task ChangeLanguageAsync(string languageLabel)
+  {
+    await SelectLanguageAsync(languageLabel);
+    await ClickUpdateSettingsButtonAsync();
   }
 }
