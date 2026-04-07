@@ -10,6 +10,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "profile-permissions-001",
+    FeatureArea = "auth",
+    Behavior = "Unauthenticated user accessing dashboard is redirected to login",
+    Verifies = ["URL changes to /login"])]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenAccessingDashboard()
   {
     // Act - try to access dashboard without authentication
@@ -20,6 +25,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "profile-permissions-002",
+    FeatureArea = "auth",
+    Behavior = "Unauthenticated user accessing profile page is redirected to login",
+    Verifies = ["URL changes to /login"])]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenAccessingProfilePage()
   {
     // Arrange

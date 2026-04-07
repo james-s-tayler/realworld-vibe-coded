@@ -10,6 +10,11 @@ public class Screenshots : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-screenshots-001",
+    FeatureArea = "feed",
+    Behavior = "Home page global feed renders correctly with max-length article content and favorite count",
+    Verifies = ["article preview is visible in global feed", "screenshot width does not exceed viewport width", "URL is the home page"])]
   public async Task HomePageGlobalFeedWithArticle()
   {
     // Arrange - create user with max-length fields

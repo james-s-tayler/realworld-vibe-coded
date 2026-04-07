@@ -69,6 +69,10 @@
         "TestE2eFeed",
         "TestE2eMobile",
         "TestE2eMultitenancy",
+        "TestEvals",
+        "TestEvalsCoverage",
+        "TestEvalsGenerate",
+        "TestEvalsMasterList",
         "TestServer"
       ]
     },

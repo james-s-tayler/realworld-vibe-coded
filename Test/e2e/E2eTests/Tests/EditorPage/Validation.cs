@@ -10,6 +10,11 @@ public class Validation : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "editor-validation-001",
+    FeatureArea = "editor",
+    Behavior = "Creating an article with a duplicate title displays a validation error",
+    Verifies = ["error message contains 'has already been taken'"])]
   public async Task CreateArticle_WithDuplicateTitle_DisplaysErrorMessage()
   {
     // Arrange

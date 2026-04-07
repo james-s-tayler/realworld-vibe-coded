@@ -10,6 +10,11 @@ public class Screenshots : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "article-screenshots-001",
+    FeatureArea = "articles",
+    Behavior = "Article page renders correctly with max-length content including title, body, and comment",
+    Verifies = ["article title is visible", "screenshot width does not exceed viewport width", "URL contains the article slug"])]
   public async Task ArticlePageWithMaxLengthContent()
   {
     // Arrange - create user with max-length fields

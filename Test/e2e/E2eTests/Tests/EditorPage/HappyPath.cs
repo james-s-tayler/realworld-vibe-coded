@@ -10,6 +10,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "editor-happy-001",
+    FeatureArea = "editor",
+    Behavior = "User can create a new article with tags and view it on the article page",
+    Verifies = ["article title is displayed on article page", "author matches the logged-in user"])]
   public async Task UserCanCreateArticle_AndViewArticle()
   {
     // Arrange
@@ -34,6 +39,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "editor-happy-002",
+    FeatureArea = "editor",
+    Behavior = "User can create an article with multiple tags and see them on the article page",
+    Verifies = ["both tags are visible on the published article"])]
   public async Task UserCanCreateArticleWithTags_AndViewTagsOnArticle()
   {
     // Arrange
@@ -56,6 +66,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "editor-happy-003",
+    FeatureArea = "editor",
+    Behavior = "Pressing Enter in the tag input adds the tag below the input field",
+    Verifies = ["tag chip is visible below the tag input"])]
   public async Task TagsAppearBelowInput_WhenAddedViaEnter()
   {
     // Arrange
@@ -74,6 +89,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "editor-happy-004",
+    FeatureArea = "editor",
+    Behavior = "Typing a comma in the tag input adds the tag below the input field",
+    Verifies = ["tag chip is visible below the tag input"])]
   public async Task TagsAppearBelowInput_WhenAddedViaComma()
   {
     // Arrange
@@ -92,6 +112,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "editor-happy-005",
+    FeatureArea = "editor",
+    Behavior = "Existing tags are pre-populated when editing an article",
+    Verifies = ["tag1 is visible in the editor", "tag2 is visible in the editor"])]
   public async Task ExistingTagsDisplayed_WhenEditingArticle()
   {
     // Arrange
@@ -111,6 +136,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "editor-happy-006",
+    FeatureArea = "editor",
+    Behavior = "Individual tags can be removed from the editor without affecting other tags",
+    Verifies = ["removed tag is no longer visible", "remaining tag is still visible"])]
   public async Task TagsCanBeIndividuallyRemoved()
   {
     // Arrange
@@ -135,6 +165,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "editor-happy-007",
+    FeatureArea = "editor",
+    Behavior = "Removing a tag in the editor and saving persists the removal on the article page",
+    Verifies = ["removed tag is not visible on the article page", "remaining tag is still visible on the article page"])]
   public async Task RemovedTagIsPersistedAfterSave()
   {
     // Arrange
@@ -159,6 +194,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "editor-happy-008",
+    FeatureArea = "editor",
+    Behavior = "Tag text left in the input field without pressing Enter is automatically added when publishing",
+    Verifies = ["pending tag appears on the published article page"])]
   public async Task UnsubmittedTagInInputIsAddedOnPublish()
   {
     // Arrange
@@ -181,6 +221,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "editor-happy-009",
+    FeatureArea = "editor",
+    Behavior = "User can edit their own article's title and see the updated title on the article page",
+    Verifies = ["updated article title is displayed on the article page"])]
   public async Task UserCanEditOwnArticle()
   {
     // Arrange

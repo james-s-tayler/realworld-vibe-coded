@@ -10,6 +10,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "auth-happy-001",
+    FeatureArea = "auth",
+    Behavior = "User can log in with valid credentials and see authenticated UI state",
+    Verifies = ["User profile link shows email after login"])]
   public async Task UserCanSignIn_WithExistingCredentials()
   {
     // Arrange

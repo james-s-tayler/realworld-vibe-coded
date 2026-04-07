@@ -9,6 +9,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-permissions-001",
+    FeatureArea = "users",
+    Behavior = "Admin user sees Users link in sidebar navigation",
+    Verifies = ["Users link is visible"])]
   public async Task AdminUserSeesUsersLinkInNavigation()
   {
     // Arrange - create and log in an ADMIN user (first user in tenant)
@@ -24,6 +29,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-permissions-002",
+    FeatureArea = "users",
+    Behavior = "Non-admin user does not see Users link in sidebar navigation",
+    Verifies = ["Users link is not visible"])]
   public async Task NonAdminUserDoesNotSeeUsersLinkInNavigation()
   {
     // Arrange - create ADMIN user, then invite non-ADMIN user
@@ -43,6 +53,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-permissions-003",
+    FeatureArea = "users",
+    Behavior = "Non-admin user redirected to 403 Forbidden when accessing /users directly",
+    Verifies = ["URL changes to /forbidden", "403 heading visible", "Permission denied message visible"])]
   public async Task NonAdminUserRedirectedToForbiddenWhenAccessingUsersPage()
   {
     // Arrange - create ADMIN user, then invite non-ADMIN user
@@ -64,6 +79,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-permissions-004",
+    FeatureArea = "users",
+    Behavior = "Forbidden page has a link back to the home page",
+    Verifies = ["'Go back to home' link navigates to /"])]
   public async Task ForbiddenPageHasLinkToHomePage()
   {
     // Arrange - create ADMIN user, then invite non-ADMIN user
@@ -88,6 +108,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-permissions-005",
+    FeatureArea = "users",
+    Behavior = "Admin cannot deactivate their own account",
+    Verifies = ["Deactivate option not visible in self overflow menu"])]
   public async Task AdminCannotDeactivateSelf()
   {
     // Arrange - log in as admin
@@ -105,6 +130,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-permissions-006",
+    FeatureArea = "users",
+    Behavior = "Admin cannot remove their own ADMIN role",
+    Verifies = ["Error message 'Cannot remove your own ADMIN role' visible"])]
   public async Task AdminCannotRemoveOwnAdminRole()
   {
     // Arrange - log in as admin

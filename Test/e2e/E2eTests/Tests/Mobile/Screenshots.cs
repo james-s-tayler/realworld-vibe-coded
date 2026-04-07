@@ -7,6 +7,11 @@ public class Screenshots : MobileAppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "mobile-screenshots-001",
+    FeatureArea = "mobile",
+    Behavior = "Login page renders correctly on mobile with no horizontal overflow",
+    Verifies = ["Screenshot width within viewport"])]
   public async Task LoginPage()
   {
     await Pages.LoginPage.GoToAsync();
@@ -16,6 +21,11 @@ public class Screenshots : MobileAppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "mobile-screenshots-002",
+    FeatureArea = "mobile",
+    Behavior = "Register page renders correctly on mobile with no horizontal overflow",
+    Verifies = ["Screenshot width within viewport"])]
   public async Task RegisterPage()
   {
     await Pages.RegisterPage.GoToAsync();
@@ -25,6 +35,11 @@ public class Screenshots : MobileAppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "mobile-screenshots-003",
+    FeatureArea = "mobile",
+    Behavior = "Settings page renders correctly on mobile with no horizontal overflow",
+    Verifies = ["Screenshot width within viewport"])]
   public async Task SettingsPage()
   {
     var user = await Api.CreateUserAsync();
@@ -36,6 +51,11 @@ public class Screenshots : MobileAppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "mobile-screenshots-004",
+    FeatureArea = "mobile",
+    Behavior = "Dashboard page renders correctly on mobile with no horizontal overflow",
+    Verifies = ["Screenshot width within viewport"])]
   public async Task DashboardPage()
   {
     var user = await Api.CreateUserAsync();
@@ -47,6 +67,11 @@ public class Screenshots : MobileAppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "mobile-screenshots-005",
+    FeatureArea = "mobile",
+    Behavior = "Sidebar open state renders correctly on mobile with no horizontal overflow",
+    Verifies = ["Screenshot width within viewport"])]
   public async Task SidebarOpenOnMobile()
   {
     var user = await Api.CreateUserAsync();

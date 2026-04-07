@@ -10,6 +10,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "dashboard-happy-001",
+    FeatureArea = "dashboard",
+    Behavior = "Dashboard shows welcome message when user is logged in",
+    Verifies = ["Welcome heading is visible", "Welcome heading contains 'Welcome'"])]
   public async Task Dashboard_ShowsWelcomeMessage_WhenLoggedIn()
   {
     // Arrange
@@ -24,6 +29,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "dashboard-happy-002",
+    FeatureArea = "dashboard",
+    Behavior = "Dashboard shows feature banner when DashboardBanner flag is enabled",
+    Verifies = ["Feature banner is visible"])]
   public async Task Dashboard_ShowsBanner_WhenFeatureFlagEnabled()
   {
     // Arrange — E2E runs with Development config where all flags are enabled
@@ -37,6 +47,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "dashboard-happy-003",
+    FeatureArea = "dashboard",
+    Behavior = "Dashboard banner disappears when feature flag is toggled off and reappears when toggled on",
+    Verifies = ["Banner visible initially", "Banner disappears after flag disabled", "Banner reappears after flag re-enabled"])]
   public async Task Dashboard_BannerDisappears_WhenFeatureFlagToggledOff()
   {
     // Arrange — login and verify banner is visible

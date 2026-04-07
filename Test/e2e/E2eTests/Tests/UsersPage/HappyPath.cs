@@ -10,6 +10,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-happy-001",
+    FeatureArea = "users",
+    Behavior = "Admin can navigate to Users page from sidebar menu",
+    Verifies = ["Users heading visible", "Invite User button visible"])]
   public async Task NavigateToUsersPageFromMenu()
   {
     // Arrange - create and log in a user
@@ -24,6 +29,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-happy-002",
+    FeatureArea = "users",
+    Behavior = "Admin can invite a user who can then log in",
+    Verifies = ["Invited user appears in table", "Invited user can log in and reach home page"])]
   public async Task InviteUserThenLogoutAndLoginAsInvitedUser()
   {
     // Arrange - create and log in an admin user
@@ -55,6 +65,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-happy-003",
+    FeatureArea = "users",
+    Behavior = "Clicking a user's profile link navigates to their profile page",
+    Verifies = ["URL changes to /profile/{username}"])]
   public async Task ClickUserProfileLinkNavigatesToProfile()
   {
     // Arrange - create one user and invite another to same tenant
@@ -81,6 +96,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-happy-004",
+    FeatureArea = "users",
+    Behavior = "Deactivated user shows 'Deactivated' status in the users table",
+    Verifies = ["Status tag contains 'Deactivated'"])]
   public async Task DeactivateUserThenVerifyStatusColumn()
   {
     // Arrange - create admin and invite a user
@@ -102,6 +122,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-happy-005",
+    FeatureArea = "users",
+    Behavior = "Admin can deactivate and reactivate a user via the UI",
+    Verifies = ["Status shows 'Deactivated' after deactivation", "Status shows 'Active' after reactivation"])]
   public async Task DeactivateAndReactivateUser()
   {
     // Arrange
@@ -128,6 +153,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-happy-006",
+    FeatureArea = "users",
+    Behavior = "Deactivated user cannot log in and sees lockout error",
+    Verifies = ["Error message contains 'Account is locked out'"])]
   public async Task DeactivatedUserCannotLogin()
   {
     // Arrange - deactivate an invited user
@@ -145,6 +175,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-happy-007",
+    FeatureArea = "users",
+    Behavior = "Admin can add ADMIN role to a user via edit roles modal",
+    Verifies = ["User row shows 'ADMIN' in roles column"])]
   public async Task EditUserRolesAddsAdminRole()
   {
     // Arrange
@@ -166,6 +201,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-happy-008",
+    FeatureArea = "users",
+    Behavior = "Admin can remove ADMIN role from a user via edit roles modal",
+    Verifies = ["User row no longer shows 'ADMIN'", "User row still shows 'USER'"])]
   public async Task EditUserRolesRemovesAdminRole()
   {
     // Arrange - create admin, invite user, give them ADMIN role via API
@@ -190,6 +230,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-happy-009",
+    FeatureArea = "users",
+    Behavior = "OWNER role checkbox is read-only in edit roles modal",
+    Verifies = ["OWNER checkbox is disabled"])]
   public async Task OwnerRoleIsReadOnlyInEditModal()
   {
     // Arrange - log in as the owner/admin
@@ -208,6 +253,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-happy-010",
+    FeatureArea = "users",
+    Behavior = "Pagination displays correct total user count",
+    Verifies = ["Pagination is visible", "Pagination contains correct count"])]
   public async Task PaginationShowsCorrectCount()
   {
     // Arrange - create admin and invite a user

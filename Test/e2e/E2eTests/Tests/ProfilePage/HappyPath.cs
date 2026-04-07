@@ -10,6 +10,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "profile-happy-001",
+    FeatureArea = "profile",
+    Behavior = "User can view their own profile page",
+    Verifies = ["Profile heading shows user's email"])]
   public async Task UserCanViewOwnProfile()
   {
     // Arrange
@@ -26,6 +31,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "profile-happy-002",
+    FeatureArea = "profile",
+    Behavior = "User can view another user's profile within same tenant",
+    Verifies = ["Profile heading shows other user's email"])]
   public async Task UserCanViewOtherUsersProfile()
   {
     // Arrange

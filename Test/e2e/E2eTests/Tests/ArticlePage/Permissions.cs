@@ -10,6 +10,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "article-permissions-001",
+    FeatureArea = "articles",
+    Behavior = "Unauthenticated user is redirected to the login page when accessing an article",
+    Verifies = ["URL changes to /login"])]
   public async Task UnauthenticatedUser_RedirectsToLogin_WhenAccessingArticlePage()
   {
     // Arrange

@@ -12,6 +12,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "settings-happy-001",
+    FeatureArea = "settings",
+    Behavior = "User can update bio and see it reflected on profile page",
+    Verifies = ["Bio text visible on profile page after update"])]
   public async Task UserCanEditProfile()
   {
     // Arrange
@@ -35,6 +40,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "settings-happy-002",
+    FeatureArea = "settings",
+    Behavior = "User can change language to Japanese and see translated UI",
+    Verifies = ["Success message in Japanese", "Sidebar nav in Japanese", "Page title in Japanese", "Dashboard welcome text in Japanese"])]
   public async Task UserCanChangeLanguageToJapanese()
   {
     // Arrange
@@ -72,6 +82,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "settings-happy-003",
+    FeatureArea = "settings",
+    Behavior = "User can sign out via sidebar logout button",
+    Verifies = ["User is logged out after clicking logout"])]
   public async Task UserCanSignOut()
   {
     // Arrange
