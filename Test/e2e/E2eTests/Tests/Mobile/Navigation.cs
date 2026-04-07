@@ -32,7 +32,7 @@ public class Navigation : MobileAppPageTest
     var user = await Api.CreateUserAsync();
     await LoginOnMobileAsync(user.Email, user.Password);
 
-    await HamburgerButton.ClickAsync();
+    await HamburgerButton.DispatchEventAsync("click");
 
     await Expect(SideNav).ToBeVisibleAsync();
   }
@@ -62,7 +62,7 @@ public class Navigation : MobileAppPageTest
   {
     await Pages.LoginPage.GoToAsync();
 
-    await HamburgerButton.ClickAsync();
+    await HamburgerButton.DispatchEventAsync("click");
 
     await Expect(SideNav.GetByRole(AriaRole.Link, new() { Name = "Sign in" })).ToBeVisibleAsync();
     await Expect(SideNav.GetByRole(AriaRole.Link, new() { Name = "Sign up" })).ToBeVisibleAsync();
