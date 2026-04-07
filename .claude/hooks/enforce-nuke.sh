@@ -7,8 +7,8 @@ if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*dotnet\b'; then
   exit 2
 fi
 
-if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*docker(-compose)?\b' || echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*docker\s+compose\b'; then
-  echo "BLOCKED: Do not run docker/docker-compose commands directly. Use ./build.sh <target> instead. Key targets: RunLocalPublish, RunLocalDependencies, RunLocalDependenciesDown, DbReset, TestServerPostman*, TestE2e" >&2
+if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*docker-compose\b' || echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*docker\s+compose\b'; then
+  echo "BLOCKED: Do not run docker compose commands directly. Use ./build.sh <target> instead. Key targets: RunLocalPublish, RunLocalDependencies, RunLocalDependenciesDown, DbReset, TestServerPostman*, TestE2e" >&2
   exit 2
 fi
 
