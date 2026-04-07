@@ -53,6 +53,7 @@
         "LintNukeVerify",
         "LintServerFix",
         "LintServerVerify",
+        "LintSpecVerify",
         "PathsCleanDirectories",
         "PathsShowWorktreeInfo",
         "RunLocalClient",
