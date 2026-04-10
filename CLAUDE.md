@@ -15,6 +15,7 @@ Reference as needed:
 - `SPEC-REFERENCE.md` — complete API spec (the source of truth for what to build)
 - `Docs/architecture.md` — tech stack, folder structure, build commands
 - `Docs/observability.md` — OpenTelemetry tracing/metrics, Grafana/Jaeger/Prometheus stack
+- Chrome DevTools MCP — visual browser inspection via `/browser-inspect` and debugging via `/browser-debug`
 
 ## Rules Index
 

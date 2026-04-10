@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "chrome-devtools": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [".claude/scripts/chrome-devtools-mcp.sh", "--headless", "--isolated", "--acceptInsecureCerts"]
+    }
+  }
+}

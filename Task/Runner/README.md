@@ -58,7 +58,7 @@ All Nuke targets follow specific naming conventions:
 - **Build targets**: Start with `Build` - `BuildServer`, `BuildClient`
 - **Test targets**: Start with `Test` - `TestServer`, `TestServerPostman`
 - **Database targets**: Start with `Db` or `DbMigrations` - `DbReset`, `DbMigrationsCheckUncommitted`
-- **Utility targets**: Use descriptive names - `RunLocalServer`, `InstallClient`, etc.
+- **Utility targets**: Use descriptive names - `RunLocalPublish`, `InstallClient`, etc.
 
 These conventions are enforced by ArchUnit.NET tests in the `lint-nuke-verify` target.
 
