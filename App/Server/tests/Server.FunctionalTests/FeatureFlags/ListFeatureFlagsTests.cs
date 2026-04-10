@@ -9,7 +9,7 @@ public class ListFeatureFlagsTests : AppTestBase
   }
 
   [Fact]
-  public async Task ListFeatureFlags_ReturnsV2FormatWithClientVisibleFlags()
+  public async Task ListFeatureFlags_ReturnsV2FormatWithEmptyClientVisibleFlags()
   {
     var tenant = await Fixture.RegisterTenantAsync();
     var user = tenant.Users[0];
@@ -19,11 +19,7 @@ public class ListFeatureFlagsTests : AppTestBase
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.FeatureManagement.ShouldNotBeNull();
     result.FeatureManagement.FeatureFlags.ShouldNotBeNull();
-    result.FeatureManagement.FeatureFlags.Count.ShouldBe(1);
-
-    var dashboardBanner = result.FeatureManagement.FeatureFlags.First();
-    dashboardBanner.Id.ShouldBe("DashboardBanner");
-    dashboardBanner.Enabled.ShouldBeFalse();
+    result.FeatureManagement.FeatureFlags.Count.ShouldBe(0);
   }
 
   [Fact]

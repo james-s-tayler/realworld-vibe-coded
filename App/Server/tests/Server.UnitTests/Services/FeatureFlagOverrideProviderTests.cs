@@ -12,7 +12,7 @@ public class FeatureFlagOverrideProviderTests
   {
     var config = BuildConfiguration();
 
-    _sut.SetOverride("DashboardBanner", true, config);
+    _sut.SetOverride("DisabledFeature", true, config);
 
     _sut.TryGet("feature_management:feature_flags:0:enabled", out var value);
     value.ShouldBe("True");
@@ -34,8 +34,8 @@ public class FeatureFlagOverrideProviderTests
   {
     var config = BuildConfiguration();
 
-    _sut.SetOverride("DashboardBanner", true, config);
-    _sut.ClearOverride("DashboardBanner", config);
+    _sut.SetOverride("DisabledFeature", true, config);
+    _sut.ClearOverride("DisabledFeature", config);
 
     _sut.TryGet("feature_management:feature_flags:0:enabled", out _).ShouldBeFalse();
   }
@@ -45,7 +45,7 @@ public class FeatureFlagOverrideProviderTests
   {
     var config = BuildConfiguration();
 
-    _sut.SetOverride("DashboardBanner", true, config);
+    _sut.SetOverride("DisabledFeature", true, config);
     _sut.SetOverride("SampleFeature", false, config);
 
     _sut.ClearAllOverrides();
@@ -79,7 +79,7 @@ public class FeatureFlagOverrideProviderTests
     var config = new ConfigurationBuilder()
       .AddInMemoryCollection(new Dictionary<string, string?>
       {
-        ["feature_management:feature_flags:0:id"] = "DashboardBanner",
+        ["feature_management:feature_flags:0:id"] = "DisabledFeature",
         ["feature_management:feature_flags:0:enabled"] = "false",
         ["feature_management:feature_flags:1:id"] = "SampleFeature",
         ["feature_management:feature_flags:1:enabled"] = "true",

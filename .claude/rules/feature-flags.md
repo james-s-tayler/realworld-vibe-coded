@@ -14,7 +14,7 @@ Feature flags use the Microsoft Feature Management v2 schema (`feature_managemen
 {
   "feature_management": {
     "feature_flags": [
-      { "id": "DashboardBanner", "enabled": false }
+      { "id": "MyFeature", "enabled": false }
     ]
   }
 }

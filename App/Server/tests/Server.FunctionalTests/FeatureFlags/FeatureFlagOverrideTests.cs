@@ -1,5 +1,4 @@
 ﻿using Server.Web.DevOnly.Endpoints.FeatureFlag;
-using Server.Web.FeatureFlags.List;
 
 namespace Server.FunctionalTests.FeatureFlags;
 
@@ -19,10 +18,10 @@ public class FeatureFlagOverrideTests : AppTestBase, IDisposable
   {
     var (response, result) = await Fixture.Client
       .PUTAsync<SetFeatureFlagOverride, SetFeatureFlagOverrideRequest, CheckFeatureFlagResponse>(
-        new SetFeatureFlagOverrideRequest { FeatureName = "DashboardBanner", Enabled = true });
+        new SetFeatureFlagOverrideRequest { FeatureName = "DisabledFeature", Enabled = true });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.FeatureName.ShouldBe("DashboardBanner");
+    result.FeatureName.ShouldBe("DisabledFeature");
     result.IsEnabled.ShouldBeTrue();
   }
 
@@ -43,31 +42,14 @@ public class FeatureFlagOverrideTests : AppTestBase, IDisposable
   {
     await Fixture.Client
       .PUTAsync<SetFeatureFlagOverride, SetFeatureFlagOverrideRequest, CheckFeatureFlagResponse>(
-        new SetFeatureFlagOverrideRequest { FeatureName = "DashboardBanner", Enabled = true });
+        new SetFeatureFlagOverrideRequest { FeatureName = "DisabledFeature", Enabled = true });
 
     var (response, result) = await Fixture.Client
       .GETAsync<CheckFeatureFlag, CheckFeatureFlagRequest, CheckFeatureFlagResponse>(
-        new CheckFeatureFlagRequest { FeatureName = "DashboardBanner" });
+        new CheckFeatureFlagRequest { FeatureName = "DisabledFeature" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
     result.IsEnabled.ShouldBeTrue();
-  }
-
-  [Fact]
-  public async Task SetOverride_ReflectedInListEndpoint()
-  {
-    var tenant = await Fixture.RegisterTenantAsync();
-    var user = tenant.Users[0];
-
-    await Fixture.Client
-      .PUTAsync<SetFeatureFlagOverride, SetFeatureFlagOverrideRequest, CheckFeatureFlagResponse>(
-        new SetFeatureFlagOverrideRequest { FeatureName = "DashboardBanner", Enabled = true });
-
-    var (response, result) = await user.Client.GETAsync<ListFeatureFlags, FeatureFlagsResponse>();
-
-    response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    var dashboardBanner = result.FeatureManagement.FeatureFlags.First(f => f.Id == "DashboardBanner");
-    dashboardBanner.Enabled.ShouldBeTrue();
   }
 
   [Fact]
@@ -75,14 +57,14 @@ public class FeatureFlagOverrideTests : AppTestBase, IDisposable
   {
     await Fixture.Client
       .PUTAsync<SetFeatureFlagOverride, SetFeatureFlagOverrideRequest, CheckFeatureFlagResponse>(
-        new SetFeatureFlagOverrideRequest { FeatureName = "DashboardBanner", Enabled = true });
+        new SetFeatureFlagOverrideRequest { FeatureName = "DisabledFeature", Enabled = true });
 
     var (response, result) = await Fixture.Client
       .DELETEAsync<ClearFeatureFlagOverride, CheckFeatureFlagRequest, CheckFeatureFlagResponse>(
-        new CheckFeatureFlagRequest { FeatureName = "DashboardBanner" });
+        new CheckFeatureFlagRequest { FeatureName = "DisabledFeature" });
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.FeatureName.ShouldBe("DashboardBanner");
+    result.FeatureName.ShouldBe("DisabledFeature");
     result.IsEnabled.ShouldBeFalse();
   }
 
@@ -91,13 +73,13 @@ public class FeatureFlagOverrideTests : AppTestBase, IDisposable
   {
     await Fixture.Client
       .PUTAsync<SetFeatureFlagOverride, SetFeatureFlagOverrideRequest, CheckFeatureFlagResponse>(
-        new SetFeatureFlagOverrideRequest { FeatureName = "DashboardBanner", Enabled = true });
+        new SetFeatureFlagOverrideRequest { FeatureName = "DisabledFeature", Enabled = true });
 
     for (var i = 0; i < 3; i++)
     {
       var (response, result) = await Fixture.Client
         .GETAsync<CheckFeatureFlag, CheckFeatureFlagRequest, CheckFeatureFlagResponse>(
-          new CheckFeatureFlagRequest { FeatureName = "DashboardBanner" });
+          new CheckFeatureFlagRequest { FeatureName = "DisabledFeature" });
 
       response.StatusCode.ShouldBe(HttpStatusCode.OK);
       result.IsEnabled.ShouldBeTrue();
