@@ -88,6 +88,8 @@ public static class MiddlewareConfig
       Predicate = check => check.Tags.Contains("ready"), // Only run readiness checks (database)
     });
 
+    app.MapPrometheusScrapingEndpoint();
+
     await RunMigrationsAsync(app);
 
     return app;
