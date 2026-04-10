@@ -1,4 +1,6 @@
-﻿namespace E2eTests.Tests.SettingsPage;
+﻿using Microsoft.Playwright;
+
+namespace E2eTests.Tests.SettingsPage;
 
 /// <summary>
 /// Happy path tests for the Settings page (/settings).
