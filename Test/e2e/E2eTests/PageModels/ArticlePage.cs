@@ -38,13 +38,13 @@ public class ArticlePage : BasePage
   /// Favorite article button.
   /// </summary>
   public ILocator FavoriteButton =>
-    Page.GetByRole(AriaRole.Button).Filter(new() { HasTextRegex = new Regex("Favorite Article") });
+    Page.GetByRole(AriaRole.Button).Filter(new() { HasTextRegex = new Regex("^Favorite") });
 
   /// <summary>
   /// Unfavorite article button (visible when article is already favorited).
   /// </summary>
   public ILocator UnfavoriteButton =>
-    Page.GetByRole(AriaRole.Button).Filter(new() { HasTextRegex = new Regex("Unfavorite Article") });
+    Page.GetByRole(AriaRole.Button).Filter(new() { HasTextRegex = new Regex("^Unfavorite") });
 
   /// <summary>
   /// Follow user button.

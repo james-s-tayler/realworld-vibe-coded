@@ -51,9 +51,9 @@ public class HappyPath : AppPageTest
     var japaneseSuccess = Page.GetByText("設定が正常に更新されました");
     await Expect(japaneseSuccess).ToBeVisibleAsync();
 
-    // Sidebar should be translated to Japanese
-    var japaneseSettings = Page.GetByText("設定");
-    await Expect(japaneseSettings).ToBeVisibleAsync();
+    // Sidebar nav should be translated to Japanese
+    var japaneseNavSettings = Page.GetByRole(AriaRole.Link, new() { Name = "設定" });
+    await Expect(japaneseNavSettings).ToBeVisibleAsync();
   }
 
   [Fact]
