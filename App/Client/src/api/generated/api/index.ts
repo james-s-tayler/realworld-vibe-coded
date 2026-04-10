@@ -4,6 +4,10 @@
 // @ts-ignore
 import { ArticlesRequestBuilderNavigationMetadata, ArticlesRequestBuilderRequestsMetadata, type ArticlesRequestBuilder } from './articles/index.js';
 // @ts-ignore
+import { ConfigRequestBuilderRequestsMetadata, type ConfigRequestBuilder } from './config/index.js';
+// @ts-ignore
+import { FeatureFlagsRequestBuilderRequestsMetadata, type FeatureFlagsRequestBuilder } from './featureFlags/index.js';
+// @ts-ignore
 import { IdentityRequestBuilderNavigationMetadata, type IdentityRequestBuilder } from './identity/index.js';
 // @ts-ignore
 import { ProfilesRequestBuilderNavigationMetadata, type ProfilesRequestBuilder } from './profiles/index.js';
@@ -24,6 +28,14 @@ export interface ApiRequestBuilder extends BaseRequestBuilder<ApiRequestBuilder>
      * The articles property
      */
     get articles(): ArticlesRequestBuilder;
+    /**
+     * The config property
+     */
+    get config(): ConfigRequestBuilder;
+    /**
+     * The featureFlags property
+     */
+    get featureFlags(): FeatureFlagsRequestBuilder;
     /**
      * The identity property
      */
@@ -56,6 +68,12 @@ export const ApiRequestBuilderNavigationMetadata: Record<Exclude<keyof ApiReques
     articles: {
         requestsMetadata: ArticlesRequestBuilderRequestsMetadata,
         navigationMetadata: ArticlesRequestBuilderNavigationMetadata,
+    },
+    config: {
+        requestsMetadata: ConfigRequestBuilderRequestsMetadata,
+    },
+    featureFlags: {
+        requestsMetadata: FeatureFlagsRequestBuilderRequestsMetadata,
     },
     identity: {
         navigationMetadata: IdentityRequestBuilderNavigationMetadata,

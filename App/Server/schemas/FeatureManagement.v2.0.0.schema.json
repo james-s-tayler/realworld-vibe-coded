@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Feature Management Configuration (v2)",
+  "required": ["feature_management"],
+  "properties": {
+    "feature_management": {
+      "type": "object",
+      "title": "Feature Management",
+      "description": "Declares feature management configuration using the v2 schema format.",
+      "required": ["feature_flags"],
+      "properties": {
+        "feature_flags": {
+          "type": "array",
+          "title": "Feature Flags",
+          "description": "An array of feature flag declarations.",
+          "items": {
+            "type": "object",
+            "title": "Feature Flag",
+            "required": ["id"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "title": "Feature Flag ID",
+                "description": "The unique identifier for this feature flag."
+              },
+              "enabled": {
+                "type": "boolean",
+                "title": "Enabled",
+                "description": "Whether this feature flag is enabled.",
+                "default": false
+              },
+              "description": {
+                "type": "string",
+                "title": "Description",
+                "description": "A description for this feature flag."
+              },
+              "conditions": {
+                "type": "object",
+                "title": "Conditions",
+                "description": "Conditions for evaluating the feature flag.",
+                "properties": {
+                  "requirement_type": {
+                    "type": "string",
+                    "enum": ["Any", "All"],
+                    "default": "Any"
+                  },
+                  "client_filters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["name"],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "parameters": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "variants": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["name"],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "configuration_value": {},
+                    "configuration_reference": {
+                      "type": "string"
+                    },
+                    "status_override": {
+                      "type": "string",
+                      "enum": ["None", "Enabled", "Disabled"]
+                    }
+                  }
+                }
+              },
+              "allocation": {
+                "type": "object",
+                "properties": {
+                  "default_when_enabled": {
+                    "type": "string"
+                  },
+                  "default_when_disabled": {
+                    "type": "string"
+                  },
+                  "user": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "group": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "percentile": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "seed": {
+                    "type": "string"
+                  }
+                }
+              },
+              "telemetry": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

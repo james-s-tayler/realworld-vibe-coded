@@ -45,7 +45,9 @@
     "yourFeed": "Your Feed",
     "globalFeed": "Global Feed",
     "articleFeeds": "Article feeds",
-    "popularTags": "Popular Tags"
+    "popularTags": "Popular Tags",
+    "featureBannerTitle": "New Feature",
+    "featureBannerMessage": "Check out our latest updates and improvements."
   },
   "article": {
     "editArticle": "Edit Article",

@@ -29,6 +29,10 @@ vi.mock('../api/tags', () => ({
   },
 }))
 
+vi.mock('../hooks/useFeatureFlag', () => ({
+  useFeatureFlag: vi.fn().mockReturnValue(false),
+}))
+
 function renderHomePage() {
   return render(
     <BrowserRouter>

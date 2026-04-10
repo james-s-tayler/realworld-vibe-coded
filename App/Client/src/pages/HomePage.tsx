@@ -9,6 +9,8 @@ import { ArticleList } from '../components/ArticleList';
 import { TagList } from '../components/TagList';
 import { PageShell } from '../components/PageShell';
 import { ApiError } from '../api/client';
+import { useFeatureFlag } from '../hooks/useFeatureFlag';
+import { FEATURE_FLAGS } from '../featureFlags';
 import type { Article } from '../types/article';
 import './HomePage.css';
 
@@ -31,6 +33,7 @@ export const HomePage: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { requireAuth } = useRequireAuth();
+  const showDashboardBanner = useFeatureFlag(FEATURE_FLAGS.DASHBOARD_BANNER);
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesCount, setArticlesCount] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
@@ -152,6 +155,14 @@ export const HomePage: React.FC = () => {
       banner={<HomeBanner />}
       sidebar={sidebarContent}
     >
+      {showDashboardBanner && (
+        <InlineNotification
+          kind="info"
+          title={t('home.featureBannerTitle')}
+          subtitle={t('home.featureBannerMessage')}
+          lowContrast
+        />
+      )}
       {error && (
         <InlineNotification
           kind="error"
