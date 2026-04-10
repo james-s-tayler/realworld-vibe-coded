@@ -10,7 +10,6 @@ public class FavoriteArticleValidator : Validator<FavoriteArticleRequest>
 
     RuleFor(x => x.Slug)
       .NotEmpty()
-      .WithMessage("can't be blank")
       .OverridePropertyName("slug");
   }
 }

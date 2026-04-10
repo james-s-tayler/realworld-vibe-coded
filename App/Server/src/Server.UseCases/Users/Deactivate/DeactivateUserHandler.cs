@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Resources;
 
 namespace Server.UseCases.Users.Deactivate;
 
@@ -11,13 +13,16 @@ public class DeactivateUserHandler : ICommandHandler<DeactivateUserCommand, Appl
 {
   private readonly IHttpContextAccessor _httpContextAccessor;
   private readonly ILogger<DeactivateUserHandler> _logger;
+  private readonly IStringLocalizer _localizer;
 
   public DeactivateUserHandler(
     IHttpContextAccessor httpContextAccessor,
-    ILogger<DeactivateUserHandler> logger)
+    ILogger<DeactivateUserHandler> logger,
+    IStringLocalizer localizer)
   {
     _httpContextAccessor = httpContextAccessor;
     _logger = logger;
+    _localizer = localizer;
   }
 
   // PV014: UserManager.SetLockoutEndDateAsync is a mutation operation, but the analyzer doesn't recognize it
@@ -30,7 +35,7 @@ public class DeactivateUserHandler : ICommandHandler<DeactivateUserCommand, Appl
     if (request.UserId == request.CurrentUserId)
     {
       _logger.LogWarning("User {UserId} attempted to deactivate themselves", request.CurrentUserId);
-      return Result<ApplicationUser>.Forbidden(new ErrorDetail("userId", "Cannot deactivate your own account."));
+      return Result<ApplicationUser>.Forbidden(new ErrorDetail("userId", _localizer[SharedResource.Keys.CannotDeactivateOwnAccount]));
     }
 
     var userManager = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
@@ -45,7 +50,7 @@ public class DeactivateUserHandler : ICommandHandler<DeactivateUserCommand, Appl
     if (roles.Contains(DefaultRoles.Owner))
     {
       _logger.LogWarning("User {CurrentUserId} attempted to deactivate OWNER user {UserId}", request.CurrentUserId, request.UserId);
-      return Result<ApplicationUser>.Forbidden(new ErrorDetail("userId", "Cannot deactivate the account owner."));
+      return Result<ApplicationUser>.Forbidden(new ErrorDetail("userId", _localizer[SharedResource.Keys.CannotDeactivateTenantOwner]));
     }
 
     await userManager.SetLockoutEnabledAsync(user, true);

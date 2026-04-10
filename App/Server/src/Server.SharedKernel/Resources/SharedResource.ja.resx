@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <data name="EmailAlreadyExists" xml:space="preserve">
+    <value>メールアドレスは既に使用されています</value>
+  </data>
+  <data name="UsernameAlreadyExists" xml:space="preserve">
+    <value>ユーザー名は既に使用されています</value>
+  </data>
+  <data name="UnsupportedLanguage" xml:space="preserve">
+    <value>はサポートされていない言語です。</value>
+  </data>
+  <data name="PasswordUpdateFailed" xml:space="preserve">
+    <value>パスワードの更新に失敗しました。</value>
+  </data>
+  <data name="UserUpdateFailed" xml:space="preserve">
+    <value>ユーザーの更新に失敗しました。</value>
+  </data>
+  <data name="EmailAlreadyRegistered" xml:space="preserve">
+    <value>そのメールアドレスは既に登録されています</value>
+  </data>
+  <data name="InvalidAssignableRole" xml:space="preserve">
+    <value>'{0}'は有効な割り当て可能なロールではありません。許可されたロール：ADMIN</value>
+  </data>
+  <data name="InvalidEmailOrPassword" xml:space="preserve">
+    <value>メールアドレスまたはパスワードが無効です。</value>
+  </data>
+  <data name="CannotRemoveOwnAdminRole" xml:space="preserve">
+    <value>自分のADMINロールは削除できません。</value>
+  </data>
+  <data name="CannotDeactivateOwnAccount" xml:space="preserve">
+    <value>自分のアカウントは無効にできません。</value>
+  </data>
+  <data name="CannotDeactivateTenantOwner" xml:space="preserve">
+    <value>テナントオーナーは無効にできません。</value>
+  </data>
+  <data name="NoTenantContext" xml:space="preserve">
+    <value>テナントコンテキストが見つかりません</value>
+  </data>
+  <data name="AccountLockedOut" xml:space="preserve">
+    <value>アカウントがロックされています。</value>
+  </data>
+  <data name="TwoFactorRequired" xml:space="preserve">
+    <value>二要素認証が必要です。</value>
+  </data>
+  <data name="CanOnlyDeleteOwnComments" xml:space="preserve">
+    <value>自分のコメントのみ削除できます</value>
+  </data>
+  <data name="CanOnlyDeleteOwnArticles" xml:space="preserve">
+    <value>自分の記事のみ削除できます</value>
+  </data>
+  <data name="CanOnlyUpdateOwnArticles" xml:space="preserve">
+    <value>自分の記事のみ更新できます</value>
+  </data>
+  <data name="DuplicateSlug" xml:space="preserve">
+    <value>スラグが重複しています</value>
+  </data>
+  <data name="SlugAlreadyTaken" xml:space="preserve">
+    <value>は既に使用されています</value>
+  </data>
+  <data name="NotBeingFollowed" xml:space="preserve">
+    <value>はフォローされていません</value>
+  </data>
+  <data name="AuthorNotFound" xml:space="preserve">
+    <value>著者レコードが見つかりません - データ整合性の問題</value>
+  </data>
+  <data name="TagCannotContainCommas" xml:space="preserve">
+    <value>カンマを含むことはできません</value>
+  </data>
+  <data name="AtLeastOneFieldRequired" xml:space="preserve">
+    <value>少なくとも1つのフィールドが必要です</value>
+  </data>
+  <data name="AtLeastOneRoleRequired" xml:space="preserve">
+    <value>少なくとも1つのロールが必要です。</value>
+  </data>
+</root>

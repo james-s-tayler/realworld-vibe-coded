@@ -10,7 +10,6 @@ public class DeleteArticleValidator : Validator<DeleteArticleRequest>
 
     RuleFor(x => x.Slug)
       .NotEmpty()
-      .WithMessage("can't be blank")
       .OverridePropertyName("slug");
   }
 }

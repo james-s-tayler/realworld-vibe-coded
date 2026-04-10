@@ -46,7 +46,8 @@ public class UpdateUser(IMediator mediator, IUserContext userContext) : Endpoint
         request.User.Username,
         request.User.Password,
         request.User.Bio,
-        request.User.Image),
+        request.User.Image,
+        request.User.Language),
       cancellationToken);
 
     await Send.ResultMapperAsync(result, Map.FromEntityAsync, cancellationToken);

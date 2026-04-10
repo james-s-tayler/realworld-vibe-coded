@@ -33,6 +33,30 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  public async Task UserCanChangeLanguageToJapanese()
+  {
+    // Arrange
+    var user = await Api.CreateUserAsync();
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
+    await Pages.SettingsPage.GoToAsync();
+
+    // Act — change language to Japanese
+    await Pages.SettingsPage.ChangeLanguageAsync("日本語");
+    await Pages.SettingsPage.ClickUpdateSettingsButtonAsync();
+
+    // Assert — success message should be in Japanese
+    var japaneseSuccess = Page.GetByText("設定が正常に更新されました");
+    await Expect(japaneseSuccess).ToBeVisibleAsync();
+
+    // Sidebar should be translated to Japanese
+    var japaneseSettings = Page.GetByText("設定");
+    await Expect(japaneseSettings).ToBeVisibleAsync();
+  }
+
+  [Fact]
   public async Task UserCanSignOut()
   {
     // Arrange

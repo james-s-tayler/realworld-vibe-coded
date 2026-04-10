@@ -10,7 +10,6 @@ public class GetArticleValidator : Validator<GetArticleRequest>
 
     RuleFor(x => x.Slug)
       .NotEmpty()
-      .WithMessage("can't be blank")
       .OverridePropertyName("slug");
   }
 }

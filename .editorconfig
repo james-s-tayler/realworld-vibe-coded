@@ -125,6 +125,9 @@ dotnet_diagnostic.SA1204.severity = error
 dotnet_diagnostic.SA1028.severity = error
 dotnet_diagnostic.SA1129.severity = error
 
+# Darp.Utils.ResxSourceGenerator: enforce parity across .resx translation files
+dotnet_diagnostic.DarpResX005.severity = error
+
 # Microsoft.VisualStudio.Threading.Analyzers: transitive leak from FastEndpoints.ClientGen.Kiota
 dotnet_diagnostic.VSTHRD200.severity = none
 

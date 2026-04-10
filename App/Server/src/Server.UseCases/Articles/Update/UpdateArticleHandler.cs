@@ -1,15 +1,18 @@
-﻿using Server.Core.ArticleAggregate;
+﻿using Microsoft.Extensions.Localization;
+using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications.Articles;
 using Server.Core.TagAggregate;
 using Server.Core.TagAggregate.Specifications;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
+using Server.SharedKernel.Resources;
 
 namespace Server.UseCases.Articles.Update;
 
 public class UpdateArticleHandler(
   IRepository<Article> articleRepository,
-  IRepository<Tag> tagRepository)
+  IRepository<Tag> tagRepository,
+  IStringLocalizer localizer)
   : ICommandHandler<UpdateArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(UpdateArticleCommand request, CancellationToken cancellationToken)
@@ -24,7 +27,7 @@ public class UpdateArticleHandler(
 
     if (article.AuthorId != request.UserId)
     {
-      return Result<Article>.Forbidden(new ErrorDetail("Forbidden", "You can only update your own articles"));
+      return Result<Article>.Forbidden(new ErrorDetail("Forbidden", localizer[SharedResource.Keys.CanOnlyUpdateOwnArticles]));
     }
 
     // Check for duplicate slug if title changed
@@ -38,7 +41,7 @@ public class UpdateArticleHandler(
 
         if (existingArticle != null)
         {
-          return Result<Article>.Invalid(new ErrorDetail("slug", "duplicate slug"));
+          return Result<Article>.Invalid(new ErrorDetail("slug", localizer[SharedResource.Keys.DuplicateSlug]));
         }
       }
     }

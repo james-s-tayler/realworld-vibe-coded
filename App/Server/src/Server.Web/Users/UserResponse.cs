@@ -11,4 +11,6 @@ public class UserResponse
   public string? Image { get; set; }
 
   public List<string> Roles { get; set; } = [];
+
+  public string Language { get; set; } = "en";
 }

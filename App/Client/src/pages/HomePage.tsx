@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, InlineNotification, Pagination } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { articlesApi } from '../api/articles';
@@ -14,16 +15,20 @@ import './HomePage.css';
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
-const HomeBanner: React.FC = () => (
-  <div className="banner">
-    <div className="container">
-      <h1 className="banner-title">conduit</h1>
-      <p className="banner-subtitle">A place to share your <i>Angular</i> knowledge.</p>
+const HomeBanner: React.FC = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="banner">
+      <div className="container">
+        <h1 className="banner-title">{t('home.bannerTitle')}</h1>
+        <p className="banner-subtitle">{t('home.bannerSubtitle')}</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const HomePage: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { requireAuth } = useRequireAuth();
   const [articles, setArticles] = useState<Article[]>([]);
@@ -135,7 +140,7 @@ export const HomePage: React.FC = () => {
 
   const sidebarContent = (
     <Tile className="sidebar">
-      <p className="sidebar-title">Popular Tags</p>
+      <p className="sidebar-title">{t('home.popularTags')}</p>
       <TagList tags={tags} loading={tagsLoading} onTagClick={handleTagClick} />
     </Tile>
   );
@@ -150,16 +155,16 @@ export const HomePage: React.FC = () => {
       {error && (
         <InlineNotification
           kind="error"
-          title="Error"
+          title={t('error.title')}
           subtitle={error}
           lowContrast
           onCloseButtonClick={() => setError(null)}
         />
       )}
       <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
-        <TabList aria-label="Article feeds">
-          <Tab>Your Feed</Tab>
-          <Tab>Global Feed</Tab>
+        <TabList aria-label={t('home.articleFeeds')}>
+          <Tab>{t('home.yourFeed')}</Tab>
+          <Tab>{t('home.globalFeed')}</Tab>
           {selectedTag && <Tab>#{selectedTag}</Tab>}
         </TabList>
         <TabPanels>

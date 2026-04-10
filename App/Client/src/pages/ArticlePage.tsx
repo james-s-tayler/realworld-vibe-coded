@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import { Button, TextArea, Loading, InlineNotification, Tile, Tag, IconButton } from '@carbon/react';
 import { FavoriteFilled, Favorite, Edit, TrashCan } from '@carbon/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { articlesApi } from '../api/articles';
@@ -31,7 +32,9 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
   onDelete,
   onFollow,
   onFavorite,
-}) => (
+}) => {
+  const { t } = useTranslation();
+  return (
   <div className="banner">
     <div className="container">
       <h1>{article.title}</h1>
@@ -51,7 +54,7 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
               renderIcon={Edit}
               onClick={onEdit}
             >
-              Edit Article
+              {t('article.editArticle')}
             </Button>
             <Button
               kind="danger--ghost"
@@ -59,7 +62,7 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
               renderIcon={TrashCan}
               onClick={onDelete}
             >
-              Delete Article
+              {t('article.deleteArticle')}
             </Button>
           </div>
         ) : (
@@ -69,7 +72,7 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
               size="sm"
               onClick={onFollow}
             >
-              {article.author.following ? 'Unfollow' : 'Follow'} {truncateUsername(article.author.username)}
+              {article.author.following ? t('article.unfollow', { username: truncateUsername(article.author.username) }) : t('article.follow', { username: truncateUsername(article.author.username) })}
             </Button>
             <Button
               kind="ghost"
@@ -77,16 +80,18 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
               renderIcon={article.favorited ? FavoriteFilled : Favorite}
               onClick={onFavorite}
             >
-              {article.favorited ? 'Unfavorite' : 'Favorite'} Article ({article.favoritesCount})
+              {article.favorited ? t('article.unfavorite') : t('article.favorite')} ({article.favoritesCount})
             </Button>
           </div>
         )}
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export const ArticlePage: React.FC = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -200,7 +205,7 @@ export const ArticlePage: React.FC = () => {
   if (loading) {
     return (
       <PageShell className="article-page loading">
-        <Loading description="Loading article..." withOverlay={false} />
+        <Loading description={t('article.loading')} withOverlay={false} />
       </PageShell>
     );
   }
@@ -210,8 +215,8 @@ export const ArticlePage: React.FC = () => {
       <PageShell className="article-page" columnLayout="full">
         <InlineNotification
           kind="error"
-          title="Article not found"
-          subtitle={error || 'The requested article could not be found'}
+          title={t('article.notFound')}
+          subtitle={error || t('article.notFoundMessage')}
         />
       </PageShell>
     );
@@ -259,7 +264,7 @@ export const ArticlePage: React.FC = () => {
                   <TextArea
                     id="comment"
                     labelText=""
-                    placeholder="Write a comment..."
+                    placeholder={t('article.comments.placeholder')}
                     value={commentBody}
                     onChange={(e) => setCommentBody(e.target.value)}
                     rows={3}
@@ -273,17 +278,14 @@ export const ArticlePage: React.FC = () => {
                     className="comment-author-img"
                   />
                   <Button type="submit" size="sm" disabled={submitting || !commentBody.trim()}>
-                    Post Comment
+                    {t('article.comments.submit')}
                   </Button>
                 </div>
               </form>
             </Tile>
           ) : (
             <div className="comment-auth-prompt">
-              <p>
-                <Link to="/login">Sign in</Link> or <Link to="/register">sign up</Link> to add
-                comments on this article.
-              </p>
+              <p>{t('article.comments.authPrompt')}</p>
             </div>
           )}
 
@@ -308,7 +310,7 @@ export const ArticlePage: React.FC = () => {
                   <IconButton
                     kind="ghost"
                     size="sm"
-                    label="Delete comment"
+                    label={t('article.comments.delete')}
                     onClick={() => handleCommentDelete(comment.id)}
                   >
                     <TrashCan size={16} />

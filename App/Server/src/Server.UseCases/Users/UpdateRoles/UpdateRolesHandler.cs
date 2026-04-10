@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
+using Server.SharedKernel.Resources;
 
 namespace Server.UseCases.Users.UpdateRoles;
 
@@ -11,13 +13,16 @@ public class UpdateRolesHandler : ICommandHandler<UpdateRolesCommand, Applicatio
 {
   private readonly IHttpContextAccessor _httpContextAccessor;
   private readonly ILogger<UpdateRolesHandler> _logger;
+  private readonly IStringLocalizer _localizer;
 
   public UpdateRolesHandler(
     IHttpContextAccessor httpContextAccessor,
-    ILogger<UpdateRolesHandler> logger)
+    ILogger<UpdateRolesHandler> logger,
+    IStringLocalizer localizer)
   {
     _httpContextAccessor = httpContextAccessor;
     _logger = logger;
+    _localizer = localizer;
   }
 
   // PV014: UserManager role methods are mutation operations, but the analyzer doesn't recognize them
@@ -41,7 +46,7 @@ public class UpdateRolesHandler : ICommandHandler<UpdateRolesCommand, Applicatio
     if (request.UserId == request.CurrentUserId && currentRoles.Contains(DefaultRoles.Admin) && !request.Roles.Contains(DefaultRoles.Admin))
     {
       _logger.LogWarning("User {UserId} attempted to remove their own ADMIN role", request.CurrentUserId);
-      return Result<ApplicationUser>.Forbidden(new ErrorDetail("roles", "Cannot remove your own ADMIN role."));
+      return Result<ApplicationUser>.Forbidden(new ErrorDetail("roles", _localizer[SharedResource.Keys.CannotRemoveOwnAdminRole]));
     }
 
     // Preserve OWNER role if user has it — it's immutable

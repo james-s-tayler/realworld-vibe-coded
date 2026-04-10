@@ -7,4 +7,5 @@ public record UserWithRolesDto(
   string Bio,
   string? Image,
   List<string> Roles,
-  bool IsActive);
+  bool IsActive,
+  string Language = "en");

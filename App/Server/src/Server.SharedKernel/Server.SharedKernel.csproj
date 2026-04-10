@@ -4,12 +4,18 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" />
     <PackageReference Include="Ardalis.Specification" />
+    <PackageReference Include="Darp.Utils.ResxSourceGenerator" PrivateAssets="all" />
     <PackageReference Include="Finbuckle.MultiTenant.Abstractions" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="MediatR.Contracts" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\SharedResource.resx" Public="true" EmitFormatMethods="true" ClassName="Server.SharedKernel.Resources.SharedResource" />
   </ItemGroup>
 
 </Project>

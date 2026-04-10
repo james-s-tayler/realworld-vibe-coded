@@ -752,6 +752,7 @@ export function deserializeIntoUpdateUserData(updateUserData: Partial<UpdateUser
         "bio": n => { updateUserData.bio = n.getStringValue(); },
         "email": n => { updateUserData.email = n.getStringValue(); },
         "image": n => { updateUserData.image = n.getStringValue(); },
+        "language": n => { updateUserData.language = n.getStringValue(); },
         "password": n => { updateUserData.password = n.getStringValue(); },
         "username": n => { updateUserData.username = n.getStringValue(); },
     }
@@ -802,6 +803,7 @@ export function deserializeIntoUserDto(userDto: Partial<UserDto> | undefined = {
         "id": n => { userDto.id = n.getStringValue(); },
         "image": n => { userDto.image = n.getStringValue(); },
         "isActive": n => { userDto.isActive = n.getBooleanValue(); },
+        "language": n => { userDto.language = n.getStringValue(); },
         "roles": n => { userDto.roles = n.getCollectionOfPrimitiveValues<string>(); },
         "username": n => { userDto.username = n.getStringValue(); },
     }
@@ -817,6 +819,7 @@ export function deserializeIntoUserResponse(userResponse: Partial<UserResponse> 
         "bio": n => { userResponse.bio = n.getStringValue(); },
         "email": n => { userResponse.email = n.getStringValue(); },
         "image": n => { userResponse.image = n.getStringValue(); },
+        "language": n => { userResponse.language = n.getStringValue(); },
         "roles": n => { userResponse.roles = n.getCollectionOfPrimitiveValues<string>(); },
         "username": n => { userResponse.username = n.getStringValue(); },
     }
@@ -1255,6 +1258,7 @@ export function serializeUpdateUserData(writer: SerializationWriter, updateUserD
     writer.writeStringValue("bio", updateUserData.bio);
     writer.writeStringValue("email", updateUserData.email);
     writer.writeStringValue("image", updateUserData.image);
+    writer.writeStringValue("language", updateUserData.language);
     writer.writeStringValue("password", updateUserData.password);
     writer.writeStringValue("username", updateUserData.username);
 }
@@ -1305,6 +1309,7 @@ export function serializeUserDto(writer: SerializationWriter, userDto: Partial<U
     writer.writeStringValue("id", userDto.id);
     writer.writeStringValue("image", userDto.image);
     writer.writeBooleanValue("isActive", userDto.isActive);
+    writer.writeStringValue("language", userDto.language);
     writer.writeCollectionOfPrimitiveValues<string>("roles", userDto.roles);
     writer.writeStringValue("username", userDto.username);
 }
@@ -1320,6 +1325,7 @@ export function serializeUserResponse(writer: SerializationWriter, userResponse:
     writer.writeStringValue("bio", userResponse.bio);
     writer.writeStringValue("email", userResponse.email);
     writer.writeStringValue("image", userResponse.image);
+    writer.writeStringValue("language", userResponse.language);
     writer.writeCollectionOfPrimitiveValues<string>("roles", userResponse.roles);
     writer.writeStringValue("username", userResponse.username);
 }
@@ -1387,6 +1393,10 @@ export interface UpdateUserData extends Parsable {
      */
     image?: string | null;
     /**
+     * The language property
+     */
+    language?: string | null;
+    /**
      * The password property
      */
     password?: string | null;
@@ -1435,6 +1445,10 @@ export interface UserDto extends Parsable {
      */
     isActive?: boolean | null;
     /**
+     * The language property
+     */
+    language?: string | null;
+    /**
      * The roles property
      */
     roles?: string[] | null;
@@ -1456,6 +1470,10 @@ export interface UserResponse extends Parsable {
      * The image property
      */
     image?: string | null;
+    /**
+     * The language property
+     */
+    language?: string | null;
     /**
      * The roles property
      */

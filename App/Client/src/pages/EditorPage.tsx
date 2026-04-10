@@ -8,6 +8,7 @@ import {
   Stack,
   Tag,
 } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { articlesApi } from '../api/articles';
 import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
@@ -16,6 +17,7 @@ import { ARTICLE_CONSTRAINTS, TAG_CONSTRAINTS } from '../constants';
 import './EditorPage.css';
 
 export const EditorPage: React.FC = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug?: string }>();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
@@ -131,7 +133,7 @@ export const EditorPage: React.FC = () => {
     <PageShell
       className="editor-page"
       columnLayout="wide"
-      title={slug ? 'Edit Article' : 'New Article'}
+      title={slug ? t('editor.editTitle') : t('editor.newTitle')}
     >
       <ErrorDisplay
         error={error}
@@ -139,14 +141,14 @@ export const EditorPage: React.FC = () => {
       />
 
       {loadingArticle ? (
-        <p>Loading article...</p>
+        <p>{t('editor.loading')}</p>
       ) : (
         <Form onSubmit={handleSubmit}>
           <Stack gap={6}>
             <TextInput
               id="title"
               labelText=""
-              placeholder="Article Title"
+              placeholder={t('editor.titlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -156,7 +158,7 @@ export const EditorPage: React.FC = () => {
             <TextInput
               id="description"
               labelText=""
-              placeholder="What's this article about?"
+              placeholder={t('editor.descriptionPlaceholder')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
@@ -166,7 +168,7 @@ export const EditorPage: React.FC = () => {
             <TextArea
               id="body"
               labelText=""
-              placeholder="Write your article (in markdown)"
+              placeholder={t('editor.bodyPlaceholder')}
               value={body}
               onChange={(e) => setBody(e.target.value)}
               required
@@ -177,7 +179,7 @@ export const EditorPage: React.FC = () => {
               <TextInput
                 id="tags"
                 labelText=""
-                placeholder="Enter tags"
+                placeholder={t('editor.tagsPlaceholder')}
                 value={tagInput}
                 onChange={handleTagChange}
                 onKeyPress={handleTagKeyPress}
@@ -203,7 +205,7 @@ export const EditorPage: React.FC = () => {
               size="lg"
               className="pull-xs-right"
             >
-              {submitting ? 'Publishing...' : 'Publish Article'}
+              {submitting ? t('editor.submitting') : t('editor.submit')}
             </Button>
           </Stack>
         </Form>

@@ -10,7 +10,6 @@ public class FollowProfileValidator : Validator<FollowProfileRequest>
 
     RuleFor(x => x.Username)
       .NotEmpty()
-      .WithMessage("is required.")
       .OverridePropertyName("username");
   }
 }

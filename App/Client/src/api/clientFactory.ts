@@ -10,6 +10,12 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
+let currentLanguage = 'en';
+
+export function setApiLanguage(lang: string): void {
+  currentLanguage = lang;
+}
+
 function getCookie(name: string): string | null {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -35,6 +41,10 @@ const customFetch = async (
   }
 
   requestInit.credentials = 'include';
+
+  const headers = new Headers(requestInit.headers);
+  headers.set('Accept-Language', currentLanguage);
+  requestInit.headers = headers;
 
   return fetch(url, requestInit);
 };

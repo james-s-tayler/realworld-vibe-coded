@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tag, SkeletonText } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import './TagList.css';
 
 interface TagListProps {
@@ -9,6 +10,8 @@ interface TagListProps {
 }
 
 export const TagList: React.FC<TagListProps> = ({ tags, loading, onTagClick }) => {
+  const { t } = useTranslation();
+
   if (loading) {
     return (
       <div className="tag-list-loading">
@@ -20,7 +23,7 @@ export const TagList: React.FC<TagListProps> = ({ tags, loading, onTagClick }) =
   if (tags.length === 0) {
     return (
       <div className="tag-list-empty">
-        <p>No tags available</p>
+        <p>{t('tags.empty')}</p>
       </div>
     );
   }
