@@ -1,11 +1,13 @@
-﻿using Server.Core.AuthorAggregate;
+﻿using Microsoft.Extensions.Localization;
+using Server.Core.AuthorAggregate;
 using Server.Core.AuthorAggregate.Specifications;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
+using Server.SharedKernel.Resources;
 
 namespace Server.UseCases.Profiles.Unfollow;
 
-public class UnfollowUserHandler(IRepository<Author> authorRepository)
+public class UnfollowUserHandler(IRepository<Author> authorRepository, IStringLocalizer localizer)
   : ICommandHandler<UnfollowUserCommand, Author>
 {
   public async Task<Result<Author>> Handle(UnfollowUserCommand request, CancellationToken cancellationToken)
@@ -31,7 +33,7 @@ public class UnfollowUserHandler(IRepository<Author> authorRepository)
     // Check if the author is currently following the target author
     if (!currentAuthor.IsFollowing(authorToUnfollow))
     {
-      return Result<Author>.Invalid(new ErrorDetail("username", "is not being followed"));
+      return Result<Author>.Invalid(new ErrorDetail("username", localizer[SharedResource.Keys.NotBeingFollowed]));
     }
 
     // Unfollow the author

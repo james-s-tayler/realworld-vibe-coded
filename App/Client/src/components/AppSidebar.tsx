@@ -16,12 +16,14 @@ import {
   UserFollow,
   Logout,
 } from '@carbon/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { RequireRole } from './RequireRole';
 import { truncateUsername } from '../utils/textUtils';
 import './AppSidebar.css';
 
 export const AppSidebar: React.FC = () => {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ export const AppSidebar: React.FC = () => {
         isFixedNav
         expanded
         isChildOfHeader={false}
-        aria-label="Side navigation"
+        aria-label={t('nav.sideNavLabel')}
         className="app-sidebar"
       >
         <SideNavItems>
@@ -51,7 +53,7 @@ export const AppSidebar: React.FC = () => {
                 renderIcon={Home}
                 isActive={isActive('/')}
               >
-                Home
+                {t('nav.home')}
               </SideNavLink>
               <SideNavLink
                 as={Link}
@@ -59,7 +61,7 @@ export const AppSidebar: React.FC = () => {
                 renderIcon={Edit}
                 isActive={isActive('/editor')}
               >
-                New Article
+                {t('nav.newArticle')}
               </SideNavLink>
               <RequireRole roles={['ADMIN']}>
                 <SideNavLink
@@ -68,7 +70,7 @@ export const AppSidebar: React.FC = () => {
                   renderIcon={UserMultiple}
                   isActive={isActive('/users')}
                 >
-                  Users
+                  {t('nav.users')}
                 </SideNavLink>
               </RequireRole>
               <SideNavLink
@@ -77,7 +79,7 @@ export const AppSidebar: React.FC = () => {
                 renderIcon={Settings}
                 isActive={isActive('/settings')}
               >
-                Settings
+                {t('nav.settings')}
               </SideNavLink>
               <div className="app-sidebar__profile-spacer" />
               <SideNavLink
@@ -97,7 +99,7 @@ export const AppSidebar: React.FC = () => {
                   handleLogout();
                 }}
               >
-                Log out
+                {t('nav.logOut')}
               </SideNavLink>
             </>
           ) : (
@@ -108,7 +110,7 @@ export const AppSidebar: React.FC = () => {
                 renderIcon={Login}
                 isActive={isActive('/login')}
               >
-                Sign in
+                {t('nav.signIn')}
               </SideNavLink>
               <SideNavLink
                 as={Link}
@@ -116,7 +118,7 @@ export const AppSidebar: React.FC = () => {
                 renderIcon={UserFollow}
                 isActive={isActive('/register')}
               >
-                Sign up
+                {t('nav.signUp')}
               </SideNavLink>
             </>
           )}

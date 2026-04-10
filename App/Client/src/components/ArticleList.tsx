@@ -1,5 +1,6 @@
 import React from 'react';
 import { Loading } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import { ArticlePreview } from './ArticlePreview';
 import type { Article } from '../types/article';
 import './ArticleList.css';
@@ -17,10 +18,12 @@ export const ArticleList: React.FC<ArticleListProps> = ({
   onFavorite,
   onUnfavorite,
 }) => {
+  const { t } = useTranslation();
+
   if (loading) {
     return (
       <div className="article-list-loading">
-        <Loading description="Loading articles..." withOverlay={false} />
+        <Loading description={t('articles.loading')} withOverlay={false} />
       </div>
     );
   }
@@ -28,7 +31,7 @@ export const ArticleList: React.FC<ArticleListProps> = ({
   if (articles.length === 0) {
     return (
       <div className="article-list-empty">
-        <p>No articles are here... yet.</p>
+        <p>{t('articles.empty')}</p>
       </div>
     );
   }

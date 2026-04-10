@@ -2137,3 +2137,24 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260410153813_AddLanguageToApplicationUser'
+)
+BEGIN
+    ALTER TABLE [AspNetUsers] ADD [Language] nvarchar(10) NOT NULL DEFAULT N'en';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20260410153813_AddLanguageToApplicationUser'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20260410153813_AddLanguageToApplicationUser', N'10.0.1');
+END;
+
+COMMIT;
+GO
+

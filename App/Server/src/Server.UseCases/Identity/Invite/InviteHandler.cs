@@ -4,12 +4,14 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.AuthorAggregate;
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.Identity;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
+using Server.SharedKernel.Resources;
 
 namespace Server.UseCases.Identity.Invite;
 
@@ -21,17 +23,20 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
   private readonly IUserEmailChecker _userEmailChecker;
   private readonly ILogger<InviteHandler> _logger;
   private readonly IHttpContextAccessor _httpContextAccessor;
+  private readonly IStringLocalizer _localizer;
 
   public InviteHandler(
     IRepository<Author> authorRepository,
     IUserEmailChecker userEmailChecker,
     ILogger<InviteHandler> logger,
-    IHttpContextAccessor httpContextAccessor)
+    IHttpContextAccessor httpContextAccessor,
+    IStringLocalizer localizer)
   {
     _authorRepository = authorRepository;
     _userEmailChecker = userEmailChecker;
     _logger = logger;
     _httpContextAccessor = httpContextAccessor;
+    _localizer = localizer;
   }
 
   // PV014: UserManager.CreateAsync is a mutation operation, but the analyzer doesn't recognize it
@@ -47,7 +52,7 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
     if (tenantInfo == null)
     {
       _logger.LogError("User invitation failed: No tenant context found");
-      return Result<Unit>.Invalid(new ErrorDetail("tenant", "No tenant context found"));
+      return Result<Unit>.Invalid(new ErrorDetail("tenant", _localizer[SharedResource.Keys.NoTenantContext]));
     }
 
     var tenantId = tenantInfo.Id!;
@@ -58,7 +63,7 @@ public class InviteHandler : ICommandHandler<InviteCommand, Unit>
     if (emailExists)
     {
       _logger.LogWarning("User invitation failed for {Email}: Duplicate email", request.Email);
-      return Result<Unit>.Invalid(new ErrorDetail("email", "A user has already been registered with that email"));
+      return Result<Unit>.Invalid(new ErrorDetail("email", _localizer[SharedResource.Keys.EmailAlreadyRegistered]));
     }
 
     _logger.LogInformation("Creating new user with email {Email} in tenant {TenantId}", request.Email, tenantId);

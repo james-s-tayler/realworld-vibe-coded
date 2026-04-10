@@ -43,3 +43,12 @@ export const TAG_CONSTRAINTS = {
 export const COMMENT_CONSTRAINTS = {
   BODY_MAX_LENGTH: 5000,
 } as const;
+
+/**
+ * Supported languages for i18n.
+ * Must match backend I18n:SupportedLanguages in appsettings.json.
+ */
+export const SUPPORTED_LANGUAGES = [
+  { id: 'en', label: 'English' },
+  { id: 'ja', label: '日本語' },
+] as const;

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
 import { Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, InlineNotification, Pagination } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { profilesApi } from '../api/profiles';
@@ -24,7 +25,9 @@ interface ProfileBannerProps {
   onFollow: () => void;
 }
 
-const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, onFollow }) => (
+const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, onFollow }) => {
+  const { t } = useTranslation();
+  return (
   <div className="user-info">
     <div className="container">
       <div className="row">
@@ -39,7 +42,7 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, on
           {isOwnProfile ? (
             <Link to="/settings">
               <Button kind="ghost" size="sm" renderIcon={Settings}>
-                Edit Profile Settings
+                {t('profile.editSettings')}
               </Button>
             </Link>
           ) : (
@@ -48,16 +51,18 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, on
               size="sm"
               onClick={onFollow}
             >
-              {profile.following ? 'Unfollow' : 'Follow'} {truncateUsername(profile.username)}
+              {profile.following ? t('profile.unfollow') : t('profile.follow')} {truncateUsername(profile.username)}
             </Button>
           )}
         </div>
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export const ProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const { requireAuth } = useRequireAuth();
@@ -172,7 +177,7 @@ export const ProfilePage: React.FC = () => {
   if (loading) {
     return (
       <div className="profile-page loading">
-        <Loading description="Loading profile..." withOverlay={false} />
+        <Loading description={t('profile.loading')} withOverlay={false} />
       </div>
     );
   }
@@ -182,7 +187,7 @@ export const ProfilePage: React.FC = () => {
       <PageShell className="profile-page">
         <InlineNotification
           kind="error"
-          title="Error"
+          title={t('error.title')}
           subtitle={error}
           lowContrast
         />
@@ -193,7 +198,7 @@ export const ProfilePage: React.FC = () => {
   if (!profile) {
     return (
       <PageShell className="profile-page">
-        <p>Profile not found</p>
+        <p>{t('profile.notFound')}</p>
       </PageShell>
     );
   }
@@ -207,9 +212,9 @@ export const ProfilePage: React.FC = () => {
       banner={<ProfileBanner profile={profile} isOwnProfile={!!isOwnProfile} onFollow={handleFollow} />}
     >
       <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
-        <TabList aria-label="Profile tabs">
-          <Tab>My Articles</Tab>
-          <Tab>Favorited Articles</Tab>
+        <TabList aria-label={t('profile.profileTabs')}>
+          <Tab>{t('profile.myArticles')}</Tab>
+          <Tab>{t('profile.favoritedArticles')}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>

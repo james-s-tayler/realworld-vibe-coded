@@ -45,6 +45,7 @@ export const authApi = {
     password?: string;
     bio?: string;
     image?: string;
+    language?: string;
   }): Promise<UserResponse> => {
     try {
       const result = await getApiClient().api.user.put({ user: updates });

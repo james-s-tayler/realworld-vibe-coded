@@ -19,7 +19,8 @@ const mockUser = {
   username: 'testuser',
   bio: 'Test bio',
   image: 'https://example.com/avatar.jpg',
-  token: 'test-token',
+  roles: ['OWNER', 'ADMIN'],
+  language: 'en',
 }
 
 function renderSettingsPage() {
@@ -71,6 +72,7 @@ describe('SettingsPage', () => {
     await waitFor(() => {
       expect(authApi.updateUser).toHaveBeenCalledWith({
         bio: 'Completely new bio text',
+        language: 'en',
       })
       expect(screen.getByText(/settings updated successfully/i)).toBeInTheDocument()
     })
@@ -133,6 +135,7 @@ describe('SettingsPage', () => {
         username: 'newusername',
         bio: 'New bio',
         image: 'https://example.com/new-avatar.jpg',
+        language: 'en',
       })
     })
   })
@@ -156,6 +159,7 @@ describe('SettingsPage', () => {
     await waitFor(() => {
       expect(authApi.updateUser).toHaveBeenCalledWith({
         password: 'newpassword123',
+        language: 'en',
       })
     })
   })

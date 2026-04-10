@@ -25,6 +25,7 @@ public class ApplicationUsersQuery : IQueryApplicationUsers
         user.Bio,
         user.Image,
         user.LockoutEnd,
+        user.Language,
         Roles = (from ur in _dbContext.UserRoles
                  where ur.UserId == user.Id
                  join r in _dbContext.Roles on ur.RoleId equals r.Id
@@ -44,7 +45,8 @@ public class ApplicationUsersQuery : IQueryApplicationUsers
       userWithRoles.Bio ?? string.Empty,
       userWithRoles.Image,
       userWithRoles.Roles.ToList(),
-      !(userWithRoles.LockoutEnd.HasValue && userWithRoles.LockoutEnd.Value > DateTimeOffset.UtcNow));
+      !(userWithRoles.LockoutEnd.HasValue && userWithRoles.LockoutEnd.Value > DateTimeOffset.UtcNow),
+      userWithRoles.Language);
   }
 
   public async Task<List<UserWithRolesDto>> ListUsersWithRoles(int limit, int offset, CancellationToken cancellationToken = default)
@@ -60,6 +62,7 @@ public class ApplicationUsersQuery : IQueryApplicationUsers
         user.Bio,
         user.Image,
         user.LockoutEnd,
+        user.Language,
         Roles = (from ur in _dbContext.UserRoles
                  where ur.UserId == user.Id
                  join r in _dbContext.Roles on ur.RoleId equals r.Id
@@ -76,7 +79,8 @@ public class ApplicationUsersQuery : IQueryApplicationUsers
       u.Bio ?? string.Empty,
       u.Image,
       u.Roles.ToList(),
-      !(u.LockoutEnd.HasValue && u.LockoutEnd.Value > DateTimeOffset.UtcNow))).ToList();
+      !(u.LockoutEnd.HasValue && u.LockoutEnd.Value > DateTimeOffset.UtcNow),
+      u.Language)).ToList();
   }
 
   public async Task<int> CountUsers(CancellationToken cancellationToken = default)

@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.AuthorAggregate;
 using Server.Core.AuthorAggregate.Specifications;
 using Server.Core.IdentityAggregate;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
+using Server.SharedKernel.Resources;
 using Server.UseCases.Interfaces;
 using Server.UseCases.Users.Dtos;
 
@@ -19,17 +21,20 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
   private readonly IRepository<Author> _authorRepository;
   private readonly IQueryApplicationUsers _queryApplicationUsers;
   private readonly ILogger<UpdateUserHandler> _logger;
+  private readonly IStringLocalizer _localizer;
 
   public UpdateUserHandler(
     UserManager<ApplicationUser> userManager,
     IRepository<Author> authorRepository,
     IQueryApplicationUsers queryApplicationUsers,
-    ILogger<UpdateUserHandler> logger)
+    ILogger<UpdateUserHandler> logger,
+    IStringLocalizer localizer)
   {
     _userManager = userManager;
     _authorRepository = authorRepository;
     _queryApplicationUsers = queryApplicationUsers;
     _logger = logger;
+    _localizer = localizer;
   }
 
   public async Task<Result<UserWithRolesDto>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
@@ -55,7 +60,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
         return Result<UserWithRolesDto>.Invalid(new ErrorDetail
         {
           Identifier = "email",
-          ErrorMessage = "Email already exists",
+          ErrorMessage = _localizer[SharedResource.Keys.EmailAlreadyExists],
         });
       }
 
@@ -73,7 +78,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
         return Result<UserWithRolesDto>.Invalid(new ErrorDetail
         {
           Identifier = "username",
-          ErrorMessage = "Username already exists",
+          ErrorMessage = _localizer[SharedResource.Keys.UsernameAlreadyExists],
         });
       }
 
@@ -109,6 +114,11 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
       user.Image = request.Image;
     }
 
+    if (request.Language != null)
+    {
+      user.Language = request.Language;
+    }
+
     var result = await _userManager.UpdateAsync(user);
 
     if (!result.Succeeded)
@@ -130,7 +140,7 @@ public class UpdateUserHandler : ICommandHandler<UpdateUserCommand, UserWithRole
       if (author == null)
       {
         _logger.LogError("Author record not found for user {UserId} - data integrity violation", user.Id);
-        return Result<UserWithRolesDto>.Error(new ErrorDetail("author", "Author record not found - data integrity issue"));
+        return Result<UserWithRolesDto>.Error(new ErrorDetail("author", _localizer[SharedResource.Keys.AuthorNotFound]));
       }
 
       author.Update(user.UserName!, user.Bio ?? string.Empty, user.Image);

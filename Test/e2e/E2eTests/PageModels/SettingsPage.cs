@@ -87,6 +87,20 @@ public class SettingsPage : BasePage
   }
 
   /// <summary>
+  /// Language dropdown.
+  /// </summary>
+  public ILocator LanguageDropdown => Page.Locator("#language");
+
+  /// <summary>
+  /// Selects a language from the dropdown.
+  /// </summary>
+  public async Task ChangeLanguageAsync(string languageLabel)
+  {
+    await LanguageDropdown.ClickAsync();
+    await Page.GetByText(languageLabel).ClickAsync();
+  }
+
+  /// <summary>
   /// Attempts to update settings and expects it to fail with an error.
   /// </summary>
   public async Task UpdateSettingsAndExpectErrorAsync(string? username = null, string? email = null)

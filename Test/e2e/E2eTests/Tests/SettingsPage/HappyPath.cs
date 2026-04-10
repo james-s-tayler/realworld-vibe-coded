@@ -1,4 +1,6 @@
-﻿namespace E2eTests.Tests.SettingsPage;
+﻿using Microsoft.Playwright;
+
+namespace E2eTests.Tests.SettingsPage;
 
 /// <summary>
 /// Happy path tests for the Settings page (/settings).
@@ -30,6 +32,30 @@ public class HappyPath : AppPageTest
     await Pages.ProfilePage.WaitForProfileToLoadAsync(user.Email);
 
     await Pages.ProfilePage.VerifyBioVisibleAsync(bioText);
+  }
+
+  [Fact]
+  public async Task UserCanChangeLanguageToJapanese()
+  {
+    // Arrange
+    var user = await Api.CreateUserAsync();
+
+    await Pages.LoginPage.GoToAsync();
+    await Pages.LoginPage.LoginAsync(user.Email, user.Password);
+
+    await Pages.SettingsPage.GoToAsync();
+
+    // Act — change language to Japanese
+    await Pages.SettingsPage.ChangeLanguageAsync("日本語");
+    await Pages.SettingsPage.ClickUpdateSettingsButtonAsync();
+
+    // Assert — success message should be in Japanese
+    var japaneseSuccess = Page.GetByText("設定が正常に更新されました");
+    await Expect(japaneseSuccess).ToBeVisibleAsync();
+
+    // Sidebar nav should be translated to Japanese
+    var japaneseNavSettings = Page.GetByRole(AriaRole.Link, new() { Name = "設定" });
+    await Expect(japaneseNavSettings).ToBeVisibleAsync();
   }
 
   [Fact]

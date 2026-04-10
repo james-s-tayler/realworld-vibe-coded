@@ -5,15 +5,18 @@ import {
   HeaderContainer,
   HeaderName,
 } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import './AppHeader.css';
 
 export const AppHeader: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <HeaderContainer
       render={() => (
-        <Header aria-label="Conduit">
+        <Header aria-label={t('brand')}>
           <HeaderName as={Link} to="/" prefix="">
-            conduit
+            {t('brand')}
           </HeaderName>
         </Header>
       )}

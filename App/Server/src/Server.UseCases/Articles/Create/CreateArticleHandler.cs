@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications.Articles;
 using Server.Core.AuthorAggregate;
@@ -8,6 +9,7 @@ using Server.Core.TagAggregate;
 using Server.Core.TagAggregate.Specifications;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
+using Server.SharedKernel.Resources;
 
 namespace Server.UseCases.Articles.Create;
 
@@ -15,7 +17,8 @@ public class CreateArticleHandler(
   UserManager<ApplicationUser> userManager,
   IRepository<Article> articleRepository,
   IRepository<Author> authorRepository,
-  IRepository<Tag> tagRepository)
+  IRepository<Tag> tagRepository,
+  IStringLocalizer localizer)
   : ICommandHandler<CreateArticleCommand, Article>
 {
   public async Task<Result<Article>> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
@@ -42,7 +45,7 @@ public class CreateArticleHandler(
 
     if (existingArticle != null)
     {
-      return Result<Article>.Invalid(new ErrorDetail("slug", "has already been taken"));
+      return Result<Article>.Invalid(new ErrorDetail("slug", localizer[SharedResource.Keys.SlugAlreadyTaken]));
     }
 
     // Create the article

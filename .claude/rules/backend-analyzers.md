@@ -62,24 +62,22 @@ public class DeactivateUserRequest
 }
 ```
 
+### I18N001: ErrorMessage should use IStringLocalizer (warning)
+Handler ErrorMessage/ErrorDetail must use `_localizer[SharedResource.Keys.*]`. Allows `string.Join()` and member access (framework passthrough).
+
+### I18N002: WithMessage must use lambda in Validator (error)
+FastEndpoints Validators are singletons — `.WithMessage(localizer[...])` freezes culture. Use `.WithMessage(x => localizer[...])`.
+
 ### Key import: `using Server.Infrastructure;`
 Required in ALL web endpoint files for `ResultMapperAsync` and `ResultValueAsync` extension methods.
-This is the #1 most-forgotten import — add it to every endpoint file.
 
 ## Common Gotchas
 
-- **EF Core inverse navigation:** When adding an inverse navigation property (e.g., `Article.Favorites`), update the relationship config to `.WithMany(a => a.Favorites)` — otherwise EF creates duplicate FK columns
-- **Partial update validation:** `PUT` endpoints with optional fields (e.g., Update*) must validate at least one field is provided — reject empty `{}` payloads
+- **EF Core inverse navigation:** update relationship config to `.WithMany(a => a.Favorites)` — otherwise EF creates duplicate FK columns
+- **Partial update validation:** `PUT` endpoints with optional fields must validate at least one field is provided
 
-## Result Status -> HTTP Code Mapping
+## Result → HTTP Code Mapping
 
-- `Result.Success()` -> 200 OK
-- `Result.Created()` -> 201 Created
-- `Result.NoContent()` -> 204 No Content
-- `Result.Invalid()` -> 400 Bad Request (use for validation errors)
-- `Result.Forbidden()` -> 403 Forbidden
-- `Result.NotFound()` -> 404 Not Found
-- `Result.Error()` -> 422 Unprocessable Entity (use for business rule violations)
+`Success` → 200, `Created` → 201, `NoContent` → 204, `Invalid` → 400, `Forbidden` → 403, `NotFound` → 404, `Error` → 422
 
-Use `ErrorDetail(fieldName, message)` from `Server.SharedKernel.Result` for error details.
-NOT `ValidationError` — that type doesn't exist.
+Use `ErrorDetail(fieldName, message)` from `Server.SharedKernel.Result` — NOT `ValidationError`.

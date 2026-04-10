@@ -11,4 +11,6 @@ public class UpdateUserData
   public string? Bio { get; set; }
 
   public string? Image { get; set; }
+
+  public string? Language { get; set; }
 }

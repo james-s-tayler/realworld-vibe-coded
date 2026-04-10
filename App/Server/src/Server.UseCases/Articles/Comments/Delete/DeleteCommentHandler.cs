@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Server.Core.ArticleAggregate;
 using Server.Core.ArticleAggregate.Specifications.Articles;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
+using Server.SharedKernel.Resources;
 
 namespace Server.UseCases.Articles.Comments.Delete;
 
@@ -10,13 +12,16 @@ public class DeleteCommentHandler : ICommandHandler<DeleteCommentCommand, Commen
 {
   private readonly IRepository<Article> _articleRepository;
   private readonly ILogger<DeleteCommentHandler> _logger;
+  private readonly IStringLocalizer _localizer;
 
   public DeleteCommentHandler(
     IRepository<Article> articleRepository,
-    ILogger<DeleteCommentHandler> logger)
+    ILogger<DeleteCommentHandler> logger,
+    IStringLocalizer localizer)
   {
     _articleRepository = articleRepository;
     _logger = logger;
+    _localizer = localizer;
   }
 
   public async Task<Result<Comment>> Handle(DeleteCommentCommand request, CancellationToken cancellationToken)
@@ -38,7 +43,7 @@ public class DeleteCommentHandler : ICommandHandler<DeleteCommentCommand, Commen
     // Check if the user is the author of the comment
     if (comment.AuthorId != request.UserId)
     {
-      return Result<Comment>.Forbidden(new ErrorDetail("Forbidden", "You can only delete your own comments"));
+      return Result<Comment>.Forbidden(new ErrorDetail("Forbidden", _localizer[SharedResource.Keys.CanOnlyDeleteOwnComments]));
     }
 
     // Remove the comment

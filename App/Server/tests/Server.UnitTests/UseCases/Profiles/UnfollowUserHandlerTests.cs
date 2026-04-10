@@ -1,4 +1,5 @@
-﻿using Server.Core.AuthorAggregate;
+﻿using Microsoft.Extensions.Localization;
+using Server.Core.AuthorAggregate;
 using Server.Core.AuthorAggregate.Specifications;
 using Server.SharedKernel.Persistence;
 using Server.SharedKernel.Result;
@@ -9,6 +10,7 @@ namespace Server.UnitTests.UseCases.Profiles;
 public class UnfollowUserHandlerTests
 {
   private readonly IRepository<Author> _authorRepo = Substitute.For<IRepository<Author>>();
+  private readonly IStringLocalizer _localizer = Substitute.For<IStringLocalizer>();
 
   [Fact]
   public async Task Handle_WhenAuthorToUnfollowNotFound_ReturnsNotFound()
@@ -17,7 +19,7 @@ public class UnfollowUserHandlerTests
       Arg.Any<AuthorByUsernameSpec>(),
       Arg.Any<CancellationToken>()).Returns((Author?)null);
 
-    var handler = new UnfollowUserHandler(_authorRepo);
+    var handler = new UnfollowUserHandler(_authorRepo, _localizer);
     var result = await handler.Handle(new UnfollowUserCommand("unknown", Guid.NewGuid()), CancellationToken.None);
 
     result.Status.ShouldBe(ResultStatus.NotFound);
@@ -34,7 +36,7 @@ public class UnfollowUserHandlerTests
       Arg.Any<AuthorWithFollowingByUserIdSpec>(),
       Arg.Any<CancellationToken>()).Returns((Author?)null);
 
-    var handler = new UnfollowUserHandler(_authorRepo);
+    var handler = new UnfollowUserHandler(_authorRepo, _localizer);
     var result = await handler.Handle(new UnfollowUserCommand("target", Guid.NewGuid()), CancellationToken.None);
 
     result.Status.ShouldBe(ResultStatus.Error);
@@ -55,7 +57,7 @@ public class UnfollowUserHandlerTests
       Arg.Any<AuthorWithFollowingByUserIdSpec>(),
       Arg.Any<CancellationToken>()).Returns(current);
 
-    var handler = new UnfollowUserHandler(_authorRepo);
+    var handler = new UnfollowUserHandler(_authorRepo, _localizer);
     var result = await handler.Handle(new UnfollowUserCommand("target", currentUserId), CancellationToken.None);
 
     result.Status.ShouldBe(ResultStatus.Invalid);
@@ -77,7 +79,7 @@ public class UnfollowUserHandlerTests
       Arg.Any<AuthorWithFollowingByUserIdSpec>(),
       Arg.Any<CancellationToken>()).Returns(current);
 
-    var handler = new UnfollowUserHandler(_authorRepo);
+    var handler = new UnfollowUserHandler(_authorRepo, _localizer);
     var result = await handler.Handle(new UnfollowUserCommand("target", currentUserId), CancellationToken.None);
 
     result.IsSuccess.ShouldBeTrue();

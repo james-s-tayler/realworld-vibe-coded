@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import { Tag, Button } from '@carbon/react';
 import { FavoriteFilled, Favorite } from '@carbon/icons-react';
+import { useTranslation } from 'react-i18next';
 import type { Article } from '../types/article';
 import { DEFAULT_PROFILE_IMAGE } from '../constants';
 import { truncateUsername } from '../utils/textUtils';
@@ -18,6 +19,7 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({
   onFavorite,
   onUnfavorite,
 }) => {
+  const { t } = useTranslation();
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (article.favorited && onUnfavorite) {
@@ -63,7 +65,7 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({
         <h2 className="article-title">{article.title}</h2>
         <p className="article-description">{article.description}</p>
         <div className="article-footer">
-          <span className="read-more">Read more...</span>
+          <span className="read-more">{t('article.readMore')}</span>
           <div className="article-tags">
             {article.tagList.map((tag) => (
               <Tag key={tag} type="outline" size="sm">

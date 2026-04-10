@@ -10,7 +10,6 @@ public class UnfollowProfileValidator : Validator<UnfollowProfileRequest>
 
     RuleFor(x => x.Username)
       .NotEmpty()
-      .WithMessage("is required.")
       .OverridePropertyName("username");
   }
 }

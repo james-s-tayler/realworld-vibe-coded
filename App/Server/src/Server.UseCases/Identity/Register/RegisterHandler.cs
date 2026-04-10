@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Server.Core.AuthorAggregate;
 using Server.Core.IdentityAggregate;
@@ -11,6 +12,7 @@ using Server.Core.TenantInfoAggregate;
 using Server.SharedKernel.Identity;
 using Server.SharedKernel.MediatR;
 using Server.SharedKernel.Persistence;
+using Server.SharedKernel.Resources;
 
 namespace Server.UseCases.Identity.Register;
 
@@ -22,17 +24,20 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
   private readonly IUserEmailChecker _userEmailChecker;
   private readonly ILogger<RegisterHandler> _logger;
   private readonly IHttpContextAccessor _httpContextAccessor;
+  private readonly IStringLocalizer _localizer;
 
   public RegisterHandler(
     IRepository<TenantInfo> tenantRepository,
     IUserEmailChecker userEmailChecker,
     ILogger<RegisterHandler> logger,
-    IHttpContextAccessor httpContextAccessor)
+    IHttpContextAccessor httpContextAccessor,
+    IStringLocalizer localizer)
   {
     _tenantRepository = tenantRepository;
     _userEmailChecker = userEmailChecker;
     _logger = logger;
     _httpContextAccessor = httpContextAccessor;
+    _localizer = localizer;
   }
 
   // PV014: UserManager.CreateAsync is a mutation operation, but the analyzer doesn't recognize it
@@ -47,7 +52,7 @@ public class RegisterHandler : ICommandHandler<RegisterCommand, Unit>
     if (emailExists)
     {
       _logger.LogWarning("User registration failed for {Email}: Duplicate email", request.Email);
-      return Result<Unit>.Invalid(new ErrorDetail("email", "A user has already been registered with that email"));
+      return Result<Unit>.Invalid(new ErrorDetail("email", _localizer[SharedResource.Keys.EmailAlreadyRegistered]));
     }
 
     var tenantId = Guid.NewGuid().ToString();

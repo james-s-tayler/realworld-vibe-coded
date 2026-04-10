@@ -10,7 +10,6 @@ public class UnfavoriteArticleValidator : Validator<UnfavoriteArticleRequest>
 
     RuleFor(x => x.Slug)
       .NotEmpty()
-      .WithMessage("can't be blank")
       .OverridePropertyName("slug");
   }
 }
