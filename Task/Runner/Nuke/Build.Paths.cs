@@ -12,6 +12,10 @@ public partial class Build
 
   internal AbsolutePath ServerProject => RootDirectory / "App" / "Server" / "src" / "Server.Web" / "Server.Web.csproj";
 
+  internal AbsolutePath AppSettingsDirectory => RootDirectory / "App" / "Server" / "src" / "Server.Web";
+
+  internal AbsolutePath SchemaDirectory => RootDirectory / "App" / "Server" / "schemas";
+
   internal AbsolutePath ServerInfrastructureProject => RootDirectory / "App" / "Server" / "src" / "Server.Infrastructure" / "Server.Infrastructure.csproj";
 
   internal AbsolutePath MigrationsDirectory => RootDirectory / "App" / "Server" / "src" / "Server.Infrastructure" / "Data" / "Migrations";

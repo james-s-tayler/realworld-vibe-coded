@@ -31,6 +31,7 @@ Rules in `.claude/rules/` are loaded automatically by path scope. Read the relev
 | `backend-templates-persistence.md` | `App/Server/**` | Copy-paste: EF Core config, ResponseMapper |
 | `frontend.md` | `App/Client/**` | Kiota bridge workflow, project structure, routing, state |
 | `frontend-components.md` | `App/Client/**` | Hooks, Carbon components, CSS classes, API module template |
+| `feature-flags.md` | `App/Server/**`, `App/Client/**` | FeatureFlags constants, FF001/FF002 analyzers, Azure App Configuration |
 | `e2e.md` | `Test/e2e/**` | Playwright conventions, ARIA selectors, Expect() only |
 | `functional-tests.md` | `App/Server/tests/**` | FastEndpoints test extensions (SRV007), AppFixture |
 | `testing.md` | — | E2E test structure overview, progressive tier targets |
