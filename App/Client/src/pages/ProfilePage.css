@@ -10,7 +10,7 @@
 }
 
 .user-info {
-  background: #f3f3f3;
+  background: var(--cds-layer-01);
   padding: 2rem 0;
   text-align: center;
 }
@@ -27,15 +27,11 @@
   font-weight: 600;
   margin-bottom: 0.5rem;
   overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
 }
 
 .user-info p {
-  color: #999;
+  color: var(--cds-text-secondary);
   margin-bottom: 1rem;
   overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
 }
 

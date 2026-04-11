@@ -3,11 +3,12 @@
 :root {
   --header-height: 3rem; /* Carbon Design System header height (48px) */
   --sidebar-width: 256px;
+
   font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #373a3c;
-  background-color: #ffffff;
+  color: var(--cds-text-primary);
+  background-color: var(--cds-background);
 }
 
 * {
@@ -26,19 +27,19 @@ body {
 }
 
 /* Carbon's SideNav with isChildOfHeader auto-pushes content at lg+ */
-@media (min-width: 66rem) {
+@media (width >= 66rem) {
   #root {
     padding-left: var(--sidebar-width);
   }
 }
 
 a {
-  color: #5cb85c;
+  color: var(--cds-link-primary);
   text-decoration: none;
 }
 
 a:hover {
-  color: #3d8b3d;
+  color: var(--cds-link-primary-hover);
   text-decoration: underline;
 }
 

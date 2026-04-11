@@ -1,0 +1,18 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "plugins": ["stylelint-declaration-strict-value"],
+  "rules": {
+    "color-no-hex": [true, {
+      "message": "Use a Carbon design token var(--cds-*) instead of hex color \"{{ actual }}\""
+    }],
+    "scale-unlimited/declaration-strict-value": [
+      ["color", "background-color", "background", "fill", "stroke", "outline-color"],
+      {
+        "ignoreValues": ["transparent", "inherit", "currentColor", "initial", "unset", "none", "white"],
+        "disableFix": true,
+        "message": "Use a Carbon design token var(--cds-*) instead of literal value for \"{{ property }}\""
+      }
+    ],
+    "selector-class-pattern": null
+  }
+}

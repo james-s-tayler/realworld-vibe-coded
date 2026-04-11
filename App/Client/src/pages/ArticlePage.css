@@ -10,19 +10,18 @@
 }
 
 .article-page .banner {
-  background: var(--cds-background-inverse, #333);
-  color: var(--cds-text-on-color, white);
-  padding: var(--cds-spacing-07, 2rem) 0;
-  padding-top: calc(var(--cds-spacing-07, 2rem) + var(--header-height));
+  background: var(--cds-background-inverse);
+  color: var(--cds-text-on-color);
+  padding: var(--cds-spacing-07) 0;
+  padding-top: calc(var(--cds-spacing-07) + var(--header-height));
   margin-top: calc(-1 * var(--header-height));
 }
 
 .article-page .banner h1 {
-  font-size: var(--cds-heading-05-font-size, 2.8rem);
-  font-weight: var(--cds-heading-05-font-weight, 600);
-  line-height: var(--cds-heading-05-line-height, 1.2);
-  margin-bottom: var(--cds-spacing-06, 2rem);
-  word-wrap: break-word;
+  font-size: var(--cds-heading-05-font-size);
+  font-weight: var(--cds-heading-05-font-weight);
+  line-height: var(--cds-heading-05-line-height);
+  margin-bottom: var(--cds-spacing-06);
   overflow-wrap: break-word;
 }
 
@@ -43,7 +42,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  margin-right: var(--cds-spacing-03, 0.5rem);
+  margin-right: var(--cds-spacing-03);
 }
 
 .article-meta .info {
@@ -52,12 +51,12 @@
 }
 
 .article-meta .author {
-  color: var(--cds-text-on-color, white);
+  color: var(--cds-text-on-color);
   font-weight: 500;
 }
 
 .article-meta .date {
-  color: var(--cds-text-on-color-disabled, #bbb);
+  color: var(--cds-text-on-color-disabled);
   font-size: 0.8rem;
 }
 
@@ -74,13 +73,11 @@
   font-size: 1.2rem;
   line-height: 1.8;
   margin-bottom: var(--cds-spacing-06, 2rem);
-  word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
 .article-body p {
   margin-bottom: var(--cds-spacing-05, 1rem);
-  word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
@@ -116,7 +113,7 @@
   align-items: center;
   justify-content: space-between;
   padding-top: var(--cds-spacing-05, 1rem);
-  border-top: 1px solid var(--cds-border-subtle-01, rgba(0, 0, 0, 0.1));
+  border-top: 1px solid var(--cds-border-subtle-01);
 }
 
 .comment-tile {
@@ -125,13 +122,11 @@
 
 .comment-body {
   margin-bottom: var(--cds-spacing-05, 1rem);
-  word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
 .comment-body p {
   margin: 0;
-  word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
@@ -140,7 +135,7 @@
   align-items: center;
   gap: var(--cds-spacing-03, 0.5rem);
   padding-top: var(--cds-spacing-05, 1rem);
-  border-top: 1px solid var(--cds-border-subtle-01, rgba(0, 0, 0, 0.1));
+  border-top: 1px solid var(--cds-border-subtle-01);
 }
 
 .comment-author {
@@ -158,12 +153,12 @@
 }
 
 .comment-author-name {
-  color: #5cb85c;
+  color: var(--cds-link-primary);
   font-weight: 500;
 }
 
 .date-posted {
-  color: var(--cds-text-secondary, #525252);
+  color: var(--cds-text-secondary);
   font-size: var(--cds-label-01-font-size, 0.75rem);
   margin-left: auto;
 }
