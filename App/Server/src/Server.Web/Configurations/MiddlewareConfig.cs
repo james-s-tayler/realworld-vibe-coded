@@ -22,7 +22,8 @@ public static class MiddlewareConfig
           .ProducesProblemDetails(StatusCodes.Status404NotFound)
           .ProducesProblemDetails(StatusCodes.Status403Forbidden)
           .ProducesProblemDetails(StatusCodes.Status409Conflict)
-          .ProducesProblemDetails(StatusCodes.Status500InternalServerError));
+          .ProducesProblemDetails(StatusCodes.Status500InternalServerError)
+          .ProducesProblemDetails(StatusCodes.Status503ServiceUnavailable));
       };
       if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
       {

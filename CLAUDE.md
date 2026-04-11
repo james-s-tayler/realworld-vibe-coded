@@ -10,6 +10,7 @@ These are the primary rules.
 4. **Every feature must have its Postman and E2E tests passing before moving to the next feature.** The implementation workflow enforces this.
 5. **All compiler warnings and errors must be resolved.** Never suppress or ignore them.
 8. **Frontend API client relies on Kiota code generation.** Always make backend changes first, then run `./build.sh BuildGenerateApiClient` before writing frontend code. `BuildClient` does this automatically (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Never reference fields in frontend that don't exist in the generated types.
+9. **Every test failure must be investigated.** Never dismiss failures as "pre-existing", "unrelated", or "flaky" without investigation. Read the logs, check the traces, understand the root cause. If the failure is genuinely outside the scope of current work, file it as a known issue with evidence — but never ignore it.
 
 Reference as needed:
 - `SPEC-REFERENCE.md` — complete API spec (the source of truth for what to build)

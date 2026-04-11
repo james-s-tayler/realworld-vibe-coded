@@ -20,3 +20,12 @@ paths:
 - SideNav links on mobile overlay: use `DispatchEventAsync("click")` — page content can intercept pointer events on fixed-position overlays
 - Prefer `ToBeVisibleAsync` over `ToBeInViewportAsync` — SideNav slide-in animation makes viewport checks flaky in headless CI
 - `MobileAppPageTest` base class: configures 375x667 viewport, `IsMobile`, `HasTouch`; provides `HamburgerButton`, `CloseMenuButton`, `SideNav` locators and `LoginOnMobileAsync()`
+
+### HttpClient in E2E Test Fixtures
+
+- **Never** construct `HttpClient` directly — use `IHttpClientFactory` via `ServiceCollection`
+- Add `Microsoft.Extensions.Http.Resilience` for transient retry (408, 429, 503, 504)
+- **Never** retry on 500 — that's a server bug, not a transient error
+- Server returns 503 for `TimeoutException` (SQL timeouts etc.) — see `ExceptionHandlingBehavior`
+- Pattern: see `ApiFixture.cs` constructor for `AddResilienceHandler` setup
+- Dispose `ServiceProvider` in `DisposeAsync()` — it owns the handler pipeline
