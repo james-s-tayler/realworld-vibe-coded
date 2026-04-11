@@ -1,23 +1,40 @@
 {
-  "extends": ["stylelint-config-standard"],
-  "plugins": ["stylelint-declaration-strict-value"],
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-plugin-carbon-tokens/config/recommended"
+  ],
+  "plugins": [
+    "stylelint-plugin-carbon-tokens"
+  ],
   "rules": {
-    "color-no-hex": [true, {
-      "message": "Use a Carbon design token var(--cds-*) instead of hex color \"{{ actual }}\""
-    }],
-    "scale-unlimited/declaration-strict-value": [
-      [
-        "color", "background-color", "background", "fill", "stroke", "outline-color",
-        "margin", "margin-top", "margin-right", "margin-bottom", "margin-left",
-        "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
-        "gap", "row-gap", "column-gap"
-      ],
+    "selector-class-pattern": null,
+    "carbon/theme-use": [
+      true,
       {
-        "ignoreValues": ["transparent", "inherit", "currentColor", "initial", "unset", "none", "white", "0", "auto"],
-        "disableFix": true,
-        "message": "Use a Carbon design token var(--cds-spacing-*) or var(--cds-*) instead of literal value for \"{{ property }}\""
+        "acceptCarbonCustomProp": true,
+        "acceptValues": [
+          "/inherit|initial|none|unset/",
+          "/currentColor|transparent/",
+          "white",
+          "/rgb\\(/",
+          "/^0$/"
+        ],
+        "severity": "error"
       }
     ],
-    "selector-class-pattern": null
+    "carbon/layout-use": [
+      true,
+      {
+        "acceptCarbonCustomProp": true,
+        "acceptValues": [
+          "/var\\(--header-height\\)/",
+          "/var\\(--sidebar-width\\)/",
+          "/^0$/",
+          "auto"
+        ],
+        "severity": "error"
+      }
+    ],
+    "carbon/type-use": null
   }
 }

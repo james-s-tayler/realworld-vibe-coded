@@ -15,7 +15,7 @@ import type { Article } from '../types/article';
 import type { Comment } from '../types/comment';
 import { DEFAULT_PROFILE_IMAGE, COMMENT_CONSTRAINTS } from '../constants';
 import { truncateUsername } from '../utils/textUtils';
-import './ArticlePage.css';
+import './ArticlePage.scss';
 
 interface ArticleBannerProps {
   article: Article;

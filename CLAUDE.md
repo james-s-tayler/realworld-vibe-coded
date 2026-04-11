@@ -18,6 +18,7 @@ Reference as needed:
 - `Docs/architecture.md` — tech stack, folder structure, build commands
 - `Docs/observability.md` — OpenTelemetry tracing/metrics, Grafana/Jaeger/Prometheus stack
 - Chrome DevTools MCP — visual browser inspection via `/browser-inspect` and debugging via `/browser-debug`
+- Docs MCP server — search/scrape indexed library documentation before planning
 
 ## Rules Index
 
@@ -39,4 +40,5 @@ Rules in `.claude/rules/` are loaded automatically by path scope. Read the relev
 | `testing.md` | — | E2E test structure overview, progressive tier targets |
 | `cicd.md` | `.github/**` | GitHub Actions naming, path-based job gating |
 | `nuke.md` | `Task/Runner/**` | Worktree port isolation, Vite env var conventions |
+| `research.md` | — | Docs MCP research-first workflow for planning |
 | `harness.md` | `.claude/**`, `scripts/**` | Hook conventions, settings.json, marker files, protected files |

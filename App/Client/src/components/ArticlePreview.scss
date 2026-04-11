@@ -1,5 +1,7 @@
+@use '@carbon/react/scss/spacing' as *;
+
 .article-preview {
-  padding: var(--cds-spacing-06, 1.5rem) 0;
+  padding: $spacing-06 0;
   border-bottom: 1px solid var(--cds-border-subtle);
 }
 
@@ -7,7 +9,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--cds-spacing-05, 1rem);
+  margin-bottom: $spacing-05;
 }
 
 .author-info {
@@ -21,7 +23,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  margin-right: var(--cds-spacing-03, 0.5rem);
+  margin-right: $spacing-03;
 }
 
 .author-details {
@@ -61,14 +63,14 @@
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--cds-text-primary);
-  margin-bottom: var(--cds-spacing-03, 0.5rem);
+  margin-bottom: $spacing-03;
   overflow-wrap: break-word;
 }
 
 .article-description {
   font-size: 1rem;
   color: var(--cds-text-secondary);
-  margin-bottom: var(--cds-spacing-05, 1rem);
+  margin-bottom: $spacing-05;
   overflow-wrap: break-word;
 }
 
@@ -85,6 +87,6 @@
 
 .article-tags {
   display: flex;
-  gap: var(--cds-spacing-02, 0.25rem);
+  gap: $spacing-02;
   flex-wrap: wrap;
 }

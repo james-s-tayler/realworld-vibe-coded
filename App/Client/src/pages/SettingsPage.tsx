@@ -15,7 +15,7 @@ import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
 import { USER_CONSTRAINTS, SUPPORTED_LANGUAGES } from '../constants';
-import './SettingsPage.css';
+import './SettingsPage.scss';
 
 export const SettingsPage: React.FC = () => {
   const { t, i18n } = useTranslation();

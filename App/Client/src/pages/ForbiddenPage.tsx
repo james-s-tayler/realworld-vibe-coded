@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { PageShell } from '../components/PageShell';
-import './ForbiddenPage.css';
+import './ForbiddenPage.scss';
 
 export const ForbiddenPage: React.FC = () => {
   const { t } = useTranslation();

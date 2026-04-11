@@ -1,7 +1,9 @@
+@use '@carbon/react/scss/spacing' as *;
+
 .tag-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--cds-spacing-03, 0.5rem);
+  gap: $spacing-03;
 }
 
 .tag-pill {
@@ -10,17 +12,17 @@
   color: white;
   border: none;
   border-radius: 10rem;
-  padding: var(--cds-spacing-02, 0.25rem) var(--cds-spacing-03, 0.6rem);
+  padding: $spacing-02 $spacing-03;
   font-size: 0.8rem;
 }
 
 .tag-pill:hover {
-  background-color: var(--cds-text-secondary-hover);
+  background-color: var(--cds-text-helper);
 }
 
 .tag-list-loading,
 .tag-list-empty {
-  padding: var(--cds-spacing-05, 1rem);
+  padding: $spacing-05;
   text-align: center;
   color: var(--cds-text-secondary);
 }

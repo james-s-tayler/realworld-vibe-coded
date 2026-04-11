@@ -13,7 +13,7 @@ import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
 import { USER_CONSTRAINTS } from '../constants';
 import { type AppError, normalizeError } from '../utils/errors';
-import './AuthPages.css';
+import './AuthPages.scss';
 
 interface RegisterState {
   error: AppError | null;

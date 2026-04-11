@@ -1,3 +1,5 @@
+@use '@carbon/react/scss/spacing' as *;
+
 .article-page {
   min-height: 100vh;
 }
@@ -12,8 +14,8 @@
 .article-page .banner {
   background: var(--cds-background-inverse);
   color: var(--cds-text-on-color);
-  padding: var(--cds-spacing-07, 2rem) 0;
-  padding-top: calc(var(--cds-spacing-07, 2rem) + var(--header-height));
+  padding: $spacing-07 0;
+  padding-top: calc(#{$spacing-07} + var(--header-height));
   margin-top: calc(-1 * var(--header-height));
 }
 
@@ -21,7 +23,7 @@
   font-size: var(--cds-heading-05-font-size, 2.8rem);
   font-weight: var(--cds-heading-05-font-weight, 600);
   line-height: var(--cds-heading-05-line-height, 1.2);
-  margin-bottom: var(--cds-spacing-06, 2rem);
+  margin-bottom: $spacing-06;
   overflow-wrap: break-word;
 }
 
@@ -42,7 +44,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  margin-right: var(--cds-spacing-03, 0.5rem);
+  margin-right: $spacing-03;
 }
 
 .article-meta .info {
@@ -62,37 +64,37 @@
 
 .article-meta .actions {
   display: flex;
-  gap: var(--cds-spacing-03, 0.5rem);
+  gap: $spacing-03;
 }
 
 .article-content {
-  padding: var(--cds-spacing-07, 2rem) 0;
+  padding: $spacing-07 0;
 }
 
 .article-body {
   font-size: 1.2rem;
   line-height: 1.8;
-  margin-bottom: var(--cds-spacing-06, 2rem);
+  margin-bottom: $spacing-06;
   overflow-wrap: break-word;
 }
 
 .article-body p {
-  margin-bottom: var(--cds-spacing-05, 1rem);
+  margin-bottom: $spacing-05;
   overflow-wrap: break-word;
 }
 
 .article-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--cds-spacing-03, 0.5rem);
-  margin-bottom: var(--cds-spacing-06, 2rem);
+  gap: $spacing-03;
+  margin-bottom: $spacing-06;
 }
 
 .article-grid-container {
   max-width: 1140px;
   margin-left: auto;
   margin-right: auto;
-  padding: 0 var(--cds-spacing-05, 1rem);
+  padding: 0 $spacing-05;
 }
 
 .article-column-offset {
@@ -101,27 +103,27 @@
 }
 
 .comment-form {
-  margin-bottom: var(--cds-spacing-05, 1rem);
+  margin-bottom: $spacing-05;
 }
 
 .comment-form-body {
-  margin-bottom: var(--cds-spacing-05, 1rem);
+  margin-bottom: $spacing-05;
 }
 
 .comment-form-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: var(--cds-spacing-05, 1rem);
+  padding-top: $spacing-05;
   border-top: 1px solid var(--cds-border-subtle-01);
 }
 
 .comment-tile {
-  margin-bottom: var(--cds-spacing-05, 1rem);
+  margin-bottom: $spacing-05;
 }
 
 .comment-body {
-  margin-bottom: var(--cds-spacing-05, 1rem);
+  margin-bottom: $spacing-05;
   overflow-wrap: break-word;
 }
 
@@ -133,8 +135,8 @@
 .comment-footer {
   display: flex;
   align-items: center;
-  gap: var(--cds-spacing-03, 0.5rem);
-  padding-top: var(--cds-spacing-05, 1rem);
+  gap: $spacing-03;
+  padding-top: $spacing-05;
   border-top: 1px solid var(--cds-border-subtle-01);
 }
 
@@ -143,7 +145,7 @@
   align-items: center;
   text-decoration: none;
   color: inherit;
-  gap: var(--cds-spacing-03, 0.5rem);
+  gap: $spacing-03;
 }
 
 .comment-author-img {
@@ -164,7 +166,7 @@
 }
 
 .comment-auth-prompt {
-  margin-bottom: var(--cds-spacing-06, 2rem);
+  margin-bottom: $spacing-06;
   text-align: center;
 }
 

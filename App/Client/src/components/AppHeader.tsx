@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { RequireRole } from './RequireRole';
 import { truncateUsername } from '../utils/textUtils';
-import './AppHeader.css';
+import './AppHeader.scss';
 
 export const AppHeader: React.FC = () => {
   const { t } = useTranslation();
