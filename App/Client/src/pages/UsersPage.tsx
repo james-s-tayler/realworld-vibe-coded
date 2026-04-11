@@ -12,7 +12,7 @@ import {
   Button,
   Modal,
   TextInput,
-  InlineNotification,
+  PasswordInput,
   Loading,
   Pagination,
   Tag,
@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { PageShell } from '../components/PageShell';
 import { usersApi, type User } from '../api/users';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
 import { ApiError } from '../api/client';
 import './UsersPage.css';
 
@@ -35,10 +36,10 @@ const ASSIGNABLE_ROLES = ['ADMIN'];
 export const UsersPage: React.FC = () => {
   const { t } = useTranslation();
   const { user: currentUser } = useAuth();
+  const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [usersCount, setUsersCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
@@ -46,34 +47,28 @@ export const UsersPage: React.FC = () => {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [invitePassword, setInvitePassword] = useState('');
-  const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviting, setInviting] = useState(false);
 
   // Edit roles modal
   const [editRolesModalOpen, setEditRolesModalOpen] = useState(false);
   const [editRolesUser, setEditRolesUser] = useState<User | null>(null);
   const [editRolesSelected, setEditRolesSelected] = useState<string[]>([]);
-  const [editRolesError, setEditRolesError] = useState<string | null>(null);
   const [editRolesSaving, setEditRolesSaving] = useState(false);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       const offset = (currentPage - 1) * pageSize;
       const response = await usersApi.listUsers(pageSize, offset);
       setUsers(response.users);
       setUsersCount(response.usersCount);
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('users.failedToLoad'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('users.failedToLoad');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     } finally {
       setLoading(false);
     }
-  }, [currentPage, pageSize, t]);
+  }, [currentPage, pageSize, t, showToast]);
 
   useEffect(() => {
     loadUsers();
@@ -86,12 +81,11 @@ export const UsersPage: React.FC = () => {
 
   const handleInviteUser = async () => {
     if (!inviteEmail || !invitePassword) {
-      setInviteError(t('users.emailAndPasswordRequired'));
+      showToast({ kind: 'error', title: t('error.title'), subtitle: t('users.emailAndPasswordRequired') });
       return;
     }
 
     setInviting(true);
-    setInviteError(null);
     try {
       await usersApi.inviteUser(inviteEmail, invitePassword);
       setInviteModalOpen(false);
@@ -99,11 +93,8 @@ export const UsersPage: React.FC = () => {
       setInvitePassword('');
       await loadUsers();
     } catch (err) {
-      if (err instanceof ApiError) {
-        setInviteError(err.errors.join(', '));
-      } else {
-        setInviteError(t('users.failedToInvite'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('users.failedToInvite');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     } finally {
       setInviting(false);
     }
@@ -114,11 +105,8 @@ export const UsersPage: React.FC = () => {
       await usersApi.deactivateUser(user.id);
       await loadUsers();
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('users.failedToDeactivate'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('users.failedToDeactivate');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     }
   };
 
@@ -127,18 +115,14 @@ export const UsersPage: React.FC = () => {
       await usersApi.reactivateUser(user.id);
       await loadUsers();
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('users.failedToReactivate'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('users.failedToReactivate');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     }
   };
 
   const openEditRolesModal = (user: User) => {
     setEditRolesUser(user);
     setEditRolesSelected(user.roles.filter((r) => ASSIGNABLE_ROLES.includes(r)));
-    setEditRolesError(null);
     setEditRolesModalOpen(true);
   };
 
@@ -148,18 +132,14 @@ export const UsersPage: React.FC = () => {
     }
 
     setEditRolesSaving(true);
-    setEditRolesError(null);
     try {
       await usersApi.updateUserRoles(editRolesUser.id, editRolesSelected);
       setEditRolesModalOpen(false);
       setEditRolesUser(null);
       await loadUsers();
     } catch (err) {
-      if (err instanceof ApiError) {
-        setEditRolesError(err.errors.join(', '));
-      } else {
-        setEditRolesError(t('users.failedToUpdateRoles'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('users.failedToUpdateRoles');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     } finally {
       setEditRolesSaving(false);
     }
@@ -203,15 +183,6 @@ export const UsersPage: React.FC = () => {
           {t('users.inviteUser')}
         </Button>
       </div>
-
-      {error && (
-        <InlineNotification
-          kind="error"
-          title={t('error.title')}
-          subtitle={error}
-          onClose={() => setError(null)}
-        />
-      )}
 
       {loading ? (
         <Loading description={t('users.loading')} withOverlay={false} />
@@ -311,7 +282,6 @@ export const UsersPage: React.FC = () => {
           setInviteModalOpen(false);
           setInviteEmail('');
           setInvitePassword('');
-          setInviteError(null);
         }}
         modalHeading={t('users.inviteModalTitle')}
         primaryButtonText={t('users.invite')}
@@ -319,15 +289,6 @@ export const UsersPage: React.FC = () => {
         onRequestSubmit={handleInviteUser}
         primaryButtonDisabled={inviting}
       >
-        {inviteError && (
-          <InlineNotification
-            kind="error"
-            title={t('error.title')}
-            subtitle={inviteError}
-            onClose={() => setInviteError(null)}
-            style={{ marginBottom: '1rem' }}
-          />
-        )}
         <TextInput
           id="invite-email"
           labelText={t('users.email')}
@@ -336,15 +297,14 @@ export const UsersPage: React.FC = () => {
           onChange={(e) => setInviteEmail(e.target.value)}
           disabled={inviting}
         />
-        <TextInput
+        <PasswordInput
           id="invite-password"
           labelText={t('users.password')}
-          type="password"
           placeholder={t('users.password')}
           value={invitePassword}
           onChange={(e) => setInvitePassword(e.target.value)}
           disabled={inviting}
-          style={{ marginTop: '1rem' }}
+          className="users-modal-spacing"
         />
       </Modal>
 
@@ -353,7 +313,6 @@ export const UsersPage: React.FC = () => {
         onRequestClose={() => {
           setEditRolesModalOpen(false);
           setEditRolesUser(null);
-          setEditRolesError(null);
         }}
         modalHeading={t('users.editRolesTitle', { username: editRolesUser?.username ?? '' })}
         primaryButtonText={t('users.save')}
@@ -361,15 +320,6 @@ export const UsersPage: React.FC = () => {
         onRequestSubmit={handleEditRolesSubmit}
         primaryButtonDisabled={editRolesSaving}
       >
-        {editRolesError && (
-          <InlineNotification
-            kind="error"
-            title={t('error.title')}
-            subtitle={editRolesError}
-            onClose={() => setEditRolesError(null)}
-            style={{ marginBottom: '1rem' }}
-          />
-        )}
         <div className="edit-roles-checkboxes">
           {editRolesUser?.roles.includes('OWNER') && (
             <Checkbox

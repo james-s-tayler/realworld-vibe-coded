@@ -13,6 +13,22 @@ vi.mock('./api/auth', () => ({
   },
 }))
 
+vi.mock('./api/featureFlagsApi', () => ({
+  featureFlagsApi: {
+    getConfig: vi.fn().mockResolvedValue({
+      feature_management: { feature_flags: [] },
+    }),
+  },
+}))
+
+vi.mock('./api/configApi', () => ({
+  configApi: {
+    getConfig: vi.fn().mockResolvedValue({
+      featureFlagRefreshIntervalSeconds: 60,
+    }),
+  },
+}))
+
 const mockUser = {
   email: 'test@example.com',
   username: 'testuser',

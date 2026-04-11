@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Button, InlineNotification } from '@carbon/react';
+import { Button, ToastNotification } from '@carbon/react';
 import { Settings, UserAvatar } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useFeatureFlag } from '../hooks/useFeatureFlag';
 import { FEATURE_FLAGS } from '../featureFlags';
 import { PageShell } from '../components/PageShell';
+import './DashboardPage.css';
 
 export const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
@@ -16,7 +17,7 @@ export const DashboardPage: React.FC = () => {
   return (
     <PageShell className="dashboard-page">
       {showBanner && (
-        <InlineNotification
+        <ToastNotification
           kind="info"
           title={t('dashboard.bannerTitle')}
           subtitle={t('dashboard.bannerMessage')}
@@ -26,7 +27,7 @@ export const DashboardPage: React.FC = () => {
       )}
       <h1>{user ? t('dashboard.welcome', { username: user.username }) : t('dashboard.welcomeGuest')}</h1>
       <p>{t('dashboard.subtitle')}</p>
-      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+      <div className="dashboard-actions">
         <Link to="/settings">
           <Button kind="primary" renderIcon={Settings}>
             {t('dashboard.settings')}

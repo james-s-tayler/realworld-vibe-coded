@@ -29,10 +29,15 @@
   },
   "settings": {
     "title": "Your Settings",
+    "imageUrlLabel": "Profile picture URL",
     "imageUrl": "URL of profile picture",
+    "usernameLabel": "Username",
     "username": "Username",
+    "bioLabel": "Bio",
     "bio": "Short bio about you",
+    "emailLabel": "Email",
     "email": "Email",
+    "newPasswordLabel": "New Password",
     "newPassword": "New Password",
     "language": "Language",
     "submit": "Update Settings",
@@ -83,7 +88,8 @@
     "emailAndPasswordRequired": "Email and password are required",
     "actionsFor": "Actions for {{email}}",
     "password": "Password",
-    "emailPlaceholder": "user@example.com"
+    "emailPlaceholder": "user@example.com",
+    "atLeastOneRole": "At least one role must be selected"
   },
   "forbidden": {
     "title": "403 - Forbidden",
@@ -91,7 +97,11 @@
     "goHome": "Go back to home"
   },
   "error": {
-    "title": "Error"
+    "title": "Error",
+    "pageTitle": "Something went wrong",
+    "pageMessage": "An unexpected error occurred. Please try again.",
+    "goHome": "Go back to home",
+    "loadingAuth": "Loading..."
   },
   "pagination": {
     "previous": "Previous page",

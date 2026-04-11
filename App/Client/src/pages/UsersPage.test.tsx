@@ -3,6 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { UsersPage } from './UsersPage';
+import { ToastProvider } from '../context/ToastContext';
+import { ToastContainer } from '../components/ToastContainer';
 import { usersApi } from '../api/users';
 
 vi.mock('../api/users', () => ({
@@ -48,7 +50,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -62,12 +67,15 @@ describe('UsersPage', () => {
 
   it('shows loading state while fetching users', () => {
     vi.mocked(usersApi.listUsers).mockImplementation(
-      () => new Promise(() => {}) // Never resolves
+      () => new Promise(() => {})
     );
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -79,7 +87,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -94,7 +105,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -127,7 +141,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -135,26 +152,21 @@ describe('UsersPage', () => {
       expect(screen.getByText('user1')).toBeInTheDocument();
     });
 
-    // Open invite modal
     const inviteButton = screen.getByRole('button', { name: /invite user/i });
     await user.click(inviteButton);
 
-    // Fill in form
     const emailInput = screen.getByLabelText('Email');
     const passwordInput = screen.getByLabelText('Password');
     await user.type(emailInput, 'user2@test.com');
     await user.type(passwordInput, 'password123');
 
-    // Submit
     const submitButton = screen.getByRole('button', { name: /^invite$/i });
     await user.click(submitButton);
 
-    // Verify invite was called
     await waitFor(() => {
       expect(usersApi.inviteUser).toHaveBeenCalledWith('user2@test.com', 'password123');
     });
 
-    // Verify users list was refreshed
     await waitFor(() => {
       expect(screen.getByText('user2')).toBeInTheDocument();
     });
@@ -167,7 +179,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -175,21 +190,17 @@ describe('UsersPage', () => {
       expect(screen.queryByText('Loading users...')).not.toBeInTheDocument();
     });
 
-    // Open invite modal
     const inviteButton = screen.getByRole('button', { name: /invite user/i });
     await user.click(inviteButton);
 
-    // Fill in form
     const emailInput = screen.getByLabelText('Email');
     const passwordInput = screen.getByLabelText('Password');
     await user.type(emailInput, 'user2@test.com');
     await user.type(passwordInput, 'password123');
 
-    // Submit
     const submitButton = screen.getByRole('button', { name: /^invite$/i });
     await user.click(submitButton);
 
-    // Verify error is shown
     await waitFor(() => {
       expect(screen.getByText('Failed to invite user')).toBeInTheDocument();
     });
@@ -200,7 +211,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -218,7 +232,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -236,7 +253,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 

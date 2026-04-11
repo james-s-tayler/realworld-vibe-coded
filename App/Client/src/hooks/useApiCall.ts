@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { type AppError, normalizeError } from '../utils/errors';
 
 export interface UseApiCallResult<T> {
@@ -56,6 +56,11 @@ export function useApiCall<T>(
   const [error, setError] = useState<AppError | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const onSuccessRef = useRef(options?.onSuccess);
+  onSuccessRef.current = options?.onSuccess;
+  const onErrorRef = useRef(options?.onError);
+  onErrorRef.current = options?.onError;
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -74,18 +79,18 @@ export function useApiCall<T>(
       try {
         const result = await apiFunction(...args);
         setData(result);
-        options?.onSuccess?.(result);
+        onSuccessRef.current?.(result);
         return result;
       } catch (err) {
         const normalizedError = normalizeError(err);
         setError(normalizedError);
-        options?.onError?.(normalizedError);
+        onErrorRef.current?.(normalizedError);
         return null;
       } finally {
         setLoading(false);
       }
     },
-    [apiFunction, options]
+    [apiFunction]
   );
 
   return {
