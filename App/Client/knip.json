@@ -8,10 +8,6 @@
     "@microsoft/kiota-abstractions",
     "@microsoft/kiota-bundle",
     "@microsoft/kiota-http-fetchlibrary",
-    "@microsoft/kiota-serialization-form",
-    "@microsoft/kiota-serialization-json",
-    "@microsoft/kiota-serialization-multipart",
-    "@microsoft/kiota-serialization-text",
     "mkdirp"
   ]
 }
