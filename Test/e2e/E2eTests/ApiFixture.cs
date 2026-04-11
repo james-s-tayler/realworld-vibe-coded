@@ -1,6 +1,10 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
+using Polly;
 
 namespace E2eTests;
 
@@ -13,6 +17,7 @@ public class ApiFixture : IAsyncLifetime
   private readonly string _baseUrl;
   private readonly JsonSerializerOptions _jsonOptions;
   private readonly HttpClient _httpClient;
+  private readonly ServiceProvider _serviceProvider;
   private int _userCounter;
   private int _articleCounter;
 
@@ -24,18 +29,40 @@ public class ApiFixture : IAsyncLifetime
       PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
-    // Configure HttpClientHandler to accept self-signed certificates in test environments
-    var handler = new HttpClientHandler();
-
-    // WARNING: Disables all SSL/TLS certificate validation for E2E tests.
-    // This is safe ONLY in isolated test environments (e.g., E2E tests with self-signed dev certificates in Docker containers).
-    // NEVER use this pattern in production code, as it allows any certificate (including expired, self-signed, or malicious).
-    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-
-    _httpClient = new HttpClient(handler)
+    var services = new ServiceCollection();
+    services.AddHttpClient("e2e", client =>
     {
-      BaseAddress = new Uri(_baseUrl),
-    };
+      client.BaseAddress = new Uri(_baseUrl);
+    })
+    .ConfigurePrimaryHttpMessageHandler(() =>
+    {
+      // WARNING: Disables all SSL/TLS certificate validation for E2E tests.
+      // This is safe ONLY in isolated test environments (e.g., E2E tests with self-signed dev certificates in Docker containers).
+      // NEVER use this pattern in production code, as it allows any certificate (including expired, self-signed, or malicious).
+      return new HttpClientHandler
+      {
+        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true,
+      };
+    })
+    .AddResilienceHandler("transient-retry", builder =>
+    {
+      builder.AddRetry(new HttpRetryStrategyOptions
+      {
+        MaxRetryAttempts = 3,
+        Delay = TimeSpan.FromSeconds(2),
+        BackoffType = DelayBackoffType.Exponential,
+        ShouldHandle = static args => ValueTask.FromResult(
+          args.Outcome.Result?.StatusCode is
+            HttpStatusCode.RequestTimeout or       // 408
+            HttpStatusCode.TooManyRequests or       // 429
+            HttpStatusCode.ServiceUnavailable or    // 503
+            HttpStatusCode.GatewayTimeout),         // 504
+      });
+    });
+
+    _serviceProvider = services.BuildServiceProvider();
+    var factory = _serviceProvider.GetRequiredService<IHttpClientFactory>();
+    _httpClient = factory.CreateClient("e2e");
   }
 
   public ValueTask InitializeAsync()
@@ -43,10 +70,10 @@ public class ApiFixture : IAsyncLifetime
     return ValueTask.CompletedTask;
   }
 
-  public ValueTask DisposeAsync()
+  public async ValueTask DisposeAsync()
   {
     _httpClient?.Dispose();
-    return ValueTask.CompletedTask;
+    await _serviceProvider.DisposeAsync();
   }
 
   /// <summary>

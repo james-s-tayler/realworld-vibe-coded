@@ -12,6 +12,8 @@ import { ThrowNestedExceptionFromEndpointRequestBuilderRequestsMetadata, type Th
 // @ts-ignore
 import { ThrowNestedExceptionFromUsecaseRequestBuilderRequestsMetadata, type ThrowNestedExceptionFromUsecaseRequestBuilder } from './throwNestedExceptionFromUsecase/index.js';
 // @ts-ignore
+import { ThrowSqlTimeoutRequestBuilderRequestsMetadata, type ThrowSqlTimeoutRequestBuilder } from './throwSqlTimeout/index.js';
+// @ts-ignore
 import { type ValidationErrorEndpointRequestBuilder, ValidationErrorEndpointRequestBuilderRequestsMetadata } from './validationErrorEndpoint/index.js';
 // @ts-ignore
 import { type ValidationErrorValidatorRequestBuilder, ValidationErrorValidatorRequestBuilderRequestsMetadata } from './validationErrorValidator/index.js';
@@ -43,6 +45,10 @@ export interface TestErrorRequestBuilder extends BaseRequestBuilder<TestErrorReq
      */
     get throwNestedExceptionFromUsecase(): ThrowNestedExceptionFromUsecaseRequestBuilder;
     /**
+     * The throwSqlTimeout property
+     */
+    get throwSqlTimeout(): ThrowSqlTimeoutRequestBuilder;
+    /**
      * The validationErrorEndpoint property
      */
     get validationErrorEndpoint(): ValidationErrorEndpointRequestBuilder;
@@ -73,6 +79,9 @@ export const TestErrorRequestBuilderNavigationMetadata: Record<Exclude<keyof Tes
     },
     throwNestedExceptionFromUsecase: {
         requestsMetadata: ThrowNestedExceptionFromUsecaseRequestBuilderRequestsMetadata,
+    },
+    throwSqlTimeout: {
+        requestsMetadata: ThrowSqlTimeoutRequestBuilderRequestsMetadata,
     },
     validationErrorEndpoint: {
         requestsMetadata: ValidationErrorEndpointRequestBuilderRequestsMetadata,

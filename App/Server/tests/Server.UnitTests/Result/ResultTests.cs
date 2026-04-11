@@ -3,7 +3,7 @@
 namespace Server.UnitTests.Result;
 
 /// <summary>
-/// Comprehensive tests for Result<T> class covering all factory methods and properties.
+/// Comprehensive tests for Result class covering all factory methods and properties.
 /// </summary>
 public class ResultTests
 {
