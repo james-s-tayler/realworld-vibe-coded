@@ -1,6 +1,6 @@
 services:
   api:
-    image: conduit-localdev-api:local
+    image: conduit-localdev-api:${IMAGE_TAG:-local}
     build:
       context: ../../
       dockerfile: Task/LocalDev/Dockerfile.publish
@@ -14,9 +14,10 @@ services:
       Serilog__WriteTo__1__Args__Path: /app/Logs/RunLocalPublish/Server.Web/Serilog/logs.json
       Serilog__WriteTo__2__Args__ServerUrl: http://seq:80
       OpenTelemetry__OtlpEndpoint: "http://jaeger:4317"
+      CookieSuffix: "${COOKIE_SUFFIX:-}"
     ports:
-      - "5000:5000"
-      - "5001:5001"
+      - "${PORT_API_HTTP:-5000}:5000"
+      - "${PORT_API_HTTPS:-5001}:5001"
     volumes:
       - ../../Logs:/app/Logs
     healthcheck:
@@ -31,4 +32,4 @@ services:
 networks:
   app-network:
     external: true
-    name: app-network
+    name: ${NETWORK_NAME:-app-network}

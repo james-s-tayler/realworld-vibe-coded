@@ -65,7 +65,7 @@ public partial class Build
 
   internal void ResetDatabase()
   {
-    if (DoesDockerVolumeExist(Constants.Docker.Volumes.SqlServer))
+    if (DoesDockerVolumeExist(SqlServerVolumeName))
     {
       Log.Information("Detected SQL Server docker volume. Removing volume to reset database...");
       RemoveSqlServerVolume();
@@ -95,11 +95,18 @@ public partial class Build
     {
       // Stop any running containers first
       Log.Information("Stopping SQL Server container if running...");
-      DockerTasks.Docker($"compose -f {DockerComposeDependencies} -p {Constants.Docker.Projects.DevDependencies} down", workingDirectory: RootDirectory);
+      var envVars = GetWorktreeEnvVars();
+      var args = $"compose -f {DockerComposeDependencies} -p {ScopedProjectName(Constants.Docker.Projects.DevDependencies)} down";
+      var process = ProcessTasks.StartProcess(
+        "docker",
+        args,
+        workingDirectory: RootDirectory,
+        environmentVariables: envVars);
+      process.WaitForExit();
 
       // Remove the volume
       Log.Information("Removing SQL Server docker volume...");
-      DockerTasks.DockerVolumeRm(_ => _.SetVolumes(Constants.Docker.Volumes.SqlServer));
+      DockerTasks.DockerVolumeRm(_ => _.SetVolumes(SqlServerVolumeName));
 
       Log.Information("✓ SQL Server database reset complete - docker volume removed");
     }

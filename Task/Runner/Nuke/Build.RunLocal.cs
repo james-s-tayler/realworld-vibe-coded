@@ -4,7 +4,6 @@ using Nuke;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
-using Nuke.Common.Tools.Docker;
 using Nuke.Common.Tools.Npm;
 using Serilog;
 using static Nuke.Common.Tools.Npm.NpmTasks;
@@ -26,17 +25,18 @@ public partial class Build
     .Executes(() =>
     {
       Log.Information("Starting local development environment with Docker Compose (hot-reload)...");
+      LogWorktreeInfo();
 
       var hotReloadComposeFile = TaskLocalDevDirectory / "docker-compose.hot-reload.yml";
 
-      var envVars = new Dictionary<string, string>
+      var envVars = new Dictionary<string, string>(GetWorktreeEnvVars())
       {
         ["DOCKER_BUILDKIT"] = "1",
       };
 
       // Run docker-compose to start dev dependencies and API with hot-reload
       Log.Information("Running Docker Compose for local development with hot-reload...");
-      var args = $"compose -f {hotReloadComposeFile} -p {Constants.Docker.Projects.App} up --build";
+      var args = $"compose -f {hotReloadComposeFile} -p {ScopedProjectName(Constants.Docker.Projects.App)} up --build";
       var process = ProcessTasks.StartProcess(
         "docker",
         args,
@@ -53,14 +53,16 @@ public partial class Build
     .Executes(() =>
     {
       Log.Information("Starting local development environment with Docker Compose (published artifact)...");
+      LogWorktreeInfo();
 
-      var envVars = new Dictionary<string, string>
+      var envVars = new Dictionary<string, string>(GetWorktreeEnvVars())
       {
         ["DOCKER_BUILDKIT"] = "1",
       };
 
+      var detached = Agent ? " -d" : string.Empty;
       Log.Information("Running Docker Compose for local development with published artifact...");
-      var args = $"compose -f {DockerComposePublish} -p {Constants.Docker.Projects.App} up --build";
+      var args = $"compose -f {DockerComposePublish} -p {ScopedProjectName(Constants.Docker.Projects.App)} up --build{detached}";
       var process = ProcessTasks.StartProcess(
             "docker",
             args,
@@ -74,7 +76,14 @@ public partial class Build
     .Executes(() =>
     {
       Log.Information("Stopping local published app containers...");
-      DockerTasks.Docker($"compose -f {DockerComposePublish} -p {Constants.Docker.Projects.App} down", workingDirectory: RootDirectory);
+      var envVars = GetWorktreeEnvVars();
+      var args = $"compose -f {DockerComposePublish} -p {ScopedProjectName(Constants.Docker.Projects.App)} down";
+      var process = ProcessTasks.StartProcess(
+        "docker",
+        args,
+        workingDirectory: RootDirectory,
+        environmentVariables: envVars);
+      process.WaitForExit();
     });
 
   internal Target RunLocalDependencies => _ => _
@@ -84,15 +93,15 @@ public partial class Build
     {
       Log.Information("Starting dev dependencies");
 
-      var envVars = new Dictionary<string, string>
+      var envVars = new Dictionary<string, string>(GetWorktreeEnvVars())
       {
         ["DOCKER_BUILDKIT"] = "1",
       };
 
       try
       {
-        Log.Information("Running Docker Compose for local development with published artifact...");
-        var args = $"compose -f {DockerComposeDependencies} -p {Constants.Docker.Projects.DevDependencies} up -d";
+        Log.Information("Running Docker Compose for dev dependencies...");
+        var args = $"compose -f {DockerComposeDependencies} -p {ScopedProjectName(Constants.Docker.Projects.DevDependencies)} up -d";
         var process = ProcessTasks.StartProcess(
           "docker",
           args,
@@ -108,11 +117,18 @@ public partial class Build
     });
 
   internal Target RunLocalDependenciesDown => _ => _
-    .Description("stop dev dependencies")
+    .Description("Stop dev dependencies")
     .Executes(() =>
     {
       Log.Information("Stopping dev dependencies");
-      DockerTasks.Docker($"compose -f {DockerComposeDependencies} -p {Constants.Docker.Projects.DevDependencies} down", workingDirectory: RootDirectory);
+      var envVars = GetWorktreeEnvVars();
+      var args = $"compose -f {DockerComposeDependencies} -p {ScopedProjectName(Constants.Docker.Projects.DevDependencies)} down";
+      var process = ProcessTasks.StartProcess(
+        "docker",
+        args,
+        workingDirectory: RootDirectory,
+        environmentVariables: envVars);
+      process.WaitForExit();
     });
 
   internal Target RunLocalClient => _ => _
@@ -120,10 +136,13 @@ public partial class Build
     .DependsOn(InstallClient)
     .Executes(() =>
     {
-      Log.Information($"Starting Vite dev server in {ClientDirectory}");
+      var offset = Constants.Worktree.GetPortOffset(RootDirectory);
+      var apiPort = 5000 + offset;
+      Log.Information("Starting Vite dev server in {ClientDirectory} (API proxy → http://localhost:{ApiPort})", ClientDirectory, apiPort);
       NpmRun(s => s
         .SetProcessWorkingDirectory(ClientDirectory)
-        .SetCommand("dev"));
+        .SetCommand("dev")
+        .SetProcessEnvironmentVariable("VITE_API_URL", $"http://localhost:{apiPort}"));
     });
 
   internal Target RunLocalDocsMcpServerUp => _ => _
@@ -146,13 +165,14 @@ public partial class Build
 
       // Start Docs MCP Server in the background
       Log.Information("Starting Docs MCP Server in the background...");
-      var mcpProcess = StartBackgroundProcess("npx", "--yes @arabold/docs-mcp-server@latest");
+      var mcpProcess = StartBackgroundProcess("npx", $"--yes @arabold/docs-mcp-server@latest --port {DocsMcpPort}");
       DocsMcpPidFile.WriteAllText(mcpProcess.Id.ToString());
       Log.Information("Docs MCP Server started with PID: {PID}", mcpProcess.Id);
 
       // Wait for the server to be available
-      Log.Information("Waiting for Docs MCP Server to be available at http://127.0.0.1:6280...");
-      if (!WaitForHttpEndpoint("http://127.0.0.1:6280", timeoutSeconds: 15))
+      var mcpUrl = $"http://127.0.0.1:{DocsMcpPort}";
+      Log.Information("Waiting for Docs MCP Server to be available at {Url}...", mcpUrl);
+      if (!WaitForHttpEndpoint(mcpUrl, timeoutSeconds: 15))
       {
         Log.Error("Docs MCP Server did not become available within the timeout period");
 
@@ -162,7 +182,7 @@ public partial class Build
         throw new Exception("Docs MCP Server failed to start - try run npx @arabold/docs-mcp-server@latest");
       }
 
-      Log.Information("✓ Docs MCP Server is available at http://127.0.0.1:6280");
+      Log.Information("✓ Docs MCP Server is available at {Url}", mcpUrl);
 
       // Check if ngrok is available
       if (!IsCommandAvailable("ngrok"))
@@ -171,14 +191,14 @@ public partial class Build
         Log.Warning("Install ngrok from https://ngrok.com/download");
         Log.Warning("Continuing without ngrok...");
         Log.Information("✓ Docs MCP Server started successfully (without ngrok)");
-        Log.Information("  Docs MCP Server: http://127.0.0.1:6280");
+        Log.Information("  Docs MCP Server: http://127.0.0.1:{Port}", DocsMcpPort);
         Log.Information("  PID files stored in: {PidDirectory}", PidDirectory);
         return;
       }
 
       // Start ngrok in the background
       Log.Information("Starting ngrok in the background...");
-      var ngrokProcess = StartBackgroundProcess("ngrok", "http 6280 --url noncognizably-chartographical-fae.ngrok-free.app");
+      var ngrokProcess = StartBackgroundProcess("ngrok", $"http {DocsMcpPort} --url noncognizably-chartographical-fae.ngrok-free.app");
       NgrokPidFile.WriteAllText(ngrokProcess.Id.ToString());
       Log.Information("ngrok started with PID: {PID}", ngrokProcess.Id);
 
@@ -187,7 +207,7 @@ public partial class Build
       System.Threading.Thread.Sleep(3000);
 
       Log.Information("✓ Services started successfully");
-      Log.Information("  Docs MCP Server: http://127.0.0.1:6280");
+      Log.Information("  Docs MCP Server: http://127.0.0.1:{Port}", DocsMcpPort);
       Log.Information("  ngrok: https://noncognizably-chartographical-fae.ngrok-free.app");
       Log.Information("  PID files stored in: {PidDirectory}", PidDirectory);
     });
@@ -248,9 +268,9 @@ public partial class Build
       Log.Information("Verifying services are stopped...");
       System.Threading.Thread.Sleep(1000);
 
-      if (IsHttpEndpointAvailable("http://127.0.0.1:6280"))
+      if (IsHttpEndpointAvailable($"http://127.0.0.1:{DocsMcpPort}"))
       {
-        var error = "Docs MCP Server is still accessible at http://127.0.0.1:6280";
+        var error = $"Docs MCP Server is still accessible at http://127.0.0.1:{DocsMcpPort}";
         Log.Error(error);
         errors.Add(error);
       }
