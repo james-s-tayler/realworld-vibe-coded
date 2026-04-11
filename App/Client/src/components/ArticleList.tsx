@@ -3,7 +3,7 @@ import { Loading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { ArticlePreview } from './ArticlePreview';
 import type { Article } from '../types/article';
-import './ArticleList.css';
+import './ArticleList.scss';
 
 interface ArticleListProps {
   articles: Article[];

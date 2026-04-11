@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tag, SkeletonText } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import './TagList.css';
+import './TagList.scss';
 
 interface TagListProps {
   tags: string[];

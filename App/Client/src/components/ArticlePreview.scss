@@ -1,13 +1,15 @@
+@use '@carbon/react/scss/spacing' as *;
+
 .article-preview {
-  padding: 1.5rem 0;
-  border-bottom: 1px solid #e5e5e5;
+  padding: $spacing-06 0;
+  border-bottom: 1px solid var(--cds-border-subtle);
 }
 
 .article-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: $spacing-05;
 }
 
 .author-info {
@@ -21,7 +23,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  margin-right: 0.5rem;
+  margin-right: $spacing-03;
 }
 
 .author-details {
@@ -30,26 +32,24 @@
 }
 
 .author-name {
-  color: #5cb85c;
+  color: var(--cds-link-primary);
   font-weight: 500;
   font-size: 0.9rem;
   overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
 }
 
 .article-date {
-  color: #bbb;
+  color: var(--cds-text-placeholder);
   font-size: 0.8rem;
 }
 
 .favorite-button {
-  color: #5cb85c;
-  border: 1px solid #5cb85c;
+  color: var(--cds-link-primary);
+  border: 1px solid var(--cds-link-primary);
 }
 
 .favorite-button.favorited {
-  background-color: #5cb85c;
+  background-color: var(--cds-link-primary);
   color: white;
 }
 
@@ -62,20 +62,16 @@
 .article-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #373a3c;
-  margin-bottom: 0.5rem;
+  color: var(--cds-text-primary);
+  margin-bottom: $spacing-03;
   overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
 }
 
 .article-description {
   font-size: 1rem;
-  color: #999;
-  margin-bottom: 1rem;
+  color: var(--cds-text-secondary);
+  margin-bottom: $spacing-05;
   overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
 }
 
 .article-footer {
@@ -85,12 +81,12 @@
 }
 
 .read-more {
-  color: #bbb;
+  color: var(--cds-text-placeholder);
   font-size: 0.8rem;
 }
 
 .article-tags {
   display: flex;
-  gap: 0.25rem;
+  gap: $spacing-02;
   flex-wrap: wrap;
 }

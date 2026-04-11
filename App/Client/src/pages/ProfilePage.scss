@@ -1,3 +1,5 @@
+@use '@carbon/react/scss/spacing' as *;
+
 .profile-page {
   min-height: 100vh;
 }
@@ -10,8 +12,8 @@
 }
 
 .user-info {
-  background: #f3f3f3;
-  padding: 2rem 0;
+  background: var(--cds-layer-01);
+  padding: $spacing-07 0;
   text-align: center;
 }
 
@@ -19,23 +21,18 @@
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  margin-bottom: 1rem;
+  margin-bottom: $spacing-05;
 }
 
 .user-info h4 {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: $spacing-03;
   overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
 }
 
 .user-info p {
-  color: #999;
-  margin-bottom: 1rem;
+  color: var(--cds-text-secondary);
+  margin-bottom: $spacing-05;
   overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
 }
-

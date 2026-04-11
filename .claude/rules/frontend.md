@@ -46,10 +46,16 @@ The generated API client (`src/api/generated/`) is the **type contract** between
 
 ## Carbon Design System — Styling Rules
 
+**All custom styles use SCSS (`.scss` files), not plain CSS.** This enables direct use of Carbon's SCSS tokens.
+
+- **Spacing:** `@use '@carbon/react/scss/spacing' as *;` then use `$spacing-05`, `$spacing-07`, etc. These are SCSS-only — Carbon does NOT emit `--cds-spacing-*` CSS custom properties.
+- **Colors:** Use `var(--cds-text-primary)`, `var(--cds-layer-01)`, etc. These ARE real CSS custom properties emitted by Carbon's theme system.
+- **Never use hard-coded hex colors or arbitrary rem/px spacing values.** `stylelint-plugin-carbon-tokens` enforces this via `LintClientStylelintVerify`.
+
 **Never write direct CSS overrides for Carbon components.** Before adding custom CSS for colors, theming, hover states, or layout of any Carbon component:
 1. Research the Carbon-native approach first (e.g., `Theme` component for scoped theming, component props like `kind`, `size`, design tokens)
 2. Use Carbon's `Theme` component (`theme="g100"`, `"g90"`, `"g10"`, `"white"`) for dark/light zones — not manual background/color overrides
-3. Only add custom CSS for layout concerns (positioning, sizing, spacing) that Carbon doesn't handle
+3. Only add custom CSS for layout concerns (positioning, sizing) that Carbon doesn't handle
 
 ## Common Gotchas
 
@@ -62,7 +68,7 @@ Before implementing a frontend page/component:
 1. Check generated types in `src/api/generated/models/` — know what fields are available
 2. Check existing components in `src/components/` — reuse before creating new ones
 3. Check existing API modules in `src/api/` — extend before creating new ones
-4. Check existing CSS classes in stylesheets — use before adding new ones
+4. Check existing SCSS classes in stylesheets — use before adding new ones
 
 After implementing:
 1. Verify with `./build.sh BuildClient` (auto-regenerates Kiota types)

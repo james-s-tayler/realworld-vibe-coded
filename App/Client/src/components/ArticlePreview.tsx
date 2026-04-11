@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type { Article } from '../types/article';
 import { DEFAULT_PROFILE_IMAGE } from '../constants';
 import { truncateUsername } from '../utils/textUtils';
-import './ArticlePreview.css';
+import './ArticlePreview.scss';
 
 interface ArticlePreviewProps {
   article: Article;

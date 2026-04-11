@@ -44,7 +44,7 @@ import { Add, FavoriteFilled, Favorite, UserFollow, Settings } from '@carbon/ico
 - `Tag`: supports `onClick`, `size="sm"`; `Pagination`: for article list pagination
 - `OverflowMenu`: use `iconDescription` (NOT `aria-label`) to set the trigger button's accessible name. `aria-label` on `<OverflowMenu>` does NOT propagate to the rendered button — Playwright and screen readers won't see it.
 
-## CSS Classes (from existing stylesheets)
+## SCSS Classes (from existing stylesheets)
 
 - `.article-preview` — Card container; `.article-meta`, `.author-info`, `.author-image` — Author
 - `.article-title`, `.article-description`, `.article-footer` — Content

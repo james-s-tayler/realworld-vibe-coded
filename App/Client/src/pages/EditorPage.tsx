@@ -14,7 +14,7 @@ import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
 import { ARTICLE_CONSTRAINTS, TAG_CONSTRAINTS } from '../constants';
-import './EditorPage.css';
+import './EditorPage.scss';
 
 export const EditorPage: React.FC = () => {
   const { t } = useTranslation();

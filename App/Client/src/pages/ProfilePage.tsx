@@ -15,7 +15,7 @@ import type { Profile } from '../types/article';
 import type { Article } from '../types/article';
 import { DEFAULT_PROFILE_IMAGE } from '../constants';
 import { truncateUsername } from '../utils/textUtils';
-import './ProfilePage.css';
+import './ProfilePage.scss';
 
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];

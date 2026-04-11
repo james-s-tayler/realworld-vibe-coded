@@ -27,7 +27,7 @@ import { usersApi, type User } from '../api/users';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { ApiError } from '../api/client';
-import './UsersPage.css';
+import './UsersPage.scss';
 
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50];

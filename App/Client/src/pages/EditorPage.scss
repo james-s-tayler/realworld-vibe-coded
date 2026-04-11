@@ -1,11 +1,13 @@
+@use '@carbon/react/scss/spacing' as *;
+
 .editor-page {
   min-height: calc(100vh - 56px);
-  padding: 1.5rem 0;
+  padding: $spacing-06 0;
 }
 
 .editor-page .tag-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: $spacing-03;
+  margin-top: $spacing-03;
 }

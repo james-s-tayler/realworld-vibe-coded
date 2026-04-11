@@ -12,7 +12,7 @@ import { useAuth } from '../hooks/useAuth';
 import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
 import { type AppError, normalizeError } from '../utils/errors';
-import './AuthPages.css';
+import './AuthPages.scss';
 
 interface LoginState {
   error: AppError | null;

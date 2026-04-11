@@ -1,0 +1,40 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-plugin-carbon-tokens/config/recommended"
+  ],
+  "plugins": [
+    "stylelint-plugin-carbon-tokens"
+  ],
+  "rules": {
+    "selector-class-pattern": null,
+    "carbon/theme-use": [
+      true,
+      {
+        "acceptCarbonCustomProp": true,
+        "acceptValues": [
+          "/inherit|initial|none|unset/",
+          "/currentColor|transparent/",
+          "white",
+          "/rgb\\(/",
+          "/^0$/"
+        ],
+        "severity": "error"
+      }
+    ],
+    "carbon/layout-use": [
+      true,
+      {
+        "acceptCarbonCustomProp": true,
+        "acceptValues": [
+          "/var\\(--header-height\\)/",
+          "/var\\(--sidebar-width\\)/",
+          "/^0$/",
+          "auto"
+        ],
+        "severity": "error"
+      }
+    ],
+    "carbon/type-use": null
+  }
+}

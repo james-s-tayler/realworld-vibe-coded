@@ -11,7 +11,7 @@ import { TagList } from '../components/TagList';
 import { PageShell } from '../components/PageShell';
 import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
-import './HomePage.css';
+import './HomePage.scss';
 
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
