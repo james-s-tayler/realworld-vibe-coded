@@ -19,6 +19,7 @@ export interface UserRequestBuilder extends BaseRequestBuilder<UserRequestBuilde
      * @throws {ProblemDetails} error when the service returns a 404 status code
      * @throws {ProblemDetails} error when the service returns a 409 status code
      * @throws {ProblemDetails} error when the service returns a 500 status code
+     * @throws {ProblemDetails} error when the service returns a 503 status code
      */
      get(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<UserCurrentResponse | undefined>;
     /**
@@ -32,6 +33,7 @@ export interface UserRequestBuilder extends BaseRequestBuilder<UserRequestBuilde
      * @throws {ProblemDetails} error when the service returns a 404 status code
      * @throws {ProblemDetails} error when the service returns a 409 status code
      * @throws {ProblemDetails} error when the service returns a 500 status code
+     * @throws {ProblemDetails} error when the service returns a 503 status code
      */
      put(body: UpdateUserRequest, requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<UpdateUserResponse | undefined>;
     /**
@@ -65,6 +67,7 @@ export const UserRequestBuilderRequestsMetadata: RequestsMetadata = {
             404: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             409: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             500: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
+            503: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
         },
         adapterMethodName: "send",
         responseBodyFactory:  createUserCurrentResponseFromDiscriminatorValue,
@@ -79,6 +82,7 @@ export const UserRequestBuilderRequestsMetadata: RequestsMetadata = {
             404: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             409: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
             500: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
+            503: createProblemDetailsFromDiscriminatorValue as ParsableFactory<Parsable>,
         },
         adapterMethodName: "send",
         responseBodyFactory:  createUpdateUserResponseFromDiscriminatorValue,
