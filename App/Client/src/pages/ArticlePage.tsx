@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
-import { Button, TextArea, Loading, InlineNotification, Tile, Tag, IconButton } from '@carbon/react';
+import { Button, TextArea, Loading, Tile, Tag, IconButton } from '@carbon/react';
 import { FavoriteFilled, Favorite, Edit, TrashCan } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
+import { useToast } from '../hooks/useToast';
 import { articlesApi } from '../api/articles';
 import { commentsApi } from '../api/comments';
 import { profilesApi } from '../api/profiles';
@@ -96,6 +97,7 @@ export const ArticlePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { requireAuth } = useRequireAuth();
+  const { showToast } = useToast();
   const [article, setArticle] = useState<Article | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,15 +113,13 @@ export const ArticlePage: React.FC = () => {
       const response = await articlesApi.getArticle(slug);
       setArticle(response.article);
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('article.notFoundMessage'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('article.notFoundMessage');
+      setError(message);
+      showToast({ kind: 'error', title: t('article.notFound'), subtitle: message });
     } finally {
       setLoading(false);
     }
-  }, [slug, t]);
+  }, [slug, t, showToast]);
 
   const loadComments = useCallback(async () => {
     if (!slug) return;
@@ -127,13 +127,10 @@ export const ArticlePage: React.FC = () => {
       const response = await commentsApi.getComments(slug);
       setComments(response.comments);
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('article.failedToLoadComments'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('article.failedToLoadComments');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     }
-  }, [slug, t]);
+  }, [slug, t, showToast]);
 
   useEffect(() => {
     loadArticle();
@@ -151,11 +148,8 @@ export const ArticlePage: React.FC = () => {
         return response;
       });
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('article.failedToFavorite'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('article.failedToFavorite');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     }
   };
 
@@ -170,11 +164,8 @@ export const ArticlePage: React.FC = () => {
         return response;
       });
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('article.failedToFollow'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('article.failedToFollow');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     }
   };
 
@@ -184,11 +175,8 @@ export const ArticlePage: React.FC = () => {
       await articlesApi.deleteArticle(article.slug);
       navigate('/');
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('article.failedToDelete'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('article.failedToDelete');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     }
   };
 
@@ -201,11 +189,8 @@ export const ArticlePage: React.FC = () => {
       setComments([response.comment, ...comments]);
       setCommentBody('');
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('article.failedToComment'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('article.failedToComment');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     } finally {
       setSubmitting(false);
     }
@@ -217,11 +202,8 @@ export const ArticlePage: React.FC = () => {
       await commentsApi.deleteComment(slug, id);
       setComments(comments.filter(c => c.id !== id));
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('article.failedToDeleteComment'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('article.failedToDeleteComment');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     }
   };
 
@@ -236,11 +218,7 @@ export const ArticlePage: React.FC = () => {
   if (!article) {
     return (
       <PageShell className="article-page" columnLayout="full">
-        <InlineNotification
-          kind="error"
-          title={t('article.notFound')}
-          subtitle={error || t('article.notFoundMessage')}
-        />
+        <p>{error || t('article.notFoundMessage')}</p>
       </PageShell>
     );
   }
@@ -263,15 +241,6 @@ export const ArticlePage: React.FC = () => {
       }
     >
       <div className="container">
-        {error && (
-          <InlineNotification
-            kind="error"
-            title={t('error.title')}
-            subtitle={error}
-            lowContrast
-            onCloseButtonClick={() => setError(null)}
-          />
-        )}
         <div className="article-content">
           <div className="article-body">
             {article.body.split('\n').map((paragraph, index) => (

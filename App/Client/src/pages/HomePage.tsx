@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, InlineNotification, Pagination } from '@carbon/react';
+import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, Pagination } from '@carbon/react';
+import { useToast } from '../hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
@@ -31,6 +32,7 @@ export const HomePage: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { requireAuth } = useRequireAuth();
+  const { showToast } = useToast();
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesCount, setArticlesCount] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
@@ -39,7 +41,6 @@ export const HomePage: React.FC = () => {
   // Default to "Your Feed" (index 0)
   const [activeTab, setActiveTab] = useState(0);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
@@ -50,18 +51,17 @@ export const HomePage: React.FC = () => {
       setTags(response.tags);
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
+        showToast({ kind: 'error', title: t('error.title'), subtitle: err.errors.join(', ') });
       } else {
-        setError(t('home.failedToLoadTags'));
+        showToast({ kind: 'error', title: t('error.title'), subtitle: t('home.failedToLoadTags') });
       }
     } finally {
       setTagsLoading(false);
     }
-  }, [t]);
+  }, [t, showToast]);
 
   const loadArticles = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       let response;
       const offset = (currentPage - 1) * pageSize;
@@ -77,17 +77,16 @@ export const HomePage: React.FC = () => {
       }
       setArticles(response.articles);
       setArticlesCount(response.articlesCount);
-    } catch (error) {
-      console.error('Failed to load articles:', error);
-      if (error instanceof ApiError) {
-        setError(error.errors.join(', '));
+    } catch (err) {
+      if (err instanceof ApiError) {
+        showToast({ kind: 'error', title: t('error.title'), subtitle: err.errors.join(', ') });
       } else {
-        setError('Failed to load articles');
+        showToast({ kind: 'error', title: t('error.title'), subtitle: t('home.failedToLoadTags') });
       }
     } finally {
       setLoading(false);
     }
-  }, [activeTab, selectedTag, user, currentPage, pageSize]);
+  }, [activeTab, selectedTag, user, currentPage, pageSize, t, showToast]);
 
   useEffect(() => {
     loadTags();
@@ -106,9 +105,9 @@ export const HomePage: React.FC = () => {
       });
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
+        showToast({ kind: 'error', title: t('error.title'), subtitle: err.errors.join(', ') });
       } else {
-        setError(t('home.failedToFavorite'));
+        showToast({ kind: 'error', title: t('error.title'), subtitle: t('home.failedToFavorite') });
       }
     }
   };
@@ -122,9 +121,9 @@ export const HomePage: React.FC = () => {
       });
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
+        showToast({ kind: 'error', title: t('error.title'), subtitle: err.errors.join(', ') });
       } else {
-        setError(t('home.failedToUnfavorite'));
+        showToast({ kind: 'error', title: t('error.title'), subtitle: t('home.failedToUnfavorite') });
       }
     }
   };
@@ -164,15 +163,6 @@ export const HomePage: React.FC = () => {
       banner={<HomeBanner />}
       sidebar={sidebarContent}
     >
-      {error && (
-        <InlineNotification
-          kind="error"
-          title={t('error.title')}
-          subtitle={error}
-          lowContrast
-          onCloseButtonClick={() => setError(null)}
-        />
-      )}
       <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
         <TabList aria-label={t('home.articleFeeds')}>
           <Tab>{t('home.yourFeed')}</Tab>

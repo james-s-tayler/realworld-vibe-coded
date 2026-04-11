@@ -5,12 +5,12 @@ import {
   TextArea,
   PasswordInput,
   Button,
-  InlineNotification,
   Stack,
   Dropdown,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
 import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
@@ -20,13 +20,13 @@ import './SettingsPage.css';
 export const SettingsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user, updateUser } = useAuth();
+  const { showToast } = useToast();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [image, setImage] = useState('');
   const [password, setPassword] = useState('');
   const [language, setLanguage] = useState(i18n.language);
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -59,7 +59,7 @@ export const SettingsPage: React.FC = () => {
 
   const { error, loading, execute, clearError } = useApiCall(updateApi, {
     onSuccess: () => {
-      setSuccess(true);
+      showToast({ kind: 'success', title: t('settings.success'), subtitle: t('settings.successMessage') });
       setPassword('');
       i18n.changeLanguage(language);
     },
@@ -67,7 +67,6 @@ export const SettingsPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSuccess(false);
     await execute();
   };
 
@@ -85,16 +84,6 @@ export const SettingsPage: React.FC = () => {
         error={error}
         onClose={clearError}
       />
-
-      {success && (
-        <InlineNotification
-          kind="success"
-          title={t('settings.success')}
-          subtitle={t('settings.successMessage')}
-          onCloseButtonClick={() => setSuccess(false)}
-          className="settings-notification"
-        />
-      )}
 
       <Form onSubmit={handleSubmit}>
         <Stack gap={6}>

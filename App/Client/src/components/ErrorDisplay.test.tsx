@@ -1,9 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render } from '@testing-library/react';
 import { ErrorDisplay } from './ErrorDisplay';
 import { AppError } from '../utils/errors';
 import { ApiError } from '../api/client';
+
+const mockShowToast = vi.fn().mockReturnValue('toast-id');
+const mockRemoveToast = vi.fn();
+vi.mock('../hooks/useToast', () => ({
+  useToast: () => ({ showToast: mockShowToast, removeToast: mockRemoveToast, toasts: [] }),
+}));
 
 describe('ErrorDisplay', () => {
   beforeEach(() => {
@@ -14,67 +19,71 @@ describe('ErrorDisplay', () => {
     it('renders nothing when error is null', () => {
       const { container } = render(<ErrorDisplay error={null} />);
       expect(container.firstChild).toBeNull();
+      expect(mockShowToast).not.toHaveBeenCalled();
     });
 
-    it('renders nothing when show is false', () => {
-      const appError: AppError = {
-        type: 'general',
-        title: 'Error',
-        messages: ['Some error']
-      };
-      const { container } = render(<ErrorDisplay error={appError} show={false} />);
-      expect(container.firstChild).toBeNull();
-    });
-
-    it('renders error notification when AppError is provided', () => {
+    it('calls showToast when AppError is provided', () => {
       const appError: AppError = {
         type: 'general',
         title: 'Error',
         messages: ['Something went wrong']
       };
       render(<ErrorDisplay error={appError} />);
-      expect(screen.getByTestId('error-display')).toBeInTheDocument();
-      expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith({
+        kind: 'error',
+        title: 'Error',
+        subtitle: 'Something went wrong',
+      });
     });
 
-    it('renders nothing when messages array is empty', () => {
+    it('does not call showToast when messages array is empty', () => {
       const appError: AppError = {
         type: 'general',
         title: 'Error',
         messages: []
       };
-      const { container } = render(<ErrorDisplay error={appError} />);
-      expect(container.firstChild).toBeNull();
+      render(<ErrorDisplay error={appError} />);
+      expect(mockShowToast).not.toHaveBeenCalled();
     });
   });
 
   describe('error normalization', () => {
     it('normalizes string error correctly', () => {
       render(<ErrorDisplay error="A simple error message" />);
-      expect(screen.getByText(/a simple error message/i)).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ subtitle: expect.stringContaining('A simple error message') })
+      );
     });
 
     it('normalizes string array errors and joins with commas', () => {
       render(<ErrorDisplay error={['Error 1', 'Error 2', 'Error 3']} />);
-      expect(screen.getByText(/error 1, error 2, error 3/i)).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ subtitle: 'Error 1, Error 2, Error 3' })
+      );
     });
 
     it('normalizes Error object correctly', () => {
       const error = new Error('JavaScript error message');
       render(<ErrorDisplay error={error} />);
-      expect(screen.getByText(/javascript error message/i)).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ subtitle: expect.stringContaining('JavaScript error message') })
+      );
     });
 
     it('normalizes ApiError correctly', () => {
       const apiError = new ApiError(422, ['Title: has already been taken'], 'Bad Request');
       render(<ErrorDisplay error={apiError} />);
-      expect(screen.getByText(/title: has already been taken/i)).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ subtitle: expect.stringContaining('Title: has already been taken') })
+      );
     });
 
     it('displays multiple ApiError errors joined with commas', () => {
       const apiError = new ApiError(422, ['Title: is required', 'Body: is required'], 'Bad Request');
       render(<ErrorDisplay error={apiError} />);
-      expect(screen.getByText(/title: is required, body: is required/i)).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ subtitle: 'Title: is required, Body: is required' })
+      );
     });
   });
 
@@ -86,95 +95,66 @@ describe('ErrorDisplay', () => {
         messages: ['Field is required']
       };
       render(<ErrorDisplay error={appError} />);
-      expect(screen.getByText(/custom title/i)).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Custom Title' })
+      );
     });
 
     it('uses title from ApiError when available', () => {
       const apiError = new ApiError(422, ['Field is required'], 'Bad Request');
       render(<ErrorDisplay error={apiError} />);
-      expect(screen.getByText(/bad request/i)).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Bad Request' })
+      );
     });
 
     it('falls back to error type title when ApiError has no title', () => {
       const apiError = new ApiError(401, ['Invalid credentials']);
       render(<ErrorDisplay error={apiError} />);
-      expect(screen.getByText(/authentication error/i)).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Authentication Error' })
+      );
     });
 
     it('shows "Server Error" title for 500 status', () => {
       const apiError = new ApiError(500, ['Internal server error']);
       render(<ErrorDisplay error={apiError} />);
-      expect(screen.getByText('Server Error')).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Server Error' })
+      );
     });
 
     it('shows "Error" title for non-ApiError errors', () => {
       render(<ErrorDisplay error="Generic error" />);
-      expect(screen.getByText('Error')).toBeInTheDocument();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Error' })
+      );
     });
   });
 
-  describe('close button', () => {
-    it('calls onClose callback when close button is clicked', async () => {
-      const user = userEvent.setup();
-      const mockOnClose = vi.fn();
+  describe('cleanup', () => {
+    it('removes toast when error changes to null', () => {
       const appError: AppError = {
         type: 'general',
         title: 'Error',
         messages: ['Some error']
       };
-      render(<ErrorDisplay error={appError} onClose={mockOnClose} />);
-      
-      const closeButton = screen.getByRole('button', { name: /close/i });
-      await user.click(closeButton);
-      
-      expect(mockOnClose).toHaveBeenCalledTimes(1);
-    });
-  });
+      const { rerender } = render(<ErrorDisplay error={appError} />);
+      expect(mockShowToast).toHaveBeenCalled();
 
-  describe('accessibility', () => {
-    it('has aria-live attribute for screen readers', () => {
-      const appError: AppError = {
-        type: 'general',
-        title: 'Error',
-        messages: ['Some error']
-      };
-      render(<ErrorDisplay error={appError} />);
-      const notification = screen.getByTestId('error-display');
-      expect(notification).toHaveAttribute('aria-live', 'polite');
+      rerender(<ErrorDisplay error={null} />);
+      expect(mockRemoveToast).toHaveBeenCalledWith('toast-id');
     });
 
-    it('has data-testid for testing', () => {
+    it('removes toast on unmount', () => {
       const appError: AppError = {
         type: 'general',
         title: 'Error',
         messages: ['Some error']
       };
-      render(<ErrorDisplay error={appError} />);
-      expect(screen.getByTestId('error-display')).toBeInTheDocument();
-    });
-  });
-
-  describe('styling', () => {
-    it('applies custom styles', () => {
-      const appError: AppError = {
-        type: 'general',
-        title: 'Error',
-        messages: ['Some error']
-      };
-      render(<ErrorDisplay error={appError} style={{ marginTop: '2rem' }} />);
-      const notification = screen.getByTestId('error-display');
-      expect(notification).toHaveStyle({ marginTop: '2rem' });
-    });
-
-    it('always includes marginBottom style', () => {
-      const appError: AppError = {
-        type: 'general',
-        title: 'Error',
-        messages: ['Some error']
-      };
-      render(<ErrorDisplay error={appError} />);
-      const notification = screen.getByTestId('error-display');
-      expect(notification).toHaveStyle({ marginBottom: '1rem' });
+      const { unmount } = render(<ErrorDisplay error={appError} />);
+      unmount();
+      expect(mockRemoveToast).toHaveBeenCalledWith('toast-id');
     });
   });
 });

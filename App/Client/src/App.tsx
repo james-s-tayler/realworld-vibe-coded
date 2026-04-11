@@ -3,7 +3,9 @@ import { lazy, Suspense } from 'react';
 import { Loading } from '@carbon/react';
 import { AuthProvider } from './context/AuthContext';
 import { FeatureFlagProvider } from './context/FeatureFlagContext';
+import { ToastProvider } from './context/ToastContext';
 import { AppHeader } from './components/AppHeader';
+import { ToastContainer } from './components/ToastContainer';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleProtectedRoute } from './components/RoleProtectedRoute';
 
@@ -28,7 +30,9 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <FeatureFlagProvider>
+          <ToastProvider>
           <AppHeader />
+          <ToastContainer />
           <Suspense fallback={<LazyFallback />}>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
@@ -92,6 +96,7 @@ function App() {
               />
             </Routes>
           </Suspense>
+        </ToastProvider>
         </FeatureFlagProvider>
       </AuthProvider>
     </BrowserRouter>

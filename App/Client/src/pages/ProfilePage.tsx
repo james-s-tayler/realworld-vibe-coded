@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
-import { Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, InlineNotification, Pagination } from '@carbon/react';
+import { Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, Pagination } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
+import { useToast } from '../hooks/useToast';
 import { profilesApi } from '../api/profiles';
 import { articlesApi } from '../api/articles';
 import { ArticleList } from '../components/ArticleList';
@@ -66,6 +67,7 @@ export const ProfilePage: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const { requireAuth } = useRequireAuth();
+  const { showToast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesCount, setArticlesCount] = useState(0);
@@ -74,25 +76,20 @@ export const ProfilePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [articlesLoading, setArticlesLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [error, setError] = useState<string | null>(null);
 
   const loadProfile = useCallback(async () => {
     if (!username) return;
     setLoading(true);
-    setError(null);
     try {
       const response = await profilesApi.getProfile(username);
       setProfile(response.profile);
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('profile.notFound'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('profile.notFound');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     } finally {
       setLoading(false);
     }
-  }, [username, t]);
+  }, [username, t, showToast]);
 
   const loadArticles = useCallback(async () => {
     if (!username) return;
@@ -106,15 +103,12 @@ export const ProfilePage: React.FC = () => {
       setArticles(response.articles);
       setArticlesCount(response.articlesCount);
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('profile.failedToLoadArticles'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('profile.failedToLoadArticles');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     } finally {
       setArticlesLoading(false);
     }
-  }, [username, activeTab, currentPage, pageSize, t]);
+  }, [username, activeTab, currentPage, pageSize, t, showToast]);
 
   useEffect(() => {
     loadProfile();
@@ -149,11 +143,8 @@ export const ProfilePage: React.FC = () => {
         return response;
       });
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('profile.failedToFollow'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('profile.failedToFollow');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     }
   };
 
@@ -165,11 +156,8 @@ export const ProfilePage: React.FC = () => {
         return response;
       });
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('profile.failedToFavorite'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('profile.failedToFavorite');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     }
   };
 
@@ -181,11 +169,8 @@ export const ProfilePage: React.FC = () => {
         return response;
       });
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.errors.join(', '));
-      } else {
-        setError(t('profile.failedToUnfavorite'));
-      }
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('profile.failedToUnfavorite');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     }
   };
 
@@ -194,19 +179,6 @@ export const ProfilePage: React.FC = () => {
       <div className="profile-page loading">
         <Loading description={t('profile.loading')} withOverlay={false} />
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <PageShell className="profile-page">
-        <InlineNotification
-          kind="error"
-          title={t('error.title')}
-          subtitle={error}
-          lowContrast
-        />
-      </PageShell>
     );
   }
 
@@ -226,15 +198,6 @@ export const ProfilePage: React.FC = () => {
       columnLayout="wide"
       banner={<ProfileBanner profile={profile} isOwnProfile={!!isOwnProfile} onFollow={handleFollow} />}
     >
-      {error && (
-        <InlineNotification
-          kind="error"
-          title={t('error.title')}
-          subtitle={error}
-          lowContrast
-          onCloseButtonClick={() => setError(null)}
-        />
-      )}
       <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
         <TabList aria-label={t('profile.profileTabs')}>
           <Tab>{t('profile.myArticles')}</Tab>
