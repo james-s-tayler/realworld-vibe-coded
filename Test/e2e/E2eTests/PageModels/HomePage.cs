@@ -240,6 +240,7 @@ public class HomePage : BasePage
 
   public async Task VerifyArticlePreviewTagsAsync(string title, params string[] tags)
   {
+    await Expect(GetArticlePreviewByTitle(title)).ToBeVisibleAsync();
     foreach (var tag in tags)
     {
       await Expect(GetArticlePreviewTag(title, tag)).ToBeVisibleAsync();

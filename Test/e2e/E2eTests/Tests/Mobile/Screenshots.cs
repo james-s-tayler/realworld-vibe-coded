@@ -1,4 +1,4 @@
-namespace E2eTests.Tests.Mobile;
+﻿namespace E2eTests.Tests.Mobile;
 
 public class Screenshots : MobileAppPageTest
 {

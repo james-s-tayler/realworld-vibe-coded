@@ -10,6 +10,7 @@ public static class Constants
     public static class Projects
     {
       public const string App = "app";
+      public const string Server = "server";
       public const string DevDependencies = "dev-dependencies";
     }
 
