@@ -1,60 +1,76 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
+import { lazy, Suspense } from 'react';
+import { Loading } from '@carbon/react';
 import { AuthProvider } from './context/AuthContext';
 import { FeatureFlagProvider } from './context/FeatureFlagContext';
+import { ToastProvider } from './context/ToastContext';
+import { AppHeader } from './components/AppHeader';
+import { ToastContainer } from './components/ToastContainer';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleProtectedRoute } from './components/RoleProtectedRoute';
-import { AppHeader } from './components/AppHeader';
-import { DashboardPage } from './pages/DashboardPage';
-import { LoginPage } from './pages/LoginPage';
-import { RegisterPage } from './pages/RegisterPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { SettingsPage } from './pages/SettingsPage';
-import { UsersPage } from './pages/UsersPage';
-import { ForbiddenPage } from './pages/ForbiddenPage';
+
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
+const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('./pages/RegisterPage').then(m => ({ default: m.RegisterPage })));
+const ProfilePage = lazy(() => import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const UsersPage = lazy(() => import('./pages/UsersPage').then(m => ({ default: m.UsersPage })));
+const ForbiddenPage = lazy(() => import('./pages/ForbiddenPage').then(m => ({ default: m.ForbiddenPage })));
+
+const LazyFallback = () => (
+  <div className="loading-fullscreen">
+    <Loading description="Loading..." withOverlay={false} />
+  </div>
+);
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <FeatureFlagProvider>
-        <AppHeader />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/profile/:username"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <SettingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/users"
-            element={
-              <RoleProtectedRoute requiredRoles={['ADMIN']}>
-                <UsersPage />
-              </RoleProtectedRoute>
-            }
-          />
-          <Route path="/forbidden" element={<ForbiddenPage />} />
-        </Routes>
+          <ToastProvider>
+          <AppHeader />
+          <ToastContainer />
+          <Suspense fallback={<LazyFallback />}>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forbidden" element={<ForbiddenPage />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile/:username"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <SettingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/users"
+                element={
+                  <RoleProtectedRoute requiredRoles={['ADMIN']}>
+                    <UsersPage />
+                  </RoleProtectedRoute>
+                }
+              />
+            </Routes>
+          </Suspense>
+        </ToastProvider>
         </FeatureFlagProvider>
       </AuthProvider>
     </BrowserRouter>

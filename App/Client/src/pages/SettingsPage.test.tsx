@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router'
 import { SettingsPage } from './SettingsPage'
 import { AuthProvider } from '../context/AuthContext'
+import { ToastProvider } from '../context/ToastContext'
+import { ToastContainer } from '../components/ToastContainer'
 import { authApi } from '../api/auth'
 
 vi.mock('../api/auth', () => ({
@@ -26,7 +28,10 @@ function renderSettingsPage() {
   return render(
     <BrowserRouter>
       <AuthProvider>
-        <SettingsPage />
+        <ToastProvider>
+          <ToastContainer />
+          <SettingsPage />
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   )
@@ -53,7 +58,7 @@ describe('SettingsPage', () => {
   it('updates user profile successfully', async () => {
     const user = userEvent.setup()
     const updatedUser = { ...mockUser, bio: 'Completely new bio text' }
-    
+
     vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
     vi.mocked(authApi.updateUser).mockResolvedValue({ user: updatedUser })
 
@@ -78,9 +83,8 @@ describe('SettingsPage', () => {
 
   it('displays error message on update failure', async () => {
     const user = userEvent.setup()
-    
+
     vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
-    // Throw an error that normalizeError can handle
     vi.mocked(authApi.updateUser).mockRejectedValue(new Error('username has already been taken'))
 
     renderSettingsPage()
@@ -107,7 +111,7 @@ describe('SettingsPage', () => {
       bio: 'New bio',
       image: 'https://example.com/new-avatar.jpg',
     }
-    
+
     vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
     vi.mocked(authApi.updateUser).mockResolvedValue({ user: updatedUser })
 
@@ -119,10 +123,10 @@ describe('SettingsPage', () => {
 
     await user.clear(screen.getByPlaceholderText(/username/i))
     await user.type(screen.getByPlaceholderText(/username/i), 'newusername')
-    
+
     await user.clear(screen.getByPlaceholderText(/short bio about you/i))
     await user.type(screen.getByPlaceholderText(/short bio about you/i), 'New bio')
-    
+
     await user.clear(screen.getByPlaceholderText(/url of profile picture/i))
     await user.type(screen.getByPlaceholderText(/url of profile picture/i), 'https://example.com/new-avatar.jpg')
 
@@ -140,7 +144,7 @@ describe('SettingsPage', () => {
   it('allows updating password', async () => {
     const user = userEvent.setup()
     const updatedUser = { ...mockUser }
-    
+
     vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
     vi.mocked(authApi.updateUser).mockResolvedValue({ user: updatedUser })
 

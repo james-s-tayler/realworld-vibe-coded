@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
-import { Button, Loading, InlineNotification } from '@carbon/react';
+import { Button, Loading } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
 import { profilesApi } from '../api/profiles';
 import { PageShell } from '../components/PageShell';
 import { ApiError } from '../api/client';
@@ -50,28 +51,23 @@ export const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const loadProfile = useCallback(async () => {
     if (!username) return;
     setLoading(true);
-    setError(null);
     try {
       const response = await profilesApi.getProfile(username);
       setProfile(response.profile);
-    } catch (error) {
-      console.error('Failed to load profile:', error);
-      if (error instanceof ApiError) {
-        setError(error.errors.join(', '));
-      } else {
-        setError(t('profile.failedToLoad'));
-      }
+    } catch (err) {
+      const message = err instanceof ApiError ? err.errors.join(', ') : t('profile.failedToLoad');
+      showToast({ kind: 'error', title: t('error.title'), subtitle: message });
     } finally {
       setLoading(false);
     }
-  }, [username, t]);
+  }, [username, t, showToast]);
 
   useEffect(() => {
     loadProfile();
@@ -82,19 +78,6 @@ export const ProfilePage: React.FC = () => {
       <div className="profile-page loading">
         <Loading description={t('profile.loading')} withOverlay={false} />
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <PageShell className="profile-page">
-        <InlineNotification
-          kind="error"
-          title={t('profile.error')}
-          subtitle={error}
-          lowContrast
-        />
-      </PageShell>
     );
   }
 
