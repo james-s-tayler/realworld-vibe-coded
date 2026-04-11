@@ -284,6 +284,13 @@ public partial class Build
       .DependsOn(PathsCleanDirectories)
       .Executes(() => RunE2eCollection("Multitenancy"));
 
+  internal Target TestE2eMobile => _ => _
+      .Description("Run E2E Playwright tests for Mobile tier (responsive design)")
+      .DependsOn(BuildServerPublish)
+      .DependsOn(InstallDotnetToolLiquidReports)
+      .DependsOn(PathsCleanDirectories)
+      .Executes(() => RunE2eCollection("Mobile"));
+
   private void RunE2eCollection(string collectionName)
   {
     Log.Information("Running E2E {CollectionName} tests with Docker Compose", collectionName);
