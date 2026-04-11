@@ -12,6 +12,7 @@ import {
   Button,
   Modal,
   TextInput,
+  PasswordInput,
   InlineNotification,
   Loading,
   Pagination,
@@ -320,7 +321,7 @@ export const UsersPage: React.FC = () => {
             title={t('error.title')}
             subtitle={inviteError}
             onClose={() => setInviteError(null)}
-            style={{ marginBottom: '1rem' }}
+            className="users-modal-notification"
           />
         )}
         <TextInput
@@ -331,15 +332,14 @@ export const UsersPage: React.FC = () => {
           onChange={(e) => setInviteEmail(e.target.value)}
           disabled={inviting}
         />
-        <TextInput
+        <PasswordInput
           id="invite-password"
           labelText={t('users.password')}
-          type="password"
           placeholder={t('users.password')}
           value={invitePassword}
           onChange={(e) => setInvitePassword(e.target.value)}
           disabled={inviting}
-          style={{ marginTop: '1rem' }}
+          className="users-modal-spacing"
         />
       </Modal>
 
@@ -362,7 +362,7 @@ export const UsersPage: React.FC = () => {
             title={t('error.title')}
             subtitle={editRolesError}
             onClose={() => setEditRolesError(null)}
-            style={{ marginBottom: '1rem' }}
+            className="users-modal-notification"
           />
         )}
         <div className="edit-roles-checkboxes">

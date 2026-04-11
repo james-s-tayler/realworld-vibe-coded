@@ -35,7 +35,7 @@ public class UsersPage : BasePage
   /// <summary>
   /// Gets the password input in the invite modal.
   /// </summary>
-  public ILocator InvitePasswordInput => InviteModal.GetByLabel("Password");
+  public ILocator InvitePasswordInput => InviteModal.GetByLabel("Password").And(InviteModal.Locator("input"));
 
   /// <summary>
   /// Gets the invite submit button in the modal.

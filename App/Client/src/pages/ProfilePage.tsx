@@ -83,17 +83,16 @@ export const ProfilePage: React.FC = () => {
     try {
       const response = await profilesApi.getProfile(username);
       setProfile(response.profile);
-    } catch (error) {
-      console.error('Failed to load profile:', error);
-      if (error instanceof ApiError) {
-        setError(error.errors.join(', '));
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
       } else {
-        setError('Failed to load profile');
+        setError(t('profile.notFound'));
       }
     } finally {
       setLoading(false);
     }
-  }, [username]);
+  }, [username, t]);
 
   const loadArticles = useCallback(async () => {
     if (!username) return;
@@ -106,12 +105,16 @@ export const ProfilePage: React.FC = () => {
       const response = await articlesApi.listArticles(params);
       setArticles(response.articles);
       setArticlesCount(response.articlesCount);
-    } catch (error) {
-      console.error('Failed to load articles:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('profile.failedToLoadArticles'));
+      }
     } finally {
       setArticlesLoading(false);
     }
-  }, [username, activeTab, currentPage, pageSize]);
+  }, [username, activeTab, currentPage, pageSize, t]);
 
   useEffect(() => {
     loadProfile();
@@ -145,8 +148,12 @@ export const ProfilePage: React.FC = () => {
         setProfile(response.profile);
         return response;
       });
-    } catch (error) {
-      console.error('Failed to follow/unfollow:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('profile.failedToFollow'));
+      }
     }
   };
 
@@ -157,8 +164,12 @@ export const ProfilePage: React.FC = () => {
         setArticles(articles.map(a => a.slug === slug ? response.article : a));
         return response;
       });
-    } catch (error) {
-      console.error('Failed to favorite article:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('profile.failedToFavorite'));
+      }
     }
   };
 
@@ -169,8 +180,12 @@ export const ProfilePage: React.FC = () => {
         setArticles(articles.map(a => a.slug === slug ? response.article : a));
         return response;
       });
-    } catch (error) {
-      console.error('Failed to unfavorite article:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('profile.failedToUnfavorite'));
+      }
     }
   };
 
@@ -211,6 +226,15 @@ export const ProfilePage: React.FC = () => {
       columnLayout="wide"
       banner={<ProfileBanner profile={profile} isOwnProfile={!!isOwnProfile} onFollow={handleFollow} />}
     >
+      {error && (
+        <InlineNotification
+          kind="error"
+          title={t('error.title')}
+          subtitle={error}
+          lowContrast
+          onCloseButtonClick={() => setError(null)}
+        />
+      )}
       <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
         <TabList aria-label={t('profile.profileTabs')}>
           <Tab>{t('profile.myArticles')}</Tab>

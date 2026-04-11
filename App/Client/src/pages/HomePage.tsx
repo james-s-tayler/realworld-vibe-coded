@@ -48,12 +48,16 @@ export const HomePage: React.FC = () => {
     try {
       const response = await tagsApi.getTags();
       setTags(response.tags);
-    } catch (error) {
-      console.error('Failed to load tags:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('home.failedToLoadTags'));
+      }
     } finally {
       setTagsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const loadArticles = useCallback(async () => {
     setLoading(true);
@@ -100,8 +104,12 @@ export const HomePage: React.FC = () => {
         setArticles(articles.map(a => a.slug === slug ? response.article : a));
         return response;
       });
-    } catch (error) {
-      console.error('Failed to favorite article:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('home.failedToFavorite'));
+      }
     }
   };
 
@@ -112,8 +120,12 @@ export const HomePage: React.FC = () => {
         setArticles(articles.map(a => a.slug === slug ? response.article : a));
         return response;
       });
-    } catch (error) {
-      console.error('Failed to unfavorite article:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('home.failedToUnfavorite'));
+      }
     }
   };
 
@@ -168,42 +180,8 @@ export const HomePage: React.FC = () => {
           {selectedTag && <Tab>#{selectedTag}</Tab>}
         </TabList>
         <TabPanels>
-          <TabPanel>
-            <ArticleList
-              articles={articles}
-              loading={loading}
-              onFavorite={handleFavorite}
-              onUnfavorite={handleUnfavorite}
-            />
-            {articlesCount > 0 && (
-              <Pagination
-                page={currentPage}
-                pageSize={pageSize}
-                pageSizes={PAGE_SIZE_OPTIONS}
-                totalItems={articlesCount}
-                onChange={handlePageChange}
-              />
-            )}
-          </TabPanel>
-          <TabPanel>
-            <ArticleList
-              articles={articles}
-              loading={loading}
-              onFavorite={handleFavorite}
-              onUnfavorite={handleUnfavorite}
-            />
-            {articlesCount > 0 && (
-              <Pagination
-                page={currentPage}
-                pageSize={pageSize}
-                pageSizes={PAGE_SIZE_OPTIONS}
-                totalItems={articlesCount}
-                onChange={handlePageChange}
-              />
-            )}
-          </TabPanel>
-          {selectedTag && (
-            <TabPanel>
+          {[0, 1, ...(selectedTag ? [2] : [])].map((tabIndex) => (
+            <TabPanel key={tabIndex}>
               <ArticleList
                 articles={articles}
                 loading={loading}
@@ -220,7 +198,7 @@ export const HomePage: React.FC = () => {
                 />
               )}
             </TabPanel>
-          )}
+          ))}
         </TabPanels>
       </Tabs>
     </PageShell>

@@ -3,6 +3,7 @@ import {
   Form,
   TextInput,
   TextArea,
+  PasswordInput,
   Button,
   InlineNotification,
   Stack,
@@ -91,7 +92,7 @@ export const SettingsPage: React.FC = () => {
           title={t('settings.success')}
           subtitle={t('settings.successMessage')}
           onCloseButtonClick={() => setSuccess(false)}
-          style={{ marginBottom: '1rem' }}
+          className="settings-notification"
         />
       )}
 
@@ -99,7 +100,8 @@ export const SettingsPage: React.FC = () => {
         <Stack gap={6}>
           <TextInput
             id="image"
-            labelText=""
+            labelText={t('settings.imageUrlLabel')}
+            hideLabel
             placeholder={t('settings.imageUrl')}
             value={image}
             onChange={(e) => setImage(e.target.value)}
@@ -108,7 +110,8 @@ export const SettingsPage: React.FC = () => {
 
           <TextInput
             id="username"
-            labelText=""
+            labelText={t('settings.usernameLabel')}
+            hideLabel
             placeholder={t('settings.username')}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -119,7 +122,8 @@ export const SettingsPage: React.FC = () => {
 
           <TextArea
             id="bio"
-            labelText=""
+            labelText={t('settings.bioLabel')}
+            hideLabel
             placeholder={t('settings.bio')}
             value={bio}
             onChange={(e) => setBio(e.target.value)}
@@ -129,7 +133,8 @@ export const SettingsPage: React.FC = () => {
 
           <TextInput
             id="email"
-            labelText=""
+            labelText={t('settings.emailLabel')}
+            hideLabel
             placeholder={t('settings.email')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -138,13 +143,13 @@ export const SettingsPage: React.FC = () => {
             maxLength={USER_CONSTRAINTS.EMAIL_MAX_LENGTH}
           />
 
-          <TextInput
+          <PasswordInput
             id="password"
-            labelText=""
+            labelText={t('settings.newPasswordLabel')}
+            hideLabel
             placeholder={t('settings.newPassword')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            type="password"
             minLength={USER_CONSTRAINTS.PASSWORD_MIN_LENGTH}
           />
 

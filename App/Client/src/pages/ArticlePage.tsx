@@ -110,27 +110,30 @@ export const ArticlePage: React.FC = () => {
     try {
       const response = await articlesApi.getArticle(slug);
       setArticle(response.article);
-    } catch (error) {
-      console.error('Failed to load article:', error);
-      if (error instanceof ApiError) {
-        setError(error.errors.join(', '));
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
       } else {
-        setError('Failed to load article');
+        setError(t('article.notFoundMessage'));
       }
     } finally {
       setLoading(false);
     }
-  }, [slug]);
+  }, [slug, t]);
 
   const loadComments = useCallback(async () => {
     if (!slug) return;
     try {
       const response = await commentsApi.getComments(slug);
       setComments(response.comments);
-    } catch (error) {
-      console.error('Failed to load comments:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('article.failedToLoadComments'));
+      }
     }
-  }, [slug]);
+  }, [slug, t]);
 
   useEffect(() => {
     loadArticle();
@@ -147,8 +150,12 @@ export const ArticlePage: React.FC = () => {
         setArticle(response.article);
         return response;
       });
-    } catch (error) {
-      console.error('Failed to favorite/unfavorite article:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('article.failedToFavorite'));
+      }
     }
   };
 
@@ -162,8 +169,12 @@ export const ArticlePage: React.FC = () => {
         setArticle({ ...article, author: response.profile });
         return response;
       });
-    } catch (error) {
-      console.error('Failed to follow/unfollow user:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('article.failedToFollow'));
+      }
     }
   };
 
@@ -172,8 +183,12 @@ export const ArticlePage: React.FC = () => {
     try {
       await articlesApi.deleteArticle(article.slug);
       navigate('/');
-    } catch (error) {
-      console.error('Failed to delete article:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('article.failedToDelete'));
+      }
     }
   };
 
@@ -185,8 +200,12 @@ export const ArticlePage: React.FC = () => {
       const response = await commentsApi.createComment(slug, commentBody);
       setComments([response.comment, ...comments]);
       setCommentBody('');
-    } catch (error) {
-      console.error('Failed to post comment:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('article.failedToComment'));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -197,8 +216,12 @@ export const ArticlePage: React.FC = () => {
     try {
       await commentsApi.deleteComment(slug, id);
       setComments(comments.filter(c => c.id !== id));
-    } catch (error) {
-      console.error('Failed to delete comment:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(t('article.failedToDeleteComment'));
+      }
     }
   };
 
@@ -240,6 +263,15 @@ export const ArticlePage: React.FC = () => {
       }
     >
       <div className="container">
+        {error && (
+          <InlineNotification
+            kind="error"
+            title={t('error.title')}
+            subtitle={error}
+            lowContrast
+            onCloseButtonClick={() => setError(null)}
+          />
+        )}
         <div className="article-content">
           <div className="article-body">
             {article.body.split('\n').map((paragraph, index) => (
@@ -263,7 +295,8 @@ export const ArticlePage: React.FC = () => {
                 <div className="comment-form-body">
                   <TextArea
                     id="comment"
-                    labelText=""
+                    labelText={t('article.comments.label')}
+                    hideLabel
                     placeholder={t('article.comments.placeholder')}
                     value={commentBody}
                     onChange={(e) => setCommentBody(e.target.value)}

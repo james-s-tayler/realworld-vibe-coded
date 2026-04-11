@@ -15,7 +15,7 @@ export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({ children
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div className="loading-fullscreen">
         <Loading description="Loading..." withOverlay={false} />
       </div>
     );
