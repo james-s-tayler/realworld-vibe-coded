@@ -30,6 +30,22 @@ vi.mock('./api/auth', () => ({
   },
 }))
 
+vi.mock('./api/featureFlagsApi', () => ({
+  featureFlagsApi: {
+    getConfig: vi.fn().mockResolvedValue({
+      feature_management: { feature_flags: [] },
+    }),
+  },
+}))
+
+vi.mock('./api/configApi', () => ({
+  configApi: {
+    getConfig: vi.fn().mockResolvedValue({
+      featureFlagRefreshIntervalSeconds: 60,
+    }),
+  },
+}))
+
 const mockArticles = {
   articles: [],
   articlesCount: 0,
@@ -48,7 +64,6 @@ const mockUser = {
 
 describe('App', () => {
   beforeEach(() => {
-    // Clear localStorage before each test
     localStorage.clear()
     vi.clearAllMocks()
     vi.mocked(articlesApi.listArticles).mockResolvedValue(mockArticles)
@@ -57,7 +72,6 @@ describe('App', () => {
   })
 
   it('renders the app without crashing', async () => {
-    // Mock unauthenticated state
     vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('Not authenticated'))
     render(<App />)
     await waitFor(() => {
@@ -66,25 +80,20 @@ describe('App', () => {
   })
 
   it('renders and loads authenticated user', async () => {
-    // Mock authenticated state
     vi.mocked(authApi.getCurrentUser).mockResolvedValue({ user: mockUser })
     render(<App />)
-    
-    // Wait for auth to finish loading
+
     await waitFor(() => {
       expect(vi.mocked(authApi.getCurrentUser)).toHaveBeenCalled()
     })
-    
-    // After auth loads, we should either see home page or be able to interact with the app
+
     await waitFor(() => {
-      // Check that loading is done by seeing if we have the header navigation
       const navigation = screen.getByRole('navigation', { name: /side navigation/i })
       expect(navigation).toBeInTheDocument()
     }, { timeout: 3000 })
   })
 
   it('shows sign in and sign up buttons when not authenticated', async () => {
-    // Mock unauthenticated state
     vi.mocked(authApi.getCurrentUser).mockRejectedValue(new Error('Not authenticated'))
     render(<App />)
     await waitFor(() => {

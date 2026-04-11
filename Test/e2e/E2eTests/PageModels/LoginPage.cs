@@ -30,7 +30,7 @@ public class LoginPage : BasePage
   /// <summary>
   /// Error display element.
   /// </summary>
-  public ILocator ErrorDisplay => Page.GetByTestId("error-display");
+  public ILocator ErrorDisplay => Page.GetByTestId("toast-error");
 
   /// <summary>
   /// Fills in the login form.

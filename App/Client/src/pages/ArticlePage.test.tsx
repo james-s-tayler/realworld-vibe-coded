@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { ArticlePage } from './ArticlePage';
 import { AuthContext } from '../context/AuthContext';
+import { ToastProvider } from '../context/ToastContext';
 import { articlesApi } from '../api/articles';
 import { commentsApi } from '../api/comments';
 
@@ -51,19 +52,21 @@ const mockArticle = {
 
 const renderWithAuth = (user = null) => {
   return render(
-    <AuthContext.Provider value={{ 
-      user, 
+    <AuthContext.Provider value={{
+      user,
       loading: false,
-      login: vi.fn(), 
+      login: vi.fn(),
       register: vi.fn(),
-      logout: vi.fn(), 
+      logout: vi.fn(),
       updateUser: vi.fn()
     }}>
-      <MemoryRouter initialEntries={['/article/test-article']}>
-        <Routes>
-          <Route path="/article/:slug" element={<ArticlePage />} />
-        </Routes>
-      </MemoryRouter>
+      <ToastProvider>
+        <MemoryRouter initialEntries={['/article/test-article']}>
+          <Routes>
+            <Route path="/article/:slug" element={<ArticlePage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>
     </AuthContext.Provider>
   );
 };

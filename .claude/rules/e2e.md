@@ -15,6 +15,12 @@ paths:
 - **Carbon Checkbox:** Use `Force = true` on `CheckAsync()`/`UncheckAsync()`. Carbon renders checkboxes as hidden `<input>` + visible `<label>` — the label intercepts pointer events. Example: `GetRoleCheckbox("ADMIN").CheckAsync(new() { Force = true })`
 - **Expected login failures:** Use `Pages.LoginPage.LoginAndExpectErrorAsync()`, NOT `LoginAsync()`. `LoginAsync` asserts successful navigation and will timeout if login fails. For testing that a deactivated/invalid user cannot log in, use `LoginAndExpectErrorAsync` + `VerifyErrorContainsTextAsync`.
 
+### Toast Notifications
+
+- Error/success feedback renders via `ToastNotification` in a fixed-position container — NOT inline
+- Locate toasts with `GetByTestId("toast-error")`, `GetByTestId("toast-success")`, etc. — pattern is `toast-{kind}`
+- Page models expose `ErrorDisplay` locator pointing to `toast-error`; use `VerifyErrorContainsTextAsync()` to assert error text
+
 ### Carbon SideNav Overlay (Mobile)
 
 - SideNav links on mobile overlay: use `DispatchEventAsync("click")` — page content can intercept pointer events on fixed-position overlays

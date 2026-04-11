@@ -12,8 +12,13 @@ if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*docker-compose\b' || echo "$COMMAND
   exit 2
 fi
 
-if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*npm\s+run\b'; then
+if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*npm\s+(run|test)\b'; then
   echo "BLOCKED: Do not run npm scripts directly. Use ./build.sh <target> instead." >&2
+  exit 2
+fi
+
+if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*npx\s+(vitest|eslint|tsc)\b'; then
+  echo "BLOCKED: Do not run frontend tools directly. Use ./build.sh <target> instead. Key targets: TestClient, LintClientVerify, BuildClient" >&2
   exit 2
 fi
 

@@ -20,7 +20,6 @@ export const FeatureFlagProvider: React.FC<FeatureFlagProviderProps> = ({ childr
   const fetchFlags = useCallback(async () => {
     try {
       const config = await featureFlagsApi.getConfig();
-
       const provider = new ConfigurationObjectFeatureFlagProvider(config as unknown as Record<string, unknown>);
       const manager = new FeatureManager(provider);
 

@@ -30,10 +30,15 @@
   },
   "settings": {
     "title": "Your Settings",
+    "imageUrlLabel": "Profile picture URL",
     "imageUrl": "URL of profile picture",
+    "usernameLabel": "Username",
     "username": "Username",
+    "bioLabel": "Bio",
     "bio": "Short bio about you",
+    "emailLabel": "Email",
     "email": "Email",
+    "newPasswordLabel": "New Password",
     "newPassword": "New Password",
     "language": "Language",
     "submit": "Update Settings",
@@ -47,7 +52,10 @@
     "yourFeed": "Your Feed",
     "globalFeed": "Global Feed",
     "articleFeeds": "Article feeds",
-    "popularTags": "Popular Tags"
+    "popularTags": "Popular Tags",
+    "failedToLoadTags": "Failed to load tags",
+    "failedToFavorite": "Failed to favorite article",
+    "failedToUnfavorite": "Failed to unfavorite article"
   },
   "article": {
     "editArticle": "Edit Article",
@@ -61,19 +69,30 @@
     "loading": "Loading article...",
     "readMore": "Read more...",
     "comments": {
+      "label": "Comment",
       "placeholder": "Write a comment...",
       "submit": "Post Comment",
       "delete": "Delete comment",
       "authPrompt": "Sign in or sign up to add comments on this article."
-    }
+    },
+    "failedToFavorite": "Failed to favorite/unfavorite article",
+    "failedToFollow": "Failed to follow/unfollow user",
+    "failedToDelete": "Failed to delete article",
+    "failedToComment": "Failed to post comment",
+    "failedToDeleteComment": "Failed to delete comment",
+    "failedToLoadComments": "Failed to load comments"
   },
   "editor": {
     "newTitle": "New Article",
     "editTitle": "Edit Article",
     "loading": "Loading article...",
+    "titleLabel": "Title",
     "titlePlaceholder": "Article Title",
+    "descriptionLabel": "Description",
     "descriptionPlaceholder": "What's this article about?",
+    "bodyLabel": "Body",
     "bodyPlaceholder": "Write your article (in markdown)",
+    "tagsLabel": "Tags",
     "tagsPlaceholder": "Enter tags",
     "submit": "Publish Article",
     "submitting": "Publishing..."
@@ -86,7 +105,11 @@
     "notFound": "Profile not found",
     "myArticles": "My Articles",
     "favoritedArticles": "Favorited Articles",
-    "profileTabs": "Profile tabs"
+    "profileTabs": "Profile tabs",
+    "failedToLoadArticles": "Failed to load articles",
+    "failedToFollow": "Failed to follow/unfollow user",
+    "failedToFavorite": "Failed to favorite article",
+    "failedToUnfavorite": "Failed to unfavorite article"
   },
   "users": {
     "title": "Users",
@@ -124,7 +147,11 @@
     "goHome": "Go back to home"
   },
   "error": {
-    "title": "Error"
+    "title": "Error",
+    "pageTitle": "Something went wrong",
+    "pageMessage": "An unexpected error occurred. Please try again.",
+    "goHome": "Go back to home",
+    "loadingAuth": "Loading..."
   },
   "articles": {
     "loading": "Loading articles...",

@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router'
 import { LoginPage } from './LoginPage'
 import { AuthProvider } from '../context/AuthContext'
+import { ToastProvider } from '../context/ToastContext'
+import { ToastContainer } from '../components/ToastContainer'
 import { authApi } from '../api/auth'
 
 vi.mock('../api/auth', () => ({
@@ -27,7 +29,10 @@ function renderLoginPage() {
   return render(
     <BrowserRouter>
       <AuthProvider>
-        <LoginPage />
+        <ToastProvider>
+          <ToastContainer />
+          <LoginPage />
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   )
@@ -44,7 +49,7 @@ describe('LoginPage', () => {
     
     expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument()
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
+    expect(document.getElementById('password')!).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
   })
 
@@ -71,7 +76,7 @@ describe('LoginPage', () => {
     renderLoginPage()
 
     await user.type(screen.getByLabelText(/email/i), 'test@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'password123')
+    await user.type(document.getElementById('password')!, 'password123')
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
     await waitFor(() => {
@@ -89,7 +94,7 @@ describe('LoginPage', () => {
     renderLoginPage()
 
     await user.type(screen.getByLabelText(/email/i), 'test@example.com')
-    await user.type(screen.getByLabelText(/password/i), 'wrongpassword')
+    await user.type(document.getElementById('password')!, 'wrongpassword')
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
     await waitFor(() => {

@@ -3,13 +3,14 @@ import {
   Form,
   TextInput,
   TextArea,
+  PasswordInput,
   Button,
-  InlineNotification,
   Stack,
   Dropdown,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../hooks/useToast';
 import { useApiCall } from '../hooks/useApiCall';
 import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
@@ -19,13 +20,13 @@ import './SettingsPage.css';
 export const SettingsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user, updateUser } = useAuth();
+  const { showToast } = useToast();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [image, setImage] = useState('');
   const [password, setPassword] = useState('');
   const [language, setLanguage] = useState(i18n.language);
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -58,7 +59,7 @@ export const SettingsPage: React.FC = () => {
 
   const { error, loading, execute, clearError } = useApiCall(updateApi, {
     onSuccess: () => {
-      setSuccess(true);
+      showToast({ kind: 'success', title: t('settings.success'), subtitle: t('settings.successMessage') });
       setPassword('');
       i18n.changeLanguage(language);
     },
@@ -66,7 +67,6 @@ export const SettingsPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSuccess(false);
     await execute();
   };
 
@@ -85,21 +85,12 @@ export const SettingsPage: React.FC = () => {
         onClose={clearError}
       />
 
-      {success && (
-        <InlineNotification
-          kind="success"
-          title={t('settings.success')}
-          subtitle={t('settings.successMessage')}
-          onCloseButtonClick={() => setSuccess(false)}
-          style={{ marginBottom: '1rem' }}
-        />
-      )}
-
       <Form onSubmit={handleSubmit}>
         <Stack gap={6}>
           <TextInput
             id="image"
-            labelText=""
+            labelText={t('settings.imageUrlLabel')}
+            hideLabel
             placeholder={t('settings.imageUrl')}
             value={image}
             onChange={(e) => setImage(e.target.value)}
@@ -108,7 +99,8 @@ export const SettingsPage: React.FC = () => {
 
           <TextInput
             id="username"
-            labelText=""
+            labelText={t('settings.usernameLabel')}
+            hideLabel
             placeholder={t('settings.username')}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -119,7 +111,8 @@ export const SettingsPage: React.FC = () => {
 
           <TextArea
             id="bio"
-            labelText=""
+            labelText={t('settings.bioLabel')}
+            hideLabel
             placeholder={t('settings.bio')}
             value={bio}
             onChange={(e) => setBio(e.target.value)}
@@ -129,7 +122,8 @@ export const SettingsPage: React.FC = () => {
 
           <TextInput
             id="email"
-            labelText=""
+            labelText={t('settings.emailLabel')}
+            hideLabel
             placeholder={t('settings.email')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -138,13 +132,13 @@ export const SettingsPage: React.FC = () => {
             maxLength={USER_CONSTRAINTS.EMAIL_MAX_LENGTH}
           />
 
-          <TextInput
+          <PasswordInput
             id="password"
-            labelText=""
+            labelText={t('settings.newPasswordLabel')}
+            hideLabel
             placeholder={t('settings.newPassword')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            type="password"
             minLength={USER_CONSTRAINTS.PASSWORD_MIN_LENGTH}
           />
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, InlineNotification, Pagination } from '@carbon/react';
+import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, Pagination } from '@carbon/react';
+import { useToast } from '../hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
@@ -31,6 +32,7 @@ export const HomePage: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { requireAuth } = useRequireAuth();
+  const { showToast } = useToast();
   const [articles, setArticles] = useState<Article[]>([]);
   const [articlesCount, setArticlesCount] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
@@ -39,7 +41,6 @@ export const HomePage: React.FC = () => {
   // Default to "Your Feed" (index 0)
   const [activeTab, setActiveTab] = useState(0);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
@@ -48,16 +49,19 @@ export const HomePage: React.FC = () => {
     try {
       const response = await tagsApi.getTags();
       setTags(response.tags);
-    } catch (error) {
-      console.error('Failed to load tags:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        showToast({ kind: 'error', title: t('error.title'), subtitle: err.errors.join(', ') });
+      } else {
+        showToast({ kind: 'error', title: t('error.title'), subtitle: t('home.failedToLoadTags') });
+      }
     } finally {
       setTagsLoading(false);
     }
-  }, []);
+  }, [t, showToast]);
 
   const loadArticles = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       let response;
       const offset = (currentPage - 1) * pageSize;
@@ -73,17 +77,16 @@ export const HomePage: React.FC = () => {
       }
       setArticles(response.articles);
       setArticlesCount(response.articlesCount);
-    } catch (error) {
-      console.error('Failed to load articles:', error);
-      if (error instanceof ApiError) {
-        setError(error.errors.join(', '));
+    } catch (err) {
+      if (err instanceof ApiError) {
+        showToast({ kind: 'error', title: t('error.title'), subtitle: err.errors.join(', ') });
       } else {
-        setError('Failed to load articles');
+        showToast({ kind: 'error', title: t('error.title'), subtitle: t('home.failedToLoadTags') });
       }
     } finally {
       setLoading(false);
     }
-  }, [activeTab, selectedTag, user, currentPage, pageSize]);
+  }, [activeTab, selectedTag, user, currentPage, pageSize, t, showToast]);
 
   useEffect(() => {
     loadTags();
@@ -100,8 +103,12 @@ export const HomePage: React.FC = () => {
         setArticles(articles.map(a => a.slug === slug ? response.article : a));
         return response;
       });
-    } catch (error) {
-      console.error('Failed to favorite article:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        showToast({ kind: 'error', title: t('error.title'), subtitle: err.errors.join(', ') });
+      } else {
+        showToast({ kind: 'error', title: t('error.title'), subtitle: t('home.failedToFavorite') });
+      }
     }
   };
 
@@ -112,8 +119,12 @@ export const HomePage: React.FC = () => {
         setArticles(articles.map(a => a.slug === slug ? response.article : a));
         return response;
       });
-    } catch (error) {
-      console.error('Failed to unfavorite article:', error);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        showToast({ kind: 'error', title: t('error.title'), subtitle: err.errors.join(', ') });
+      } else {
+        showToast({ kind: 'error', title: t('error.title'), subtitle: t('home.failedToUnfavorite') });
+      }
     }
   };
 
@@ -152,15 +163,6 @@ export const HomePage: React.FC = () => {
       banner={<HomeBanner />}
       sidebar={sidebarContent}
     >
-      {error && (
-        <InlineNotification
-          kind="error"
-          title={t('error.title')}
-          subtitle={error}
-          lowContrast
-          onCloseButtonClick={() => setError(null)}
-        />
-      )}
       <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
         <TabList aria-label={t('home.articleFeeds')}>
           <Tab>{t('home.yourFeed')}</Tab>
@@ -168,42 +170,8 @@ export const HomePage: React.FC = () => {
           {selectedTag && <Tab>#{selectedTag}</Tab>}
         </TabList>
         <TabPanels>
-          <TabPanel>
-            <ArticleList
-              articles={articles}
-              loading={loading}
-              onFavorite={handleFavorite}
-              onUnfavorite={handleUnfavorite}
-            />
-            {articlesCount > 0 && (
-              <Pagination
-                page={currentPage}
-                pageSize={pageSize}
-                pageSizes={PAGE_SIZE_OPTIONS}
-                totalItems={articlesCount}
-                onChange={handlePageChange}
-              />
-            )}
-          </TabPanel>
-          <TabPanel>
-            <ArticleList
-              articles={articles}
-              loading={loading}
-              onFavorite={handleFavorite}
-              onUnfavorite={handleUnfavorite}
-            />
-            {articlesCount > 0 && (
-              <Pagination
-                page={currentPage}
-                pageSize={pageSize}
-                pageSizes={PAGE_SIZE_OPTIONS}
-                totalItems={articlesCount}
-                onChange={handlePageChange}
-              />
-            )}
-          </TabPanel>
-          {selectedTag && (
-            <TabPanel>
+          {[0, 1, ...(selectedTag ? [2] : [])].map((tabIndex) => (
+            <TabPanel key={tabIndex}>
               <ArticleList
                 articles={articles}
                 loading={loading}
@@ -220,7 +188,7 @@ export const HomePage: React.FC = () => {
                 />
               )}
             </TabPanel>
-          )}
+          ))}
         </TabPanels>
       </Tabs>
     </PageShell>

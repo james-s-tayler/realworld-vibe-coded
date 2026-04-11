@@ -147,7 +147,8 @@ export const EditorPage: React.FC = () => {
           <Stack gap={6}>
             <TextInput
               id="title"
-              labelText=""
+              labelText={t('editor.titleLabel')}
+              hideLabel
               placeholder={t('editor.titlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -157,7 +158,8 @@ export const EditorPage: React.FC = () => {
 
             <TextInput
               id="description"
-              labelText=""
+              labelText={t('editor.descriptionLabel')}
+              hideLabel
               placeholder={t('editor.descriptionPlaceholder')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -167,7 +169,8 @@ export const EditorPage: React.FC = () => {
 
             <TextArea
               id="body"
-              labelText=""
+              labelText={t('editor.bodyLabel')}
+              hideLabel
               placeholder={t('editor.bodyPlaceholder')}
               value={body}
               onChange={(e) => setBody(e.target.value)}
@@ -178,11 +181,12 @@ export const EditorPage: React.FC = () => {
             <div>
               <TextInput
                 id="tags"
-                labelText=""
+                labelText={t('editor.tagsLabel')}
+                hideLabel
                 placeholder={t('editor.tagsPlaceholder')}
                 value={tagInput}
                 onChange={handleTagChange}
-                onKeyPress={handleTagKeyPress}
+                onKeyDown={handleTagKeyPress}
                 onBlur={handleAddTag}
                 maxLength={TAG_CONSTRAINTS.NAME_MAX_LENGTH}
               />

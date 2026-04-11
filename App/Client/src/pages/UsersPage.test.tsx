@@ -3,6 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { UsersPage } from './UsersPage';
+import { ToastProvider } from '../context/ToastContext';
+import { ToastContainer } from '../components/ToastContainer';
 import { usersApi } from '../api/users';
 
 vi.mock('../api/users', () => ({
@@ -48,7 +50,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -67,7 +72,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -79,7 +87,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -94,7 +105,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -127,7 +141,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -167,7 +184,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -200,7 +220,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -218,7 +241,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
@@ -236,7 +262,10 @@ describe('UsersPage', () => {
 
     render(
       <MemoryRouter>
-        <UsersPage />
+        <ToastProvider>
+          <ToastContainer />
+          <UsersPage />
+        </ToastProvider>
       </MemoryRouter>
     );
 
