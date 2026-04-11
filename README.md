@@ -41,6 +41,8 @@ Server.Analyzers         — 32 custom Roslyn analyzers (SRV + PV series)
 
 Endpoints are thin: bind request → authorize → delegate to MediatR → map response. Business rules live in handlers. Persistence is abstracted behind repository interfaces.
 
+![Backend Architecture Diagram](Docs/architecture-diagram.svg)
+
 **Cross-cutting concerns:**
 - **OpenTelemetry** — distributed tracing and metrics (see [Observability](#-observability))
 - **Serilog** — structured logging with enrichers, file sinks, and Seq integration
