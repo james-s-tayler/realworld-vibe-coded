@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--cds-spacing-07, 2rem);
 }
 
 .users-page-header h1 {
@@ -12,14 +12,14 @@
 .edit-roles-checkboxes {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  gap: var(--cds-spacing-03, 0.5rem);
+  margin-top: var(--cds-spacing-05, 1rem);
 }
 
 .users-modal-notification {
-  margin-bottom: 1rem;
+  margin-bottom: var(--cds-spacing-05, 1rem);
 }
 
 .users-modal-spacing {
-  margin-top: 1rem;
+  margin-top: var(--cds-spacing-05, 1rem);
 }

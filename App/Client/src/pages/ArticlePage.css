@@ -92,7 +92,7 @@
   max-width: 1140px;
   margin-left: auto;
   margin-right: auto;
-  padding: 0 15px;
+  padding: 0 var(--cds-spacing-05, 1rem);
 }
 
 .article-column-offset {

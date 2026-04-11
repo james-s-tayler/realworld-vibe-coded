@@ -6,11 +6,16 @@
       "message": "Use a Carbon design token var(--cds-*) instead of hex color \"{{ actual }}\""
     }],
     "scale-unlimited/declaration-strict-value": [
-      ["color", "background-color", "background", "fill", "stroke", "outline-color"],
+      [
+        "color", "background-color", "background", "fill", "stroke", "outline-color",
+        "margin", "margin-top", "margin-right", "margin-bottom", "margin-left",
+        "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
+        "gap", "row-gap", "column-gap"
+      ],
       {
-        "ignoreValues": ["transparent", "inherit", "currentColor", "initial", "unset", "none", "white"],
+        "ignoreValues": ["transparent", "inherit", "currentColor", "initial", "unset", "none", "white", "0", "auto"],
         "disableFix": true,
-        "message": "Use a Carbon design token var(--cds-*) instead of literal value for \"{{ property }}\""
+        "message": "Use a Carbon design token var(--cds-spacing-*) or var(--cds-*) instead of literal value for \"{{ property }}\""
       }
     ],
     "selector-class-pattern": null

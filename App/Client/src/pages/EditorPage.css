@@ -1,11 +1,11 @@
 .editor-page {
   min-height: calc(100vh - 56px);
-  padding: 1.5rem 0;
+  padding: var(--cds-spacing-06, 1.5rem) 0;
 }
 
 .editor-page .tag-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: var(--cds-spacing-03, 0.5rem);
+  margin-top: var(--cds-spacing-03, 0.5rem);
 }

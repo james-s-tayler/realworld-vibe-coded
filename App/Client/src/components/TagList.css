@@ -1,7 +1,7 @@
 .tag-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--cds-spacing-03, 0.5rem);
 }
 
 .tag-pill {
@@ -10,7 +10,7 @@
   color: white;
   border: none;
   border-radius: 10rem;
-  padding: 0.25rem 0.6rem;
+  padding: var(--cds-spacing-02, 0.25rem) var(--cds-spacing-03, 0.6rem);
   font-size: 0.8rem;
 }
 
@@ -20,7 +20,7 @@
 
 .tag-list-loading,
 .tag-list-empty {
-  padding: 1rem;
+  padding: var(--cds-spacing-05, 1rem);
   text-align: center;
   color: var(--cds-text-secondary);
 }

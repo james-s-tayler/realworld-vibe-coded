@@ -1,12 +1,12 @@
 .forbidden-page {
   text-align: center;
-  padding: 2rem;
+  padding: var(--cds-spacing-07, 2rem);
 }
 
 .forbidden-page h1 {
-  margin-bottom: 1rem;
+  margin-bottom: var(--cds-spacing-05, 1rem);
 }
 
 .forbidden-page p {
-  margin-bottom: 1rem;
+  margin-bottom: var(--cds-spacing-05, 1rem);
 }
