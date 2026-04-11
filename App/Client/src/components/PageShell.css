@@ -1,16 +1,7 @@
 .page-shell {
   min-height: calc(100vh - 56px);
-}
-
-.page-shell-grid {
-  max-width: 1140px;
-  margin: 0 auto;
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
-}
-
-.page-shell h1 {
-  margin-bottom: 0.5rem;
 }
 
 .page-shell-title {

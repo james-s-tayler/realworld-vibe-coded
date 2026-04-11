@@ -43,7 +43,7 @@ export const PageShell: React.FC<PageShellProps> = ({
   return (
     <div className={pageClassName}>
       {banner && <div className="page-shell-banner">{banner}</div>}
-      <Grid className="page-shell-grid">
+      <Grid narrow>
         <Column sm={span.sm} md={span.md} lg={span.lg}>
           {title && <h1 className="page-shell-title">{title}</h1>}
           {subtitle && <p className="page-shell-subtitle">{subtitle}</p>}
