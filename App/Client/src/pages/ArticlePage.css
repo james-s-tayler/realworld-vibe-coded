@@ -12,16 +12,16 @@
 .article-page .banner {
   background: var(--cds-background-inverse);
   color: var(--cds-text-on-color);
-  padding: var(--cds-spacing-07) 0;
-  padding-top: calc(var(--cds-spacing-07) + var(--header-height));
+  padding: var(--cds-spacing-07, 2rem) 0;
+  padding-top: calc(var(--cds-spacing-07, 2rem) + var(--header-height));
   margin-top: calc(-1 * var(--header-height));
 }
 
 .article-page .banner h1 {
-  font-size: var(--cds-heading-05-font-size);
-  font-weight: var(--cds-heading-05-font-weight);
-  line-height: var(--cds-heading-05-line-height);
-  margin-bottom: var(--cds-spacing-06);
+  font-size: var(--cds-heading-05-font-size, 2.8rem);
+  font-weight: var(--cds-heading-05-font-weight, 600);
+  line-height: var(--cds-heading-05-line-height, 1.2);
+  margin-bottom: var(--cds-spacing-06, 2rem);
   overflow-wrap: break-word;
 }
 
@@ -42,7 +42,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  margin-right: var(--cds-spacing-03);
+  margin-right: var(--cds-spacing-03, 0.5rem);
 }
 
 .article-meta .info {
