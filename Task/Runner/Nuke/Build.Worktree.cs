@@ -58,6 +58,7 @@ public partial class Build
     Log.Information("  Jaeger UI:  {Port}", 16686 + offset);
     Log.Information("  Prometheus: {Port}", 9090 + offset);
     Log.Information("  Grafana:    {Port}", 3000 + offset);
+    Log.Information("  Vite:       {Port}", 5173 + offset);
     Log.Information("  Docs MCP:   {Port}", DocsMcpPort);
   }
 }
