@@ -1,0 +1,117 @@
+flowchart TB
+    subgraph CLIENT["Client"]
+        req["HTTP Request\nPOST /api/articles\nBearer Token / Cookie"]
+        res["HTTP Response\n200 / 201 / 400 / 404 / 422\nJSON Body"]
+    end
+
+    subgraph WEB["Server.Web - Presentation Layer"]
+        direction TB
+        MW["ASP.NET Middleware\nExceptionHandler, MultiTenant\nAuthentication, Authorization"]
+        FE["FastEndpoints\nEndpoint TRequest TResponse TMapper\nRoute matching, model binding"]
+        VAL["FluentValidation\nValidator TRequest\nReturns 400 on failure"]
+        SEND["Send.ResultMapperAsync\nMaps Result T to HTTP status"]
+        MAP["ResponseMapper\nDomain entity to DTO"]
+        GEH["GlobalExceptionHandler\nPost-processor, catches unhandled exceptions"]
+    end
+
+    subgraph MEDIATOR["MediatR Pipeline - Behaviors"]
+        direction TB
+        B1["1. TracingBehavior\nOpenTelemetry span via ActivitySource"]
+        B2["2. LoggingBehavior\nSerilog structured logging, elapsed ms"]
+        B3["3. TransactionBehavior\nICommand only, wraps in EF transaction\nIUnitOfWork.ExecuteInTransactionAsync"]
+        B4["4. ExceptionHandlingBehavior\nCatches DB/SQL/timeout exceptions\nTransforms to Result.Conflict / Error"]
+    end
+
+    subgraph USECASES["Server.UseCases - Application Layer CQRS"]
+        direction LR
+        CMD["ICommand T\n+ ICommandHandler\nMutations: create, update, delete"]
+        QRY["IQuery T\n+ IQueryHandler\nReads: get, list, search"]
+    end
+
+    subgraph CORE["Server.Core - Domain Layer"]
+        direction LR
+        AGG["Aggregate Roots\nArticle, Author, Tag, User\nEach in own Aggregate namespace"]
+        ENT["Child Entities\nComment, UserFollowing\nOwned by aggregate roots"]
+        SPEC["Specifications\nArticleBySlugSpec\nArdalis.Specification queries"]
+        EVT["Domain Events\nIDomainEvent\nPublished post-SaveChanges"]
+    end
+
+    subgraph SHARED["Server.SharedKernel - Contracts"]
+        direction LR
+        RES["Result T\nSuccess / Created / NoContent\nInvalid / NotFound / Error / ..."]
+        REPOI["IRepository T\nAdd, Update, Delete\nGetById, List, Count"]
+        BASE["EntityBase\nId, ChangeCheck, CreatedAt\nUpdatedAt, CreatedBy, UpdatedBy"]
+    end
+
+    subgraph INFRA["Server.Infrastructure - Data and Services"]
+        direction TB
+        REPO["EfRepository T\nArdalis RepositoryBase"]
+        UOW["UnitOfWork\nEF execution strategy + transaction"]
+        CTX["AppDbContext\nMultiTenantIdentityDbContext\nAuditDbContext"]
+        AUDINT["AuditableEntityInterceptor\nSets CreatedAt/UpdatedAt/By"]
+        DISP["MediatRDomainEventDispatcher\nPublishes events post-commit"]
+        UC["UserContext\nIUserContext: UserId, Username\nfrom ClaimsPrincipal"]
+    end
+
+    subgraph EXTERNAL["External Systems"]
+        direction LR
+        DB[("SQL Server\nMulti-tenant\nFinbuckle filtered")]
+        AUDIT["Audit.NET\nFile-based audit logs"]
+        OTEL["OpenTelemetry\nJaeger traces\nPrometheus metrics\nSeq logs"]
+    end
+
+    req --> MW
+    MW --> FE
+    FE --> VAL
+    VAL -->|Valid| SEND
+    VAL -->|Invalid 400| res
+    SEND -->|IMediator.Send| B1
+    B1 --> B2
+    B2 --> B3
+    B3 --> B4
+    B4 --> CMD
+    B4 --> QRY
+    CMD -->|Repository.AddAsync etc| REPO
+    QRY -->|Repository.ListAsync Spec| REPO
+    CMD -.->|uses| AGG
+    QRY -.->|uses| SPEC
+    AGG --- ENT
+    AGG --- EVT
+    AGG -.->|extends| BASE
+    REPOI -.->|implemented by| REPO
+    REPO --> CTX
+    CTX --> AUDINT
+    CTX --> DB
+    CTX -->|SaveChangesAsync| DISP
+    DISP -.->|mediator.Publish| EVT
+    UOW --> CTX
+    B3 -.->|uses| UOW
+    CTX --> AUDIT
+    B1 --> OTEL
+    CMD -->|Result T| B4
+    QRY -->|Result T| B4
+    B4 -->|Result T| B3
+    B3 -->|Result T| B2
+    B2 -->|Result T| B1
+    B1 -->|Result T| SEND
+    SEND --> MAP
+    MAP --> GEH
+    GEH --> res
+
+    classDef web fill:#4589ff,color:#fff,stroke:#0043ce
+    classDef mediator fill:#a56eff,color:#fff,stroke:#6929c4
+    classDef usecases fill:#0e6027,color:#fff,stroke:#044317
+    classDef core fill:#d4a017,color:#000,stroke:#8a6d3b
+    classDef shared fill:#6c757d,color:#fff,stroke:#495057
+    classDef infra fill:#d02670,color:#fff,stroke:#9f1853
+    classDef external fill:#343a3f,color:#fff,stroke:#21272a
+    classDef client fill:#f4f4f4,color:#161616,stroke:#8d8d8d
+
+    class MW,FE,VAL,SEND,MAP,GEH web
+    class B1,B2,B3,B4 mediator
+    class CMD,QRY usecases
+    class AGG,ENT,SPEC,EVT core
+    class RES,REPOI,BASE shared
+    class REPO,UOW,CTX,AUDINT,DISP,UC infra
+    class DB,AUDIT,OTEL external
+    class req,res client

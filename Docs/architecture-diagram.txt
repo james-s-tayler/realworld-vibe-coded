@@ -1,0 +1,162 @@
+
+    CONDUIT BACKEND ARCHITECTURE — Request Pipeline through Clean Architecture Layers
+    ==================================================================================
+
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  CLIENT                                                                         │
+    │  HTTP Request (POST /api/articles, Bearer token / Cookie)                       │
+    └─────────────────────────────────┬───────────────────────────────────────────────┘
+                                      │ JSON over HTTPS
+                                      ▼
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  SERVER.WEB — Presentation Layer                                      [blue]    │
+    │                                                                                 │
+    │  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────────────┐  │
+    │  │ ASP.NET Middleware│  │ FastEndpoints    │  │ FluentValidation              │  │
+    │  │                  │  │                  │  │ Validator<TRequest>           │  │
+    │  │ ExceptionHandler │  │ Endpoint<TReq,   │  │ Auto-discovered               │  │
+    │  │ MultiTenant      │  │   TRes, TMapper> │  │ Invalid → 400 Bad Request     │  │
+    │  │ Authentication   │  │                  │  │                               │  │
+    │  │ Authorization    │  │ Route match,     │  │                               │  │
+    │  │ Antiforgery      │  │ model binding    │  │                               │  │
+    │  └──────────────────┘  └──────────────────┘  └───────────────────────────────┘  │
+    │                                                                                 │
+    │  ┌──────────────────────────────┐  ┌──────────────────────────────────────────┐  │
+    │  │ Send.ResultMapperAsync()     │  │ GlobalExceptionHandler (PostProcessor)   │  │
+    │  │ Maps Result<T> → HTTP status │  │ Last-resort exception → ProblemDetails   │  │
+    │  │ + ResponseMapper<TRes,TEnt>  │  │                                          │  │
+    │  └──────────────────────────────┘  └──────────────────────────────────────────┘  │
+    └─────────────────────────────────┬───────────────────────────────────────────────┘
+                                      │ IMediator.Send(command/query)
+                                      ▼
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  MEDIATR PIPELINE — Behaviors (executed in order)                    [purple]    │
+    │                                                                                 │
+    │  ┌─────────────────────────────────────────────────────────────────────────────┐ │
+    │  │ 1. TracingBehavior          OpenTelemetry span (ActivitySource: Conduit.*)  │ │
+    │  ├─────────────────────────────────────────────────────────────────────────────┤ │
+    │  │ 2. LoggingBehavior          Serilog: {@Request}, elapsed ms, status        │ │
+    │  ├─────────────────────────────────────────────────────────────────────────────┤ │
+    │  │ 3. TransactionBehavior      ICommand only → IUnitOfWork transaction        │ │
+    │  │                             Commit on success, rollback on failure          │ │
+    │  ├─────────────────────────────────────────────────────────────────────────────┤ │
+    │  │ 4. ExceptionHandlingBehavior  DB/SQL/Timeout → Result.Conflict/Error       │ │
+    │  └─────────────────────────────────────────────────────────────────────────────┘ │
+    └─────────────────────────────────┬───────────────────────────────────────────────┘
+                                      │ Result<T>
+                                      ▼
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  SERVER.USECASES — Application Layer (CQRS)                         [green]     │
+    │                                                                                 │
+    │  ┌───────────────────────────┐  ┌───────────────────────────┐                   │
+    │  │ ICommand<T>               │  │ IQuery<T>                 │                   │
+    │  │ + ICommandHandler         │  │ + IQueryHandler           │                   │
+    │  │                           │  │                           │                   │
+    │  │ Mutations:                │  │ Reads:                    │                   │
+    │  │ create, update, delete    │  │ get, list, search         │                   │
+    │  │                           │  │                           │                   │
+    │  │ MUST call repository      │  │ Uses Specifications       │                   │
+    │  │ mutation (PV014 enforced) │  │ (Ardalis.Specification)   │                   │
+    │  └───────────────────────────┘  └───────────────────────────┘                   │
+    └──────────────────┬──────────────────────────────┬───────────────────────────────┘
+                       │ uses domain entities          │ IRepository<T>.ListAsync(spec)
+                       ▼                               ▼
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  SERVER.CORE — Domain Layer                                         [gold]      │
+    │                                                                                 │
+    │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────┐  ┌──────────────┐  │
+    │  │ Aggregate Roots  │  │ Child Entities  │  │Specifications│  │Domain Events │  │
+    │  │                  │  │                  │  │              │  │              │  │
+    │  │ Article          │  │ Comment          │  │ ArticleBy-   │  │ IDomainEvent │  │
+    │  │ Author           │  │ UserFollowing    │  │   SlugSpec   │  │ : INotifi-   │  │
+    │  │ Tag              │  │                  │  │ AuthorBy-    │  │   cation     │  │
+    │  │ User             │  │ (owned by agg    │  │   UserIdSpec │  │              │  │
+    │  │                  │  │  roots)          │  │              │  │ Published    │  │
+    │  │ Each in own      │  │                  │  │              │  │ post-commit  │  │
+    │  │ *Aggregate ns    │  │                  │  │              │  │              │  │
+    │  └─────────────────┘  └─────────────────┘  └──────────────┘  └──────────────┘  │
+    └─────────────────────────────────┬───────────────────────────────────────────────┘
+                                      │ extends EntityBase, IAggregateRoot
+                                      ▼
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  SERVER.SHAREDKERNEL — Contracts & Abstractions                      [gray]     │
+    │                                                                                 │
+    │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────┐  ┌──────────────┐  │
+    │  │ Result<T>        │  │ IRepository<T>  │  │ EntityBase   │  │ MediatR      │  │
+    │  │                  │  │                  │  │              │  │ Contracts    │  │
+    │  │ Success          │  │ Add/Update/     │  │ Id (Guid)    │  │              │  │
+    │  │ Created          │  │ Delete          │  │ ChangeCheck  │  │ ICommand<T>  │  │
+    │  │ NoContent        │  │ GetById/List/   │  │ CreatedAt    │  │ IQuery<T>    │  │
+    │  │ Invalid          │  │ Count           │  │ UpdatedAt    │  │ IResult-     │  │
+    │  │ NotFound         │  │                  │  │ CreatedBy    │  │   Request<T> │  │
+    │  │ Error            │  │ Constrained to  │  │ UpdatedBy    │  │              │  │
+    │  │ Conflict         │  │ IAggregateRoot  │  │              │  │              │  │
+    │  │ CriticalError    │  │                  │  │              │  │              │  │
+    │  │ Unavailable      │  │                  │  │              │  │              │  │
+    │  └─────────────────┘  └─────────────────┘  └──────────────┘  └──────────────┘  │
+    └─────────────────────────────────┬───────────────────────────────────────────────┘
+                                      │ implemented by
+                                      ▼
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  SERVER.INFRASTRUCTURE — Data & Services                             [pink]     │
+    │                                                                                 │
+    │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────┐  ┌──────────────┐  │
+    │  │ EfRepository<T> │  │ AppDbContext     │  │ UnitOfWork   │  │ Services     │  │
+    │  │                  │  │                  │  │              │  │              │  │
+    │  │ Ardalis          │  │ MultiTenant-     │  │ ExecuteIn-   │  │ UserContext  │  │
+    │  │ RepositoryBase   │  │ IdentityDb-      │  │ Transaction- │  │ BcryptHash  │  │
+    │  │                  │  │ Context          │  │ Async()      │  │ EmailSender │  │
+    │  │ Implements       │  │                  │  │              │  │              │  │
+    │  │ IRepository<T>  │  │ [AuditDbContext]  │  │ EF execution │  │ DomainEvent │  │
+    │  │                  │  │ DomainEvent      │  │ strategy +   │  │ Dispatcher  │  │
+    │  │                  │  │ dispatch         │  │ audit scope  │  │ (MediatR)   │  │
+    │  └─────────────────┘  └─────────────────┘  └──────────────┘  └──────────────┘  │
+    └─────────────────────────────────┬───────────────────────────────────────────────┘
+                                      │ persists to
+                                      ▼
+    ┌─────────────────────────────────────────────────────────────────────────────────┐
+    │  EXTERNAL SYSTEMS                                                    [dark]     │
+    │                                                                                 │
+    │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────┐  ┌──────────────┐  │
+    │  │ SQL Server       │  │ Audit.NET       │  │ OpenTelemetry│  │ Azure        │  │
+    │  │                  │  │                  │  │              │  │              │  │
+    │  │ Multi-tenant     │  │ File-based      │  │ → Jaeger     │  │ App Config   │  │
+    │  │ (Finbuckle)      │  │ audit logs      │  │   (traces)   │  │ (feat flags) │  │
+    │  │                  │  │                  │  │ → Prometheus │  │              │  │
+    │  │ Query filters    │  │ Transaction-     │  │   (metrics)  │  │ Monitor      │  │
+    │  │ per tenant ID    │  │ aware, with      │  │ → Seq        │  │ (prod telem) │  │
+    │  │                  │  │ correlation ID   │  │   (logs)     │  │              │  │
+    │  └─────────────────┘  └─────────────────┘  └──────────────┘  └──────────────┘  │
+    └─────────────────────────────────────────────────────────────────────────────────┘
+
+
+    RESULT<T> → HTTP STATUS MAPPING
+    ════════════════════════════════
+
+    Result Status     HTTP Code              When
+    ─────────────     ─────────              ────
+    Success           200 OK                 Successful read or update
+    Created           201 Created            New resource created
+    NoContent         204 No Content         Delete or void operation
+    Invalid           400 Bad Request        Business rule validation failure
+    Unauthorized      401 Unauthorized       Missing or invalid credentials
+    Forbidden         403 Forbidden          Authenticated but not authorized
+    NotFound          404 Not Found          Entity doesn't exist
+    Conflict          409 Conflict           Concurrency or duplicate key
+    Error             422 Unprocessable      Semantic error in request
+    CriticalError     500 Internal           Unhandled exception
+    Unavailable       503 Service Unavail.   Timeout or transient failure
+
+
+    DEPENDENCY RULE
+    ═══════════════
+
+    Dependencies point INWARD only. Enforced by project references + 35 Roslyn analyzers.
+
+         Web ──→ UseCases ──→ Core ──→ SharedKernel
+          │          │                      ▲
+          │          └──────────────────────┘
+          │                                 ▲
+          └──→ Infrastructure ──────────────┘
+               (implements SharedKernel interfaces)
+
