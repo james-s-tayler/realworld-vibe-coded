@@ -127,8 +127,7 @@ export const UsersPage: React.FC = () => {
   };
 
   const handleEditRolesSubmit = async () => {
-    if (!editRolesUser || editRolesSelected.length === 0) {
-      showToast({ kind: 'error', title: t('error.title'), subtitle: t('users.atLeastOneRole') });
+    if (!editRolesUser) {
       return;
     }
 
@@ -319,7 +318,7 @@ export const UsersPage: React.FC = () => {
         primaryButtonText={t('users.save')}
         secondaryButtonText={t('users.cancel')}
         onRequestSubmit={handleEditRolesSubmit}
-        primaryButtonDisabled={editRolesSaving || editRolesSelected.length === 0}
+        primaryButtonDisabled={editRolesSaving}
       >
         <div className="edit-roles-checkboxes">
           {editRolesUser?.roles.includes('OWNER') && (
