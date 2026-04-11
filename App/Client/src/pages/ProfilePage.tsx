@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
-import { Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, Pagination } from '@carbon/react';
+import { Grid, Column, Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, Pagination } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -30,9 +30,8 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, on
   const { t } = useTranslation();
   return (
   <div className="user-info">
-    <div className="container">
-      <div className="row">
-        <div className="col-xs-12 col-md-10 offset-md-1">
+    <Grid>
+      <Column lg={{ span: 14, offset: 1 }} md={8} sm={4}>
           <img
             src={profile.image || DEFAULT_PROFILE_IMAGE}
             alt={profile.username}
@@ -55,9 +54,8 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, on
               {profile.following ? t('profile.unfollow') : t('profile.follow')} {truncateUsername(profile.username)}
             </Button>
           )}
-        </div>
-      </div>
-    </div>
+      </Column>
+    </Grid>
   </div>
   );
 };

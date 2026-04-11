@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
-import { Button, TextArea, Loading, Tile, Tag, IconButton } from '@carbon/react';
+import { Grid, Column, Button, TextArea, Loading, Tile, Tag, IconButton } from '@carbon/react';
 import { FavoriteFilled, Favorite, Edit, TrashCan } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -37,9 +37,10 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
   const { t } = useTranslation();
   return (
   <div className="banner">
-    <div className="container">
-      <h1>{article.title}</h1>
-      <div className="article-meta">
+    <Grid>
+      <Column lg={16} md={8} sm={4}>
+        <h1>{article.title}</h1>
+        <div className="article-meta">
         <Link to={`/profile/${article.author.username}`} className="author-info">
           <img src={article.author.image || DEFAULT_PROFILE_IMAGE} alt={article.author.username} />
           <div className="info">
@@ -86,7 +87,8 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
           </div>
         )}
       </div>
-    </div>
+      </Column>
+    </Grid>
   </div>
   );
 };
@@ -240,8 +242,7 @@ export const ArticlePage: React.FC = () => {
         />
       }
     >
-      <div className="container">
-        <div className="article-content">
+      <div className="article-content">
           <div className="article-body">
             {article.body.split('\n').map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
@@ -321,7 +322,6 @@ export const ArticlePage: React.FC = () => {
               </div>
             </Tile>
           ))}
-      </div>
     </PageShell>
   );
 };

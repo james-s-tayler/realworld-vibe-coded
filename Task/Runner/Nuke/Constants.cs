@@ -31,7 +31,10 @@ public static class Constants
 
     public static string GetSlug(AbsolutePath rootDir)
     {
-      return ((string)rootDir).Split('/').Last().ToLowerInvariant();
+      var raw = ((string)rootDir).Split('/').Last().ToLowerInvariant();
+
+      // Sanitize for Docker compose project names: only lowercase alphanumeric, hyphens, underscores
+      return System.Text.RegularExpressions.Regex.Replace(raw, @"[^a-z0-9\-_]", "-");
     }
 
     public static bool IsMainCheckout(AbsolutePath rootDir)

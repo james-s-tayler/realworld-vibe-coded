@@ -207,8 +207,7 @@ export const EditorPage: React.FC = () => {
               type="submit"
               disabled={submitting || !title || !description || !body}
               size="lg"
-              className="pull-xs-right"
-            >
+                         >
               {submitting ? t('editor.submitting') : t('editor.submit')}
             </Button>
           </Stack>

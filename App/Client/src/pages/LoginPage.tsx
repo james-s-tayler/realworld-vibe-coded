@@ -74,7 +74,7 @@ export const LoginPage: React.FC = () => {
             required
           />
 
-          <Button type="submit" disabled={isPending} size="lg" className="pull-xs-right">
+          <Button type="submit" disabled={isPending} size="lg">
             {isPending ? t('login.submitting') : t('login.submit')}
           </Button>
         </Stack>

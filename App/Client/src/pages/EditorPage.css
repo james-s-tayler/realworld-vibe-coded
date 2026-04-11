@@ -3,18 +3,9 @@
   padding: 1.5rem 0;
 }
 
-.editor-page .text-xs-center {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
 .editor-page .tag-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.5rem;
-}
-
-.editor-page .pull-xs-right {
-  float: right;
 }
