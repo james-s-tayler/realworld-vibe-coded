@@ -123,6 +123,10 @@ public partial class Build
   internal AbsolutePath LogsTestServerPostman => RootDirectory / "Logs" / "Test" / "Postman";
   #endregion
 
+  internal Target PathsShowWorktreeInfo => _ => _
+    .Description("Show worktree isolation info: slug, port offset, and all port mappings")
+    .Executes(LogWorktreeInfo);
+
   internal Target PathsCleanDirectories => _ => _
     .Description("Pre-create directories that Docker containers need to prevent root permission issues")
     .Executes(() =>

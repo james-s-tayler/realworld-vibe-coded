@@ -54,6 +54,7 @@
         "LintServerFix",
         "LintServerVerify",
         "PathsCleanDirectories",
+        "PathsShowWorktreeInfo",
         "RunLocalClient",
         "RunLocalDependencies",
         "RunLocalDependenciesDown",

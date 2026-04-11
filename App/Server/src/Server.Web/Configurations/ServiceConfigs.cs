@@ -92,11 +92,19 @@ public static class ServiceConfigs
     .AddBearerToken(IdentityConstants.BearerScheme)
     .AddCookie(IdentityConstants.ApplicationScheme);
 
+    // Scope cookie names by instance so multiple worktrees on localhost don't collide
+    var cookieSuffix = builder.Configuration["CookieSuffix"] ?? string.Empty;
+
+    services.ConfigureApplicationCookie(options =>
+    {
+      options.Cookie.Name = $".AspNetCore.Identity.Application{cookieSuffix}";
+    });
+
     // Configure CSRF protection for cookie-based authentication
     services.AddAntiforgery(options =>
     {
       options.HeaderName = "X-XSRF-TOKEN";
-      options.Cookie.Name = "XSRF-TOKEN";
+      options.Cookie.Name = $"XSRF-TOKEN{cookieSuffix}";
       options.Cookie.HttpOnly = false; // Client needs to read it
       options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
       options.Cookie.SameSite = SameSiteMode.Strict;
