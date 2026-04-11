@@ -1,17 +1,17 @@
 .cds--header {
-  background-color: #f4f4f4;
-  border-bottom: 1px solid #e0e0e0;
+  background-color: var(--cds-layer-01);
+  border-bottom: 1px solid var(--cds-border-subtle-01);
 }
 
 .cds--header__name {
-  color: #5cb85c;
+  color: var(--cds-link-primary);
   font-family: 'Titillium Web', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
 }
 
 .cds--header__name:hover {
-  color: #5cb85c;
+  color: var(--cds-link-primary);
 }
 
 /* SideNav styles (merged from AppSidebar.css) */

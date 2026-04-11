@@ -1,0 +1,13 @@
+{
+  "rules": {
+    "declaration-property-value-disallowed-list": [{
+      "/.*/": ["/#[0-9a-fA-F]{3,8}/"]
+    }, {
+      "message": "Hex colors are banned — use Carbon design tokens (var(--cds-*)) instead"
+    }],
+    "color-named": ["never", {
+      "message": "Named colors are banned — use Carbon design tokens (var(--cds-*)) instead",
+      "ignore": ["inside-function"]
+    }]
+  }
+}

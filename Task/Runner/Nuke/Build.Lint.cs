@@ -30,8 +30,8 @@ public partial class Build
               .SetProject(ServerSolution));
       });
 
-  internal Target LintClientVerify => _ => _
-      .Description("Verify client code formatting and style")
+  internal Target LintClientCodeVerify => _ => _
+      .Description("Verify client code with ESLint and locale parity checks")
       .DependsOn(InstallClient)
       .Executes(() =>
       {
@@ -41,8 +41,8 @@ public partial class Build
               .SetCommand("lint"));
       });
 
-  internal Target LintClientFix => _ => _
-      .Description("Fix client code formatting and style issues automatically")
+  internal Target LintClientCodeFix => _ => _
+      .Description("Fix client ESLint issues automatically")
       .DependsOn(InstallClient)
       .Executes(() =>
       {
@@ -50,6 +50,81 @@ public partial class Build
         NpmRun(s => s
               .SetProcessWorkingDirectory(ClientDirectory)
               .SetCommand("lint:fix"));
+      });
+
+  internal Target LintClientStylesVerify => _ => _
+      .Description("Verify client CSS uses Carbon design tokens (no hex colors)")
+      .DependsOn(InstallClient)
+      .Executes(() =>
+      {
+        Log.Information($"Running Stylelint on {ClientDirectory}");
+        NpmRun(s => s
+              .SetProcessWorkingDirectory(ClientDirectory)
+              .SetCommand("lint:styles"));
+      });
+
+  internal Target LintClientStylesFix => _ => _
+      .Description("Fix client Stylelint issues automatically")
+      .DependsOn(InstallClient)
+      .Executes(() =>
+      {
+        Log.Information($"Running Stylelint fix on {ClientDirectory}");
+        NpmRun(s => s
+              .SetProcessWorkingDirectory(ClientDirectory)
+              .SetCommand("lint:styles:fix"));
+      });
+
+  internal Target LintClientVerify => _ => _
+      .Description("Verify all client linting (code + styles). Runs both linters and reports all failures")
+      .DependsOn(InstallClient)
+      .Executes(() =>
+      {
+        var failures = new List<string>();
+
+        try
+        {
+          Log.Information($"Running ESLint on {ClientDirectory}");
+          NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("lint"));
+        }
+        catch (ProcessException)
+        {
+          failures.Add("ESLint");
+        }
+
+        try
+        {
+          Log.Information($"Running Stylelint on {ClientDirectory}");
+          NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("lint:styles"));
+        }
+        catch (ProcessException)
+        {
+          failures.Add("Stylelint");
+        }
+
+        if (failures.Any())
+        {
+          throw new Exception($"Client lint failures: {string.Join(", ", failures)}");
+        }
+      });
+
+  internal Target LintClientFix => _ => _
+      .Description("Fix all client linting issues (code + styles)")
+      .DependsOn(InstallClient)
+      .Executes(() =>
+      {
+        Log.Information($"Running ESLint fix on {ClientDirectory}");
+        NpmRun(s => s
+              .SetProcessWorkingDirectory(ClientDirectory)
+              .SetCommand("lint:fix"));
+
+        Log.Information($"Running Stylelint fix on {ClientDirectory}");
+        NpmRun(s => s
+              .SetProcessWorkingDirectory(ClientDirectory)
+              .SetCommand("lint:styles:fix"));
       });
 
   internal Target LintNukeVerify => _ => _
@@ -158,7 +233,7 @@ public partial class Build
 
   internal Target LintAllVerify => _ => _
       .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
-      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintClaudeMdVerify, LintClaudeRulesVerify, LintApiClientVerify, LintAppSettingsVerify)
+      .DependsOn(LintClientVerify, LintClientCodeVerify, LintClientStylesVerify, LintServerVerify, LintNukeVerify, LintClaudeMdVerify, LintClaudeRulesVerify, LintApiClientVerify, LintAppSettingsVerify)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
@@ -171,7 +246,7 @@ public partial class Build
 
   internal Target LintAllFix => _ => _
       .Description("Fix all C# formatting & analyzer issues automatically")
-      .DependsOn(LintClientFix, LintServerFix, LintNukeFix)
+      .DependsOn(LintClientFix, LintClientCodeFix, LintClientStylesFix, LintServerFix, LintNukeFix)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";

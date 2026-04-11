@@ -17,8 +17,13 @@ if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*npm\s+(run|test)\b'; then
   exit 2
 fi
 
-if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*npx\s+(vitest|eslint|tsc)\b'; then
+if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*npx\s+(vitest|eslint|stylelint|tsc)\b'; then
   echo "BLOCKED: Do not run frontend tools directly. Use ./build.sh <target> instead. Key targets: TestClient, LintClientVerify, BuildClient" >&2
+  exit 2
+fi
+
+if echo "$COMMAND" | grep -qE '(^|\||&&|;)\s*node_modules/\.bin/'; then
+  echo "BLOCKED: Do not run node_modules/.bin/* directly. Use ./build.sh <target> instead." >&2
   exit 2
 fi
 

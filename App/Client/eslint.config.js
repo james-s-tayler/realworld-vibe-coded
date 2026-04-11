@@ -49,6 +49,7 @@ export default defineConfig([
       'custom-rules/cbn002-no-empty-label-text': 'error',
       'custom-rules/cbn004-no-on-key-press': 'error',
       'custom-rules/cbn005-no-inline-notification': 'error',
+      'custom-rules/cbn006-no-legacy-class-names': 'error',
     },
   },
 

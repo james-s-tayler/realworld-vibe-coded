@@ -53,20 +53,24 @@ All user-facing strings must use `useTranslation()` hook. Never hardcode display
 - **Carbon Tabs:** `selectedIndex={-1}` doesn't work — compute the proper tab index for dynamic tab sets
 - **Kiota body-less PUT/POST:** Kiota sends no body and no `Content-Type` header for endpoints without a request body defined in the OpenAPI spec. FastEndpoints rejects these with 415. The fix is on the backend — annotate all route-bound properties with `[RouteParam]` so FastEndpoints accepts `*/*`. Never bypass Kiota with raw `fetch` for this — fix the root cause.
 
-## Carbon Design System Styling
+## Carbon Design System — CSS-Last Approach
 
-- Use Carbon's `<Theme theme="g100">` wrapper for dark-themed sections (e.g., sidebar)
-- Override Carbon token variables (e.g., `--cds-layer`) on scoped selectors, not globally
-- For layout CSS (spacing, sizing, positioning), use standard CSS — not Carbon tokens
-- Scope Carbon overrides to component class (e.g., `.app-sidebar .cds--side-nav__item`)
+Prefer Carbon components and tokens over custom CSS. Write custom CSS only when no Carbon component or token covers the need.
+
+- **Layout:** Use `Grid`/`Column` from `@carbon/react` — not custom flexbox grids
+- **Colors:** Use `var(--cds-*)` tokens — hex colors and named colors are banned by Stylelint (`LintClientStylesVerify`)
+- **Spacing:** Prefer Carbon spacing tokens (`var(--cds-spacing-*)`) for margin, padding, gap
+- **Alignment:** Use Carbon layout props or flexbox `align-self` — not `float`
+- **Theming:** Use `<Theme theme="g100">` for dark sections; scope overrides to component selectors
+- Legacy Bootstrap class names (`col-md-*`, `pull-xs-*`, etc.) are banned by ESLint (CBN006)
 
 ## Frontend Implementation Checklist
 
 Before implementing a frontend page/component:
 1. Check generated types in `src/api/generated/models/` — know what fields are available
-2. Check existing components in `src/components/` — reuse before creating new ones
-3. Check existing API modules in `src/api/` — extend before creating new ones
-4. Check existing CSS classes in stylesheets — use before adding new ones
+2. Check if a Carbon component already handles the UI need — use before writing custom CSS
+3. Check existing components in `src/components/` — reuse before creating new ones
+4. Check existing API modules in `src/api/` — extend before creating new ones
 
 After implementing:
 1. Verify with `./build.sh BuildClient` (auto-regenerates Kiota types)

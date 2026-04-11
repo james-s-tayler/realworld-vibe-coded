@@ -3,6 +3,6 @@
   padding: 1.5rem 0;
 }
 
-.pull-xs-right {
-  float: right;
+.auth-page .cds--stack > .cds--btn {
+  align-self: flex-end;
 }

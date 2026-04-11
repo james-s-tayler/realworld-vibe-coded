@@ -6,8 +6,8 @@
 
 .tag-pill {
   cursor: pointer;
-  background-color: #818181;
-  color: white;
+  background-color: var(--cds-background-inverse);
+  color: var(--cds-text-on-color);
   border: none;
   border-radius: 10rem;
   padding: 0.25rem 0.6rem;
@@ -15,12 +15,12 @@
 }
 
 .tag-pill:hover {
-  background-color: #687077;
+  background-color: var(--cds-background-inverse-hover);
 }
 
 .tag-list-loading,
 .tag-list-empty {
   padding: 1rem;
   text-align: center;
-  color: #999;
+  color: var(--cds-text-helper);
 }

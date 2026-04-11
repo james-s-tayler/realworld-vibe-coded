@@ -1,6 +1,6 @@
 .article-preview {
   padding: 1.5rem 0;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--cds-border-subtle-00);
 }
 
 .article-meta {
@@ -30,7 +30,7 @@
 }
 
 .author-name {
-  color: #5cb85c;
+  color: var(--cds-link-primary);
   font-weight: 500;
   font-size: 0.9rem;
   overflow-wrap: break-word;
@@ -39,18 +39,18 @@
 }
 
 .article-date {
-  color: #bbb;
+  color: var(--cds-text-helper);
   font-size: 0.8rem;
 }
 
 .favorite-button {
-  color: #5cb85c;
-  border: 1px solid #5cb85c;
+  color: var(--cds-link-primary);
+  border: 1px solid var(--cds-link-primary);
 }
 
 .favorite-button.favorited {
-  background-color: #5cb85c;
-  color: white;
+  background-color: var(--cds-link-primary);
+  color: var(--cds-text-on-color);
 }
 
 .article-link {
@@ -62,7 +62,7 @@
 .article-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #373a3c;
+  color: var(--cds-text-primary);
   margin-bottom: 0.5rem;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -71,7 +71,7 @@
 
 .article-description {
   font-size: 1rem;
-  color: #999;
+  color: var(--cds-text-helper);
   margin-bottom: 1rem;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -85,7 +85,7 @@
 }
 
 .read-more {
-  color: #bbb;
+  color: var(--cds-text-helper);
   font-size: 0.8rem;
 }
 

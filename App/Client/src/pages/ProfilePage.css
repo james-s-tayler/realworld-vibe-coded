@@ -10,9 +10,15 @@
 }
 
 .user-info {
-  background: #f3f3f3;
+  background-color: var(--cds-layer-01);
   padding: 2rem 0;
   text-align: center;
+}
+
+.user-info-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .user-img {
@@ -32,10 +38,9 @@
 }
 
 .user-info p {
-  color: #999;
+  color: var(--cds-text-helper);
   margin-bottom: 1rem;
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
 }
-

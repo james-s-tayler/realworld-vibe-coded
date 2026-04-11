@@ -23,9 +23,7 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile }) 
 
   return (
     <div className="user-info">
-      <div className="container">
-        <div className="row">
-          <div className="col-xs-12 col-md-10 offset-md-1">
+      <div className="user-info-inner">
             <img
               src={profile.image || DEFAULT_PROFILE_IMAGE}
               alt={profile.username}
@@ -40,8 +38,6 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile }) 
                 </Button>
               </Link>
             )}
-          </div>
-        </div>
       </div>
     </div>
   );

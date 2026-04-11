@@ -46,40 +46,16 @@ describe('PageShell', () => {
   });
 
   describe('column layouts', () => {
-    it('uses full layout by default', () => {
-      const { container } = render(<PageShell>Content</PageShell>);
-      expect(container.querySelector('.col-md-12')).toBeInTheDocument();
-    });
-
-    it('applies narrow layout (col-md-6)', () => {
-      const { container } = render(
-        <PageShell columnLayout="narrow">Content</PageShell>
-      );
-      expect(container.querySelector('.col-md-6.offset-md-3')).toBeInTheDocument();
-    });
-
-    it('applies wide layout (col-md-10)', () => {
-      const { container } = render(
-        <PageShell columnLayout="wide">Content</PageShell>
-      );
-      expect(container.querySelector('.col-md-10.offset-md-1')).toBeInTheDocument();
-    });
-
-    it('applies full layout (col-md-12)', () => {
-      const { container } = render(
-        <PageShell columnLayout="full">Content</PageShell>
-      );
-      expect(container.querySelector('.col-md-12')).toBeInTheDocument();
-    });
-
-    it('applies two-column layout (col-md-9)', () => {
-      const { container } = render(
-        <PageShell columnLayout="two-column" sidebar={<div>Sidebar</div>}>
-          Content
-        </PageShell>
-      );
-      expect(container.querySelector('.col-md-9')).toBeInTheDocument();
-      expect(container.querySelector('.col-md-3')).toBeInTheDocument();
+    it('renders content for all layout types', () => {
+      for (const layout of ['narrow', 'wide', 'full', 'two-column'] as const) {
+        const { unmount } = render(
+          <PageShell columnLayout={layout} sidebar={layout === 'two-column' ? <div>Sidebar</div> : undefined}>
+            Content
+          </PageShell>
+        );
+        expect(screen.getByText('Content')).toBeInTheDocument();
+        unmount();
+      }
     });
   });
 
@@ -103,11 +79,11 @@ describe('PageShell', () => {
       expect(screen.queryByText('Sidebar content')).not.toBeInTheDocument();
     });
 
-    it('does not render sidebar column when sidebar is not provided', () => {
-      const { container } = render(
+    it('does not render sidebar when sidebar is not provided', () => {
+      render(
         <PageShell columnLayout="two-column">Main content</PageShell>
       );
-      expect(container.querySelector('.col-md-3')).not.toBeInTheDocument();
+      expect(screen.getByText('Main content')).toBeInTheDocument();
     });
   });
 

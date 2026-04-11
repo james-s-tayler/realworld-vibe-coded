@@ -25,7 +25,7 @@ const { data, error, loading, execute } = useApiCall(
 </PageShell>
 ```
 
-Layout options: `narrow` (50% centered), `wide` (83%), `full` (100%), `two-column` (70/30 with sidebar)
+PageShell uses Carbon `Grid`/`Column` internally. Layout options: `narrow`, `wide`, `full`, `two-column`
 
 ## Carbon Design System
 
@@ -33,6 +33,7 @@ Layout options: `narrow` (50% centered), `wide` (83%), `full` (100%), `two-colum
 import {
   Form, TextInput, TextArea, Button, Loading, InlineNotification,
   Stack, Tabs, TabList, Tab, TabPanels, TabPanel, Tag, Pagination, Modal,
+  Grid, Column,
 } from '@carbon/react';
 import { Add, FavoriteFilled, Favorite, UserFollow, Settings } from '@carbon/icons-react';
 ```
@@ -43,10 +44,13 @@ import { Add, FavoriteFilled, Favorite, UserFollow, Settings } from '@carbon/ico
 - `Tag`: supports `onClick`, `size="sm"`; `Pagination`: for article list pagination
 - `OverflowMenu`: use `iconDescription` (NOT `aria-label`) for accessible name
 
-## CSS Classes (from existing stylesheets)
+## CSS — Carbon-First
 
-- `.article-preview` — Card; `.article-meta`, `.author-info`, `.author-image` — Author
-- `.tag-pill`, `.tag-list` — Tags; `.sidebar` — Sidebar; `.pull-xs-right` — Float right
+Minimize custom CSS. Use Carbon components, tokens, and layout primitives before writing CSS.
+- Colors: `var(--cds-text-primary)`, `var(--cds-link-primary)`, `var(--cds-border-subtle-01)`, etc.
+- No hex colors or named colors in CSS (Stylelint-enforced)
+- No Bootstrap/legacy class names in JSX (ESLint CBN006-enforced)
+- No `float` — use flexbox `align-self` or Carbon `Grid`/`Column`
 
 ## Error Handling
 
@@ -74,10 +78,8 @@ export const featureApi = {
 
 ## Carbon i18n
 
-Use `translateWithId` for DataTable/Dropdown: `(id) => t('carbon.${id}')`.
-For Pagination, pass translated text props (`backwardText`, `forwardText`, etc.). See `.claude/rules/i18n.md`.
+`translateWithId` for DataTable/Dropdown: `(id) => t('carbon.${id}')`. Pagination: pass translated text props. See `.claude/rules/i18n.md`.
 
 ## Testing (Vitest)
 
-- Mock API modules matching their export structure (object with methods)
-- `vi.clearAllMocks()` in `beforeEach`; use `MemoryRouter` for route-dependent components
+- Mock API modules matching export structure; `vi.clearAllMocks()` in `beforeEach`; `MemoryRouter` for routes

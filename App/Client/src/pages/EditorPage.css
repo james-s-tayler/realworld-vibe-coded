@@ -3,8 +3,7 @@
   padding: 1.5rem 0;
 }
 
-.editor-page .text-xs-center {
-  text-align: center;
+.editor-page .page-shell-title {
   margin-bottom: 2rem;
 }
 
@@ -15,6 +14,6 @@
   margin-top: 0.5rem;
 }
 
-.editor-page .pull-xs-right {
-  float: right;
+.editor-page .cds--stack > .cds--btn {
+  align-self: flex-end;
 }
