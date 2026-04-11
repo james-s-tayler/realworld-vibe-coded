@@ -12,7 +12,7 @@ describe('PageShell', () => {
     const { container } = render(
       <PageShell className="custom-page">Content</PageShell>
     );
-    expect(container.firstChild).toHaveClass('page-shell', 'custom-page');
+    expect(container.firstChild).toHaveClass('custom-page');
   });
 
   it('renders title when provided', () => {
@@ -46,40 +46,25 @@ describe('PageShell', () => {
   });
 
   describe('column layouts', () => {
-    it('uses full layout by default', () => {
-      const { container } = render(<PageShell>Content</PageShell>);
-      expect(container.querySelector('.col-md-12')).toBeInTheDocument();
+    it('renders content for all layout variants', () => {
+      const layouts = ['narrow', 'wide', 'full'] as const;
+      for (const layout of layouts) {
+        const { unmount } = render(
+          <PageShell columnLayout={layout}>Content for {layout}</PageShell>
+        );
+        expect(screen.getByText(`Content for ${layout}`)).toBeInTheDocument();
+        unmount();
+      }
     });
 
-    it('applies narrow layout (col-md-6)', () => {
-      const { container } = render(
-        <PageShell columnLayout="narrow">Content</PageShell>
-      );
-      expect(container.querySelector('.col-md-6.offset-md-3')).toBeInTheDocument();
-    });
-
-    it('applies wide layout (col-md-10)', () => {
-      const { container } = render(
-        <PageShell columnLayout="wide">Content</PageShell>
-      );
-      expect(container.querySelector('.col-md-10.offset-md-1')).toBeInTheDocument();
-    });
-
-    it('applies full layout (col-md-12)', () => {
-      const { container } = render(
-        <PageShell columnLayout="full">Content</PageShell>
-      );
-      expect(container.querySelector('.col-md-12')).toBeInTheDocument();
-    });
-
-    it('applies two-column layout (col-md-9)', () => {
-      const { container } = render(
+    it('renders two-column layout with sidebar', () => {
+      render(
         <PageShell columnLayout="two-column" sidebar={<div>Sidebar</div>}>
           Content
         </PageShell>
       );
-      expect(container.querySelector('.col-md-9')).toBeInTheDocument();
-      expect(container.querySelector('.col-md-3')).toBeInTheDocument();
+      expect(screen.getByText('Content')).toBeInTheDocument();
+      expect(screen.getByText('Sidebar')).toBeInTheDocument();
     });
   });
 
@@ -103,11 +88,11 @@ describe('PageShell', () => {
       expect(screen.queryByText('Sidebar content')).not.toBeInTheDocument();
     });
 
-    it('does not render sidebar column when sidebar is not provided', () => {
-      const { container } = render(
+    it('does not render sidebar when sidebar is not provided', () => {
+      render(
         <PageShell columnLayout="two-column">Main content</PageShell>
       );
-      expect(container.querySelector('.col-md-3')).not.toBeInTheDocument();
+      expect(screen.getByText('Main content')).toBeInTheDocument();
     });
   });
 

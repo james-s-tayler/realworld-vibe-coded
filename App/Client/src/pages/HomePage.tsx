@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Tabs, TabList, Tab, TabPanels, TabPanel, Tile, Pagination } from '@carbon/react';
+import { Grid, Column, Tabs, TabList, Tab, TabPanels, TabPanel, Tile, Pagination } from '@carbon/react';
 import { useToast } from '../hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -20,10 +20,12 @@ const HomeBanner: React.FC = () => {
   const { t } = useTranslation();
   return (
     <div className="banner">
-      <div className="container">
-        <h1 className="banner-title">{t('home.bannerTitle')}</h1>
-        <p className="banner-subtitle">{t('home.bannerSubtitle')}</p>
-      </div>
+      <Grid>
+        <Column lg={16} md={8} sm={4}>
+          <h1 className="banner-title">{t('home.bannerTitle')}</h1>
+          <p className="banner-subtitle">{t('home.bannerSubtitle')}</p>
+        </Column>
+      </Grid>
     </div>
   );
 };

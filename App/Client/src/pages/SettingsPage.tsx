@@ -154,7 +154,7 @@ export const SettingsPage: React.FC = () => {
             }}
           />
 
-          <Button type="submit" disabled={loading} size="lg" className="pull-xs-right">
+          <Button type="submit" disabled={loading} size="lg">
             {loading ? t('settings.submitting') : t('settings.submit')}
           </Button>
         </Stack>

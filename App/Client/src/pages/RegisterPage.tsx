@@ -77,7 +77,7 @@ export const RegisterPage: React.FC = () => {
             minLength={USER_CONSTRAINTS.PASSWORD_MIN_LENGTH}
           />
 
-          <Button type="submit" disabled={isPending} size="lg" className="pull-xs-right">
+          <Button type="submit" disabled={isPending} size="lg">
             {isPending ? t('register.submitting') : t('register.submit')}
           </Button>
         </Stack>
