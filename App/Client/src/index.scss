@@ -1,6 +1,9 @@
+@use '@carbon/react/scss/theme' as *;
 @import 'https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap';
 
 :root {
+  @include theme;
+
   --header-height: 3rem; /* Carbon Design System header height (48px) */
   --sidebar-width: 256px;
 
