@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1580" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <rect width="1100" height="1580" fill="white"/>
   <style>
     .layer-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; }
     .box-title { font-size: 12px; font-weight: 600; }
