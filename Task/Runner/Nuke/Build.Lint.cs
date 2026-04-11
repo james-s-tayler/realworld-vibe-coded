@@ -74,8 +74,19 @@ public partial class Build
               .SetCommand("lint:styles:fix"));
       });
 
+  internal Target LintClientDeadCodeVerify => _ => _
+      .Description("Detect unused files, exports, and dependencies with knip")
+      .DependsOn(InstallClient)
+      .Executes(() =>
+      {
+        Log.Information($"Running knip on {ClientDirectory}");
+        NpmRun(s => s
+              .SetProcessWorkingDirectory(ClientDirectory)
+              .SetCommand("lint:dead-code"));
+      });
+
   internal Target LintClientVerify => _ => _
-      .Description("Verify all client linting (code + styles). Runs both linters and reports all failures")
+      .Description("Verify all client linting (code + styles + dead code). Runs all linters and reports all failures")
       .DependsOn(InstallClient)
       .Executes(() =>
       {
@@ -103,6 +114,18 @@ public partial class Build
         catch (ProcessException)
         {
           failures.Add("Stylelint");
+        }
+
+        try
+        {
+          Log.Information($"Running knip on {ClientDirectory}");
+          NpmRun(s => s
+                .SetProcessWorkingDirectory(ClientDirectory)
+                .SetCommand("lint:dead-code"));
+        }
+        catch (ProcessException)
+        {
+          failures.Add("knip");
         }
 
         if (failures.Any())
@@ -233,7 +256,7 @@ public partial class Build
 
   internal Target LintAllVerify => _ => _
       .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
-      .DependsOn(LintClientVerify, LintClientCodeVerify, LintClientStylesVerify, LintServerVerify, LintNukeVerify, LintClaudeMdVerify, LintClaudeRulesVerify, LintApiClientVerify, LintAppSettingsVerify)
+      .DependsOn(LintClientVerify, LintClientCodeVerify, LintClientStylesVerify, LintClientDeadCodeVerify, LintServerVerify, LintNukeVerify, LintClaudeMdVerify, LintClaudeRulesVerify, LintApiClientVerify, LintAppSettingsVerify)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";

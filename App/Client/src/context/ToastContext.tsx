@@ -1,8 +1,6 @@
 import React, { useState, useCallback, type ReactNode } from 'react';
 import { ToastContext, type Toast } from './ToastContextType';
 
-export { ToastContext };
-
 let nextId = 0;
 
 interface ToastProviderProps {

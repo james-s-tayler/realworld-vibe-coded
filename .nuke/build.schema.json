@@ -49,6 +49,7 @@
         "LintClaudeRulesVerify",
         "LintClientCodeFix",
         "LintClientCodeVerify",
+        "LintClientDeadCodeVerify",
         "LintClientFix",
         "LintClientStylesFix",
         "LintClientStylesVerify",

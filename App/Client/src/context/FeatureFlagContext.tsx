@@ -5,8 +5,6 @@ import { featureFlagsApi } from '../api/featureFlagsApi';
 import { useAuth } from '../hooks/useAuth';
 import { FeatureFlagContext } from './FeatureFlagContextType';
 
-export { FeatureFlagContext };
-
 interface FeatureFlagProviderProps {
   children: ReactNode;
 }

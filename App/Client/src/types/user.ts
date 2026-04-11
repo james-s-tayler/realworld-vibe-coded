@@ -7,37 +7,6 @@ export interface User {
   language: string;
 }
 
-export interface LoginRequest {
-  user: {
-    email: string;
-    password: string;
-  };
-}
-
-export interface RegisterRequest {
-  user: {
-    email: string;
-    password: string;
-  };
-}
-
-export interface UpdateUserRequest {
-  user: {
-    email?: string;
-    username?: string;
-    password?: string;
-    bio?: string;
-    image?: string;
-    language?: string;
-  };
-}
-
 export interface UserResponse {
   user: User;
-}
-
-export interface ErrorResponse {
-  errors: {
-    body: string[];
-  };
 }

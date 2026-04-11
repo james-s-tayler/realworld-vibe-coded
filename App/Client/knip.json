@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignore": ["src/api/generated/**"],
+  "exclude": ["types", "nsTypes"],
+  "ignoreDependencies": [
+    "@carbon/icons-react",
+    "@carbon/styles",
+    "@microsoft/kiota-abstractions",
+    "@microsoft/kiota-bundle",
+    "@microsoft/kiota-http-fetchlibrary",
+    "@microsoft/kiota-serialization-form",
+    "@microsoft/kiota-serialization-json",
+    "@microsoft/kiota-serialization-multipart",
+    "@microsoft/kiota-serialization-text",
+    "mkdirp"
+  ]
+}
