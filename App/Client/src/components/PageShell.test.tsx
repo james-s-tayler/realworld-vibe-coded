@@ -12,7 +12,7 @@ describe('PageShell', () => {
     const { container } = render(
       <PageShell className="custom-page">Content</PageShell>
     );
-    expect(container.firstChild).toHaveClass('page-shell', 'custom-page');
+    expect(container.firstChild).toHaveClass('custom-page');
   });
 
   it('renders title when provided', () => {

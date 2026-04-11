@@ -1,6 +1,5 @@
 import React from 'react';
 import { Grid, Column } from '@carbon/react';
-import './PageShell.css';
 
 type ColumnLayout = 'narrow' | 'wide' | 'full' | 'two-column';
 
@@ -30,15 +29,13 @@ export const PageShell: React.FC<PageShellProps> = ({
   banner,
   sidebar,
 }) => {
-  const pageClassName = ['page-shell', className].filter(Boolean).join(' ');
-
   return (
-    <div className={pageClassName}>
-      {banner && <div className="page-shell-banner">{banner}</div>}
-      <Grid className="page-shell-grid">
+    <div className={className}>
+      {banner}
+      <Grid>
         <Column {...columnProps[columnLayout]}>
-          {title && <h1 className="page-shell-title">{title}</h1>}
-          {subtitle && <p className="page-shell-subtitle">{subtitle}</p>}
+          {title && <h1>{title}</h1>}
+          {subtitle && <p>{subtitle}</p>}
           {children}
         </Column>
         {columnLayout === 'two-column' && sidebar && (
