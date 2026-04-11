@@ -23,7 +23,13 @@ body {
 #root {
   min-height: 100vh;
   padding-top: var(--header-height);
-  padding-left: var(--sidebar-width);
+}
+
+/* Carbon's SideNav with isChildOfHeader auto-pushes content at lg+ */
+@media (min-width: 66rem) {
+  #root {
+    padding-left: var(--sidebar-width);
+  }
 }
 
 a {

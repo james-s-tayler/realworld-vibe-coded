@@ -68,6 +68,7 @@
         "TestE2eArticles",
         "TestE2eAuth",
         "TestE2eFeed",
+        "TestE2eMobile",
         "TestE2eMultitenancy",
         "TestServer",
         "TestServerPostmanArticle",

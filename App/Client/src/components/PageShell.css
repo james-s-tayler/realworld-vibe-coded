@@ -79,8 +79,12 @@
   width: 100%;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Responsive adjustments — aligned with Carbon lg breakpoint (1056px) where sidebar collapses */
+@media (max-width: 66rem) {
+  .page-shell .container.page {
+    padding: 1rem;
+  }
+
   .page-shell .col-md-6,
   .page-shell .col-md-9,
   .page-shell .col-md-10,
