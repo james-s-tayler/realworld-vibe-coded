@@ -1,11 +1,10 @@
 @use '@carbon/react/scss/theme' as *;
+@use '@carbon/react/scss/breakpoint' as *;
+@use '@carbon/styles/scss/components/ui-shell/functions' as shell;
 @import 'https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap';
 
 :root {
   @include theme;
-
-  --header-height: 3rem; /* Carbon Design System header height (48px) */
-  --sidebar-width: 256px;
 
   font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.5;
@@ -26,13 +25,15 @@ body {
 
 #root {
   min-height: 100vh;
-  padding-top: var(--header-height);
 }
 
-/* Carbon's SideNav with isChildOfHeader auto-pushes content at lg+ */
-@media (width >= 66rem) {
-  #root {
-    padding-left: var(--sidebar-width);
+/* Carbon Content handles header offset; zero padding since Grid has its own gutters.
+   SideNav with isChildOfHeader needs manual margin since the sibling CSS selector doesn't match. */
+.cds--content {
+  padding: 0;
+
+  @include breakpoint(lg) {
+    margin-inline-start: shell.mini-units(32);
   }
 }
 

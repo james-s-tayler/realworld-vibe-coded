@@ -15,8 +15,6 @@
   background: var(--cds-background-inverse);
   color: var(--cds-text-on-color);
   padding: $spacing-07 0;
-  padding-top: calc(#{$spacing-07} + var(--header-height));
-  margin-top: calc(-1 * var(--header-height));
 }
 
 .article-page .banner h1 {
