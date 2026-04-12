@@ -52,6 +52,7 @@ The generated API client (`src/api/generated/`) is the **type contract** between
 - **Colors:** Use `var(--cds-text-primary)`, `var(--cds-layer-01)`, etc. These ARE real CSS custom properties emitted by Carbon's theme system.
 - **Typography:** `@use '@carbon/react/scss/type' as type;` then use `@include type.type-style('heading-03');`. SCSS mixins only — sets font-size, weight, line-height, letter-spacing together. Never set font-size/font-weight individually.
 - **Font:** IBM Plex Sans globally (from Carbon). No custom fonts.
+- **Philosophy:** Express all visual decisions through Carbon tokens and mixins, not raw CSS values. Tokens are the API contract; raw values bypass the design system.
 - **Never use hard-coded hex colors, arbitrary rem/px spacing, or arbitrary font-size values.** `stylelint-plugin-carbon-tokens` enforces all three (`carbon/theme-use`, `carbon/layout-use`, `carbon/type-use`) via `LintClientStylelintVerify`.
 
 **Never write direct CSS overrides for Carbon components.** Before adding custom CSS for colors, theming, hover states, or layout of any Carbon component:
