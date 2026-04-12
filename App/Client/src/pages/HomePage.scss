@@ -1,10 +1,6 @@
 @use '@carbon/react/scss/spacing' as *;
 @use '@carbon/react/scss/type' as type;
 
-.home-page {
-  min-height: 100vh;
-}
-
 .banner {
   background: linear-gradient(135deg, var(--cds-link-primary) 0%, var(--cds-link-visited) 100%);
   padding: $spacing-07 0;
