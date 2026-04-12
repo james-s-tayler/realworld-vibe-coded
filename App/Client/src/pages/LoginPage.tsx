@@ -6,6 +6,7 @@ import {
   PasswordInput,
   Button,
   Stack,
+  InlineLoading,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -74,9 +75,13 @@ export const LoginPage: React.FC = () => {
             required
           />
 
-          <Button type="submit" disabled={isPending} size="lg">
-            {isPending ? t('login.submitting') : t('login.submit')}
-          </Button>
+          {isPending ? (
+            <InlineLoading status="active" description={t('login.submitting')} />
+          ) : (
+            <Button type="submit" size="lg">
+              {t('login.submit')}
+            </Button>
+          )}
         </Stack>
       </Form>
     </PageShell>

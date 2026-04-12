@@ -72,6 +72,7 @@
       "label": "Comment",
       "placeholder": "Write a comment...",
       "submit": "Post Comment",
+      "submitting": "Posting...",
       "delete": "Delete comment",
       "authPrompt": "Sign in or sign up to add comments on this article."
     },

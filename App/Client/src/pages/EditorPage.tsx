@@ -7,6 +7,7 @@ import {
   Button,
   Stack,
   Tag,
+  InlineLoading,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { articlesApi } from '../api/articles';
@@ -203,13 +204,17 @@ export const EditorPage: React.FC = () => {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={submitting || !title || !description || !body}
-              size="lg"
-                         >
-              {submitting ? t('editor.submitting') : t('editor.submit')}
-            </Button>
+            {submitting ? (
+              <InlineLoading status="active" description={t('editor.submitting')} />
+            ) : (
+              <Button
+                type="submit"
+                disabled={!title || !description || !body}
+                size="lg"
+              >
+                {t('editor.submit')}
+              </Button>
+            )}
           </Stack>
         </Form>
       )}

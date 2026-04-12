@@ -7,6 +7,7 @@ import {
   Button,
   Stack,
   Dropdown,
+  InlineLoading,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -154,9 +155,13 @@ export const SettingsPage: React.FC = () => {
             }}
           />
 
-          <Button type="submit" disabled={loading} size="lg">
-            {loading ? t('settings.submitting') : t('settings.submit')}
-          </Button>
+          {loading ? (
+            <InlineLoading status="active" description={t('settings.submitting')} />
+          ) : (
+            <Button type="submit" size="lg">
+              {t('settings.submit')}
+            </Button>
+          )}
         </Stack>
       </Form>
 
