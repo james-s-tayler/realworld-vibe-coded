@@ -24,6 +24,10 @@ Focused debugging recipes using Chrome DevTools MCP tools. Requires the app to b
 2. `get_console_message` — get full stack traces
 3. Fix frontend code → `./build.sh BuildClient --agent` → restart → verify
 
+## Authentication
+
+If you need to debug pages behind authentication, **register a new account** via the Sign up page first — never guess credentials for an existing account. If you get redirected to `/login`, register before retrying.
+
 ## Walking Through E2E Test Steps
 
 Manually reproduce what a Playwright test does to diagnose failures:
