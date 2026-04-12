@@ -2,7 +2,7 @@
 
 .toast-container {
   position: fixed;
-  top: var(--header-height);
+  top: $spacing-09;
   right: $spacing-05;
   z-index: 9000;
   display: flex;

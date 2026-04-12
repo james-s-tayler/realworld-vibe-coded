@@ -99,6 +99,14 @@ public partial class Build
             workingDirectory: RootDirectory,
             environmentVariables: envVars);
       process.WaitForExit();
+
+      if (Agent)
+      {
+        var offset = Constants.Worktree.GetPortOffset(RootDirectory);
+        var httpsPort = 5001 + offset;
+        var appUrl = $"https://localhost:{httpsPort}";
+        Log.Information("Application is running at {Url}", appUrl);
+      }
     });
 
   internal Target RunLocalPublishDown => _ => _

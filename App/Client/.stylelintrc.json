@@ -27,10 +27,9 @@
       {
         "acceptCarbonCustomProp": true,
         "acceptValues": [
-          "/var\\(--header-height\\)/",
-          "/var\\(--sidebar-width\\)/",
           "/^0$/",
-          "auto"
+          "auto",
+          "/mini-units/"
         ],
         "severity": "error"
       }

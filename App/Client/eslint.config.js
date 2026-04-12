@@ -68,6 +68,15 @@ export default defineConfig([
     },
   },
 
+  // TST001: No userEvent.type() in tests (causes CI flakiness)
+  {
+    files: ['src/**/*.test.{ts,tsx}'],
+    plugins: { 'custom-rules': customRules },
+    rules: {
+      'custom-rules/tst001-no-user-event-type': 'error',
+    },
+  },
+
   // ARCH001: No direct useContext in pages/components
   {
     files: ['src/pages/**/*.{ts,tsx}', 'src/components/**/*.{ts,tsx}'],

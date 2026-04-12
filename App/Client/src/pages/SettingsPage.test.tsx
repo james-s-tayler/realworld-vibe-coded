@@ -71,7 +71,8 @@ describe('SettingsPage', () => {
 
     const bioField = screen.getByPlaceholderText(/short bio about you/i)
     await user.clear(bioField)
-    await user.type(bioField, 'Completely new bio text')
+    await user.click(bioField)
+    await user.paste('Completely new bio text')
     await user.click(screen.getByRole('button', { name: /update settings/i }))
 
     await waitFor(() => {
@@ -98,7 +99,8 @@ describe('SettingsPage', () => {
 
     const usernameField = screen.getByPlaceholderText(/username/i)
     await user.clear(usernameField)
-    await user.type(usernameField, 'existinguser')
+    await user.click(usernameField)
+    await user.paste('existinguser')
     await user.click(screen.getByRole('button', { name: /update settings/i }))
 
     await waitFor(() => {
@@ -125,13 +127,16 @@ describe('SettingsPage', () => {
     })
 
     await user.clear(screen.getByPlaceholderText(/username/i))
-    await user.type(screen.getByPlaceholderText(/username/i), 'newusername')
-    
+    await user.click(screen.getByPlaceholderText(/username/i))
+    await user.paste('newusername')
+
     await user.clear(screen.getByPlaceholderText(/short bio about you/i))
-    await user.type(screen.getByPlaceholderText(/short bio about you/i), 'New bio')
-    
+    await user.click(screen.getByPlaceholderText(/short bio about you/i))
+    await user.paste('New bio')
+
     await user.clear(screen.getByPlaceholderText(/url of profile picture/i))
-    await user.type(screen.getByPlaceholderText(/url of profile picture/i), 'https://example.com/new-avatar.jpg')
+    await user.click(screen.getByPlaceholderText(/url of profile picture/i))
+    await user.paste('https://example.com/new-avatar.jpg')
 
     await user.click(screen.getByRole('button', { name: /update settings/i }))
 
@@ -158,7 +163,8 @@ describe('SettingsPage', () => {
       expect(screen.getByPlaceholderText(/new password/i)).toBeInTheDocument()
     })
 
-    await user.type(screen.getByPlaceholderText(/new password/i), 'newpassword123')
+    await user.click(screen.getByPlaceholderText(/new password/i))
+    await user.paste('newpassword123')
     await user.click(screen.getByRole('button', { name: /update settings/i }))
 
     await waitFor(() => {

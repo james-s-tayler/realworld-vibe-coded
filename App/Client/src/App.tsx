@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
 import { lazy, Suspense } from 'react';
-import { Loading } from '@carbon/react';
+import { Content, Loading } from '@carbon/react';
 import { AuthProvider } from './context/AuthContext';
 import { FeatureFlagProvider } from './context/FeatureFlagContext';
 import { ToastProvider } from './context/ToastContext';
@@ -32,6 +32,7 @@ function App() {
         <FeatureFlagProvider>
           <ToastProvider>
           <AppHeader />
+          <Content>
           <ToastContainer />
           <Suspense fallback={<LazyFallback />}>
             <Routes>
@@ -96,6 +97,7 @@ function App() {
               />
             </Routes>
           </Suspense>
+          </Content>
         </ToastProvider>
         </FeatureFlagProvider>
       </AuthProvider>

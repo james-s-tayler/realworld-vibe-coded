@@ -77,8 +77,10 @@ describe('RegisterPage', () => {
 
     renderRegisterPage()
 
-    await user.type(screen.getByLabelText(/email/i), 'newuser@example.com')
-    await user.type(document.getElementById('password')!, 'password123')
+    await user.click(screen.getByLabelText(/email/i))
+    await user.paste('newuser@example.com')
+    await user.click(document.getElementById('password')!)
+    await user.paste('password123')
     await user.click(screen.getByRole('button', { name: /sign up/i }))
 
     await waitFor(() => {
@@ -88,14 +90,16 @@ describe('RegisterPage', () => {
 
   it('displays error message on registration failure', async () => {
     const user = userEvent.setup()
-    
+
     // Throw an error that normalizeError can handle
     vi.mocked(authApi.register).mockRejectedValue(new Error('email has already been taken'))
 
     renderRegisterPage()
 
-    await user.type(screen.getByLabelText(/email/i), 'test@example.com')
-    await user.type(document.getElementById('password')!, 'password123')
+    await user.click(screen.getByLabelText(/email/i))
+    await user.paste('test@example.com')
+    await user.click(document.getElementById('password')!)
+    await user.paste('password123')
     await user.click(screen.getByRole('button', { name: /sign up/i }))
 
     await waitFor(() => {
