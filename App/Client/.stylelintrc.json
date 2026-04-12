@@ -23,11 +23,23 @@
     "carbon/layout-use": [
       true,
       {
+        "includeProps": [
+          "*",
+          "/^width$/",
+          "/^height$/",
+          "/^min-width$/",
+          "/^max-width$/",
+          "/^min-height$/",
+          "/^max-height$/"
+        ],
         "acceptCarbonCustomProp": true,
         "acceptValues": [
           "/^0$/",
           "auto",
-          "/mini-units/"
+          "/mini-units/",
+          "/inherit|initial|none|unset/",
+          "/^-{0,1}[0-9]*(%|vw|vh)$/",
+          "/calc/"
         ],
         "severity": "error"
       }

@@ -105,7 +105,7 @@ This overrides a Carbon `<Button>` with custom border/background to create a tog
 
 ---
 
-### 5. Hardcoded Image Dimensions
+### ~~5. Hardcoded Image Dimensions~~ FIXED
 
 **Severity:** Medium
 **Files:** Multiple
@@ -121,9 +121,11 @@ All avatar images use hardcoded pixel widths/heights.
 
 **Recommendation:** Replace with spacing tokens: `width: $spacing-07; height: $spacing-07;` for 32px avatars, `width: $spacing-06; height: $spacing-06;` for 24px avatars. For the 100px profile image, there's no exact spacing token, but use rem units at minimum.
 
+**Resolution:** Replaced all hardcoded pixel dimensions with Carbon spacing tokens: `$spacing-07` for 32px avatars, `$spacing-06` for 24px avatars, `$spacing-12` (96px) for the 100px profile avatar (nearest token, imperceptible difference). Extended `carbon/layout-use` stylelint rule to include `width`, `height`, `min-height`, `max-height`, `min-width`, `max-width` to prevent future regressions.
+
 ---
 
-### 6. Hardcoded `z-index: 9000`
+### ~~6. Hardcoded `z-index: 9000`~~ FIXED
 
 **Severity:** Low
 **File:** `ToastContainer.scss:7`
@@ -138,9 +140,11 @@ Carbon has its own z-index layers. The toast should sit above Carbon components 
 
 **Recommendation:** Use Carbon's z-index utilities: `@use '@carbon/react/scss/utilities' as *;` and then reference a documented z-index level, or at minimum extract this to a named variable.
 
+**Resolution:** Replaced `z-index: 9000` with `z-index: z.z('modal')` using Carbon's z-index utility function from `@carbon/styles/scss/utilities/z-index`. Also removed redundant `max-width: 25rem` — Carbon's `ToastNotification` already controls its own width (`inline-size: 288px`).
+
 ---
 
-### 7. Hardcoded Shadow Dimensions
+### ~~7. Hardcoded Shadow Dimensions~~ FIXED
 
 **Severity:** Low
 **File:** `HomePage.scss:10-11, 15`
@@ -157,6 +161,8 @@ Carbon has its own z-index layers. The toast should sit above Carbon components 
 ```
 
 The shadow color correctly uses `var(--cds-shadow)`, but the dimensions (`8px`, `1px 3px`) are hardcoded. The `8px` values could use `$spacing-03` to stay on the spacing grid.
+
+**Resolution:** Replaced `8px` with `$spacing-03` in the banner `box-shadow`. Left `text-shadow: 0 1px 3px` as-is — sub-grid decorative values with no meaningful Carbon token mapping.
 
 ---
 
@@ -320,9 +326,9 @@ Either use `stylelint-declaration-strict-value` for `z-index` to require variabl
 | ~~2~~ | ~~Medium~~ | ~~Custom container bypassing Grid~~ | ~~ArticlePage~~ |
 | ~~3~~ | ~~Low~~ | ~~Line-height overriding type token~~ | ~~ArticlePage~~ |
 | ~~4~~ | ~~Medium~~ | ~~Custom button CSS overrides~~ | ~~ArticlePreview~~ |
-| 5 | Medium | Hardcoded px image dimensions | ArticlePreview, ArticlePage, ProfilePage |
-| 6 | Low | Magic `z-index: 9000` | ToastContainer |
-| 7 | Low | Hardcoded shadow dimensions | HomePage |
+| ~~5~~ | ~~Medium~~ | ~~Hardcoded px image dimensions~~ | ~~ArticlePreview, ArticlePage, ProfilePage~~ |
+| ~~6~~ | ~~Low~~ | ~~Magic `z-index: 9000`~~ | ~~ToastContainer~~ |
+| ~~7~~ | ~~Low~~ | ~~Hardcoded shadow dimensions~~ | ~~HomePage~~ |
 | 8 | High | `window.confirm()` + missing i18n | ArticlePage |
 | 9 | Low | Manual flex stacks could use `<Stack>` | Multiple (5 files) |
 | ~~10~~ | ~~Low~~ | ~~Inconsistent full-height approach~~ | ~~6 page files~~ |
@@ -331,5 +337,5 @@ Either use `stylelint-declaration-strict-value` for `z-index` to require variabl
 | 13 | Low | Banner padding pattern duplicated | 3 page files |
 
 **High:** 1 finding (window.confirm)
-**Medium:** 1 finding remaining (image dimensions)
-**Low:** 6 findings remaining (DRY/consistency improvements)
+**Medium:** 0 findings remaining
+**Low:** 4 findings remaining (DRY/consistency improvements)
