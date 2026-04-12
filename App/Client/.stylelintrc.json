@@ -53,8 +53,7 @@
       {
         "acceptCarbonCustomProp": true,
         "acceptValues": [
-          "/inherit|initial|none|unset/",
-          "/1\\.8/"
+          "/inherit|initial|none|unset/"
         ],
         "severity": "error"
       }

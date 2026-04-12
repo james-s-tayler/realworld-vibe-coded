@@ -44,16 +44,6 @@
   color: var(--cds-text-placeholder);
 }
 
-.favorite-button {
-  color: var(--cds-link-primary);
-  border: 1px solid var(--cds-link-primary);
-}
-
-.favorite-button.favorited {
-  background-color: var(--cds-link-primary);
-  color: var(--cds-text-on-color);
-}
-
 .article-link {
   text-decoration: none;
   color: inherit;
