@@ -74,6 +74,13 @@ hr {
   height: 100vh;
 }
 
+.page-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
 /* Shared layout utilities */
 .article-meta {
   display: flex;

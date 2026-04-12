@@ -50,7 +50,7 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
           </Stack>
         </Link>
         {isAuthor ? (
-          <div className="actions">
+          <Stack orientation="horizontal" gap={3}>
             <Button
               kind="ghost"
               size="sm"
@@ -67,9 +67,9 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
             >
               {t('article.deleteArticle')}
             </Button>
-          </div>
+          </Stack>
         ) : (
-          <div className="actions">
+          <Stack orientation="horizontal" gap={3}>
             <Button
               kind="ghost"
               size="sm"
@@ -85,7 +85,7 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
             >
               {article.favorited ? t('article.unfavorite') : t('article.favorite')} ({article.favoritesCount})
             </Button>
-          </div>
+          </Stack>
         )}
       </div>
       </Column>
@@ -214,7 +214,7 @@ export const ArticlePage: React.FC = () => {
 
   if (loading) {
     return (
-      <PageShell className="article-page loading">
+      <PageShell className="article-page page-loading">
         <Loading description={t('article.loading')} withOverlay={false} />
       </PageShell>
     );
