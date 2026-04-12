@@ -6,6 +6,7 @@ import cbn005 from './rules/cbn005-no-inline-notification.js';
 import arch001 from './rules/arch001-no-direct-use-context.js';
 import arch002 from './rules/arch002-no-generated-imports.js';
 import arch003 from './rules/arch003-no-api-in-components.js';
+import tst001 from './rules/tst001-no-user-event-type.js';
 
 const plugin = {
   meta: {
@@ -21,6 +22,7 @@ const plugin = {
     'arch001-no-direct-use-context': arch001,
     'arch002-no-generated-imports': arch002,
     'arch003-no-api-in-components': arch003,
+    'tst001-no-user-event-type': tst001,
   },
 };
 

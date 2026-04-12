@@ -75,8 +75,10 @@ describe('LoginPage', () => {
 
     renderLoginPage()
 
-    await user.type(screen.getByLabelText(/email/i), 'test@example.com')
-    await user.type(document.getElementById('password')!, 'password123')
+    await user.click(screen.getByLabelText(/email/i))
+    await user.paste('test@example.com')
+    await user.click(document.getElementById('password')!)
+    await user.paste('password123')
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
     await waitFor(() => {
@@ -87,14 +89,16 @@ describe('LoginPage', () => {
 
   it('displays error message on login failure', async () => {
     const user = userEvent.setup()
-    
+
     // Throw an error that normalizeError can handle
     vi.mocked(authApi.login).mockRejectedValue(new Error('email or password is invalid'))
 
     renderLoginPage()
 
-    await user.type(screen.getByLabelText(/email/i), 'test@example.com')
-    await user.type(document.getElementById('password')!, 'wrongpassword')
+    await user.click(screen.getByLabelText(/email/i))
+    await user.paste('test@example.com')
+    await user.click(document.getElementById('password')!)
+    await user.paste('wrongpassword')
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
     await waitFor(() => {
