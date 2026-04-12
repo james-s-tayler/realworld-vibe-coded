@@ -3,7 +3,6 @@
 
 .banner {
   background: linear-gradient(135deg, var(--cds-link-primary) 0%, var(--cds-link-visited) 100%);
-  padding: $spacing-07 0;
   text-align: center;
   color: var(--cds-text-on-color);
   box-shadow: inset 0 $spacing-03 $spacing-03 (-$spacing-03) var(--cds-shadow),

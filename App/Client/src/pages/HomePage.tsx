@@ -21,7 +21,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 const HomeBanner: React.FC = () => {
   const { t } = useTranslation();
   return (
-    <div className="banner">
+    <div className="page-banner banner">
       <Grid>
         <Column lg={16} md={8} sm={4}>
           <h1 className="banner-title">{t('home.bannerTitle')}</h1>

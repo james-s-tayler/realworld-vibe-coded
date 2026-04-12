@@ -37,13 +37,13 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
 }) => {
   const { t } = useTranslation();
   return (
-  <div className="banner">
+  <div className="page-banner banner">
     <Grid>
       <Column lg={16} md={8} sm={4}>
         <h1>{article.title}</h1>
         <div className="article-meta">
         <Link to={`/profile/${article.author.username}`} className="author-info">
-          <img src={article.author.image || DEFAULT_PROFILE_IMAGE} alt={article.author.username} />
+          <img src={article.author.image || DEFAULT_PROFILE_IMAGE} alt={article.author.username} className="avatar-md" />
           <div className="info">
             <span className="author cds--text-truncate-end" title={article.author.username}>{article.author.username}</span>
             <span className="date">{new Date(article.createdAt).toLocaleDateString()}</span>
@@ -287,7 +287,7 @@ export const ArticlePage: React.FC = () => {
                   <img
                     src={user.image || DEFAULT_PROFILE_IMAGE}
                     alt={user.username}
-                    className="comment-author-img"
+                    className="avatar-sm"
                   />
                   <Button type="submit" size="sm" disabled={submitting || !commentBody.trim()}>
                     {t('article.comments.submit')}
@@ -312,7 +312,7 @@ export const ArticlePage: React.FC = () => {
                   <img
                     src={comment.author.image || DEFAULT_PROFILE_IMAGE}
                     alt={comment.author.username}
-                    className="comment-author-img"
+                    className="avatar-sm"
                   />
                   <span className="comment-author-name cds--text-truncate-end" title={comment.author.username}>{comment.author.username}</span>
                 </Link>

@@ -45,7 +45,7 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({
           <img
             src={article.author.image || DEFAULT_PROFILE_IMAGE}
             alt={article.author.username}
-            className="author-image"
+            className="author-image avatar-md"
           />
           <div className="author-details">
             <span className="author-name cds--text-truncate-end" title={article.author.username}>{article.author.username}</span>

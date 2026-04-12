@@ -27,7 +27,6 @@
 .article-page .banner {
   background: var(--cds-background-inverse);
   color: var(--cds-text-on-color);
-  padding: $spacing-07 0;
 }
 
 .article-page .banner h1 {
@@ -51,10 +50,7 @@
   overflow: hidden;
 }
 
-.article-meta img {
-  width: $spacing-07;
-  height: $spacing-07;
-  border-radius: 50%;
+.article-meta .avatar-md {
   margin-right: $spacing-03;
 }
 
@@ -149,12 +145,6 @@
   color: inherit;
   gap: $spacing-03;
   overflow: hidden;
-}
-
-.comment-author-img {
-  width: $spacing-06;
-  height: $spacing-06;
-  border-radius: 50%;
 }
 
 .comment-author-name {

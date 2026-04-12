@@ -216,7 +216,7 @@ Three different approaches to full-height pages:
 
 ---
 
-### 11. `<hr>` With Custom/Missing Styling
+### ~~11. `<hr>` With Custom/Missing Styling~~ FIXED
 
 **Severity:** Low
 **Files:** `SettingsPage.scss:8-11`, `ArticlePage.tsx:269`
@@ -233,9 +233,11 @@ And `ArticlePage.tsx:269` has a bare `<hr />` with no class — it inherits brow
 
 **Recommendation:** Extract a shared `.divider` class or add a global `hr` reset in `index.scss` that uses Carbon border tokens consistently.
 
+**Resolution:** Added a global `hr` reset in `index.scss` using `$spacing-07` margin and `var(--cds-border-subtle)` border. Removed the dead `.settings-page hr` rule from `SettingsPage.scss` (SettingsPage.tsx has no `<hr>` elements).
+
 ---
 
-### 12. Repeated Avatar `border-radius: 50%`
+### ~~12. Repeated Avatar `border-radius: 50%`~~ FIXED
 
 **Severity:** Low
 **Files:** `ArticlePreview.scss`, `ArticlePage.scss`, `ProfilePage.scss`
@@ -251,9 +253,11 @@ Four separate declarations of the same circular avatar pattern.
 
 **Recommendation:** Extract a shared `.avatar` SCSS class (or mixin) that handles the `border-radius: 50%` + sizing, and apply it in one place. Could have `.avatar--sm` (24px), `.avatar--md` (32px), `.avatar--lg` (100px) variants using spacing tokens.
 
+**Resolution:** Added three global avatar utility classes in `index.scss`: `.avatar-sm` (`$spacing-06`), `.avatar-md` (`$spacing-07`), `.avatar-lg` (`$spacing-12`), each with `border-radius: 50%`. Stripped sizing/rounding from the four component-level selectors, keeping only contextual margins. Replaced `.article-meta img` element selector with class-based `.article-meta .avatar-md`. Deleted `.comment-author-img` block entirely.
+
 ---
 
-### 13. Banner Pattern Duplicated
+### ~~13. Banner Pattern Duplicated~~ FIXED
 
 **Severity:** Low
 **Files:** `HomePage.scss`, `ArticlePage.scss`, `ProfilePage.scss`
@@ -261,6 +265,8 @@ Four separate declarations of the same circular avatar pattern.
 Three pages have their own banner implementations with duplicated inner styles (padding `$spacing-07 0`, Grid wrapping, full-width background). The `PageShell` banner prop handles placement, but the banner content styles are repeated.
 
 **Recommendation:** Extract a shared `.page-banner` base class for the common padding/layout pattern.
+
+**Resolution:** Added `.page-banner` base class in `index.scss` with the shared `padding: $spacing-07 0`. Removed padding from the three page-specific banner selectors. Composed the base class on each banner `<div>` in TSX (`className="page-banner banner"`, `className="page-banner user-info"`).
 
 ---
 
@@ -332,10 +338,10 @@ Either use `stylelint-declaration-strict-value` for `z-index` to require variabl
 | 8 | High | `window.confirm()` + missing i18n | ArticlePage |
 | 9 | Low | Manual flex stacks could use `<Stack>` | Multiple (5 files) |
 | ~~10~~ | ~~Low~~ | ~~Inconsistent full-height approach~~ | ~~6 page files~~ |
-| 11 | Low | Unstyled `<hr>` / duplicate styling | ArticlePage, SettingsPage |
-| 12 | Low | Repeated avatar `border-radius: 50%` | 4 files |
-| 13 | Low | Banner padding pattern duplicated | 3 page files |
+| ~~11~~ | ~~Low~~ | ~~Unstyled `<hr>` / duplicate styling~~ | ~~ArticlePage, SettingsPage~~ |
+| ~~12~~ | ~~Low~~ | ~~Repeated avatar `border-radius: 50%`~~ | ~~4 files~~ |
+| ~~13~~ | ~~Low~~ | ~~Banner padding pattern duplicated~~ | ~~3 page files~~ |
 
 **High:** 1 finding (window.confirm)
 **Medium:** 0 findings remaining
-**Low:** 4 findings remaining (DRY/consistency improvements)
+**Low:** 1 finding remaining (#9 — manual flex stacks could use `<Stack>`)
