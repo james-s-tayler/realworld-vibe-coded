@@ -24,7 +24,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { RequireRole } from './RequireRole';
-import { truncateUsername } from '../utils/textUtils';
+
 import './AppHeader.scss';
 
 export const AppHeader: React.FC = () => {
@@ -117,7 +117,7 @@ export const AppHeader: React.FC = () => {
                         isActive={isActive(`/profile/${user.username}`)}
                         title={user.username}
                       >
-                        {truncateUsername(user.username)}
+                        {user.username}
                       </SideNavLink>
                       <SideNavLink
                         renderIcon={Logout}

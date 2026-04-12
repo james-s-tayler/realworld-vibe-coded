@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
-import { Grid, Column, Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, Pagination } from '@carbon/react';
+import { Grid, Column, Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, Pagination, Breadcrumb, BreadcrumbItem } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -14,7 +14,6 @@ import { ApiError } from '../api/client';
 import type { Profile } from '../types/article';
 import type { Article } from '../types/article';
 import { DEFAULT_PROFILE_IMAGE } from '../constants';
-import { truncateUsername } from '../utils/textUtils';
 import './ProfilePage.scss';
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -37,7 +36,7 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, on
             alt={profile.username}
             className="user-img"
           />
-          <h4 title={profile.username}>{truncateUsername(profile.username)}</h4>
+          <h4 title={profile.username}>{profile.username}</h4>
           <p>{profile.bio}</p>
           {isOwnProfile ? (
             <Link to="/settings">
@@ -51,7 +50,7 @@ const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, on
               size="sm"
               onClick={onFollow}
             >
-              {profile.following ? t('profile.unfollow') : t('profile.follow')} {truncateUsername(profile.username)}
+              {`${profile.following ? t('profile.unfollow') : t('profile.follow')} ${profile.username}`}
             </Button>
           )}
       </Column>
@@ -195,6 +194,14 @@ export const ProfilePage: React.FC = () => {
       className="profile-page"
       columnLayout="wide"
       banner={<ProfileBanner profile={profile} isOwnProfile={!!isOwnProfile} onFollow={handleFollow} />}
+      breadcrumbs={
+        <Breadcrumb noTrailingSlash>
+          <BreadcrumbItem>
+            <Link to="/">{t('breadcrumb.home')}</Link>
+          </BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage title={`@${profile.username}`}>{`@${profile.username}`}</BreadcrumbItem>
+        </Breadcrumb>
+      }
     >
       <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
         <TabList aria-label={t('profile.profileTabs')}>

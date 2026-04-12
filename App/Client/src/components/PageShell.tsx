@@ -10,6 +10,7 @@ interface PageShellProps {
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   banner?: React.ReactNode;
+  breadcrumbs?: React.ReactNode;
   sidebar?: React.ReactNode;
 }
 
@@ -27,6 +28,7 @@ export const PageShell: React.FC<PageShellProps> = ({
   title,
   subtitle,
   banner,
+  breadcrumbs,
   sidebar,
 }) => {
   return (
@@ -34,6 +36,7 @@ export const PageShell: React.FC<PageShellProps> = ({
       {banner}
       <Grid>
         <Column {...columnProps[columnLayout]}>
+          {breadcrumbs}
           {title && <h1>{title}</h1>}
           {subtitle && <p>{subtitle}</p>}
           {children}

@@ -11,14 +11,16 @@ These are the primary rules.
 5. **All compiler warnings and errors must be resolved.** Never suppress or ignore them.
 8. **Frontend API client relies on Kiota code generation.** Always make backend changes first, then run `./build.sh BuildGenerateApiClient` before writing frontend code. `BuildClient` does this automatically (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Never reference fields in frontend that don't exist in the generated types.
 9. **Every test failure must be investigated.** Never dismiss failures as "pre-existing", "unrelated", or "flaky" without investigation. Read the logs, check the traces, understand the root cause. If the failure is genuinely outside the scope of current work, file it as a known issue with evidence — but never ignore it.
-10. **Never assume `localhost:5001` for the app URL.** Worktrees use port offsets — the actual port varies. After `RunLocalPublish`, read the build output for the `Application is running at {url}` log line and use that URL.
+10. **Never guess the app URL.** Worktrees use port offsets and the Vite dev server uses HTTPS (via `basicSsl` plugin). Never construct the URL from `ss`/`lsof`/`docker port` — always read the Nuke build output which logs the correct `https://` URL with the right port. If the build ran in background, read the task output file.
+11. **Verify frontend changes visually.** After implementing UI changes, run `./build.sh RunLocalHotReload --agent` to spin up the app, then use Chrome DevTools MCP tools to navigate, take screenshots, and independently verify the work looks and functions correctly before considering it done.
+12. **RunLocal\* lifecycle.** Always tear down before spinning up: run the matching `*Down` target (e.g., `RunLocalHotReloadDown`, `RunLocalPublishDown`) before starting a new `RunLocal*` target — port conflicts silently break things. Always run `RunLocal*` targets in background mode (`run_in_background: true`) so they don't block the conversation.
 
 Reference as needed:
 - `SPEC-REFERENCE.md` — complete API spec (the source of truth for what to build)
 - `.specify/specs/` — per-feature specifications, plans, and acceptance criteria
 - `Docs/architecture.md` — tech stack, folder structure, build commands
 - `Docs/observability.md` — OpenTelemetry tracing/metrics, Grafana/Jaeger/Prometheus stack
-- Chrome DevTools MCP — visual browser inspection via `/browser-inspect` and debugging via `/browser-debug`
+- Chrome DevTools MCP — visual browser inspection via `/browser-inspect` and debugging via `/browser-debug`. Use to verify UI changes with screenshots.
 - Docs MCP server — search/scrape indexed library documentation before planning
 
 ## Rules Index

@@ -3,6 +3,20 @@
 
 .article-page {
   min-height: 100vh;
+
+  .cds--breadcrumb {
+    margin-bottom: $spacing-05;
+  }
+
+  .cds--breadcrumb-item:last-child {
+    overflow: hidden;
+
+    .cds--link {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
 }
 
 .article-page.loading {
@@ -36,6 +50,7 @@
   align-items: center;
   text-decoration: none;
   color: inherit;
+  overflow: hidden;
 }
 
 .article-meta img {
@@ -139,6 +154,7 @@
   gap: $spacing-03;
   padding-top: $spacing-05;
   border-top: 1px solid var(--cds-border-subtle-01);
+  overflow: hidden;
 }
 
 .comment-author {
@@ -147,6 +163,7 @@
   text-decoration: none;
   color: inherit;
   gap: $spacing-03;
+  overflow: hidden;
 }
 
 .comment-author-img {
