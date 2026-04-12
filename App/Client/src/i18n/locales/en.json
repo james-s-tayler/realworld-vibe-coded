@@ -47,6 +47,7 @@
     "successMessage": "Settings updated successfully"
   },
   "home": {
+    "title": "Home",
     "bannerTitle": "conduit",
     "bannerSubtitle": "A place to share your knowledge.",
     "yourFeed": "Your Feed",

@@ -77,8 +77,7 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <PageShell
-      className="settings-page"
-      columnLayout="narrow"
+      columnLayout="wide"
       title={t('settings.title')}
     >
       <ErrorDisplay

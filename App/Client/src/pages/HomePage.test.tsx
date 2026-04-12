@@ -101,8 +101,7 @@ describe('HomePage', () => {
     renderHomePage()
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /conduit/i })).toBeInTheDocument()
-      expect(screen.getByText(/a place to share your/i)).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /home/i })).toBeInTheDocument()
     })
   })
 

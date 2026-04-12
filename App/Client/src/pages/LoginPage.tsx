@@ -47,8 +47,7 @@ export const LoginPage: React.FC = () => {
 
   return (
     <PageShell
-      className="auth-page"
-      columnLayout="narrow"
+      columnLayout="wide"
       title={t('login.title')}
       subtitle={<Link to="/register">{t('login.needAccount')}</Link>}
     >

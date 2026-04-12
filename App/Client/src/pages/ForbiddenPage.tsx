@@ -10,8 +10,7 @@ export const ForbiddenPage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <PageShell className="forbidden-page">
-      <h1>{t('forbidden.title')}</h1>
+    <PageShell className="forbidden-page" title={t('forbidden.title')}>
       <p>{t('forbidden.message')}</p>
       <p>
         <Link to="/">{t('forbidden.goHome')}</Link>

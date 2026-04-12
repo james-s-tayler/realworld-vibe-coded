@@ -1,6 +1,6 @@
 import './HomePage.scss';
 
-import { Column, Grid, Pagination,Tab, TabList, TabPanel, TabPanels, Tabs, Tile } from '@carbon/react';
+import { Pagination,Tab, TabList, TabPanel, TabPanels, Tabs, Tile } from '@carbon/react';
 import React, { useCallback,useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,19 +18,6 @@ import type { Article } from '../types/article';
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
-const HomeBanner: React.FC = () => {
-  const { t } = useTranslation();
-  return (
-    <div className="page-banner banner">
-      <Grid>
-        <Column lg={16} md={8} sm={4}>
-          <h1 className="banner-title">{t('home.bannerTitle')}</h1>
-          <p className="banner-subtitle">{t('home.bannerSubtitle')}</p>
-        </Column>
-      </Grid>
-    </div>
-  );
-};
 
 export const HomePage: React.FC = () => {
   const { t } = useTranslation();
@@ -164,7 +151,7 @@ export const HomePage: React.FC = () => {
     <PageShell
       className="home-page"
       columnLayout="two-column"
-      banner={<HomeBanner />}
+      title={t('home.title')}
       sidebar={sidebarContent}
     >
       <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
