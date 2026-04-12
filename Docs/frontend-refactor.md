@@ -1,7 +1,7 @@
 # Frontend Carbon Design System Refactor
 
 **Date:** April 11-13, 2026
-**Scope:** PRs #672 through #692 (21 pull requests)
+**Scope:** PRs #658, #668, #672 through #692 (23 pull requests)
 **Goal:** Transform the frontend from a Bootstrap-legacy React app into a fully Carbon Design System-native application with automated guardrails to prevent regression.
 
 ---
@@ -9,43 +9,119 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Phase 1: Audit and Grid Migration (#672-#673)](#phase-1-audit-and-grid-migration)
-3. [Phase 2: Design Token Enforcement (#674)](#phase-2-design-token-enforcement)
-4. [Phase 3: Carbon Component Adoption (#675-#678)](#phase-3-carbon-component-adoption)
-5. [Phase 4: Guardrail Hardening (#679-#680)](#phase-4-guardrail-hardening)
-6. [Phase 5: CSS Cleanup and Carbon Audit Round 2 (#681-#686)](#phase-5-css-cleanup-and-carbon-audit-round-2)
-7. [Phase 6: SCSS Audit and Deduplication (#687-#692)](#phase-6-scss-audit-and-deduplication)
-8. [Guardrails Added](#guardrails-added)
-9. [Files Deleted](#files-deleted)
-10. [Carbon Components Adopted](#carbon-components-adopted)
-11. [Changes to .claude/rules](#changes-to-clauderules)
-12. [Changes to CLAUDE.md](#changes-to-claudemd)
-13. [Impact Summary](#impact-summary)
+2. [Phase 0: Frontend Library Audit (#658, #668)](#phase-0-frontend-library-audit)
+3. [Phase 1: Audit and Grid Migration (#672-#673)](#phase-1-audit-and-grid-migration)
+4. [Phase 2: Design Token Enforcement (#674)](#phase-2-design-token-enforcement)
+5. [Phase 3: Carbon Component Adoption (#675-#678)](#phase-3-carbon-component-adoption)
+6. [Phase 4: Guardrail Hardening (#679-#680)](#phase-4-guardrail-hardening)
+7. [Phase 5: CSS Cleanup and Carbon Audit Round 2 (#681-#686)](#phase-5-css-cleanup-and-carbon-audit-round-2)
+8. [Phase 6: SCSS Audit and Deduplication (#687-#692)](#phase-6-scss-audit-and-deduplication)
+9. [Screenshots](#screenshots)
+10. [Guardrails Added](#guardrails-added)
+11. [Files Deleted](#files-deleted)
+12. [Carbon Components Adopted](#carbon-components-adopted)
+13. [Changes to .claude/rules](#changes-to-clauderules)
+14. [Changes to CLAUDE.md](#changes-to-claudemd)
+15. [Impact Summary](#impact-summary)
 
 ---
 
 ## Overview
 
-The frontend started as a React + Vite application styled with a custom Bootstrap-style 12-column grid, hardcoded hex colors, arbitrary pixel/rem spacing, and manual layout hacks. Over 21 PRs, every stylesheet was migrated to SCSS with Carbon design tokens, the grid was replaced with Carbon's 16-column `Grid`/`Column`, and automated lint rules were added to prevent regression.
+The frontend started as a React + Vite application with `<TextInput type="password">` instead of Carbon's `PasswordInput`, empty `labelText=""` accessibility violations, `console.error` instead of user-visible notifications, inline styles, and no custom ESLint enforcement. It was styled with a custom Bootstrap-style 12-column grid, hardcoded hex colors, arbitrary pixel/rem spacing, and manual layout hacks. Over 23 PRs, the codebase was modernized with React 19 patterns, a custom ESLint plugin, toast notifications, every stylesheet was migrated to SCSS with Carbon design tokens, the grid was replaced with Carbon's 16-column `Grid`/`Column`, and automated lint rules were added to prevent regression.
 
 ### Before
 
+- `<TextInput type="password">` instead of Carbon `PasswordInput`
+- Empty `labelText=""` accessibility violations (10 instances)
+- `console.error` for error handling (15 instances) — not visible to users
+- Inline `style={{}}` attributes instead of CSS classes
+- Deprecated `onKeyPress` event handlers
+- No custom ESLint enforcement for Carbon or architectural patterns
 - Custom 12-column Bootstrap grid (`col-md-*`, `offset-md-*`, `container`, `row`)
 - 14 plain CSS files with hardcoded hex colors, px/rem spacing, font sizes
 - Manual `#root` padding for header offset
 - `window.confirm()` for destructive actions
 - Text-swap buttons during form submission
 - No lint enforcement for design tokens
+- No code splitting (all pages in initial bundle)
 
 ### After
 
+- Carbon `PasswordInput` with built-in visibility toggle
+- Proper `labelText` + `hideLabel` on all form inputs (WCAG compliant)
+- Toast notification system (`ToastContext`/`useToast`/`ToastContainer`) for user-visible errors
+- React 19 `useActionState` + `startTransition` on auth forms
+- `React.lazy` code splitting for all 9 page components
+- Custom ESLint plugin with 10 rules (ARCH001-003, CBN001-007) + 41 tests
 - Carbon 16-column `Grid`/`Column` with responsive breakpoints
 - 12 SCSS files using Carbon `$spacing-*`, `var(--cds-*)`, and `@include type.type-style()` tokens
 - Carbon `Content` component for header/sidenav offset
 - Carbon `Modal` for destructive confirmations
 - Carbon `InlineLoading` for form submission states
 - Full stylelint enforcement of 5 Carbon token rules (color, spacing, typography, motion duration, motion easing)
-- 2 new ESLint rules (CBN006, CBN007) and `no-explicit-any` + `simple-import-sort`
+- `no-explicit-any` + `simple-import-sort` ESLint rules
+
+---
+
+## Phase 0: Frontend Library Audit
+
+The refactor began with a comprehensive audit of frontend library usage against official documentation for Carbon Design System, React Router v7, React 19, react-i18next, and @microsoft/feature-management. PR #658 implemented the changes on main; PR #668 ported the non-domain-specific subset to the multi-tenant starter template.
+
+### PR #658 — refactor: frontend library audit — accessibility, code splitting, React 19
+**Type:** Refactor | **Files:** 56 | **+~900 -~700**
+
+The foundational PR that established modern React patterns and the custom ESLint plugin:
+
+**Carbon PasswordInput**
+- Replaced `<TextInput type="password">` with Carbon's `<PasswordInput>` on login, register, settings, and invite user forms (built-in visibility toggle)
+
+**Accessibility (WCAG)**
+- Fixed 10 instances of empty `labelText=""` on form inputs — added proper `labelText` + `hideLabel` for screen reader compliance
+
+**React 19 Patterns**
+- `useActionState` + `startTransition` on LoginPage and RegisterPage (eliminates controlled-input boilerplate)
+- `React.lazy` + `Suspense` code splitting for all 9 page components (reduces initial bundle)
+
+**Error Handling Overhaul**
+- Replaced 15 `console.error` calls (invisible to users) with `<InlineNotification>` error states on HomePage, ArticlePage, ProfilePage
+- Deduplicated HomePage TabPanels — 3 identical `<TabPanel>` blocks replaced with `.map()`
+
+**Code Quality**
+- Replaced all inline `style={{}}` attributes with CSS classes using Carbon spacing tokens
+- Replaced deprecated `onKeyPress` with `onKeyDown` on EditorPage tag input
+- Fixed `useApiCall` memoization — `useRef` for `onSuccess`/`onError` callbacks to prevent `execute` recreation every render
+
+**Custom ESLint Plugin (`eslint-plugin-custom-rules`) — 8 rules with 41 tests**
+
+| Rule | What it prevents |
+|------|-----------------|
+| `ARCH001` | Direct `useContext()` in pages/components — must use hook wrappers |
+| `ARCH002` | Imports from `api/generated/` outside `src/api/` |
+| `ARCH003` | API module imports in components — receive data via props |
+| `CBN001` | `<TextInput type="password">` — must use `<PasswordInput>` |
+| `CBN002` | Empty `labelText=""` — accessibility violation |
+| `CBN003` | Inline `style={{}}` in pages/components — use CSS classes |
+| `CBN004` | Deprecated `onKeyPress` — use `onKeyDown` |
+| `CBN005` | `<InlineNotification>` — must use `<ToastNotification>` via toast system |
+
+**Toast Notification System**
+- `ToastContext` + `ToastProvider` for dispatching toasts
+- `useToast` hook for component access
+- `ToastContainer` component renders fixed-position toast stack
+- Migrated all `InlineNotification` usage to `ToastNotification` across all pages and `ErrorDisplay`
+
+**Infrastructure**
+- `enforce-nuke.sh` hook: blocks `npm test` and `npx vitest/eslint/tsc` direct invocations — must use Nuke targets
+- Built-in `no-console` ESLint rule for production code
+- 35 new i18n translation keys (en + ja)
+
+**Not implemented:** `createBrowserRouter` migration — investigated but Carbon's `HeaderContainer` + `SideNav` overlay loses expanded state under react-router v7's `startTransition`, breaking mobile navigation.
+
+### PR #668 — refactor: port frontend architecture improvements from main
+**Type:** Refactor (port) | **Files:** 54 | **+~1050 -~400**
+
+Ported all non-domain-specific changes from PR #658 to the multi-tenant starter template. Identical ESLint plugin, toast system, React 19 patterns, and accessibility fixes. Also fixed a mobile E2E test race condition where `LoginOnMobileAsync` was clicking the hamburger before `useActionState`'s deferred navigation completed.
 
 ---
 
@@ -262,6 +338,60 @@ Audit of all 14 SCSS files identifying 10 findings: duplicate class definitions,
 
 ---
 
+## Screenshots
+
+All screenshots captured from the running application after the refactor was complete.
+
+### Authentication (Unauthenticated)
+
+| Page | Screenshot |
+|------|------------|
+| Login | ![Login Page](screenshots/01-login-page.png) |
+| Register | ![Register Page](screenshots/02-register-page.png) |
+
+### Home Page (Authenticated)
+
+| View | Screenshot |
+|------|------------|
+| Your Feed | ![Home - Your Feed](screenshots/03-home-your-feed.png) |
+| Global Feed | ![Home - Global Feed](screenshots/04-home-global-feed.png) |
+| Tag Filter | ![Home - Tag Filter](screenshots/05-home-tag-filter.png) |
+
+### Article
+
+| View | Screenshot |
+|------|------------|
+| Article Page (with breadcrumb, comments, tags) | ![Article Page](screenshots/06-article-page.png) |
+| Article Not Found | ![Article Not Found](screenshots/13-article-not-found.png) |
+
+### Editor
+
+| View | Screenshot |
+|------|------------|
+| New Article | ![Editor - New Article](screenshots/07-editor-new-article.png) |
+| Edit Article (with tags) | ![Editor - Edit Article](screenshots/08-editor-edit-article.png) |
+
+### Settings
+
+| View | Screenshot |
+|------|------------|
+| User Settings | ![Settings Page](screenshots/09-settings-page.png) |
+
+### Profile
+
+| View | Screenshot |
+|------|------------|
+| My Articles | ![Profile - My Articles](screenshots/10-profile-page.png) |
+| Favorited Articles | ![Profile - Favorited](screenshots/11-profile-favorited.png) |
+
+### Admin
+
+| View | Screenshot |
+|------|------------|
+| Users Management | ![Users Page](screenshots/12-users-page.png) |
+
+---
+
 ## Guardrails Added
 
 ### Stylelint — Carbon Token Enforcement (`.stylelintrc.json`)
@@ -280,15 +410,37 @@ The `carbon/layout-use` rule was later extended in PR #684 to also cover `width`
 
 The `carbon/theme-use` whitelist was tightened in PR #680 (removed `rgb()` and `white`).
 
-### ESLint — New Rules
+### ESLint — Custom Plugin (`eslint-plugin-custom-rules`)
+
+10 custom rules with full test coverage, created across PRs #658 and #676:
 
 | Rule | What it prevents | Added in |
 |------|-----------------|----------|
-| `cbn006-no-raw-form` | Raw `<form>` elements (must use Carbon `<Form>`) | PR #676 |
-| `no-restricted-globals` (CBN007) | `window.confirm`, `window.alert`, `window.prompt` | PR #685 |
+| `ARCH001` | Direct `useContext()` — must use hook wrappers | PR #658 |
+| `ARCH002` | Imports from `api/generated/` outside `src/api/` | PR #658 |
+| `ARCH003` | API module imports in components — receive data via props | PR #658 |
+| `CBN001` | `<TextInput type="password">` — must use `<PasswordInput>` | PR #658 |
+| `CBN002` | Empty `labelText=""` — accessibility violation | PR #658 |
+| `CBN003` | Inline `style={{}}` in pages/components — use CSS classes | PR #658 |
+| `CBN004` | Deprecated `onKeyPress` — use `onKeyDown` | PR #658 |
+| `CBN005` | `<InlineNotification>` — must use toast system | PR #658 |
+| `CBN006` | Raw `<form>` elements — must use Carbon `<Form>` | PR #676 |
+| `CBN007` (`no-restricted-globals`) | `window.confirm`, `window.alert`, `window.prompt` | PR #685 |
+
+### ESLint — Built-in Rules
+
+| Rule | What it prevents | Added in |
+|------|-----------------|----------|
+| `no-console` | `console.*` in production code | PR #658 |
 | `@typescript-eslint/no-explicit-any` | Explicit `any` type annotations | PR #680 |
 | `simple-import-sort/imports` | Inconsistent import ordering | PR #680 |
 | `simple-import-sort/exports` | Inconsistent export ordering | PR #680 |
+
+### Infrastructure Guardrails
+
+| Guardrail | What it prevents | Added in |
+|-----------|-----------------|----------|
+| `enforce-nuke.sh` hook | Direct `npm test`, `npx vitest/eslint/tsc` — must use Nuke targets | PR #658 |
 
 ### Nuke Lint Target Restructure
 
@@ -316,6 +468,8 @@ Added to `.claude/rules/guardrails.md` (PR #677): "All guardrails use error seve
 
 | Component | Replaces | PR |
 |-----------|----------|----|
+| `PasswordInput` | `<TextInput type="password">` | #658 |
+| `ToastNotification` | `InlineNotification` for error display | #658 |
 | `Grid` / `Column` | Custom Bootstrap `col-md-*` grid | #673 |
 | `Content` | Manual `#root` padding for header offset | #675 |
 | `Form` | Raw `<form>` elements | #676 |
@@ -340,6 +494,7 @@ Added to `.claude/rules/guardrails.md` (PR #677): "All guardrails use error seve
 
 | File | Change | PR |
 |------|--------|----|
+| `e2e.md` | Added toast notification locator conventions, error-display to toast-error selectors | #658 |
 | `frontend.md` | Added Carbon Design System styling rules section: SCSS-only spacing tokens, CSS custom property colors, typography mixins, IBM Plex Sans font, token-first philosophy, "never write direct CSS overrides for Carbon components" | #674, #677, #679 |
 | `frontend-components.md` | Cleaned up stale `InlineNotification` references (contradicted CBN005), added `InlineLoading`, `OperationalTag`, `Modal`, `Stack` usage patterns | #676, #677, #685 |
 | `guardrails.md` | Added principle: "All guardrails use error severity — never warning" | #677 |
@@ -362,17 +517,21 @@ Added to `.claude/rules/guardrails.md` (PR #677): "All guardrails use error seve
 
 | Metric | Value |
 |--------|-------|
-| Total PRs | 21 |
-| Files changed (cumulative) | ~230 |
-| Lines added (cumulative) | ~3,575 |
-| Lines removed (cumulative) | ~1,590 |
-| Net new lines | ~1,985 |
+| Total PRs | 23 |
+| Files changed (cumulative) | ~340 |
+| Lines added (cumulative) | ~5,525 |
+| Lines removed (cumulative) | ~2,690 |
+| Net new lines | ~2,835 |
 | CSS files eliminated | 3 (App.css, AuthPages.scss, SettingsPage.scss) |
 | Hardcoded hex colors removed | All |
 | Hardcoded spacing values removed | All |
 | Hardcoded font-size values removed | All |
+| Accessibility violations fixed | 10 (empty labelText) |
+| console.error calls replaced | 15 (with toast notifications) |
 | Stylelint rules active | 5/5 (all at error severity) |
-| New ESLint rules | 5 (CBN006, CBN007, no-explicit-any, import-sort x2) |
-| Carbon components adopted | 9 new component types |
+| Custom ESLint rules | 10 (ARCH001-003, CBN001-007) with 41+ tests |
+| Additional ESLint rules | 4 (no-console, no-explicit-any, import-sort x2) |
+| Carbon components adopted | 11 new component types |
 | Custom grid CSS removed | ~170 lines |
+| Pages with code splitting | 9/9 (React.lazy) |
 | E2E test regressions | 0 (84/84 passing throughout) |
