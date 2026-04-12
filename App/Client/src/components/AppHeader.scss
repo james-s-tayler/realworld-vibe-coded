@@ -1,20 +1,3 @@
-@use '@carbon/react/scss/type' as type;
-
-.cds--header {
-  background-color: var(--cds-layer-01);
-  border-bottom: 1px solid var(--cds-border-subtle);
-}
-
-.cds--header__name {
-  @include type.type-style('heading-03');
-
-  color: var(--cds-link-primary);
-}
-
-.cds--header__name:hover {
-  color: var(--cds-link-primary);
-}
-
 /* SideNav styles (merged from AppSidebar.css) */
 .cds--side-nav .cds--side-nav__items {
   display: flex;

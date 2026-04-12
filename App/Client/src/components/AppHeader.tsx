@@ -55,6 +55,7 @@ export const AppHeader: React.FC = () => {
         closeRef.current = isSideNavExpanded ? onClickSideNavExpand : null;
 
         return (
+          <Theme theme="g90">
           <Header aria-label={t('brand')}>
             <SkipToContent />
             <HeaderMenuButton
@@ -66,7 +67,7 @@ export const AppHeader: React.FC = () => {
               {t('brand')}
             </HeaderName>
 
-            <Theme theme="g100">
+            <Theme theme="g90">
               <SideNav
                 aria-label={t('nav.sideNavLabel')}
                 expanded={isSideNavExpanded}
@@ -155,6 +156,7 @@ export const AppHeader: React.FC = () => {
               </SideNav>
             </Theme>
           </Header>
+          </Theme>
         );
       }}
     />
