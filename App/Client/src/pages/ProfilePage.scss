@@ -7,6 +7,17 @@
   .cds--breadcrumb {
     margin-bottom: $spacing-05;
   }
+
+  .cds--breadcrumb-item:last-child {
+    overflow: hidden;
+
+    .cds--link {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+
 }
 
 .profile-page.loading {
@@ -33,7 +44,9 @@
   @include type.type-style('heading-03');
 
   margin-bottom: $spacing-03;
-  overflow-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-info p {

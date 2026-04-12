@@ -7,6 +7,7 @@ import cbn006 from './rules/cbn006-no-raw-form.js';
 import arch001 from './rules/arch001-no-direct-use-context.js';
 import arch002 from './rules/arch002-no-generated-imports.js';
 import arch003 from './rules/arch003-no-api-in-components.js';
+import cbn007 from './rules/cbn007-no-js-text-truncation.js';
 import tst001 from './rules/tst001-no-user-event-type.js';
 
 const plugin = {
@@ -21,6 +22,7 @@ const plugin = {
     'cbn004-no-on-key-press': cbn004,
     'cbn005-no-inline-notification': cbn005,
     'cbn006-no-raw-form': cbn006,
+    'cbn007-no-js-text-truncation': cbn007,
     'arch001-no-direct-use-context': arch001,
     'arch002-no-generated-imports': arch002,
     'arch003-no-api-in-components': arch003,

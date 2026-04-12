@@ -14,7 +14,6 @@ import { ApiError } from '../api/client';
 import type { Article } from '../types/article';
 import type { Comment } from '../types/comment';
 import { DEFAULT_PROFILE_IMAGE, COMMENT_CONSTRAINTS } from '../constants';
-import { truncateUsername } from '../utils/textUtils';
 import './ArticlePage.scss';
 
 interface ArticleBannerProps {
@@ -44,7 +43,7 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
         <Link to={`/profile/${article.author.username}`} className="author-info">
           <img src={article.author.image || DEFAULT_PROFILE_IMAGE} alt={article.author.username} />
           <div className="info">
-            <span className="author" title={article.author.username}>{truncateUsername(article.author.username)}</span>
+            <span className="author cds--text-truncate-end" title={article.author.username}>{article.author.username}</span>
             <span className="date">{new Date(article.createdAt).toLocaleDateString()}</span>
           </div>
         </Link>
@@ -74,7 +73,7 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
               size="sm"
               onClick={onFollow}
             >
-              {article.author.following ? t('article.unfollow', { username: truncateUsername(article.author.username) }) : t('article.follow', { username: truncateUsername(article.author.username) })}
+              {article.author.following ? t('article.unfollow', { username: article.author.username }) : t('article.follow', { username: article.author.username })}
             </Button>
             <Button
               kind="ghost"
@@ -246,7 +245,7 @@ export const ArticlePage: React.FC = () => {
           <BreadcrumbItem>
             <Link to="/">{t('breadcrumb.home')}</Link>
           </BreadcrumbItem>
-          <BreadcrumbItem isCurrentPage>{article.title}</BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage title={article.title}>{article.title}</BreadcrumbItem>
         </Breadcrumb>
       }
     >
@@ -313,7 +312,7 @@ export const ArticlePage: React.FC = () => {
                     alt={comment.author.username}
                     className="comment-author-img"
                   />
-                  <span className="comment-author-name" title={comment.author.username}>{truncateUsername(comment.author.username)}</span>
+                  <span className="comment-author-name cds--text-truncate-end" title={comment.author.username}>{comment.author.username}</span>
                 </Link>
                 <span className="date-posted">
                   {new Date(comment.createdAt).toLocaleDateString()}
