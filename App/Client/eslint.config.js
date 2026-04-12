@@ -47,7 +47,6 @@ export default defineConfig([
       'custom-rules/cbn004-no-on-key-press': 'error',
       'custom-rules/cbn005-no-inline-notification': 'error',
       'custom-rules/cbn006-no-raw-form': 'error',
-      'custom-rules/cbn007-no-js-text-truncation': 'error',
     },
   },
 
