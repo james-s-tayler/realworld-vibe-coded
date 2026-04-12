@@ -66,7 +66,7 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({
         <p className="article-description">{article.description}</p>
         <div className="article-footer">
           <span className="read-more">{t('article.readMore')}</span>
-          <div className="article-tags">
+          <div className="tag-list">
             {article.tagList.map((tag) => (
               <Tag key={tag} type="outline" size="sm">
                 {tag}

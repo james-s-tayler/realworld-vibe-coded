@@ -1,30 +1,6 @@
 @use '@carbon/react/scss/spacing' as *;
 @use '@carbon/react/scss/type' as type;
 
-.profile-page {
-  .cds--breadcrumb {
-    margin-bottom: $spacing-05;
-  }
-
-  .cds--breadcrumb-item:last-child {
-    overflow: hidden;
-
-    .cds--link {
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-
-
-}
-
-.profile-page.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50vh;
-}
-
 .user-info {
   background: var(--cds-layer-01);
   text-align: center;

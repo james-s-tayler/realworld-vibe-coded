@@ -1,11 +1,5 @@
 @use '@carbon/react/scss/spacing' as *;
 
-.tag-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-03;
-}
-
 .tag-list-loading,
 .tag-list-empty {
   padding: $spacing-05;
