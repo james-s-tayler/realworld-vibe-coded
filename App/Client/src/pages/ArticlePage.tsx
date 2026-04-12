@@ -1,7 +1,7 @@
 import './ArticlePage.scss';
 
 import { Edit, Favorite, FavoriteFilled, TrashCan } from '@carbon/icons-react';
-import { Breadcrumb, BreadcrumbItem,Button, Column, Form, Grid, IconButton, InlineLoading, Loading, Tag, TextArea, Tile } from '@carbon/react';
+import { Breadcrumb, BreadcrumbItem,Button, Column, Form, Grid, IconButton, InlineLoading, Loading, Modal, Stack, Tag, TextArea, Tile } from '@carbon/react';
 import React, { useCallback,useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link,useNavigate, useParams } from 'react-router';
@@ -44,10 +44,10 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
         <div className="article-meta">
         <Link to={`/profile/${article.author.username}`} className="author-info">
           <img src={article.author.image || DEFAULT_PROFILE_IMAGE} alt={article.author.username} className="avatar-md" />
-          <div className="info">
+          <Stack gap={1} className="info">
             <span className="author cds--text-truncate-end" title={article.author.username}>{article.author.username}</span>
             <span className="date">{new Date(article.createdAt).toLocaleDateString()}</span>
-          </div>
+          </Stack>
         </Link>
         {isAuthor ? (
           <div className="actions">
@@ -107,6 +107,7 @@ export const ArticlePage: React.FC = () => {
   const [commentBody, setCommentBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const loadArticle = useCallback(async () => {
     if (!slug) return;
@@ -173,7 +174,8 @@ export const ArticlePage: React.FC = () => {
   };
 
   const handleDelete = async () => {
-    if (!article || !window.confirm('Are you sure you want to delete this article?')) return;
+    if (!article) return;
+    setDeleteModalOpen(false);
     try {
       await articlesApi.deleteArticle(article.slug);
       navigate('/');
@@ -237,7 +239,7 @@ export const ArticlePage: React.FC = () => {
           article={article}
           isAuthor={!!isAuthor}
           onEdit={() => navigate(`/editor/${article.slug}`)}
-          onDelete={handleDelete}
+          onDelete={() => setDeleteModalOpen(true)}
           onFollow={handleFollow}
           onFavorite={handleFavorite}
         />
@@ -332,6 +334,18 @@ export const ArticlePage: React.FC = () => {
               </div>
             </Tile>
           ))}
+      <Modal
+        open={deleteModalOpen}
+        onRequestClose={() => setDeleteModalOpen(false)}
+        modalHeading={t('article.confirmDeleteTitle')}
+        primaryButtonText={t('article.confirmDeleteButton')}
+        secondaryButtonText={t('article.cancelButton')}
+        onRequestSubmit={handleDelete}
+        danger
+        size="sm"
+      >
+        <p>{t('article.confirmDeleteBody')}</p>
+      </Modal>
     </PageShell>
   );
 };

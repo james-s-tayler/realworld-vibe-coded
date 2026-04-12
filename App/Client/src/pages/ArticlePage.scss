@@ -55,8 +55,7 @@
 }
 
 .article-meta .info {
-  display: flex;
-  flex-direction: column;
+  min-width: 0;
 }
 
 .article-meta .author {
