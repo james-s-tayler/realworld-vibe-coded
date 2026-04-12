@@ -36,7 +36,7 @@ export default defineConfig([
     },
   },
 
-  // CBN001, CBN002, CBN004, CBN005: Carbon component rules (all source, not tests)
+  // CBN001, CBN002, CBN004, CBN005, CBN006: Carbon component rules (all source, not tests)
   {
     files: ['src/**/*.{ts,tsx}'],
     ignores: ['src/**/*.test.{ts,tsx}', 'src/test/**'],
@@ -46,6 +46,7 @@ export default defineConfig([
       'custom-rules/cbn002-no-empty-label-text': 'error',
       'custom-rules/cbn004-no-on-key-press': 'error',
       'custom-rules/cbn005-no-inline-notification': 'error',
+      'custom-rules/cbn006-no-raw-form': 'error',
     },
   },
 

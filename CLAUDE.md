@@ -11,6 +11,7 @@ These are the primary rules.
 5. **All compiler warnings and errors must be resolved.** Never suppress or ignore them.
 8. **Frontend API client relies on Kiota code generation.** Always make backend changes first, then run `./build.sh BuildGenerateApiClient` before writing frontend code. `BuildClient` does this automatically (chain: `BuildClient → BuildGenerateApiClient → BuildServer`). Never reference fields in frontend that don't exist in the generated types.
 9. **Every test failure must be investigated.** Never dismiss failures as "pre-existing", "unrelated", or "flaky" without investigation. Read the logs, check the traces, understand the root cause. If the failure is genuinely outside the scope of current work, file it as a known issue with evidence — but never ignore it.
+10. **Never assume `localhost:5001` for the app URL.** Worktrees use port offsets — the actual port varies. After `RunLocalPublish`, read the build output for the `Application is running at {url}` log line and use that URL.
 
 Reference as needed:
 - `SPEC-REFERENCE.md` — complete API spec (the source of truth for what to build)

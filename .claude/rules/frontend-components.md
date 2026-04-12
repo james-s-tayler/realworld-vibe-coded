@@ -31,14 +31,14 @@ Layout options: `narrow` (50% centered), `wide` (83%), `full` (100%), `two-colum
 
 ```typescript
 import {
-  Form, TextInput, TextArea, Button, Loading, InlineNotification,
+  Form, TextInput, TextArea, Button, Loading, InlineLoading,
   Stack, Tabs, TabList, Tab, TabPanels, TabPanel, Tag, Pagination, Modal,
 } from '@carbon/react';
 import { Add, FavoriteFilled, Favorite, UserFollow, Settings } from '@carbon/icons-react';
 ```
 
 - `Button`: `kind="primary|secondary|ghost|danger--ghost"`, `size="sm|lg"`, `renderIcon={Icon}`
-- `InlineNotification`: `kind="error|success"`, `title`, `subtitle`, `onCloseButtonClick`
+- `InlineLoading`: `status="active"` during submit — conditionally render to replace Button (never text-swap ternaries). For compact forms, render beside the button instead.
 - `Loading`: `withOverlay={false}` for inline
 - `Tabs`: `Tabs > TabList > Tab` + `TabPanels > TabPanel`
 - `Tag`: supports `onClick`, `size="sm"`; `Pagination`: for article list pagination
@@ -57,7 +57,7 @@ import { ErrorDisplay } from '../components/ErrorDisplay';
 // In JSX: {error && <ErrorDisplay error={error} onClose={clearError} />}
 ```
 
-`ErrorDisplay` renders `InlineNotification` with normalized error messages.
+`ErrorDisplay` wraps notification rendering internally — never import notification components directly (CBN005).
 
 ## API Module Template
 

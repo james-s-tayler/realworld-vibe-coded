@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
-import { Grid, Column, Button, TextArea, Loading, Tile, Tag, IconButton } from '@carbon/react';
+import { Grid, Column, Button, TextArea, Loading, Tile, Tag, IconButton, Form, InlineLoading } from '@carbon/react';
 import { FavoriteFilled, Favorite, Edit, TrashCan } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -261,7 +261,7 @@ export const ArticlePage: React.FC = () => {
 
         {user ? (
           <Tile className="comment-form">
-              <form onSubmit={handleCommentSubmit}>
+              <Form onSubmit={handleCommentSubmit}>
                 <div className="comment-form-body">
                   <TextArea
                     id="comment"
@@ -283,8 +283,9 @@ export const ArticlePage: React.FC = () => {
                   <Button type="submit" size="sm" disabled={submitting || !commentBody.trim()}>
                     {t('article.comments.submit')}
                   </Button>
+                  {submitting && <InlineLoading description={t('article.comments.submitting')} />}
                 </div>
-              </form>
+              </Form>
             </Tile>
           ) : (
             <div className="comment-auth-prompt">
