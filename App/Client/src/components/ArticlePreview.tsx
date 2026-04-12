@@ -53,9 +53,8 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({
           </div>
         </Link>
         <Button
-          kind="ghost"
+          kind={article.favorited ? 'primary' : 'tertiary'}
           size="sm"
-          className={`favorite-button ${article.favorited ? 'favorited' : ''}`}
           onClick={handleFavoriteClick}
           renderIcon={article.favorited ? FavoriteFilled : Favorite}
         >
