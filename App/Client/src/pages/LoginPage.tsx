@@ -1,5 +1,3 @@
-import './AuthPages.scss';
-
 import {
   Button,
   Form,

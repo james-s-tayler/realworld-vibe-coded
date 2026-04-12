@@ -1,22 +1,6 @@
 @use '@carbon/react/scss/spacing' as *;
 @use '@carbon/react/scss/type' as type;
 
-.article-page {
-  .cds--breadcrumb {
-    margin-bottom: $spacing-05;
-  }
-
-  .cds--breadcrumb-item:last-child {
-    overflow: hidden;
-
-    .cds--link {
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-
-}
-
 .article-page.loading {
   display: flex;
   justify-content: center;
@@ -34,12 +18,6 @@
 
   margin-bottom: $spacing-06;
   overflow-wrap: break-word;
-}
-
-.article-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .article-meta .author-info {
@@ -91,10 +69,7 @@
   overflow-wrap: break-word;
 }
 
-.article-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-03;
+.article-page .tag-list {
   margin-bottom: $spacing-06;
 }
 
