@@ -1,13 +1,14 @@
+@use '@carbon/react/scss/type' as type;
+
 .cds--header {
   background-color: var(--cds-layer-01);
   border-bottom: 1px solid var(--cds-border-subtle);
 }
 
 .cds--header__name {
+  @include type.type-style('heading-03');
+
   color: var(--cds-link-primary);
-  font-family: 'Titillium Web', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
 }
 
 .cds--header__name:hover {

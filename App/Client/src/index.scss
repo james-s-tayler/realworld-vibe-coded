@@ -1,14 +1,10 @@
 @use '@carbon/react/scss/theme' as *;
 @use '@carbon/react/scss/breakpoint' as *;
 @use '@carbon/styles/scss/components/ui-shell/functions' as shell;
-@import 'https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap';
 
 :root {
   @include theme;
 
-  font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
   color: var(--cds-text-primary);
   background-color: var(--cds-background);
 }
@@ -45,11 +41,6 @@ a {
 a:hover {
   color: var(--cds-link-primary-hover);
   text-decoration: underline;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.1;
 }
 
 .loading-fullscreen {

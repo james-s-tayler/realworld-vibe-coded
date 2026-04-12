@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, SkeletonText } from '@carbon/react';
+import { OperationalTag, SkeletonText } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import './TagList.scss';
 
@@ -31,14 +31,13 @@ export const TagList: React.FC<TagListProps> = ({ tags, loading, onTagClick }) =
   return (
     <div className="tag-list">
       {tags.map((tag) => (
-        <Tag
+        <OperationalTag
           key={tag}
-          type="outline"
-          className="tag-pill"
-          onClick={() => onTagClick && onTagClick(tag)}
-        >
-          {tag}
-        </Tag>
+          type="gray"
+          size="sm"
+          text={tag}
+          onClick={() => onTagClick?.(tag)}
+        />
       ))}
     </div>
   );

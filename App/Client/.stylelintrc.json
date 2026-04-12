@@ -34,6 +34,16 @@
         "severity": "error"
       }
     ],
-    "carbon/type-use": null
+    "carbon/type-use": [
+      true,
+      {
+        "acceptCarbonCustomProp": true,
+        "acceptValues": [
+          "/inherit|initial|none|unset/",
+          "/1\\.8/"
+        ],
+        "severity": "error"
+      }
+    ]
   }
 }

@@ -50,7 +50,9 @@ The generated API client (`src/api/generated/`) is the **type contract** between
 
 - **Spacing:** `@use '@carbon/react/scss/spacing' as *;` then use `$spacing-05`, `$spacing-07`, etc. These are SCSS-only — Carbon does NOT emit `--cds-spacing-*` CSS custom properties.
 - **Colors:** Use `var(--cds-text-primary)`, `var(--cds-layer-01)`, etc. These ARE real CSS custom properties emitted by Carbon's theme system.
-- **Never use hard-coded hex colors or arbitrary rem/px spacing values.** `stylelint-plugin-carbon-tokens` enforces this via `LintClientStylelintVerify`.
+- **Typography:** `@use '@carbon/react/scss/type' as type;` then use `@include type.type-style('heading-03');`. SCSS mixins only — sets font-size, weight, line-height, letter-spacing together. Never set font-size/font-weight individually.
+- **Font:** IBM Plex Sans globally (from Carbon). No custom fonts.
+- **Never use hard-coded hex colors, arbitrary rem/px spacing, or arbitrary font-size values.** `stylelint-plugin-carbon-tokens` enforces all three (`carbon/theme-use`, `carbon/layout-use`, `carbon/type-use`) via `LintClientStylelintVerify`.
 
 **Never write direct CSS overrides for Carbon components.** Before adding custom CSS for colors, theming, hover states, or layout of any Carbon component:
 1. Research the Carbon-native approach first (e.g., `Theme` component for scoped theming, component props like `kind`, `size`, design tokens)

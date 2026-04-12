@@ -6,20 +6,6 @@
   gap: $spacing-03;
 }
 
-.tag-pill {
-  cursor: pointer;
-  background-color: var(--cds-text-secondary);
-  color: white;
-  border: none;
-  border-radius: 10rem;
-  padding: $spacing-02 $spacing-03;
-  font-size: 0.8rem;
-}
-
-.tag-pill:hover {
-  background-color: var(--cds-text-helper);
-}
-
 .tag-list-loading,
 .tag-list-empty {
   padding: $spacing-05;
