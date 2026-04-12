@@ -74,3 +74,37 @@ hr {
   height: 100vh;
 }
 
+/* Shared layout utilities */
+.article-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-03;
+}
+
+/* Breadcrumb overflow — prevents long titles breaking layout */
+.cds--breadcrumb {
+  margin-bottom: $spacing-05;
+}
+
+.cds--breadcrumb-item:last-child {
+  overflow: hidden;
+
+  .cds--link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Standard page content padding */
+.auth-page,
+.editor-page,
+.settings-page {
+  padding: $spacing-06 0;
+}
+

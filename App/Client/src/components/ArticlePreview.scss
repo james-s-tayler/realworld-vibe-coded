@@ -7,9 +7,6 @@
 }
 
 .article-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: $spacing-05;
 }
 
@@ -74,8 +71,3 @@
   color: var(--cds-text-placeholder);
 }
 
-.article-tags {
-  display: flex;
-  gap: $spacing-02;
-  flex-wrap: wrap;
-}

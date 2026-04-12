@@ -259,7 +259,7 @@ export const ArticlePage: React.FC = () => {
               <p key={index}>{paragraph}</p>
             ))}
           </div>
-          <div className="article-tags">
+          <div className="tag-list">
             {article.tagList.map(tag => (
               <Tag key={tag} type="outline" size="sm" as={Link} to={`/?tag=${tag}`}>
                 {tag}

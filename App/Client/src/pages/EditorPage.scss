@@ -1,12 +1,5 @@
 @use '@carbon/react/scss/spacing' as *;
 
-.editor-page {
-  padding: $spacing-06 0;
-}
-
 .editor-page .tag-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-03;
   margin-top: $spacing-03;
 }

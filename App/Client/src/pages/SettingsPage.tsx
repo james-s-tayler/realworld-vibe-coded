@@ -1,5 +1,3 @@
-import './SettingsPage.scss';
-
 import {
   Button,
   Dropdown,
