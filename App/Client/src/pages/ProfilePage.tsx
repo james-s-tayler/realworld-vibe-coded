@@ -30,13 +30,13 @@ interface ProfileBannerProps {
 const ProfileBanner: React.FC<ProfileBannerProps> = ({ profile, isOwnProfile, onFollow }) => {
   const { t } = useTranslation();
   return (
-  <div className="user-info">
+  <div className="page-banner user-info">
     <Grid>
       <Column lg={{ span: 14, offset: 1 }} md={8} sm={4}>
           <img
             src={profile.image || DEFAULT_PROFILE_IMAGE}
             alt={profile.username}
-            className="user-img"
+            className="user-img avatar-lg"
           />
           <h4 title={profile.username}>{profile.username}</h4>
           <p>{profile.bio}</p>

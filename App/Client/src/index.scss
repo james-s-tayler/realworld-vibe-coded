@@ -1,5 +1,6 @@
 @use '@carbon/react/scss/theme' as *;
 @use '@carbon/react/scss/breakpoint' as *;
+@use '@carbon/react/scss/spacing' as *;
 @use '@carbon/styles/scss/components/ui-shell/functions' as shell;
 
 :root {
@@ -36,6 +37,34 @@ a {
 a:hover {
   color: var(--cds-link-primary-hover);
   text-decoration: underline;
+}
+
+hr {
+  margin: $spacing-07 0;
+  border: 0;
+  border-top: 1px solid var(--cds-border-subtle);
+}
+
+.avatar-sm {
+  width: $spacing-06;
+  height: $spacing-06;
+  border-radius: 50%;
+}
+
+.avatar-md {
+  width: $spacing-07;
+  height: $spacing-07;
+  border-radius: 50%;
+}
+
+.avatar-lg {
+  width: $spacing-12;
+  height: $spacing-12;
+  border-radius: 50%;
+}
+
+.page-banner {
+  padding: $spacing-07 0;
 }
 
 .loading-fullscreen {
