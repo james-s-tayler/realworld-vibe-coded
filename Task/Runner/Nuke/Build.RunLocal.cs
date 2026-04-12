@@ -4,13 +4,13 @@ using Nuke;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
-using Nuke.Common.Tools.Npm;
 using Serilog;
-using static Nuke.Common.Tools.Npm.NpmTasks;
 
 public partial class Build
 {
   internal AbsolutePath PidDirectory => RootDirectory / ".nuke" / "pids";
+
+  internal AbsolutePath ViteDevServerPidFile => PidDirectory / "vite-dev-server.pid";
 
   internal AbsolutePath DocsMcpPidFile => PidDirectory / "docs-mcp-server.pid";
 
@@ -175,15 +175,54 @@ public partial class Build
     .After(RunLocalServer)
     .Executes(() =>
     {
+      PidDirectory.CreateDirectory();
+
+      if (ViteDevServerPidFile.FileExists())
+      {
+        var stalePid = int.Parse(ViteDevServerPidFile.ReadAllText());
+        try
+        {
+          Process.GetProcessById(stalePid);
+          Log.Warning("Vite dev server is already running (PID: {PID}). Run RunLocalClientDown first.", stalePid);
+          throw new Exception($"Vite dev server is already running (PID: {stalePid}). Run RunLocalClientDown first.");
+        }
+        catch (ArgumentException)
+        {
+          Log.Information("Cleaning up stale Vite PID file (process {PID} no longer running)", stalePid);
+          ViteDevServerPidFile.DeleteFile();
+        }
+      }
+
       var offset = Constants.Worktree.GetPortOffset(RootDirectory);
       var apiPort = 5001 + offset;
       var vitePort = 5173 + offset;
       Log.Information("Starting Vite dev server on port {VitePort} in {ClientDirectory} (API proxy -> https://localhost:{ApiPort})", vitePort, ClientDirectory, apiPort);
-      NpmRun(s => s
-        .SetProcessWorkingDirectory(ClientDirectory)
-        .SetCommand("dev")
-        .SetProcessEnvironmentVariable("API_PROXY_TARGET", $"https://localhost:{apiPort}")
-        .SetProcessEnvironmentVariable("VITE_DEV_PORT", $"{vitePort}"));
+
+      var viteLogFile = RootDirectory / ".nuke" / "temp" / "vite-dev-server.log";
+      var viteProcess = StartDetachedProcess(
+        "npx",
+        "vite",
+        viteLogFile,
+        ClientDirectory,
+        new Dictionary<string, string>
+        {
+          ["API_PROXY_TARGET"] = $"https://localhost:{apiPort}",
+          ["VITE_DEV_PORT"] = $"{vitePort}",
+        });
+      ViteDevServerPidFile.WriteAllText(viteProcess.Id.ToString());
+      Log.Information("Vite dev server started with PID: {PID}", viteProcess.Id);
+
+      var viteUrl = $"https://localhost:{vitePort}";
+      Log.Information("Waiting for Vite dev server to be available at {Url}...", viteUrl);
+      if (!WaitForHttpsEndpoint(viteUrl, timeoutSeconds: 60))
+      {
+        Log.Error("Vite dev server did not become available within the timeout period");
+        KillProcess(viteProcess.Id);
+        ViteDevServerPidFile.DeleteFile();
+        throw new Exception($"Vite dev server failed to start on port {vitePort}");
+      }
+
+      Log.Information("Vite dev server is available at {Url}", viteUrl);
     });
 
   internal Target RunLocalClientDown => _ => _
@@ -193,7 +232,19 @@ public partial class Build
       var offset = Constants.Worktree.GetPortOffset(RootDirectory);
       var vitePort = 5173 + offset;
       Log.Information("Stopping Vite dev server on port {Port}...", vitePort);
-      KillProcessOnPort(vitePort);
+
+      if (ViteDevServerPidFile.FileExists())
+      {
+        var vitePid = int.Parse(ViteDevServerPidFile.ReadAllText());
+        Log.Information("Stopping Vite dev server (PID: {PID})...", vitePid);
+        KillProcess(vitePid);
+        ViteDevServerPidFile.DeleteFile();
+      }
+      else
+      {
+        Log.Information("No Vite PID file found, falling back to port-based kill");
+        KillProcessOnPort(vitePort);
+      }
     });
 
   internal Target RunLocalDocsMcpServerUp => _ => _
@@ -258,7 +309,7 @@ public partial class Build
       Log.Information("Docs MCP Server stopped successfully");
     });
 
-  private Process StartBackgroundProcess(string executable, string arguments)
+  private Process StartBackgroundProcess(string executable, string arguments, AbsolutePath? workingDirectory = null, Dictionary<string, string>? environmentVariables = null)
   {
     var startInfo = new ProcessStartInfo
     {
@@ -269,8 +320,16 @@ public partial class Build
       RedirectStandardOutput = true,
       RedirectStandardError = true,
       RedirectStandardInput = false,
-      WorkingDirectory = RootDirectory,
+      WorkingDirectory = workingDirectory ?? RootDirectory,
     };
+
+    if (environmentVariables != null)
+    {
+      foreach (var (key, value) in environmentVariables)
+      {
+        startInfo.Environment[key] = value;
+      }
+    }
 
     var process = new Process { StartInfo = startInfo };
 
@@ -295,6 +354,41 @@ public partial class Build
     process.BeginErrorReadLine();
 
     // Give the process a moment to fail if there's an immediate error
+    System.Threading.Thread.Sleep(500);
+    if (process.HasExited)
+    {
+      throw new Exception($"Process {executable} exited immediately with code {process.ExitCode}");
+    }
+
+    return process;
+  }
+
+  private Process StartDetachedProcess(string executable, string arguments, AbsolutePath logFile, AbsolutePath? workingDirectory = null, Dictionary<string, string>? environmentVariables = null)
+  {
+    // Build env var exports for the shell command
+    var envExports = string.Empty;
+    if (environmentVariables != null)
+    {
+      envExports = string.Join(" ", environmentVariables.Select(kv => $"{kv.Key}={kv.Value}")) + " ";
+    }
+
+    // Use bash with shell-level redirection so stdout/stderr go directly to a file,
+    // not through pipes to the parent. This prevents the child dying when Nuke exits.
+    var startInfo = new ProcessStartInfo
+    {
+      FileName = "bash",
+      Arguments = $"-c \"{envExports}{executable} {arguments} >> {logFile} 2>&1\"",
+      UseShellExecute = false,
+      CreateNoWindow = true,
+      RedirectStandardOutput = false,
+      RedirectStandardError = false,
+      RedirectStandardInput = false,
+      WorkingDirectory = workingDirectory ?? RootDirectory,
+    };
+
+    var process = new Process { StartInfo = startInfo };
+    process.Start();
+
     System.Threading.Thread.Sleep(500);
     if (process.HasExited)
     {
