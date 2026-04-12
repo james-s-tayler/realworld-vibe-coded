@@ -27,6 +27,7 @@ When adding a guardrail to prevent a class of defect, choose the earliest enforc
 | Server Roslyn Analyzers | `App/Server/analyzers/` | Build |
 | Nuke Build Analyzers | `Task/Runner/Nuke.Analyzers/` | Build |
 | E2E Test Analyzers | `Test/e2e/E2eTests.Analyzers/` | Build |
+| ReferenceTrimmer | `App/Server/Directory.Build.props` | Build |
 | TypeScript Strict Mode | `App/Client/tsconfig.app.json` | Build |
 | .editorconfig + StyleCop | `.editorconfig` | Lint |
 | Nuke Lint Targets | `Task/Runner/Nuke/Build.Lint.cs` | Lint |
