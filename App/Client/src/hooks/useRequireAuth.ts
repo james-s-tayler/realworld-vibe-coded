@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
-import { useAuth } from './useAuth';
+
 import { ApiError } from '../api/client';
+import { useAuth } from './useAuth';
 
 /**
  * A hook that provides a wrapper function for authenticated API actions.

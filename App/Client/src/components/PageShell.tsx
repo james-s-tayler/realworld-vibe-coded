@@ -1,5 +1,5 @@
+import { Column,Grid } from '@carbon/react';
 import React from 'react';
-import { Grid, Column } from '@carbon/react';
 
 type ColumnLayout = 'narrow' | 'wide' | 'full' | 'two-column';
 

@@ -15,8 +15,6 @@
         "acceptValues": [
           "/inherit|initial|none|unset/",
           "/currentColor|transparent/",
-          "white",
-          "/rgb\\(/",
           "/^0$/"
         ],
         "severity": "error"

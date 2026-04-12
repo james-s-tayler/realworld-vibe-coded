@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { profilesApi } from './profiles';
+import { beforeEach,describe, expect, it, vi } from 'vitest';
+
 import { getApiClient } from './clientFactory';
+import { profilesApi } from './profiles';
 
 vi.mock('./clientFactory');
 

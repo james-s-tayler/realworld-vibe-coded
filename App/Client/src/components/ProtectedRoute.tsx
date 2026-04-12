@@ -1,7 +1,8 @@
+import { Loading } from '@carbon/react';
 import React from 'react';
 import { Navigate } from 'react-router';
+
 import { useAuth } from '../hooks/useAuth';
-import { Loading } from '@carbon/react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

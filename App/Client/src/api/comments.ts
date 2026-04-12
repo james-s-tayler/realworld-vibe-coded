@@ -1,9 +1,9 @@
-import { getApiClient } from './clientFactory';
-import { convertKiotaError } from './errors';
 import type {
   CommentResponse,
   CommentsResponse,
 } from '../types/comment';
+import { getApiClient } from './clientFactory';
+import { convertKiotaError } from './errors';
 
 export const commentsApi = {
   getComments: async (slug: string): Promise<CommentsResponse> => {

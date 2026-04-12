@@ -1,6 +1,6 @@
+import type { TagsResponse } from '../types/tag';
 import { getApiClient } from './clientFactory';
 import { convertKiotaError } from './errors';
-import type { TagsResponse } from '../types/tag';
 
 export const tagsApi = {
   getTags: async (): Promise<TagsResponse> => {

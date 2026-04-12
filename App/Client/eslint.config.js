@@ -4,6 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import i18next from 'eslint-plugin-i18next'
 import tseslint from 'typescript-eslint'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import { defineConfig, globalIgnores } from 'eslint/config'
 import customRules from './eslint-plugin-custom-rules/index.js'
 
@@ -20,6 +21,20 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'error',
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx}'],
+    plugins: { 'simple-import-sort': simpleImportSort },
+    rules: {
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
     },
   },
   {

@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { BrowserRouter, Route, Routes } from 'react-router'
-import { ProtectedRoute } from './ProtectedRoute'
-import { AuthProvider } from '../context/AuthContext'
+import { beforeEach,describe, expect, it, vi } from 'vitest'
+
 import { authApi } from '../api/auth'
+import { AuthProvider } from '../context/AuthContext'
+import { ProtectedRoute } from './ProtectedRoute'
 
 vi.mock('../api/auth', () => ({
   authApi: {

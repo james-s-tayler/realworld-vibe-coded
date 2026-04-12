@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { act,renderHook } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { useRequireAuth } from './useRequireAuth';
-import { AuthContext } from '../context/AuthContextType';
+import { beforeEach,describe, expect, it, vi } from 'vitest';
+
 import { ApiError } from '../api/client';
+import { AuthContext } from '../context/AuthContextType';
+import { useRequireAuth } from './useRequireAuth';
 
 // Mock useNavigate
 const mockNavigate = vi.fn();

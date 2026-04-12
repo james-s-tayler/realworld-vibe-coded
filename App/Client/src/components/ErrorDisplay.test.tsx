@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
-import { ErrorDisplay } from './ErrorDisplay';
-import { AppError } from '../utils/errors';
+import { beforeEach,describe, expect, it, vi } from 'vitest';
+
 import { ApiError } from '../api/client';
+import { AppError } from '../utils/errors';
+import { ErrorDisplay } from './ErrorDisplay';
 
 const mockShowToast = vi.fn().mockReturnValue('toast-id');
 const mockRemoveToast = vi.fn();

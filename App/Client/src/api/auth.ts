@@ -1,6 +1,6 @@
+import type { UserResponse } from '../types/user';
 import { getApiClient } from './clientFactory';
 import { convertKiotaError } from './errors';
-import type { UserResponse } from '../types/user';
 
 export const authApi = {
   login: async (email: string, password: string): Promise<void> => {

@@ -1,20 +1,22 @@
-import React, { useActionState, startTransition } from 'react';
-import { useNavigate, Link } from 'react-router';
+import './AuthPages.scss';
+
 import {
-  Form,
-  TextInput,
-  PasswordInput,
   Button,
-  Stack,
+  Form,
   InlineLoading,
+  PasswordInput,
+  Stack,
+  TextInput,
 } from '@carbon/react';
+import React, { startTransition,useActionState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../hooks/useAuth';
+import { Link,useNavigate } from 'react-router';
+
 import { ErrorDisplay } from '../components/ErrorDisplay';
 import { PageShell } from '../components/PageShell';
 import { USER_CONSTRAINTS } from '../constants';
+import { useAuth } from '../hooks/useAuth';
 import { type AppError, normalizeError } from '../utils/errors';
-import './AuthPages.scss';
 
 interface RegisterState {
   error: AppError | null;

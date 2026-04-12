@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { commentsApi } from './comments';
+import { beforeEach,describe, expect, it, vi } from 'vitest';
+
 import { getApiClient } from './clientFactory';
+import { commentsApi } from './comments';
 
 vi.mock('./clientFactory');
 

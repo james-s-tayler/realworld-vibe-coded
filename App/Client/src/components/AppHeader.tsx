@@ -1,31 +1,32 @@
-import React, { useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import './AppHeader.scss';
+
+import {
+  Edit,
+  Home,
+  Login,
+  Logout,
+  Settings,
+  UserAvatar,
+  UserFollow,
+  UserMultiple,
+} from '@carbon/icons-react';
 import {
   Header,
   HeaderContainer,
   HeaderMenuButton,
   HeaderName,
-  SkipToContent,
-  Theme,
   SideNav,
   SideNavItems,
   SideNavLink,
+  SkipToContent,
+  Theme,
 } from '@carbon/react';
-import {
-  Home,
-  Edit,
-  UserMultiple,
-  Settings,
-  UserAvatar,
-  Login,
-  UserFollow,
-  Logout,
-} from '@carbon/icons-react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link, useLocation, useNavigate } from 'react-router';
+
 import { useAuth } from '../hooks/useAuth';
 import { RequireRole } from './RequireRole';
-
-import './AppHeader.scss';
 
 export const AppHeader: React.FC = () => {
   const { t } = useTranslation();

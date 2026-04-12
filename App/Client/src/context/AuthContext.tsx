@@ -1,7 +1,8 @@
-import React, { useState, useEffect, type ReactNode } from 'react';
-import i18n from '../i18n/i18n';
+import React, { type ReactNode,useEffect, useState } from 'react';
+
 import { authApi } from '../api/auth';
 import { setApiLanguage } from '../api/clientFactory';
+import i18n from '../i18n/i18n';
 import type { User } from '../types/user';
 import { AuthContext } from './AuthContextType';
 

@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useApiCall } from './useApiCall';
+import { act,renderHook } from '@testing-library/react';
+import { beforeEach,describe, expect, it, vi } from 'vitest';
+
 import { ApiError } from '../api/client';
+import { useApiCall } from './useApiCall';
 
 describe('useApiCall', () => {
   beforeEach(() => {

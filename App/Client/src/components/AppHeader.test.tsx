@@ -1,10 +1,11 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import { AppHeader } from './AppHeader';
+import { describe, expect, it, vi } from 'vitest';
+
 import { AuthContext } from '../context/AuthContext';
 import type { User } from '../types/user';
+import { AppHeader } from './AppHeader';
 
 const mockLogout = vi.fn();
 

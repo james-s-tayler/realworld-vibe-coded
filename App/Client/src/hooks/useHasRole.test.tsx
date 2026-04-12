@@ -1,8 +1,9 @@
-import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useHasRole } from './useHasRole';
+import { describe, expect, it, vi } from 'vitest';
+
 import { AuthContext } from '../context/AuthContextType';
 import type { User } from '../types/user';
+import { useHasRole } from './useHasRole';
 
 const wrapper = (user: User | null) => ({ children }: { children: React.ReactNode }) => (
   <AuthContext.Provider
