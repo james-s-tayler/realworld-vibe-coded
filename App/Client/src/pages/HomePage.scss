@@ -1,25 +1,6 @@
 @use '@carbon/react/scss/spacing' as *;
 @use '@carbon/react/scss/type' as type;
 
-.banner {
-  background: linear-gradient(135deg, var(--cds-link-primary) 0%, var(--cds-link-visited) 100%);
-  text-align: center;
-  color: var(--cds-text-on-color);
-  box-shadow: inset 0 $spacing-03 $spacing-03 (-$spacing-03) var(--cds-shadow),
-              inset 0 (-$spacing-03) $spacing-03 (-$spacing-03) var(--cds-shadow);
-}
-
-.banner-title {
-  @include type.type-style('heading-07');
-
-  text-shadow: 0 1px 3px var(--cds-shadow);
-  margin-bottom: $spacing-03;
-}
-
-.banner-subtitle {
-  @include type.type-style('heading-03');
-}
-
 .sidebar {
   padding: $spacing-03 $spacing-05;
   background-color: var(--cds-layer-01);

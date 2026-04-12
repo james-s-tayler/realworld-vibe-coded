@@ -1,5 +1,3 @@
-import './AuthPages.scss';
-
 import {
   Button,
   Form,
@@ -50,8 +48,7 @@ export const RegisterPage: React.FC = () => {
 
   return (
     <PageShell
-      className="auth-page"
-      columnLayout="narrow"
+      columnLayout="wide"
       title={t('register.title')}
       subtitle={<Link to="/login">{t('register.haveAccount')}</Link>}
     >

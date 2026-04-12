@@ -1,0 +1,13 @@
+@use '@carbon/react/scss/spacing' as *;
+
+.page-shell > .cds--css-grid {
+  padding-top: $spacing-07;
+}
+
+.page-shell__header h1 {
+  margin-bottom: $spacing-05;
+}
+
+.page-shell__header p {
+  margin-bottom: $spacing-05;
+}
