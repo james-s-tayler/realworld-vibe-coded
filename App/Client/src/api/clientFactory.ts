@@ -3,9 +3,10 @@ import {
   FetchRequestAdapter,
   HttpClient,
 } from '@microsoft/kiota-http-fetchlibrary';
+
 import {
-  createConduitApiClient,
   type ConduitApiClient,
+  createConduitApiClient,
 } from './generated/conduitApiClient.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';

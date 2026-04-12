@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { normalizeError, AppError } from './errors';
+import { describe, expect,it } from 'vitest';
+
 import { ApiError } from '../api/client';
+import { AppError,normalizeError } from './errors';
 
 describe('normalizeError', () => {
   describe('ApiError normalization', () => {

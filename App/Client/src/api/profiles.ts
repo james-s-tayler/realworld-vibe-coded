@@ -1,6 +1,6 @@
+import type { ProfileResponse } from '../types/profile';
 import { getApiClient } from './clientFactory';
 import { convertKiotaError } from './errors';
-import type { ProfileResponse } from '../types/profile';
 
 export const profilesApi = {
   getProfile: async (username: string): Promise<ProfileResponse> => {

@@ -1,7 +1,9 @@
-import React from 'react';
-import { ToastNotification } from '@carbon/react';
-import { useToast } from '../hooks/useToast';
 import './ToastContainer.scss';
+
+import { ToastNotification } from '@carbon/react';
+import React from 'react';
+
+import { useToast } from '../hooks/useToast';
 
 export const ToastContainer: React.FC = () => {
   const { toasts, removeToast } = useToast();

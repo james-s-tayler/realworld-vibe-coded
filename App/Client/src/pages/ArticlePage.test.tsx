@@ -1,11 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { ArticlePage } from './ArticlePage';
-import { AuthContext } from '../context/AuthContext';
-import { ToastProvider } from '../context/ToastContext';
+import { beforeEach,describe, expect, it, vi } from 'vitest';
+
 import { articlesApi } from '../api/articles';
 import { commentsApi } from '../api/comments';
+import { AuthContext } from '../context/AuthContext';
+import { ToastProvider } from '../context/ToastContext';
+import { ArticlePage } from './ArticlePage';
 
 // Mock the API modules
 vi.mock('../api/articles', () => ({

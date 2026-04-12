@@ -1,9 +1,11 @@
-import React from 'react';
-import { Loading } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
-import { ArticlePreview } from './ArticlePreview';
-import type { Article } from '../types/article';
 import './ArticleList.scss';
+
+import { Loading } from '@carbon/react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+
+import type { Article } from '../types/article';
+import { ArticlePreview } from './ArticlePreview';
 
 interface ArticleListProps {
   articles: Article[];

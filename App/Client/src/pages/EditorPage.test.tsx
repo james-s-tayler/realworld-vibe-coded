@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { EditorPage } from './EditorPage';
+import { beforeEach,describe, expect, it, vi } from 'vitest';
+
 import { AuthContext } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
+import { EditorPage } from './EditorPage';
 
 // Mock the articles API
 vi.mock('../api/articles', () => ({

@@ -1,9 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { ArticlePreview } from './ArticlePreview';
-import { AuthContext } from '../context/AuthContext';
+import { describe, expect, it, vi } from 'vitest';
+
 import { DEFAULT_PROFILE_IMAGE } from '../constants';
+import { AuthContext } from '../context/AuthContext';
+import { ArticlePreview } from './ArticlePreview';
 
 const mockArticle = {
   slug: 'test-article',

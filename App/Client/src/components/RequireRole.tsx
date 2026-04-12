@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { useHasRole } from '../hooks/useHasRole';
 
 interface RequireRoleProps {

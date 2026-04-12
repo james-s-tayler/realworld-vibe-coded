@@ -1,12 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router'
-import { LoginPage } from './LoginPage'
+import { beforeEach,describe, expect, it, vi } from 'vitest'
+
+import { authApi } from '../api/auth'
+import { ToastContainer } from '../components/ToastContainer'
 import { AuthProvider } from '../context/AuthContext'
 import { ToastProvider } from '../context/ToastContext'
-import { ToastContainer } from '../components/ToastContainer'
-import { authApi } from '../api/auth'
+import { LoginPage } from './LoginPage'
 
 vi.mock('../api/auth', () => ({
   authApi: {

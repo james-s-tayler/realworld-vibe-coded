@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router';
-import { RoleProtectedRoute } from './RoleProtectedRoute';
+import { MemoryRouter, Route,Routes } from 'react-router';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { AuthContext } from '../context/AuthContextType';
 import type { User } from '../types/user';
+import { RoleProtectedRoute } from './RoleProtectedRoute';
 
 describe('RoleProtectedRoute', () => {
   const mockUser: User = {

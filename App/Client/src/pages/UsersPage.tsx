@@ -1,33 +1,35 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router';
+import './UsersPage.scss';
+
+import { Add } from '@carbon/icons-react';
 import {
-  DataTable,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
   Button,
-  Modal,
-  TextInput,
-  PasswordInput,
-  Loading,
-  Pagination,
-  Tag,
   Checkbox,
+  DataTable,
+  Loading,
+  Modal,
   OverflowMenu,
   OverflowMenuItem,
+  Pagination,
+  PasswordInput,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tag,
+  TextInput,
 } from '@carbon/react';
-import { Add } from '@carbon/icons-react';
+import React, { useCallback,useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
+
+import { ApiError } from '../api/client';
+import { type User,usersApi } from '../api/users';
 import { PageShell } from '../components/PageShell';
-import { usersApi, type User } from '../api/users';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
-import { ApiError } from '../api/client';
-import './UsersPage.scss';
 
 const DEFAULT_PAGE_SIZE = 20;
 const PAGE_SIZE_OPTIONS = [10, 20, 50];

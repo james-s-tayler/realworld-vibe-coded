@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { tagsApi } from './tags';
+import { beforeEach,describe, expect, it, vi } from 'vitest';
+
 import { getApiClient } from './clientFactory';
+import { tagsApi } from './tags';
 
 vi.mock('./clientFactory');
 

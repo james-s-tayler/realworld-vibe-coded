@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
-import App from './App'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { articlesApi } from './api/articles'
-import { tagsApi } from './api/tags'
 import { authApi } from './api/auth'
+import { tagsApi } from './api/tags'
+import App from './App'
 
 vi.mock('./api/articles', () => ({
   articlesApi: {

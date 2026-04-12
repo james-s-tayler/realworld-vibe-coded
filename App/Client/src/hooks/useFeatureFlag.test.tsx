@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useFeatureFlag } from './useFeatureFlag';
+import { describe, expect,it } from 'vitest';
+
 import { FeatureFlagContext } from '../context/FeatureFlagContextType';
+import { useFeatureFlag } from './useFeatureFlag';
 
 const wrapper =
   (flags: Record<string, boolean>) =>

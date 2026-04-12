@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { type AppError, normalizeError } from '../utils/errors';
+
 import { useToast } from '../hooks/useToast';
+import { type AppError, normalizeError } from '../utils/errors';
 
 export interface ErrorDisplayProps {
   error: AppError | unknown | null;

@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+
 import { FeatureFlagContext } from '../context/FeatureFlagContextType';
 
 export const useFeatureFlag = (flagName: string): boolean => {

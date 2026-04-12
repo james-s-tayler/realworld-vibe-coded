@@ -1,12 +1,12 @@
-import { getApiClient } from './clientFactory';
-import { convertKiotaError } from './errors';
 import type {
   ArticleResponse,
   ArticlesResponse,
   CreateArticleRequest,
-  UpdateArticleRequest,
   ListArticlesRequest,
+  UpdateArticleRequest,
 } from '../types/article';
+import { getApiClient } from './clientFactory';
+import { convertKiotaError } from './errors';
 
 export const articlesApi = {
   listArticles: async (params: ListArticlesRequest = {}): Promise<ArticlesResponse> => {
