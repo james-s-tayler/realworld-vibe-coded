@@ -156,11 +156,13 @@ describe('UsersPage', () => {
     const inviteButton = screen.getByRole('button', { name: /invite user/i });
     await user.click(inviteButton);
 
-    // Fill in form
+    // Fill in form (paste instead of type to avoid per-keystroke overhead)
     const emailInput = screen.getByLabelText('Email');
     const passwordInput = screen.getByLabelText('Password');
-    await user.type(emailInput, 'user2@test.com');
-    await user.type(passwordInput, 'password123');
+    await user.click(emailInput);
+    await user.paste('user2@test.com');
+    await user.click(passwordInput);
+    await user.paste('password123');
 
     // Submit
     const submitButton = screen.getByRole('button', { name: /^invite$/i });
@@ -199,11 +201,13 @@ describe('UsersPage', () => {
     const inviteButton = screen.getByRole('button', { name: /invite user/i });
     await user.click(inviteButton);
 
-    // Fill in form
+    // Fill in form (paste instead of type to avoid per-keystroke overhead)
     const emailInput = screen.getByLabelText('Email');
     const passwordInput = screen.getByLabelText('Password');
-    await user.type(emailInput, 'user2@test.com');
-    await user.type(passwordInput, 'password123');
+    await user.click(emailInput);
+    await user.paste('user2@test.com');
+    await user.click(passwordInput);
+    await user.paste('password123');
 
     // Submit
     const submitButton = screen.getByRole('button', { name: /^invite$/i });
