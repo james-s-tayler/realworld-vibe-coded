@@ -1,13 +1,6 @@
 @use '@carbon/react/scss/spacing' as *;
 @use '@carbon/react/scss/type' as type;
 
-.article-page.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50vh;
-}
-
 .article-page .banner {
   background: var(--cds-background-inverse);
   color: var(--cds-text-on-color);
@@ -46,11 +39,6 @@
   @include type.type-style('label-01');
 
   color: var(--cds-text-on-color-disabled);
-}
-
-.article-meta .actions {
-  display: flex;
-  gap: $spacing-03;
 }
 
 .article-content {

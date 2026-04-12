@@ -175,7 +175,7 @@ export const ProfilePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="profile-page loading">
+      <div className="profile-page page-loading">
         <Loading description={t('profile.loading')} withOverlay={false} />
       </div>
     );
