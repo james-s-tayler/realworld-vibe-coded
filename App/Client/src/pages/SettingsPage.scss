@@ -1,7 +1,6 @@
 @use '@carbon/react/scss/spacing' as *;
 
 .settings-page {
-  min-height: calc(100vh - 56px);
   padding: $spacing-06 0;
 }
 
@@ -9,8 +8,4 @@
   margin: $spacing-07 0;
   border: 0;
   border-top: 1px solid var(--cds-border-subtle);
-}
-
-.settings-notification {
-  margin-bottom: $spacing-05;
 }

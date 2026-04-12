@@ -31,6 +31,16 @@ Full browser inspection workflow using Chrome DevTools MCP tools.
 - `press_key` — press a keyboard key (Enter, Tab, Escape, etc.)
 - `evaluate_script` — run arbitrary JavaScript in the page context
 
+## Authentication
+
+If you need to inspect pages behind authentication (settings, editor, profile, etc.):
+
+1. **Register a new account** via the Sign up page — never guess credentials for an existing account
+2. **Log in** with the account you just created
+3. **Then navigate** to the target page
+
+If you navigate to an authenticated page and get redirected to `/login`, this means you need to register first.
+
 ## Workflow Pattern
 
 ```

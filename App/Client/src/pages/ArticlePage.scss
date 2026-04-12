@@ -2,8 +2,6 @@
 @use '@carbon/react/scss/type' as type;
 
 .article-page {
-  min-height: 100vh;
-
   .cds--breadcrumb {
     margin-bottom: $spacing-05;
   }
@@ -103,18 +101,6 @@
   flex-wrap: wrap;
   gap: $spacing-03;
   margin-bottom: $spacing-06;
-}
-
-.article-grid-container {
-  max-width: 1140px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 $spacing-05;
-}
-
-.article-column-offset {
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .comment-form {

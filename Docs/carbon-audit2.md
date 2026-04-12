@@ -20,7 +20,7 @@ The codebase is already well-integrated with Carbon:
 
 ## Findings
 
-### 1. Hardcoded Header Height — `calc(100vh - 56px)`
+### ~~1. Hardcoded Header Height — `calc(100vh - 56px)`~~ FIXED
 
 **Severity:** Medium
 **Files:** `AuthPages.scss:4`, `SettingsPage.scss:4`, `EditorPage.scss:4`
@@ -29,9 +29,11 @@ All three use `min-height: calc(100vh - 56px)` where `56px` is the Carbon UI She
 
 **Recommendation:** The header offset is already handled by `.cds--content` in `index.scss`. These pages render inside `<Content>` via the app layout, so the `calc(100vh - 56px)` is compensating for something `.cds--content` should handle. Either use a consistent approach across all pages or reference Carbon's shell height token: `shell.mini-units(6)` from `@carbon/styles/scss/components/ui-shell/functions`.
 
+**Resolution:** Centralized full-height layout in `.cds--content` using `min-height: calc(100vh - shell.mini-units(6))`. Removed `min-height` from all 6 page SCSS files and `body`/`#root`. Also fixes finding #10.
+
 ---
 
-### 2. Custom Container Instead of Carbon Grid
+### ~~2. Custom Container Instead of Carbon Grid~~ FIXED
 
 **Severity:** Medium
 **File:** `ArticlePage.scss:110-118`
@@ -53,6 +55,8 @@ All three use `min-height: calc(100vh - 56px)` where `56px` is the Carbon UI She
 This is a hand-rolled centered container. The `1140px` max-width is arbitrary and doesn't align with any Carbon breakpoint (`max` = 1584px, `xlg` = 1312px, `lg` = 1056px).
 
 **Recommendation:** Use Carbon Grid with a `Column` span/offset to constrain content width, which is what `PageShell` already does for other pages. The article content section should flow through PageShell's Grid system rather than bypassing it.
+
+**Resolution:** Removed unused `.article-grid-container` and `.article-column-offset` selectors (dead CSS — never referenced in TSX). Also removed `.settings-notification` and `.users-modal-notification`.
 
 ---
 
@@ -190,7 +194,7 @@ Many components use manual flexbox column layouts with gaps that are exactly wha
 
 ---
 
-### 10. Inconsistent Full-Height Patterns
+### ~~10. Inconsistent Full-Height Patterns~~ FIXED
 
 **Severity:** Low
 **Files:** 6 page SCSS files
@@ -201,6 +205,8 @@ Three different approaches to full-height pages:
 - `min-height: 50vh` — Loading states in ArticlePage, ProfilePage
 
 **Recommendation:** Standardize on one approach. Since all pages render inside `.cds--content` (which handles the header offset), the content area height should be consistent. Consider adding a single utility class in `index.scss` and applying it from `PageShell`.
+
+**Resolution:** Fixed as part of finding #1 — centralized in `.cds--content` with `min-height: calc(100vh - shell.mini-units(6))`.
 
 ---
 
@@ -310,8 +316,8 @@ Either use `stylelint-declaration-strict-value` for `z-index` to require variabl
 
 | # | Severity | Finding | Files |
 |---|----------|---------|-------|
-| 1 | Medium | Hardcoded `56px` header height | AuthPages, Settings, Editor |
-| 2 | Medium | Custom container bypassing Grid | ArticlePage |
+| ~~1~~ | ~~Medium~~ | ~~Hardcoded `56px` header height~~ | ~~AuthPages, Settings, Editor~~ |
+| ~~2~~ | ~~Medium~~ | ~~Custom container bypassing Grid~~ | ~~ArticlePage~~ |
 | ~~3~~ | ~~Low~~ | ~~Line-height overriding type token~~ | ~~ArticlePage~~ |
 | ~~4~~ | ~~Medium~~ | ~~Custom button CSS overrides~~ | ~~ArticlePreview~~ |
 | 5 | Medium | Hardcoded px image dimensions | ArticlePreview, ArticlePage, ProfilePage |
@@ -319,11 +325,11 @@ Either use `stylelint-declaration-strict-value` for `z-index` to require variabl
 | 7 | Low | Hardcoded shadow dimensions | HomePage |
 | 8 | High | `window.confirm()` + missing i18n | ArticlePage |
 | 9 | Low | Manual flex stacks could use `<Stack>` | Multiple (5 files) |
-| 10 | Low | Inconsistent full-height approach | 6 page files |
+| ~~10~~ | ~~Low~~ | ~~Inconsistent full-height approach~~ | ~~6 page files~~ |
 | 11 | Low | Unstyled `<hr>` / duplicate styling | ArticlePage, SettingsPage |
 | 12 | Low | Repeated avatar `border-radius: 50%` | 4 files |
 | 13 | Low | Banner padding pattern duplicated | 3 page files |
 
 **High:** 1 finding (window.confirm)
-**Medium:** 3 findings remaining (header height, custom container, image dimensions)
-**Low:** 7 findings remaining (DRY/consistency improvements)
+**Medium:** 1 finding remaining (image dimensions)
+**Low:** 6 findings remaining (DRY/consistency improvements)

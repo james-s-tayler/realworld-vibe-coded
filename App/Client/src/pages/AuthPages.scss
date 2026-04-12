@@ -1,6 +1,5 @@
 @use '@carbon/react/scss/spacing' as *;
 
 .auth-page {
-  min-height: calc(100vh - 56px);
   padding: $spacing-06 0;
 }

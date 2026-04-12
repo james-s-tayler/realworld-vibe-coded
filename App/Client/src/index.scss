@@ -16,16 +16,12 @@
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
-}
-
-#root {
-  min-height: 100vh;
 }
 
 /* Carbon Content handles header offset; zero padding since Grid has its own gutters.
    SideNav with isChildOfHeader needs manual margin since the sibling CSS selector doesn't match. */
 .cds--content {
+  min-height: calc(100vh - shell.mini-units(6));
   padding: 0;
 
   @include breakpoint(lg) {
