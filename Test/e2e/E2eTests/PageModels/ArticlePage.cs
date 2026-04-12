@@ -84,18 +84,26 @@ public class ArticlePage : BasePage
   }
 
   /// <summary>
-  /// Clicks the delete button and accepts the confirmation dialog.
+  /// Delete confirmation modal.
+  /// </summary>
+  public ILocator DeleteModal => Page.GetByRole(AriaRole.Dialog, new() { Name = "Delete Article" });
+
+  /// <summary>
+  /// Danger button inside the delete confirmation modal.
+  /// </summary>
+  public ILocator DeleteModalConfirmButton =>
+    DeleteModal.GetByRole(AriaRole.Button, new() { Name = "Delete" });
+
+  /// <summary>
+  /// Clicks the delete button and confirms via the Carbon danger modal.
   /// </summary>
   public async Task DeleteArticleAsync()
   {
     await Expect(DeleteButton).ToBeVisibleAsync();
-
-    Page.Dialog += async (_, dialog) =>
-    {
-      await dialog.AcceptAsync();
-    };
-
     await DeleteButton.ClickAsync();
+
+    await Expect(DeleteModal).ToBeVisibleAsync();
+    await DeleteModalConfirmButton.ClickAsync();
   }
 
   /// <summary>

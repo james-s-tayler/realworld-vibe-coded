@@ -11,6 +11,7 @@ import {
   OverflowMenuItem,
   Pagination,
   PasswordInput,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -317,7 +318,7 @@ export const UsersPage: React.FC = () => {
         onRequestSubmit={handleEditRolesSubmit}
         primaryButtonDisabled={editRolesSaving || editRolesSelected.length === 0}
       >
-        <div className="edit-roles-checkboxes">
+        <Stack gap={3} className="edit-roles-checkboxes">
           {editRolesUser?.roles.includes('OWNER') && (
             <Checkbox
               id="role-owner"
@@ -336,7 +337,7 @@ export const UsersPage: React.FC = () => {
               disabled={editRolesSaving}
             />
           ))}
-        </div>
+        </Stack>
       </Modal>
     </PageShell>
   );
