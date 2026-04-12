@@ -86,7 +86,7 @@ describe('ArticlePage', () => {
   it('renders article title after loading', async () => {
     renderWithAuth();
     await waitFor(() => {
-      expect(screen.getByText('Test Article')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1, name: 'Test Article' })).toBeInTheDocument();
     });
   });
 
