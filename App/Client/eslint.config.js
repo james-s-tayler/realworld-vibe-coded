@@ -84,6 +84,19 @@ export default defineConfig([
     },
   },
 
+  // CBN007: Ban native browser dialogs — use Carbon Modal instead
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/**/*.test.{ts,tsx}', 'src/test/**'],
+    rules: {
+      'no-restricted-globals': ['error',
+        { name: 'confirm', message: 'Use Carbon Modal with danger prop instead of window.confirm().' },
+        { name: 'alert', message: 'Use Carbon Modal or ToastNotification instead of window.alert().' },
+        { name: 'prompt', message: 'Use Carbon Modal with TextInput instead of window.prompt().' },
+      ],
+    },
+  },
+
   // TST001: No userEvent.type() in tests (causes CI flakiness)
   {
     files: ['src/**/*.test.{ts,tsx}'],

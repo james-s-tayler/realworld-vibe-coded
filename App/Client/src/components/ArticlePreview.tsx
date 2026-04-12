@@ -1,7 +1,7 @@
 import './ArticlePreview.scss';
 
 import { Favorite,FavoriteFilled } from '@carbon/icons-react';
-import { Button,Tag } from '@carbon/react';
+import { Button,Stack,Tag } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -47,10 +47,10 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({
             alt={article.author.username}
             className="author-image avatar-md"
           />
-          <div className="author-details">
+          <Stack gap={1} className="author-details">
             <span className="author-name cds--text-truncate-end" title={article.author.username}>{article.author.username}</span>
             <span className="article-date">{formatDate(article.createdAt)}</span>
-          </div>
+          </Stack>
         </Link>
         <Button
           kind={article.favorited ? 'primary' : 'tertiary'}
