@@ -225,7 +225,7 @@ public class ArticlePage : BasePage
   }
 
   public ILocator GetArticleTag(string tagName) =>
-    Page.Locator(".article-tags .cds--tag").Filter(new() { HasText = tagName });
+    Page.Locator(".tag-list .cds--tag").Filter(new() { HasText = tagName });
 
   public async Task VerifyArticleTagsVisibleAsync(params string[] tags)
   {
