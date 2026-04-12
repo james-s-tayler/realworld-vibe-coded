@@ -1,12 +1,12 @@
 @use '@carbon/react/scss/spacing' as *;
+@use '@carbon/styles/scss/utilities/z-index' as z;
 
 .toast-container {
   position: fixed;
   top: $spacing-09;
   right: $spacing-05;
-  z-index: 9000;
+  z-index: z.z('modal');
   display: flex;
   flex-direction: column;
   gap: $spacing-03;
-  max-width: 25rem;
 }
