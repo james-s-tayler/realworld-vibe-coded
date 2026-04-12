@@ -34,6 +34,22 @@
         "severity": "error"
       }
     ],
+    "carbon/motion-duration-use": [
+      true,
+      {
+        "acceptCarbonCustomProp": true,
+        "acceptValues": [
+          "/^0$/"
+        ],
+        "severity": "error"
+      }
+    ],
+    "carbon/motion-easing-use": [
+      true,
+      {
+        "severity": "error"
+      }
+    ],
     "carbon/type-use": [
       true,
       {
