@@ -1,7 +1,7 @@
 # Frontend Carbon Design System Refactor
 
 **Date:** April 11-13, 2026
-**Scope:** PRs #658, #668, #672 through #692 (23 pull requests)
+**Scope:** [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658), [PR #668](https://github.com/james-s-tayler/realworld-vibe-coded/pull/668), [PR #672](https://github.com/james-s-tayler/realworld-vibe-coded/pull/672) through [PR #692](https://github.com/james-s-tayler/realworld-vibe-coded/pull/692) (23 pull requests)
 **Goal:** Transform the frontend from a Bootstrap-legacy React app into a fully Carbon Design System-native application with automated guardrails to prevent regression.
 
 ---
@@ -66,9 +66,9 @@ The frontend started as a React + Vite application with `<TextInput type="passwo
 
 ## Phase 0: Frontend Library Audit
 
-The refactor began with a comprehensive audit of frontend library usage against official documentation for Carbon Design System, React Router v7, React 19, react-i18next, and @microsoft/feature-management. PR #658 implemented the changes on main; PR #668 ported the non-domain-specific subset to the multi-tenant starter template.
+The refactor began with a comprehensive audit of frontend library usage against official documentation for Carbon Design System, React Router v7, React 19, react-i18next, and @microsoft/feature-management. [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) implemented the changes on main; [PR #668](https://github.com/james-s-tayler/realworld-vibe-coded/pull/668) ported the non-domain-specific subset to the multi-tenant starter template.
 
-### PR #658 — refactor: frontend library audit — accessibility, code splitting, React 19
+### [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) — refactor: frontend library audit — accessibility, code splitting, React 19
 **Type:** Refactor | **Files:** 56 | **+~900 -~700**
 
 The foundational PR that established modern React patterns and the custom ESLint plugin:
@@ -118,16 +118,16 @@ The foundational PR that established modern React patterns and the custom ESLint
 
 **Not implemented:** `createBrowserRouter` migration — investigated but Carbon's `HeaderContainer` + `SideNav` overlay loses expanded state under react-router v7's `startTransition`, breaking mobile navigation.
 
-### PR #668 — refactor: port frontend architecture improvements from main
+### [PR #668](https://github.com/james-s-tayler/realworld-vibe-coded/pull/668) — refactor: port frontend architecture improvements from main
 **Type:** Refactor (port) | **Files:** 54 | **+~1050 -~400**
 
-Ported all non-domain-specific changes from PR #658 to the multi-tenant starter template. Identical ESLint plugin, toast system, React 19 patterns, and accessibility fixes. Also fixed a mobile E2E test race condition where `LoginOnMobileAsync` was clicking the hamburger before `useActionState`'s deferred navigation completed.
+Ported all non-domain-specific changes from [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) to the multi-tenant starter template. Identical ESLint plugin, toast system, React 19 patterns, and accessibility fixes. Also fixed a mobile E2E test race condition where `LoginOnMobileAsync` was clicking the hamburger before `useActionState`'s deferred navigation completed.
 
 ---
 
 ## Phase 1: Audit and Grid Migration
 
-### PR #672 — docs: add Carbon Design System audit report
+### [PR #672](https://github.com/james-s-tayler/realworld-vibe-coded/pull/672) — docs: add Carbon Design System audit report
 **Type:** Documentation | **Files:** 1 | **+184 -0**
 
 Initial audit of all `@carbon/react` usage against official Carbon documentation. Identified 7 findings across layout, design tokens, typography, and underused components:
@@ -137,7 +137,7 @@ Initial audit of all `@carbon/react` usage against official Carbon documentation
 - **P2:** Manual UI Shell content offset should use Carbon `Content` wrapper
 - **P3:** Underused components: `InlineLoading`, `Breadcrumb`, `ClickableTile`, Carbon `Form`
 
-### PR #673 — feat: replace custom Bootstrap grid with Carbon Grid/Column
+### [PR #673](https://github.com/james-s-tayler/realworld-vibe-coded/pull/673) — feat: replace custom Bootstrap grid with Carbon Grid/Column
 **Type:** Feature | **Files:** 17 | **+132 -264**
 
 Replaced the entire custom 12-column grid system with Carbon's native 16-column `Grid`/`Column`.
@@ -156,7 +156,7 @@ Removed ~170 lines of custom grid CSS. Also fixed a Nuke worktree bug where `+` 
 
 ## Phase 2: Design Token Enforcement
 
-### PR #674 — feat: add stylelint for Carbon design token enforcement
+### [PR #674](https://github.com/james-s-tayler/realworld-vibe-coded/pull/674) — feat: add stylelint for Carbon design token enforcement
 **Type:** Feature | **Files:** 44 | **+1549 -284**
 
 The largest single PR of the refactor. Three major changes:
@@ -173,7 +173,7 @@ The largest single PR of the refactor. Three major changes:
 - Extends `stylelint-config-standard-scss` and `stylelint-plugin-carbon-tokens/config/recommended`
 - `carbon/theme-use` — enforces Carbon color tokens (error severity)
 - `carbon/layout-use` — enforces Carbon spacing tokens (error severity)
-- `carbon/type-use` — disabled initially (enabled later in PR #677)
+- `carbon/type-use` — disabled initially (enabled later in [PR #677](https://github.com/james-s-tayler/realworld-vibe-coded/pull/677))
 
 **3. Nuke lint target restructure (`Build.Lint.cs`)**
 
@@ -192,7 +192,7 @@ The largest single PR of the refactor. Three major changes:
 
 ## Phase 3: Carbon Component Adoption
 
-### PR #675 — refactor: replace manual content offset with Carbon Content component
+### [PR #675](https://github.com/james-s-tayler/realworld-vibe-coded/pull/675) — refactor: replace manual content offset with Carbon Content component
 **Type:** Refactor | **Files:** 18 | **+230 -42**
 
 - Replaced manual `#root` padding offset with Carbon's `Content` component (`<main class="cds--content">`)
@@ -200,7 +200,7 @@ The largest single PR of the refactor. Three major changes:
 - Removed banner negative-margin hacks in HomePage and ArticlePage
 - For SideNav offset at lg+ breakpoints, used Carbon's `mini-units(32)` function (needed because `Content`'s sibling selector doesn't match when SideNav uses `isChildOfHeader`)
 
-### PR #676 — feat: add CBN006 lint rule and InlineLoading for form submissions
+### [PR #676](https://github.com/james-s-tayler/realworld-vibe-coded/pull/676) — feat: add CBN006 lint rule and InlineLoading for form submissions
 **Type:** Feature | **Files:** 13 | **+106 -23**
 
 - **New ESLint rule CBN006:** Bans raw `<form>` elements, enforcing Carbon `<Form>` usage
@@ -208,7 +208,7 @@ The largest single PR of the refactor. Three major changes:
   - LoginPage, RegisterPage, EditorPage, SettingsPage, ArticlePage (comments)
 - Cleaned up stale `InlineNotification` references in `frontend-components.md`
 
-### PR #677 — refactor: Carbon tag styling + typography systematization
+### [PR #677](https://github.com/james-s-tayler/realworld-vibe-coded/pull/677) — refactor: Carbon tag styling + typography systematization
 **Type:** Refactor | **Files:** 13 | **+75 -82**
 
 - Replaced custom `.tag-pill` CSS with Carbon `OperationalTag` (`type="gray"`, `size="sm"`) for sidebar tags
@@ -217,7 +217,7 @@ The largest single PR of the refactor. Three major changes:
 - **Enabled `carbon/type-use` stylelint rule** — completed the trifecta: color + spacing + typography enforcement
 - Added guardrails principle: all guardrails use error severity, never warning
 
-### PR #678 — feat: add Carbon Breadcrumb navigation, close carbon audit
+### [PR #678](https://github.com/james-s-tayler/realworld-vibe-coded/pull/678) — feat: add Carbon Breadcrumb navigation, close carbon audit
 **Type:** Feature | **Files:** 15 | **+76 -284**
 
 - Added location-based breadcrumbs (`Home > page title`) to ArticlePage and ProfilePage using Carbon `Breadcrumb` with React Router `Link`
@@ -228,14 +228,14 @@ The largest single PR of the refactor. Three major changes:
 
 ## Phase 4: Guardrail Hardening
 
-### PR #679 — lint: enable Carbon motion stylelint rules
+### [PR #679](https://github.com/james-s-tayler/realworld-vibe-coded/pull/679) — lint: enable Carbon motion stylelint rules
 **Type:** Lint | **Files:** 2 | **+17 -0**
 
 - Enabled `carbon/motion-duration-use` and `carbon/motion-easing-use` in `.stylelintrc.json`
 - This activated all 5 rules from `stylelint-plugin-carbon-tokens`: theme, layout, type, motion-duration, motion-easing
 - Added Carbon's token-first philosophy statement to `.claude/rules/frontend.md`
 
-### PR #680 — feat: add ESLint guardrails and tighten stylelint Carbon token enforcement
+### [PR #680](https://github.com/james-s-tayler/realworld-vibe-coded/pull/680) — feat: add ESLint guardrails and tighten stylelint Carbon token enforcement
 **Type:** Feature | **Files:** 74 | **+327 -230**
 
 - **`@typescript-eslint/no-explicit-any`** — bans explicit `any` type annotations (error)
@@ -248,19 +248,19 @@ The largest single PR of the refactor. Three major changes:
 
 ## Phase 5: CSS Cleanup and Carbon Audit Round 2
 
-### PR #681 — fix: remove redundant header offset and dead CSS selectors
+### [PR #681](https://github.com/james-s-tayler/realworld-vibe-coded/pull/681) — fix: remove redundant header offset and dead CSS selectors
 **Type:** Fix | **Files:** 11 | **+29 -44**
 
 - Replaced `calc(100vh - 56px)` with `100vh` in AuthPages, SettingsPage, EditorPage (Carbon `Content` already handles header offset)
 - Removed 4 dead CSS selectors: `.article-grid-container`, `.article-column-offset`, `.settings-notification`, `.users-modal-notification`
 
-### PR #682 — fix: remove custom CSS overrides for Carbon audit findings #3 and #4
+### [PR #682](https://github.com/james-s-tayler/realworld-vibe-coded/pull/682) — fix: remove custom CSS overrides for Carbon audit findings #3 and #4
 **Type:** Fix | **Files:** 5 | **+331 -15**
 
 - **Finding #3:** Removed `line-height: 1.8` override from `.article-body`, accepting Carbon's `body-02` token value (1.5)
 - **Finding #4:** Replaced custom `.favorite-button` CSS (border/background overrides on ghost Button) with Carbon-native `kind` prop toggling: `kind="tertiary"` (unfavorited) → `kind="primary"` (favorited)
 
-### PR #683 — fix: run Vite dev server as detached process
+### [PR #683](https://github.com/james-s-tayler/realworld-vibe-coded/pull/683) — fix: run Vite dev server as detached process
 **Type:** Infrastructure fix | **Files:** 1 | **+104 -10**
 
 Fixed the Nuke `build.log` lock contention issue ([nuke-build/nuke#1088](https://github.com/nuke-build/nuke/issues/1088)):
@@ -269,7 +269,7 @@ Fixed the Nuke `build.log` lock contention issue ([nuke-build/nuke#1088](https:/
 - `RunLocalHotReload` now completes in ~14 seconds then exits
 - `RunLocalHotReloadDown` runs as a separate Nuke invocation without lock conflict
 
-### PR #684 — fix: replace hardcoded CSS values with Carbon tokens (#5, #6, #7)
+### [PR #684](https://github.com/james-s-tayler/realworld-vibe-coded/pull/684) — fix: replace hardcoded CSS values with Carbon tokens (#5, #6, #7)
 **Type:** Fix | **Files:** 8 | **+39 -22**
 
 - **#5:** Replaced hardcoded pixel image dimensions with `$spacing-07` (32px), `$spacing-06` (24px), `$spacing-12` (100px avatars)
@@ -277,14 +277,14 @@ Fixed the Nuke `build.log` lock contention issue ([nuke-build/nuke#1088](https:/
 - **#7:** Replaced hardcoded `8px` shadow dimensions with `$spacing-03`
 - **Guardrail:** Extended `carbon/layout-use` to enforce tokens on `width`, `height`, `min-height`, `max-height`, `min-width`, `max-width`
 
-### PR #685 — fix: replace window.confirm with Carbon Modal and adopt Stack component
+### [PR #685](https://github.com/james-s-tayler/realworld-vibe-coded/pull/685) — fix: replace window.confirm with Carbon Modal and adopt Stack component
 **Type:** Fix | **Files:** 10 | **+63 -24**
 
 - **Finding #8:** Replaced `window.confirm()` in article deletion with Carbon `<Modal danger>` with i18n support (en/ja)
 - **New ESLint rule:** `no-restricted-globals` (CBN007) banning `window.confirm`, `window.alert`, `window.prompt`
 - **Finding #9:** Replaced manual flexbox column layouts with Carbon `<Stack>` in ArticlePreview, ArticlePage banner, and UsersPage
 
-### PR #686 — fix: extract shared CSS utilities for avatars, banners, and hr (#11, #12, #13)
+### [PR #686](https://github.com/james-s-tayler/realworld-vibe-coded/pull/686) — fix: extract shared CSS utilities for avatars, banners, and hr (#11, #12, #13)
 **Type:** Fix | **Files:** 11 | **+51 -40**
 
 - **#11:** Added Carbon-tokenized global `<hr>` style; removed dead `.settings-page hr` rule
@@ -295,18 +295,18 @@ Fixed the Nuke `build.log` lock contention issue ([nuke-build/nuke#1088](https:/
 
 ## Phase 6: SCSS Audit and Deduplication
 
-### PR #687 — docs: SCSS audit for Carbon Design System improvements
+### [PR #687](https://github.com/james-s-tayler/realworld-vibe-coded/pull/687) — docs: SCSS audit for Carbon Design System improvements
 **Type:** Documentation | **Files:** 1 | **+102 -0**
 
 Audit of all 14 SCSS files identifying 10 findings: duplicate class definitions, flex patterns replaceable with `<Stack>`, inconsistent loading states, breadcrumb overflow duplication, and ~70 lines of CSS that could be consolidated.
 
-### PR #688 — fix: replace AppHeader CSS overrides with Carbon Theme component
+### [PR #688](https://github.com/james-s-tayler/realworld-vibe-coded/pull/688) — fix: replace AppHeader CSS overrides with Carbon Theme component
 **Type:** Fix | **Files:** 3 | **+33 -18**
 
 - Removed direct `.cds--header` and `.cds--header__name` CSS overrides (pre-Carbon holdovers)
 - Wrapped `<Header>` in `<Theme theme="g90">` for Carbon-native dark header theming
 
-### PR #689 — refactor: deduplicate SCSS shared utilities into index.scss
+### [PR #689](https://github.com/james-s-tayler/realworld-vibe-coded/pull/689) — refactor: deduplicate SCSS shared utilities into index.scss
 **Type:** Refactor | **Files:** 14 | **+38 -83**
 
 - Consolidated `.article-meta`, `.tag-list`, breadcrumb overflow, and page padding patterns into `index.scss`
@@ -314,13 +314,13 @@ Audit of all 14 SCSS files identifying 10 findings: duplicate class definitions,
 - Deleted `AuthPages.scss` and `SettingsPage.scss` (only contained the now-global padding rule)
 - Net reduction: **-45 lines** of duplicated SCSS
 
-### PR #690 — refactor: replace flex patterns with Carbon Stack and consolidate loading states
+### [PR #690](https://github.com/james-s-tayler/realworld-vibe-coded/pull/690) — refactor: replace flex patterns with Carbon Stack and consolidate loading states
 **Type:** Refactor | **Files:** 5 | **+13 -25**
 
 - Replaced custom `display: flex; gap` CSS for article page actions with Carbon `<Stack orientation="horizontal" gap={3}>`
 - Consolidated identical `.article-page.loading` and `.profile-page.loading` into shared `.page-loading` utility
 
-### PR #691 — feat: consistent page layout spacing and branded header
+### [PR #691](https://github.com/james-s-tayler/realworld-vibe-coded/pull/691) — feat: consistent page layout spacing and branded header
 **Type:** Feature | **Files:** 13 | **+38 -54**
 
 - Replaced per-page banners with primary blue header background using `--cds-button-primary` token
@@ -329,7 +329,7 @@ Audit of all 14 SCSS files identifying 10 findings: duplicate class definitions,
 - Added "Home" title to HomePage (with i18n) — all pages now have titles
 - Standardized form pages to `wide` columnLayout per Carbon form alignment guidelines
 
-### PR #692 — fix: remove legacy page padding that doubled editor page spacing
+### [PR #692](https://github.com/james-s-tayler/realworld-vibe-coded/pull/692) — fix: remove legacy page padding that doubled editor page spacing
 **Type:** Fix | **Files:** 1 | **+0 -6**
 
 - Removed dead CSS rule in `index.scss` applying `$spacing-06` padding to `.editor-page`, `.auth-page`, `.settings-page`
@@ -400,55 +400,55 @@ All 5 rules from `stylelint-plugin-carbon-tokens` are now active at error severi
 
 | Rule | Enforces | Added in |
 |------|----------|----------|
-| `carbon/theme-use` | Carbon color tokens (`var(--cds-*)`) | PR #674 |
-| `carbon/layout-use` | Carbon spacing tokens (`$spacing-*`) | PR #674 |
-| `carbon/type-use` | Carbon typography mixins (`type.type-style()`) | PR #677 |
-| `carbon/motion-duration-use` | Carbon motion duration tokens | PR #679 |
-| `carbon/motion-easing-use` | Carbon motion easing tokens | PR #679 |
+| `carbon/theme-use` | Carbon color tokens (`var(--cds-*)`) | [PR #674](https://github.com/james-s-tayler/realworld-vibe-coded/pull/674) |
+| `carbon/layout-use` | Carbon spacing tokens (`$spacing-*`) | [PR #674](https://github.com/james-s-tayler/realworld-vibe-coded/pull/674) |
+| `carbon/type-use` | Carbon typography mixins (`type.type-style()`) | [PR #677](https://github.com/james-s-tayler/realworld-vibe-coded/pull/677) |
+| `carbon/motion-duration-use` | Carbon motion duration tokens | [PR #679](https://github.com/james-s-tayler/realworld-vibe-coded/pull/679) |
+| `carbon/motion-easing-use` | Carbon motion easing tokens | [PR #679](https://github.com/james-s-tayler/realworld-vibe-coded/pull/679) |
 
-The `carbon/layout-use` rule was later extended in PR #684 to also cover `width`, `height`, `min-width`, `max-width`, `min-height`, `max-height`.
+The `carbon/layout-use` rule was later extended in [PR #684](https://github.com/james-s-tayler/realworld-vibe-coded/pull/684) to also cover `width`, `height`, `min-width`, `max-width`, `min-height`, `max-height`.
 
-The `carbon/theme-use` whitelist was tightened in PR #680 (removed `rgb()` and `white`).
+The `carbon/theme-use` whitelist was tightened in [PR #680](https://github.com/james-s-tayler/realworld-vibe-coded/pull/680) (removed `rgb()` and `white`).
 
 ### ESLint — Custom Plugin (`eslint-plugin-custom-rules`)
 
-10 custom rules with full test coverage, created across PRs #658 and #676:
+10 custom rules with full test coverage, created across [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) and [PR #676](https://github.com/james-s-tayler/realworld-vibe-coded/pull/676):
 
 | Rule | What it prevents | Added in |
 |------|-----------------|----------|
-| `ARCH001` | Direct `useContext()` — must use hook wrappers | PR #658 |
-| `ARCH002` | Imports from `api/generated/` outside `src/api/` | PR #658 |
-| `ARCH003` | API module imports in components — receive data via props | PR #658 |
-| `CBN001` | `<TextInput type="password">` — must use `<PasswordInput>` | PR #658 |
-| `CBN002` | Empty `labelText=""` — accessibility violation | PR #658 |
-| `CBN003` | Inline `style={{}}` in pages/components — use CSS classes | PR #658 |
-| `CBN004` | Deprecated `onKeyPress` — use `onKeyDown` | PR #658 |
-| `CBN005` | `<InlineNotification>` — must use toast system | PR #658 |
-| `CBN006` | Raw `<form>` elements — must use Carbon `<Form>` | PR #676 |
-| `CBN007` (`no-restricted-globals`) | `window.confirm`, `window.alert`, `window.prompt` | PR #685 |
+| `ARCH001` | Direct `useContext()` — must use hook wrappers | [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `ARCH002` | Imports from `api/generated/` outside `src/api/` | [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `ARCH003` | API module imports in components — receive data via props | [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `CBN001` | `<TextInput type="password">` — must use `<PasswordInput>` | [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `CBN002` | Empty `labelText=""` — accessibility violation | [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `CBN003` | Inline `style={{}}` in pages/components — use CSS classes | [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `CBN004` | Deprecated `onKeyPress` — use `onKeyDown` | [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `CBN005` | `<InlineNotification>` — must use toast system | [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `CBN006` | Raw `<form>` elements — must use Carbon `<Form>` | [PR #676](https://github.com/james-s-tayler/realworld-vibe-coded/pull/676) |
+| `CBN007` (`no-restricted-globals`) | `window.confirm`, `window.alert`, `window.prompt` | [PR #685](https://github.com/james-s-tayler/realworld-vibe-coded/pull/685) |
 
 ### ESLint — Built-in Rules
 
 | Rule | What it prevents | Added in |
 |------|-----------------|----------|
-| `no-console` | `console.*` in production code | PR #658 |
-| `@typescript-eslint/no-explicit-any` | Explicit `any` type annotations | PR #680 |
-| `simple-import-sort/imports` | Inconsistent import ordering | PR #680 |
-| `simple-import-sort/exports` | Inconsistent export ordering | PR #680 |
+| `no-console` | `console.*` in production code | [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `@typescript-eslint/no-explicit-any` | Explicit `any` type annotations | [PR #680](https://github.com/james-s-tayler/realworld-vibe-coded/pull/680) |
+| `simple-import-sort/imports` | Inconsistent import ordering | [PR #680](https://github.com/james-s-tayler/realworld-vibe-coded/pull/680) |
+| `simple-import-sort/exports` | Inconsistent export ordering | [PR #680](https://github.com/james-s-tayler/realworld-vibe-coded/pull/680) |
 
 ### Infrastructure Guardrails
 
 | Guardrail | What it prevents | Added in |
 |-----------|-----------------|----------|
-| `enforce-nuke.sh` hook | Direct `npm test`, `npx vitest/eslint/tsc` — must use Nuke targets | PR #658 |
+| `enforce-nuke.sh` hook | Direct `npm test`, `npx vitest/eslint/tsc` — must use Nuke targets | [PR #658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
 
 ### Nuke Lint Target Restructure
 
-`LintClientVerify` and `LintClientFix` became composite targets over separate ESLint and stylelint leaf targets (PR #674), enabling independent execution and clearer CI output.
+`LintClientVerify` and `LintClientFix` became composite targets over separate ESLint and stylelint leaf targets ([PR #674](https://github.com/james-s-tayler/realworld-vibe-coded/pull/674)), enabling independent execution and clearer CI output.
 
 ### Guardrails Principle
 
-Added to `.claude/rules/guardrails.md` (PR #677): "All guardrails use error severity — never warning. A guardrail that doesn't block is just a suggestion."
+Added to `.claude/rules/guardrails.md` ([PR #677](https://github.com/james-s-tayler/realworld-vibe-coded/pull/677)): "All guardrails use error severity — never warning. A guardrail that doesn't block is just a suggestion."
 
 ---
 
@@ -456,11 +456,11 @@ Added to `.claude/rules/guardrails.md` (PR #677): "All guardrails use error seve
 
 | File | Reason | PR |
 |------|--------|----|
-| `App.css` | Dead Vite boilerplate, never imported | #674 |
-| `AuthPages.scss` | Only contained global padding rule (moved to `PageShell.scss`) | #689, #691 |
-| `SettingsPage.scss` | Only contained global padding rule (moved to `PageShell.scss`) | #689, #691 |
+| `App.css` | Dead Vite boilerplate, never imported | [#674](https://github.com/james-s-tayler/realworld-vibe-coded/pull/674) |
+| `AuthPages.scss` | Only contained global padding rule (moved to `PageShell.scss`) | [#689](https://github.com/james-s-tayler/realworld-vibe-coded/pull/689), [#691](https://github.com/james-s-tayler/realworld-vibe-coded/pull/691) |
+| `SettingsPage.scss` | Only contained global padding rule (moved to `PageShell.scss`) | [#689](https://github.com/james-s-tayler/realworld-vibe-coded/pull/689), [#691](https://github.com/james-s-tayler/realworld-vibe-coded/pull/691) |
 
-14 CSS files were renamed to SCSS (PR #674). Net result: 12 SCSS files remaining.
+14 CSS files were renamed to SCSS ([PR #674](https://github.com/james-s-tayler/realworld-vibe-coded/pull/674)). Net result: 12 SCSS files remaining.
 
 ---
 
@@ -468,17 +468,17 @@ Added to `.claude/rules/guardrails.md` (PR #677): "All guardrails use error seve
 
 | Component | Replaces | PR |
 |-----------|----------|----|
-| `PasswordInput` | `<TextInput type="password">` | #658 |
-| `ToastNotification` | `InlineNotification` for error display | #658 |
-| `Grid` / `Column` | Custom Bootstrap `col-md-*` grid | #673 |
-| `Content` | Manual `#root` padding for header offset | #675 |
-| `Form` | Raw `<form>` elements | #676 |
-| `InlineLoading` | Text-swap submit buttons | #676 |
-| `OperationalTag` | Custom `.tag-pill` CSS | #677 |
-| `Breadcrumb` | No breadcrumbs existed | #678 |
-| `Modal` (danger) | `window.confirm()` | #685 |
-| `Stack` | Manual flexbox column layouts | #685, #690 |
-| `Theme` (g90) | Manual CSS overrides for dark header | #688 |
+| `PasswordInput` | `<TextInput type="password">` | [#658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `ToastNotification` | `InlineNotification` for error display | [#658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `Grid` / `Column` | Custom Bootstrap `col-md-*` grid | [#673](https://github.com/james-s-tayler/realworld-vibe-coded/pull/673) |
+| `Content` | Manual `#root` padding for header offset | [#675](https://github.com/james-s-tayler/realworld-vibe-coded/pull/675) |
+| `Form` | Raw `<form>` elements | [#676](https://github.com/james-s-tayler/realworld-vibe-coded/pull/676) |
+| `InlineLoading` | Text-swap submit buttons | [#676](https://github.com/james-s-tayler/realworld-vibe-coded/pull/676) |
+| `OperationalTag` | Custom `.tag-pill` CSS | [#677](https://github.com/james-s-tayler/realworld-vibe-coded/pull/677) |
+| `Breadcrumb` | No breadcrumbs existed | [#678](https://github.com/james-s-tayler/realworld-vibe-coded/pull/678) |
+| `Modal` (danger) | `window.confirm()` | [#685](https://github.com/james-s-tayler/realworld-vibe-coded/pull/685) |
+| `Stack` | Manual flexbox column layouts | [#685](https://github.com/james-s-tayler/realworld-vibe-coded/pull/685), [#690](https://github.com/james-s-tayler/realworld-vibe-coded/pull/690) |
+| `Theme` (g90) | Manual CSS overrides for dark header | [#688](https://github.com/james-s-tayler/realworld-vibe-coded/pull/688) |
 
 ---
 
@@ -488,16 +488,16 @@ Added to `.claude/rules/guardrails.md` (PR #677): "All guardrails use error seve
 
 | File | Contents | PR |
 |------|----------|----|
-| `research.md` | Research-first planning — verify framework assumptions against docs before proposing plans | #674 |
+| `research.md` | Research-first planning — verify framework assumptions against docs before proposing plans | [#674](https://github.com/james-s-tayler/realworld-vibe-coded/pull/674) |
 
 ### Modified Files
 
 | File | Change | PR |
 |------|--------|----|
-| `e2e.md` | Added toast notification locator conventions, error-display to toast-error selectors | #658 |
-| `frontend.md` | Added Carbon Design System styling rules section: SCSS-only spacing tokens, CSS custom property colors, typography mixins, IBM Plex Sans font, token-first philosophy, "never write direct CSS overrides for Carbon components" | #674, #677, #679 |
-| `frontend-components.md` | Cleaned up stale `InlineNotification` references (contradicted CBN005), added `InlineLoading`, `OperationalTag`, `Modal`, `Stack` usage patterns | #676, #677, #685 |
-| `guardrails.md` | Added principle: "All guardrails use error severity — never warning" | #677 |
+| `e2e.md` | Added toast notification locator conventions, error-display to toast-error selectors | [#658](https://github.com/james-s-tayler/realworld-vibe-coded/pull/658) |
+| `frontend.md` | Added Carbon Design System styling rules section: SCSS-only spacing tokens, CSS custom property colors, typography mixins, IBM Plex Sans font, token-first philosophy, "never write direct CSS overrides for Carbon components" | [#674](https://github.com/james-s-tayler/realworld-vibe-coded/pull/674), [#677](https://github.com/james-s-tayler/realworld-vibe-coded/pull/677), [#679](https://github.com/james-s-tayler/realworld-vibe-coded/pull/679) |
+| `frontend-components.md` | Cleaned up stale `InlineNotification` references (contradicted CBN005), added `InlineLoading`, `OperationalTag`, `Modal`, `Stack` usage patterns | [#676](https://github.com/james-s-tayler/realworld-vibe-coded/pull/676), [#677](https://github.com/james-s-tayler/realworld-vibe-coded/pull/677), [#685](https://github.com/james-s-tayler/realworld-vibe-coded/pull/685) |
+| `guardrails.md` | Added principle: "All guardrails use error severity — never warning" | [#677](https://github.com/james-s-tayler/realworld-vibe-coded/pull/677) |
 
 ---
 
@@ -505,11 +505,11 @@ Added to `.claude/rules/guardrails.md` (PR #677): "All guardrails use error seve
 
 | Change | PR |
 |--------|----|
-| Added `RunLocalHotReload` and `RunLocalPublish` as primary local dev commands | #678 |
-| Added invariant: "Verify frontend changes visually" — run the app and use Chrome DevTools MCP | #678 |
-| Added invariant: "`RunLocal*` lifecycle" — always tear down before spinning up | #678 |
-| Added stylelint Carbon Tokens to guardrail classes table | #674 |
-| Updated `LintClientVerify`/`LintClientFix` descriptions to reflect composite structure | #674 |
+| Added `RunLocalHotReload` and `RunLocalPublish` as primary local dev commands | [#678](https://github.com/james-s-tayler/realworld-vibe-coded/pull/678) |
+| Added invariant: "Verify frontend changes visually" — run the app and use Chrome DevTools MCP | [#678](https://github.com/james-s-tayler/realworld-vibe-coded/pull/678) |
+| Added invariant: "`RunLocal*` lifecycle" — always tear down before spinning up | [#678](https://github.com/james-s-tayler/realworld-vibe-coded/pull/678) |
+| Added stylelint Carbon Tokens to guardrail classes table | [#674](https://github.com/james-s-tayler/realworld-vibe-coded/pull/674) |
+| Updated `LintClientVerify`/`LintClientFix` descriptions to reflect composite structure | [#674](https://github.com/james-s-tayler/realworld-vibe-coded/pull/674) |
 
 ---
 
