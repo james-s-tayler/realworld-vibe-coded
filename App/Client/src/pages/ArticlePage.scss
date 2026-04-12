@@ -89,7 +89,6 @@
 .article-body {
   @include type.type-style('body-02');
 
-  line-height: 1.8;
   margin-bottom: $spacing-06;
   overflow-wrap: break-word;
 }
