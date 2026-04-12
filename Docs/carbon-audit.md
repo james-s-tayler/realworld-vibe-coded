@@ -111,12 +111,6 @@ Carbon's `Content` component handles this automatically when used inside a `Head
 
 ### 5. Underused Carbon components
 
-#### 5a. No `InlineNotification` for form errors
-
-**Impact: MEDIUM** | All form pages
-
-Form validation errors (e.g., login/register failures) would benefit from inline notifications placed directly in the form rather than fleeting toasts.
-
 #### 5b. Raw `<form>` instead of Carbon `Form` in ArticlePage
 
 **Impact: LOW** | `ArticlePage.tsx:263`
@@ -168,17 +162,15 @@ Custom `.tag-pill` class overrides Carbon Tag styling with hard-coded background
 
 ## Recommended Changes by Priority
 
-| Priority | Change | Effort | Files |
-|----------|--------|--------|-------|
-| **P1** | Replace hard-coded colors with `--cds-*` tokens | Medium | 7 CSS files |
-| **P1** | Replace hard-coded spacing with `--cds-spacing-*` tokens | Medium | 6 CSS files |
-| **P2** | Migrate PageShell to Carbon `Grid`/`Column` | High | PageShell.tsx/css, index.css, HomePage.css |
-| **P2** | Use Carbon `Content` wrapper instead of manual offset | Low | index.css, App.tsx |
-| **P3** | Use `InlineLoading` for form submission states | Low | Form pages |
-| **P3** | Wrap comment `<form>` in Carbon `Form` | Trivial | ArticlePage.tsx |
-| **P3** | Remove TagList.css overrides, use Carbon Tag `type` props | Low | TagList.tsx/css |
-| **P3** | Add `Breadcrumb` to article/profile pages | Low | ArticlePage, ProfilePage |
-| **P4** | Consider IBM Plex Sans or systematize Titillium usage | Medium | index.css |
-| **P4** | Use `ClickableTile` for interactive tiles | Low | ArticlePage.tsx |
-
-The P1 token changes are the highest-value/lowest-risk improvements -- they make dark mode possible and ensure visual consistency without changing any component behavior.
+| Priority | Change | Effort | Status |
+|----------|--------|--------|--------|
+| ~~P1~~ | ~~Replace hard-coded colors with `--cds-*` tokens~~ | ~~Medium~~ | Done |
+| ~~P1~~ | ~~Replace hard-coded spacing with `--cds-spacing-*` tokens~~ | ~~Medium~~ | Done |
+| ~~P2~~ | ~~Migrate PageShell to Carbon `Grid`/`Column`~~ | ~~High~~ | Done |
+| ~~P2~~ | ~~Use Carbon `Content` wrapper instead of manual offset~~ | ~~Low~~ | Done |
+| ~~P3~~ | ~~Use `InlineLoading` for form submission states~~ | ~~Low~~ | Done |
+| ~~P3~~ | ~~Wrap comment `<form>` in Carbon `Form`~~ | ~~Trivial~~ | Done |
+| ~~P3~~ | ~~Remove TagList.css overrides, use Carbon `OperationalTag`~~ | ~~Low~~ | Done |
+| **P3** | Add `Breadcrumb` to article/profile pages | Low | |
+| ~~P4~~ | ~~Systematize typography: IBM Plex Sans + Carbon type tokens~~ | ~~Medium~~ | Done |
+| **P4** | Use `ClickableTile` for interactive tiles | Low | |

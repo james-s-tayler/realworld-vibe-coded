@@ -1,14 +1,18 @@
+@import 'https://fonts.googleapis.com/css2?family=Titillium+Web:wght@700&display=swap';
+
 .cds--header {
   background-color: var(--cds-layer-01);
   border-bottom: 1px solid var(--cds-border-subtle);
 }
 
+/* stylelint-disable carbon/type-use -- brand element uses Titillium Web intentionally */
 .cds--header__name {
   color: var(--cds-link-primary);
   font-family: 'Titillium Web', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
 }
+/* stylelint-enable carbon/type-use */
 
 .cds--header__name:hover {
   color: var(--cds-link-primary);

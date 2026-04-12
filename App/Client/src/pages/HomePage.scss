@@ -1,4 +1,5 @@
 @use '@carbon/react/scss/spacing' as *;
+@use '@carbon/react/scss/type' as type;
 
 .home-page {
   min-height: 100vh;
@@ -14,15 +15,14 @@
 }
 
 .banner-title {
-  font-size: 3.5rem;
-  font-weight: 700;
+  @include type.type-style('heading-07');
+
   text-shadow: 0 1px 3px rgb(0 0 0 / 30%);
   margin-bottom: $spacing-03;
 }
 
 .banner-subtitle {
-  font-size: 1.5rem;
-  font-weight: 300;
+  @include type.type-style('heading-03');
 }
 
 .sidebar {
@@ -31,7 +31,7 @@
 }
 
 .sidebar-title {
+  @include type.type-style('heading-compact-01');
+
   margin-bottom: $spacing-03;
-  font-size: 0.9rem;
-  font-weight: 500;
 }

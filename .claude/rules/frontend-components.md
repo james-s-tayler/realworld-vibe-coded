@@ -32,7 +32,7 @@ Layout options: `narrow` (50% centered), `wide` (83%), `full` (100%), `two-colum
 ```typescript
 import {
   Form, TextInput, TextArea, Button, Loading, InlineLoading,
-  Stack, Tabs, TabList, Tab, TabPanels, TabPanel, Tag, Pagination, Modal,
+  Stack, Tabs, TabList, Tab, TabPanels, TabPanel, Tag, OperationalTag, Pagination, Modal,
 } from '@carbon/react';
 import { Add, FavoriteFilled, Favorite, UserFollow, Settings } from '@carbon/icons-react';
 ```
@@ -41,7 +41,8 @@ import { Add, FavoriteFilled, Favorite, UserFollow, Settings } from '@carbon/ico
 - `InlineLoading`: `status="active"` during submit — conditionally render to replace Button (never text-swap ternaries). For compact forms, render beside the button instead.
 - `Loading`: `withOverlay={false}` for inline
 - `Tabs`: `Tabs > TabList > Tab` + `TabPanels > TabPanel`
-- `Tag`: supports `onClick`, `size="sm"`; `Pagination`: for article list pagination
+- `Tag`: read-only display, `type="outline"`, `size="sm"`; `OperationalTag`: interactive (click-to-filter), `type="gray"`, `size="sm"`, uses `text` prop not children
+- `Pagination`: for article list pagination
 - `OverflowMenu`: use `iconDescription` (NOT `aria-label`) to set the trigger button's accessible name. `aria-label` on `<OverflowMenu>` does NOT propagate to the rendered button — Playwright and screen readers won't see it.
 
 ## SCSS Classes (from existing stylesheets)

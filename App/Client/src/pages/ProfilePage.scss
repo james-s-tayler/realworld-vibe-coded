@@ -1,4 +1,5 @@
 @use '@carbon/react/scss/spacing' as *;
+@use '@carbon/react/scss/type' as type;
 
 .profile-page {
   min-height: 100vh;
@@ -25,8 +26,8 @@
 }
 
 .user-info h4 {
-  font-size: 1.5rem;
-  font-weight: 600;
+  @include type.type-style('heading-03');
+
   margin-bottom: $spacing-03;
   overflow-wrap: break-word;
 }

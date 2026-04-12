@@ -19,6 +19,7 @@ When adding a guardrail to prevent a class of defect, choose the earliest enforc
 - A single lint rule replaces infinite code review comments
 - Guidance (rank 4) is a last resort for things that can't be mechanically checked
 - When adding a guardrail, fix all existing violations in the same PR
+- All guardrails use error severity — never warning. A guardrail that doesn't block is just a suggestion
 
 ### Guardrail Classes
 
