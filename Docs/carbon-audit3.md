@@ -100,3 +100,33 @@ box-shadow: inset 0 $spacing-03 $spacing-03 (-$spacing-03) var(--cds-shadow)
 | 4 | **Extract CommentSection component** | Medium — better separation of concerns | Medium |
 | 5 | **Fix AppHeader Carbon overrides** | Low — use `<Theme>` component | Low |
 | 6 | **Fix `--cds-shadow` misuse in banner** | Low — semantic correctness | Low |
+
+---
+
+## Implementation Plan — PR Grouping
+
+Split across 4 PRs, ordered from safest to riskiest:
+
+### PR 1 — Quick fixes (Findings 7, 9)
+- Fix `--cds-shadow` misuse in HomePage banner
+- Fix AppHeader direct Carbon class overrides with `<Theme>`
+- Both are isolated, single-file changes with no cross-cutting impact
+
+### PR 2 — SCSS deduplication (Findings 1, 2, 5, 6)
+- Move `.article-meta` to `index.scss` (remove from ArticlePreview.scss + ArticlePage.scss)
+- Unify `.article-tags` / `.tag-list` into one shared class with consistent gap
+- Move breadcrumb overflow rules to `index.scss` (remove from ArticlePage.scss + ProfilePage.scss)
+- Extract `.page-content-padded` for the repeated `padding: $spacing-06 0` (auth, editor, settings)
+- All mechanical "move CSS, delete duplicate" — no TSX changes, no behavior change
+
+### PR 3 — Replace flex patterns with `<Stack>` + consolidate loading states (Findings 3, 4)
+- Replace custom `display:flex` with `<Stack>` in TSX (`.actions`, `.author-details`, `.info`, `.edit-roles-checkboxes`, etc.)
+- Consolidate loading patterns into shared utilities
+- These naturally pair because both involve TSX + SCSS changes across multiple components, and the `<Stack>` replacements are what let you delete the loading flex CSS too
+
+### PR 4 — Component extractions (Findings 8, 10)
+- Extract shared `AuthorMeta` component (unify the divergent author-info patterns between ArticlePreview and ArticlePage)
+- Extract `CommentSection` component from ArticlePage
+- Highest risk since it's new components + refactoring existing TSX — but the two extractions are in the same area (ArticlePage) so reviewing them together gives a coherent picture
+
+Each PR builds on the previous one's cleanup: PRs 1-2 are SCSS-only with zero rendering risk, PR 3 changes rendering but not structure, PR 4 restructures components.
