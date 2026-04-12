@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
-import { Grid, Column, Button, TextArea, Loading, Tile, Tag, IconButton, Form, InlineLoading } from '@carbon/react';
+import { Grid, Column, Button, TextArea, Loading, Tile, Tag, IconButton, Form, InlineLoading, Breadcrumb, BreadcrumbItem } from '@carbon/react';
 import { FavoriteFilled, Favorite, Edit, TrashCan } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -240,6 +240,14 @@ export const ArticlePage: React.FC = () => {
           onFollow={handleFollow}
           onFavorite={handleFavorite}
         />
+      }
+      breadcrumbs={
+        <Breadcrumb noTrailingSlash>
+          <BreadcrumbItem>
+            <Link to="/">{t('breadcrumb.home')}</Link>
+          </BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>{article.title}</BreadcrumbItem>
+        </Breadcrumb>
       }
     >
       <div className="article-content">

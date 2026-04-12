@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
-import { Grid, Column, Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, Pagination } from '@carbon/react';
+import { Grid, Column, Button, Tabs, TabList, Tab, TabPanels, TabPanel, Loading, Pagination, Breadcrumb, BreadcrumbItem } from '@carbon/react';
 import { Settings } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -195,6 +195,14 @@ export const ProfilePage: React.FC = () => {
       className="profile-page"
       columnLayout="wide"
       banner={<ProfileBanner profile={profile} isOwnProfile={!!isOwnProfile} onFollow={handleFollow} />}
+      breadcrumbs={
+        <Breadcrumb noTrailingSlash>
+          <BreadcrumbItem>
+            <Link to="/">{t('breadcrumb.home')}</Link>
+          </BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>{`@${profile.username}`}</BreadcrumbItem>
+        </Breadcrumb>
+      }
     >
       <Tabs selectedIndex={activeTab} onChange={handleTabChange}>
         <TabList aria-label={t('profile.profileTabs')}>

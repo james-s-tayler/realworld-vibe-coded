@@ -57,6 +57,9 @@
     "failedToFavorite": "Failed to favorite article",
     "failedToUnfavorite": "Failed to unfavorite article"
   },
+  "breadcrumb": {
+    "home": "Home"
+  },
   "article": {
     "editArticle": "Edit Article",
     "deleteArticle": "Delete Article",

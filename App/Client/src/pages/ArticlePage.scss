@@ -3,6 +3,10 @@
 
 .article-page {
   min-height: 100vh;
+
+  .cds--breadcrumb {
+    margin-bottom: $spacing-05;
+  }
 }
 
 .article-page.loading {

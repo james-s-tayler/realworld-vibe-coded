@@ -57,6 +57,9 @@
     "failedToFavorite": "\u304a\u6c17\u306b\u5165\u308a\u306b\u5931\u6557\u3057\u307e\u3057\u305f",
     "failedToUnfavorite": "\u304a\u6c17\u306b\u5165\u308a\u89e3\u9664\u306b\u5931\u6557\u3057\u307e\u3057\u305f"
   },
+  "breadcrumb": {
+    "home": "\u30db\u30fc\u30e0"
+  },
   "article": {
     "editArticle": "\u8a18\u4e8b\u3092\u7de8\u96c6",
     "deleteArticle": "\u8a18\u4e8b\u3092\u524a\u9664",

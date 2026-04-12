@@ -123,11 +123,13 @@ The comment form uses a raw `<form>` element. Other forms (Login, Register, Sett
 
 When forms submit, buttons are disabled but show no visual loading indicator. Carbon's `InlineLoading` component provides a spinner + status text that can be placed inside or next to buttons.
 
-#### 5d. No `ClickableTile` for article previews
+#### ~~5d. No `ClickableTile` for article previews~~ (N/A)
 
-**Impact: LOW** | `ArticlePage.tsx:295`, `HomePage.tsx`
+**Impact: N/A** | `ArticlePage.tsx:295`, `HomePage.tsx`
 
-Comment tiles and article previews could use `ClickableTile` instead of plain `Tile` + wrapper `Link`, giving them built-in hover/focus states and better accessibility.
+~~Comment tiles and article previews could use `ClickableTile` instead of plain `Tile` + wrapper `Link`, giving them built-in hover/focus states and better accessibility.~~
+
+**Resolution:** After researching Carbon's ClickableTile docs, this is not applicable. ClickableTile renders as a single `<a>` element and Carbon explicitly states: "Due to accessibility concerns, clickable tiles cannot contain separate internal CTAs." Both ArticlePreview (author link, favorite button, article link) and comment tiles (author link, delete button) contain multiple interactive elements, making ClickableTile inappropriate. Using it would be an accessibility regression.
 
 #### 5e. No `Breadcrumb` navigation
 
@@ -171,6 +173,6 @@ Custom `.tag-pill` class overrides Carbon Tag styling with hard-coded background
 | ~~P3~~ | ~~Use `InlineLoading` for form submission states~~ | ~~Low~~ | Done |
 | ~~P3~~ | ~~Wrap comment `<form>` in Carbon `Form`~~ | ~~Trivial~~ | Done |
 | ~~P3~~ | ~~Remove TagList.css overrides, use Carbon `OperationalTag`~~ | ~~Low~~ | Done |
-| **P3** | Add `Breadcrumb` to article/profile pages | Low | |
+| ~~P3~~ | ~~Add `Breadcrumb` to article/profile pages~~ | ~~Low~~ | Done |
 | ~~P4~~ | ~~Systematize typography: IBM Plex Sans + Carbon type tokens~~ | ~~Medium~~ | Done |
-| **P4** | Use `ClickableTile` for interactive tiles | Low | |
+| ~~P4~~ | ~~Use `ClickableTile` for interactive tiles~~ | ~~Low~~ | N/A — both ArticlePreview and comment tiles contain multiple interactive elements (links, buttons); Carbon docs prohibit internal CTAs inside ClickableTile |
