@@ -15,7 +15,7 @@ This is the third RealWorld implementation I've done, and it was for the purpose
 
 | Layer | Technologies |
 |:------|:-------------|
-| **Backend** | .NET 10, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQLite, Serilog, Audit.NET, Microsoft.FeatureManagement |
+| **Backend** | .NET 10, FastEndpoints, MediatR (CQRS), FluentValidation, EF Core + SQL Server, Serilog, Audit.NET, Microsoft.FeatureManagement |
 | **Frontend** | React 19, Vite, TypeScript, Carbon Design System |
 | **Testing** | xUnit, Vitest, Playwright, Postman/Newman |
 | **Build** | Nuke Build, GitHub Actions |

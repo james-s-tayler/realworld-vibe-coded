@@ -44,4 +44,5 @@ Rules in `.claude/rules/` are loaded automatically by path scope. Read the relev
 | `cicd.md` | `.github/**` | GitHub Actions naming, path-based job gating |
 | `nuke.md` | `Task/Runner/**` | Worktree port isolation, Vite env var conventions |
 | `research.md` | — | Docs MCP research-first workflow for planning |
+| `sharplens.md` | — | SharpLens MCP caveats: source-generated symbols invisible, diagnostics unreliable |
 | `harness.md` | `.claude/**`, `scripts/**` | Hook conventions, settings.json, marker files, protected files |
