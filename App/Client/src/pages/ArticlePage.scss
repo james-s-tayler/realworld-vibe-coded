@@ -13,34 +13,6 @@
   overflow-wrap: break-word;
 }
 
-.article-meta .author-info {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-  overflow: hidden;
-}
-
-.article-meta .avatar-md {
-  margin-right: $spacing-03;
-}
-
-.article-meta .info {
-  min-width: 0;
-}
-
-.article-meta .author {
-  @include type.type-style('heading-compact-01');
-
-  color: var(--cds-text-on-color);
-}
-
-.article-meta .date {
-  @include type.type-style('label-01');
-
-  color: var(--cds-text-on-color-disabled);
-}
-
 .article-content {
   padding: $spacing-07 0;
 }
@@ -59,74 +31,4 @@
 
 .article-page .tag-list {
   margin-bottom: $spacing-06;
-}
-
-.comment-form {
-  margin-bottom: $spacing-05;
-}
-
-.comment-form-body {
-  margin-bottom: $spacing-05;
-}
-
-.comment-form-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: $spacing-05;
-  border-top: 1px solid var(--cds-border-subtle-01);
-}
-
-.comment-tile {
-  margin-bottom: $spacing-05;
-}
-
-.comment-body {
-  margin-bottom: $spacing-05;
-  overflow-wrap: break-word;
-}
-
-.comment-body p {
-  margin: 0;
-  overflow-wrap: break-word;
-}
-
-.comment-footer {
-  display: flex;
-  align-items: center;
-  gap: $spacing-03;
-  padding-top: $spacing-05;
-  border-top: 1px solid var(--cds-border-subtle-01);
-  overflow: hidden;
-}
-
-.comment-author {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-  gap: $spacing-03;
-  overflow: hidden;
-}
-
-.comment-author-name {
-  @include type.type-style('heading-compact-01');
-
-  color: var(--cds-link-primary);
-}
-
-.date-posted {
-  @include type.type-style('label-01');
-
-  color: var(--cds-text-secondary);
-  margin-left: auto;
-}
-
-.comment-auth-prompt {
-  margin-bottom: $spacing-06;
-  text-align: center;
-}
-
-.comment-auth-prompt p {
-  @include type.type-style('body-compact-01');
 }

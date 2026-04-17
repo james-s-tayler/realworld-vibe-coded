@@ -1,0 +1,41 @@
+@use '@carbon/react/scss/spacing' as *;
+@use '@carbon/react/scss/type' as type;
+
+.author-meta {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+}
+
+.author-meta .avatar-sm,
+.author-meta .avatar-md {
+  margin-right: $spacing-03;
+}
+
+.author-meta__details {
+  min-width: 0;
+}
+
+.author-meta__name {
+  @include type.type-style('body-compact-01');
+
+  color: var(--cds-link-primary);
+}
+
+.author-meta__date {
+  @include type.type-style('label-01');
+
+  color: var(--cds-text-placeholder);
+}
+
+.author-meta--banner .author-meta__name {
+  @include type.type-style('heading-compact-01');
+
+  color: var(--cds-text-on-color);
+}
+
+.author-meta--banner .author-meta__date {
+  color: var(--cds-text-on-color-disabled);
+}

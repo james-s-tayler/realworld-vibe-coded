@@ -1,13 +1,13 @@
 import './ArticlePreview.scss';
 
 import { Favorite,FavoriteFilled } from '@carbon/icons-react';
-import { Button,Stack,Tag } from '@carbon/react';
+import { Button,Tag } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
-import { DEFAULT_PROFILE_IMAGE } from '../constants';
 import type { Article } from '../types/article';
+import { AuthorMeta } from './AuthorMeta';
 
 interface ArticlePreviewProps {
   article: Article;
@@ -30,28 +30,14 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
   return (
     <div className="article-preview">
       <div className="article-meta">
-        <Link to={`/profile/${article.author.username}`} className="author-info">
-          <img
-            src={article.author.image || DEFAULT_PROFILE_IMAGE}
-            alt={article.author.username}
-            className="author-image avatar-md"
-          />
-          <Stack gap={1} className="author-details">
-            <span className="author-name cds--text-truncate-end" title={article.author.username}>{article.author.username}</span>
-            <span className="article-date">{formatDate(article.createdAt)}</span>
-          </Stack>
-        </Link>
+        <AuthorMeta
+          username={article.author.username}
+          image={article.author.image}
+          date={article.createdAt}
+        />
         <Button
           kind={article.favorited ? 'primary' : 'tertiary'}
           size="sm"

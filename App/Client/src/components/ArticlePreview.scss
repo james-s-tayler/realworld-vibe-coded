@@ -10,33 +10,6 @@
   margin-bottom: $spacing-05;
 }
 
-.author-info {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-}
-
-.author-image {
-  margin-right: $spacing-03;
-}
-
-.author-details {
-  min-width: 0;
-}
-
-.author-name {
-  @include type.type-style('body-compact-01');
-
-  color: var(--cds-link-primary);
-}
-
-.article-date {
-  @include type.type-style('label-01');
-
-  color: var(--cds-text-placeholder);
-}
-
 .article-link {
   text-decoration: none;
   color: inherit;
