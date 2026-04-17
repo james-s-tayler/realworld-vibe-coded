@@ -1,0 +1,20 @@
+# Codex project config for Conduit (realworld-vibe-coded).
+#
+# YOLO mode: bypasses all approvals AND disables the sandbox — equivalent to
+# Claude Code's --dangerously-skip-permissions. Codex can read/write anywhere,
+# run any command, and use the network without asking.
+#
+# This file is ONLY loaded when the project is marked trusted in ~/.codex/config.toml:
+#
+#     [projects."/home/me/source/realworld-vibe-coded"]
+#     trust_level = "trusted"
+#
+# Without that entry, Codex ignores this file entirely. Run `codex` once in this
+# directory and it will prompt to trust; accept, and the trust entry is written
+# for you.
+
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+
+# Live web search (fetches current pages, not the cached OpenAI index).
+web_search = "live"
