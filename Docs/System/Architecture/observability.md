@@ -37,7 +37,7 @@ Audit.NET captures entity-level change tracking for all EF Core operations, writ
 - **Format**: JSON files with timestamps, entity type, primary key, changed properties, old/new values
 - **Identity events**: Authentication events (login, logout, failed attempts) are also audited
 
-See `Docs/AUDIT.md` for full details on the audit log format and configuration.
+See `Docs/System/Architecture/AUDIT.md` for full details on the audit log format and configuration.
 
 ## What Gets Instrumented
 
