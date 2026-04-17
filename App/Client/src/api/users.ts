@@ -12,8 +12,8 @@ export interface User {
 }
 
 export interface UsersResponse {
-  users: User[];
-  usersCount: number;
+  items: User[];
+  count: number;
 }
 
 export const usersApi = {

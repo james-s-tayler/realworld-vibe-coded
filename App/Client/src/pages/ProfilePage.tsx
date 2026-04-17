@@ -99,8 +99,8 @@ export const ProfilePage: React.FC = () => {
         ? { author: username, limit: pageSize, offset }
         : { favorited: username, limit: pageSize, offset };
       const response = await articlesApi.listArticles(params);
-      setArticles(response.articles);
-      setArticlesCount(response.articlesCount);
+      setArticles(response.items);
+      setArticlesCount(response.count);
     } catch (err) {
       const message = err instanceof ApiError ? err.errors.join(', ') : t('profile.failedToLoadArticles');
       showToast({ kind: 'error', title: t('error.title'), subtitle: message });

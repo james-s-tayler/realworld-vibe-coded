@@ -1,4 +1,5 @@
 ﻿using Server.Infrastructure;
+using Server.SharedKernel.Pagination;
 using Server.UseCases.Users.List;
 
 namespace Server.Web.Users.List;
@@ -9,7 +10,8 @@ namespace Server.Web.Users.List;
 /// <remarks>
 /// List all users in the system. Authentication required.
 /// </remarks>
-public class ListUsers(IMediator mediator) : Endpoint<ListUsersRequest, UsersResponse, UserMapper>
+public class ListUsers(IMediator mediator)
+  : Endpoint<ListUsersRequest, PaginatedResponse<UserDto>, ListUsersMapper>
 {
   public override void Configure()
   {
@@ -26,6 +28,6 @@ public class ListUsers(IMediator mediator) : Endpoint<ListUsersRequest, UsersRes
   {
     var result = await mediator.Send(new ListUsersQuery(req.Limit, req.Offset), cancellationToken);
 
-    await Send.ResultMapperAsync(result, async (users, ct) => await Map.FromEntityAsync(users, ct), cancellationToken);
+    await Send.ResultMapperAsync(result, Map.FromEntityAsync, cancellationToken);
   }
 }

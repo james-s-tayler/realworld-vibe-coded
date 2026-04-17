@@ -16,24 +16,27 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
 {
   public override async Task<ArticleResponse> FromEntityAsync(Article article, CancellationToken ct)
   {
-    // Resolve current user service to get authentication context
-    var currentUserService = Resolve<IUserContext>();
-    var currentUserId = currentUserService.GetCurrentUserId();
+    var dto = await MapArticleToDtoAsync(article, Resolve<IUserContext>(), Resolve<AppDbContext>(), ct);
+    return new ArticleResponse { Article = dto };
+  }
 
-    // Use domain methods to compute user-specific values
+  internal static async Task<ArticleDto> MapArticleToDtoAsync(
+    Article article,
+    IUserContext userContext,
+    AppDbContext dbContext,
+    CancellationToken ct)
+  {
+    var currentUserId = userContext.GetCurrentUserId();
     var isFavorited = article.IsFavoritedBy(currentUserId);
 
-    // Check if current user follows the article author by querying AuthorFollowing directly
-    // This avoids loading ApplicationUser with all ASP.NET Identity fields
     var isFollowing = false;
     if (currentUserId.HasValue)
     {
-      var dbContext = Resolve<AppDbContext>();
       isFollowing = await dbContext.Set<AuthorFollowing>()
         .AnyAsync(af => af.FollowerId == currentUserId.Value && af.FollowedId == article.AuthorId, ct);
     }
 
-    var articleDto = new ArticleDto(
+    return new ArticleDto(
       article.Slug,
       article.Title,
       article.Description,
@@ -50,7 +53,5 @@ public class ArticleMapper : ResponseMapper<ArticleResponse, Article>
         isFollowing
       )
     );
-
-    return new ArticleResponse { Article = articleDto };
   }
 }

@@ -47,7 +47,7 @@ describe('UsersPage', () => {
       mockUser({ id: '2', email: 'user2@test.com', username: 'user2', roles: ['ADMIN'] }),
     ];
 
-    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockUsers, usersCount: 2 });
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ items: mockUsers, count: 2 });
 
     render(
       <MemoryRouter>
@@ -102,7 +102,7 @@ describe('UsersPage', () => {
 
   it('opens invite modal when invite button is clicked', async () => {
     const user = userEvent.setup();
-    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: [], usersCount: 0 });
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ items: [], count: 0 });
 
     render(
       <MemoryRouter>
@@ -136,8 +136,8 @@ describe('UsersPage', () => {
     ];
 
     vi.mocked(usersApi.listUsers)
-      .mockResolvedValueOnce({ users: initialUsers, usersCount: 1 })
-      .mockResolvedValueOnce({ users: updatedUsers, usersCount: 2 });
+      .mockResolvedValueOnce({ items: initialUsers, count: 1 })
+      .mockResolvedValueOnce({ items: updatedUsers, count: 2 });
     vi.mocked(usersApi.inviteUser).mockResolvedValue();
 
     render(
@@ -182,7 +182,7 @@ describe('UsersPage', () => {
 
   it('shows error when invite fails', async () => {
     const user = userEvent.setup();
-    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: [], usersCount: 0 });
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ items: [], count: 0 });
     vi.mocked(usersApi.inviteUser).mockRejectedValue(new Error('Invite failed'));
 
     render(
@@ -221,7 +221,7 @@ describe('UsersPage', () => {
   });
 
   it('passes pagination params to listUsers', async () => {
-    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: [], usersCount: 0 });
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ items: [], count: 0 });
 
     render(
       <MemoryRouter>
@@ -242,7 +242,7 @@ describe('UsersPage', () => {
       mockUser({ id: '1', email: 'user1@test.com', username: 'user1', isActive: true }),
     ];
 
-    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockUsers, usersCount: 1 });
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ items: mockUsers, count: 1 });
 
     render(
       <MemoryRouter>
@@ -263,7 +263,7 @@ describe('UsersPage', () => {
       mockUser({ id: '1', email: 'user1@test.com', username: 'user1', isActive: false }),
     ];
 
-    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockUsers, usersCount: 1 });
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ items: mockUsers, count: 1 });
 
     render(
       <MemoryRouter>

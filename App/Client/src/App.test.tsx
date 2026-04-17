@@ -48,8 +48,8 @@ vi.mock('./api/configApi', () => ({
 }))
 
 const mockArticles = {
-  articles: [],
-  articlesCount: 0,
+  items: [],
+  count: 0,
 }
 
 const mockTags = {

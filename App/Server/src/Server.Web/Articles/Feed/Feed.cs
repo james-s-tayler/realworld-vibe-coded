@@ -1,5 +1,6 @@
-﻿using Server.Infrastructure;
-using Server.UseCases.Articles;
+﻿using Server.Core.ArticleAggregate.Dtos;
+using Server.Infrastructure;
+using Server.SharedKernel.Pagination;
 using Server.UseCases.Articles.Feed;
 using Server.UseCases.Interfaces;
 
@@ -11,7 +12,8 @@ namespace Server.Web.Articles.Feed;
 /// <remarks>
 /// Get articles from followed users. Authentication required.
 /// </remarks>
-public class Feed(IMediator mediator, IUserContext userContext) : Endpoint<FeedRequest, ArticlesResponse, ArticleMapper>
+public class Feed(IMediator mediator, IUserContext userContext)
+  : Endpoint<FeedRequest, PaginatedResponse<ArticleDto>, FeedMapper>
 {
   public override void Configure()
   {
@@ -26,7 +28,6 @@ public class Feed(IMediator mediator, IUserContext userContext) : Endpoint<FeedR
 
   public override async Task HandleAsync(FeedRequest request, CancellationToken cancellationToken)
   {
-    // Get current user ID from service
     var userId = userContext.GetRequiredCurrentUserId();
 
     var result = await mediator.Send(
@@ -36,19 +37,6 @@ public class Feed(IMediator mediator, IUserContext userContext) : Endpoint<FeedR
         request.Offset),
       cancellationToken);
 
-    await Send.ResultMapperAsync(
-      result,
-      async (feedResult, ct) =>
-      {
-        var articleDtos = new List<Server.Core.ArticleAggregate.Dtos.ArticleDto>();
-        foreach (var article in feedResult.Articles)
-        {
-          var response = await Map.FromEntityAsync(article, ct);
-          articleDtos.Add(response.Article);
-        }
-
-        return new ArticlesResponse(articleDtos, feedResult.TotalCount);
-      },
-      cancellationToken);
+    await Send.ResultMapperAsync(result, Map.FromEntityAsync, cancellationToken);
   }
 }

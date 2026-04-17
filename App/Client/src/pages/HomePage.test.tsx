@@ -44,8 +44,8 @@ function renderHomePage() {
 }
 
 const mockArticles = {
-  articles: [],
-  articlesCount: 0,
+  items: [],
+  count: 0,
 }
 
 const mockTags = {
@@ -72,8 +72,8 @@ const createMockArticles = (count: number) => {
     },
   }));
   return {
-    articles,
-    articlesCount: count,
+    items: articles,
+    count,
   };
 };
 

@@ -66,8 +66,8 @@ export const HomePage: React.FC = () => {
         // Global Feed
         response = await articlesApi.listArticles({ limit: pageSize, offset });
       }
-      setArticles(response.articles);
-      setArticlesCount(response.articlesCount);
+      setArticles(response.items);
+      setArticlesCount(response.count);
     } catch (err) {
       if (err instanceof ApiError) {
         showToast({ kind: 'error', title: t('error.title'), subtitle: err.errors.join(', ') });

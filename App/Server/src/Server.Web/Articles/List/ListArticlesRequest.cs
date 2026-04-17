@@ -1,6 +1,8 @@
-﻿namespace Server.Web.Articles.List;
+﻿using Server.SharedKernel.Pagination;
 
-public class ListArticlesRequest
+namespace Server.Web.Articles.List;
+
+public class ListArticlesRequest : IPaginatedRequest
 {
   [QueryParam]
   public string? Tag { get; set; }

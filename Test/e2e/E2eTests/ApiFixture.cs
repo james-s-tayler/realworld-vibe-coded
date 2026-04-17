@@ -563,7 +563,7 @@ public class ApiFixture : IAsyncLifetime
 
   private class UsersListResponse
   {
-    [JsonPropertyName("users")]
+    [JsonPropertyName("items")]
     public List<ListedUser> Users { get; set; } = [];
   }
 }

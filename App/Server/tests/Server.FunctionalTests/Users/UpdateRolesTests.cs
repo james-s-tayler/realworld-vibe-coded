@@ -1,4 +1,5 @@
 ﻿using Server.Core.IdentityAggregate;
+using Server.SharedKernel.Pagination;
 using Server.Web.Users.List;
 using Server.Web.Users.UpdateRoles;
 
@@ -27,8 +28,8 @@ public class UpdateRolesTests : AppTestBase
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
     // Verify roles were updated
-    var (_, listResult) = await owner.Client.GETAsync<ListUsers, UsersResponse>();
-    var updatedUser = listResult.Users.First(u => u.Email == tenant.Users[1].Email);
+    var (_, listResult) = await owner.Client.GETAsync<ListUsers, PaginatedResponse<UserDto>>();
+    var updatedUser = listResult.Items.First(u => u.Email == tenant.Users[1].Email);
     updatedUser.Roles.ShouldContain(DefaultRoles.Admin);
     updatedUser.Roles.ShouldContain(DefaultRoles.Author);
   }
@@ -59,8 +60,8 @@ public class UpdateRolesTests : AppTestBase
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
     // Verify ADMIN was removed
-    var (_, listResult) = await owner.Client.GETAsync<ListUsers, UsersResponse>();
-    var updatedUser = listResult.Users.First(u => u.Email == tenant.Users[1].Email);
+    var (_, listResult) = await owner.Client.GETAsync<ListUsers, PaginatedResponse<UserDto>>();
+    var updatedUser = listResult.Items.First(u => u.Email == tenant.Users[1].Email);
     updatedUser.Roles.ShouldNotContain(DefaultRoles.Admin);
     updatedUser.Roles.ShouldContain(DefaultRoles.Author);
   }
@@ -117,8 +118,8 @@ public class UpdateRolesTests : AppTestBase
     response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
     // Verify OWNER is still there
-    var (_, listResult) = await owner.Client.GETAsync<ListUsers, UsersResponse>();
-    var ownerUser = listResult.Users.First(u => u.Email == owner.Email);
+    var (_, listResult) = await owner.Client.GETAsync<ListUsers, PaginatedResponse<UserDto>>();
+    var ownerUser = listResult.Items.First(u => u.Email == owner.Email);
     ownerUser.Roles.ShouldContain(DefaultRoles.Owner);
     ownerUser.Roles.ShouldContain(DefaultRoles.Admin);
     ownerUser.Roles.ShouldContain(DefaultRoles.Author);
@@ -190,8 +191,8 @@ public class UpdateRolesTests : AppTestBase
 
   private async Task<Guid> GetUserIdByEmail(HttpClient client, string email)
   {
-    var (_, result) = await client.GETAsync<ListUsers, UsersResponse>();
-    var user = result.Users.First(u => u.Email == email);
+    var (_, result) = await client.GETAsync<ListUsers, PaginatedResponse<UserDto>>();
+    var user = result.Items.First(u => u.Email == email);
     return user.Id;
   }
 }

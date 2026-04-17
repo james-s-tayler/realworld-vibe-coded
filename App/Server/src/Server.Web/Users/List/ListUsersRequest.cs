@@ -1,6 +1,8 @@
-﻿namespace Server.Web.Users.List;
+﻿using Server.SharedKernel.Pagination;
 
-public class ListUsersRequest
+namespace Server.Web.Users.List;
+
+public class ListUsersRequest : IPaginatedRequest
 {
   [QueryParam]
   public int Limit { get; set; } = 20;

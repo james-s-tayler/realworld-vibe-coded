@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Server.Core.IdentityAggregate;
+using Server.SharedKernel.Pagination;
 using Server.Web.Users.GetCurrent;
 using Server.Web.Users.List;
 using Server.Web.Users.Update;
@@ -228,28 +229,28 @@ public class UsersTests : AppTestBase
     var user = tenant.Users[0];
 
     // Act
-    var (response, result) = await user.Client.GETAsync<ListUsers, UsersResponse>();
+    var (response, result) = await user.Client.GETAsync<ListUsers, PaginatedResponse<UserDto>>();
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Users.ShouldNotBeNull();
-    result.Users.Count.ShouldBeGreaterThanOrEqualTo(3);
+    result.Items.ShouldNotBeNull();
+    result.Items.Count.ShouldBeGreaterThanOrEqualTo(3);
 
     // Verify all created users are in the response
     foreach (var createdUser in tenant.Users)
     {
-      result.Users.ShouldContain(u => u.Email == createdUser.Email);
+      result.Items.ShouldContain(u => u.Email == createdUser.Email);
     }
 
     // Verify roles are included
-    result.Users.ForEach(u =>
+    foreach (var u in result.Items)
     {
       u.Roles.ShouldNotBeNull();
       u.Roles.ShouldNotBeEmpty();
-    });
+    }
 
     // Verify first user (tenant owner) has ADMIN role
-    var ownerDto = result.Users.First(u => u.Email == tenant.Users[0].Email);
+    var ownerDto = result.Items.First(u => u.Email == tenant.Users[0].Email);
     ownerDto.Roles.ShouldContain(DefaultRoles.Admin);
     ownerDto.Roles.ShouldContain(DefaultRoles.Owner);
     ownerDto.Roles.ShouldContain(DefaultRoles.Author);
@@ -273,11 +274,11 @@ public class UsersTests : AppTestBase
     var user = tenant.Users[0];
 
     var request = new ListUsersRequest();
-    var (response, result) = await user.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=2&offset=0", request);
+    var (response, result) = await user.Client.GETAsync<ListUsersRequest, PaginatedResponse<UserDto>>("/api/users?limit=2&offset=0", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Users.Count.ShouldBeLessThanOrEqualTo(2);
-    result.UsersCount.ShouldBeGreaterThanOrEqualTo(3);
+    result.Items.Count.ShouldBeLessThanOrEqualTo(2);
+    result.Count.ShouldBeGreaterThanOrEqualTo(3);
   }
 
   [Fact]
@@ -287,11 +288,11 @@ public class UsersTests : AppTestBase
     var user = tenant.Users[0];
 
     var request = new ListUsersRequest();
-    var (response, result) = await user.Client.GETAsync<ListUsersRequest, UsersResponse>("/api/users?limit=20&offset=1", request);
+    var (response, result) = await user.Client.GETAsync<ListUsersRequest, PaginatedResponse<UserDto>>("/api/users?limit=20&offset=1", request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Users.Count.ShouldBeGreaterThanOrEqualTo(2);
-    result.UsersCount.ShouldBeGreaterThanOrEqualTo(3);
+    result.Items.Count.ShouldBeGreaterThanOrEqualTo(2);
+    result.Count.ShouldBeGreaterThanOrEqualTo(3);
   }
 
   [Fact]
@@ -300,10 +301,10 @@ public class UsersTests : AppTestBase
     var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
     var user = tenant.Users[0];
 
-    var (response, result) = await user.Client.GETAsync<ListUsers, UsersResponse>();
+    var (response, result) = await user.Client.GETAsync<ListUsers, PaginatedResponse<UserDto>>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.UsersCount.ShouldBeGreaterThanOrEqualTo(2);
+    result.Count.ShouldBeGreaterThanOrEqualTo(2);
   }
 
   [Fact]
@@ -312,13 +313,13 @@ public class UsersTests : AppTestBase
     var tenant = await Fixture.RegisterTenantAsync();
     var user = tenant.Users[0];
 
-    var (response, result) = await user.Client.GETAsync<ListUsers, UsersResponse>();
+    var (response, result) = await user.Client.GETAsync<ListUsers, PaginatedResponse<UserDto>>();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Users.ShouldNotBeEmpty();
-    result.Users.ForEach(u =>
+    result.Items.ShouldNotBeEmpty();
+    foreach (var u in result.Items)
     {
       u.IsActive.ShouldBeTrue();
-    });
+    }
   }
 }

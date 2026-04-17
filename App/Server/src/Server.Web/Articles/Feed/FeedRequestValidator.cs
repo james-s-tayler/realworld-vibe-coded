@@ -1,18 +1,7 @@
-﻿using FluentValidation;
+﻿using Server.Web.Shared.Pagination;
 
 namespace Server.Web.Articles.Feed;
 
-public class FeedRequestValidator : Validator<FeedRequest>
+public class FeedRequestValidator : PaginationAwareValidator<FeedRequest>
 {
-  public FeedRequestValidator()
-  {
-    RuleFor(x => x.Limit)
-      .GreaterThan(0)
-      .LessThanOrEqualTo(100)
-      .OverridePropertyName("limit");
-
-    RuleFor(x => x.Offset)
-      .GreaterThanOrEqualTo(0)
-      .OverridePropertyName("offset");
-  }
 }
