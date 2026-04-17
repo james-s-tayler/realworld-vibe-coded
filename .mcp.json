@@ -12,6 +12,14 @@
     "microsoft-learn": {
       "type": "http",
       "url": "https://learn.microsoft.com/api/mcp"
+    },
+    "sharplens": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "sharplens-mcp"],
+      "env": {
+        "DOTNET_SOLUTION_PATH": "${CLAUDE_PROJECT_DIR}/All.sln"
+      }
     }
   }
 }
