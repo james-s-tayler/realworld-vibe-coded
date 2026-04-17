@@ -26,7 +26,6 @@
       "enum": [
         "BuildClient",
         "BuildGenerateApiClient",
-        "BuildRoslynMcp",
         "BuildServer",
         "BuildServerPublish",
         "DbMigrationsAdd",

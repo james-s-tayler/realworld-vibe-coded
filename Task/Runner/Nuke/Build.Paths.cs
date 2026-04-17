@@ -56,8 +56,6 @@ public partial class Build
 
   internal AbsolutePath DockerComposeServer => TaskLocalDevDirectory / "docker-compose.server.yml";
 
-  internal AbsolutePath RoslynMcpProject => RootDirectory / "Task" / "McpServers" / "roslyn-mcp" / "RoslynMCP" / "RoslynMCP.csproj";
-
   internal AbsolutePath LocalNuGetFeedDirectory => RootDirectory / ".local-nuget";
 
   #endregion

@@ -3,8 +3,18 @@ name: CI
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'Docs/**'
+      - '.claude/**'
+      - '.archon/**'
+      - 'CLAUDE.md'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - 'Docs/**'
+      - '.claude/**'
+      - '.archon/**'
+      - 'CLAUDE.md'
 
 # Cancel in-progress runs for the same ref/PR to save minutes
 concurrency:
@@ -72,27 +82,6 @@ jobs:
 
       - name: Build (Nuke build system)
         run: dotnet build Task/Runner/Nuke.sln
-
-  build-roslyn-mcp:
-    name: build-roslyn-mcp
-    runs-on: ubuntu-latest
-    env:
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-      DOTNET_CLI_TELEMETRY_OPTOUT: 1
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET (from global.json)
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: App/Server/global.json
-
-      - name: Verify .NET version
-        run: dotnet --info
-
-      - name: Build RoslynMCP
-        run: ./build.sh build-roslyn-mcp
 
   build-server:
     name: build-server
