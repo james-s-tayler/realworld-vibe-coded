@@ -184,3 +184,4 @@ This implementation has been generalized into reusable starter templates:
 
 - [**Single-Tenant Starter Template**](https://github.com/james-s-tayler/realworld-vibe-coded/tree/single-tenant-starter-template) — the same architecture without multi-tenancy, using SQLite
 - [**Multi-Tenant Starter Template**](https://github.com/james-s-tayler/realworld-vibe-coded/tree/multi-tenant-starter-template) — adds Finbuckle multi-tenancy, SQL Server, tenant-scoped data isolation
+
