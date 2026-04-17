@@ -1,7 +1,7 @@
 import './ArticlePage.scss';
 
 import { Edit, Favorite, FavoriteFilled, TrashCan } from '@carbon/icons-react';
-import { Breadcrumb, BreadcrumbItem,Button, Column, Form, Grid, IconButton, InlineLoading, Loading, Modal, Stack, Tag, TextArea, Tile } from '@carbon/react';
+import { Breadcrumb, BreadcrumbItem,Button, Column, Grid, Loading, Modal, Stack, Tag } from '@carbon/react';
 import React, { useCallback,useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link,useNavigate, useParams } from 'react-router';
@@ -10,8 +10,9 @@ import { articlesApi } from '../api/articles';
 import { ApiError } from '../api/client';
 import { commentsApi } from '../api/comments';
 import { profilesApi } from '../api/profiles';
+import { AuthorMeta } from '../components/AuthorMeta';
+import { CommentSection } from '../components/CommentSection';
 import { PageShell } from '../components/PageShell';
-import { COMMENT_CONSTRAINTS,DEFAULT_PROFILE_IMAGE } from '../constants';
 import { useAuth } from '../hooks/useAuth';
 import { useRequireAuth } from '../hooks/useRequireAuth';
 import { useToast } from '../hooks/useToast';
@@ -42,13 +43,12 @@ const ArticleBanner: React.FC<ArticleBannerProps> = ({
       <Column lg={16} md={8} sm={4}>
         <h1>{article.title}</h1>
         <div className="article-meta">
-        <Link to={`/profile/${article.author.username}`} className="author-info">
-          <img src={article.author.image || DEFAULT_PROFILE_IMAGE} alt={article.author.username} className="avatar-md" />
-          <Stack gap={1} className="info">
-            <span className="author cds--text-truncate-end" title={article.author.username}>{article.author.username}</span>
-            <span className="date">{new Date(article.createdAt).toLocaleDateString()}</span>
-          </Stack>
-        </Link>
+        <AuthorMeta
+          username={article.author.username}
+          image={article.author.image}
+          date={article.createdAt}
+          variant="banner"
+        />
         {isAuthor ? (
           <Stack orientation="horizontal" gap={3}>
             <Button
@@ -104,8 +104,6 @@ export const ArticlePage: React.FC = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [commentBody, setCommentBody] = useState('');
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
@@ -185,19 +183,14 @@ export const ArticlePage: React.FC = () => {
     }
   };
 
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!slug || !commentBody.trim()) return;
-    setSubmitting(true);
+  const handleCommentSubmit = async (body: string) => {
+    if (!slug) return;
     try {
-      const response = await commentsApi.createComment(slug, commentBody);
+      const response = await commentsApi.createComment(slug, body);
       setComments([response.comment, ...comments]);
-      setCommentBody('');
     } catch (err) {
       const message = err instanceof ApiError ? err.errors.join(', ') : t('article.failedToComment');
       showToast({ kind: 'error', title: t('error.title'), subtitle: message });
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -270,70 +263,12 @@ export const ArticlePage: React.FC = () => {
 
         <hr />
 
-        {user ? (
-          <Tile className="comment-form">
-              <Form onSubmit={handleCommentSubmit}>
-                <div className="comment-form-body">
-                  <TextArea
-                    id="comment"
-                    labelText={t('article.comments.label')}
-                    hideLabel
-                    placeholder={t('article.comments.placeholder')}
-                    value={commentBody}
-                    onChange={(e) => setCommentBody(e.target.value)}
-                    rows={3}
-                    maxLength={COMMENT_CONSTRAINTS.BODY_MAX_LENGTH}
-                  />
-                </div>
-                <div className="comment-form-footer">
-                  <img
-                    src={user.image || DEFAULT_PROFILE_IMAGE}
-                    alt={user.username}
-                    className="avatar-sm"
-                  />
-                  <Button type="submit" size="sm" disabled={submitting || !commentBody.trim()}>
-                    {t('article.comments.submit')}
-                  </Button>
-                  {submitting && <InlineLoading description={t('article.comments.submitting')} />}
-                </div>
-              </Form>
-            </Tile>
-          ) : (
-            <div className="comment-auth-prompt">
-              <p>{t('article.comments.authPrompt')}</p>
-            </div>
-          )}
-
-          {comments.map(comment => (
-            <Tile key={comment.id} className="comment-tile">
-              <div className="comment-body">
-                <p>{comment.body}</p>
-              </div>
-              <div className="comment-footer">
-                <Link to={`/profile/${comment.author.username}`} className="comment-author">
-                  <img
-                    src={comment.author.image || DEFAULT_PROFILE_IMAGE}
-                    alt={comment.author.username}
-                    className="avatar-sm"
-                  />
-                  <span className="comment-author-name cds--text-truncate-end" title={comment.author.username}>{comment.author.username}</span>
-                </Link>
-                <span className="date-posted">
-                  {new Date(comment.createdAt).toLocaleDateString()}
-                </span>
-                {user && user.username === comment.author.username && (
-                  <IconButton
-                    kind="ghost"
-                    size="sm"
-                    label={t('article.comments.delete')}
-                    onClick={() => handleCommentDelete(comment.id)}
-                  >
-                    <TrashCan size={16} />
-                  </IconButton>
-                )}
-              </div>
-            </Tile>
-          ))}
+        <CommentSection
+          comments={comments}
+          user={user}
+          onSubmit={handleCommentSubmit}
+          onDelete={handleCommentDelete}
+        />
       <Modal
         open={deleteModalOpen}
         onRequestClose={() => setDeleteModalOpen(false)}
