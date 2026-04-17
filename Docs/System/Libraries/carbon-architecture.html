@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carbon Design System — Architecture Diagram</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --cds-background: #161616;
+    --cds-layer-01: #262626;
+    --cds-layer-02: #393939;
+    --cds-layer-03: #525252;
+    --cds-text-primary: #f4f4f4;
+    --cds-text-secondary: #c6c6c6;
+    --cds-text-helper: #a8a8a8;
+    --cds-blue-60: #0f62fe;
+    --cds-blue-40: #78a9ff;
+    --cds-blue-30: #a6c8ff;
+    --cds-purple-60: #8a3ffc;
+    --cds-purple-40: #be95ff;
+    --cds-teal-60: #009d9a;
+    --cds-teal-40: #08bdba;
+    --cds-green-60: #198038;
+    --cds-green-40: #42be65;
+    --cds-magenta-60: #d02670;
+    --cds-magenta-40: #ff7eb6;
+    --cds-cyan-60: #0072c3;
+    --cds-cyan-40: #33b1ff;
+    --cds-orange-40: #ff832b;
+    --cds-red-60: #da1e28;
+    --cds-border-subtle: #393939;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+    background: var(--cds-background);
+    color: var(--cds-text-primary);
+    padding: 48px 24px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  h1 span { font-weight: 600; }
+
+  .subtitle {
+    font-size: 1rem;
+    color: var(--cds-text-helper);
+    margin-bottom: 48px;
+    font-weight: 400;
+  }
+
+  .diagram-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Layer labels */
+  .layer-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    fill: var(--cds-text-helper);
+  }
+
+  /* Package boxes */
+  .pkg-box {
+    rx: 4;
+    ry: 4;
+    stroke-width: 1;
+  }
+
+  .pkg-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    fill: var(--cds-text-primary);
+  }
+
+  .pkg-desc {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 10px;
+    fill: var(--cds-text-secondary);
+  }
+
+  .pkg-version {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    fill: var(--cds-text-helper);
+  }
+
+  /* Dependency arrows */
+  .dep-line {
+    stroke-width: 1.5;
+    fill: none;
+    opacity: 0.5;
+  }
+
+  .dep-line:hover { opacity: 1; stroke-width: 2.5; }
+
+  /* Token detail boxes */
+  .token-box {
+    rx: 2;
+    ry: 2;
+  }
+
+  .token-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+  }
+
+  /* Section headers */
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 56px 0 24px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--cds-border-subtle);
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+    padding: 16px;
+    background: var(--cds-layer-01);
+    border-radius: 4px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--cds-text-secondary);
+  }
+
+  .legend-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Info cards */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  /* Token reference tables */
+  .token-section {
+    margin-top: 48px;
+  }
+
+  .token-section h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 32px 0 12px;
+    color: var(--cds-text-primary);
+  }
+
+  .token-section h3:first-child { margin-top: 0; }
+
+  .token-group-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--cds-text-helper);
+    margin: 24px 0 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--cds-border-subtle);
+  }
+
+  .token-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .token-table th {
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--cds-text-helper);
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--cds-border-subtle);
+    position: sticky;
+    top: 0;
+    background: var(--cds-background);
+  }
+
+  .token-table td {
+    padding: 5px 12px;
+    border-bottom: 1px solid rgba(57,57,57,0.4);
+    vertical-align: top;
+  }
+
+  .token-table tr:hover td {
+    background: var(--cds-layer-01);
+  }
+
+  .token-table code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+
+  .token-table .tok-name {
+    color: var(--cds-cyan-40);
+    white-space: nowrap;
+  }
+
+  .token-table .tok-val {
+    color: var(--cds-text-secondary);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+  }
+
+  .token-table .tok-desc {
+    color: var(--cds-text-helper);
+    font-size: 12px;
+  }
+
+  .color-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-right: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .color-palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 2px;
+    margin-bottom: 24px;
+  }
+
+  .color-family {
+    background: var(--cds-layer-01);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .color-family-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--cds-border-subtle);
+  }
+
+  .color-grade {
+    display: flex;
+    align-items: center;
+    padding: 3px 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    gap: 8px;
+  }
+
+  .color-grade:hover { background: var(--cds-layer-02); }
+
+  .color-grade .swatch {
+    width: 20px;
+    height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .color-grade .grade-num {
+    color: var(--cds-text-helper);
+    width: 22px;
+  }
+
+  .color-grade .hex {
+    color: var(--cds-text-secondary);
+  }
+
+  .tab-container { margin-top: 16px; }
+
+  .tab-buttons {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--cds-border-subtle);
+    margin-bottom: 0;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    color: var(--cds-text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s;
+  }
+
+  .tab-btn:hover { color: var(--cds-text-primary); background: var(--cds-layer-01); }
+  .tab-btn.active { color: var(--cds-text-primary); border-bottom-color: var(--cds-blue-60); }
+
+  .tab-panel { display: none; padding-top: 16px; }
+  .tab-panel.active { display: block; }
+
+  .easing-visual {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .easing-curve-mini {
+    width: 40px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .type-sample {
+    color: var(--cds-text-secondary);
+    margin-top: 2px;
+  }
+
+  .info-card {
+    background: var(--cds-layer-01);
+    border: 1px solid var(--cds-border-subtle);
+    border-radius: 4px;
+    padding: 20px;
+    border-left: 3px solid;
+  }
+
+  .info-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .info-card p {
+    font-size: 13px;
+    color: var(--cds-text-secondary);
+    line-height: 1.5;
+  }
+
+  .info-card code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: var(--cds-layer-02);
+    padding: 1px 6px;
+    border-radius: 2px;
+    color: var(--cds-cyan-40);
+  }
+
+  .info-card ul {
+    margin: 8px 0 0 16px;
+    font-size: 12px;
+    color: var(--cds-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Token flow section */
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .flow-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .flow-content {
+    flex: 1;
+    padding-top: 4px;
+  }
+
+  .flow-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .flow-content p {
+    font-size: 13px;
+    color: var(--cds-text-secondary);
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="diagram-container">
+
+<h1><span>Carbon</span> Design System</h1>
+<p class="subtitle">Architecture &amp; Package Dependency Map &mdash; v11 (as installed in this project)</p>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background: var(--cds-blue-60);"></div>Component Layer</div>
+  <div class="legend-item"><div class="legend-swatch" style="background: var(--cds-purple-60);"></div>Styles Aggregation</div>
+  <div class="legend-item"><div class="legend-swatch" style="background: var(--cds-teal-60);"></div>Theme System</div>
+  <div class="legend-item"><div class="legend-swatch" style="background: var(--cds-green-60);"></div>Foundation Tokens</div>
+  <div class="legend-item"><div class="legend-swatch" style="background: var(--cds-magenta-60);"></div>Icons</div>
+  <div class="legend-item"><div class="legend-swatch" style="background: var(--cds-cyan-60);"></div>Utilities</div>
+</div>
+
+<!-- ============================================================ -->
+<!--  MAIN ARCHITECTURE SVG                                       -->
+<!-- ============================================================ -->
+<svg viewBox="0 0 1100 680" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1100px;">
+  <defs>
+    <!-- Arrow markers -->
+    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="var(--cds-blue-40)" />
+    </marker>
+    <marker id="arrow-purple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="var(--cds-purple-40)" />
+    </marker>
+    <marker id="arrow-teal" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="var(--cds-teal-40)" />
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="var(--cds-green-40)" />
+    </marker>
+    <marker id="arrow-magenta" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="var(--cds-magenta-40)" />
+    </marker>
+    <marker id="arrow-cyan" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="var(--cds-cyan-40)" />
+    </marker>
+
+    <!-- Layer backgrounds -->
+    <linearGradient id="layer-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#262626" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#262626" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ==================== LAYER BACKGROUNDS ==================== -->
+
+  <!-- Layer 4: Component Layer -->
+  <rect x="20" y="10" width="1060" height="100" rx="8" fill="url(#layer-bg)" stroke="var(--cds-border-subtle)" stroke-width="0.5"/>
+  <text x="40" y="32" class="layer-label">Component Layer</text>
+
+  <!-- Layer 3: Style Aggregation -->
+  <rect x="20" y="130" width="1060" height="100" rx="8" fill="url(#layer-bg)" stroke="var(--cds-border-subtle)" stroke-width="0.5"/>
+  <text x="40" y="152" class="layer-label">Style Aggregation</text>
+
+  <!-- Layer 2: Theme System -->
+  <rect x="20" y="250" width="1060" height="120" rx="8" fill="url(#layer-bg)" stroke="var(--cds-border-subtle)" stroke-width="0.5"/>
+  <text x="40" y="272" class="layer-label">Theme System</text>
+
+  <!-- Layer 1: Foundation Tokens -->
+  <rect x="20" y="390" width="1060" height="120" rx="8" fill="url(#layer-bg)" stroke="var(--cds-border-subtle)" stroke-width="0.5"/>
+  <text x="40" y="412" class="layer-label">Foundation Tokens (Leaf Packages)</text>
+
+  <!-- Layer 0: Runtime output -->
+  <rect x="20" y="540" width="1060" height="120" rx="8" fill="url(#layer-bg)" stroke="var(--cds-border-subtle)" stroke-width="0.5"/>
+  <text x="40" y="562" class="layer-label">Runtime Output (Browser)</text>
+
+  <!-- ==================== DEPENDENCY LINES ==================== -->
+
+  <!-- @carbon/react → @carbon/styles -->
+  <path d="M350,100 L350,138" class="dep-line" stroke="var(--cds-purple-40)" marker-end="url(#arrow-purple)"/>
+  <!-- @carbon/react → @carbon/icons-react -->
+  <path d="M480,100 C480,115 750,115 750,100" class="dep-line" stroke="var(--cds-magenta-40)" marker-end="url(#arrow-magenta)" transform="translate(0,0)"/>
+  <!-- Actually let's draw react→icons as same-layer -->
+  <!-- @carbon/react → @carbon/icons-react (horizontal) -->
+
+  <!-- @carbon/styles → @carbon/themes -->
+  <path d="M250,222 L250,258" class="dep-line" stroke="var(--cds-teal-40)" marker-end="url(#arrow-teal)"/>
+  <!-- @carbon/styles → @carbon/grid -->
+  <path d="M420,222 L530,258" class="dep-line" stroke="var(--cds-teal-40)" marker-end="url(#arrow-teal)"/>
+  <!-- @carbon/styles → @carbon/type (via themes) -->
+  <path d="M500,222 L700,258" class="dep-line" stroke="var(--cds-teal-40)" marker-end="url(#arrow-teal)"/>
+  <!-- @carbon/styles → foundation tokens (direct deps) -->
+  <path d="M180,222 C120,300 120,380 135,398" class="dep-line" stroke="var(--cds-green-40)" marker-end="url(#arrow-green)"/>
+  <path d="M350,222 C350,300 475,360 475,398" class="dep-line" stroke="var(--cds-green-40)" marker-end="url(#arrow-green)"/>
+
+  <!-- @carbon/themes → @carbon/colors -->
+  <path d="M200,362 L135,398" class="dep-line" stroke="var(--cds-green-40)" marker-end="url(#arrow-green)"/>
+  <!-- @carbon/themes → @carbon/layout -->
+  <path d="M290,362 L315,398" class="dep-line" stroke="var(--cds-green-40)" marker-end="url(#arrow-green)"/>
+  <!-- @carbon/themes → @carbon/type (needs type for component tokens) -->
+  <path d="M350,362 C400,380 660,380 700,362" class="dep-line" stroke="var(--cds-teal-40)" marker-end="url(#arrow-teal)"/>
+
+  <!-- @carbon/grid → @carbon/layout -->
+  <path d="M530,362 L350,398" class="dep-line" stroke="var(--cds-green-40)" marker-end="url(#arrow-green)"/>
+
+  <!-- @carbon/type → @carbon/layout -->
+  <path d="M700,362 C600,390 400,390 350,398" class="dep-line" stroke="var(--cds-green-40)" marker-end="url(#arrow-green)"/>
+  <!-- @carbon/type → @carbon/grid -->
+  <path d="M700,362 C650,370 580,370 560,362" class="dep-line" stroke="var(--cds-teal-40)" marker-end="url(#arrow-teal)"/>
+
+  <!-- @carbon/icons-react → @carbon/icon-helpers -->
+  <path d="M850,100 L950,138" class="dep-line" stroke="var(--cds-magenta-40)" marker-end="url(#arrow-magenta)"/>
+
+  <!-- Foundation → Runtime -->
+  <path d="M550,502 L550,548" class="dep-line" stroke="var(--cds-text-helper)" stroke-dasharray="6,4" opacity="0.4"/>
+
+  <!-- ==================== PACKAGE BOXES ==================== -->
+
+  <!-- === LAYER 4: Component === -->
+
+  <!-- @carbon/react -->
+  <rect x="140" y="48" width="420" height="50" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-blue-60)"/>
+  <text x="160" y="70" class="pkg-label" fill="var(--cds-blue-40)">@carbon/react</text>
+  <text x="345" y="70" class="pkg-version">v1.92.1</text>
+  <text x="160" y="86" class="pkg-desc">122 React components • re-exports all @carbon/styles SCSS</text>
+
+  <!-- @carbon/icons-react -->
+  <rect x="680" y="48" width="300" height="50" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-magenta-60)"/>
+  <text x="700" y="70" class="pkg-label" fill="var(--cds-magenta-40)">@carbon/icons-react</text>
+  <text x="878" y="70" class="pkg-version">v11.68.0</text>
+  <text x="700" y="86" class="pkg-desc">500+ React icon components</text>
+
+  <!-- Arrow from react to icons-react -->
+  <path d="M560,73 L672,73" class="dep-line" stroke="var(--cds-magenta-40)" marker-end="url(#arrow-magenta)"/>
+  <text x="598" y="67" class="pkg-desc" fill="var(--cds-text-helper)">depends on</text>
+
+  <!-- === LAYER 3: Style Aggregation === -->
+
+  <!-- @carbon/styles -->
+  <rect x="140" y="168" width="520" height="54" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-purple-60)"/>
+  <text x="160" y="190" class="pkg-label" fill="var(--cds-purple-40)">@carbon/styles</text>
+  <text x="332" y="190" class="pkg-version">v1.91.0</text>
+  <text x="160" y="206" class="pkg-desc">SCSS aggregator — @forward's all token packages + 100+ component stylesheets</text>
+
+  <!-- @carbon/icon-helpers -->
+  <rect x="830" y="168" width="220" height="54" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-magenta-60)"/>
+  <text x="850" y="190" class="pkg-label" fill="var(--cds-magenta-40)">@carbon/icon-helpers</text>
+  <text x="850" y="206" class="pkg-desc">SVG attribute utilities</text>
+
+  <!-- === LAYER 2: Theme System === -->
+
+  <!-- @carbon/themes -->
+  <rect x="80" y="288" width="340" height="74" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-teal-60)"/>
+  <text x="100" y="310" class="pkg-label" fill="var(--cds-teal-40)">@carbon/themes</text>
+  <text x="266" y="310" class="pkg-version">v11.61.0</text>
+  <text x="100" y="326" class="pkg-desc">4 built-in themes: $white, $g10, $g90, $g100</text>
+  <text x="100" y="342" class="pkg-desc">theme() mixin emits --cds-* CSS custom properties</text>
+
+  <!-- @carbon/grid -->
+  <rect x="460" y="288" width="200" height="74" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-teal-60)"/>
+  <text x="480" y="310" class="pkg-label" fill="var(--cds-teal-40)">@carbon/grid</text>
+  <text x="480" y="326" class="pkg-desc">16-column CSS Grid</text>
+  <text x="480" y="342" class="pkg-desc">5 breakpoints: sm–max</text>
+
+  <!-- @carbon/type -->
+  <rect x="700" y="288" width="300" height="74" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-teal-60)"/>
+  <text x="720" y="310" class="pkg-label" fill="var(--cds-teal-40)">@carbon/type</text>
+  <text x="830" y="310" class="pkg-version">v11.48.0</text>
+  <text x="720" y="326" class="pkg-desc">IBM Plex font-face + type style mixins</text>
+  <text x="720" y="342" class="pkg-desc">heading-01…07, body, label, code, caption</text>
+
+  <!-- === LAYER 1: Foundation Tokens === -->
+
+  <!-- @carbon/colors -->
+  <rect x="40" y="418" width="180" height="74" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-green-60)"/>
+  <text x="58" y="440" class="pkg-label" fill="var(--cds-green-40)">@carbon/colors</text>
+  <text x="58" y="456" class="pkg-desc">IBM color swatches</text>
+  <text x="58" y="472" class="pkg-desc">12 palettes × 10 grades</text>
+
+  <!-- @carbon/layout -->
+  <rect x="250" y="418" width="200" height="74" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-green-60)"/>
+  <text x="268" y="440" class="pkg-label" fill="var(--cds-green-40)">@carbon/layout</text>
+  <text x="268" y="456" class="pkg-desc">$spacing-01…13 tokens</text>
+  <text x="268" y="472" class="pkg-desc">rem() / em() / px() helpers</text>
+
+  <!-- @carbon/motion -->
+  <rect x="480" y="418" width="220" height="74" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-green-60)"/>
+  <text x="498" y="440" class="pkg-label" fill="var(--cds-green-40)">@carbon/motion</text>
+  <text x="498" y="456" class="pkg-desc">6 easing curves × 2 modes</text>
+  <text x="498" y="472" class="pkg-desc">6 duration tokens (70ms–700ms)</text>
+
+  <!-- @carbon/feature-flags -->
+  <rect x="730" y="418" width="220" height="74" class="pkg-box" fill="var(--cds-layer-01)" stroke="var(--cds-cyan-60)"/>
+  <text x="748" y="440" class="pkg-label" fill="var(--cds-cyan-40)">@carbon/feature-flags</text>
+  <text x="748" y="456" class="pkg-desc">v11/v12 feature toggles</text>
+  <text x="748" y="472" class="pkg-desc">SCSS + JS runtime checks</text>
+
+  <!-- === LAYER 0: Runtime Output === -->
+
+  <!-- CSS Custom Properties -->
+  <rect x="60" y="570" width="280" height="74" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-text-helper)" stroke-dasharray="4,2"/>
+  <text x="78" y="592" class="pkg-label" fill="var(--cds-orange-40)">CSS Custom Properties</text>
+  <text x="78" y="608" class="pkg-desc">--cds-text-primary, --cds-layer-01, --cds-background…</text>
+  <text x="78" y="624" class="pkg-desc">100+ token variables on :root — enables runtime theming</text>
+
+  <!-- CSS Classes -->
+  <rect x="380" y="570" width="280" height="74" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-text-helper)" stroke-dasharray="4,2"/>
+  <text x="398" y="592" class="pkg-label" fill="var(--cds-orange-40)">CSS Classes</text>
+  <text x="398" y="608" class="pkg-desc">.cds--btn, .cds--modal, .cds--css-grid…</text>
+  <text x="398" y="624" class="pkg-desc">Component styles compiled from SCSS → browser CSS</text>
+
+  <!-- React DOM -->
+  <rect x="700" y="570" width="340" height="74" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-text-helper)" stroke-dasharray="4,2"/>
+  <text x="718" y="592" class="pkg-label" fill="var(--cds-orange-40)">React Virtual DOM</text>
+  <text x="718" y="608" class="pkg-desc">&lt;Button kind="primary"&gt; → &lt;button class="cds--btn"&gt;</text>
+  <text x="718" y="624" class="pkg-desc">Components render semantic HTML with cds--* classes</text>
+
+</svg>
+
+<!-- ============================================================ -->
+<!--  TOKEN FLOW DIAGRAM                                          -->
+<!-- ============================================================ -->
+
+<h2 class="section-title">Token Flow: From Definition to Browser</h2>
+
+<svg viewBox="0 0 1100 260" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1100px;">
+  <defs>
+    <marker id="flow-arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <path d="M0,0 L10,3.5 L0,7" fill="var(--cds-blue-40)" />
+    </marker>
+  </defs>
+
+  <!-- Step 1: Raw values -->
+  <rect x="20" y="20" width="180" height="100" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-green-60)"/>
+  <text x="38" y="44" class="pkg-label" fill="var(--cds-green-40)">1. Raw Values</text>
+  <text x="38" y="64" class="pkg-desc" fill="var(--cds-text-secondary)">@carbon/colors</text>
+  <text x="38" y="80" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">$blue-60: #0f62fe</text>
+  <text x="38" y="96" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">$gray-100: #161616</text>
+  <text x="38" y="112" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">$spacing-05: 1.25rem</text>
+
+  <!-- Arrow 1→2 -->
+  <path d="M200,70 L240,70" stroke="var(--cds-blue-40)" stroke-width="2" fill="none" marker-end="url(#flow-arrow)"/>
+
+  <!-- Step 2: Theme maps -->
+  <rect x="250" y="20" width="200" height="100" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-teal-60)"/>
+  <text x="268" y="44" class="pkg-label" fill="var(--cds-teal-40)">2. Theme Maps</text>
+  <text x="268" y="64" class="pkg-desc" fill="var(--cds-text-secondary)">@carbon/themes</text>
+  <text x="268" y="80" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">$white: (</text>
+  <text x="268" y="94" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  background: #fff,</text>
+  <text x="268" y="108" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  text-primary: #161616)</text>
+
+  <!-- Arrow 2→3 -->
+  <path d="M450,70 L490,70" stroke="var(--cds-blue-40)" stroke-width="2" fill="none" marker-end="url(#flow-arrow)"/>
+
+  <!-- Step 3: Sass variables → CSS var() -->
+  <rect x="500" y="20" width="240" height="100" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-purple-60)"/>
+  <text x="518" y="44" class="pkg-label" fill="var(--cds-purple-40)">3. Sass → var()</text>
+  <text x="518" y="64" class="pkg-desc" fill="var(--cds-text-secondary)">@carbon/styles (token SCSS vars)</text>
+  <text x="518" y="80" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">$background:</text>
+  <text x="518" y="94" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  var(--cds-background, #fff)</text>
+  <text x="518" y="108" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-text-helper)">↑ CSS var ref with fallback</text>
+
+  <!-- Arrow 3→4 -->
+  <path d="M740,70 L780,70" stroke="var(--cds-blue-40)" stroke-width="2" fill="none" marker-end="url(#flow-arrow)"/>
+
+  <!-- Step 4: CSS custom properties -->
+  <rect x="790" y="20" width="280" height="100" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-orange-40)"/>
+  <text x="808" y="44" class="pkg-label" fill="var(--cds-orange-40)">4. Browser CSS</text>
+  <text x="808" y="64" class="pkg-desc" fill="var(--cds-text-secondary)">theme() mixin output on :root</text>
+  <text x="808" y="80" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">:root {</text>
+  <text x="808" y="94" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  --cds-background: #fff;</text>
+  <text x="808" y="108" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  --cds-text-primary: #161616; }</text>
+
+  <!-- Compile-time vs Runtime boundary -->
+  <line x1="765" y1="0" x2="765" y2="260" stroke="var(--cds-text-helper)" stroke-width="1" stroke-dasharray="8,4" opacity="0.4"/>
+  <text x="685" y="148" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-text-helper)" text-anchor="end">Compile-time (Sass)</text>
+  <text x="785" y="148" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-text-helper)">Runtime (CSS)</text>
+
+  <!-- Consumer usage -->
+  <rect x="250" y="160" width="460" height="80" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-blue-60)"/>
+  <text x="268" y="184" class="pkg-label" fill="var(--cds-blue-40)">Consumer Usage (Your SCSS)</text>
+  <text x="268" y="204" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">@use '@carbon/react/scss/theme' as theme;</text>
+  <text x="268" y="220" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">.my-class { color: theme.$text-primary; }</text>
+  <text x="268" y="236" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-text-helper)">// Compiles to → .my-class { color: var(--cds-text-primary, #161616); }</text>
+
+  <!-- Arrow from step 3 down to consumer -->
+  <path d="M620,120 L620,152" stroke="var(--cds-blue-40)" stroke-width="1.5" fill="none" marker-end="url(#flow-arrow)"/>
+
+  <!-- Arrow from consumer to step 4 -->
+  <path d="M710,200 L930,200 L930,128" stroke="var(--cds-orange-40)" stroke-width="1.5" fill="none" stroke-dasharray="4,3" opacity="0.5"/>
+  <text x="790" y="195" font-family="IBM Plex Mono" font-size="9" fill="var(--cds-text-helper)">resolves at runtime</text>
+</svg>
+
+<!-- ============================================================ -->
+<!--  SASS MODULE COMPOSITION                                     -->
+<!-- ============================================================ -->
+
+<h2 class="section-title">Sass Module Composition (@forward / @use)</h2>
+
+<svg viewBox="0 0 1100 300" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1100px;">
+  <defs>
+    <marker id="fwd-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="var(--cds-purple-40)" />
+    </marker>
+    <marker id="use-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="var(--cds-cyan-40)" />
+    </marker>
+  </defs>
+
+  <!-- @carbon/react/index.scss -->
+  <rect x="40" y="20" width="280" height="60" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-blue-60)"/>
+  <text x="58" y="44" class="pkg-label" fill="var(--cds-blue-40)">@carbon/react/index.scss</text>
+  <text x="58" y="60" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">@forward '@carbon/styles';</text>
+
+  <!-- Arrow down -->
+  <path d="M180,80 L180,108" stroke="var(--cds-purple-40)" stroke-width="2" fill="none" marker-end="url(#fwd-arrow)"/>
+  <text x="190" y="98" font-family="IBM Plex Mono" font-size="9" fill="var(--cds-purple-40)">@forward</text>
+
+  <!-- @carbon/styles/index.scss -->
+  <rect x="40" y="115" width="400" height="170" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-purple-60)"/>
+  <text x="58" y="140" class="pkg-label" fill="var(--cds-purple-40)">@carbon/styles/index.scss</text>
+
+  <text x="58" y="162" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-purple-40)">@forward</text>
+  <text x="133" y="162" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">'scss/config';</text>
+  <text x="58" y="178" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-purple-40)">@forward</text>
+  <text x="133" y="178" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">'scss/colors';</text>
+  <text x="270" y="178" font-family="IBM Plex Mono" font-size="9" fill="var(--cds-text-helper)">← @carbon/colors</text>
+  <text x="58" y="194" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-purple-40)">@forward</text>
+  <text x="133" y="194" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">'scss/spacing';</text>
+  <text x="270" y="194" font-family="IBM Plex Mono" font-size="9" fill="var(--cds-text-helper)">← @carbon/layout</text>
+  <text x="58" y="210" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-purple-40)">@forward</text>
+  <text x="133" y="210" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">'scss/motion';</text>
+  <text x="270" y="210" font-family="IBM Plex Mono" font-size="9" fill="var(--cds-text-helper)">← @carbon/motion</text>
+  <text x="58" y="226" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-purple-40)">@forward</text>
+  <text x="133" y="226" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">'scss/type';</text>
+  <text x="270" y="226" font-family="IBM Plex Mono" font-size="9" fill="var(--cds-text-helper)">← @carbon/type</text>
+  <text x="58" y="242" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-purple-40)">@forward</text>
+  <text x="133" y="242" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">'scss/themes';</text>
+  <text x="270" y="242" font-family="IBM Plex Mono" font-size="9" fill="var(--cds-text-helper)">← @carbon/themes</text>
+  <text x="58" y="258" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">@use</text>
+  <text x="92" y="258" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">'scss/reset';</text>
+  <text x="58" y="274" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">@use</text>
+  <text x="92" y="274" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">'scss/components';</text>
+  <text x="270" y="274" font-family="IBM Plex Mono" font-size="9" fill="var(--cds-text-helper)">← 100+ component .scss files</text>
+
+  <!-- Explanation box -->
+  <rect x="520" y="115" width="540" height="170" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-border-subtle)"/>
+  <text x="538" y="140" class="pkg-label" fill="var(--cds-text-primary)">Key Insight: @forward vs @use</text>
+
+  <text x="538" y="165" font-family="IBM Plex Mono" font-size="11" fill="var(--cds-purple-40)">@forward</text>
+  <text x="630" y="165" font-family="IBM Plex Sans" font-size="12" fill="var(--cds-text-secondary)">Re-exports members to downstream consumers.</text>
+  <text x="538" y="183" font-family="IBM Plex Sans" font-size="12" fill="var(--cds-text-secondary)">This is why you can import tokens from @carbon/react</text>
+  <text x="538" y="199" font-family="IBM Plex Sans" font-size="12" fill="var(--cds-text-secondary)">instead of each package individually.</text>
+
+  <text x="538" y="227" font-family="IBM Plex Mono" font-size="11" fill="var(--cds-cyan-40)">@use</text>
+  <text x="586" y="227" font-family="IBM Plex Sans" font-size="12" fill="var(--cds-text-secondary)">Loads a module privately (for internal use only).</text>
+  <text x="538" y="245" font-family="IBM Plex Sans" font-size="12" fill="var(--cds-text-secondary)">Reset and component styles are consumed but not</text>
+  <text x="538" y="261" font-family="IBM Plex Sans" font-size="12" fill="var(--cds-text-secondary)">re-exported — they emit CSS directly.</text>
+</svg>
+
+<!-- ============================================================ -->
+<!--  THEME SYSTEM DETAIL                                         -->
+<!-- ============================================================ -->
+
+<h2 class="section-title">Theme System</h2>
+
+<div class="info-grid">
+  <div class="info-card" style="border-left-color: var(--cds-teal-60);">
+    <h3 style="color: var(--cds-teal-40);">4 Built-in Themes</h3>
+    <ul>
+      <li><code>$white</code> — Light default (background: #ffffff)</li>
+      <li><code>$g10</code> — Light gray (background: #f4f4f4)</li>
+      <li><code>$g90</code> — Dark gray (background: #262626)</li>
+      <li><code>$g100</code> — Darkest (background: #161616)</li>
+    </ul>
+  </div>
+  <div class="info-card" style="border-left-color: var(--cds-purple-60);">
+    <h3 style="color: var(--cds-purple-40);">Compile-Time Theme Selection</h3>
+    <p>Set default theme via Sass <code>with</code> configuration:</p>
+    <p style="margin-top: 8px;"><code>@use '@carbon/themes' with ($theme: $g90);</code></p>
+    <p style="margin-top: 8px;">All SCSS variables get fallback values from the chosen theme.</p>
+  </div>
+  <div class="info-card" style="border-left-color: var(--cds-blue-60);">
+    <h3 style="color: var(--cds-blue-40);">Runtime Theme Switching (React)</h3>
+    <p>Carbon provides React components for runtime theming:</p>
+    <ul>
+      <li><code>&lt;GlobalTheme theme="g90"&gt;</code> — app-wide</li>
+      <li><code>&lt;Theme theme="g100"&gt;</code> — zoned sections</li>
+      <li><code>data-carbon-theme</code> — CSS attribute selector</li>
+    </ul>
+  </div>
+  <div class="info-card" style="border-left-color: var(--cds-green-60);">
+    <h3 style="color: var(--cds-green-40);">Token Categories (100+ tokens)</h3>
+    <ul>
+      <li><strong>Background:</strong> background, layer-01/02/03</li>
+      <li><strong>Text:</strong> text-primary, text-secondary, text-helper</li>
+      <li><strong>Interactive:</strong> interactive, focus, border-interactive</li>
+      <li><strong>Support:</strong> support-error, support-warning, support-success</li>
+      <li><strong>Field:</strong> field-01/02, border-subtle</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  FOUNDATION TOKEN DETAILS                                    -->
+<!-- ============================================================ -->
+
+<h2 class="section-title">Foundation Token Reference</h2>
+
+<div class="info-grid">
+  <div class="info-card" style="border-left-color: #0f62fe;">
+    <h3 style="color: var(--cds-blue-40);">Colors (@carbon/colors)</h3>
+    <p>IBM Design Language color palette. 12 hue families, each with 10 grades (10–100).</p>
+    <ul>
+      <li>blue, cyan, teal, green (cool)</li>
+      <li>yellow, orange (warm)</li>
+      <li>red, magenta, purple (vibrant)</li>
+      <li>gray, cool-gray, warm-gray (neutral)</li>
+      <li>+ black, white constants</li>
+    </ul>
+  </div>
+  <div class="info-card" style="border-left-color: var(--cds-green-60);">
+    <h3 style="color: var(--cds-green-40);">Layout (@carbon/layout)</h3>
+    <p>Spacing scale based on the 2x Grid (multiples of 8px mini-unit).</p>
+    <ul>
+      <li><code>$spacing-01</code>: 0.125rem (2px)</li>
+      <li><code>$spacing-03</code>: 0.5rem (8px)</li>
+      <li><code>$spacing-05</code>: 1rem (16px)</li>
+      <li><code>$spacing-07</code>: 2rem (32px)</li>
+      <li><code>$spacing-09</code>: 3rem (48px)</li>
+      <li><code>$spacing-13</code>: 10rem (160px)</li>
+    </ul>
+  </div>
+  <div class="info-card" style="border-left-color: var(--cds-magenta-60);">
+    <h3 style="color: var(--cds-magenta-40);">Motion (@carbon/motion)</h3>
+    <p>Two modes: <strong>productive</strong> (task-focused) and <strong>expressive</strong> (significant moments).</p>
+    <ul>
+      <li><strong>Easings:</strong> standard, entrance, exit</li>
+      <li><code>$duration-fast-01</code>: 70ms (micro)</li>
+      <li><code>$duration-fast-02</code>: 110ms (fade)</li>
+      <li><code>$duration-moderate-01</code>: 150ms (expand)</li>
+      <li><code>$duration-moderate-02</code>: 240ms (toast)</li>
+      <li><code>$duration-slow-01</code>: 400ms (large)</li>
+      <li><code>$duration-slow-02</code>: 700ms (background)</li>
+    </ul>
+  </div>
+  <div class="info-card" style="border-left-color: var(--cds-cyan-60);">
+    <h3 style="color: var(--cds-cyan-40);">Typography (@carbon/type)</h3>
+    <p>IBM Plex Sans font family with role-based type styles (not a numeric scale).</p>
+    <ul>
+      <li><code>heading-01</code>…<code>heading-07</code> (hierarchical)</li>
+      <li><code>body-01</code>, <code>body-02</code> (body text)</li>
+      <li><code>label-01</code>, <code>label-02</code> (form labels)</li>
+      <li><code>code-01</code>, <code>code-02</code> (monospace)</li>
+      <li><code>caption-01</code> (small text)</li>
+      <li>Each sets: size, weight, line-height, letter-spacing</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  GRID SYSTEM                                                 -->
+<!-- ============================================================ -->
+
+<h2 class="section-title">Grid System</h2>
+
+<svg viewBox="0 0 1100 200" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1100px;">
+  <!-- Background -->
+  <rect x="20" y="20" width="1060" height="160" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-border-subtle)"/>
+
+  <!-- Title -->
+  <text x="40" y="48" class="pkg-label" fill="var(--cds-teal-40)">16-Column CSS Grid (default in v11)</text>
+
+  <!-- Grid columns visualization -->
+  <!-- 16 columns -->
+  <g transform="translate(40, 60)">
+    <!-- Column rects -->
+    <rect x="0" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.3" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="64" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.3" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="128" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.3" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="192" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.3" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="256" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.15" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="320" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.15" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="384" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.15" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="448" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.15" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="512" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.1" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="576" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.1" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="640" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.1" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="704" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.1" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="768" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.1" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="832" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.1" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="896" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.1" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+    <rect x="960" y="0" width="58" height="40" rx="2" fill="var(--cds-blue-60)" opacity="0.1" stroke="var(--cds-blue-60)" stroke-width="0.5"/>
+
+    <!-- Breakpoint labels -->
+    <!-- sm: 4 cols -->
+    <rect x="0" y="48" width="250" height="20" rx="2" fill="var(--cds-green-60)" opacity="0.3"/>
+    <text x="8" y="62" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-green-40)">sm (320px) — 4 columns</text>
+
+    <!-- md: 8 cols -->
+    <rect x="0" y="72" width="506" height="20" rx="2" fill="var(--cds-teal-60)" opacity="0.3"/>
+    <text x="8" y="86" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-teal-40)">md (672px) — 8 columns</text>
+
+    <!-- lg: 16 cols -->
+    <rect x="0" y="96" width="1018" height="20" rx="2" fill="var(--cds-blue-60)" opacity="0.3"/>
+    <text x="8" y="110" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-blue-40)">lg (1056px) / xlg (1312px) / max (1584px) — 16 columns</text>
+  </g>
+</svg>
+
+<!-- ============================================================ -->
+<!--  COMPONENT ARCHITECTURE                                      -->
+<!-- ============================================================ -->
+
+<h2 class="section-title">Component Architecture: How @carbon/react Builds on Everything</h2>
+
+<svg viewBox="0 0 1100 360" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:1100px;">
+  <defs>
+    <marker id="comp-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="var(--cds-blue-40)" />
+    </marker>
+  </defs>
+
+  <!-- Your App -->
+  <rect x="350" y="10" width="400" height="50" rx="4" fill="var(--cds-layer-02)" stroke="var(--cds-blue-60)" stroke-width="2"/>
+  <text x="460" y="40" class="pkg-label" fill="var(--cds-blue-40)" font-size="14">Your React App</text>
+
+  <!-- Arrows down to two paths -->
+  <path d="M470,60 L270,95" stroke="var(--cds-blue-40)" stroke-width="1.5" fill="none" marker-end="url(#comp-arrow)"/>
+  <path d="M630,60 L830,95" stroke="var(--cds-purple-40)" stroke-width="1.5" fill="none" marker-end="url(#comp-arrow)"/>
+
+  <!-- Left path: JS imports -->
+  <rect x="120" y="100" width="300" height="100" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-blue-60)"/>
+  <text x="140" y="124" class="pkg-label" fill="var(--cds-blue-40)">JavaScript Imports</text>
+  <text x="140" y="148" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">import { Button, Modal,</text>
+  <text x="140" y="164" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  DataTable } from '@carbon/react';</text>
+  <text x="140" y="184" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">import { Add } from '@carbon/icons-react';</text>
+
+  <!-- Right path: SCSS imports -->
+  <rect x="680" y="100" width="380" height="100" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-purple-60)"/>
+  <text x="700" y="124" class="pkg-label" fill="var(--cds-purple-40)">SCSS Imports</text>
+  <text x="700" y="148" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">@use '@carbon/react';</text>
+  <text x="700" y="164" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-text-helper)">// or selectively:</text>
+  <text x="700" y="180" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">@use '@carbon/react/scss/components/button';</text>
+
+  <!-- Arrows down -->
+  <path d="M270,200 L270,235" stroke="var(--cds-blue-40)" stroke-width="1.5" fill="none" marker-end="url(#comp-arrow)"/>
+  <path d="M870,200 L870,235" stroke="var(--cds-purple-40)" stroke-width="1.5" fill="none" marker-end="url(#comp-arrow)"/>
+
+  <!-- What JS provides -->
+  <rect x="60" y="240" width="420" height="100" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-blue-60)"/>
+  <text x="80" y="264" class="pkg-label" fill="var(--cds-blue-40)">React Components Render:</text>
+  <text x="80" y="286" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">&lt;button class="cds--btn cds--btn--primary"&gt;</text>
+  <text x="80" y="302" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  &lt;svg class="cds--btn__icon"&gt;...&lt;/svg&gt;</text>
+  <text x="80" y="318" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  Click me</text>
+  <text x="80" y="334" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">&lt;/button&gt;</text>
+
+  <!-- What SCSS provides -->
+  <rect x="620" y="240" width="440" height="100" rx="4" fill="var(--cds-layer-01)" stroke="var(--cds-purple-60)"/>
+  <text x="640" y="264" class="pkg-label" fill="var(--cds-purple-40)">Compiled CSS Styles:</text>
+  <text x="640" y="286" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">.cds--btn { height: 3rem;</text>
+  <text x="640" y="302" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  padding: 0 var(--cds-spacing-05);</text>
+  <text x="640" y="318" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  color: var(--cds-text-on-color);</text>
+  <text x="640" y="334" font-family="IBM Plex Mono" font-size="10" fill="var(--cds-cyan-40)">  background: var(--cds-button-primary); }</text>
+
+  <!-- Connection line -->
+  <path d="M480,290 L612,290" stroke="var(--cds-text-helper)" stroke-width="1" fill="none" stroke-dasharray="6,4" opacity="0.5"/>
+  <text x="510" y="284" font-family="IBM Plex Mono" font-size="9" fill="var(--cds-text-helper)">class names</text>
+  <text x="518" y="296" font-family="IBM Plex Mono" font-size="9" fill="var(--cds-text-helper)">bind them</text>
+</svg>
+
+<!-- ============================================================ -->
+<!--  COMPLETE TOKEN REFERENCE                                    -->
+<!-- ============================================================ -->
+
+<h2 class="section-title">Complete Token Reference</h2>
+
+<div class="tab-container">
+  <div class="tab-buttons" id="tokenTabs">
+    <button class="tab-btn active" data-tab="tab-theme-tokens">Theme Tokens</button>
+    <button class="tab-btn" data-tab="tab-color-palette">Color Palette</button>
+    <button class="tab-btn" data-tab="tab-spacing">Spacing</button>
+    <button class="tab-btn" data-tab="tab-typography">Typography</button>
+    <button class="tab-btn" data-tab="tab-motion">Motion</button>
+    <button class="tab-btn" data-tab="tab-grid">Grid</button>
+    <button class="tab-btn" data-tab="tab-component">Component Tokens</button>
+  </div>
+
+  <!-- ==================== THEME TOKENS TAB ==================== -->
+  <div class="tab-panel active" id="tab-theme-tokens">
+    <p style="font-size:13px; color: var(--cds-text-helper); margin-bottom: 16px;">
+      153 semantic color tokens mapped to CSS custom properties (<code>--cds-{token}</code>). Values shown for <strong>$white</strong> theme.
+    </p>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Background (8 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$background</code></td><td class="tok-val">--cds-background</td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Page background</td></tr>
+      <tr><td><code class="tok-name">$background-hover</code></td><td class="tok-val">--cds-background-hover</td><td><span class="color-swatch" style="background:rgba(141,141,141,0.12)"></span><code class="tok-val">rgba(141,141,141,0.12)</code></td><td class="tok-desc">Hover state</td></tr>
+      <tr><td><code class="tok-name">$background-active</code></td><td class="tok-val">--cds-background-active</td><td><span class="color-swatch" style="background:rgba(141,141,141,0.5)"></span><code class="tok-val">rgba(141,141,141,0.5)</code></td><td class="tok-desc">Active/pressed state</td></tr>
+      <tr><td><code class="tok-name">$background-selected</code></td><td class="tok-val">--cds-background-selected</td><td><span class="color-swatch" style="background:rgba(141,141,141,0.2)"></span><code class="tok-val">rgba(141,141,141,0.2)</code></td><td class="tok-desc">Selected state</td></tr>
+      <tr><td><code class="tok-name">$background-selected-hover</code></td><td class="tok-val">--cds-background-selected-hover</td><td><span class="color-swatch" style="background:rgba(141,141,141,0.32)"></span><code class="tok-val">rgba(141,141,141,0.32)</code></td><td class="tok-desc">Selected + hover</td></tr>
+      <tr><td><code class="tok-name">$background-inverse</code></td><td class="tok-val">--cds-background-inverse</td><td><span class="color-swatch" style="background:#393939"></span><code class="tok-val">#393939</code></td><td class="tok-desc">Inverse background (tooltips)</td></tr>
+      <tr><td><code class="tok-name">$background-inverse-hover</code></td><td class="tok-val">--cds-background-inverse-hover</td><td><span class="color-swatch" style="background:#474747"></span><code class="tok-val">#474747</code></td><td class="tok-desc">Inverse hover</td></tr>
+      <tr><td><code class="tok-name">$background-brand</code></td><td class="tok-val">--cds-background-brand</td><td><span class="color-swatch" style="background:#0f62fe"></span><code class="tok-val">#0f62fe</code></td><td class="tok-desc">Brand color background</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Layer (20 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$layer-01</code></td><td class="tok-val">--cds-layer-01</td><td><span class="color-swatch" style="background:#f4f4f4"></span><code class="tok-val">#f4f4f4</code></td><td class="tok-desc">Primary container</td></tr>
+      <tr><td><code class="tok-name">$layer-hover-01</code></td><td class="tok-val">--cds-layer-hover-01</td><td><span class="color-swatch" style="background:#e8e8e8"></span><code class="tok-val">#e8e8e8</code></td><td class="tok-desc">Layer-01 hover</td></tr>
+      <tr><td><code class="tok-name">$layer-active-01</code></td><td class="tok-val">--cds-layer-active-01</td><td><span class="color-swatch" style="background:#c6c6c6"></span><code class="tok-val">#c6c6c6</code></td><td class="tok-desc">Layer-01 active</td></tr>
+      <tr><td><code class="tok-name">$layer-selected-01</code></td><td class="tok-val">--cds-layer-selected-01</td><td><span class="color-swatch" style="background:#e0e0e0"></span><code class="tok-val">#e0e0e0</code></td><td class="tok-desc">Layer-01 selected</td></tr>
+      <tr><td><code class="tok-name">$layer-selected-hover-01</code></td><td class="tok-val">--cds-layer-selected-hover-01</td><td><span class="color-swatch" style="background:#d1d1d1"></span><code class="tok-val">#d1d1d1</code></td><td class="tok-desc">Layer-01 selected hover</td></tr>
+      <tr><td><code class="tok-name">$layer-02</code></td><td class="tok-val">--cds-layer-02</td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Secondary container</td></tr>
+      <tr><td><code class="tok-name">$layer-hover-02</code></td><td class="tok-val">--cds-layer-hover-02</td><td><span class="color-swatch" style="background:#e8e8e8"></span><code class="tok-val">#e8e8e8</code></td><td class="tok-desc">Layer-02 hover</td></tr>
+      <tr><td><code class="tok-name">$layer-active-02</code></td><td class="tok-val">--cds-layer-active-02</td><td><span class="color-swatch" style="background:#c6c6c6"></span><code class="tok-val">#c6c6c6</code></td><td class="tok-desc">Layer-02 active</td></tr>
+      <tr><td><code class="tok-name">$layer-selected-02</code></td><td class="tok-val">--cds-layer-selected-02</td><td><span class="color-swatch" style="background:#e0e0e0"></span><code class="tok-val">#e0e0e0</code></td><td class="tok-desc">Layer-02 selected</td></tr>
+      <tr><td><code class="tok-name">$layer-selected-hover-02</code></td><td class="tok-val">--cds-layer-selected-hover-02</td><td><span class="color-swatch" style="background:#d1d1d1"></span><code class="tok-val">#d1d1d1</code></td><td class="tok-desc">Layer-02 selected hover</td></tr>
+      <tr><td><code class="tok-name">$layer-03</code></td><td class="tok-val">--cds-layer-03</td><td><span class="color-swatch" style="background:#f4f4f4"></span><code class="tok-val">#f4f4f4</code></td><td class="tok-desc">Tertiary container</td></tr>
+      <tr><td><code class="tok-name">$layer-hover-03</code></td><td class="tok-val">--cds-layer-hover-03</td><td><span class="color-swatch" style="background:#e8e8e8"></span><code class="tok-val">#e8e8e8</code></td><td class="tok-desc">Layer-03 hover</td></tr>
+      <tr><td><code class="tok-name">$layer-active-03</code></td><td class="tok-val">--cds-layer-active-03</td><td><span class="color-swatch" style="background:#c6c6c6"></span><code class="tok-val">#c6c6c6</code></td><td class="tok-desc">Layer-03 active</td></tr>
+      <tr><td><code class="tok-name">$layer-selected-03</code></td><td class="tok-val">--cds-layer-selected-03</td><td><span class="color-swatch" style="background:#e0e0e0"></span><code class="tok-val">#e0e0e0</code></td><td class="tok-desc">Layer-03 selected</td></tr>
+      <tr><td><code class="tok-name">$layer-selected-hover-03</code></td><td class="tok-val">--cds-layer-selected-hover-03</td><td><span class="color-swatch" style="background:#d1d1d1"></span><code class="tok-val">#d1d1d1</code></td><td class="tok-desc">Layer-03 selected hover</td></tr>
+      <tr><td><code class="tok-name">$layer-selected-inverse</code></td><td class="tok-val">--cds-layer-selected-inverse</td><td><span class="color-swatch" style="background:#161616"></span><code class="tok-val">#161616</code></td><td class="tok-desc">Inverse selected</td></tr>
+      <tr><td><code class="tok-name">$layer-selected-disabled</code></td><td class="tok-val">--cds-layer-selected-disabled</td><td><span class="color-swatch" style="background:#8d8d8d"></span><code class="tok-val">#8d8d8d</code></td><td class="tok-desc">Disabled selected</td></tr>
+      <tr><td><code class="tok-name">$layer-accent-01</code></td><td class="tok-val">--cds-layer-accent-01</td><td><span class="color-swatch" style="background:#e0e0e0"></span><code class="tok-val">#e0e0e0</code></td><td class="tok-desc">Accent layer-01</td></tr>
+      <tr><td><code class="tok-name">$layer-accent-02</code></td><td class="tok-val">--cds-layer-accent-02</td><td><span class="color-swatch" style="background:#e0e0e0"></span><code class="tok-val">#e0e0e0</code></td><td class="tok-desc">Accent layer-02</td></tr>
+      <tr><td><code class="tok-name">$layer-accent-03</code></td><td class="tok-val">--cds-layer-accent-03</td><td><span class="color-swatch" style="background:#e0e0e0"></span><code class="tok-val">#e0e0e0</code></td><td class="tok-desc">Accent layer-03</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Field (6 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$field-01</code></td><td class="tok-val">--cds-field-01</td><td><span class="color-swatch" style="background:#f4f4f4"></span><code class="tok-val">#f4f4f4</code></td><td class="tok-desc">Primary input field</td></tr>
+      <tr><td><code class="tok-name">$field-hover-01</code></td><td class="tok-val">--cds-field-hover-01</td><td><span class="color-swatch" style="background:#e8e8e8"></span><code class="tok-val">#e8e8e8</code></td><td class="tok-desc">Field-01 hover</td></tr>
+      <tr><td><code class="tok-name">$field-02</code></td><td class="tok-val">--cds-field-02</td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Secondary input field</td></tr>
+      <tr><td><code class="tok-name">$field-hover-02</code></td><td class="tok-val">--cds-field-hover-02</td><td><span class="color-swatch" style="background:#e8e8e8"></span><code class="tok-val">#e8e8e8</code></td><td class="tok-desc">Field-02 hover</td></tr>
+      <tr><td><code class="tok-name">$field-03</code></td><td class="tok-val">--cds-field-03</td><td><span class="color-swatch" style="background:#f4f4f4"></span><code class="tok-val">#f4f4f4</code></td><td class="tok-desc">Tertiary input field</td></tr>
+      <tr><td><code class="tok-name">$field-hover-03</code></td><td class="tok-val">--cds-field-hover-03</td><td><span class="color-swatch" style="background:#e8e8e8"></span><code class="tok-val">#e8e8e8</code></td><td class="tok-desc">Field-03 hover</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Border (14 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$border-subtle-00</code></td><td class="tok-val">--cds-border-subtle-00</td><td><span class="color-swatch" style="background:#e0e0e0"></span><code class="tok-val">#e0e0e0</code></td><td class="tok-desc">Subtle border (page level)</td></tr>
+      <tr><td><code class="tok-name">$border-subtle-01</code></td><td class="tok-val">--cds-border-subtle-01</td><td><span class="color-swatch" style="background:#c6c6c6"></span><code class="tok-val">#c6c6c6</code></td><td class="tok-desc">Subtle border on layer-01</td></tr>
+      <tr><td><code class="tok-name">$border-subtle-02</code></td><td class="tok-val">--cds-border-subtle-02</td><td><span class="color-swatch" style="background:#e0e0e0"></span><code class="tok-val">#e0e0e0</code></td><td class="tok-desc">Subtle border on layer-02</td></tr>
+      <tr><td><code class="tok-name">$border-subtle-03</code></td><td class="tok-val">--cds-border-subtle-03</td><td><span class="color-swatch" style="background:#c6c6c6"></span><code class="tok-val">#c6c6c6</code></td><td class="tok-desc">Subtle border on layer-03</td></tr>
+      <tr><td><code class="tok-name">$border-strong-01</code></td><td class="tok-val">--cds-border-strong-01</td><td><span class="color-swatch" style="background:#8d8d8d"></span><code class="tok-val">#8d8d8d</code></td><td class="tok-desc">Strong border on layer-01</td></tr>
+      <tr><td><code class="tok-name">$border-strong-02</code></td><td class="tok-val">--cds-border-strong-02</td><td><span class="color-swatch" style="background:#8d8d8d"></span><code class="tok-val">#8d8d8d</code></td><td class="tok-desc">Strong border on layer-02</td></tr>
+      <tr><td><code class="tok-name">$border-strong-03</code></td><td class="tok-val">--cds-border-strong-03</td><td><span class="color-swatch" style="background:#8d8d8d"></span><code class="tok-val">#8d8d8d</code></td><td class="tok-desc">Strong border on layer-03</td></tr>
+      <tr><td><code class="tok-name">$border-tile-01</code></td><td class="tok-val">--cds-border-tile-01</td><td><span class="color-swatch" style="background:#c6c6c6"></span><code class="tok-val">#c6c6c6</code></td><td class="tok-desc">Tile border</td></tr>
+      <tr><td><code class="tok-name">$border-tile-02</code></td><td class="tok-val">--cds-border-tile-02</td><td><span class="color-swatch" style="background:#a8a8a8"></span><code class="tok-val">#a8a8a8</code></td><td class="tok-desc">Tile border on layer-02</td></tr>
+      <tr><td><code class="tok-name">$border-tile-03</code></td><td class="tok-val">--cds-border-tile-03</td><td><span class="color-swatch" style="background:#c6c6c6"></span><code class="tok-val">#c6c6c6</code></td><td class="tok-desc">Tile border on layer-03</td></tr>
+      <tr><td><code class="tok-name">$border-inverse</code></td><td class="tok-val">--cds-border-inverse</td><td><span class="color-swatch" style="background:#161616"></span><code class="tok-val">#161616</code></td><td class="tok-desc">Inverse border</td></tr>
+      <tr><td><code class="tok-name">$border-interactive</code></td><td class="tok-val">--cds-border-interactive</td><td><span class="color-swatch" style="background:#0f62fe"></span><code class="tok-val">#0f62fe</code></td><td class="tok-desc">Interactive/focus border</td></tr>
+      <tr><td><code class="tok-name">$border-disabled</code></td><td class="tok-val">--cds-border-disabled</td><td><span class="color-swatch" style="background:#c6c6c6"></span><code class="tok-val">#c6c6c6</code></td><td class="tok-desc">Disabled border</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Text (10 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$text-primary</code></td><td class="tok-val">--cds-text-primary</td><td><span class="color-swatch" style="background:#161616"></span><code class="tok-val">#161616</code></td><td class="tok-desc">Primary body text</td></tr>
+      <tr><td><code class="tok-name">$text-secondary</code></td><td class="tok-val">--cds-text-secondary</td><td><span class="color-swatch" style="background:#525252"></span><code class="tok-val">#525252</code></td><td class="tok-desc">Secondary/supporting text</td></tr>
+      <tr><td><code class="tok-name">$text-placeholder</code></td><td class="tok-val">--cds-text-placeholder</td><td><span class="color-swatch" style="background:rgba(22,22,22,0.4)"></span><code class="tok-val">rgba(22,22,22,0.4)</code></td><td class="tok-desc">Placeholder text</td></tr>
+      <tr><td><code class="tok-name">$text-helper</code></td><td class="tok-val">--cds-text-helper</td><td><span class="color-swatch" style="background:#6f6f6f"></span><code class="tok-val">#6f6f6f</code></td><td class="tok-desc">Helper/hint text</td></tr>
+      <tr><td><code class="tok-name">$text-error</code></td><td class="tok-val">--cds-text-error</td><td><span class="color-swatch" style="background:#da1e28"></span><code class="tok-val">#da1e28</code></td><td class="tok-desc">Error message text</td></tr>
+      <tr><td><code class="tok-name">$text-inverse</code></td><td class="tok-val">--cds-text-inverse</td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Inverse (on dark) text</td></tr>
+      <tr><td><code class="tok-name">$text-on-color</code></td><td class="tok-val">--cds-text-on-color</td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Text on colored backgrounds</td></tr>
+      <tr><td><code class="tok-name">$text-on-color-disabled</code></td><td class="tok-val">--cds-text-on-color-disabled</td><td><span class="color-swatch" style="background:#8d8d8d"></span><code class="tok-val">#8d8d8d</code></td><td class="tok-desc">Disabled text on color</td></tr>
+      <tr><td><code class="tok-name">$text-disabled</code></td><td class="tok-val">--cds-text-disabled</td><td><span class="color-swatch" style="background:rgba(22,22,22,0.25)"></span><code class="tok-val">rgba(22,22,22,0.25)</code></td><td class="tok-desc">Disabled text</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Link (8 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$link-primary</code></td><td class="tok-val">--cds-link-primary</td><td><span class="color-swatch" style="background:#0f62fe"></span><code class="tok-val">#0f62fe</code></td><td class="tok-desc">Primary link</td></tr>
+      <tr><td><code class="tok-name">$link-primary-hover</code></td><td class="tok-val">--cds-link-primary-hover</td><td><span class="color-swatch" style="background:#0043ce"></span><code class="tok-val">#0043ce</code></td><td class="tok-desc">Primary link hover</td></tr>
+      <tr><td><code class="tok-name">$link-secondary</code></td><td class="tok-val">--cds-link-secondary</td><td><span class="color-swatch" style="background:#0043ce"></span><code class="tok-val">#0043ce</code></td><td class="tok-desc">Secondary link</td></tr>
+      <tr><td><code class="tok-name">$link-visited</code></td><td class="tok-val">--cds-link-visited</td><td><span class="color-swatch" style="background:#8a3ffc"></span><code class="tok-val">#8a3ffc</code></td><td class="tok-desc">Visited link</td></tr>
+      <tr><td><code class="tok-name">$link-inverse</code></td><td class="tok-val">--cds-link-inverse</td><td><span class="color-swatch" style="background:#78a9ff"></span><code class="tok-val">#78a9ff</code></td><td class="tok-desc">Inverse link</td></tr>
+      <tr><td><code class="tok-name">$link-inverse-hover</code></td><td class="tok-val">--cds-link-inverse-hover</td><td><span class="color-swatch" style="background:#a6c8ff"></span><code class="tok-val">#a6c8ff</code></td><td class="tok-desc">Inverse link hover</td></tr>
+      <tr><td><code class="tok-name">$link-inverse-active</code></td><td class="tok-val">--cds-link-inverse-active</td><td><span class="color-swatch" style="background:#f4f4f4"></span><code class="tok-val">#f4f4f4</code></td><td class="tok-desc">Inverse link active</td></tr>
+      <tr><td><code class="tok-name">$link-inverse-visited</code></td><td class="tok-val">--cds-link-inverse-visited</td><td><span class="color-swatch" style="background:#be95ff"></span><code class="tok-val">#be95ff</code></td><td class="tok-desc">Inverse visited link</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Icon (7 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$icon-primary</code></td><td class="tok-val">--cds-icon-primary</td><td><span class="color-swatch" style="background:#161616"></span><code class="tok-val">#161616</code></td><td class="tok-desc">Primary icons</td></tr>
+      <tr><td><code class="tok-name">$icon-secondary</code></td><td class="tok-val">--cds-icon-secondary</td><td><span class="color-swatch" style="background:#525252"></span><code class="tok-val">#525252</code></td><td class="tok-desc">Secondary icons</td></tr>
+      <tr><td><code class="tok-name">$icon-inverse</code></td><td class="tok-val">--cds-icon-inverse</td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Icons on dark backgrounds</td></tr>
+      <tr><td><code class="tok-name">$icon-on-color</code></td><td class="tok-val">--cds-icon-on-color</td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Icons on colored backgrounds</td></tr>
+      <tr><td><code class="tok-name">$icon-on-color-disabled</code></td><td class="tok-val">--cds-icon-on-color-disabled</td><td><span class="color-swatch" style="background:#8d8d8d"></span><code class="tok-val">#8d8d8d</code></td><td class="tok-desc">Disabled icons on color</td></tr>
+      <tr><td><code class="tok-name">$icon-disabled</code></td><td class="tok-val">--cds-icon-disabled</td><td><span class="color-swatch" style="background:rgba(22,22,22,0.25)"></span><code class="tok-val">rgba(22,22,22,0.25)</code></td><td class="tok-desc">Disabled icons</td></tr>
+      <tr><td><code class="tok-name">$icon-interactive</code></td><td class="tok-val">--cds-icon-interactive</td><td><span class="color-swatch" style="background:#0f62fe"></span><code class="tok-val">#0f62fe</code></td><td class="tok-desc">Interactive/clickable icons</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Support / Status (12 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$support-error</code></td><td class="tok-val">--cds-support-error</td><td><span class="color-swatch" style="background:#da1e28"></span><code class="tok-val">#da1e28</code></td><td class="tok-desc">Error state</td></tr>
+      <tr><td><code class="tok-name">$support-success</code></td><td class="tok-val">--cds-support-success</td><td><span class="color-swatch" style="background:#198038"></span><code class="tok-val">#198038</code></td><td class="tok-desc">Success state</td></tr>
+      <tr><td><code class="tok-name">$support-warning</code></td><td class="tok-val">--cds-support-warning</td><td><span class="color-swatch" style="background:#f1c21b"></span><code class="tok-val">#f1c21b</code></td><td class="tok-desc">Warning state</td></tr>
+      <tr><td><code class="tok-name">$support-info</code></td><td class="tok-val">--cds-support-info</td><td><span class="color-swatch" style="background:#0043ce"></span><code class="tok-val">#0043ce</code></td><td class="tok-desc">Informational state</td></tr>
+      <tr><td><code class="tok-name">$support-error-inverse</code></td><td class="tok-val">--cds-support-error-inverse</td><td><span class="color-swatch" style="background:#fa4d56"></span><code class="tok-val">#fa4d56</code></td><td class="tok-desc">Error on dark</td></tr>
+      <tr><td><code class="tok-name">$support-success-inverse</code></td><td class="tok-val">--cds-support-success-inverse</td><td><span class="color-swatch" style="background:#42be65"></span><code class="tok-val">#42be65</code></td><td class="tok-desc">Success on dark</td></tr>
+      <tr><td><code class="tok-name">$support-warning-inverse</code></td><td class="tok-val">--cds-support-warning-inverse</td><td><span class="color-swatch" style="background:#f1c21b"></span><code class="tok-val">#f1c21b</code></td><td class="tok-desc">Warning on dark</td></tr>
+      <tr><td><code class="tok-name">$support-info-inverse</code></td><td class="tok-val">--cds-support-info-inverse</td><td><span class="color-swatch" style="background:#4589ff"></span><code class="tok-val">#4589ff</code></td><td class="tok-desc">Info on dark</td></tr>
+      <tr><td><code class="tok-name">$support-caution-major</code></td><td class="tok-val">--cds-support-caution-major</td><td><span class="color-swatch" style="background:#ff832b"></span><code class="tok-val">#ff832b</code></td><td class="tok-desc">Major caution</td></tr>
+      <tr><td><code class="tok-name">$support-caution-minor</code></td><td class="tok-val">--cds-support-caution-minor</td><td><span class="color-swatch" style="background:#f1c21b"></span><code class="tok-val">#f1c21b</code></td><td class="tok-desc">Minor caution</td></tr>
+      <tr><td><code class="tok-name">$support-caution-undefined</code></td><td class="tok-val">--cds-support-caution-undefined</td><td><span class="color-swatch" style="background:#a56eff"></span><code class="tok-val">#a56eff</code></td><td class="tok-desc">Undefined caution</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Interactive / Focus / Misc (10 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$interactive</code></td><td class="tok-val">--cds-interactive</td><td><span class="color-swatch" style="background:#0f62fe"></span><code class="tok-val">#0f62fe</code></td><td class="tok-desc">Interactive elements</td></tr>
+      <tr><td><code class="tok-name">$focus</code></td><td class="tok-val">--cds-focus</td><td><span class="color-swatch" style="background:#0f62fe"></span><code class="tok-val">#0f62fe</code></td><td class="tok-desc">Focus ring outer</td></tr>
+      <tr><td><code class="tok-name">$focus-inset</code></td><td class="tok-val">--cds-focus-inset</td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Focus ring inner</td></tr>
+      <tr><td><code class="tok-name">$focus-inverse</code></td><td class="tok-val">--cds-focus-inverse</td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Inverse focus ring</td></tr>
+      <tr><td><code class="tok-name">$highlight</code></td><td class="tok-val">--cds-highlight</td><td><span class="color-swatch" style="background:#d0e2ff"></span><code class="tok-val">#d0e2ff</code></td><td class="tok-desc">Text highlight</td></tr>
+      <tr><td><code class="tok-name">$overlay</code></td><td class="tok-val">--cds-overlay</td><td><span class="color-swatch" style="background:rgba(22,22,22,0.5)"></span><code class="tok-val">rgba(22,22,22,0.5)</code></td><td class="tok-desc">Modal/overlay backdrop</td></tr>
+      <tr><td><code class="tok-name">$toggle-off</code></td><td class="tok-val">--cds-toggle-off</td><td><span class="color-swatch" style="background:#8d8d8d"></span><code class="tok-val">#8d8d8d</code></td><td class="tok-desc">Toggle off state</td></tr>
+      <tr><td><code class="tok-name">$shadow</code></td><td class="tok-val">--cds-shadow</td><td><span class="color-swatch" style="background:rgba(0,0,0,0.3)"></span><code class="tok-val">rgba(0,0,0,0.3)</code></td><td class="tok-desc">Drop shadows</td></tr>
+      <tr><td><code class="tok-name">$skeleton-background</code></td><td class="tok-val">--cds-skeleton-background</td><td><span class="color-swatch" style="background:#e8e8e8"></span><code class="tok-val">#e8e8e8</code></td><td class="tok-desc">Skeleton loading bg</td></tr>
+      <tr><td><code class="tok-name">$skeleton-element</code></td><td class="tok-val">--cds-skeleton-element</td><td><span class="color-swatch" style="background:#c6c6c6"></span><code class="tok-val">#c6c6c6</code></td><td class="tok-desc">Skeleton element</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-purple-40);">AI Tokens (18 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$ai-popover-background</code></td><td class="tok-val">--cds-ai-popover-background</td><td class="tok-desc">AI popover background</td></tr>
+      <tr><td><code class="tok-name">$ai-popover-shadow-outer-01</code></td><td class="tok-val">--cds-ai-popover-shadow-outer-01</td><td class="tok-desc">AI popover outer shadow</td></tr>
+      <tr><td><code class="tok-name">$ai-popover-shadow-outer-02</code></td><td class="tok-val">--cds-ai-popover-shadow-outer-02</td><td class="tok-desc">AI popover outer shadow 2</td></tr>
+      <tr><td><code class="tok-name">$ai-inner-shadow</code></td><td class="tok-val">--cds-ai-inner-shadow</td><td class="tok-desc">AI inner shadow</td></tr>
+      <tr><td><code class="tok-name">$ai-aura-start-sm</code></td><td class="tok-val">--cds-ai-aura-start-sm</td><td class="tok-desc">AI aura gradient start (small)</td></tr>
+      <tr><td><code class="tok-name">$ai-aura-start</code></td><td class="tok-val">--cds-ai-aura-start</td><td class="tok-desc">AI aura gradient start</td></tr>
+      <tr><td><code class="tok-name">$ai-aura-end</code></td><td class="tok-val">--cds-ai-aura-end</td><td class="tok-desc">AI aura gradient end</td></tr>
+      <tr><td><code class="tok-name">$ai-aura-hover-background</code></td><td class="tok-val">--cds-ai-aura-hover-background</td><td class="tok-desc">AI aura hover bg</td></tr>
+      <tr><td><code class="tok-name">$ai-aura-hover-start</code></td><td class="tok-val">--cds-ai-aura-hover-start</td><td class="tok-desc">AI aura hover gradient start</td></tr>
+      <tr><td><code class="tok-name">$ai-aura-hover-end</code></td><td class="tok-val">--cds-ai-aura-hover-end</td><td class="tok-desc">AI aura hover gradient end</td></tr>
+      <tr><td><code class="tok-name">$ai-border-strong</code></td><td class="tok-val">--cds-ai-border-strong</td><td class="tok-desc">AI strong border</td></tr>
+      <tr><td><code class="tok-name">$ai-border-start</code></td><td class="tok-val">--cds-ai-border-start</td><td class="tok-desc">AI border gradient start</td></tr>
+      <tr><td><code class="tok-name">$ai-border-end</code></td><td class="tok-val">--cds-ai-border-end</td><td class="tok-desc">AI border gradient end</td></tr>
+      <tr><td><code class="tok-name">$ai-drop-shadow</code></td><td class="tok-val">--cds-ai-drop-shadow</td><td class="tok-desc">AI drop shadow</td></tr>
+      <tr><td><code class="tok-name">$ai-overlay</code></td><td class="tok-val">--cds-ai-overlay</td><td class="tok-desc">AI overlay</td></tr>
+      <tr><td><code class="tok-name">$ai-skeleton-background</code></td><td class="tok-val">--cds-ai-skeleton-background</td><td class="tok-desc">AI skeleton bg</td></tr>
+      <tr><td><code class="tok-name">$ai-skeleton-element-background</code></td><td class="tok-val">--cds-ai-skeleton-element-background</td><td class="tok-desc">AI skeleton element</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-purple-40);">Chat Tokens (14 tokens)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>CSS Custom Property</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$chat-prompt-background</code></td><td class="tok-val">--cds-chat-prompt-background</td><td class="tok-desc">Chat prompt input bg</td></tr>
+      <tr><td><code class="tok-name">$chat-prompt-border-start</code></td><td class="tok-val">--cds-chat-prompt-border-start</td><td class="tok-desc">Prompt border gradient start</td></tr>
+      <tr><td><code class="tok-name">$chat-prompt-border-end</code></td><td class="tok-val">--cds-chat-prompt-border-end</td><td class="tok-desc">Prompt border gradient end</td></tr>
+      <tr><td><code class="tok-name">$chat-bubble-user</code></td><td class="tok-val">--cds-chat-bubble-user</td><td class="tok-desc">User chat bubble</td></tr>
+      <tr><td><code class="tok-name">$chat-bubble-agent</code></td><td class="tok-val">--cds-chat-bubble-agent</td><td class="tok-desc">Agent chat bubble</td></tr>
+      <tr><td><code class="tok-name">$chat-bubble-border</code></td><td class="tok-val">--cds-chat-bubble-border</td><td class="tok-desc">Chat bubble border</td></tr>
+      <tr><td><code class="tok-name">$chat-avatar-bot</code></td><td class="tok-val">--cds-chat-avatar-bot</td><td class="tok-desc">Bot avatar color</td></tr>
+      <tr><td><code class="tok-name">$chat-avatar-agent</code></td><td class="tok-val">--cds-chat-avatar-agent</td><td class="tok-desc">Agent avatar color</td></tr>
+      <tr><td><code class="tok-name">$chat-avatar-user</code></td><td class="tok-val">--cds-chat-avatar-user</td><td class="tok-desc">User avatar color</td></tr>
+      <tr><td><code class="tok-name">$chat-shell-background</code></td><td class="tok-val">--cds-chat-shell-background</td><td class="tok-desc">Chat shell bg</td></tr>
+      <tr><td><code class="tok-name">$chat-header-background</code></td><td class="tok-val">--cds-chat-header-background</td><td class="tok-desc">Chat header bg</td></tr>
+      <tr><td><code class="tok-name">$chat-button</code></td><td class="tok-val">--cds-chat-button</td><td class="tok-desc">Chat button</td></tr>
+      <tr><td><code class="tok-name">$chat-button-hover</code></td><td class="tok-val">--cds-chat-button-hover</td><td class="tok-desc">Chat button hover</td></tr>
+      <tr><td><code class="tok-name">$chat-button-active</code></td><td class="tok-val">--cds-chat-button-active</td><td class="tok-desc">Chat button active</td></tr>
+    </table>
+  </div>
+
+  <!-- ==================== COLOR PALETTE TAB ==================== -->
+  <div class="tab-panel" id="tab-color-palette">
+    <p style="font-size:13px; color: var(--cds-text-helper); margin-bottom: 16px;">
+      IBM Design Language color palette. 12 hue families &times; 10 grades (10&ndash;100) + hover variants. Total: 240+ color values.
+    </p>
+
+    <div class="color-palette-grid">
+      <!-- Blue -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#0f62fe; color:#fff;">Blue</div>
+        <div class="color-grade"><span class="swatch" style="background:#edf5ff"></span><span class="grade-num">10</span><span class="hex">#edf5ff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#d0e2ff"></span><span class="grade-num">20</span><span class="hex">#d0e2ff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#a6c8ff"></span><span class="grade-num">30</span><span class="hex">#a6c8ff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#78a9ff"></span><span class="grade-num">40</span><span class="hex">#78a9ff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#4589ff"></span><span class="grade-num">50</span><span class="hex">#4589ff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#0f62fe"></span><span class="grade-num">60</span><span class="hex">#0f62fe</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#0043ce"></span><span class="grade-num">70</span><span class="hex">#0043ce</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#002d9c"></span><span class="grade-num">80</span><span class="hex">#002d9c</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#001d6c"></span><span class="grade-num">90</span><span class="hex">#001d6c</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#001141"></span><span class="grade-num">100</span><span class="hex">#001141</span></div>
+      </div>
+      <!-- Cyan -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#0072c3; color:#fff;">Cyan</div>
+        <div class="color-grade"><span class="swatch" style="background:#e5f6ff"></span><span class="grade-num">10</span><span class="hex">#e5f6ff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#bae6ff"></span><span class="grade-num">20</span><span class="hex">#bae6ff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#82cfff"></span><span class="grade-num">30</span><span class="hex">#82cfff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#33b1ff"></span><span class="grade-num">40</span><span class="hex">#33b1ff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#1192e8"></span><span class="grade-num">50</span><span class="hex">#1192e8</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#0072c3"></span><span class="grade-num">60</span><span class="hex">#0072c3</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#00539a"></span><span class="grade-num">70</span><span class="hex">#00539a</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#003a6d"></span><span class="grade-num">80</span><span class="hex">#003a6d</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#012749"></span><span class="grade-num">90</span><span class="hex">#012749</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#061727"></span><span class="grade-num">100</span><span class="hex">#061727</span></div>
+      </div>
+      <!-- Teal -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#009d9a; color:#fff;">Teal</div>
+        <div class="color-grade"><span class="swatch" style="background:#d9fbfb"></span><span class="grade-num">10</span><span class="hex">#d9fbfb</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#9ef0f0"></span><span class="grade-num">20</span><span class="hex">#9ef0f0</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#3ddbd9"></span><span class="grade-num">30</span><span class="hex">#3ddbd9</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#08bdba"></span><span class="grade-num">40</span><span class="hex">#08bdba</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#009d9a"></span><span class="grade-num">50</span><span class="hex">#009d9a</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#007d79"></span><span class="grade-num">60</span><span class="hex">#007d79</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#005d5d"></span><span class="grade-num">70</span><span class="hex">#005d5d</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#004144"></span><span class="grade-num">80</span><span class="hex">#004144</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#022b30"></span><span class="grade-num">90</span><span class="hex">#022b30</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#081a1c"></span><span class="grade-num">100</span><span class="hex">#081a1c</span></div>
+      </div>
+      <!-- Green -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#198038; color:#fff;">Green</div>
+        <div class="color-grade"><span class="swatch" style="background:#defbe6"></span><span class="grade-num">10</span><span class="hex">#defbe6</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#a7f0ba"></span><span class="grade-num">20</span><span class="hex">#a7f0ba</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#6fdc8c"></span><span class="grade-num">30</span><span class="hex">#6fdc8c</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#42be65"></span><span class="grade-num">40</span><span class="hex">#42be65</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#24a148"></span><span class="grade-num">50</span><span class="hex">#24a148</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#198038"></span><span class="grade-num">60</span><span class="hex">#198038</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#0e6027"></span><span class="grade-num">70</span><span class="hex">#0e6027</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#044317"></span><span class="grade-num">80</span><span class="hex">#044317</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#022d0d"></span><span class="grade-num">90</span><span class="hex">#022d0d</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#071908"></span><span class="grade-num">100</span><span class="hex">#071908</span></div>
+      </div>
+      <!-- Red -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#da1e28; color:#fff;">Red</div>
+        <div class="color-grade"><span class="swatch" style="background:#fff1f1"></span><span class="grade-num">10</span><span class="hex">#fff1f1</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ffd7d9"></span><span class="grade-num">20</span><span class="hex">#ffd7d9</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ffb3b8"></span><span class="grade-num">30</span><span class="hex">#ffb3b8</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ff8389"></span><span class="grade-num">40</span><span class="hex">#ff8389</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#fa4d56"></span><span class="grade-num">50</span><span class="hex">#fa4d56</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#da1e28"></span><span class="grade-num">60</span><span class="hex">#da1e28</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#a2191f"></span><span class="grade-num">70</span><span class="hex">#a2191f</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#750e13"></span><span class="grade-num">80</span><span class="hex">#750e13</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#520408"></span><span class="grade-num">90</span><span class="hex">#520408</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#2d0709"></span><span class="grade-num">100</span><span class="hex">#2d0709</span></div>
+      </div>
+      <!-- Magenta -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#d02670; color:#fff;">Magenta</div>
+        <div class="color-grade"><span class="swatch" style="background:#fff0f7"></span><span class="grade-num">10</span><span class="hex">#fff0f7</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ffd6e8"></span><span class="grade-num">20</span><span class="hex">#ffd6e8</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ffafd2"></span><span class="grade-num">30</span><span class="hex">#ffafd2</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ff7eb6"></span><span class="grade-num">40</span><span class="hex">#ff7eb6</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ee5396"></span><span class="grade-num">50</span><span class="hex">#ee5396</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#d02670"></span><span class="grade-num">60</span><span class="hex">#d02670</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#9f1853"></span><span class="grade-num">70</span><span class="hex">#9f1853</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#740937"></span><span class="grade-num">80</span><span class="hex">#740937</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#510224"></span><span class="grade-num">90</span><span class="hex">#510224</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#2a0a18"></span><span class="grade-num">100</span><span class="hex">#2a0a18</span></div>
+      </div>
+      <!-- Purple -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#8a3ffc; color:#fff;">Purple</div>
+        <div class="color-grade"><span class="swatch" style="background:#f6f2ff"></span><span class="grade-num">10</span><span class="hex">#f6f2ff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#e8daff"></span><span class="grade-num">20</span><span class="hex">#e8daff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#d4bbff"></span><span class="grade-num">30</span><span class="hex">#d4bbff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#be95ff"></span><span class="grade-num">40</span><span class="hex">#be95ff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#a56eff"></span><span class="grade-num">50</span><span class="hex">#a56eff</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#8a3ffc"></span><span class="grade-num">60</span><span class="hex">#8a3ffc</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#6929c4"></span><span class="grade-num">70</span><span class="hex">#6929c4</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#491d8b"></span><span class="grade-num">80</span><span class="hex">#491d8b</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#31135e"></span><span class="grade-num">90</span><span class="hex">#31135e</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#1c0f30"></span><span class="grade-num">100</span><span class="hex">#1c0f30</span></div>
+      </div>
+      <!-- Orange -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#ba4e00; color:#fff;">Orange</div>
+        <div class="color-grade"><span class="swatch" style="background:#fff2e8"></span><span class="grade-num">10</span><span class="hex">#fff2e8</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ffd9be"></span><span class="grade-num">20</span><span class="hex">#ffd9be</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ffb784"></span><span class="grade-num">30</span><span class="hex">#ffb784</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ff832b"></span><span class="grade-num">40</span><span class="hex">#ff832b</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#eb6200"></span><span class="grade-num">50</span><span class="hex">#eb6200</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ba4e00"></span><span class="grade-num">60</span><span class="hex">#ba4e00</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#8a3800"></span><span class="grade-num">70</span><span class="hex">#8a3800</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#5e2900"></span><span class="grade-num">80</span><span class="hex">#5e2900</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#3e1a00"></span><span class="grade-num">90</span><span class="hex">#3e1a00</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#231000"></span><span class="grade-num">100</span><span class="hex">#231000</span></div>
+      </div>
+      <!-- Yellow -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#8e6a00; color:#fff;">Yellow</div>
+        <div class="color-grade"><span class="swatch" style="background:#fcf4d6"></span><span class="grade-num">10</span><span class="hex">#fcf4d6</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#fddc69"></span><span class="grade-num">20</span><span class="hex">#fddc69</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#f1c21b"></span><span class="grade-num">30</span><span class="hex">#f1c21b</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#d2a106"></span><span class="grade-num">40</span><span class="hex">#d2a106</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#b28600"></span><span class="grade-num">50</span><span class="hex">#b28600</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#8e6a00"></span><span class="grade-num">60</span><span class="hex">#8e6a00</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#684e00"></span><span class="grade-num">70</span><span class="hex">#684e00</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#483700"></span><span class="grade-num">80</span><span class="hex">#483700</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#302400"></span><span class="grade-num">90</span><span class="hex">#302400</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#1c1500"></span><span class="grade-num">100</span><span class="hex">#1c1500</span></div>
+      </div>
+      <!-- Gray -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#6f6f6f; color:#fff;">Gray</div>
+        <div class="color-grade"><span class="swatch" style="background:#f4f4f4"></span><span class="grade-num">10</span><span class="hex">#f4f4f4</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#e0e0e0"></span><span class="grade-num">20</span><span class="hex">#e0e0e0</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#c6c6c6"></span><span class="grade-num">30</span><span class="hex">#c6c6c6</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#a8a8a8"></span><span class="grade-num">40</span><span class="hex">#a8a8a8</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#8d8d8d"></span><span class="grade-num">50</span><span class="hex">#8d8d8d</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#6f6f6f"></span><span class="grade-num">60</span><span class="hex">#6f6f6f</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#525252"></span><span class="grade-num">70</span><span class="hex">#525252</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#393939"></span><span class="grade-num">80</span><span class="hex">#393939</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#262626"></span><span class="grade-num">90</span><span class="hex">#262626</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#161616"></span><span class="grade-num">100</span><span class="hex">#161616</span></div>
+      </div>
+      <!-- Cool Gray -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#697077; color:#fff;">Cool Gray</div>
+        <div class="color-grade"><span class="swatch" style="background:#f2f4f8"></span><span class="grade-num">10</span><span class="hex">#f2f4f8</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#dde1e6"></span><span class="grade-num">20</span><span class="hex">#dde1e6</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#c1c7cd"></span><span class="grade-num">30</span><span class="hex">#c1c7cd</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#a2a9b0"></span><span class="grade-num">40</span><span class="hex">#a2a9b0</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#878d96"></span><span class="grade-num">50</span><span class="hex">#878d96</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#697077"></span><span class="grade-num">60</span><span class="hex">#697077</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#4d5358"></span><span class="grade-num">70</span><span class="hex">#4d5358</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#343a3f"></span><span class="grade-num">80</span><span class="hex">#343a3f</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#21272a"></span><span class="grade-num">90</span><span class="hex">#21272a</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#121619"></span><span class="grade-num">100</span><span class="hex">#121619</span></div>
+      </div>
+      <!-- Warm Gray -->
+      <div class="color-family">
+        <div class="color-family-header" style="background:#726e6e; color:#fff;">Warm Gray</div>
+        <div class="color-grade"><span class="swatch" style="background:#f7f3f2"></span><span class="grade-num">10</span><span class="hex">#f7f3f2</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#e5e0df"></span><span class="grade-num">20</span><span class="hex">#e5e0df</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#cac5c4"></span><span class="grade-num">30</span><span class="hex">#cac5c4</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#ada8a8"></span><span class="grade-num">40</span><span class="hex">#ada8a8</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#8f8b8b"></span><span class="grade-num">50</span><span class="hex">#8f8b8b</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#726e6e"></span><span class="grade-num">60</span><span class="hex">#726e6e</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#565151"></span><span class="grade-num">70</span><span class="hex">#565151</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#3c3838"></span><span class="grade-num">80</span><span class="hex">#3c3838</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#272525"></span><span class="grade-num">90</span><span class="hex">#272525</span></div>
+        <div class="color-grade"><span class="swatch" style="background:#171414"></span><span class="grade-num">100</span><span class="hex">#171414</span></div>
+      </div>
+    </div>
+
+    <p class="token-group-label">Special</p>
+    <table class="token-table" style="max-width: 400px;">
+      <tr><td><span class="color-swatch" style="background:#000000"></span><code class="tok-name">black</code></td><td class="tok-val">#000000</td></tr>
+      <tr><td><span class="color-swatch" style="background:#ffffff; border-color: rgba(255,255,255,0.3)"></span><code class="tok-name">white</code></td><td class="tok-val">#ffffff</td></tr>
+    </table>
+  </div>
+
+  <!-- ==================== SPACING TAB ==================== -->
+  <div class="tab-panel" id="tab-spacing">
+    <p style="font-size:13px; color: var(--cds-text-helper); margin-bottom: 16px;">
+      Based on the 2x Grid system. All spacing uses rem units for scalability.
+    </p>
+
+    <p class="token-group-label" style="color: var(--cds-green-40);">Spacing Scale (13 tokens)</p>
+    <table class="token-table">
+      <tr><th>SCSS Variable</th><th>Value</th><th>px</th><th style="width: 40%;">Visual</th></tr>
+      <tr><td><code class="tok-name">$spacing-01</code></td><td class="tok-val">0.125rem</td><td class="tok-val">2px</td><td><div style="width:2px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-02</code></td><td class="tok-val">0.25rem</td><td class="tok-val">4px</td><td><div style="width:4px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-03</code></td><td class="tok-val">0.5rem</td><td class="tok-val">8px</td><td><div style="width:8px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-04</code></td><td class="tok-val">0.75rem</td><td class="tok-val">12px</td><td><div style="width:12px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-05</code></td><td class="tok-val">1rem</td><td class="tok-val">16px</td><td><div style="width:16px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-06</code></td><td class="tok-val">1.5rem</td><td class="tok-val">24px</td><td><div style="width:24px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-07</code></td><td class="tok-val">2rem</td><td class="tok-val">32px</td><td><div style="width:32px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-08</code></td><td class="tok-val">2.5rem</td><td class="tok-val">40px</td><td><div style="width:40px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-09</code></td><td class="tok-val">3rem</td><td class="tok-val">48px</td><td><div style="width:48px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-10</code></td><td class="tok-val">4rem</td><td class="tok-val">64px</td><td><div style="width:64px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-11</code></td><td class="tok-val">5rem</td><td class="tok-val">80px</td><td><div style="width:80px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-12</code></td><td class="tok-val">6rem</td><td class="tok-val">96px</td><td><div style="width:96px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+      <tr><td><code class="tok-name">$spacing-13</code></td><td class="tok-val">10rem</td><td class="tok-val">160px</td><td><div style="width:160px;height:12px;background:var(--cds-green-40);border-radius:1px;"></div></td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-green-40);">Container Sizes (5 tokens)</p>
+    <table class="token-table">
+      <tr><th>SCSS Variable</th><th>Value</th><th>px</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$container-01</code></td><td class="tok-val">1.5rem</td><td class="tok-val">24px</td><td class="tok-desc">XS container</td></tr>
+      <tr><td><code class="tok-name">$container-02</code></td><td class="tok-val">2rem</td><td class="tok-val">32px</td><td class="tok-desc">SM container</td></tr>
+      <tr><td><code class="tok-name">$container-03</code></td><td class="tok-val">2.5rem</td><td class="tok-val">40px</td><td class="tok-desc">MD container (default input height)</td></tr>
+      <tr><td><code class="tok-name">$container-04</code></td><td class="tok-val">3rem</td><td class="tok-val">48px</td><td class="tok-desc">LG container (default button height)</td></tr>
+      <tr><td><code class="tok-name">$container-05</code></td><td class="tok-val">4rem</td><td class="tok-val">64px</td><td class="tok-desc">XL container</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-green-40);">Fluid Spacing (4 tokens)</p>
+    <table class="token-table">
+      <tr><th>SCSS Variable</th><th>Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$fluid-spacing-01</code></td><td class="tok-val">0</td><td class="tok-desc">No fluid spacing</td></tr>
+      <tr><td><code class="tok-name">$fluid-spacing-02</code></td><td class="tok-val">2vw</td><td class="tok-desc">Small fluid</td></tr>
+      <tr><td><code class="tok-name">$fluid-spacing-03</code></td><td class="tok-val">5vw</td><td class="tok-desc">Medium fluid</td></tr>
+      <tr><td><code class="tok-name">$fluid-spacing-04</code></td><td class="tok-val">10vw</td><td class="tok-desc">Large fluid</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-green-40);">Icon Sizes (2 tokens)</p>
+    <table class="token-table">
+      <tr><th>SCSS Variable</th><th>Value</th><th>px</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$icon-size-01</code></td><td class="tok-val">1rem</td><td class="tok-val">16px</td><td class="tok-desc">Default icon size</td></tr>
+      <tr><td><code class="tok-name">$icon-size-02</code></td><td class="tok-val">1.25rem</td><td class="tok-val">20px</td><td class="tok-desc">Large icon size</td></tr>
+    </table>
+  </div>
+
+  <!-- ==================== TYPOGRAPHY TAB ==================== -->
+  <div class="tab-panel" id="tab-typography">
+    <p style="font-size:13px; color: var(--cds-text-helper); margin-bottom: 16px;">
+      Role-based type styles (not a numeric scale). Each token sets font-size, line-height, font-weight, and letter-spacing together.
+      Use via <code>@include type.type-style('heading-03')</code>.
+    </p>
+
+    <p class="token-group-label" style="color: var(--cds-cyan-40);">Utility Styles</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>Size</th><th>Weight</th><th>Line Height</th><th>Letter Spacing</th><th>Sample</th></tr>
+      <tr><td><code class="tok-name">caption-01</code></td><td class="tok-val">0.75rem / 12px</td><td class="tok-val">400</td><td class="tok-val">1.334</td><td class="tok-val">0.32px</td><td><span class="type-sample" style="font-size:12px;line-height:1.334;letter-spacing:0.32px;">Caption text</span></td></tr>
+      <tr><td><code class="tok-name">caption-02</code></td><td class="tok-val">0.875rem / 14px</td><td class="tok-val">400</td><td class="tok-val">1.286</td><td class="tok-val">0.32px</td><td><span class="type-sample" style="font-size:14px;line-height:1.286;letter-spacing:0.32px;">Caption text</span></td></tr>
+      <tr><td><code class="tok-name">label-01</code></td><td class="tok-val">0.75rem / 12px</td><td class="tok-val">400</td><td class="tok-val">1.334</td><td class="tok-val">0.32px</td><td><span class="type-sample" style="font-size:12px;line-height:1.334;letter-spacing:0.32px;">Label text</span></td></tr>
+      <tr><td><code class="tok-name">label-02</code></td><td class="tok-val">0.875rem / 14px</td><td class="tok-val">400</td><td class="tok-val">1.286</td><td class="tok-val">0.16px</td><td><span class="type-sample" style="font-size:14px;line-height:1.286;letter-spacing:0.16px;">Label text</span></td></tr>
+      <tr><td><code class="tok-name">helper-text-01</code></td><td class="tok-val">0.75rem / 12px</td><td class="tok-val">400</td><td class="tok-val">1.334</td><td class="tok-val">0.32px</td><td><span class="type-sample" style="font-size:12px;line-height:1.334;letter-spacing:0.32px;">Helper text</span></td></tr>
+      <tr><td><code class="tok-name">helper-text-02</code></td><td class="tok-val">0.875rem / 14px</td><td class="tok-val">400</td><td class="tok-val">1.286</td><td class="tok-val">0.16px</td><td><span class="type-sample" style="font-size:14px;line-height:1.286;letter-spacing:0.16px;">Helper text</span></td></tr>
+      <tr><td><code class="tok-name">legal-01</code></td><td class="tok-val">0.75rem / 12px</td><td class="tok-val">400</td><td class="tok-val">1.334</td><td class="tok-val">0.32px</td><td><span class="type-sample" style="font-size:12px;line-height:1.334;letter-spacing:0.32px;">Legal text</span></td></tr>
+      <tr><td><code class="tok-name">legal-02</code></td><td class="tok-val">0.875rem / 14px</td><td class="tok-val">400</td><td class="tok-val">1.286</td><td class="tok-val">0.16px</td><td><span class="type-sample" style="font-size:14px;line-height:1.286;letter-spacing:0.16px;">Legal text</span></td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-cyan-40);">Body Styles</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>Size</th><th>Weight</th><th>Line Height</th><th>Letter Spacing</th><th>Sample</th></tr>
+      <tr><td><code class="tok-name">body-compact-01</code></td><td class="tok-val">0.875rem / 14px</td><td class="tok-val">400</td><td class="tok-val">1.286</td><td class="tok-val">0.16px</td><td><span class="type-sample" style="font-size:14px;line-height:1.286;letter-spacing:0.16px;">Body compact</span></td></tr>
+      <tr><td><code class="tok-name">body-compact-02</code></td><td class="tok-val">1rem / 16px</td><td class="tok-val">400</td><td class="tok-val">1.375</td><td class="tok-val">0</td><td><span class="type-sample" style="font-size:16px;line-height:1.375;">Body compact</span></td></tr>
+      <tr><td><code class="tok-name">body-01</code></td><td class="tok-val">0.875rem / 14px</td><td class="tok-val">400</td><td class="tok-val">1.429</td><td class="tok-val">0.16px</td><td><span class="type-sample" style="font-size:14px;line-height:1.429;letter-spacing:0.16px;">Body text with comfortable line height</span></td></tr>
+      <tr><td><code class="tok-name">body-02</code></td><td class="tok-val">1rem / 16px</td><td class="tok-val">400</td><td class="tok-val">1.5</td><td class="tok-val">0</td><td><span class="type-sample" style="font-size:16px;line-height:1.5;">Body text with comfortable line height</span></td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-cyan-40);">Code Styles</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>Size</th><th>Weight</th><th>Line Height</th><th>Font</th><th>Sample</th></tr>
+      <tr><td><code class="tok-name">code-01</code></td><td class="tok-val">0.75rem / 12px</td><td class="tok-val">400</td><td class="tok-val">1.334</td><td class="tok-val">IBM Plex Mono</td><td><span class="type-sample" style="font-family:'IBM Plex Mono',monospace;font-size:12px;">const x = 42;</span></td></tr>
+      <tr><td><code class="tok-name">code-02</code></td><td class="tok-val">0.875rem / 14px</td><td class="tok-val">400</td><td class="tok-val">1.429</td><td class="tok-val">IBM Plex Mono</td><td><span class="type-sample" style="font-family:'IBM Plex Mono',monospace;font-size:14px;">const x = 42;</span></td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-cyan-40);">Heading Styles (Fixed)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>Size</th><th>Weight</th><th>Line Height</th><th>Sample</th></tr>
+      <tr><td><code class="tok-name">heading-compact-01</code></td><td class="tok-val">0.875rem / 14px</td><td class="tok-val">600</td><td class="tok-val">1.286</td><td><span class="type-sample" style="font-size:14px;font-weight:600;line-height:1.286;">Heading Compact</span></td></tr>
+      <tr><td><code class="tok-name">heading-compact-02</code></td><td class="tok-val">1rem / 16px</td><td class="tok-val">600</td><td class="tok-val">1.375</td><td><span class="type-sample" style="font-size:16px;font-weight:600;line-height:1.375;">Heading Compact</span></td></tr>
+      <tr><td><code class="tok-name">heading-01</code></td><td class="tok-val">0.875rem / 14px</td><td class="tok-val">600</td><td class="tok-val">1.429</td><td><span class="type-sample" style="font-size:14px;font-weight:600;line-height:1.429;">Heading 01</span></td></tr>
+      <tr><td><code class="tok-name">heading-02</code></td><td class="tok-val">1rem / 16px</td><td class="tok-val">600</td><td class="tok-val">1.5</td><td><span class="type-sample" style="font-size:16px;font-weight:600;line-height:1.5;">Heading 02</span></td></tr>
+      <tr><td><code class="tok-name">heading-03</code></td><td class="tok-val">1.25rem / 20px</td><td class="tok-val">400</td><td class="tok-val">1.4</td><td><span class="type-sample" style="font-size:20px;line-height:1.4;">Heading 03</span></td></tr>
+      <tr><td><code class="tok-name">heading-04</code></td><td class="tok-val">1.75rem / 28px</td><td class="tok-val">400</td><td class="tok-val">1.286</td><td><span class="type-sample" style="font-size:28px;line-height:1.286;">Heading 04</span></td></tr>
+      <tr><td><code class="tok-name">heading-05</code></td><td class="tok-val">2rem / 32px</td><td class="tok-val">400</td><td class="tok-val">1.25</td><td><span class="type-sample" style="font-size:32px;line-height:1.25;">Heading 05</span></td></tr>
+      <tr><td><code class="tok-name">heading-06</code></td><td class="tok-val">2.625rem / 42px</td><td class="tok-val">300</td><td class="tok-val">1.199</td><td><span class="type-sample" style="font-size:42px;font-weight:300;line-height:1.199;">Heading 06</span></td></tr>
+      <tr><td><code class="tok-name">heading-07</code></td><td class="tok-val">3.375rem / 54px</td><td class="tok-val">300</td><td class="tok-val">1.199</td><td><span class="type-sample" style="font-size:48px;font-weight:300;line-height:1.199;">Heading 07</span></td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-cyan-40);">Fluid / Expressive Styles (scale with viewport)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>sm Size</th><th>max Size</th><th>Weight</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">fluid-heading-03</code></td><td class="tok-val">1.25rem / 20px</td><td class="tok-val">1.5rem / 24px</td><td class="tok-val">400</td><td class="tok-desc">Expressive heading small</td></tr>
+      <tr><td><code class="tok-name">fluid-heading-04</code></td><td class="tok-val">1.75rem / 28px</td><td class="tok-val">2rem / 32px</td><td class="tok-val">400</td><td class="tok-desc">Expressive heading medium</td></tr>
+      <tr><td><code class="tok-name">fluid-heading-05</code></td><td class="tok-val">2rem / 32px</td><td class="tok-val">3.375rem / 54px</td><td class="tok-val">300</td><td class="tok-desc">Expressive heading large</td></tr>
+      <tr><td><code class="tok-name">fluid-heading-06</code></td><td class="tok-val">2rem / 32px</td><td class="tok-val">3.375rem / 54px</td><td class="tok-val">600</td><td class="tok-desc">Expressive heading large (bold)</td></tr>
+      <tr><td><code class="tok-name">fluid-paragraph-01</code></td><td class="tok-val">1.5rem / 24px</td><td class="tok-val">2rem / 32px</td><td class="tok-val">300</td><td class="tok-desc">Expressive paragraph</td></tr>
+      <tr><td><code class="tok-name">fluid-quotation-01</code></td><td class="tok-val">1.25rem / 20px</td><td class="tok-val">2rem / 32px</td><td class="tok-val">400</td><td class="tok-desc">Pull quote (Plex Serif)</td></tr>
+      <tr><td><code class="tok-name">fluid-quotation-02</code></td><td class="tok-val">2rem / 32px</td><td class="tok-val">3.375rem / 54px</td><td class="tok-val">300</td><td class="tok-desc">Large pull quote (Plex Serif)</td></tr>
+      <tr><td><code class="tok-name">fluid-display-01</code></td><td class="tok-val">2.625rem / 42px</td><td class="tok-val">4.75rem / 76px</td><td class="tok-val">300</td><td class="tok-desc">Display light</td></tr>
+      <tr><td><code class="tok-name">fluid-display-02</code></td><td class="tok-val">2.625rem / 42px</td><td class="tok-val">4.75rem / 76px</td><td class="tok-val">600</td><td class="tok-desc">Display semibold</td></tr>
+      <tr><td><code class="tok-name">fluid-display-03</code></td><td class="tok-val">2.625rem / 42px</td><td class="tok-val">5.25rem / 84px</td><td class="tok-val">300</td><td class="tok-desc">Display large light</td></tr>
+      <tr><td><code class="tok-name">fluid-display-04</code></td><td class="tok-val">2.625rem / 42px</td><td class="tok-val">7rem / 112px</td><td class="tok-val">300</td><td class="tok-desc">Display extra large</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-cyan-40);">Font Families</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>Stack</th></tr>
+      <tr><td><code class="tok-name">$font-family-sans</code></td><td class="tok-val">'IBM Plex Sans', system-ui, -apple-system, sans-serif</td></tr>
+      <tr><td><code class="tok-name">$font-family-sans-condensed</code></td><td class="tok-val">'IBM Plex Sans Condensed', Helvetica Neue, Arial, sans-serif</td></tr>
+      <tr><td><code class="tok-name">$font-family-serif</code></td><td class="tok-val">'IBM Plex Serif', Georgia, Times, serif</td></tr>
+      <tr><td><code class="tok-name">$font-family-mono</code></td><td class="tok-val">'IBM Plex Mono', Menlo, DejaVu Sans Mono, monospace</td></tr>
+      <tr><td><code class="tok-name">$font-family-sans-hebrew</code></td><td class="tok-val">'IBM Plex Sans Hebrew', Helvetica Hebrew, Arial Hebrew, sans-serif</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-cyan-40);">Font Weights</p>
+    <table class="token-table" style="max-width: 400px;">
+      <tr><td><code class="tok-name">$font-weight-light</code></td><td class="tok-val">300</td><td><span style="font-weight:300;">Light sample</span></td></tr>
+      <tr><td><code class="tok-name">$font-weight-regular</code></td><td class="tok-val">400</td><td><span style="font-weight:400;">Regular sample</span></td></tr>
+      <tr><td><code class="tok-name">$font-weight-semibold</code></td><td class="tok-val">600</td><td><span style="font-weight:600;">Semibold sample</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ==================== MOTION TAB ==================== -->
+  <div class="tab-panel" id="tab-motion">
+    <p style="font-size:13px; color: var(--cds-text-helper); margin-bottom: 16px;">
+      Two motion modes: <strong>productive</strong> (task-focused, subtle) and <strong>expressive</strong> (significant moments, enthusiastic).
+    </p>
+
+    <p class="token-group-label" style="color: var(--cds-magenta-40);">Duration Tokens (6)</p>
+    <table class="token-table">
+      <tr><th>SCSS Variable</th><th>Value</th><th style="width:30%;">Visual</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$duration-fast-01</code></td><td class="tok-val">70ms</td><td><div style="width:14px;height:12px;background:var(--cds-magenta-40);border-radius:1px;"></div></td><td class="tok-desc">Micro — button, toggle</td></tr>
+      <tr><td><code class="tok-name">$duration-fast-02</code></td><td class="tok-val">110ms</td><td><div style="width:22px;height:12px;background:var(--cds-magenta-40);border-radius:1px;"></div></td><td class="tok-desc">Fade</td></tr>
+      <tr><td><code class="tok-name">$duration-moderate-01</code></td><td class="tok-val">150ms</td><td><div style="width:30px;height:12px;background:var(--cds-magenta-40);border-radius:1px;"></div></td><td class="tok-desc">Small expansion, short moves</td></tr>
+      <tr><td><code class="tok-name">$duration-moderate-02</code></td><td class="tok-val">240ms</td><td><div style="width:48px;height:12px;background:var(--cds-magenta-40);border-radius:1px;"></div></td><td class="tok-desc">Expansion, toast notification</td></tr>
+      <tr><td><code class="tok-name">$duration-slow-01</code></td><td class="tok-val">400ms</td><td><div style="width:80px;height:12px;background:var(--cds-magenta-40);border-radius:1px;"></div></td><td class="tok-desc">Large expansion, important transitions</td></tr>
+      <tr><td><code class="tok-name">$duration-slow-02</code></td><td class="tok-val">700ms</td><td><div style="width:140px;height:12px;background:var(--cds-magenta-40);border-radius:1px;"></div></td><td class="tok-desc">Background dimming</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-magenta-40);">Easing Curves (6 = 3 types &times; 2 modes)</p>
+    <table class="token-table">
+      <tr><th>Type</th><th>Mode</th><th>Cubic Bezier</th><th>Usage</th></tr>
+      <tr>
+        <td rowspan="2"><code class="tok-name">standard</code></td>
+        <td class="tok-val">productive</td>
+        <td><code class="tok-val">cubic-bezier(0.2, 0, 0.38, 0.9)</code></td>
+        <td class="tok-desc">Default — element moves from one position to another</td>
+      </tr>
+      <tr>
+        <td class="tok-val">expressive</td>
+        <td><code class="tok-val">cubic-bezier(0.4, 0.14, 0.3, 1)</code></td>
+        <td class="tok-desc">Significant repositioning</td>
+      </tr>
+      <tr>
+        <td rowspan="2"><code class="tok-name">entrance</code></td>
+        <td class="tok-val">productive</td>
+        <td><code class="tok-val">cubic-bezier(0, 0, 0.38, 0.9)</code></td>
+        <td class="tok-desc">Element enters the screen</td>
+      </tr>
+      <tr>
+        <td class="tok-val">expressive</td>
+        <td><code class="tok-val">cubic-bezier(0, 0, 0.3, 1)</code></td>
+        <td class="tok-desc">Significant entrance</td>
+      </tr>
+      <tr>
+        <td rowspan="2"><code class="tok-name">exit</code></td>
+        <td class="tok-val">productive</td>
+        <td><code class="tok-val">cubic-bezier(0.2, 0, 1, 0.9)</code></td>
+        <td class="tok-desc">Element leaves the screen</td>
+      </tr>
+      <tr>
+        <td class="tok-val">expressive</td>
+        <td><code class="tok-val">cubic-bezier(0.4, 0.14, 1, 1)</code></td>
+        <td class="tok-desc">Significant exit</td>
+      </tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-magenta-40);">SCSS Usage</p>
+    <div style="background:var(--cds-layer-01); padding:16px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cds-cyan-40); line-height:1.6;">
+      @use '@carbon/react/scss/motion' as *;<br><br>
+      .my-element {<br>
+      &nbsp;&nbsp;<span style="color:var(--cds-text-helper)">// Duration + easing together:</span><br>
+      &nbsp;&nbsp;transition: transform <span style="color:var(--cds-magenta-40)">$duration-fast-02</span> <span style="color:var(--cds-magenta-40)">motion(standard, productive)</span>;<br><br>
+      &nbsp;&nbsp;<span style="color:var(--cds-text-helper)">// Or just the timing function:</span><br>
+      &nbsp;&nbsp;@include <span style="color:var(--cds-magenta-40)">motion(entrance, expressive)</span>;<br>
+      }
+    </div>
+  </div>
+
+  <!-- ==================== GRID TAB ==================== -->
+  <div class="tab-panel" id="tab-grid">
+    <p style="font-size:13px; color: var(--cds-text-helper); margin-bottom: 16px;">
+      16-column CSS Grid (default in v11). Based on the IBM 2x Grid.
+    </p>
+
+    <p class="token-group-label" style="color: var(--cds-teal-40);">Breakpoints (5)</p>
+    <table class="token-table">
+      <tr><th>Breakpoint</th><th>Min Width</th><th>Columns</th><th>Margin</th><th>Gutter (Wide)</th></tr>
+      <tr><td><code class="tok-name">sm</code></td><td class="tok-val">320px (20rem)</td><td class="tok-val">4</td><td class="tok-val">0</td><td class="tok-val">32px</td></tr>
+      <tr><td><code class="tok-name">md</code></td><td class="tok-val">672px (42rem)</td><td class="tok-val">8</td><td class="tok-val">16px</td><td class="tok-val">32px</td></tr>
+      <tr><td><code class="tok-name">lg</code></td><td class="tok-val">1056px (66rem)</td><td class="tok-val">16</td><td class="tok-val">16px</td><td class="tok-val">32px</td></tr>
+      <tr><td><code class="tok-name">xlg</code></td><td class="tok-val">1312px (82rem)</td><td class="tok-val">16</td><td class="tok-val">16px</td><td class="tok-val">32px</td></tr>
+      <tr><td><code class="tok-name">max</code></td><td class="tok-val">1584px (99rem)</td><td class="tok-val">16</td><td class="tok-val">24px</td><td class="tok-val">32px</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-teal-40);">Gutter Modes</p>
+    <table class="token-table">
+      <tr><th>Mode</th><th>Gutter Width</th><th>CSS Class / Prop</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">wide</code></td><td class="tok-val">32px</td><td class="tok-val">default</td><td class="tok-desc">Standard layout (default)</td></tr>
+      <tr><td><code class="tok-name">narrow</code></td><td class="tok-val">16px</td><td class="tok-val">narrow prop / .cds--css-grid--narrow</td><td class="tok-desc">Compact layout, hanging content</td></tr>
+      <tr><td><code class="tok-name">condensed</code></td><td class="tok-val">2px</td><td class="tok-val">condensed prop / .cds--css-grid--condensed</td><td class="tok-desc">Data tables, tight layouts</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-teal-40);">SCSS Breakpoint Mixins</p>
+    <div style="background:var(--cds-layer-01); padding:16px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cds-cyan-40); line-height:1.6;">
+      @use '@carbon/react/scss/breakpoint' as *;<br><br>
+      .my-element {<br>
+      &nbsp;&nbsp;@include <span style="color:var(--cds-teal-40)">breakpoint(md)</span> { <span style="color:var(--cds-text-helper)">/* 672px+ */</span> }<br>
+      &nbsp;&nbsp;@include <span style="color:var(--cds-teal-40)">breakpoint(lg)</span> { <span style="color:var(--cds-text-helper)">/* 1056px+ */</span> }<br>
+      &nbsp;&nbsp;@include <span style="color:var(--cds-teal-40)">breakpoint-down(md)</span> { <span style="color:var(--cds-text-helper)">/* below 672px */</span> }<br>
+      &nbsp;&nbsp;@include <span style="color:var(--cds-teal-40)">breakpoint-between(sm, lg)</span> { <span style="color:var(--cds-text-helper)">/* 320px–1056px */</span> }<br>
+      }
+    </div>
+  </div>
+
+  <!-- ==================== COMPONENT TOKENS TAB ==================== -->
+  <div class="tab-panel" id="tab-component">
+    <p style="font-size:13px; color: var(--cds-text-helper); margin-bottom: 16px;">
+      Component-specific tokens override theme tokens for individual components. Defined per-theme in <code>@carbon/themes/scss/generated/</code>.
+    </p>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Button Tokens (10)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$button-primary</code></td><td><span class="color-swatch" style="background:#0f62fe"></span><code class="tok-val">#0f62fe</code></td><td class="tok-desc">Primary button background</td></tr>
+      <tr><td><code class="tok-name">$button-primary-hover</code></td><td><span class="color-swatch" style="background:#0050e6"></span><code class="tok-val">#0050e6</code></td><td class="tok-desc">Primary hover</td></tr>
+      <tr><td><code class="tok-name">$button-primary-active</code></td><td><span class="color-swatch" style="background:#002d9c"></span><code class="tok-val">#002d9c</code></td><td class="tok-desc">Primary active/pressed</td></tr>
+      <tr><td><code class="tok-name">$button-secondary</code></td><td><span class="color-swatch" style="background:#393939"></span><code class="tok-val">#393939</code></td><td class="tok-desc">Secondary button background</td></tr>
+      <tr><td><code class="tok-name">$button-secondary-hover</code></td><td><span class="color-swatch" style="background:#474747"></span><code class="tok-val">#474747</code></td><td class="tok-desc">Secondary hover</td></tr>
+      <tr><td><code class="tok-name">$button-secondary-active</code></td><td><span class="color-swatch" style="background:#6f6f6f"></span><code class="tok-val">#6f6f6f</code></td><td class="tok-desc">Secondary active</td></tr>
+      <tr><td><code class="tok-name">$button-tertiary</code></td><td><span class="color-swatch" style="background:#0f62fe"></span><code class="tok-val">#0f62fe</code></td><td class="tok-desc">Tertiary button (text/border)</td></tr>
+      <tr><td><code class="tok-name">$button-tertiary-hover</code></td><td><span class="color-swatch" style="background:#0050e6"></span><code class="tok-val">#0050e6</code></td><td class="tok-desc">Tertiary hover</td></tr>
+      <tr><td><code class="tok-name">$button-tertiary-active</code></td><td><span class="color-swatch" style="background:#002d9c"></span><code class="tok-val">#002d9c</code></td><td class="tok-desc">Tertiary active</td></tr>
+      <tr><td><code class="tok-name">$button-danger-primary</code></td><td><span class="color-swatch" style="background:#da1e28"></span><code class="tok-val">#da1e28</code></td><td class="tok-desc">Danger button background</td></tr>
+      <tr><td><code class="tok-name">$button-danger-secondary</code></td><td><span class="color-swatch" style="background:#da1e28"></span><code class="tok-val">#da1e28</code></td><td class="tok-desc">Danger ghost/tertiary</td></tr>
+      <tr><td><code class="tok-name">$button-danger-hover</code></td><td><span class="color-swatch" style="background:#b81922"></span><code class="tok-val">#b81922</code></td><td class="tok-desc">Danger hover</td></tr>
+      <tr><td><code class="tok-name">$button-danger-active</code></td><td><span class="color-swatch" style="background:#750e13"></span><code class="tok-val">#750e13</code></td><td class="tok-desc">Danger active</td></tr>
+      <tr><td><code class="tok-name">$button-separator</code></td><td><span class="color-swatch" style="background:#e0e0e0"></span><code class="tok-val">#e0e0e0</code></td><td class="tok-desc">Button set separator</td></tr>
+      <tr><td><code class="tok-name">$button-disabled</code></td><td><span class="color-swatch" style="background:#c6c6c6"></span><code class="tok-val">#c6c6c6</code></td><td class="tok-desc">Disabled button background</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Notification Tokens (7)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$notification-background-error</code></td><td><span class="color-swatch" style="background:#fff1f1"></span><code class="tok-val">#fff1f1</code></td><td class="tok-desc">Error notification bg</td></tr>
+      <tr><td><code class="tok-name">$notification-background-success</code></td><td><span class="color-swatch" style="background:#defbe6"></span><code class="tok-val">#defbe6</code></td><td class="tok-desc">Success notification bg</td></tr>
+      <tr><td><code class="tok-name">$notification-background-info</code></td><td><span class="color-swatch" style="background:#edf5ff"></span><code class="tok-val">#edf5ff</code></td><td class="tok-desc">Info notification bg</td></tr>
+      <tr><td><code class="tok-name">$notification-background-warning</code></td><td><span class="color-swatch" style="background:#fcf4d6"></span><code class="tok-val">#fcf4d6</code></td><td class="tok-desc">Warning notification bg</td></tr>
+      <tr><td><code class="tok-name">$notification-action-hover</code></td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Action button hover bg</td></tr>
+      <tr><td><code class="tok-name">$notification-action-tertiary-inverse</code></td><td><span class="color-swatch" style="background:#ffffff"></span><code class="tok-val">#ffffff</code></td><td class="tok-desc">Inverse tertiary action</td></tr>
+      <tr><td><code class="tok-name">$notification-action-tertiary-inverse-hover</code></td><td><span class="color-swatch" style="background:#f4f4f4"></span><code class="tok-val">#f4f4f4</code></td><td class="tok-desc">Inverse tertiary hover</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Tag Tokens (per color &times; 10 hues)</p>
+    <table class="token-table">
+      <tr><th>Token Pattern</th><th>Available Hues</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$tag-background-{hue}</code></td><td class="tok-val">red, magenta, purple, blue, cyan, teal, green, gray, cool-gray, warm-gray</td><td class="tok-desc">Tag background per hue</td></tr>
+      <tr><td><code class="tok-name">$tag-color-{hue}</code></td><td class="tok-val">(same 10 hues)</td><td class="tok-desc">Tag text color per hue</td></tr>
+      <tr><td><code class="tok-name">$tag-hover-{hue}</code></td><td class="tok-val">(same 10 hues)</td><td class="tok-desc">Tag hover background per hue</td></tr>
+      <tr><td><code class="tok-name">$tag-border-{hue}</code></td><td class="tok-val">(same 10 hues)</td><td class="tok-desc">Tag border per hue</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Status Tokens (9)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$status-red</code></td><td><span class="color-swatch" style="background:#da1e28"></span><code class="tok-val">#da1e28</code></td><td class="tok-desc">Red status</td></tr>
+      <tr><td><code class="tok-name">$status-orange</code></td><td><span class="color-swatch" style="background:#eb6200"></span><code class="tok-val">#eb6200</code></td><td class="tok-desc">Orange status</td></tr>
+      <tr><td><code class="tok-name">$status-yellow</code></td><td><span class="color-swatch" style="background:#b28600"></span><code class="tok-val">#b28600</code></td><td class="tok-desc">Yellow status</td></tr>
+      <tr><td><code class="tok-name">$status-green</code></td><td><span class="color-swatch" style="background:#198038"></span><code class="tok-val">#198038</code></td><td class="tok-desc">Green status</td></tr>
+      <tr><td><code class="tok-name">$status-blue</code></td><td><span class="color-swatch" style="background:#0043ce"></span><code class="tok-val">#0043ce</code></td><td class="tok-desc">Blue status</td></tr>
+      <tr><td><code class="tok-name">$status-purple</code></td><td><span class="color-swatch" style="background:#8a3ffc"></span><code class="tok-val">#8a3ffc</code></td><td class="tok-desc">Purple status</td></tr>
+      <tr><td><code class="tok-name">$status-gray</code></td><td><span class="color-swatch" style="background:#8d8d8d"></span><code class="tok-val">#8d8d8d</code></td><td class="tok-desc">Gray status</td></tr>
+      <tr><td><code class="tok-name">$status-orange-outline</code></td><td><span class="color-swatch" style="background:#eb6200"></span><code class="tok-val">#eb6200</code></td><td class="tok-desc">Orange status outline</td></tr>
+      <tr><td><code class="tok-name">$status-yellow-outline</code></td><td><span class="color-swatch" style="background:#b28600"></span><code class="tok-val">#b28600</code></td><td class="tok-desc">Yellow status outline</td></tr>
+    </table>
+
+    <p class="token-group-label" style="color: var(--cds-blue-40);">Content Switcher Tokens (3)</p>
+    <table class="token-table">
+      <tr><th>Token</th><th>$white Value</th><th>Usage</th></tr>
+      <tr><td><code class="tok-name">$content-switcher-background</code></td><td class="tok-val">transparent</td><td class="tok-desc">Switcher background</td></tr>
+      <tr><td><code class="tok-name">$content-switcher-background-hover</code></td><td><span class="color-swatch" style="background:#e8e8e8"></span><code class="tok-val">#e8e8e8</code></td><td class="tok-desc">Switcher hover bg</td></tr>
+      <tr><td><code class="tok-name">$content-switcher-selected</code></td><td><span class="color-swatch" style="background:#f4f4f4"></span><code class="tok-val">#f4f4f4</code></td><td class="tok-desc">Selected switcher bg</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Tab switching script -->
+<script>
+  document.getElementById('tokenTabs').addEventListener('click', function(e) {
+    if (!e.target.classList.contains('tab-btn')) return;
+    // Deactivate all
+    this.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    this.parentElement.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    // Activate clicked
+    e.target.classList.add('active');
+    document.getElementById(e.target.dataset.tab).classList.add('active');
+  });
+</script>
+
+<!-- ============================================================ -->
+<!--  FOOTER                                                      -->
+<!-- ============================================================ -->
+<div style="margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--cds-border-subtle); color: var(--cds-text-helper); font-size: 12px;">
+  <p>Generated from installed packages at <code>App/Client/node_modules/@carbon/</code> and Carbon Design System documentation.</p>
+  <p style="margin-top: 4px;">Carbon v11 • @carbon/react v1.92.1 • @carbon/styles v1.91.0 • Dart Sass module system (@use/@forward)</p>
+</div>
+
+</div>
+</body>
+</html>
