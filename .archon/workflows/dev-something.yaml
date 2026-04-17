@@ -1,0 +1,289 @@
+name: dev-something
+description: >
+  Full lifecycle: interview -> plan -> implement -> validate -> deploy & test ->
+  PR -> CI -> merge. Interactive at every decision point.
+interactive: true
+provider: claude
+
+nodes:
+  # ── Phase 1: Interview ─────────────────────────────────────────────
+  - id: interview
+    idle_timeout: 600000
+    loop:
+      prompt: |
+        You are interviewing the user about a feature or change they want to build.
+
+        User's initial request: $ARGUMENTS
+
+        ## Your Job
+
+        1. Read CLAUDE.md (if it exists) to understand the project
+        2. Explore the codebase to understand structure, conventions, and existing patterns
+        3. Have a natural conversation with the user to fully understand:
+           - **What** they want to build or change
+           - **Why** — the motivation and context
+           - **Acceptance criteria** — how they'll know it's done
+           - **Scope boundaries** — what's explicitly NOT included
+           - **Edge cases** — anything tricky
+
+        Ask focused questions. Don't ask everything at once — build on their answers.
+        Explore relevant code as you go so your questions are informed.
+
+        When you have a clear understanding, summarize what you've learned and ask
+        if they're ready to proceed to planning.
+
+        When the user confirms ("ready", "let's go", "proceed", "yes", etc.):
+        - Write your findings to $ARTIFACTS_DIR/interview.md
+        - Signal: <promise>INTERVIEW_COMPLETE</promise>
+
+        IMPORTANT: Only signal INTERVIEW_COMPLETE when the user EXPLICITLY confirms.
+        Questions, clarifications, or partial answers are NOT confirmation.
+      until: INTERVIEW_COMPLETE
+      max_iterations: 20
+      fresh_context: false
+
+  # ── Phase 2: Plan ──────────────────────────────────────────────────
+  - id: plan
+    depends_on: [interview]
+    idle_timeout: 600000
+    command: lifecycle-plan
+
+  # ── Phase 3: Refine plan with human ────────────────────────────────
+  - id: refine-plan
+    depends_on: [plan]
+    idle_timeout: 600000
+    loop:
+      prompt: |
+        Read the implementation plan at $ARTIFACTS_DIR/plan.md and present it
+        to the user in full.
+
+        Context from interview: $ARTIFACTS_DIR/interview.md
+
+        Ask for feedback. The user may want to:
+        - Reorder tasks
+        - Add or remove scope
+        - Change technical approach
+        - Split or merge tasks
+        - Adjust acceptance criteria
+
+        If they give feedback, update $ARTIFACTS_DIR/plan.md accordingly and
+        present the revised plan.
+
+        When the user approves ("approved", "looks good", "ship it", "lgtm"):
+        - Ensure $ARTIFACTS_DIR/plan.md reflects all revisions
+        - Signal: <promise>PLAN_APPROVED</promise>
+
+        IMPORTANT: Only signal PLAN_APPROVED on EXPLICIT approval.
+        Questions, feedback, or revision requests are NOT approval.
+      until: PLAN_APPROVED
+      max_iterations: 15
+      fresh_context: false
+
+  # ── Phase 4: Implement ─────────────────────────────────────────────
+  - id: implement
+    depends_on: [refine-plan]
+    idle_timeout: 600000
+    loop:
+      prompt: |
+        You are implementing a feature from an approved plan.
+
+        FRESH SESSION — you have no memory of prior iterations.
+
+        ## Instructions
+
+        1. Read CLAUDE.md — follow ALL project conventions
+        2. Read the plan: $ARTIFACTS_DIR/plan.md
+        3. Read the interview context: $ARTIFACTS_DIR/interview.md
+        4. Check $ARTIFACTS_DIR/progress.md for completed tasks (create if missing)
+        5. Find the NEXT incomplete task from the plan
+        6. Implement it fully:
+           - Write the code
+           - Run the project's build/compile commands to verify it compiles
+           - Commit with a descriptive message
+        7. Update $ARTIFACTS_DIR/progress.md marking the task complete
+
+        If ALL tasks in the plan are complete:
+        - Write a summary to $ARTIFACTS_DIR/implementation.md
+        - Signal: <promise>IMPLEMENTED</promise>
+
+        ## Rules
+        - One task per iteration — do not skip ahead
+        - Every iteration must leave the codebase in a compilable state
+        - Follow ALL project conventions from CLAUDE.md and rules files
+        - Never skip a failing build — fix it before committing
+        - Read existing code before modifying it
+      until: IMPLEMENTED
+      max_iterations: 25
+      fresh_context: true
+
+  # ── Phase 5: Validate (auto-fix loop) ──────────────────────────────
+  - id: validate
+    depends_on: [implement]
+    idle_timeout: 600000
+    loop:
+      prompt: |
+        You are validating the implementation passes ALL project checks.
+
+        ## Instructions
+
+        1. Read CLAUDE.md to discover the project's validation commands
+           (lint, build, unit tests, integration tests, E2E tests, etc.)
+        2. Run them ALL in sequence
+        3. If ANY check fails:
+           - Read the error output carefully
+           - Diagnose the root cause
+           - Fix it in the code
+           - Re-run the failing check to verify
+           - Do NOT signal completion — the next iteration will re-run everything
+        4. If ALL checks pass on a clean run:
+           - Write results to $ARTIFACTS_DIR/validation.md
+           - Commit any fixes
+           - Signal: <promise>ALL_GREEN</promise>
+
+        ## Rules
+        - Never dismiss failures as "pre-existing", "unrelated", or "flaky"
+        - Investigate EVERY failure — read logs, check traces
+        - Never suppress warnings or skip checks
+        - Fix root causes, not symptoms
+      until: ALL_GREEN
+      max_iterations: 10
+      fresh_context: false
+
+  # ── Phase 6: Deploy locally + human testing ────────────────────────
+  - id: human-test
+    depends_on: [validate]
+    idle_timeout: 900000
+    loop:
+      prompt: |
+        You are managing local deployment for human testing.
+
+        ## First iteration (no app running yet)
+
+        1. Read CLAUDE.md to find the command to run the application locally
+        2. Start the application in the background
+        3. Wait for it to become ready (check health endpoint, logs, or port)
+        4. Tell the user:
+           - The app is running and where to access it (URL/port)
+           - What was built (brief summary from $ARTIFACTS_DIR/implementation.md)
+           - Ask them to test and provide feedback
+
+        ## When user reports issues or requests changes
+
+        1. Stop the running application
+        2. Make the requested fixes
+        3. Re-run the full validation suite (lint, build, tests, E2E)
+        4. If validation fails, fix until green
+        5. Restart the application
+        6. Tell the user it's ready to test again
+
+        ## When user approves ("approved", "looks good", "ship it", "lgtm")
+
+        1. Stop the running application and clean up any background processes
+        2. Commit any remaining changes
+        3. Signal: <promise>TESTING_APPROVED</promise>
+
+        IMPORTANT: Only signal TESTING_APPROVED on EXPLICIT user approval.
+        Bug reports, feedback, or change requests are NOT approval.
+      until: TESTING_APPROVED
+      max_iterations: 15
+      fresh_context: false
+
+  # ── Phase 7: Create PR ─────────────────────────────────────────────
+  - id: create-pr
+    depends_on: [human-test]
+    idle_timeout: 300000
+    prompt: |
+      Create a pull request for the changes on the current branch.
+
+      ## Instructions
+
+      1. Read these artifacts for context:
+         - $ARTIFACTS_DIR/interview.md — what was requested
+         - $ARTIFACTS_DIR/plan.md — the implementation plan
+         - $ARTIFACTS_DIR/validation.md — validation results
+         - $ARTIFACTS_DIR/implementation.md — what was implemented
+      2. Push the current branch to the remote
+      3. Check for a PR template at .github/PULL_REQUEST_TEMPLATE.md
+      4. Create the PR with `gh pr create`:
+         - Clear, concise title
+         - Description summarizing changes, motivation, and test results
+         - Use the repo's PR template if one exists
+      5. Write the PR URL to $ARTIFACTS_DIR/.pr-url
+      6. Write the PR number to $ARTIFACTS_DIR/.pr-number
+      7. Output the PR URL as your final message
+
+  # ── Phase 8: CI check + auto-fix ───────────────────────────────────
+  - id: ci-check
+    depends_on: [create-pr]
+    idle_timeout: 900000
+    loop:
+      prompt: |
+        You are monitoring CI and auto-fixing any failures.
+
+        ## Instructions
+
+        1. Read the PR number from $ARTIFACTS_DIR/.pr-number
+        2. Watch CI checks: `gh pr checks <number> --watch` or poll `gh run list`
+        3. Wait for ALL checks to finish
+
+        ## If CI passes
+        - Write results to $ARTIFACTS_DIR/ci-results.md
+        - Signal: <promise>CI_GREEN</promise>
+
+        ## If CI fails
+        1. Get failed run IDs: `gh run list --branch <branch> --status failure`
+        2. Read the logs: `gh run view <run-id> --log-failed`
+        3. Identify the root cause from the actual log output
+        4. Fix the issue in the code
+        5. Run the relevant validation locally to confirm the fix
+        6. Commit and push
+        7. Do NOT signal — the next iteration will re-check CI
+
+        ## Rules
+        - Always read CI logs before attempting fixes
+        - Fix root causes, not symptoms
+        - Never skip or retry without a code change
+      until: CI_GREEN
+      max_iterations: 8
+      fresh_context: false
+
+  # ── Phase 9: Human approval to merge ───────────────────────────────
+  - id: human-approve
+    depends_on: [ci-check]
+    idle_timeout: 600000
+    loop:
+      prompt: |
+        The PR is ready for final review.
+
+        ## Instructions
+
+        1. Read $ARTIFACTS_DIR/.pr-url for the PR link
+        2. Present to the user:
+           - PR URL
+           - Summary of what was built (from $ARTIFACTS_DIR/interview.md)
+           - CI status: all green
+           - Any notes or caveats worth mentioning
+        3. Ask the user to review and decide: merge or request changes
+
+        ## If user requests changes
+        1. Make the changes
+        2. Re-run validation suite
+        3. Commit and push
+        4. Wait for CI to pass
+        5. Ask for approval again
+
+        ## If user approves ("merge", "approved", "ship it", "lgtm")
+        - Signal: <promise>MERGE_APPROVED</promise>
+
+        IMPORTANT: Only signal MERGE_APPROVED on EXPLICIT approval to merge.
+      until: MERGE_APPROVED
+      max_iterations: 10
+      fresh_context: false
+
+  # ── Phase 10: Merge ────────────────────────────────────────────────
+  - id: merge
+    depends_on: [human-approve]
+    bash: |
+      PR_NUMBER=$(cat $ARTIFACTS_DIR/.pr-number)
+      gh pr merge "$PR_NUMBER" --squash --delete-branch
+    timeout: 60000
