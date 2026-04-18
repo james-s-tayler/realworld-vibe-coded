@@ -22,6 +22,7 @@ public class NukeTargetLocationAnalyzer : DiagnosticAnalyzer
   private static readonly ImmutableHashSet<string> AllowedFileNames = ImmutableHashSet.Create(
       "Build.cs",
       "Build.ApiClient.cs",
+      "Build.Archon.cs",
       "Build.Build.cs",
       "Build.Db.cs",
       "Build.Install.cs",
