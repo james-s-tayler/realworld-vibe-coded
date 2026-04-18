@@ -63,8 +63,8 @@ export const UsersPage: React.FC = () => {
     try {
       const offset = (currentPage - 1) * pageSize;
       const response = await usersApi.listUsers(pageSize, offset);
-      setUsers(response.users);
-      setUsersCount(response.usersCount);
+      setUsers(response.items);
+      setUsersCount(response.count);
     } catch (err) {
       const message = err instanceof ApiError ? err.errors.join(', ') : t('users.failedToLoad');
       showToast({ kind: 'error', title: t('error.title'), subtitle: message });

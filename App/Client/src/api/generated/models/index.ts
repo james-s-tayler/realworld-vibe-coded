@@ -70,16 +70,6 @@ export interface ArticleResponse extends Parsable {
      */
     article?: ArticleDto | null;
 }
-export interface ArticlesResponse extends Parsable {
-    /**
-     * The articles property
-     */
-    articles?: ArticleDto[] | null;
-    /**
-     * The articlesCount property
-     */
-    articlesCount?: number | null;
-}
 export interface AuthorDto extends Parsable {
     /**
      * The bio property
@@ -180,15 +170,6 @@ export interface CreateArticleRequest extends Parsable {
 // @ts-ignore
 export function createArticleResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
     return deserializeIntoArticleResponse;
-}
-/**
- * Creates a new instance of the appropriate class based on discriminator value
- * @param parseNode The parse node to use to read the discriminator value and create the object
- * @returns {ArticlesResponse}
- */
-// @ts-ignore
-export function createArticlesResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
-    return deserializeIntoArticlesResponse;
 }
 /**
  * Creates a new instance of the appropriate class based on discriminator value
@@ -327,6 +308,24 @@ export function createInviteRequestFromDiscriminatorValue(parseNode: ParseNode |
 // @ts-ignore
 export function createLoginRequestFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
     return deserializeIntoLoginRequest;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {PaginatedResponseOfArticleDto}
+ */
+// @ts-ignore
+export function createPaginatedResponseOfArticleDtoFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoPaginatedResponseOfArticleDto;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {PaginatedResponseOfUserDto}
+ */
+// @ts-ignore
+export function createPaginatedResponseOfUserDtoFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoPaginatedResponseOfUserDto;
 }
 /**
  * Creates a new instance of the appropriate class based on discriminator value
@@ -482,15 +481,6 @@ export function createUserResponseFromDiscriminatorValue(parseNode: ParseNode | 
     return deserializeIntoUserResponse;
 }
 /**
- * Creates a new instance of the appropriate class based on discriminator value
- * @param parseNode The parse node to use to read the discriminator value and create the object
- * @returns {UsersResponse}
- */
-// @ts-ignore
-export function createUsersResponseFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
-    return deserializeIntoUsersResponse;
-}
-/**
  * The deserialization information for the current model
  * @param ArticleData The instance to deserialize into.
  * @returns {Record<string, (node: ParseNode) => void>}
@@ -533,18 +523,6 @@ export function deserializeIntoArticleDto(articleDto: Partial<ArticleDto> | unde
 export function deserializeIntoArticleResponse(articleResponse: Partial<ArticleResponse> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
         "article": n => { articleResponse.article = n.getObjectValue<ArticleDto>(createArticleDtoFromDiscriminatorValue); },
-    }
-}
-/**
- * The deserialization information for the current model
- * @param ArticlesResponse The instance to deserialize into.
- * @returns {Record<string, (node: ParseNode) => void>}
- */
-// @ts-ignore
-export function deserializeIntoArticlesResponse(articlesResponse: Partial<ArticlesResponse> | undefined = {}) : Record<string, (node: ParseNode) => void> {
-    return {
-        "articles": n => { articlesResponse.articles = n.getCollectionOfObjectValues<ArticleDto>(createArticleDtoFromDiscriminatorValue); },
-        "articlesCount": n => { articlesResponse.articlesCount = n.getNumberValue(); },
     }
 }
 /**
@@ -710,6 +688,30 @@ export function deserializeIntoLoginRequest(loginRequest: Partial<LoginRequest> 
     return {
         "email": n => { loginRequest.email = n.getStringValue(); },
         "password": n => { loginRequest.password = n.getStringValue(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param PaginatedResponseOfArticleDto The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoPaginatedResponseOfArticleDto(paginatedResponseOfArticleDto: Partial<PaginatedResponseOfArticleDto> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "count": n => { paginatedResponseOfArticleDto.count = n.getNumberValue(); },
+        "items": n => { paginatedResponseOfArticleDto.items = n.getCollectionOfObjectValues<ArticleDto>(createArticleDtoFromDiscriminatorValue); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @param PaginatedResponseOfUserDto The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoPaginatedResponseOfUserDto(paginatedResponseOfUserDto: Partial<PaginatedResponseOfUserDto> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "count": n => { paginatedResponseOfUserDto.count = n.getNumberValue(); },
+        "items": n => { paginatedResponseOfUserDto.items = n.getCollectionOfObjectValues<UserDto>(createUserDtoFromDiscriminatorValue); },
     }
 }
 /**
@@ -931,18 +933,6 @@ export function deserializeIntoUserResponse(userResponse: Partial<UserResponse> 
         "username": n => { userResponse.username = n.getStringValue(); },
     }
 }
-/**
- * The deserialization information for the current model
- * @param UsersResponse The instance to deserialize into.
- * @returns {Record<string, (node: ParseNode) => void>}
- */
-// @ts-ignore
-export function deserializeIntoUsersResponse(usersResponse: Partial<UsersResponse> | undefined = {}) : Record<string, (node: ParseNode) => void> {
-    return {
-        "users": n => { usersResponse.users = n.getCollectionOfObjectValues<UserDto>(createUserDtoFromDiscriminatorValue); },
-        "usersCount": n => { usersResponse.usersCount = n.getNumberValue(); },
-    }
-}
 export interface FeatureFlagEntry extends Parsable {
     /**
      * The enabled property
@@ -984,6 +974,26 @@ export interface LoginRequest extends Parsable {
      * The password property
      */
     password?: string | null;
+}
+export interface PaginatedResponseOfArticleDto extends Parsable {
+    /**
+     * The count property
+     */
+    count?: number | null;
+    /**
+     * The items property
+     */
+    items?: ArticleDto[] | null;
+}
+export interface PaginatedResponseOfUserDto extends Parsable {
+    /**
+     * The count property
+     */
+    count?: number | null;
+    /**
+     * The items property
+     */
+    items?: UserDto[] | null;
 }
 /**
  * RFC7807 compatible problem details/ error response class. this can be used by configuring startup like so:app.UseFastEndpoints(c => c.Errors.UseProblemDetails())
@@ -1117,18 +1127,6 @@ export function serializeArticleDto(writer: SerializationWriter, articleDto: Par
 export function serializeArticleResponse(writer: SerializationWriter, articleResponse: Partial<ArticleResponse> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
     if (!articleResponse || isSerializingDerivedType) { return; }
     writer.writeObjectValue<ArticleDto>("article", articleResponse.article, serializeArticleDto);
-}
-/**
- * Serializes information the current object
- * @param ArticlesResponse The instance to serialize from.
- * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
- * @param writer Serialization writer to use to serialize this model
- */
-// @ts-ignore
-export function serializeArticlesResponse(writer: SerializationWriter, articlesResponse: Partial<ArticlesResponse> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
-    if (!articlesResponse || isSerializingDerivedType) { return; }
-    writer.writeCollectionOfObjectValues<ArticleDto>("articles", articlesResponse.articles, serializeArticleDto);
-    writer.writeNumberValue("articlesCount", articlesResponse.articlesCount);
 }
 /**
  * Serializes information the current object
@@ -1294,6 +1292,30 @@ export function serializeLoginRequest(writer: SerializationWriter, loginRequest:
     if (!loginRequest || isSerializingDerivedType) { return; }
     writer.writeStringValue("email", loginRequest.email);
     writer.writeStringValue("password", loginRequest.password);
+}
+/**
+ * Serializes information the current object
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param PaginatedResponseOfArticleDto The instance to serialize from.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializePaginatedResponseOfArticleDto(writer: SerializationWriter, paginatedResponseOfArticleDto: Partial<PaginatedResponseOfArticleDto> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!paginatedResponseOfArticleDto || isSerializingDerivedType) { return; }
+    writer.writeNumberValue("count", paginatedResponseOfArticleDto.count);
+    writer.writeCollectionOfObjectValues<ArticleDto>("items", paginatedResponseOfArticleDto.items, serializeArticleDto);
+}
+/**
+ * Serializes information the current object
+ * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
+ * @param PaginatedResponseOfUserDto The instance to serialize from.
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializePaginatedResponseOfUserDto(writer: SerializationWriter, paginatedResponseOfUserDto: Partial<PaginatedResponseOfUserDto> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
+    if (!paginatedResponseOfUserDto || isSerializingDerivedType) { return; }
+    writer.writeNumberValue("count", paginatedResponseOfUserDto.count);
+    writer.writeCollectionOfObjectValues<UserDto>("items", paginatedResponseOfUserDto.items, serializeUserDto);
 }
 /**
  * Serializes information the current object
@@ -1514,18 +1536,6 @@ export function serializeUserResponse(writer: SerializationWriter, userResponse:
     writer.writeCollectionOfPrimitiveValues<string>("roles", userResponse.roles);
     writer.writeStringValue("username", userResponse.username);
 }
-/**
- * Serializes information the current object
- * @param isSerializingDerivedType A boolean indicating whether the serialization is for a derived type.
- * @param UsersResponse The instance to serialize from.
- * @param writer Serialization writer to use to serialize this model
- */
-// @ts-ignore
-export function serializeUsersResponse(writer: SerializationWriter, usersResponse: Partial<UsersResponse> | undefined | null = {}, isSerializingDerivedType: boolean = false) : void {
-    if (!usersResponse || isSerializingDerivedType) { return; }
-    writer.writeCollectionOfObjectValues<UserDto>("users", usersResponse.users, serializeUserDto);
-    writer.writeNumberValue("usersCount", usersResponse.usersCount);
-}
 export interface SetFeatureFlagOverrideRequest extends Parsable {
     /**
      * The enabled property
@@ -1673,16 +1683,6 @@ export interface UserResponse extends Parsable {
      * The username property
      */
     username?: string | null;
-}
-export interface UsersResponse extends Parsable {
-    /**
-     * The users property
-     */
-    users?: UserDto[] | null;
-    /**
-     * The usersCount property
-     */
-    usersCount?: number | null;
 }
 /* tslint:enable */
 /* eslint-enable */

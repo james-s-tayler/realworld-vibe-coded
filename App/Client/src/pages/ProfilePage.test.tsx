@@ -52,8 +52,8 @@ const createMockArticles = (count: number) => {
     },
   }));
   return {
-    articles,
-    articlesCount: count,
+    items: articles,
+    count,
   };
 };
 
@@ -82,7 +82,7 @@ describe('ProfilePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(profilesApi.getProfile).mockResolvedValue({ profile: mockProfile });
-    vi.mocked(articlesApi.listArticles).mockResolvedValue({ articles: [], articlesCount: 0 });
+    vi.mocked(articlesApi.listArticles).mockResolvedValue({ items: [], count: 0 });
   });
 
   it('renders loading state initially', () => {

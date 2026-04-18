@@ -30,6 +30,12 @@ Never pass lambda mappers to `ResultMapperAsync`.
 Every endpoint needs a request type. Use `Endpoint<TRequest, TResponse>` or
 `Endpoint<TRequest, TResponse, TMapper>`.
 
+### SRV020: Endpoint request must have a FluentValidation validator
+Every `Endpoint<TRequest, ...>` requires an `AbstractValidator<TRequest>` (e.g. FastEndpoints `Validator<TRequest>`) somewhere in the compilation. `FastEndpoints.EmptyRequest` is exempt.
+
+### SRV021: Paginated validators must extend `PaginationAwareValidator<T>`
+Validators for request types implementing `Server.SharedKernel.Pagination.IPaginatedRequest` must inherit `Server.Web.Shared.Pagination.PaginationAwareValidator<T>` — centralizes `Limit` (1..100) and `Offset` (>=0) rules.
+
 ### SRV001: No non-generic Result
 Use `Result<T>` always.
 
@@ -48,13 +54,6 @@ For GET/DELETE endpoints with no request body (only route params), use `EmptyReq
 ### FastEndpoints: `[RouteParam]` on route-only PUT/POST/PATCH endpoints
 FastEndpoints defaults to requiring `Content-Type: application/json` for PUT/POST/PATCH. If the request DTO only has route parameters (no JSON body), Kiota and other clients send no body and no Content-Type, causing **415 Unsupported Media Type**. Annotate ALL route-bound properties with `[RouteParam]` — when every property has a non-JSON binding source attribute, FastEndpoints automatically accepts `*/*` (since v6.2). This is required for Kiota compatibility.
 ```csharp
-// WRONG — returns 415 when called without Content-Type header
-public class DeactivateUserRequest
-{
-  public Guid UserId { get; set; }
-}
-
-// CORRECT — accepts */* because all properties are annotated
 public class DeactivateUserRequest
 {
   [RouteParam]

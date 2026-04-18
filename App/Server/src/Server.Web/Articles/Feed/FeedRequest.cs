@@ -1,6 +1,8 @@
-﻿namespace Server.Web.Articles.Feed;
+﻿using Server.SharedKernel.Pagination;
 
-public class FeedRequest
+namespace Server.Web.Articles.Feed;
+
+public class FeedRequest : IPaginatedRequest
 {
   [QueryParam]
   public int Limit { get; set; } = 20;

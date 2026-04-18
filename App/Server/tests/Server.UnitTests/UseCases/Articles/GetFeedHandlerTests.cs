@@ -23,7 +23,7 @@ public class GetFeedHandlerTests
     var result = await handler.Handle(new GetFeedQuery(Guid.NewGuid()), CancellationToken.None);
 
     result.IsSuccess.ShouldBeTrue();
-    result.Value.Articles.ShouldBeEmpty();
+    result.Value.Items.ShouldBeEmpty();
     result.Value.TotalCount.ShouldBe(0);
   }
 }

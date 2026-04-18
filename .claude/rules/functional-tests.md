@@ -12,7 +12,7 @@ paths:
 var (response, result) = await client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(request);
 
 // URL-based when typed approach has issues
-var (response, result) = await client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?tag=test", request);
+var (response, result) = await client.GETAsync<ListArticlesRequest, PaginatedResponse<ArticleDto>>("/api/articles?tag=test", request);
 ```
 
 Use `AppFixture<Program>` for test fixtures. Only suppress SRV007 with clear justification (e.g., testing malformed JSON).

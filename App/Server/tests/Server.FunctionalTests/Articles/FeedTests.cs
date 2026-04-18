@@ -1,4 +1,6 @@
-﻿using Server.UseCases.Articles;
+﻿using Server.Core.ArticleAggregate.Dtos;
+using Server.SharedKernel.Pagination;
+using Server.UseCases.Articles;
 using Server.Web.Articles.Create;
 using Server.Web.Articles.Feed;
 using Server.Web.Profiles;
@@ -48,10 +50,10 @@ public class FeedTests : AppTestBase
 
     // User1 gets feed
     var feedRequest = new FeedRequest();
-    var (response, result) = await user1.Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await user1.Client.GETAsync<Feed, FeedRequest, PaginatedResponse<ArticleDto>>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
+    result.Items.ShouldNotBeNull();
   }
 
   [Fact]
@@ -61,11 +63,11 @@ public class FeedTests : AppTestBase
     var user = tenant.Users[0];
 
     var feedRequest = new FeedRequest { Limit = 2 };
-    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, PaginatedResponse<ArticleDto>>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
-    result.Articles.Count.ShouldBeLessThanOrEqualTo(2);
+    result.Items.ShouldNotBeNull();
+    result.Items.Count.ShouldBeLessThanOrEqualTo(2);
   }
 
   [Fact]
@@ -75,10 +77,10 @@ public class FeedTests : AppTestBase
     var user = tenant.Users[0];
 
     var feedRequest = new FeedRequest { Offset = 1 };
-    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, PaginatedResponse<ArticleDto>>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
+    result.Items.ShouldNotBeNull();
   }
 
   [Fact]
@@ -88,11 +90,11 @@ public class FeedTests : AppTestBase
     var user = tenant.Users[0];
 
     var feedRequest = new FeedRequest { Limit = 2, Offset = 1 };
-    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, PaginatedResponse<ArticleDto>>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
-    result.Articles.Count.ShouldBeLessThanOrEqualTo(2);
+    result.Items.ShouldNotBeNull();
+    result.Items.Count.ShouldBeLessThanOrEqualTo(2);
   }
 
   [Fact]
@@ -114,10 +116,10 @@ public class FeedTests : AppTestBase
     var user = tenant.Users[0];
 
     var feedRequest = new FeedRequest { Offset = 100 };
-    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await user.Client.GETAsync<Feed, FeedRequest, PaginatedResponse<ArticleDto>>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
+    result.Items.ShouldNotBeNull();
   }
 
   [Fact]
@@ -127,11 +129,11 @@ public class FeedTests : AppTestBase
     var tenant = await Fixture.RegisterTenantAsync();
 
     var feedRequest = new FeedRequest();
-    var (response, result) = await tenant.Users[0].Client.GETAsync<Feed, FeedRequest, ArticlesResponse>(feedRequest);
+    var (response, result) = await tenant.Users[0].Client.GETAsync<Feed, FeedRequest, PaginatedResponse<ArticleDto>>(feedRequest);
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
-    result.Articles.ShouldBeEmpty();
-    result.ArticlesCount.ShouldBe(0);
+    result.Items.ShouldNotBeNull();
+    result.Items.ShouldBeEmpty();
+    result.Count.ShouldBe(0);
   }
 }

@@ -66,7 +66,7 @@ describe('articlesApi', () => {
 
   describe('listArticles', () => {
     it('should fetch articles without params', async () => {
-      const mockResponse = { articles: [], articlesCount: 0 };
+      const mockResponse = { items: [], count: 0 };
       mocks.listGet.mockResolvedValue(mockResponse);
 
       const result = await articlesApi.listArticles();
@@ -84,7 +84,7 @@ describe('articlesApi', () => {
     });
 
     it('should fetch articles with tag filter', async () => {
-      const mockResponse = { articles: [], articlesCount: 0 };
+      const mockResponse = { items: [], count: 0 };
       mocks.listGet.mockResolvedValue(mockResponse);
 
       await articlesApi.listArticles({ tag: 'react' });
@@ -97,7 +97,7 @@ describe('articlesApi', () => {
     });
 
     it('should fetch articles with pagination', async () => {
-      mocks.listGet.mockResolvedValue({ articles: [], articlesCount: 0 });
+      mocks.listGet.mockResolvedValue({ items: [], count: 0 });
 
       await articlesApi.listArticles({ limit: 10, offset: 20 });
 
@@ -111,7 +111,7 @@ describe('articlesApi', () => {
 
   describe('getFeed', () => {
     it('should fetch user feed with default pagination', async () => {
-      const mockResponse = { articles: [], articlesCount: 0 };
+      const mockResponse = { items: [], count: 0 };
       mocks.feedGet.mockResolvedValue(mockResponse);
 
       const result = await articlesApi.getFeed();
@@ -123,7 +123,7 @@ describe('articlesApi', () => {
     });
 
     it('should fetch user feed with custom pagination', async () => {
-      mocks.feedGet.mockResolvedValue({ articles: [], articlesCount: 0 });
+      mocks.feedGet.mockResolvedValue({ items: [], count: 0 });
 
       await articlesApi.getFeed(10, 5);
 

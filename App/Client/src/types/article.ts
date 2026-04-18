@@ -23,8 +23,8 @@ export interface ArticleResponse {
 }
 
 export interface ArticlesResponse {
-  articles: Article[];
-  articlesCount: number;
+  items: Article[];
+  count: number;
 }
 
 export interface CreateArticleRequest {

@@ -1,6 +1,7 @@
 ﻿#pragma warning disable xUnit1051
 
-using Server.UseCases.Articles;
+using Server.Core.ArticleAggregate.Dtos;
+using Server.SharedKernel.Pagination;
 using Server.UseCases.Tags;
 using Server.Web.Articles.List;
 using Server.Web.Tags.List;
@@ -20,13 +21,13 @@ public class EmptyArticlesTests : AppTestBase
     var tenant = await Fixture.RegisterTenantAsync();
 
     // Act
-    var (response, result) = await tenant.Users.First().Client.GETAsync<ListArticles, ArticlesResponse>();
+    var (response, result) = await tenant.Users.First().Client.GETAsync<ListArticles, PaginatedResponse<ArticleDto>>();
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
-    result.Articles.ShouldBeEmpty();
-    result.ArticlesCount.ShouldBe(0);
+    result.Items.ShouldNotBeNull();
+    result.Items.ShouldBeEmpty();
+    result.Count.ShouldBe(0);
   }
 
   [Fact]
@@ -38,13 +39,13 @@ public class EmptyArticlesTests : AppTestBase
     var request = new ListArticlesRequest();
 
     // Act
-    var (response, result) = await tenant.Users.First().Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?author=johnjacob", request);
+    var (response, result) = await tenant.Users.First().Client.GETAsync<ListArticlesRequest, PaginatedResponse<ArticleDto>>("/api/articles?author=johnjacob", request);
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
-    result.Articles.ShouldBeEmpty();
-    result.ArticlesCount.ShouldBe(0);
+    result.Items.ShouldNotBeNull();
+    result.Items.ShouldBeEmpty();
+    result.Count.ShouldBe(0);
   }
 
   [Fact]
@@ -56,13 +57,13 @@ public class EmptyArticlesTests : AppTestBase
     var request = new ListArticlesRequest();
 
     // Act
-    var (response, result) = await tenant.Users.First().Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?favorited=testuser", request);
+    var (response, result) = await tenant.Users.First().Client.GETAsync<ListArticlesRequest, PaginatedResponse<ArticleDto>>("/api/articles?favorited=testuser", request);
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
-    result.Articles.ShouldBeEmpty();
-    result.ArticlesCount.ShouldBe(0);
+    result.Items.ShouldNotBeNull();
+    result.Items.ShouldBeEmpty();
+    result.Count.ShouldBe(0);
   }
 
   [Fact]
@@ -74,13 +75,13 @@ public class EmptyArticlesTests : AppTestBase
     var request = new ListArticlesRequest();
 
     // Act
-    var (response, result) = await tenant.Users.First().Client.GETAsync<ListArticlesRequest, ArticlesResponse>("/api/articles?tag=dragons", request);
+    var (response, result) = await tenant.Users.First().Client.GETAsync<ListArticlesRequest, PaginatedResponse<ArticleDto>>("/api/articles?tag=dragons", request);
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
-    result.Articles.ShouldBeEmpty();
-    result.ArticlesCount.ShouldBe(0);
+    result.Items.ShouldNotBeNull();
+    result.Items.ShouldBeEmpty();
+    result.Count.ShouldBe(0);
   }
 
   [Fact]

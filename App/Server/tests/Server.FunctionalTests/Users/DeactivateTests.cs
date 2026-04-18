@@ -1,4 +1,5 @@
 ﻿using Server.Core.IdentityAggregate;
+using Server.SharedKernel.Pagination;
 using Server.Web.Identity.Login;
 using Server.Web.Users.Deactivate;
 using Server.Web.Users.List;
@@ -174,16 +175,16 @@ public class DeactivateTests : AppTestBase
     await owner.Client.PUTAsync<DeactivateUser, DeactivateUserRequest, object>(deactivateRequest);
 
     // List users
-    var (_, result) = await owner.Client.GETAsync<ListUsers, UsersResponse>();
-    var deactivatedUser = result.Users.First(u => u.Email == tenant.Users[1].Email);
+    var (_, result) = await owner.Client.GETAsync<ListUsers, PaginatedResponse<UserDto>>();
+    var deactivatedUser = result.Items.First(u => u.Email == tenant.Users[1].Email);
 
     deactivatedUser.IsActive.ShouldBeFalse();
   }
 
   private async Task<Guid> GetUserIdByEmail(HttpClient client, string email)
   {
-    var (_, result) = await client.GETAsync<ListUsers, UsersResponse>();
-    var user = result.Users.First(u => u.Email == email);
+    var (_, result) = await client.GETAsync<ListUsers, PaginatedResponse<UserDto>>();
+    var user = result.Items.First(u => u.Email == email);
     return user.Id;
   }
 }

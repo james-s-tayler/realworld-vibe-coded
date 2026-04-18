@@ -506,7 +506,7 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
 - **Success Response:** `200 OK`
   ```json
   {
-    "articles": [
+    "items": [
       {
         "slug": "how-to-train-your-dragon",
         "title": "How to train your dragon",
@@ -524,7 +524,7 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
         }
       }
     ],
-    "articlesCount": 5
+    "count": 5
   }
   ```
 - **Error Responses:**
@@ -534,7 +534,7 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
 - **Test Assertions:**
   - `body` field is **NOT included** in article list items
   - Articles are ordered by most recent first (descending creation time)
-  - `articlesCount` is the TOTAL matching count, not the page size
+  - `count` is the TOTAL matching count, not the page size
   - `limit=4` on 5 articles returns 4 articles but `articlesCount: 5`
   - `offset=1` skips the first article
   - `author=username` filters to only that author's articles
@@ -752,7 +752,7 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
 - **Success Response:** `200 OK`
   ```json
   {
-    "articles": [
+    "items": [
       {
         "slug": "article-by-followed-user",
         "title": "...",
@@ -770,7 +770,7 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
         }
       }
     ],
-    "articlesCount": 3
+    "count": 3
   }
   ```
 - **Error Responses:**
@@ -783,12 +783,12 @@ This means error keys like `"DuplicateEmail"` will match a check for `"email"` (
 - **Test Assertions:**
   - `body` field is NOT included in feed article items
   - Articles ordered most recent first
-  - `articlesCount` is TOTAL feed count (not page count)
+  - `count` is TOTAL feed count (not page count)
   - `author.following` is `true` for all feed articles
   - `limit=2` returns at most 2 articles
   - `offset=1` skips the first article
-  - `offset` beyond feed length returns empty `articles: []` with correct `articlesCount`
-  - Empty feed (no followed users have articles) returns `{ articles: [], articlesCount: 0 }`
+  - `offset` beyond feed length returns empty `items: []` with correct `count`
+  - Empty feed (no followed users have articles) returns `{ items: [], count: 0 }`
 
 ---
 
@@ -856,7 +856,7 @@ interface ArticleResponse {
 }
 
 // Single: { "article": ArticleResponse }
-// List:   { "articles": ArticleResponse[], "articlesCount": number }
+// List:   { "items": ArticleResponse[], "count": number }
 // In list responses, `body` field is EXCLUDED from each article
 ```
 
@@ -1020,7 +1020,7 @@ interface CreateCommentRequest {
 - Minimum `limit`: 1
 - Minimum `offset`: 0
 - Non-numeric `limit`/`offset` values are rejected (400)
-- `articlesCount` always reflects the TOTAL matching count, regardless of pagination
+- `count` always reflects the TOTAL matching count, regardless of pagination
 - Frontend pages (HomePage, ProfilePage) must default to `limit=20`
 - Frontend pagination component must be rendered even when total articles ≤ page size
 
@@ -1028,7 +1028,7 @@ interface CreateCommentRequest {
 - Feed returns articles ONLY from users the authenticated user follows
 - Feed excludes the authenticated user's own articles
 - Feed excludes articles from unfollowed users
-- Empty feed returns `{ articles: [], articlesCount: 0 }`
+- Empty feed returns `{ items: [], count: 0 }`
 
 ### Following Rules
 - Follow is idempotent (following someone already followed returns 200 OK)

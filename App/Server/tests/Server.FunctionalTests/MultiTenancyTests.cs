@@ -1,4 +1,6 @@
-﻿using Server.UseCases.Articles;
+﻿using Server.Core.ArticleAggregate.Dtos;
+using Server.SharedKernel.Pagination;
+using Server.UseCases.Articles;
 using Server.UseCases.Tags;
 using Server.Web.Articles.Create;
 using Server.Web.Articles.List;
@@ -35,13 +37,13 @@ public class MultiTenancyTests : AppTestBase
     await tenant1.Users[0].Client.POSTAsync<Create, CreateArticleRequest, ArticleResponse>(articleRequest);
 
     // Act
-    var (response, result) = await tenant2.Users[0].Client.GETAsync<ListArticles, ArticlesResponse>();
+    var (response, result) = await tenant2.Users[0].Client.GETAsync<ListArticles, PaginatedResponse<ArticleDto>>();
 
     // Assert
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    result.Articles.ShouldNotBeNull();
-    result.Articles.ShouldBeEmpty();
-    result.ArticlesCount.ShouldBe(0);
+    result.Items.ShouldNotBeNull();
+    result.Items.ShouldBeEmpty();
+    result.Count.ShouldBe(0);
   }
 
   [Fact]
