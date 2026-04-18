@@ -11,7 +11,6 @@ public class CreateCommentValidator : Validator<CreateCommentRequest>
 
     RuleFor(x => x.Comment.Body)
       .NotEmpty()
-      .MaximumLength(Comment.BodyMaxLength)
-      .OverridePropertyName("body");
+      .MaximumLength(Comment.BodyMaxLength);
   }
 }

@@ -5,7 +5,6 @@ public class SetFeatureFlagOverrideValidator : Validator<SetFeatureFlagOverrideR
   public SetFeatureFlagOverrideValidator()
   {
     RuleFor(x => x.FeatureName)
-      .NotEmpty()
-      .OverridePropertyName("featureName");
+      .NotEmpty();
   }
 }

@@ -13,6 +13,9 @@ public static class MiddlewareConfig
     app.UseExceptionHandler();
     app.UseFastEndpoints(config =>
     {
+      // Keep our global PropertyNameResolver from ServiceConfigs — FE would otherwise overwrite it with one that
+      // uses the full PropertyChain (e.g. "article.Title"). Our resolver emits the camelCased leaf name itself.
+      config.Validation.UsePropertyNamingPolicy = false;
       config.Errors.UseProblemDetails();
       config.Endpoints.Configurator = ep =>
       {

@@ -14,17 +14,14 @@ public class CreateArticleValidator : Validator<CreateArticleRequest>
 
     RuleFor(x => x.Article.Title)
       .NotEmpty()
-      .MaximumLength(Article.TitleMaxLength)
-      .OverridePropertyName("title");
+      .MaximumLength(Article.TitleMaxLength);
 
     RuleFor(x => x.Article.Description)
       .NotEmpty()
-      .MaximumLength(Article.DescriptionMaxLength)
-      .OverridePropertyName("description");
+      .MaximumLength(Article.DescriptionMaxLength);
 
     RuleFor(x => x.Article.Body)
-      .NotEmpty()
-      .OverridePropertyName("body");
+      .NotEmpty();
 
     // Add individual tag validation for better error messages
     RuleForEach(x => x.Article.TagList)

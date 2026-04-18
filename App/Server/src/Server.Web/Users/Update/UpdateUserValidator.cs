@@ -19,8 +19,7 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
       RuleFor(x => x.User.Email)
         .NotEmpty()
         .EmailAddress()
-        .MaximumLength(ApplicationUser.EmailMaxLength)
-        .OverridePropertyName("email");
+        .MaximumLength(ApplicationUser.EmailMaxLength);
     });
 
     // Username validation - if provided, must be valid
@@ -29,8 +28,7 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
       RuleFor(x => x.User.Username)
         .NotEmpty()
         .MinimumLength(ApplicationUser.UsernameMinLength)
-        .MaximumLength(ApplicationUser.UsernameMaxLength)
-        .OverridePropertyName("username");
+        .MaximumLength(ApplicationUser.UsernameMaxLength);
     });
 
     // Password validation - if provided, must be valid
@@ -38,8 +36,7 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
     {
       RuleFor(x => x.User.Password)
         .NotEmpty()
-        .MinimumLength(ApplicationUser.PasswordMinLength)
-        .OverridePropertyName("password");
+        .MinimumLength(ApplicationUser.PasswordMinLength);
     });
 
     // Bio validation - if provided, must be valid
@@ -47,13 +44,11 @@ public class UpdateUserValidator : Validator<UpdateUserRequest>
     {
       RuleFor(x => x.User.Bio)
         .NotEmpty()
-        .MaximumLength(ApplicationUser.BioMaxLength)
-        .OverridePropertyName("bio");
+        .MaximumLength(ApplicationUser.BioMaxLength);
     });
 
     RuleFor(x => x.User.Language)
       .Must(lang => lang == null || i18nSettings.Value.SupportedLanguages.Contains(lang))
-      .WithMessage(x => localizer[SharedResource.Keys.UnsupportedLanguage])
-      .OverridePropertyName("language");
+      .WithMessage(x => localizer[SharedResource.Keys.UnsupportedLanguage]);
   }
 }
