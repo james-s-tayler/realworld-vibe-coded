@@ -24,6 +24,8 @@
     "ExecutableTarget": {
       "type": "string",
       "enum": [
+        "ArchonDown",
+        "ArchonUp",
         "BuildClient",
         "BuildGenerateApiClient",
         "BuildServer",
@@ -159,6 +161,10 @@
         "Agent": {
           "type": "boolean",
           "description": "Suppress verbose output for agent context efficiency"
+        },
+        "ArchonRoot": {
+          "type": "string",
+          "description": "Path to local Archon checkout. Defaults to ../Archon relative to the conduit repo"
         },
         "Bail": {
           "type": "boolean",

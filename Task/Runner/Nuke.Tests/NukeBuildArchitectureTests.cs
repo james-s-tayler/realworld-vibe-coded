@@ -50,6 +50,7 @@ namespace BuildTests
           .OrShould().HaveNameStartingWith("Db")
           .OrShould().HaveNameStartingWith("Install")
           .OrShould().HaveNameStartingWith("Paths")
+          .OrShould().HaveNameStartingWith("Archon")
           .Because("this is the established naming convention for Nuke build targets");
 
       nukeTargetsShouldFollowNamingConventions.Check(Architecture);
