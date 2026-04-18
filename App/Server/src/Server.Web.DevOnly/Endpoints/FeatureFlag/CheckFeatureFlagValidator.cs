@@ -5,7 +5,6 @@ public class CheckFeatureFlagValidator : Validator<CheckFeatureFlagRequest>
   public CheckFeatureFlagValidator()
   {
     RuleFor(x => x.FeatureName)
-      .NotEmpty()
-      .OverridePropertyName("featureName");
+      .NotEmpty();
   }
 }

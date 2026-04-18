@@ -126,7 +126,7 @@ public class UpdateRolesTests : AppTestBase
   }
 
   [Fact]
-  public async Task UpdateRoles_WithInvalidRole_ReturnsValidationError()
+  public async Task UpdateRoles_WithInvalidRole_ReturnsErrorNameWithIndex()
   {
     var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
     var owner = tenant.Users[0];
@@ -137,13 +137,34 @@ public class UpdateRolesTests : AppTestBase
       UserId = invitedUserId,
       Roles = ["INVALID_ROLE"],
     };
-    var (response, _) = await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, object>(request);
+    var (response, problem) = await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, ProblemDetails>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    problem.ShouldNotBeNull();
+    problem.Errors.ShouldHaveSingleItem().Name.ShouldBe("roles[0]");
   }
 
   [Fact]
-  public async Task UpdateRoles_WithEmptyRoles_ReturnsValidationError()
+  public async Task UpdateRoles_WithInvalidRoleAtNonZeroIndex_EmitsMatchingIndex()
+  {
+    var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
+    var owner = tenant.Users[0];
+    var invitedUserId = await GetUserIdByEmail(owner.Client, tenant.Users[1].Email);
+
+    var request = new UpdateRolesRequest
+    {
+      UserId = invitedUserId,
+      Roles = [DefaultRoles.Admin, DefaultRoles.Author, "BAD"],
+    };
+    var (response, problem) = await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, ProblemDetails>(request);
+
+    response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    problem.ShouldNotBeNull();
+    problem.Errors.ShouldHaveSingleItem().Name.ShouldBe("roles[2]");
+  }
+
+  [Fact]
+  public async Task UpdateRoles_WithEmptyRoles_ReturnsErrorNameWithoutIndex()
   {
     var tenant = await Fixture.RegisterTenantWithUsersAsync(2);
     var owner = tenant.Users[0];
@@ -154,9 +175,11 @@ public class UpdateRolesTests : AppTestBase
       UserId = invitedUserId,
       Roles = [],
     };
-    var (response, _) = await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, object>(request);
+    var (response, problem) = await owner.Client.PUTAsync<UpdateRoles, UpdateRolesRequest, ProblemDetails>(request);
 
     response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    problem.ShouldNotBeNull();
+    problem.Errors.ShouldHaveSingleItem().Name.ShouldBe("roles");
   }
 
   [Fact]

@@ -15,24 +15,20 @@ public class UpdateArticleValidator : Validator<UpdateArticleRequest>
     RuleFor(x => x.Article.Title)
       .NotEmpty()
       .MaximumLength(Article.TitleMaxLength)
-      .When(x => x.Article.Title != null)
-      .OverridePropertyName("title");
+      .When(x => x.Article.Title != null);
 
     RuleFor(x => x.Article.Description)
       .NotEmpty()
       .MaximumLength(Article.DescriptionMaxLength)
-      .When(x => x.Article.Description != null)
-      .OverridePropertyName("description");
+      .When(x => x.Article.Description != null);
 
     RuleFor(x => x.Article.Body)
       .NotEmpty()
-      .When(x => x.Article.Body != null)
-      .OverridePropertyName("body");
+      .When(x => x.Article.Body != null);
 
     // Ensure at least one field is provided for update
     RuleFor(x => x.Article)
       .Must(article => article.Title != null || article.Description != null || article.Body != null)
-      .WithMessage(x => localizer[SharedResource.Keys.AtLeastOneFieldRequired])
-      .OverridePropertyName("article");
+      .WithMessage(x => localizer[SharedResource.Keys.AtLeastOneFieldRequired]);
   }
 }

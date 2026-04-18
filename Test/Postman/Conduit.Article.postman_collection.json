@@ -802,7 +802,7 @@
 									"});",
 									"",
 									"",
-									"utils.assertErrorStartsWith(\"article.TagList[0]\", pm);"
+									"utils.assertErrorStartsWith(\"tagList[0]\", pm);"
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -887,7 +887,7 @@
 									"});",
 									"",
 									"",
-									"utils.assertErrorStartsWith(\"article.TagList[0]\", pm);"
+									"utils.assertErrorStartsWith(\"tagList[0]\", pm);"
 								],
 								"type": "text/javascript",
 								"packages": {},

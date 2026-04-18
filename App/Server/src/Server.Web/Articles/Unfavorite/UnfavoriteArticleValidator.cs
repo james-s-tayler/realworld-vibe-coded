@@ -9,7 +9,6 @@ public class UnfavoriteArticleValidator : Validator<UnfavoriteArticleRequest>
     RuleLevelCascadeMode = CascadeMode.Stop;
 
     RuleFor(x => x.Slug)
-      .NotEmpty()
-      .OverridePropertyName("slug");
+      .NotEmpty();
   }
 }

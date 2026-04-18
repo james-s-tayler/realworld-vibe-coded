@@ -36,6 +36,9 @@ Every `Endpoint<TRequest, ...>` requires an `AbstractValidator<TRequest>` (e.g. 
 ### SRV021: Paginated validators must extend `PaginationAwareValidator<T>`
 Validators for request types implementing `Server.SharedKernel.Pagination.IPaginatedRequest` must inherit `Server.Web.Shared.Pagination.PaginationAwareValidator<T>` — centralizes `Limit` (1..100) and `Offset` (>=0) rules.
 
+### SRV022: Never call `.OverridePropertyName()` in Validator
+Global `PropertyNameResolver` already returns the leaf member name; FastEndpoints' camelCase policy produces the final field name. Per-rule overrides drift on rename.
+
 ### SRV001: No non-generic Result
 Use `Result<T>` always.
 

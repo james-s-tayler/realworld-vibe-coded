@@ -9,7 +9,6 @@ public class GetCommentsValidator : Validator<GetCommentsRequest>
     RuleLevelCascadeMode = CascadeMode.Stop;
 
     RuleFor(x => x.Slug)
-      .NotEmpty()
-      .OverridePropertyName("slug");
+      .NotEmpty();
   }
 }

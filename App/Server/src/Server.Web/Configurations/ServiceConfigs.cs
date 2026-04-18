@@ -25,6 +25,15 @@ public static class ServiceConfigs
 {
   public static IServiceCollection AddServiceConfigs(this IServiceCollection services, Microsoft.Extensions.Logging.ILogger logger, WebApplicationBuilder builder)
   {
+    // Return the leaf member name (camelCased) so FluentValidation error "name" fields match the wire format
+    // (e.g. "title" instead of "article.Title") without per-rule .OverridePropertyName() calls. FastEndpoints'
+    // own resolver uses the full PropertyChain, so we disable UsePropertyNamingPolicy in MiddlewareConfig to
+    // prevent it from overwriting this one.
+    FluentValidation.ValidatorOptions.Global.PropertyNameResolver =
+      (_, memberInfo, _) => memberInfo?.Name is { } name
+        ? System.Text.Json.JsonNamingPolicy.CamelCase.ConvertName(name)
+        : null;
+
     services.AddProblemDetails();
     services.AddLocalization();
 
