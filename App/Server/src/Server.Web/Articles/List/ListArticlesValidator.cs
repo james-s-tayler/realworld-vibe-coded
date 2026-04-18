@@ -9,17 +9,14 @@ public class ListArticlesValidator : PaginationAwareValidator<ListArticlesReques
   {
     RuleFor(x => x.Tag)
       .NotEmpty()
-      .When(x => x.Tag != null)
-      .OverridePropertyName("tag");
+      .When(x => x.Tag != null);
 
     RuleFor(x => x.Author)
       .NotEmpty()
-      .When(x => x.Author != null)
-      .OverridePropertyName("author");
+      .When(x => x.Author != null);
 
     RuleFor(x => x.Favorited)
       .NotEmpty()
-      .When(x => x.Favorited != null)
-      .OverridePropertyName("favorited");
+      .When(x => x.Favorited != null);
   }
 }

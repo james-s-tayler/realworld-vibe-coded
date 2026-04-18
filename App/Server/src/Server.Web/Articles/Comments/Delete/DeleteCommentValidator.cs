@@ -9,7 +9,6 @@ public class DeleteCommentValidator : Validator<DeleteCommentRequest>
     RuleLevelCascadeMode = CascadeMode.Stop;
 
     RuleFor(x => x.Slug)
-      .NotEmpty()
-      .OverridePropertyName("slug");
+      .NotEmpty();
   }
 }

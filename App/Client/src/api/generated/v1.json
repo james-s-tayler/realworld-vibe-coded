@@ -4618,8 +4618,6 @@
           },
           "tagList": {
             "type": "array",
-            "maxLength": 50,
-            "minLength": 0,
             "nullable": true,
             "items": {
               "type": "string"

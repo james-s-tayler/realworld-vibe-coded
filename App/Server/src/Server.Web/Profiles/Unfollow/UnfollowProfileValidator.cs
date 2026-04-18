@@ -9,7 +9,6 @@ public class UnfollowProfileValidator : Validator<UnfollowProfileRequest>
     RuleLevelCascadeMode = CascadeMode.Stop;
 
     RuleFor(x => x.Username)
-      .NotEmpty()
-      .OverridePropertyName("username");
+      .NotEmpty();
   }
 }

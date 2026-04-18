@@ -9,7 +9,6 @@ public class ReactivateUserValidator : Validator<ReactivateUserRequest>
     RuleLevelCascadeMode = CascadeMode.Stop;
 
     RuleFor(x => x.UserId)
-      .NotEmpty()
-      .OverridePropertyName("userId");
+      .NotEmpty();
   }
 }

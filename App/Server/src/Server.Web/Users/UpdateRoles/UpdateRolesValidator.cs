@@ -19,12 +19,10 @@ public class UpdateRolesValidator : Validator<UpdateRolesRequest>
     RuleLevelCascadeMode = CascadeMode.Stop;
 
     RuleFor(x => x.Roles)
-      .NotEmpty()
-      .OverridePropertyName("roles");
+      .NotEmpty();
 
     RuleForEach(x => x.Roles)
       .Must(role => AllowedRoles.Contains(role))
-      .WithMessage((_, role) => string.Format(localizer[SharedResource.Keys.InvalidAssignableRole], role))
-      .OverridePropertyName("roles");
+      .WithMessage((_, role) => string.Format(localizer[SharedResource.Keys.InvalidAssignableRole], role));
   }
 }

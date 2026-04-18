@@ -9,7 +9,6 @@ public class GetArticleValidator : Validator<GetArticleRequest>
     RuleLevelCascadeMode = CascadeMode.Stop;
 
     RuleFor(x => x.Slug)
-      .NotEmpty()
-      .OverridePropertyName("slug");
+      .NotEmpty();
   }
 }

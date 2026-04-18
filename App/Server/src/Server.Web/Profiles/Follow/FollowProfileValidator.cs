@@ -9,7 +9,6 @@ public class FollowProfileValidator : Validator<FollowProfileRequest>
     RuleLevelCascadeMode = CascadeMode.Stop;
 
     RuleFor(x => x.Username)
-      .NotEmpty()
-      .OverridePropertyName("username");
+      .NotEmpty();
   }
 }

@@ -56,14 +56,15 @@ public class CreateValidator : Validator<CreateRequest>
   {
     RuleLevelCascadeMode = CascadeMode.Stop;
 
+    // Global PropertyNameResolver strips the chain to the leaf member; FastEndpoints' camelCase policy
+    // then produces the RealWorld-compliant field name (e.g. "title"). Never call .OverridePropertyName() —
+    // SRV022 enforces this as a build error.
     RuleFor(x => x.{Feature}.Title)
       .NotEmpty().WithMessage("is required.")
-      .MaximumLength({Entity}.TitleMaxLength).WithMessage($"cannot exceed {{Entity}.TitleMaxLength} characters.")
-      .OverridePropertyName("title");
+      .MaximumLength({Entity}.TitleMaxLength).WithMessage($"cannot exceed {{Entity}.TitleMaxLength} characters.");
 
     RuleFor(x => x.{Feature}.Description)
-      .NotEmpty().WithMessage("is required.")
-      .OverridePropertyName("description");
+      .NotEmpty().WithMessage("is required.");
   }
 }
 ```
