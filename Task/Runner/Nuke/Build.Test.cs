@@ -16,6 +16,9 @@ public partial class Build
   [Parameter("Toggle special behavior for CI environment")]
   internal readonly bool SkipPublish;
 
+  [Parameter("Skip client build when dist is pre-cached in CI")]
+  internal readonly bool SkipClientBuild;
+
   [Parameter("Stop tests on first test failure")]
   internal readonly bool Bail;
 

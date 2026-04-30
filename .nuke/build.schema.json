@@ -182,6 +182,10 @@
           "type": "string",
           "description": "Migration name for DbMigrationsAdd target"
         },
+        "SkipClientBuild": {
+          "type": "boolean",
+          "description": "Skip client build when dist is pre-cached in CI"
+        },
         "SkipPublish": {
           "type": "boolean",
           "description": "Toggle special behavior for CI environment"
