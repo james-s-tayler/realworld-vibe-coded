@@ -180,11 +180,14 @@ public abstract class AppPageTest : PageTest, IClassFixture<ApiFixture>
   /// </summary>
   private async Task StopTracingAsync()
   {
-    // Check if the test failed - only save trace for failed tests
+    // Check if tracing should always be saved (for eval grading)
+    var alwaysTrace = Environment.GetEnvironmentVariable("PLAYWRIGHT_ALWAYS_TRACE") == "true";
+
+    // Save trace for failed tests, or all tests when always-trace is enabled
     var testState = TestContext.Current.TestState;
     var testFailed = testState?.Result == TestResult.Failed;
 
-    if (testFailed)
+    if (testFailed || alwaysTrace)
     {
       if (!Directory.Exists(Constants.ReportsTestE2eArtifacts))
       {

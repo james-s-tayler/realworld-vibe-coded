@@ -10,6 +10,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "register-happy-001",
+    FeatureArea = "auth",
+    Behavior = "New tenant signup creates admin user who sees Users nav item",
+    Verifies = ["Redirects to home page", "Users nav link visible", "Users page accessible"])]
   public async Task NewTenantSignup_ShowsUsersNavItem()
   {
     // Arrange

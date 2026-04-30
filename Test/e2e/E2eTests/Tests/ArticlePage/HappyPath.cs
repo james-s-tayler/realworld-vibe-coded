@@ -10,6 +10,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "article-happy-001",
+    FeatureArea = "articles",
+    Behavior = "Tags assigned to an article are displayed on the article detail page",
+    Verifies = ["both tags are visible on the article page"])]
   public async Task Tags_AreVisibleOnIndividualArticlePage()
   {
     // Arrange
@@ -29,6 +34,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "article-happy-002",
+    FeatureArea = "articles",
+    Behavior = "Author can delete their own article and it disappears from the global feed",
+    Verifies = ["article is no longer visible in global feed after deletion"])]
   public async Task UserCanDeleteOwnArticle()
   {
     // Arrange - create user and article via API
@@ -50,6 +60,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "article-happy-003",
+    FeatureArea = "articles",
+    Behavior = "User can favorite and then unfavorite another user's article",
+    Verifies = ["favorite button toggles to unfavorite", "unfavorite button toggles back"])]
   public async Task UserCanFavoriteAndUnfavoriteArticle()
   {
     // Arrange - create two users in the same tenant
@@ -70,6 +85,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "article-happy-004",
+    FeatureArea = "articles",
+    Behavior = "Authenticated user can add a comment to an article",
+    Verifies = ["comment is successfully posted via the article page"])]
   public async Task UserCanAddCommentToArticle()
   {
     // Arrange
@@ -87,6 +107,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "article-happy-005",
+    FeatureArea = "articles",
+    Behavior = "User can delete their own comment on an article",
+    Verifies = ["comment is removed from the article page after deletion"])]
   public async Task UserCanDeleteOwnComment()
   {
     // Arrange

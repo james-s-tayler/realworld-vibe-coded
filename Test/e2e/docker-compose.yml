@@ -59,6 +59,7 @@ services:
       - DOTNET_RUNNING_IN_DOCKER=1
       - DEBUG=pw:api
       - CI=true
+      - PLAYWRIGHT_ALWAYS_TRACE=${PLAYWRIGHT_ALWAYS_TRACE:-false}
       - NODE_TLS_REJECT_UNAUTHORIZED=0
 
 networks:

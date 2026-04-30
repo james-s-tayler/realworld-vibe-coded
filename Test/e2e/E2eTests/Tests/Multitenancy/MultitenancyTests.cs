@@ -11,6 +11,11 @@ public class MultitenancyTests : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "multitenancy-happy-001",
+    FeatureArea = "multitenancy",
+    Behavior = "Users from different tenants cannot see each other's profiles",
+    Verifies = ["Profile page shows 'was not found' for cross-tenant user"])]
   public async Task Users_AreIsolated_BetweenTenants()
   {
     // Arrange - create two separate tenants with users
@@ -30,6 +35,11 @@ public class MultitenancyTests : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "multitenancy-happy-002",
+    FeatureArea = "multitenancy",
+    Behavior = "Duplicate usernames are allowed across different tenants",
+    Verifies = ["Both tenants can use same username", "Profile pages show correct username for each tenant"])]
   public async Task DuplicateUsernames_AreAllowed_BetweenTenants()
   {
     // Arrange - create two separate tenants with users

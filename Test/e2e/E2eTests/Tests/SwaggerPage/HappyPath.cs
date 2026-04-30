@@ -10,6 +10,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "swagger-happy-001",
+    FeatureArea = "swagger",
+    Behavior = "Swagger API documentation page loads and displays API info",
+    Verifies = ["API info section is visible"])]
   public async Task SwaggerApiDocs_AreDisplayed()
   {
     // Arrange & Act

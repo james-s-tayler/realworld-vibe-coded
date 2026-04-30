@@ -12,6 +12,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-happy-001",
+    FeatureArea = "feed",
+    Behavior = "A newly created article appears in the global feed and can be clicked to view",
+    Verifies = ["article title is visible in global feed", "clicking article navigates to article page with correct title"])]
   public async Task CreatedArticle_AppearsInGlobalFeed()
   {
     // Arrange - create user and article via API
@@ -34,6 +39,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-happy-002",
+    FeatureArea = "feed",
+    Behavior = "Your Feed tab is selected by default for authenticated users on the home page",
+    Verifies = ["Your Feed tab is the active/selected tab"])]
   public async Task YourFeed_IsSelectedByDefaultForAuthenticatedUser()
   {
     // Arrange - create user and article via API
@@ -50,6 +60,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-happy-003",
+    FeatureArea = "feed",
+    Behavior = "Global feed pagination displays correctly and navigates between pages",
+    Verifies = ["initial page shows 20 articles", "pagination controls are visible", "navigating forward and back returns to first page with 20 articles", "backward button is disabled on first page"])]
   public async Task GlobalFeed_DisplaysPaginationAndNavigatesCorrectly()
   {
     // Arrange - create user and articles via API
@@ -77,6 +92,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-happy-004",
+    FeatureArea = "feed",
+    Behavior = "Your Feed shows articles from followed users within the same tenant",
+    Verifies = ["followed user's article is visible in Your Feed"])]
   public async Task YourFeed_ShowsArticlesFromFollowedUsers()
   {
     // Arrange - create two users IN THE SAME TENANT, article, and follow relationship via API
@@ -99,6 +119,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-happy-005",
+    FeatureArea = "feed",
+    Behavior = "Article tags appear in the article preview card on the global feed",
+    Verifies = ["both tags are visible in the article preview"])]
   public async Task Tags_AppearInArticlePreview_OnGlobalFeed()
   {
     // Arrange
@@ -119,6 +144,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-happy-006",
+    FeatureArea = "feed",
+    Behavior = "Article tags appear in the article preview card on Your Feed",
+    Verifies = ["both tags are visible in the article preview on Your Feed"])]
   public async Task Tags_AppearInArticlePreview_OnYourFeed()
   {
     // Arrange
@@ -142,6 +172,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-happy-007",
+    FeatureArea = "feed",
+    Behavior = "Tags from created articles appear in the sidebar popular tags section",
+    Verifies = ["tag is visible in the sidebar"])]
   public async Task CreatedArticleTags_AppearInSidebar_PopularTags()
   {
     // Arrange
@@ -158,6 +193,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-happy-008",
+    FeatureArea = "feed",
+    Behavior = "Clicking a sidebar tag filters the feed to show only articles with that tag",
+    Verifies = ["tag filter tab is visible", "article with the tag is visible in filtered results"])]
   public async Task UserCanFilterArticlesByTag()
   {
     // Arrange - create user and article with tag via API
@@ -180,6 +220,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-happy-009",
+    FeatureArea = "feed",
+    Behavior = "Global feed shows pagination even with fewer articles than one full page",
+    Verifies = ["articles are loaded", "pagination controls are visible"])]
   public async Task GlobalFeed_ShowsPaginationWithFewArticles()
   {
     // Arrange - create user and few articles via API
@@ -200,6 +245,11 @@ public class HappyPath : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "home-happy-010",
+    FeatureArea = "feed",
+    Behavior = "Your Feed pagination displays correctly and navigates between pages",
+    Verifies = ["first page shows 20 articles", "pagination controls are visible", "last page shows remaining 10 articles", "navigating back shows 20 articles again"])]
   public async Task YourFeed_DisplaysPaginationAndNavigatesCorrectly()
   {
     // Arrange

@@ -322,6 +322,361 @@ public partial class Build
     }
   }
 
+  internal Target TestEvalsGenerate => _ => _
+    .Description("Generate eval expectations from SPEC-REFERENCE.md using Claude")
+    .Executes(() =>
+    {
+      var specFile = RootDirectory / "SPEC-REFERENCE.md";
+      if (!specFile.FileExists())
+      {
+        throw new Exception($"Spec file not found: {specFile}. TestEvalsGenerate requires SPEC-REFERENCE.md at the repo root.");
+      }
+
+      ReportsTestEvalsDirectory.CreateDirectory();
+
+      var script = RootDirectory / "scripts" / "evals" / "generate-expectations.sh";
+      if (!script.FileExists())
+      {
+        throw new Exception($"Script not found: {script}");
+      }
+
+      Log.Information("Generating eval expectations from {SpecFile}", specFile);
+
+      var process = ProcessTasks.StartProcess(
+        "bash",
+        $"{script} --spec {specFile} --output {ReportsTestEvalsExpectationsFile}",
+        workingDirectory: RootDirectory,
+        logOutput: !Agent);
+      process.WaitForExit();
+
+      if (process.ExitCode != 0)
+      {
+        throw new Exception($"generate-expectations.sh failed with exit code {process.ExitCode}");
+      }
+
+      Log.Information("Expectations written to {File}", ReportsTestEvalsExpectationsFile);
+    });
+
+  internal Target TestEvalsMasterList => _ => _
+    .Description("Extract master test coverage list from [TestCoverage] attributes in E2E tests")
+    .Executes(() =>
+    {
+      var testsDir = RootDirectory / "Test" / "e2e" / "E2eTests" / "Tests";
+      if (!testsDir.DirectoryExists())
+      {
+        throw new Exception($"Tests directory not found: {testsDir}");
+      }
+
+      ReportsTestEvalsDirectory.CreateDirectory();
+      var masterListFile = ReportsTestEvalsDirectory / "master-list.json";
+
+      Log.Information("Extracting [TestCoverage] attributes from {TestsDir}", testsDir);
+
+      var tests = new List<Dictionary<string, object>>();
+      var testFiles = testsDir.GlobFiles("**/*.cs");
+
+      var attrPattern = new System.Text.RegularExpressions.Regex(
+        @"\[TestCoverage\(\s*" +
+        @"Id\s*=\s*""(?<id>[^""]+)""\s*,\s*" +
+        @"FeatureArea\s*=\s*""(?<area>[^""]+)""\s*,\s*" +
+        @"Behavior\s*=\s*""(?<behavior>[^""]+)""" +
+        @"(?:\s*,\s*Verifies\s*=\s*\[(?<verifies>[^\]]*)\])?" +
+        @"\s*\)\]",
+        System.Text.RegularExpressions.RegexOptions.Singleline);
+
+      var methodPattern = new System.Text.RegularExpressions.Regex(
+        @"public\s+async\s+Task\s+(?<name>\w+)\s*\(");
+
+      foreach (var file in testFiles)
+      {
+        var content = file.ReadAllText();
+        var relativePath = RootDirectory.GetRelativePathTo(file);
+
+        // Extract class namespace/name from file path
+        var pathParts = relativePath.ToString().Replace("\\", "/").Split('/');
+        var pageName = pathParts.Length >= 2 ? pathParts[^2] : "Unknown";
+        var fileName = file.NameWithoutExtension;
+        var category = fileName.ToLowerInvariant() switch
+        {
+          "happypath" => "happy_path",
+          "validation" => "validation",
+          "permissions" => "permissions",
+          "screenshots" => "screenshots",
+          _ => fileName.ToLowerInvariant(),
+        };
+
+        var attrMatches = attrPattern.Matches(content);
+        var methodMatches = methodPattern.Matches(content);
+
+        // Pair each [TestCoverage] with its following method name
+        foreach (System.Text.RegularExpressions.Match attrMatch in attrMatches)
+        {
+          var id = attrMatch.Groups["id"].Value;
+          var area = attrMatch.Groups["area"].Value;
+          var behavior = attrMatch.Groups["behavior"].Value;
+          var verifiesRaw = attrMatch.Groups["verifies"].Value;
+
+          // Parse Verifies array: ["item1", "item2"]
+          var verifies = new List<string>();
+          if (!string.IsNullOrWhiteSpace(verifiesRaw))
+          {
+            var verifyPattern = new System.Text.RegularExpressions.Regex(@"""([^""]+)""");
+            foreach (System.Text.RegularExpressions.Match v in verifyPattern.Matches(verifiesRaw))
+            {
+              verifies.Add(v.Groups[1].Value);
+            }
+          }
+
+          // Find the method name that follows this attribute
+          var methodName = "Unknown";
+          foreach (System.Text.RegularExpressions.Match methodMatch in methodMatches)
+          {
+            if (methodMatch.Index > attrMatch.Index)
+            {
+              methodName = methodMatch.Groups["name"].Value;
+              break;
+            }
+          }
+
+          tests.Add(new Dictionary<string, object>
+          {
+            ["id"] = id,
+            ["test_method"] = methodName,
+            ["file"] = relativePath.ToString(),
+            ["feature_area"] = area,
+            ["category"] = category,
+            ["behavior"] = behavior,
+            ["verifies"] = verifies,
+          });
+        }
+      }
+
+      // Build JSON output
+      var jsonOptions = new System.Text.Json.JsonSerializerOptions
+      {
+        WriteIndented = true,
+        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.SnakeCaseLower,
+      };
+
+      var masterList = new Dictionary<string, object>
+      {
+        ["generated_at"] = DateTime.UtcNow.ToString("o"),
+        ["source"] = testsDir.ToString(),
+        ["test_count"] = tests.Count,
+        ["by_feature"] = tests.GroupBy(t => (string)t["feature_area"])
+          .ToDictionary(g => g.Key, g => g.Count()),
+        ["by_category"] = tests.GroupBy(t => (string)t["category"])
+          .ToDictionary(g => g.Key, g => g.Count()),
+        ["tests"] = tests,
+      };
+
+      var json = System.Text.Json.JsonSerializer.Serialize(masterList, jsonOptions);
+      masterListFile.WriteAllText(json);
+
+      Log.Information("Extracted {Count} test coverage entries to {File}", tests.Count, masterListFile);
+
+      if (tests.Count == 0)
+      {
+        throw new Exception(
+          "No [TestCoverage] attributes found. Ensure all [Fact] test methods have " +
+          "[TestCoverage] attributes (enforced by E2E008 analyzer).");
+      }
+    });
+
+  internal Target TestEvalsCoverage => _ => _
+    .Description("Assert generated expectations cover all tests in the master list")
+    .Executes(() =>
+    {
+      var masterListFile = ReportsTestEvalsDirectory / "master-list.json";
+      if (!masterListFile.FileExists())
+      {
+        throw new Exception(
+          $"Master list not found: {masterListFile}. " +
+          "Run ./build.sh TestEvalsMasterList first.");
+      }
+
+      if (!ReportsTestEvalsExpectationsFile.FileExists())
+      {
+        throw new Exception(
+          $"Expectations file not found: {ReportsTestEvalsExpectationsFile}. " +
+          "Run ./build.sh TestEvalsGenerate first.");
+      }
+
+      var script = RootDirectory / "scripts" / "evals" / "eval-coverage.sh";
+      if (!script.FileExists())
+      {
+        throw new Exception($"Script not found: {script}");
+      }
+
+      var coverageReportFile = ReportsTestEvalsDirectory / "coverage-report.json";
+
+      Log.Information("Comparing expectations against master list");
+
+      var process = ProcessTasks.StartProcess(
+        "bash",
+        $"{script} {masterListFile} {ReportsTestEvalsExpectationsFile} --output {coverageReportFile}",
+        workingDirectory: RootDirectory,
+        logOutput: true);
+      process.WaitForExit();
+
+      if (coverageReportFile.FileExists())
+      {
+        var reportContent = coverageReportFile.ReadAllText();
+        var doc = System.Text.Json.JsonDocument.Parse(reportContent);
+        var score = doc.RootElement.GetProperty("score").GetProperty("coverage").GetDouble();
+        var missing = doc.RootElement.GetProperty("summary").GetProperty("missing").GetInt32();
+
+        Log.Information("Coverage score: {Score}/100", score);
+
+        if (missing > 0)
+        {
+          Log.Error("{Missing} test cases from the master list are not covered by generated expectations", missing);
+          Log.Error("See {File} for details", coverageReportFile);
+        }
+      }
+
+      if (process.ExitCode != 0)
+      {
+        throw new Exception(
+          $"Coverage check failed — generated expectations do not fully cover the master test list. " +
+          $"See {coverageReportFile} for gaps.");
+      }
+
+      Log.Information("All master list tests are covered by generated expectations");
+    });
+
+  internal Target TestEvals => _ => _
+    .Description("Run E2E tests with tracing enabled, then grade traces against spec expectations")
+    .DependsOn(BuildServerPublish)
+    .DependsOn(InstallDotnetToolLiquidReports)
+    .DependsOn(PathsCleanDirectories)
+    .Executes(() =>
+    {
+      // Ensure expectations exist
+      if (!ReportsTestEvalsExpectationsFile.FileExists())
+      {
+        throw new Exception(
+          $"Expectations file not found: {ReportsTestEvalsExpectationsFile}. " +
+          "Run ./build.sh TestEvalsGenerate first to generate expectations from the spec.");
+      }
+
+      // Step 1: Run E2E tests with always-on tracing
+      Log.Information("Running E2E tests with PLAYWRIGHT_ALWAYS_TRACE=true");
+
+      var composeFiles = SkipPublish
+        ? "-f Test/e2e/docker-compose.yml -f Test/e2e/docker-compose.ci.yml"
+        : "-f Test/e2e/docker-compose.yml";
+      var upArgs = SkipPublish
+        ? $"compose {composeFiles} up --no-build --abort-on-container-exit"
+        : $"compose {composeFiles} up --build --abort-on-container-exit";
+      var downArgs = $"compose {composeFiles} down";
+
+      int exitCode = 0;
+      try
+      {
+        var envVars = new Dictionary<string, string>(GetWorktreeEnvVars())
+        {
+          ["DOCKER_BUILDKIT"] = "1",
+          ["PLAYWRIGHT_ALWAYS_TRACE"] = "true",
+        };
+
+        var process = ProcessTasks.StartProcess(
+          "docker",
+          upArgs,
+          workingDirectory: RootDirectory,
+          environmentVariables: envVars,
+          logOutput: !Agent);
+        process.WaitForExit();
+        exitCode = process.ExitCode;
+
+        var apiExitCode = GetServiceExitCode(composeFiles, "api");
+        if (apiExitCode > 0 && exitCode == 0)
+        {
+          Log.Error("API container crashed with exit code {ApiExitCode} but Docker Compose reported success", apiExitCode);
+          exitCode = apiExitCode;
+        }
+      }
+      finally
+      {
+        var downEnvVars = GetWorktreeEnvVars();
+        var downProcess = ProcessTasks.StartProcess(
+          "docker",
+          downArgs,
+          workingDirectory: RootDirectory,
+          environmentVariables: downEnvVars,
+          logOutput: !Agent);
+
+        // Generate test report while compose tears down
+        var reportFile = ReportsTestE2eArtifactsDirectory / "Report.md";
+        try
+        {
+          Liquid(
+            $"--inputs \"File=*.trx;Folder={ReportsTestE2eResultsDirectory}\" --output-file {reportFile} --title \"nuke {nameof(TestEvals)} E2E Results\"");
+
+          var reportSummaryFile = ReportsTestE2eArtifactsDirectory / "ReportSummary.md";
+          ExtractReportSummary(reportFile, reportSummaryFile);
+
+          if (Agent)
+          {
+            PrintReportSummary(reportSummaryFile);
+          }
+        }
+        catch (Exception ex)
+        {
+          Log.Warning("Failed to generate LiquidTestReport: {Message}", ex.Message);
+        }
+
+        downProcess.WaitForExit();
+      }
+
+      if (exitCode != 0)
+      {
+        Log.Warning("E2E tests exited with code {ExitCode} — continuing to grade available traces", exitCode);
+      }
+
+      // Step 2: Grade traces against expectations
+      var tracesDir = ReportsTestE2eArtifactsDirectory;
+      var traceFiles = tracesDir.GlobFiles("*_trace_*.zip");
+
+      if (traceFiles.Count == 0)
+      {
+        Log.Warning("No trace files found in {Dir}. Ensure PLAYWRIGHT_ALWAYS_TRACE is being passed through docker-compose.", tracesDir);
+        throw new Exception("No trace files produced — eval grading cannot proceed.");
+      }
+
+      Log.Information("Found {Count} trace files to grade", traceFiles.Count);
+
+      var evalScript = RootDirectory / "scripts" / "evals" / "eval-traces.sh";
+      if (!evalScript.FileExists())
+      {
+        throw new Exception($"Script not found: {evalScript}");
+      }
+
+      var evalProcess = ProcessTasks.StartProcess(
+        "bash",
+        $"{evalScript} {tracesDir} {ReportsTestEvalsExpectationsFile} --output {ReportsTestEvalsResultsDirectory}",
+        workingDirectory: RootDirectory,
+        logOutput: true);
+      evalProcess.WaitForExit();
+
+      // Read and display eval report
+      var evalReportFile = ReportsTestEvalsResultsDirectory / "eval-report.json";
+      if (evalReportFile.FileExists())
+      {
+        var reportContent = evalReportFile.ReadAllText();
+        var score = System.Text.Json.JsonDocument.Parse(reportContent)
+          .RootElement.GetProperty("score").GetProperty("composite").GetDouble();
+
+        Log.Information("Eval score: {Score}/100", score);
+        Log.Information("Full eval report: {File}", evalReportFile);
+      }
+
+      if (evalProcess.ExitCode != 0)
+      {
+        throw new Exception($"eval-traces.sh failed with exit code {evalProcess.ExitCode}");
+      }
+    });
+
   private int GetServiceExitCode(string composeFiles, string serviceName)
   {
     try

@@ -1,4 +1,4 @@
-﻿namespace E2eTests.Tests.LoginPage;
+namespace E2eTests.Tests.LoginPage;
 
 /// <summary>
 /// Permission tests for the Login page (/login).
@@ -10,6 +10,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "auth-permissions-001",
+    FeatureArea = "auth",
+    Behavior = "Unauthenticated user accessing editor is redirected to login",
+    Verifies = ["URL changes to /login"])]
   public async Task EditorPage_RedirectToLogin_WhenNotAuthenticated()
   {
     // Arrange
@@ -20,6 +25,11 @@ public class Permissions : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "auth-permissions-002",
+    FeatureArea = "auth",
+    Behavior = "Unauthenticated user accessing settings is redirected to login",
+    Verifies = ["URL changes to /login"])]
   public async Task SettingsPage_RedirectToLogin_WhenNotAuthenticated()
   {
     // Arrange

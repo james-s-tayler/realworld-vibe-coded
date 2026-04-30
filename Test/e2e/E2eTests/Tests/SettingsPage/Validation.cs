@@ -10,6 +10,11 @@ public class Validation : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "settings-validation-001",
+    FeatureArea = "settings",
+    Behavior = "Updating username to a duplicate shows error message",
+    Verifies = ["Error message contains 'Username already exists'"])]
   public async Task UpdateSettings_WithDuplicateUsername_DisplaysErrorMessage()
   {
     // Arrange - create two users in the same tenant
@@ -29,6 +34,11 @@ public class Validation : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "settings-validation-002",
+    FeatureArea = "settings",
+    Behavior = "Updating email to a duplicate shows error message",
+    Verifies = ["Error message contains 'Email already exists'"])]
   public async Task UpdateSettings_WithDuplicateEmail_DisplaysErrorMessage()
   {
     // Arrange - create two users in the same tenant

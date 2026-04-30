@@ -158,7 +158,7 @@ public partial class Build
 
   internal Target LintAllVerify => _ => _
       .Description("Verify all C# code formatting & analyzers (no changes). Fails if issues found")
-      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintClaudeMdVerify, LintClaudeRulesVerify, LintApiClientVerify, LintAppSettingsVerify)
+      .DependsOn(LintClientVerify, LintServerVerify, LintNukeVerify, LintClaudeMdVerify, LintClaudeRulesVerify, LintApiClientVerify, LintAppSettingsVerify, LintSpecVerify)
       .Executes(() =>
       {
         var e2eTestProject = RootDirectory / "Test" / "e2e" / "E2eTests" / "E2eTests.csproj";
@@ -257,5 +257,34 @@ public partial class Build
         }
 
         Log.Information("✓ All {Count} rules files are within the {MaxLines}-line limit", files.Count, maxLines);
+      });
+
+  internal Target LintSpecVerify => _ => _
+      .Description("Verify SPEC-REFERENCE.md has all required sections for complete eval coverage")
+      .Executes(() =>
+      {
+        var specFile = RootDirectory / "SPEC-REFERENCE.md";
+        if (!specFile.FileExists())
+        {
+          throw new Exception($"Spec file not found: {specFile}");
+        }
+
+        var script = RootDirectory / "scripts" / "evals" / "lint-spec.sh";
+        if (!script.FileExists())
+        {
+          throw new Exception($"Lint script not found: {script}");
+        }
+
+        Log.Information("Linting spec: {File}", specFile);
+
+        var process = ProcessTasks.StartProcess(
+          "bash",
+          $"{script} --spec {specFile}",
+          workingDirectory: RootDirectory,
+          logOutput: true);
+
+        process.AssertZeroExitCode();
+
+        Log.Information("✓ Spec passes structural completeness checks");
       });
 }

@@ -10,6 +10,11 @@ public class Screenshots : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-screenshots-001",
+    FeatureArea = "users",
+    Behavior = "Users page renders correctly with multiple users and no horizontal overflow",
+    Verifies = ["Table headers visible", "User rows visible", "Screenshot width within viewport"])]
   public async Task UsersPageWithMultipleUsers()
   {
     // Arrange - create one user and invite two others to same tenant
@@ -43,6 +48,11 @@ public class Screenshots : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-screenshots-002",
+    FeatureArea = "users",
+    Behavior = "Users page with pagination renders correctly and no horizontal overflow",
+    Verifies = ["Pagination visible", "Screenshot width within viewport"])]
   public async Task UsersPageWithPagination()
   {
     // Arrange - create admin and invite a user
@@ -62,6 +72,11 @@ public class Screenshots : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-screenshots-003",
+    FeatureArea = "users",
+    Behavior = "Users page with deactivated user renders correctly",
+    Verifies = ["Deactivated status tag visible", "Screenshot width within viewport"])]
   public async Task UsersPageWithDeactivatedUser()
   {
     // Arrange - create admin, invite user, then deactivate them
@@ -83,6 +98,11 @@ public class Screenshots : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "users-screenshots-004",
+    FeatureArea = "users",
+    Behavior = "Edit roles modal renders correctly when open",
+    Verifies = ["Screenshot width within viewport"])]
   public async Task EditRolesModalOpen()
   {
     // Arrange

@@ -10,6 +10,11 @@ public class Validation : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "register-validation-001",
+    FeatureArea = "auth",
+    Behavior = "Registration with duplicate email shows error message",
+    Verifies = ["Error message contains 'already been registered with that email'"])]
   public async Task Register_WithDuplicateEmail_DisplaysErrorMessage()
   {
     // Arrange
@@ -27,6 +32,11 @@ public class Validation : AppPageTest
   }
 
   [Fact]
+  [TestCoverage(
+    Id = "register-validation-002",
+    FeatureArea = "auth",
+    Behavior = "Registration with duplicate username shows error message",
+    Verifies = ["Error message contains 'already been registered with that email'"])]
   public async Task Register_WithDuplicateUsername_DisplaysErrorMessage()
   {
     // Arrange

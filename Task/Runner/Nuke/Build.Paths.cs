@@ -87,6 +87,12 @@ public partial class Build
 
   internal AbsolutePath ReportsTestE2eArtifactsDirectory => RootDirectory / "Reports" / "Test" / "e2e" / "Artifacts";
 
+  internal AbsolutePath ReportsTestEvalsDirectory => RootDirectory / "Reports" / "Test" / "Evals";
+
+  internal AbsolutePath ReportsTestEvalsExpectationsFile => ReportsTestEvalsDirectory / "expectations.json";
+
+  internal AbsolutePath ReportsTestEvalsResultsDirectory => ReportsTestEvalsDirectory / "Results";
+
   #endregion
 
   #region Logs
@@ -131,6 +137,9 @@ public partial class Build
       LogsTestE2eSerilogDirectory.CreateOrCleanDirectory();
       LogsTestServerSerilogDirectory.CreateOrCleanDirectory();
       LogsTestServerAuditDotNetDirectory.CreateOrCleanDirectory();
+
+      // Create Evals results directory (but NOT expectations — those are expensive to regenerate)
+      ReportsTestEvalsResultsDirectory.CreateOrCleanDirectory();
 
       Log.Information("✓ Directories cleaned and pre-created");
     });
